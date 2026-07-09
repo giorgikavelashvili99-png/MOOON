@@ -956,6 +956,25 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     setTimeout(() => copyNote.classList.remove('active'), 4000);
   }
 
+  // Tries to launch a native app via custom URI scheme. If the tab doesn't lose
+  // focus within the timeout (meaning no app intercepted the navigation), it runs
+  // the fallback instead. This avoids "always jumping to a bare webpage" when the
+  // app IS installed, and avoids "silently doing nothing" when it isn't.
+  function openNativeWithFallback(nativeUrl, fallback){
+    let handled = false;
+    const onBlur = () => { handled = true; };
+    window.addEventListener('blur', onBlur, { once: true });
+    window.addEventListener('visibilitychange', onBlur, { once: true });
+
+    window.location.href = nativeUrl;
+
+    setTimeout(() => {
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('visibilitychange', onBlur);
+      if (!handled) fallback();
+    }, 1200);
+  }
+
   document.getElementById('orderBtnWA').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
@@ -966,25 +985,35 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   document.getElementById('orderBtnTG').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
-    // Telegram's official "share" endpoint pre-fills the message text itself —
-    // it opens Telegram's own contact/chat picker with the text already typed in,
-    // so the user just taps the MOON chat once and hits send. Works on both the
-    // app (deep link intercepted) and desktop (opens web.telegram.org).
-    const url = `https://t.me/share/url?url=&text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-    copyToClipboard(message); // safety-net copy in case a picker step is skipped
-    flashCopyNote('✓ Telegram გაიხსნა შევსებული ტექსტით — აირჩიე MOON-ის ჩატი და გააგზავნე');
+    copyToClipboard(message); // always-on safety net
+    flashCopyNote('⏳ ვცდილობთ Telegram აპის გახსნას…');
+
+    openNativeWithFallback(
+      `tg://msg_url?url=&text=${encodeURIComponent(message)}`,
+      () => {
+        // Telegram app didn't intercept (not installed / desktop without handler) —
+        // fall back to the web share picker, which still pre-fills the text.
+        window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(message)}`, '_blank');
+        flashCopyNote('✓ Telegram Web გაიხსნა შევსებული ტექსტით — აირჩიე MOON-ის ჩატი');
+      }
+    );
   });
 
   document.getElementById('orderBtnViber').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
-    // Viber's "forward" scheme is the equivalent of Telegram's share endpoint —
-    // it opens Viber's own contact picker with the text pre-filled, so the user
-    // just taps the MOON contact once. Requires the Viber app (desktop or mobile).
-    window.location.href = `viber://forward?text=${encodeURIComponent(message)}`;
-    copyToClipboard(message); // safety-net copy in case the app isn't installed
-    flashCopyNote('✓ Viber გაიხსნა შევსებული ტექსტით — აირჩიე MOON-ის კონტაქტი და გააგზავნე');
+    copyToClipboard(message); // always-on safety net
+    flashCopyNote('⏳ ვცდილობთ Viber აპის გახსნას…');
+
+    openNativeWithFallback(
+      `viber://forward?text=${encodeURIComponent(message)}`,
+      () => {
+        // Viber has no reliable web fallback — the text is already copied,
+        // so guide the user to open the app manually and paste it in.
+        flashCopyNote('✓ ტექსტი დაკოპირდა — Viber ვერ გაიხსნა ავტომატურად (შესაძლოა არ არის დაინსტალირებული). გახსენით Viber ხელით და ჩასვით ტექსტი MOON-ის ჩატში.');
+      }
+    );
+
   });
 
   // ============================================================
