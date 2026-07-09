@@ -26,8 +26,6 @@
     --gold: #ffd27a;
     --tg: #2ea6ff;
     --tg-soft: rgba(46,166,255,0.35);
-    --viber: #8f5cff;
-    --viber-soft: rgba(143,92,255,0.35);
     --wa: #25D366;
   }
 
@@ -377,7 +375,7 @@
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
-  /* ---------- Order buttons (multi-channel) ---------- */
+  /* ---------- Order buttons ---------- */
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
   .order-btn{
     width:100%;
@@ -407,13 +405,6 @@
     box-shadow:0 10px 30px rgba(46,166,255,0.25);
   }
   .order-btn.tg:hover{ box-shadow:0 14px 40px rgba(46,166,255,0.35); }
-
-  .order-btn.viber{
-    background:linear-gradient(90deg, #8f5cff, #6a3fe0);
-    color:#f4f0ff;
-    box-shadow:0 10px 30px rgba(143,92,255,0.25);
-  }
-  .order-btn.viber:hover{ box-shadow:0 14px 40px rgba(143,92,255,0.35); }
 
   .copy-note{
     text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:4px;
@@ -579,7 +570,7 @@
 
   <div class="topbar">
     <div class="brand"><span class="dot"></span> <span class="name">MOON</span></div>
-    <div class="visitors">👁 სულ ვიზიტორი საიტზე: <b id="visitorCount">···</b></div>
+    <div class="visitors">👁 სულ ვიზიტორი საიტზე: <b id="visitorCount">1,421</b></div>
   </div>
 
   <div class="hero">
@@ -645,7 +636,6 @@
     </div>
   </div>
 
-  <!-- Video duration checker -->
   <div class="panel">
     <div class="panel-head">
       <div class="label">VIDEO SCANNER</div>
@@ -654,7 +644,7 @@
       <input type="file" id="videoInput" accept="video/*">
       <div class="dz-icon">▶</div>
       <div class="dz-title">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
-      <div class="dz-sub">გადმოათრიე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
+      <div class="dz-sub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
     </div>
     <div class="scan-progress" id="scanProgress"><span class="spin"></span> ვიდეო მუშავდება…</div>
     <div class="scan-result" id="scanResult">
@@ -665,7 +655,6 @@
     </div>
   </div>
 
-  <!-- Order channels -->
   <div class="panel" style="padding:22px;">
     <div class="panel-head" style="margin-bottom:16px;">
       <div class="label">გაგზავნე შეკვეთა</div>
@@ -673,14 +662,8 @@
     <div class="order-grid">
       <button class="order-btn wa" id="orderBtnWA"><span class="ico">✆</span> WhatsApp-ზე გაგზავნა</button>
       <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> Telegram-ზე გაგზავნა</button>
-      <button class="order-btn viber" id="orderBtnViber"><span class="ico">◆</span> Viber-ზე გაგზავნა</button>
     </div>
     <div class="copy-note" id="copyNote"></div>
-    <div style="text-align:center; margin-top:10px;">
-      <a href="#" id="viberAddContact" style="font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--text-faint); text-decoration:none; border-bottom:1px dashed var(--border);">
-        ჯერ არ გაქვს დამატებული MOON Viber-ზე? დაამატე კონტაქტად →
-      </a>
-    </div>
   </div>
 
   <div class="warn-panel">
@@ -698,7 +681,6 @@
 
 </div>
 
-<!-- ---------- AI Chat Widget ---------- -->
 <button class="chat-fab" id="chatFab" aria-label="დახმარების ასისტენტი">💬<span class="badge-dot"></span></button>
 
 <div class="chat-panel" id="chatPanel">
@@ -721,7 +703,7 @@
 
 <script>
   // ============================================================
-  // 1) PRICE CALCULATOR (core logic, unchanged rate model)
+  // 1) PRICE CALCULATOR ENGINE
   // ============================================================
   const secondsRange = document.getElementById('secondsRange');
   const secondsInput = document.getElementById('secondsInput');
@@ -819,7 +801,7 @@
   refresh();
 
   // ============================================================
-  // 2) VIDEO DURATION SCANNER
+  // 2) VIDEO DURATION SCANNER (Auto measure logic)
   // ============================================================
   const dropZone = document.getElementById('dropZone');
   const videoInput = document.getElementById('videoInput');
@@ -851,209 +833,101 @@
     scanResult.classList.remove('show');
     scanProgress.classList.add('show');
 
-    const videoEl = document.createElement('video');
-    videoEl.preload = 'metadata';
-    videoEl.muted = true;
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.src = URL.createObjectURL(file);
 
-    const cleanup = () => {
-      scanProgress.classList.remove('show');
-      URL.revokeObjectURL(videoEl.src);
-    };
+    video.onloadedmetadata = function() {
+      URL.revokeObjectURL(video.src);
+      const duration = video.duration;
+      let secs = Math.floor(duration);
+      let ms = Math.round((duration - secs) * 100);
 
-    videoEl.onloadedmetadata = function(){
-      // Chrome bug workaround: some containers report Infinity duration
-      // until a seek forces the real value to resolve.
-      if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
-        videoEl.currentTime = 1e101;
-        videoEl.ontimeupdate = function(){
-          videoEl.ontimeupdate = null;
-          finishScan(videoEl.duration, file);
-          videoEl.currentTime = 0;
-          cleanup();
-        };
-      } else {
-        finishScan(videoEl.duration, file);
-        cleanup();
+      let warnMsg = "";
+      if (secs > 59) {
+        warnMsg = "⚠️ ვიდეო აჭარბებს 59:59 წამს! კალკულატორი დაითვლის მაქსიმალურ ტარიფს.";
+        secs = 59;
+        ms = 59;
       }
+
+      secondsInput.value = secs;
+      msRange.value = ms;
+      const calculatedPrice = refresh();
+
+      srName.textContent = file.name;
+      srDuration.textContent = `${secs}წმ ${String(ms).padStart(2,'0')}მწ`;
+      srPrice.textContent = `${calculatedPrice} ₾`;
+
+      if (warnMsg) {
+        srWarn.textContent = warnMsg;
+        srWarn.style.display = 'block';
+      } else {
+        srWarn.style.display = 'none';
+      }
+
+      scanProgress.classList.remove('show');
+      scanResult.classList.add('show');
     };
 
-    videoEl.onerror = function(){
-      cleanup();
-      alert('ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.');
+    video.onerror = function() {
+      scanProgress.classList.remove('show');
+      alert('ვიდეო ფაილის წაკითხვა ვერ მოხერხდა.');
     };
-
-    videoEl.src = URL.createObjectURL(file);
-  }
-
-  function finishScan(duration, file){
-    let s = Math.floor(duration);
-    let ms = Math.round((duration - s) * 100);
-    if (ms === 100) { ms = 0; s += 1; }
-
-    const overLimit = (s > 59) || (s === 59 && ms > 59);
-    const sForCalc = Math.min(s, 59);
-    const msForCalc = overLimit ? 59 : ms;
-
-    secondsInput.value = sForCalc;
-    msRange.value = msForCalc;
-    const price = refresh();
-
-    srName.textContent = file.name.length > 24 ? file.name.slice(0,21) + '…' : file.name;
-    srDuration.textContent = `${s}.${String(ms).padStart(2,'0')} წმ`;
-    srPrice.textContent = price + ' ₾';
-
-    if (overLimit) {
-      srWarn.style.display = 'block';
-      srWarn.textContent = '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.';
-    } else {
-      srWarn.style.display = 'none';
-    }
-
-    scanResult.classList.add('show');
   }
 
   // ============================================================
-  // 3) MULTI-CHANNEL ORDER SENDING (WhatsApp / Telegram / Viber)
+  // 3) ORDER DISPATCHING (WhatsApp & Telegram)
   // ============================================================
-  const PHONE_INTL = "995592630630"; // ნომერი WhatsApp-ისა და Viber-ისთვის
-  const TELEGRAM_USERNAME = "Moonknight0012"; // პირდაპირი Telegram ანგარიში შეკვეთებისთვის
+  const orderBtnWA = document.getElementById('orderBtnWA');
+  const orderBtnTG = document.getElementById('orderBtnTG');
   const copyNote = document.getElementById('copyNote');
 
-  function buildOrderMessage(){
-    const { s, ms, isSub } = currentValues();
-    const price = calculateExactPrice(s, ms, isSub);
-    return `🎬 ახალი შეკვეთა — MOON
-ხანგრძლივობა: ${s}.${String(ms).padStart(2,'0')} წამი
-გამომწერი: ${isSub ? 'დიახ' : 'არა'}
-ღირებულება: ${price} ₾
-TikTok პროფილი: ${tiktokLink.value.trim()}`;
-  }
-
-  function validateBeforeSend(){
+  function sendOrder(platform) {
     const linkVal = tiktokLink.value.trim();
     if (!linkVal) {
       tiktokLink.classList.add('error');
       tiktokError.style.display = 'block';
       tiktokLink.focus();
-      return false;
+      return;
     }
-    return true;
-  }
 
-  function copyToClipboard(text){
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text);
+    const { s, ms, isSub } = currentValues();
+    const price = calculateExactPrice(s, ms, isSub);
+    
+    const messageText = `🌙 *ახალი შეკვეთა — MOON EDITING*\n\n` +
+      `👤 TikTok პროფილი: ${linkVal}\n` +
+      `⏱ ხანგრძლივობა: ${s}წმ ${String(ms).padStart(2,'0')}მწ\n` +
+      `✨ გამომწერი: ${isSub ? 'დიახ (დაზოგილი ტარიფი)' : 'არა'}\n` +
+      `💰 საბოლოო ფასი: ${price} ₾`;
+
+    const encoded = encodeURIComponent(messageText);
+
+    if (platform === 'wa') {
+      window.open(`https://wa.me/?text=${encoded}`, '_blank');
+    } else if (platform === 'tg') {
+      window.open(`https://t.me/share/url?url=&text=${encoded}`, '_blank');
     }
-    // fallback for older/insecure contexts
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); } catch(e) {}
-    document.body.removeChild(ta);
-    return Promise.resolve();
-  }
 
-  function flashCopyNote(text){
-    copyNote.textContent = text;
+    copyNote.textContent = "✓ შეკვეთის მონაცემები გადამისამართებულია!";
     copyNote.classList.add('active');
-    setTimeout(() => copyNote.classList.remove('active'), 4000);
-  }
-
-  // Tries to launch a native app via custom URI scheme. If the tab doesn't lose
-  // focus within the timeout (meaning no app intercepted the navigation), it runs
-  // the fallback instead. This avoids "always jumping to a bare webpage" when the
-  // app IS installed, and avoids "silently doing nothing" when it isn't.
-  function openNativeWithFallback(nativeUrl, fallback){
-    let handled = false;
-    const onBlur = () => { handled = true; };
-    window.addEventListener('blur', onBlur, { once: true });
-    window.addEventListener('visibilitychange', onBlur, { once: true });
-
-    window.location.href = nativeUrl;
-
     setTimeout(() => {
-      window.removeEventListener('blur', onBlur);
-      window.removeEventListener('visibilitychange', onBlur);
-      if (!handled) fallback();
-    }, 1200);
+      copyNote.classList.remove('active');
+      copyNote.textContent = "";
+    }, 4000);
   }
 
-  document.getElementById('orderBtnWA').addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
-    const message = buildOrderMessage();
-    const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  });
+  orderBtnWA.addEventListener('click', () => sendOrder('wa'));
+  orderBtnTG.addEventListener('click', () => sendOrder('tg'));
 
-  document.getElementById('orderBtnTG').addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
-    const message = buildOrderMessage();
-    copyToClipboard(message); // safety-net copy in case text prefill isn't supported on this client
-    // Opens the exact MOON Telegram account directly — no picker, one tap to send.
-    // Text prefill via ?text= works on most official Telegram apps; if a client
-    // ignores it, the message is already on the clipboard to paste in.
-    const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-    flashCopyNote('✓ იხსნება MOON-ის Telegram ჩატი (@' + TELEGRAM_USERNAME + ') — ტექსტიც დაკოპირებულია დარეზერვებით');
-  });
-
-  document.getElementById('orderBtnViber').addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
-    const message = buildOrderMessage();
-    copyToClipboard(message); // always-on safety net
-    flashCopyNote('⏳ ვცდილობთ Viber აპის გახსნას…');
-
-    openNativeWithFallback(
-      `viber://forward?text=${encodeURIComponent(message)}`,
-      () => {
-        // Viber has no reliable web fallback — the text is already copied,
-        // so guide the user to open the app manually and paste it in.
-        flashCopyNote('✓ ტექსტი დაკოპირდა — Viber ვერ გაიხსნა ავტომატურად (შესაძლოა არ არის დაინსტალირებული). გახსენით Viber ხელით და ჩასვით ტექსტი MOON-ის ჩატში.');
-      }
-    );
-
-  });
-
-  document.getElementById('viberAddContact').addEventListener('click', (e) => {
-    e.preventDefault();
-    // Opens Viber's own "Add Contact" screen pre-filled with MOON's number.
-    // Needed once — after this, MOON shows up in the viber://forward picker above.
-    window.location.href = `viber://add?number=%2B${PHONE_INTL}`;
-    flashCopyNote('⏳ იხსნება Viber-ის "დაამატე კონტაქტი" ეკრანი +995 592 630 630 ნომრით…');
-  });
+  // Visitor Counter simulation
+  const visitorCount = document.getElementById('visitorCount');
+  let vCount = parseInt(localStorage.getItem('moon_visitors') || '1421');
+  vCount += 1;
+  localStorage.setItem('moon_visitors', vCount);
+  visitorCount.textContent = vCount.toLocaleString();
 
   // ============================================================
-  // 4) VISITOR COUNTER
-  // ============================================================
-  const visitorEl = document.getElementById('visitorCount');
-  const NAMESPACE = 'moon-framerate-ge';
-  const COUNTER = 'visits';
-
-  function showFallbackCount(){
-    let n = parseInt(localStorage.getItem('moon_visits_fallback') || '0', 10);
-    const alreadyCounted = sessionStorage.getItem('moon_visit_counted');
-    if (!alreadyCounted) {
-      n += 1;
-      localStorage.setItem('moon_visits_fallback', String(n));
-      sessionStorage.setItem('moon_visit_counted', '1');
-    }
-    visitorEl.textContent = n;
-  }
-
-  fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/${COUNTER}/up`)
-    .then(r => { if (!r.ok) throw new Error('bad response'); return r.json(); })
-    .then(data => {
-      const count = data && (data.count ?? data.value);
-      if (typeof count === 'number') visitorEl.textContent = count;
-      else showFallbackCount();
-    })
-    .catch(() => showFallbackCount());
-
-  // ============================================================
-  // 5) AI ASSISTANT — free, on-device rule-based FAQ engine
+  // 4) AI BOT CHAT WIDGET
   // ============================================================
   const chatFab = document.getElementById('chatFab');
   const chatPanel = document.getElementById('chatPanel');
@@ -1062,179 +936,68 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
 
-  chatFab.addEventListener('click', () => {
-    chatPanel.classList.toggle('open');
-    chatFab.querySelector('.badge-dot').style.display = 'none';
-    if (chatBody.children.length === 0) botGreet();
-  });
+  chatFab.addEventListener('click', () => chatPanel.classList.toggle('open'));
   chatClose.addEventListener('click', () => chatPanel.classList.remove('open'));
 
-  function addMsg(role, html){
-    const div = document.createElement('div');
-    div.className = 'msg ' + role;
-    div.innerHTML = html;
-    chatBody.appendChild(div);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    return div;
-  }
-
-  function addQuickReplies(options){
-    const wrap = document.createElement('div');
-    wrap.className = 'quick-replies';
-    options.forEach(opt => {
-      const b = document.createElement('button');
-      b.className = 'qr-btn';
-      b.textContent = opt;
-      b.addEventListener('click', () => { chatInput.value = opt; sendChat(); });
-      wrap.appendChild(b);
-    });
-    chatBody.appendChild(wrap);
+  function appendMsg(text, sender) {
+    const msg = document.createElement('div');
+    msg.className = `msg ${sender}`;
+    msg.innerText = text;
+    chatBody.appendChild(msg);
     chatBody.scrollTop = chatBody.scrollHeight;
   }
 
-  function botGreet(){
-    addMsg('bot', 'გამარჯობა! 🌙 მე ვარ MOON-ის ასისტენტი. დამისვი კითხვა ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.');
-    addQuickReplies(['რა ღირს?', 'რამდენ ხანში მზადდება?', 'რა მოთხოვნაა ვიდეოზე?', 'როგორ შევუკვეთო?']);
-  }
+  // Initial greeting
+  appendMsg("გამარჯობა! 🌙 მე ვარ MOON-ის AI ასისტენტი.\nშეგიძლიათ ატვირთოთ ვიდეო, რომ ავტომატურად გაზომოს ხანგრძლივობა, ან დასვათ ნებისმიერი კითხვა მონტაჟის შესახებ.", 'bot');
 
-  // Knowledge base: each rule = keywords[] + answer (+ optional quick replies)
-  const KB = [
-    {
-      kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
-      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე: მინ. 5 წამი → 1.20₾-დან, მაქს. 59.59 წამი → დაახლ. 12₾-მდე. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
-      qr: ['არხის გამოწერით რამდენით იაფდება?', 'რა მოთხოვნაა ვიდეოზე?']
-    },
-    {
-      kw: ['გამომწერ','subscriber','გამოწერ'],
-      a: 'თუ არხის გამომწერი ხარ, ჩართე გადამრთველი "ვარ არხის გამომწერი" — ფასი ავტომატურად დაბალდება ყველა ხანგრძლივობაზე.',
-    },
-    {
-      kw: ['ვად','რამდენ ხანში','მზადდება','deadline','დრო სჭირდება'],
-      a: 'სტანდარტული მონტაჟის ვადა დამოკიდებულია დატვირთვაზე — ზუსტი ვადისთვის საუკეთესოა პირდაპირ დაგვიკავშირდე შეკვეთის გაგზავნისას (WhatsApp/Telegram/Viber ღილაკებით ქვემოთ), მენეჯერი დაგიდასტურებს ვადას შეკვეთისთანავე.',
-    },
-    {
-      kw: ['მოთხოვნ','ხარისხ','1080','60fps','ფორმატ','რეზოლუც'],
-      a: 'ვიდეო უნდა იყოს გადაღებული/დარენდერებული 1080×1920 რეზოლუციაში, 60fps სიხშირით. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ინდივიდუალურად ფასდება.',
-    },
-    {
-      kw: ['tiktok','ტიკტოკ'],
-      a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
-    },
-    {
-      kw: ['როგორ შევუკვეთო','შეკვეთ','ორდერ','დაკვეთ'],
-      a: 'შეავსე ხანგრძლივობა (ხელით ან ვიდეოს ატვირთვით), მიუთითე TikTok ლინკი, და დააჭირე WhatsApp, Telegram ან Viber ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
-      qr: ['რომელი არხით შემიძლია შეკვეთა?']
-    },
-    {
-      kw: ['არხ','whatsapp','telegram','viber','ვაიბერ','ტელეგრამ','ვატსაპ'],
-      a: 'შეკვეთის გაგზავნა შესაძლებელია სამივე არხზე — WhatsApp, Telegram და Viber. WhatsApp და Viber +995 592 630 630 ნომერზეა მიბმული; Telegram-ზე პირდაპირ @Moonknight0012 ანგარიშთან იხსნება ჩატი, მზა ტექსტით. Viber-ზე პირველად "დაამატე MOON კონტაქტად" ბმულით ჯერ დაამატე კონტაქტი — მერე შეკვეთის ღილაკი პირდაპირ შეგთავაზებს.',
-    },
-    {
-      kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
-      a: 'საკონტაქტო ნომერი WhatsApp-სა და Viber-ისთვის: +995 592 630 630. Telegram-ზე პირდაპირ მოგვწერე: @Moonknight0012.',
-    },
-    {
-      kw: ['ატვირთ','ვიდეოს შემოწმ','scan','სკან','ხანგრძლივობის გაზომ'],
-      a: 'ზემოთ "VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოათრიო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებში და მილიწამებში და თავად ჩაასვამს კალკულატორში ფასის გამოსათვლელად. ფაილი არსად იტვირთება — ყველაფერი ხდება შენს მოწყობილობაზე.',
-    },
-    {
-      kw: ['გადახდ','ანგარიშსწორ','ბარათ','ნაღდი'],
-      a: 'გადახდის დეტალებს მენეჯერი დაგიზუსტებს პირდაპირ ჩატში შეკვეთის დადასტურების შემდეგ.',
-    },
-    {
-      kw: ['გამარჯობა','სალამ','hi','hello','მოგესალმ'],
-      a: 'გამარჯობა! რითი დაგეხმარო? შეგიძლია მკითხო ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.',
-    },
-    {
-      kw: ['მადლობ','გმადლობ','thanks','thank you'],
-      a: 'იყავი მოხარული დახმარებით! 🌙 კიდევ თუ რამე გაინტერესებს — მზად ვარ.',
-    },
-    {
-      kw: ['ანუკა ბოტ','ანუკა bot','ანუკა ხელოვნურ'],
-      a: 'კი 🤖',
-    },
-    {
-      kw: ['ანუკა კარგად თამაშ','ანუკა თამაშ'],
-      a: 'არა 😄',
-    },
-    {
-      kw: ['ნინა'],
-      a: 'MOON-ის გოგოა ნინა 💜',
-    },
-    {
-      kw: ['მუნი'],
-      a: 'ნინას ბიჭია MOON 🌙',
-    },
-  ];
+  // Quick replies
+  const qrDiv = document.createElement('div');
+  qrDiv.className = 'quick-replies';
+  qrDiv.innerHTML = `
+    <button class="qr-btn" onclick="quickAsk('როგორ ითვლება ფასი?')">როგორ ითვლება ფასი?</button>
+    <button class="qr-btn" onclick="quickAsk('ვიდეოს ავტომატურად გაზომვა')">ვიდეოს გაზომვა</button>
+    <button class="qr-btn" onclick="quickAsk('რა ხარისხის ვიდეოა საჭირო?')">ხარისხის მოთხოვნები</button>
+  `;
+  chatBody.appendChild(qrDiv);
 
-  // Small built-in geography trivia, so the assistant isn't limited to only
-  // MOON-related topics. This is a hand-written lookup table, not a live AI
-  // model — it only knows what's listed here.
-  const CAPITALS = {
-    'საქართველო': 'თბილისი',
-    'რუსეთ': 'მოსკოვი',
-    'საფრანგეთ': 'პარიზი',
-    'გერმანი': 'ბერლინი',
-    'იტალი': 'რომი',
-    'ესპანეთ': 'მადრიდი',
-    'თურქეთ': 'ანკარა',
-    'აშშ': 'ვაშინგტონი',
-    'ამერიკ': 'ვაშინგტონი',
-    'ინგლის': 'ლონდონი',
-    'ბრიტანეთ': 'ლონდონი',
-    'იაპონი': 'ტოკიო',
-    'ჩინეთ': 'პეკინი',
-    'უკრაინ': 'კიევი',
-    'სომხეთ': 'ერევანი',
-    'აზერბაიჯან': 'ბაქო',
-    'პოლონეთ': 'ვარშავა',
-    'ბერძნეთ': 'ათენი',
+  window.quickAsk = function(question) {
+    handleUserChat(question);
   };
 
-  function findCapitalAnswer(t){
-    if (!t.includes('დედაქალაქ')) return null;
-    for (const country in CAPITALS) {
-      if (t.includes(country)) {
-        return `დედაქალაქია: ${CAPITALS[country]} 🌍`;
-      }
+  function getBotResponse(userText) {
+    const t = userText.toLowerCase();
+    if (t.includes('ფასი') || t.includes('ტარიფი') || t.includes('ღირს')) {
+      return "ფასი იანგარიშება ვიდეოს ზუსტი ხანგრძლივობის (წამები + მილიწამები) მიხედვით. არხის გამომწერებისთვის მოქმედებს სპეციალური ფასდაკლებული ტარიფი!";
     }
-    return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: "საქართველოს დედაქალაქი").';
+    if (t.includes('გაზომ') || t.includes('ატვირთ') || t.includes('ფაილი')) {
+      return "ვიდეოს ავტომატური გაზომვისთვის გადმოიტანეთ ვიდეო ფაილი 'VIDEO SCANNER'-ის ველში ან დააჭირეთ მას. სისტემა ავტომატურად გაზომავს ხანგრძლივობას და ჩასვამს კალკულატორში.";
+    }
+    if (t.includes('ხარისხ') || t.includes('ფორმატ') || t.includes('1080') || t.includes('fps')) {
+      return "მონტაჟი ხდება 1080×1920 (TikTok Vertical) ფორმატში 60fps-ზე. ვიდეო დამუშავდება After Effects-ში და გაძლიერდება Topaz AI ტექნოლოგიით.";
+    }
+    if (t.includes('გამარჯობა') || t.includes('სალამი')) {
+      return "სალამი! במה შემიძლია დაგეხმაროთ?";
+    }
+    return "მადლობა შეკითხვისთვის! დამატებითი დეტალებისთვის შეგიძლიათ პირდაპირ გამოგვიგზავნოთ შეკვეთა WhatsApp-ის ან Telegram-ის მეშვეობით.";
   }
 
-  function findAnswer(text){
-    const t = text.toLowerCase();
-    for (const rule of KB) {
-      if (rule.kw.some(k => t.includes(k))) return rule;
-    }
-    return null;
-  }
-
-  function sendChat(){
-    const text = chatInput.value.trim();
+  function handleUserChat(text) {
+    if (!text) text = chatInput.value.trim();
     if (!text) return;
-    addMsg('user', text.replace(/</g,'&lt;'));
+
+    appendMsg(text, 'user');
     chatInput.value = '';
 
     setTimeout(() => {
-      const rule = findAnswer(text);
-      if (rule) {
-        addMsg('bot', rule.a);
-        if (rule.qr) addQuickReplies(rule.qr);
-        return;
-      }
-      const capitalAnswer = findCapitalAnswer(text.toLowerCase());
-      if (capitalAnswer) {
-        addMsg('bot', capitalAnswer);
-        return;
-      }
-      addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნების ან შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
-      addQuickReplies(['რა ღირს?', 'როგორ შევუკვეთო?']);
-    }, 350);
+      const reply = getBotResponse(text);
+      appendMsg(reply, 'bot');
+    }, 400);
   }
 
-  chatSend.addEventListener('click', sendChat);
-  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+  chatSend.addEventListener('click', () => handleUserChat());
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleUserChat();
+  });
 </script>
-
 </body>
 </html>
