@@ -676,6 +676,11 @@
       <button class="order-btn viber" id="orderBtnViber"><span class="ico">◆</span> Viber-ზე გაგზავნა</button>
     </div>
     <div class="copy-note" id="copyNote"></div>
+    <div style="text-align:center; margin-top:10px;">
+      <a href="#" id="viberAddContact" style="font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--text-faint); text-decoration:none; border-bottom:1px dashed var(--border);">
+        ჯერ არ გაქვს დამატებული MOON Viber-ზე? დაამატე კონტაქტად →
+      </a>
+    </div>
   </div>
 
   <div class="warn-panel">
@@ -1012,6 +1017,14 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   });
 
+  document.getElementById('viberAddContact').addEventListener('click', (e) => {
+    e.preventDefault();
+    // Opens Viber's own "Add Contact" screen pre-filled with MOON's number.
+    // Needed once — after this, MOON shows up in the viber://forward picker above.
+    window.location.href = `viber://add?number=%2B${PHONE_INTL}`;
+    flashCopyNote('⏳ იხსნება Viber-ის "დაამატე კონტაქტი" ეკრანი +995 592 630 630 ნომრით…');
+  });
+
   // ============================================================
   // 4) VISITOR COUNTER
   // ============================================================
@@ -1114,7 +1127,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['არხ','whatsapp','telegram','viber','ვაიბერ','ტელეგრამ','ვატსაპ'],
-      a: 'შეკვეთის გაგზავნა შესაძლებელია სამივე არხზე — WhatsApp, Telegram და Viber. WhatsApp და Viber +995 592 630 630 ნომერზეა მიბმული; Telegram-ზე პირდაპირ @Moonknight0012 ანგარიშთან იხსნება ჩატი, მზა ტექსტით.',
+      a: 'შეკვეთის გაგზავნა შესაძლებელია სამივე არხზე — WhatsApp, Telegram და Viber. WhatsApp და Viber +995 592 630 630 ნომერზეა მიბმული; Telegram-ზე პირდაპირ @Moonknight0012 ანგარიშთან იხსნება ჩატი, მზა ტექსტით. Viber-ზე პირველად "დაამატე MOON კონტაქტად" ბმულით ჯერ დაამატე კონტაქტი — მერე შეკვეთის ღილაკი პირდაპირ შეგთავაზებს.',
     },
     {
       kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
