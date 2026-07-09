@@ -966,22 +966,25 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   document.getElementById('orderBtnTG').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
-    copyToClipboard(message).then(() => {
-      flashCopyNote('✓ ტექსტი დაკოპირდა — გახსნილ Telegram ჩატში ჩასვით (Ctrl+V / Cmd+V)');
-    });
-    // opens the Telegram app chat tied to this phone number, if it exists
-    window.location.href = `tg://resolve?phone=${PHONE_INTL}`;
-    // web fallback for desktop users without the app registered as a protocol handler
-    setTimeout(() => { window.open('https://web.telegram.org/', '_blank'); }, 900);
+    // Telegram's official "share" endpoint pre-fills the message text itself —
+    // it opens Telegram's own contact/chat picker with the text already typed in,
+    // so the user just taps the MOON chat once and hits send. Works on both the
+    // app (deep link intercepted) and desktop (opens web.telegram.org).
+    const url = `https://t.me/share/url?url=&text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+    copyToClipboard(message); // safety-net copy in case a picker step is skipped
+    flashCopyNote('✓ Telegram გაიხსნა შევსებული ტექსტით — აირჩიე MOON-ის ჩატი და გააგზავნე');
   });
 
   document.getElementById('orderBtnViber').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
-    copyToClipboard(message).then(() => {
-      flashCopyNote('✓ ტექსტი დაკოპირდა — გახსნილ Viber ჩატში ჩასვით (Ctrl+V / Cmd+V)');
-    });
-    window.location.href = `viber://chat?number=%2B${PHONE_INTL}`;
+    // Viber's "forward" scheme is the equivalent of Telegram's share endpoint —
+    // it opens Viber's own contact picker with the text pre-filled, so the user
+    // just taps the MOON contact once. Requires the Viber app (desktop or mobile).
+    window.location.href = `viber://forward?text=${encodeURIComponent(message)}`;
+    copyToClipboard(message); // safety-net copy in case the app isn't installed
+    flashCopyNote('✓ Viber გაიხსნა შევსებული ტექსტით — აირჩიე MOON-ის კონტაქტი და გააგზავნე');
   });
 
   // ============================================================
@@ -1086,7 +1089,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['არხ','whatsapp','telegram','viber','ვაიბერ','ტელეგრამ','ვატსაპ'],
-      a: 'შეკვეთის გაგზავნა შესაძლებელია სამივე არხზე — WhatsApp, Telegram და Viber. სამივე ერთსა და იმავე ნომერზეა მიბმული: +995 592 630 630.',
+      a: 'შეკვეთის გაგზავნა შესაძლებელია სამივე არხზე — WhatsApp, Telegram და Viber. სამივე ერთსა და იმავე ნომერზეა მიბმული: +995 592 630 630. WhatsApp-ზე ჩატი პირდაპირ იხსნება მზა ტექსტით; Telegram და Viber ხსნიან საკუთარ "გაზიარების" ფანჯარას წინასწარ ჩასმული ტექსტით — უბრალოდ აირჩიე MOON-ის ჩატი სიიდან და გააგზავნე.',
     },
     {
       kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
