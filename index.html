@@ -910,7 +910,8 @@
   // ============================================================
   // 3) MULTI-CHANNEL ORDER SENDING (WhatsApp / Telegram / Viber)
   // ============================================================
-  const PHONE_INTL = "995592630630"; // ერთი ნომერი სამივე არხისთვის
+  const PHONE_INTL = "995592630630"; // ნომერი WhatsApp-ისა და Viber-ისთვის
+  const TELEGRAM_USERNAME = "Moonknight0012"; // პირდაპირი Telegram ანგარიში შეკვეთებისთვის
   const copyNote = document.getElementById('copyNote');
 
   function buildOrderMessage(){
@@ -985,18 +986,13 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   document.getElementById('orderBtnTG').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
-    copyToClipboard(message); // always-on safety net
-    flashCopyNote('⏳ ვცდილობთ Telegram აპის გახსნას…');
-
-    openNativeWithFallback(
-      `tg://msg_url?url=&text=${encodeURIComponent(message)}`,
-      () => {
-        // Telegram app didn't intercept (not installed / desktop without handler) —
-        // fall back to the web share picker, which still pre-fills the text.
-        window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(message)}`, '_blank');
-        flashCopyNote('✓ Telegram Web გაიხსნა შევსებული ტექსტით — აირჩიე MOON-ის ჩატი');
-      }
-    );
+    copyToClipboard(message); // safety-net copy in case text prefill isn't supported on this client
+    // Opens the exact MOON Telegram account directly — no picker, one tap to send.
+    // Text prefill via ?text= works on most official Telegram apps; if a client
+    // ignores it, the message is already on the clipboard to paste in.
+    const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+    flashCopyNote('✓ იხსნება MOON-ის Telegram ჩატი (@' + TELEGRAM_USERNAME + ') — ტექსტიც დაკოპირებულია დარეზერვებით');
   });
 
   document.getElementById('orderBtnViber').addEventListener('click', () => {
@@ -1118,11 +1114,11 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['არხ','whatsapp','telegram','viber','ვაიბერ','ტელეგრამ','ვატსაპ'],
-      a: 'შეკვეთის გაგზავნა შესაძლებელია სამივე არხზე — WhatsApp, Telegram და Viber. სამივე ერთსა და იმავე ნომერზეა მიბმული: +995 592 630 630. WhatsApp-ზე ჩატი პირდაპირ იხსნება მზა ტექსტით; Telegram და Viber ხსნიან საკუთარ "გაზიარების" ფანჯარას წინასწარ ჩასმული ტექსტით — უბრალოდ აირჩიე MOON-ის ჩატი სიიდან და გააგზავნე.',
+      a: 'შეკვეთის გაგზავნა შესაძლებელია სამივე არხზე — WhatsApp, Telegram და Viber. WhatsApp და Viber +995 592 630 630 ნომერზეა მიბმული; Telegram-ზე პირდაპირ @Moonknight0012 ანგარიშთან იხსნება ჩატი, მზა ტექსტით.',
     },
     {
       kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
-      a: 'საკონტაქტო ნომერი სამივე პლატფორმისთვის: +995 592 630 630 (WhatsApp / Telegram / Viber).',
+      a: 'საკონტაქტო ნომერი WhatsApp-სა და Viber-ისთვის: +995 592 630 630. Telegram-ზე პირდაპირ მოგვწერე: @Moonknight0012.',
     },
     {
       kw: ['ატვირთ','ვიდეოს შემოწმ','scan','სკან','ხანგრძლივობის გაზომ'],
@@ -1140,7 +1136,57 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       kw: ['მადლობ','გმადლობ','thanks','thank you'],
       a: 'იყავი მოხარული დახმარებით! 🌙 კიდევ თუ რამე გაინტერესებს — მზად ვარ.',
     },
+    {
+      kw: ['ანუკა ბოტ','ანუკა bot','ანუკა ხელოვნურ'],
+      a: 'კი 🤖',
+    },
+    {
+      kw: ['ანუკა კარგად თამაშ','ანუკა თამაშ'],
+      a: 'არა 😄',
+    },
+    {
+      kw: ['ნინა'],
+      a: 'MOON-ის გოგოა ნინა 💜',
+    },
+    {
+      kw: ['მუნი'],
+      a: 'ნინას ბიჭია MOON 🌙',
+    },
   ];
+
+  // Small built-in geography trivia, so the assistant isn't limited to only
+  // MOON-related topics. This is a hand-written lookup table, not a live AI
+  // model — it only knows what's listed here.
+  const CAPITALS = {
+    'საქართველო': 'თბილისი',
+    'რუსეთ': 'მოსკოვი',
+    'საფრანგეთ': 'პარიზი',
+    'გერმანი': 'ბერლინი',
+    'იტალი': 'რომი',
+    'ესპანეთ': 'მადრიდი',
+    'თურქეთ': 'ანკარა',
+    'აშშ': 'ვაშინგტონი',
+    'ამერიკ': 'ვაშინგტონი',
+    'ინგლის': 'ლონდონი',
+    'ბრიტანეთ': 'ლონდონი',
+    'იაპონი': 'ტოკიო',
+    'ჩინეთ': 'პეკინი',
+    'უკრაინ': 'კიევი',
+    'სომხეთ': 'ერევანი',
+    'აზერბაიჯან': 'ბაქო',
+    'პოლონეთ': 'ვარშავა',
+    'ბერძნეთ': 'ათენი',
+  };
+
+  function findCapitalAnswer(t){
+    if (!t.includes('დედაქალაქ')) return null;
+    for (const country in CAPITALS) {
+      if (t.includes(country)) {
+        return `დედაქალაქია: ${CAPITALS[country]} 🌍`;
+      }
+    }
+    return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: "საქართველოს დედაქალაქი").';
+  }
 
   function findAnswer(text){
     const t = text.toLowerCase();
@@ -1161,10 +1207,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       if (rule) {
         addMsg('bot', rule.a);
         if (rule.qr) addQuickReplies(rule.qr);
-      } else {
-        addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნების ან შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
-        addQuickReplies(['რა ღირს?', 'როგორ შევუკვეთო?']);
+        return;
       }
+      const capitalAnswer = findCapitalAnswer(text.toLowerCase());
+      if (capitalAnswer) {
+        addMsg('bot', capitalAnswer);
+        return;
+      }
+      addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნების ან შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
+      addQuickReplies(['რა ღირს?', 'როგორ შევუკვეთო?']);
     }, 350);
   }
 
