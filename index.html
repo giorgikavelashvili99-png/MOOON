@@ -148,16 +148,24 @@
   .topbar-right{ display:flex; align-items:center; gap:14px; }
   .lang-switch{ display:flex; align-items:center; gap:6px; }
   .lang-btn{
-    width:32px; height:32px; border-radius:9px;
+    width:44px; height:32px; border-radius:9px;
     background:#0e0e17; border:1px solid var(--border);
-    font-size:16px; line-height:1; cursor:pointer;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px; font-weight:800; letter-spacing:0.04em;
+    line-height:1; cursor:pointer;
+    color:#ffffff;
     display:flex; align-items:center; justify-content:center;
-    opacity:0.45; transition: opacity .2s, border-color .2s, transform .15s;
+    opacity:0.45; transition: opacity .2s, border-color .2s, transform .15s, box-shadow .2s, text-shadow .2s;
   }
   .lang-btn:hover{ opacity:0.8; transform:translateY(-1px); }
   .lang-btn.active{
     opacity:1; border-color: var(--purple-soft);
     box-shadow: 0 0 14px rgba(155,92,255,0.35);
+    text-shadow:
+      0 0 6px rgba(255,255,255,0.9),
+      0 0 14px rgba(255,255,255,0.7),
+      0 0 28px rgba(155,92,255,0.7),
+      0 0 50px rgba(155,92,255,0.45);
   }
   @media (max-width: 420px){ .visitors{ display:none; } }
 
@@ -588,8 +596,8 @@
     <div class="brand"><span class="dot"></span> <span class="name">MOON</span></div>
     <div class="topbar-right">
       <div class="lang-switch" id="langSwitch">
-        <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">🇬🇪</button>
-        <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">🇺🇸</button>
+        <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">GEO</button>
+        <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">ENG</button>
       </div>
       <div class="visitors">👁 <span data-i18n="visitorsLabel">სულ ვიზიტორი საიტზე:</span> <b id="visitorCount">···</b></div>
     </div>
@@ -1198,6 +1206,41 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   function botGreet(){
+    addMsg('bot', '🌙 გამარჯობა! ჩატის გასაგრძელებლად აირჩიე ენა 👇<br>Hi! Please choose a language to continue 👇');
+    addLangChoice();
+  }
+
+  function addLangChoice(){
+    const wrap = document.createElement('div');
+    wrap.className = 'quick-replies';
+
+    const btnKa = document.createElement('button');
+    btnKa.className = 'qr-btn';
+    btnKa.textContent = 'ქართული';
+    btnKa.addEventListener('click', () => {
+      wrap.remove();
+      addMsg('user', 'ქართული');
+      setLanguage('ka');
+      setTimeout(realGreeting, 300);
+    });
+
+    const btnEn = document.createElement('button');
+    btnEn.className = 'qr-btn';
+    btnEn.textContent = 'ENGLISH';
+    btnEn.addEventListener('click', () => {
+      wrap.remove();
+      addMsg('user', 'ENGLISH');
+      setLanguage('en');
+      setTimeout(realGreeting, 300);
+    });
+
+    wrap.appendChild(btnKa);
+    wrap.appendChild(btnEn);
+    chatBody.appendChild(wrap);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function realGreeting(){
     if (currentLang === 'en') {
       addMsg('bot', "Hi! 🌙 I'm MOON's assistant. Ask me about pricing, deadlines, video requirements, or the order process.");
       addQuickReplies(['How much does it cost?', 'How long does it take?', 'What are the video requirements?', 'How do I place an order?']);
