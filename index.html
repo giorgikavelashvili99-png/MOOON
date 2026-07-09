@@ -26,8 +26,6 @@
     --gold: #ffd27a;
     --tg: #2ea6ff;
     --tg-soft: rgba(46,166,255,0.35);
-    --viber: #8f5cff;
-    --viber-soft: rgba(143,92,255,0.35);
     --wa: #25D366;
   }
 
@@ -146,6 +144,22 @@
     display:flex; align-items:center; gap:8px;
   }
   .visitors b{ color:var(--gold); font-weight:700; text-shadow:0 0 10px rgba(255,210,122,0.5); }
+
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .lang-switch{ display:flex; align-items:center; gap:6px; }
+  .lang-btn{
+    width:32px; height:32px; border-radius:9px;
+    background:#0e0e17; border:1px solid var(--border);
+    font-size:16px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0.45; transition: opacity .2s, border-color .2s, transform .15s;
+  }
+  .lang-btn:hover{ opacity:0.8; transform:translateY(-1px); }
+  .lang-btn.active{
+    opacity:1; border-color: var(--purple-soft);
+    box-shadow: 0 0 14px rgba(155,92,255,0.35);
+  }
+  @media (max-width: 420px){ .visitors{ display:none; } }
 
   .hero{ text-align:center; margin-bottom:38px; }
   .eyebrow{
@@ -377,7 +391,7 @@
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
-  /* ---------- Order buttons ---------- */
+  /* ---------- Order buttons (multi-channel) ---------- */
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
   .order-btn{
     width:100%;
@@ -572,54 +586,60 @@
 
   <div class="topbar">
     <div class="brand"><span class="dot"></span> <span class="name">MOON</span></div>
-    <div class="visitors">👁 სულ ვიზიტორი საიტზე: <b id="visitorCount">···</b></div>
+    <div class="topbar-right">
+      <div class="lang-switch" id="langSwitch">
+        <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">🇬🇪</button>
+        <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">🇺🇸</button>
+      </div>
+      <div class="visitors">👁 <span data-i18n="visitorsLabel">სულ ვიზიტორი საიტზე:</span> <b id="visitorCount">···</b></div>
+    </div>
   </div>
 
   <div class="hero">
     <div class="eyebrow">VIDEO EDITING · PRICE ENGINE</div>
-    <h1>გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
-    <p>მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
+    <h1 data-i18n="heroTitle">გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
+    <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
   </div>
 
   <div class="panel">
     <div class="panel-head">
-      <div class="label">PRICE READOUT</div>
+      <div class="label" data-i18n="priceReadout">PRICE READOUT</div>
       <div class="rec"><span class="r-dot"></span> LIVE</div>
     </div>
 
     <div class="readout">
-      <div class="tag">საბოლოო ღირებულება</div>
+      <div class="tag" data-i18n="finalPrice">საბოლოო ღირებულება</div>
       <div class="price" id="priceDisplay">1.20<sup>₾</sup></div>
-      <div class="sub-note" id="subNote">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></div>
+      <div class="sub-note" id="subNote" data-i18n="notSubscribed">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></div>
     </div>
 
     <div class="field">
       <div class="field-top">
-        <label>მონიშნე ზუსტი დრო (წამი)</label>
+        <label data-i18n="markDuration">მონიშნე ზუსტი დრო (წამი)</label>
         <span class="val" id="secVal">5</span>
       </div>
       <div class="timeline">
         <input type="range" id="secondsRange" min="5" max="59" step="1" value="5">
       </div>
-      <input type="number" class="num-input" id="secondsInput" min="0" max="59" value="5" placeholder="შეიყვანე წამი (0–59)" style="margin-top:10px;">
+      <input type="number" class="num-input" id="secondsInput" min="0" max="59" value="5" placeholder="შეიყვანე წამი (0–59)" data-i18n-placeholder="secondsPlaceholder" style="margin-top:10px;">
     </div>
 
     <div class="field">
       <div class="field-top">
-        <label>წამის მეასედი / კადრი (Milliseconds)</label>
+        <label data-i18n="msLabel">წამის მეასედი / კადრი (Milliseconds)</label>
         <span class="val" id="msVal">00</span>
       </div>
       <div class="timeline">
         <input type="range" id="msRange" min="0" max="59" step="1" value="0">
       </div>
-      <div class="hint">მაქსიმალური სრული ხანგრძლივობა — 59:59. ამის ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
+      <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობა — 59:59. ამის ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
     </div>
 
     <div class="field">
       <div class="toggle-row">
         <div class="toggle-copy">
-          <div class="t1">ვარ არხის გამომწერი</div>
-          <div class="t2">✓ დაბალი ტარიფი აქტიურდება</div>
+          <div class="t1" data-i18n="subscriberT1">ვარ არხის გამომწერი</div>
+          <div class="t2" data-i18n="subscriberT2">✓ დაბალი ტარიფი აქტიურდება</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="subToggle">
@@ -629,31 +649,31 @@
     </div>
 
     <div class="field" style="margin-bottom:6px;">
-      <div class="field-top"><label>თქვენი TikTok პროფილის ლინკი *</label></div>
+      <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
       <div class="link-input-wrap">
         <span class="icon">@</span>
         <input type="text" class="num-input" id="tiktokLink" placeholder="tiktok.com/@username">
       </div>
-      <div class="error-msg" id="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+      <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
     </div>
   </div>
 
   <!-- Video duration checker -->
   <div class="panel">
     <div class="panel-head">
-      <div class="label">VIDEO SCANNER</div>
+      <div class="label" data-i18n="videoScanner">VIDEO SCANNER</div>
     </div>
     <div class="drop-zone" id="dropZone">
       <input type="file" id="videoInput" accept="video/*">
       <div class="dz-icon">▶</div>
-      <div class="dz-title">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
-      <div class="dz-sub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
+      <div class="dz-title" data-i18n="dzTitle">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
+      <div class="dz-sub" data-i18n="dzSub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
     </div>
-    <div class="scan-progress" id="scanProgress"><span class="spin"></span> ვიდეო მუშავდება…</div>
+    <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
     <div class="scan-result" id="scanResult">
-      <div class="sr-row"><span>ფაილი</span><b id="srName">—</b></div>
-      <div class="sr-row"><span>ხანგრძლივობა</span><b id="srDuration">—</b></div>
-      <div class="sr-row"><span>გამოთვლილი ფასი</span><b id="srPrice">—</b></div>
+      <div class="sr-row"><span data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
+      <div class="sr-row"><span data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
+      <div class="sr-row"><span data-i18n="srPrice">გამოთვლილი ფასი</span><b id="srPrice">—</b></div>
       <div class="sr-warn" id="srWarn" style="display:none;"></div>
     </div>
   </div>
@@ -661,11 +681,11 @@
   <!-- Order channels -->
   <div class="panel" style="padding:22px;">
     <div class="panel-head" style="margin-bottom:16px;">
-      <div class="label">გაგზავნე შეკვეთა</div>
+      <div class="label" data-i18n="sendOrder">გაგზავნე შეკვეთა</div>
     </div>
     <div class="order-grid">
-      <button class="order-btn wa" id="orderBtnWA"><span class="ico">✆</span> WhatsApp-ზე გაგზავნა</button>
-      <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> Telegram-ზე გაგზავნა</button>
+      <button class="order-btn wa" id="orderBtnWA"><span class="ico">✆</span> <span data-i18n="sendWA">WhatsApp-ზე გაგზავნა</span></button>
+      <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> <span data-i18n="sendTG">Telegram-ზე გაგზავნა</span></button>
     </div>
     <div class="copy-note" id="copyNote"></div>
   </div>
@@ -673,15 +693,15 @@
   <div class="warn-panel">
     <div class="w-head">
       <div class="ico">!</div>
-      <span class="title">გაფრთხილება შეკვეთამდე</span>
+      <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
     </div>
-    <p>ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უდანაკლო ხარისხით.</p>
-    <p>გთხოვთ, დარწმუნებული იყავით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ინდივიდუალურად ფასდება და კალკულატორში არ შედის.</p>
-    <p>ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
+    <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უდანაკლო ხარისხით.</p>
+    <p data-i18n="warnP2">გთხოვთ, დარწმუნებული იყავით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ინდივიდუალურად ფასდება და კალკულატორში არ შედის.</p>
+    <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
     <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
   </div>
 
-  <footer>FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</footer>
+  <footer data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</footer>
 
 </div>
 
@@ -693,20 +713,141 @@
     <div class="ch-l">
       <div class="avatar">🌙</div>
       <div>
-        <div class="ch-name">MOON ასისტენტი</div>
-        <div class="ch-status"><span class="d"></span> ონლაინ</div>
+        <div class="ch-name">MOON <span data-i18n="chatAssistant">ასისტენტი</span></div>
+        <div class="ch-status"><span class="d"></span> <span data-i18n="chatOnline">ონლაინ</span></div>
       </div>
     </div>
     <button class="chat-close" id="chatClose">✕</button>
   </div>
   <div class="chat-body" id="chatBody"></div>
   <div class="chat-input-row">
-    <input type="text" id="chatInput" placeholder="დასვი კითხვა…">
+    <input type="text" id="chatInput" placeholder="დასვი კითხვა…" data-i18n-placeholder="chatInputPlaceholder">
     <button class="chat-send" id="chatSend">➤</button>
   </div>
 </div>
 
 <script>
+  // ============================================================
+  // 0) LANGUAGE / i18n SYSTEM
+  // ============================================================
+  const TRANSLATIONS = {
+    ka: {
+      visitorsLabel: 'სულ ვიზიტორი საიტზე:',
+      heroTitle: 'გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე',
+      heroSub: 'მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.',
+      priceReadout: 'PRICE READOUT',
+      finalPrice: 'საბოლოო ღირებულება',
+      subActive: '✓ გამომწერის ტარიფი აქტიურია — <b>თანხა უკვე დაზოგილია!</b>',
+      notSubscribed: 'არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b>',
+      markDuration: 'მონიშნე ზუსტი დრო (წამი)',
+      secondsPlaceholder: 'შეიყვანე წამი (0–59)',
+      msLabel: 'წამის მეასედი / კადრი (Milliseconds)',
+      msHint: 'მაქსიმალური სრული ხანგრძლივობა — 59:59. ამის ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
+      subscriberT1: 'ვარ არხის გამომწერი',
+      subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
+      tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
+      tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
+      videoScanner: 'VIDEO SCANNER',
+      dzTitle: 'ატვირთე ვიდეო ავტომატური გაზომვისთვის',
+      dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
+      scanProcessing: 'ვიდეო მუშავდება…',
+      srFile: 'ფაილი',
+      srDuration: 'ხანგრძლივობა',
+      srPrice: 'გამოთვლილი ფასი',
+      srUnit: 'წმ',
+      srWarnOver: '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.',
+      alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
+      alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
+      sendOrder: 'გაგზავნე შეკვეთა',
+      sendWA: 'WhatsApp-ზე გაგზავნა',
+      sendTG: 'Telegram-ზე გაგზავნა',
+      tgSentNote: '✓ იხსნება MOON-ის Telegram ჩატი (@MOON_TG) — ტექსტიც დაკოპირებულია დარეზერვებით',
+      warnTitle: 'გაფრთხილება შეკვეთამდე',
+      warnP1: 'ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უდანაკლო ხარისხით.',
+      warnP2: 'გთხოვთ, დარწმუნებული იყავით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ინდივიდუალურად ფასდება და კალკულატორში არ შედის.',
+      warnP3: 'ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.',
+      footer: 'FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით',
+      chatAssistant: 'ასისტენტი',
+      chatOnline: 'ონლაინ',
+      chatInputPlaceholder: 'დასვი კითხვა…',
+    },
+    en: {
+      visitorsLabel: 'Total visitors:',
+      heroTitle: 'Calculate your <span>video editing cost</span> down to the frame',
+      heroSub: 'Enter your video\'s duration (or upload a video and it will measure it automatically) — the price is calculated in real time, for After Effects & Topaz quality editing.',
+      priceReadout: 'PRICE READOUT',
+      finalPrice: 'Final price',
+      subActive: '✓ Subscriber rate is active — <b>you\'re already saving money!</b>',
+      notSubscribed: 'Not a subscriber yet — <b>subscribe to save money!</b>',
+      markDuration: 'Select exact duration (seconds)',
+      secondsPlaceholder: 'Enter seconds (0–59)',
+      msLabel: 'Hundredths of a second / frame (Milliseconds)',
+      msHint: 'Maximum total duration — 59:59. Within this range the price is calculated at the 59-second rate.',
+      subscriberT1: "I'm a channel subscriber",
+      subscriberT2: '✓ Lower rate activates',
+      tiktokLabel: 'Your TikTok profile link *',
+      tiktokError: '⚠️ A TikTok profile link is required to send the order!',
+      videoScanner: 'VIDEO SCANNER',
+      dzTitle: 'Upload a video for automatic measurement',
+      dzSub: 'Drag it here or click — duration will be filled in automatically',
+      scanProcessing: 'Processing video…',
+      srFile: 'File',
+      srDuration: 'Duration',
+      srPrice: 'Calculated price',
+      srUnit: 's',
+      srWarnOver: '⚠️ The video exceeds 59.59 seconds — it is priced individually; the calculator shows the 59.59 rate.',
+      alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
+      alertReadError: 'Could not read the video — please try another file.',
+      sendOrder: 'Send order',
+      sendWA: 'Send via WhatsApp',
+      sendTG: 'Send via Telegram',
+      tgSentNote: "✓ Opening MOON's Telegram chat (@MOON_TG) — the text has also been copied as a backup",
+      warnTitle: 'Notice before ordering',
+      warnP1: 'Video editing is done <b>only for TikTok</b>, with flawless quality.',
+      warnP2: 'Please make sure your video duration <b>does not exceed 59:59 seconds</b> — anything longer is priced individually and isn\'t included in the calculator.',
+      warnP3: 'Also make sure the footage is shot and rendered in <b>1080p / 60fps</b> quality — this affects the cleanliness of the final result.',
+      footer: 'FRAME.RATE — precise calculation, down to the frame',
+      chatAssistant: 'Assistant',
+      chatOnline: 'Online',
+      chatInputPlaceholder: 'Ask a question…',
+    }
+  };
+
+  let currentLang = localStorage.getItem('moon_lang') || 'ka';
+
+  function t(key){
+    return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.ka[key] || '');
+  }
+
+  function applyTranslations(){
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (TRANSLATIONS[currentLang][key] !== undefined) {
+        el.innerHTML = TRANSLATIONS[currentLang][key];
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (TRANSLATIONS[currentLang][key] !== undefined) {
+        el.placeholder = TRANSLATIONS[currentLang][key];
+      }
+    });
+    document.getElementById('langKa').classList.toggle('active', currentLang === 'ka');
+    document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
+    if (typeof refresh === 'function') refresh();
+  }
+
+  function setLanguage(lang){
+    if (lang !== 'ka' && lang !== 'en') return;
+    currentLang = lang;
+    localStorage.setItem('moon_lang', lang);
+    applyTranslations();
+  }
+
+  document.getElementById('langKa').addEventListener('click', () => setLanguage('ka'));
+  document.getElementById('langEn').addEventListener('click', () => setLanguage('en'));
+
   // ============================================================
   // 1) PRICE CALCULATOR (core logic, unchanged rate model)
   // ============================================================
@@ -774,9 +915,7 @@
     void priceDisplay.offsetWidth;
     priceDisplay.classList.add('bump');
 
-    subNote.innerHTML = isSub
-      ? '✓ გამომწერის ტარიფი აქტიურია — <b>თანხა უკვე დაზოგილია!</b>'
-      : 'არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b>';
+    subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
 
     return price;
   }
@@ -832,16 +971,473 @@
 
   function handleVideoFile(file){
     if (!file.type.startsWith('video/')) {
-      alert('გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)');
+      alert(t('alertNotVideo'));
       return;
     }
     scanResult.classList.remove('show');
     scanProgress.classList.add('show');
-    // NOTE: original file content was truncated here in the source
-    // provided to me — the rest of the script (video metadata reading,
-    // order button handlers, and the AI chat widget logic) was not
-    // included, so I could not edit or verify Viber references there.
+
+    const videoEl = document.createElement('video');
+    videoEl.preload = 'metadata';
+    videoEl.muted = true;
+
+    const cleanup = () => {
+      scanProgress.classList.remove('show');
+      URL.revokeObjectURL(videoEl.src);
+    };
+
+    videoEl.onloadedmetadata = function(){
+      // Chrome bug workaround: some containers report Infinity duration
+      // until a seek forces the real value to resolve.
+      if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
+        videoEl.currentTime = 1e101;
+        videoEl.ontimeupdate = function(){
+          videoEl.ontimeupdate = null;
+          finishScan(videoEl.duration, file);
+          videoEl.currentTime = 0;
+          cleanup();
+        };
+      } else {
+        finishScan(videoEl.duration, file);
+        cleanup();
+      }
+    };
+
+    videoEl.onerror = function(){
+      cleanup();
+      alert(t('alertReadError'));
+    };
+
+    videoEl.src = URL.createObjectURL(file);
   }
+
+  function finishScan(duration, file){
+    let s = Math.floor(duration);
+    let ms = Math.round((duration - s) * 100);
+    if (ms === 100) { ms = 0; s += 1; }
+
+    const overLimit = (s > 59) || (s === 59 && ms > 59);
+    const sForCalc = Math.min(s, 59);
+    const msForCalc = overLimit ? 59 : ms;
+
+    secondsInput.value = sForCalc;
+    msRange.value = msForCalc;
+    const price = refresh();
+
+    srName.textContent = file.name.length > 24 ? file.name.slice(0,21) + '…' : file.name;
+    srDuration.textContent = `${s}.${String(ms).padStart(2,'0')} ${t('srUnit')}`;
+    srPrice.textContent = price + ' ₾';
+
+    if (overLimit) {
+      srWarn.style.display = 'block';
+      srWarn.textContent = t('srWarnOver');
+    } else {
+      srWarn.style.display = 'none';
+    }
+
+    scanResult.classList.add('show');
+  }
+
+  // ============================================================
+  // 3) MULTI-CHANNEL ORDER SENDING (WhatsApp / Telegram)
+  // ============================================================
+  const PHONE_INTL = "995592630630"; // ნომერი WhatsApp-ისთვის
+  const TELEGRAM_USERNAME = "Moonknight0012"; // პირდაპირი Telegram ანგარიში შეკვეთებისთვის
+  const copyNote = document.getElementById('copyNote');
+
+  function buildOrderMessage(){
+    const { s, ms, isSub } = currentValues();
+    const price = calculateExactPrice(s, ms, isSub);
+    return `🎬 ახალი შეკვეთა — MOON
+ხანგრძლივობა: ${s}.${String(ms).padStart(2,'0')} წამი
+გამომწერი: ${isSub ? 'დიახ' : 'არა'}
+ღირებულება: ${price} ₾
+TikTok პროფილი: ${tiktokLink.value.trim()}`;
+  }
+
+  function validateBeforeSend(){
+    const linkVal = tiktokLink.value.trim();
+    if (!linkVal) {
+      tiktokLink.classList.add('error');
+      tiktokError.style.display = 'block';
+      tiktokLink.focus();
+      return false;
+    }
+    return true;
+  }
+
+  function copyToClipboard(text){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    // fallback for older/insecure contexts
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  function flashCopyNote(text){
+    copyNote.textContent = text;
+    copyNote.classList.add('active');
+    setTimeout(() => copyNote.classList.remove('active'), 4000);
+  }
+
+  // Tries to launch a native app via custom URI scheme. If the tab doesn't lose
+  // focus within the timeout (meaning no app intercepted the navigation), it runs
+  // the fallback instead. This avoids "always jumping to a bare webpage" when the
+  // app IS installed, and avoids "silently doing nothing" when it isn't.
+  function openNativeWithFallback(nativeUrl, fallback){
+    let handled = false;
+    const onBlur = () => { handled = true; };
+    window.addEventListener('blur', onBlur, { once: true });
+    window.addEventListener('visibilitychange', onBlur, { once: true });
+
+    window.location.href = nativeUrl;
+
+    setTimeout(() => {
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('visibilitychange', onBlur);
+      if (!handled) fallback();
+    }, 1200);
+  }
+
+  document.getElementById('orderBtnWA').addEventListener('click', () => {
+    if (!validateBeforeSend()) return;
+    const message = buildOrderMessage();
+    const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  });
+
+  document.getElementById('orderBtnTG').addEventListener('click', () => {
+    if (!validateBeforeSend()) return;
+    const message = buildOrderMessage();
+    copyToClipboard(message); // safety-net copy in case text prefill isn't supported on this client
+    // Opens the exact MOON Telegram account directly — no picker, one tap to send.
+    // Text prefill via ?text= works on most official Telegram apps; if a client
+    // ignores it, the message is already on the clipboard to paste in.
+    const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+    flashCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
+  });
+
+  // ============================================================
+  // 4) VISITOR COUNTER
+  // ============================================================
+  const visitorEl = document.getElementById('visitorCount');
+  const NAMESPACE = 'moon-framerate-ge';
+  const COUNTER = 'visits';
+  // The counter previously reached close to 100 visits. This baseline restores
+  // that history so the displayed number continues from roughly where it left off
+  // instead of starting back over from zero.
+  const VISITOR_BASE_OFFSET = 97;
+
+  function showFallbackCount(){
+    let n = parseInt(localStorage.getItem('moon_visits_fallback') || '0', 10);
+    const alreadyCounted = sessionStorage.getItem('moon_visit_counted');
+    if (!alreadyCounted) {
+      n += 1;
+      localStorage.setItem('moon_visits_fallback', String(n));
+      sessionStorage.setItem('moon_visit_counted', '1');
+    }
+    visitorEl.textContent = n + VISITOR_BASE_OFFSET;
+  }
+
+  fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/${COUNTER}/up`)
+    .then(r => { if (!r.ok) throw new Error('bad response'); return r.json(); })
+    .then(data => {
+      const count = data && (data.count ?? data.value);
+      if (typeof count === 'number') visitorEl.textContent = count + VISITOR_BASE_OFFSET;
+      else showFallbackCount();
+    })
+    .catch(() => showFallbackCount());
+
+  // ============================================================
+  // 5) AI ASSISTANT — free, on-device rule-based FAQ engine
+  // ============================================================
+  const chatFab = document.getElementById('chatFab');
+  const chatPanel = document.getElementById('chatPanel');
+  const chatClose = document.getElementById('chatClose');
+  const chatBody = document.getElementById('chatBody');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+
+  chatFab.addEventListener('click', () => {
+    chatPanel.classList.toggle('open');
+    chatFab.querySelector('.badge-dot').style.display = 'none';
+    if (chatBody.children.length === 0) botGreet();
+  });
+  chatClose.addEventListener('click', () => chatPanel.classList.remove('open'));
+
+  function addMsg(role, html){
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.innerHTML = html;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return div;
+  }
+
+  function addQuickReplies(options){
+    const wrap = document.createElement('div');
+    wrap.className = 'quick-replies';
+    options.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'qr-btn';
+      b.textContent = opt;
+      b.addEventListener('click', () => { chatInput.value = opt; sendChat(); });
+      wrap.appendChild(b);
+    });
+    chatBody.appendChild(wrap);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function botGreet(){
+    if (currentLang === 'en') {
+      addMsg('bot', "Hi! 🌙 I'm MOON's assistant. Ask me about pricing, deadlines, video requirements, or the order process.");
+      addQuickReplies(['How much does it cost?', 'How long does it take?', 'What are the video requirements?', 'How do I place an order?']);
+    } else {
+      addMsg('bot', 'გამარჯობა! 🌙 მე ვარ MOON-ის ასისტენტი. დამისვი კითხვა ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.');
+      addQuickReplies(['რა ღირს?', 'რამდენ ხანში მზადდება?', 'რა მოთხოვნაა ვიდეოზე?', 'როგორ შევუკვეთო?']);
+    }
+  }
+
+  // Knowledge base: each rule = keywords[] + answer (+ optional quick replies)
+  const KB_KA = [
+    {
+      kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
+      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე: მინ. 5 წამი → 1.20₾-დან, მაქს. 59.59 წამი → დაახლ. 12₾-მდე. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
+      qr: ['არხის გამოწერით რამდენით იაფდება?', 'რა მოთხოვნაა ვიდეოზე?']
+    },
+    {
+      kw: ['გამომწერ','subscriber','გამოწერ'],
+      a: 'თუ არხის გამომწერი ხარ, ჩართე გადამრთველი "ვარ არხის გამომწერი" — ფასი ავტომატურად დაბალდება ყველა ხანგრძლივობაზე.',
+    },
+    {
+      kw: ['ვად','რამდენ ხანში','მზადდება','deadline','დრო სჭირდება'],
+      a: 'სტანდარტული მონტაჟის ვადა დამოკიდებულია დატვირთვაზე — ზუსტი ვადისთვის საუკეთესოა პირდაპირ დაგვიკავშირდე შეკვეთის გაგზავნისას (WhatsApp/Telegram ღილაკებით ქვემოთ), მენეჯერი დაგიდასტურებს ვადას შეკვეთისთანავე.',
+    },
+    {
+      kw: ['მოთხოვნ','ხარისხ','1080','60fps','ფორმატ','რეზოლუც'],
+      a: 'ვიდეო უნდა იყოს გადაღებული/დარენდერებული 1080×1920 რეზოლუციაში, 60fps სიხშირით. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ინდივიდუალურად ფასდება.',
+    },
+    {
+      kw: ['tiktok','ტიკტოკ'],
+      a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
+    },
+    {
+      kw: ['როგორ შევუკვეთო','შეკვეთ','ორდერ','დაკვეთ'],
+      a: 'შეავსე ხანგრძლივობა (ხელით ან ვიდეოს ატვირთვით), მიუთითე TikTok ლინკი, და დააჭირე WhatsApp ან Telegram ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
+      qr: ['რომელი არხით შემიძლია შეკვეთა?']
+    },
+    {
+      kw: ['არხ','whatsapp','telegram','ტელეგრამ','ვატსაპ'],
+      a: 'შეკვეთის გაგზავნა შესაძლებელია WhatsApp ან Telegram არხზე. WhatsApp +995 592 630 630 ნომერზეა მიბმული; Telegram-ზე პირდაპირ @Moonknight0012 ანგარიშთან იხსნება ჩატი, მზა ტექსტით.',
+    },
+    {
+      kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
+      a: 'საკონტაქტო ნომერი WhatsApp-სთვის: +995 592 630 630. Telegram-ზე პირდაპირ მოგვწერე: @Moonknight0012.',
+    },
+    {
+      kw: ['ატვირთ','ვიდეოს შემოწმ','scan','სკან','ხანგრძლივობის გაზომ'],
+      a: 'ზემოთ "VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოიტანო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებში და მილიწამებში და თავად ჩაასვამს კალკულატორში ფასის გამოსათვლელად. ფაილი არსად იტვირთება — ყველაფერი ხდება შენს მოწყობილობაზე.',
+    },
+    {
+      kw: ['გადახდ','ანგარიშსწორ','ბარათ','ნაღდი'],
+      a: 'გადახდის დეტალებს მენეჯერი დაგიზუსტებს პირდაპირ ჩატში შეკვეთის დადასტურების შემდეგ.',
+    },
+    {
+      kw: ['გამარჯობა','სალამ','hi','hello','მოგესალმ'],
+      a: 'გამარჯობა! რითი დაგეხმარო? შეგიძლია მკითხო ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.',
+    },
+    {
+      kw: ['მადლობ','გმადლობ','thanks','thank you'],
+      a: 'იყავი მოხარული დახმარებით! 🌙 კიდევ თუ რამე გაინტერესებს — მზად ვარ.',
+    },
+    {
+      kw: ['ანუკა ბოტ','ანუკა bot','ანუკა ხელოვნურ'],
+      a: 'კი 🤖',
+    },
+    {
+      kw: ['ანუკა კარგად თამაშ','ანუკა თამაშ'],
+      a: 'არა 😄',
+    },
+    {
+      kw: ['ნინა'],
+      a: 'MOON-ის გოგოა ნინა 💜',
+    },
+    {
+      kw: ['მუნი'],
+      a: 'ნინას ბიჭია MOON 🌙',
+    },
+  ];
+
+  const KB_EN = [
+    {
+      kw: ['price','cost','how much','rate','discount'],
+      a: 'The price depends on the video duration: min. 5 seconds → from 1.20₾, max. 59.59 seconds → up to about 12₾. Use the slider in the calculator to set the duration, or upload a video — the price is calculated automatically. Subscribers get a lower rate.',
+      qr: ['How much cheaper for subscribers?', 'What are the video requirements?']
+    },
+    {
+      kw: ['subscriber','subscribe','subscription'],
+      a: 'If you\'re a channel subscriber, turn on the "I\'m a channel subscriber" toggle — the price automatically drops for every duration.',
+    },
+    {
+      kw: ['deadline','how long','turnaround','time does it take','when will it be ready'],
+      a: 'The standard editing turnaround depends on current workload — for an exact deadline it\'s best to contact us directly when sending your order (WhatsApp/Telegram buttons below); a manager will confirm the deadline right after you order.',
+    },
+    {
+      kw: ['requirement','quality','1080','60fps','format','resolution'],
+      a: 'The video must be shot/rendered at 1080×1920 resolution, 60fps. Duration must not exceed 59.59 seconds — anything longer is priced individually.',
+    },
+    {
+      kw: ['tiktok'],
+      a: 'Editing is done only for the TikTok format. To send an order you must provide your TikTok profile link in the field.',
+    },
+    {
+      kw: ['how to order','place an order','order process','how do i order'],
+      a: 'Fill in the duration (manually or by uploading a video), enter your TikTok link, and press the WhatsApp or Telegram button — the chosen app will open with a ready-made order message.',
+      qr: ['Which channel can I order through?']
+    },
+    {
+      kw: ['channel','whatsapp','telegram'],
+      a: 'You can send your order via WhatsApp or Telegram. WhatsApp is linked to +995 592 630 630; Telegram opens a chat directly with @Moonknight0012, with the message pre-filled.',
+    },
+    {
+      kw: ['number','phone','contact'],
+      a: 'Contact number for WhatsApp: +995 592 630 630. On Telegram, message us directly: @Moonknight0012.',
+    },
+    {
+      kw: ['upload','check video','scan','measure duration'],
+      a: 'In the "VIDEO SCANNER" block above you can upload or drag in a video file — the browser will automatically read the duration in seconds and milliseconds and fill it into the calculator to compute the price. The file is never uploaded anywhere — everything happens on your device.',
+    },
+    {
+      kw: ['payment','pay','card','cash'],
+      a: 'A manager will confirm payment details directly in chat after your order is confirmed.',
+    },
+    {
+      kw: ['hi','hello','hey'],
+      a: 'Hello! How can I help? You can ask me about pricing, deadlines, requirements, or the order process.',
+    },
+    {
+      kw: ['thanks','thank you'],
+      a: 'Happy to help! 🌙 If anything else comes up — I\'m here.',
+    },
+  ];
+
+  // Small built-in geography trivia, so the assistant isn't limited to only
+  // MOON-related topics. This is a hand-written lookup table, not a live AI
+  // model — it only knows what's listed here.
+  const CAPITALS_KA = {
+    'საქართველო': 'თბილისი',
+    'რუსეთ': 'მოსკოვი',
+    'საფრანგეთ': 'პარიზი',
+    'გერმანი': 'ბერლინი',
+    'იტალი': 'რომი',
+    'ესპანეთ': 'მადრიდი',
+    'თურქეთ': 'ანკარა',
+    'აშშ': 'ვაშინგტონი',
+    'ამერიკ': 'ვაშინგტონი',
+    'ინგლის': 'ლონდონი',
+    'ბრიტანეთ': 'ლონდონი',
+    'იაპონი': 'ტოკიო',
+    'ჩინეთ': 'პეკინი',
+    'უკრაინ': 'კიევი',
+    'სომხეთ': 'ერევანი',
+    'აზერბაიჯან': 'ბაქო',
+    'პოლონეთ': 'ვარშავა',
+    'ბერძნეთ': 'ათენი',
+  };
+
+  const CAPITALS_EN = {
+    'georgia': 'Tbilisi',
+    'russia': 'Moscow',
+    'france': 'Paris',
+    'germany': 'Berlin',
+    'italy': 'Rome',
+    'spain': 'Madrid',
+    'turkey': 'Ankara',
+    'usa': 'Washington, D.C.',
+    'united states': 'Washington, D.C.',
+    'america': 'Washington, D.C.',
+    'england': 'London',
+    'britain': 'London',
+    'uk': 'London',
+    'japan': 'Tokyo',
+    'china': 'Beijing',
+    'ukraine': 'Kyiv',
+    'armenia': 'Yerevan',
+    'azerbaijan': 'Baku',
+    'poland': 'Warsaw',
+    'greece': 'Athens',
+  };
+
+  function findCapitalAnswer(lowerText){
+    if (currentLang === 'en') {
+      if (!lowerText.includes('capital')) return null;
+      for (const country in CAPITALS_EN) {
+        if (lowerText.includes(country)) {
+          return `The capital is: ${CAPITALS_EN[country]} 🌍`;
+        }
+      }
+      return 'Name a specific country and I\'ll tell you its capital 🌍 (e.g. "capital of Georgia").';
+    }
+    if (!lowerText.includes('დედაქალაქ')) return null;
+    for (const country in CAPITALS_KA) {
+      if (lowerText.includes(country)) {
+        return `დედაქალაქია: ${CAPITALS_KA[country]} 🌍`;
+      }
+    }
+    return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: "საქართველოს დედაქალაქი").';
+  }
+
+  function findAnswer(text){
+    const lowerText = text.toLowerCase();
+    const kb = currentLang === 'en' ? KB_EN : KB_KA;
+    for (const rule of kb) {
+      if (rule.kw.some(k => lowerText.includes(k))) return rule;
+    }
+    return null;
+  }
+
+  function sendChat(){
+    const text = chatInput.value.trim();
+    if (!text) return;
+    addMsg('user', text.replace(/</g,'&lt;'));
+    chatInput.value = '';
+
+    setTimeout(() => {
+      const rule = findAnswer(text);
+      if (rule) {
+        addMsg('bot', rule.a);
+        if (rule.qr) addQuickReplies(rule.qr);
+        return;
+      }
+      const capitalAnswer = findCapitalAnswer(text.toLowerCase());
+      if (capitalAnswer) {
+        addMsg('bot', capitalAnswer);
+        return;
+      }
+      if (currentLang === 'en') {
+        addMsg('bot', "I don't know that specific detail — but I can help with pricing, deadlines, video requirements, or the order process. Or contact us directly using the buttons below.");
+        addQuickReplies(['How much does it cost?', 'How do I place an order?']);
+      } else {
+        addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნების ან შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
+        addQuickReplies(['რა ღირს?', 'როგორ შევუკვეთო?']);
+      }
+    }, 350);
+  }
+
+  chatSend.addEventListener('click', sendChat);
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+  // Apply the saved/default language once everything is wired up.
+  applyTranslations();
 </script>
 
 </body>
