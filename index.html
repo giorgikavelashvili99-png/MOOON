@@ -122,14 +122,14 @@
   .wrap{ position:relative; z-index:1; max-width:760px; margin:0 auto; padding:28px 20px 80px; }
 
   .topbar{
-    display:flex; align-items:center; gap:14px;
+    display:flex; align-items:center; gap:8px 14px;
     padding:14px 18px; margin-bottom:34px;
     border:1px solid var(--border-soft);
     border-radius:16px;
     background:rgba(15,15,24,0.55);
     backdrop-filter: blur(10px);
   }
-  .brand{ flex:0 0 auto; display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.05em; font-size:16px; }
+  .brand{ order:1; flex:0 0 auto; display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.05em; font-size:16px; }
   .brand .name{
     color:#f2ecff;
     text-shadow:
@@ -149,6 +149,7 @@
   .visitors-badge b{ color:var(--gold); font-weight:700; text-shadow:0 0 8px rgba(255,210,122,0.5); }
 
   .topbar-center{
+    order:2;
     flex:1;
     display:flex; align-items:center; justify-content:center; gap:8px;
     font-family:'JetBrains Mono', monospace;
@@ -165,9 +166,8 @@
     background:var(--cyan); box-shadow:0 0 10px var(--cyan);
     animation:pulse 1.6s infinite;
   }
-  @media (max-width: 680px){ .topbar-center{ display:none; } }
 
-  .topbar-right{ flex:0 0 auto; display:flex; align-items:center; gap:14px; }
+  .topbar-right{ order:3; flex:0 0 auto; display:flex; align-items:center; gap:14px; }
   .lang-switch{ display:flex; align-items:center; gap:6px; }
   .lang-btn{
     width:44px; height:32px; border-radius:9px;
@@ -188,6 +188,15 @@
       0 0 14px rgba(255,255,255,0.7),
       0 0 28px rgba(155,92,255,0.7),
       0 0 50px rgba(155,92,255,0.45);
+  }
+  @media (max-width: 640px){
+    .topbar{ flex-wrap:wrap; }
+    .topbar-right{ order:2; margin-left:auto; }
+    .topbar-center{
+      order:3; flex:1 1 100%;
+      font-size:9.5px; letter-spacing:0.1em; gap:6px;
+      margin-top:2px;
+    }
   }
   @media (max-width: 420px){
     .brand{ flex-wrap:wrap; row-gap:6px; }
@@ -1169,12 +1178,17 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   // 4) VISITOR COUNTER
   // ============================================================
   const visitorEl = document.getElementById('visitorBadge').querySelector('b');
-  const NAMESPACE = 'moon-framerate-ge';
-  const COUNTER = 'visits';
+  // The old counterapi.dev v1 endpoint this used to call has become unreliable
+  // (the service migrated to a v2/workspace-based API), which is why the count
+  // used to drift apart between devices — whichever device's request failed
+  // silently fell back to its own separate local counter. This uses a single
+  // reliable global counter instead, so every device reads the same number.
+  const VISIT_KEY = 'moon_framerate_ge_total_visits_v2';
   // The counter previously reached close to 100 visits. This baseline restores
   // that history so the displayed number continues from roughly where it left off
   // instead of starting back over from zero.
   const VISITOR_BASE_OFFSET = 97;
+  const LAST_KNOWN_KEY = 'moon_visits_last_known';
 
   // Formats large counts in compact notation, truncating (not rounding) to one
   // decimal place: 2999 -> "2.9K", 3000 -> "3K", 1000 -> "1K",
@@ -1197,25 +1211,39 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     visitorEl.textContent = formatted;
   }
 
-  function showFallbackCount(){
-    let n = parseInt(localStorage.getItem('moon_visits_fallback') || '0', 10);
-    const alreadyCounted = sessionStorage.getItem('moon_visit_counted');
-    if (!alreadyCounted) {
-      n += 1;
-      localStorage.setItem('moon_visits_fallback', String(n));
-      sessionStorage.setItem('moon_visit_counted', '1');
-    }
-    setVisitorDisplay(n + VISITOR_BASE_OFFSET);
+  function cacheKnownCount(n){
+    try { localStorage.setItem(LAST_KNOWN_KEY, String(n)); } catch(e){ /* ignore */ }
   }
 
-  fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/${COUNTER}/up`)
+  // If the network request fails, show the last real number this device saw
+  // (instead of incrementing a private local counter) so it doesn't drift
+  // away from what every other device is showing.
+  function showLastKnownOrBaseline(){
+    const cached = parseInt(localStorage.getItem(LAST_KNOWN_KEY) || '', 10);
+    setVisitorDisplay(!isNaN(cached) ? cached : VISITOR_BASE_OFFSET);
+  }
+
+  // Only register a new visit once per browser session — reloading the page
+  // re-reads the current value instead of counting again.
+  const alreadyCountedThisSession = sessionStorage.getItem('moon_visit_counted');
+  const endpoint = alreadyCountedThisSession
+    ? `https://countapi.mileshilliard.com/api/v1/get/${VISIT_KEY}`
+    : `https://countapi.mileshilliard.com/api/v1/hit/${VISIT_KEY}`;
+
+  fetch(endpoint)
     .then(r => { if (!r.ok) throw new Error('bad response'); return r.json(); })
     .then(data => {
-      const count = data && (data.count ?? data.value);
-      if (typeof count === 'number') setVisitorDisplay(count + VISITOR_BASE_OFFSET);
-      else showFallbackCount();
+      const count = parseInt(data && data.value, 10);
+      if (!isNaN(count)) {
+        const displayCount = count + VISITOR_BASE_OFFSET;
+        setVisitorDisplay(displayCount);
+        cacheKnownCount(displayCount);
+        sessionStorage.setItem('moon_visit_counted', '1');
+      } else {
+        showLastKnownOrBaseline();
+      }
     })
-    .catch(() => showFallbackCount());
+    .catch(() => showLastKnownOrBaseline());
 
   // ============================================================
   // 5) AI ASSISTANT — free, on-device rule-based FAQ engine
