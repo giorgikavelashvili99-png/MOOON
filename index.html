@@ -122,14 +122,14 @@
   .wrap{ position:relative; z-index:1; max-width:760px; margin:0 auto; padding:28px 20px 80px; }
 
   .topbar{
-    display:flex; align-items:center; justify-content:space-between;
+    display:flex; align-items:center; gap:14px;
     padding:14px 18px; margin-bottom:34px;
     border:1px solid var(--border-soft);
     border-radius:16px;
     background:rgba(15,15,24,0.55);
     backdrop-filter: blur(10px);
   }
-  .brand{ display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.05em; font-size:16px; }
+  .brand{ flex:0 0 auto; display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.05em; font-size:16px; }
   .brand .name{
     color:#f2ecff;
     text-shadow:
@@ -139,13 +139,35 @@
       0 0 60px rgba(46,230,214,0.35);
   }
   .brand .dot{ width:9px; height:9px; border-radius:50%; background:var(--cyan); box-shadow:0 0 12px var(--cyan); }
-  .visitors{
-    font-family:'JetBrains Mono', monospace; font-size:12.5px; color:var(--text-dim);
-    display:flex; align-items:center; gap:8px;
+  .visitors-badge{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--text-dim);
+    display:inline-flex; align-items:center; gap:4px;
+    border:1px solid var(--border-soft); border-radius:8px;
+    padding:2px 7px; margin-left:2px;
+    background:rgba(18,18,28,0.4);
   }
-  .visitors b{ color:var(--gold); font-weight:700; text-shadow:0 0 10px rgba(255,210,122,0.5); }
+  .visitors-badge b{ color:var(--gold); font-weight:700; text-shadow:0 0 8px rgba(255,210,122,0.5); }
 
-  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .topbar-center{
+    flex:1;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; font-weight:700; letter-spacing:0.14em;
+    text-transform:uppercase; white-space:nowrap;
+    color:#bff6ef;
+    text-shadow:
+      0 0 6px rgba(255,255,255,0.55),
+      0 0 14px rgba(46,230,214,0.8),
+      0 0 30px rgba(46,230,214,0.45);
+  }
+  .topbar-center .tc-dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--cyan); box-shadow:0 0 10px var(--cyan);
+    animation:pulse 1.6s infinite;
+  }
+  @media (max-width: 680px){ .topbar-center{ display:none; } }
+
+  .topbar-right{ flex:0 0 auto; display:flex; align-items:center; gap:14px; }
   .lang-switch{ display:flex; align-items:center; gap:6px; }
   .lang-btn{
     width:44px; height:32px; border-radius:9px;
@@ -167,7 +189,9 @@
       0 0 28px rgba(155,92,255,0.7),
       0 0 50px rgba(155,92,255,0.45);
   }
-  @media (max-width: 420px){ .visitors{ display:none; } }
+  @media (max-width: 420px){
+    .brand{ flex-wrap:wrap; row-gap:6px; }
+  }
 
   .hero{ text-align:center; margin-bottom:38px; }
   .eyebrow{
@@ -593,13 +617,13 @@
 <div class="wrap">
 
   <div class="topbar">
-    <div class="brand"><span class="dot"></span> <span class="name">MOON</span></div>
+    <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
+    <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
     <div class="topbar-right">
       <div class="lang-switch" id="langSwitch">
         <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">GEO</button>
         <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">ENG</button>
       </div>
-      <div class="visitors">👁 <span data-i18n="visitorsLabel">სულ ვიზიტორი საიტზე:</span> <b id="visitorCount">···</b></div>
     </div>
   </div>
 
@@ -617,7 +641,7 @@
 
     <div class="readout">
       <div class="tag" data-i18n="finalPrice">საბოლოო ღირებულება</div>
-      <div class="price" id="priceDisplay">1.20<sup>₾</sup></div>
+      <div class="price" id="priceDisplay">1.50<sup>₾</sup></div>
       <div class="sub-note" id="subNote" data-i18n="notSubscribed">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></div>
     </div>
 
@@ -741,6 +765,7 @@
   const TRANSLATIONS = {
     ka: {
       visitorsLabel: 'სულ ვიზიტორი საიტზე:',
+      topbarTagline: 'ფასი რეალურ დროში · AI მონტაჟი',
       heroTitle: 'გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე',
       heroSub: 'მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.',
       priceReadout: 'PRICE READOUT',
@@ -781,6 +806,7 @@
     },
     en: {
       visitorsLabel: 'Total visitors:',
+      topbarTagline: 'REAL-TIME PRICE ENGINE · AI EDITING',
       heroTitle: 'Calculate your <span>video editing cost</span> down to the frame',
       heroSub: 'Enter your video\'s duration (or upload a video and it will measure it automatically) — the price is calculated in real time, for After Effects & Topaz quality editing.',
       priceReadout: 'PRICE READOUT',
@@ -877,6 +903,11 @@
 
     const billedSecondsForRate = Math.max(Math.min(s, 59), 5);
 
+    // PRICE_SCALE anchors the 5-second rate at 1.50₾ (previously 1.20₾) while
+    // preserving the same declining-rate shape all the way to 59.59s (now 15.00₾,
+    // previously ~12.00₾) — i.e. the whole curve is scaled up by the same factor.
+    const PRICE_SCALE = 1.25;
+
     let ratePerSecond;
     if (isSubscriber) {
       ratePerSecond = 0.20 - ((billedSecondsForRate - 5) / 54) * (0.20 - 0.1525);
@@ -893,7 +924,7 @@
       billedSeconds = totalSeconds;
     }
 
-    const totalPrice = billedSeconds * ratePerSecond;
+    const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE;
     return totalPrice.toFixed(2);
   }
 
@@ -1137,13 +1168,34 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   // ============================================================
   // 4) VISITOR COUNTER
   // ============================================================
-  const visitorEl = document.getElementById('visitorCount');
+  const visitorEl = document.getElementById('visitorBadge').querySelector('b');
   const NAMESPACE = 'moon-framerate-ge';
   const COUNTER = 'visits';
   // The counter previously reached close to 100 visits. This baseline restores
   // that history so the displayed number continues from roughly where it left off
   // instead of starting back over from zero.
   const VISITOR_BASE_OFFSET = 97;
+
+  // Formats large counts in compact notation, truncating (not rounding) to one
+  // decimal place: 2999 -> "2.9K", 3000 -> "3K", 1000 -> "1K",
+  // 2,999,999 -> "2.9M", 3,000,000 -> "3M", 1,000,000 -> "1M".
+  function formatVisitorCount(n){
+    n = Math.max(0, Math.floor(n));
+    if (n < 1000) return String(n);
+    if (n < 1000000) {
+      const truncated = Math.floor(n / 100) / 10;
+      const str = (truncated % 1 === 0) ? truncated.toFixed(0) : truncated.toFixed(1);
+      return str + 'K';
+    }
+    const truncated = Math.floor(n / 100000) / 10;
+    const str = (truncated % 1 === 0) ? truncated.toFixed(0) : truncated.toFixed(1);
+    return str + 'M';
+  }
+
+  function setVisitorDisplay(n){
+    const formatted = formatVisitorCount(n);
+    visitorEl.textContent = formatted;
+  }
 
   function showFallbackCount(){
     let n = parseInt(localStorage.getItem('moon_visits_fallback') || '0', 10);
@@ -1153,14 +1205,14 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       localStorage.setItem('moon_visits_fallback', String(n));
       sessionStorage.setItem('moon_visit_counted', '1');
     }
-    visitorEl.textContent = n + VISITOR_BASE_OFFSET;
+    setVisitorDisplay(n + VISITOR_BASE_OFFSET);
   }
 
   fetch(`https://api.counterapi.dev/v1/${NAMESPACE}/${COUNTER}/up`)
     .then(r => { if (!r.ok) throw new Error('bad response'); return r.json(); })
     .then(data => {
       const count = data && (data.count ?? data.value);
-      if (typeof count === 'number') visitorEl.textContent = count + VISITOR_BASE_OFFSET;
+      if (typeof count === 'number') setVisitorDisplay(count + VISITOR_BASE_OFFSET);
       else showFallbackCount();
     })
     .catch(() => showFallbackCount());
@@ -1254,7 +1306,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const KB_KA = [
     {
       kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
-      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე: მინ. 5 წამი → 1.20₾-დან, მაქს. 59.59 წამი → დაახლ. 12₾-მდე. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
+      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე: მინ. 5 წამი → 1.50₾-დან, მაქს. 59.59 წამი → დაახლ. 15₾-მდე. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
       qr: ['არხის გამოწერით რამდენით იაფდება?', 'რა მოთხოვნაა ვიდეოზე?']
     },
     {
@@ -1323,7 +1375,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const KB_EN = [
     {
       kw: ['price','cost','how much','rate','discount'],
-      a: 'The price depends on the video duration: min. 5 seconds → from 1.20₾, max. 59.59 seconds → up to about 12₾. Use the slider in the calculator to set the duration, or upload a video — the price is calculated automatically. Subscribers get a lower rate.',
+      a: 'The price depends on the video duration: min. 5 seconds → from 1.50₾, max. 59.59 seconds → up to about 15₾. Use the slider in the calculator to set the duration, or upload a video — the price is calculated automatically. Subscribers get a lower rate.',
       qr: ['How much cheaper for subscribers?', 'What are the video requirements?']
     },
     {
