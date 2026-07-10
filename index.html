@@ -790,9 +790,11 @@
     <div class="scan-result" id="scanResult">
       <div class="sr-row"><span data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
       <div class="sr-row"><span data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
-      <div class="sr-row" id="srQualityRow" style="display:none;"><span data-i18n="srDetectedFormat">აღმოჩენილი ფორმატი</span><b id="srQuality">—</b></div>
+      <div class="sr-row"><span data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
+      <div class="sr-row" id="srQualityRow" style="display:none;"><span data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
       <div class="sr-row"><span data-i18n="srPrice">გამოთვლილი ფასი</span><b id="srPrice">—</b></div>
-      <div class="sr-info" id="srAutoNote" style="display:none;"></div>
+      <div class="sr-info" id="srMatchNote" style="display:none;"></div>
+      <div class="sr-warn" id="srMismatchNote" style="display:none;"></div>
       <div class="sr-warn" id="srWarn" style="display:none;"></div>
     </div>
   </div>
@@ -877,11 +879,13 @@
       scanProcessing: 'ვიდეო მუშავდება…',
       srFile: 'ფაილი',
       srDuration: 'ხანგრძლივობა',
-      srDetectedFormat: 'აღმოჩენილი ფორმატი',
+      srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
+      srRequestedFormat: 'მოთხოვნილი ხარისხი',
       srPrice: 'გამოთვლილი ფასი',
       srUnit: 'წმ',
       srFpsUnknown: 'fps უცნობია',
-      srAutoPicked: '✓ კალკულატორში ავტომატურად შეირჩა',
+      srMatchNote: '✓ ატვირთული ვიდეო შეესაბამება მოთხოვნილ ხარისხს ({REQ})',
+      srMismatchNote: '⚠️ მოთხოვნილია {REQ}, თუმცა ატვირთული ვიდეო რეალურად არის {DET} ხარისხის — ფასი მაინც გამოთვლილია თქვენ მიერ მოთხოვნილი ({REQ}) ხარისხის მიხედვით.',
       srWarnOver: '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
@@ -925,11 +929,13 @@
       scanProcessing: 'Processing video…',
       srFile: 'File',
       srDuration: 'Duration',
-      srDetectedFormat: 'Detected format',
+      srDetectedFormat: 'Uploaded video format',
+      srRequestedFormat: 'Requested quality',
       srPrice: 'Calculated price',
       srUnit: 's',
       srFpsUnknown: 'fps unknown',
-      srAutoPicked: '✓ Auto-selected in the calculator',
+      srMatchNote: '✓ The uploaded video matches the requested quality ({REQ})',
+      srMismatchNote: '⚠️ You requested {REQ}, but the uploaded video is actually {DET} quality — the price is still calculated based on your requested quality ({REQ}).',
       srWarnOver: '⚠️ The video exceeds 59.59 seconds — it is priced individually; the calculator shows the 59.59 rate.',
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
       alertReadError: 'Could not read the video — please try another file.',
@@ -1150,10 +1156,12 @@
   const scanResult = document.getElementById('scanResult');
   const srName = document.getElementById('srName');
   const srDuration = document.getElementById('srDuration');
+  const srRequested = document.getElementById('srRequested');
   const srQualityRow = document.getElementById('srQualityRow');
   const srQuality = document.getElementById('srQuality');
   const srPrice = document.getElementById('srPrice');
-  const srAutoNote = document.getElementById('srAutoNote');
+  const srMatchNote = document.getElementById('srMatchNote');
+  const srMismatchNote = document.getElementById('srMismatchNote');
   const srWarn = document.getElementById('srWarn');
 
   ['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
@@ -1299,25 +1307,40 @@
     secondsInput.value = sForCalc;
     msRange.value = msForCalc;
 
+    // The user's own quality selection always drives the price — the scanner
+    // only reports what it found in the file for comparison, it never
+    // overrides the requested format.
+    const requestedQuality = currentQuality;
     const hasDimensions = !!(width && height);
-    const detectedQuality = hasDimensions ? detectQualityTier(width, height, fps) : '1080_60';
-    selectQuality(detectedQuality);
+    const detectedQuality = hasDimensions ? detectQualityTier(width, height, fps) : null;
 
     const price = refresh();
 
     srName.textContent = file.name.length > 24 ? file.name.slice(0,21) + '…' : file.name;
     srDuration.textContent = `${s}.${String(ms).padStart(2,'0')} ${t('srUnit')}`;
+    srRequested.textContent = QUALITY_LABELS[requestedQuality] || QUALITY_LABELS['1080_60'];
     srPrice.textContent = price + ' ₾';
 
     if (hasDimensions) {
       const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
       srQuality.textContent = `${width}×${height} · ${fpsLabel}`;
       srQualityRow.style.display = 'flex';
-      srAutoNote.textContent = `${t('srAutoPicked')}: ${QUALITY_LABELS[detectedQuality]}`;
-      srAutoNote.style.display = 'block';
+
+      const reqLabel = QUALITY_LABELS[requestedQuality] || QUALITY_LABELS['1080_60'];
+      const detLabel = QUALITY_LABELS[detectedQuality] || QUALITY_LABELS['1080_60'];
+      if (detectedQuality === requestedQuality) {
+        srMatchNote.textContent = t('srMatchNote').replace('{REQ}', reqLabel);
+        srMatchNote.style.display = 'block';
+        srMismatchNote.style.display = 'none';
+      } else {
+        srMismatchNote.textContent = t('srMismatchNote').replace(/{REQ}/g, reqLabel).replace('{DET}', detLabel);
+        srMismatchNote.style.display = 'block';
+        srMatchNote.style.display = 'none';
+      }
     } else {
       srQualityRow.style.display = 'none';
-      srAutoNote.style.display = 'none';
+      srMatchNote.style.display = 'none';
+      srMismatchNote.style.display = 'none';
     }
 
     if (overLimit) {
