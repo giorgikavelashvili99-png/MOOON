@@ -461,6 +461,9 @@
   .scan-result .sr-warn{
     margin-top:8px; font-size:12px; color:var(--gold);
   }
+  .scan-result .sr-info{
+    margin-top:8px; font-size:12px; color:var(--cyan);
+  }
   .scan-progress{
     display:none; align-items:center; gap:10px; margin-top:14px;
     font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim);
@@ -787,7 +790,9 @@
     <div class="scan-result" id="scanResult">
       <div class="sr-row"><span data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
       <div class="sr-row"><span data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
+      <div class="sr-row" id="srQualityRow" style="display:none;"><span data-i18n="srDetectedFormat">აღმოჩენილი ფორმატი</span><b id="srQuality">—</b></div>
       <div class="sr-row"><span data-i18n="srPrice">გამოთვლილი ფასი</span><b id="srPrice">—</b></div>
+      <div class="sr-info" id="srAutoNote" style="display:none;"></div>
       <div class="sr-warn" id="srWarn" style="display:none;"></div>
     </div>
   </div>
@@ -872,8 +877,11 @@
       scanProcessing: 'ვიდეო მუშავდება…',
       srFile: 'ფაილი',
       srDuration: 'ხანგრძლივობა',
+      srDetectedFormat: 'აღმოჩენილი ფორმატი',
       srPrice: 'გამოთვლილი ფასი',
       srUnit: 'წმ',
+      srFpsUnknown: 'fps უცნობია',
+      srAutoPicked: '✓ კალკულატორში ავტომატურად შეირჩა',
       srWarnOver: '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
@@ -917,8 +925,11 @@
       scanProcessing: 'Processing video…',
       srFile: 'File',
       srDuration: 'Duration',
+      srDetectedFormat: 'Detected format',
       srPrice: 'Calculated price',
       srUnit: 's',
+      srFpsUnknown: 'fps unknown',
+      srAutoPicked: '✓ Auto-selected in the calculator',
       srWarnOver: '⚠️ The video exceeds 59.59 seconds — it is priced individually; the calculator shows the 59.59 rate.',
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
       alertReadError: 'Could not read the video — please try another file.',
@@ -1090,11 +1101,33 @@
 
   const qualityGrid = document.getElementById('qualityGrid');
   const qualityWarn = document.getElementById('qualityWarn');
+
+  function selectQuality(key){
+    if (!QUALITY_SCALES[key]) key = '1080_60';
+    currentQuality = key;
+    qualityGrid.querySelectorAll('.quality-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-quality') === key));
+    qualityWarn.classList.toggle('show', currentQuality !== '1080_60');
+  }
+
+  // Maps a scanned video's pixel dimensions + measured frame rate to the
+  // closest quality tier the calculator actually offers. Resolution is judged
+  // by the larger of the two dimensions (videos can be portrait or landscape);
+  // frame rate below 100fps is treated as the 60fps tier, since footage is
+  // essentially never shot at anything between 60 and 120 that isn't one or
+  // the other after rounding/variable-frame-rate jitter.
+  function detectQualityTier(width, height, fps){
+    const maxDim = Math.max(width || 0, height || 0);
+    let resTier = '1080';
+    if (maxDim >= 3600) resTier = '4k';
+    else if (maxDim >= 2400) resTier = '2k';
+    const fpsTier = (fps && fps >= 100) ? '120' : '60';
+    const key = `${resTier}_${fpsTier}`;
+    return QUALITY_SCALES[key] ? key : '1080_60';
+  }
+
   qualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      currentQuality = btn.getAttribute('data-quality');
-      qualityGrid.querySelectorAll('.quality-btn').forEach(b => b.classList.toggle('active', b === btn));
-      qualityWarn.classList.toggle('show', currentQuality !== '1080_60');
+      selectQuality(btn.getAttribute('data-quality'));
       refresh();
     });
   });
@@ -1117,7 +1150,10 @@
   const scanResult = document.getElementById('scanResult');
   const srName = document.getElementById('srName');
   const srDuration = document.getElementById('srDuration');
+  const srQualityRow = document.getElementById('srQualityRow');
+  const srQuality = document.getElementById('srQuality');
   const srPrice = document.getElementById('srPrice');
+  const srAutoNote = document.getElementById('srAutoNote');
   const srWarn = document.getElementById('srWarn');
 
   ['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
@@ -1144,10 +1180,26 @@
     const videoEl = document.createElement('video');
     videoEl.preload = 'metadata';
     videoEl.muted = true;
+    videoEl.playsInline = true;
+    // Kept off-screen but still attached to the document: some browsers only
+    // fire requestVideoFrameCallback (used below for fps detection) reliably
+    // for elements that are part of the render tree.
+    videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
+    document.body.appendChild(videoEl);
 
     const cleanup = () => {
       scanProgress.classList.remove('show');
       URL.revokeObjectURL(videoEl.src);
+      videoEl.remove();
+    };
+
+    const proceed = (duration) => {
+      const width = videoEl.videoWidth;
+      const height = videoEl.videoHeight;
+      detectFrameRate(videoEl).then(fps => {
+        finishScan(duration, file, width, height, fps);
+        cleanup();
+      });
     };
 
     videoEl.onloadedmetadata = function(){
@@ -1157,13 +1209,12 @@
         videoEl.currentTime = 1e101;
         videoEl.ontimeupdate = function(){
           videoEl.ontimeupdate = null;
-          finishScan(videoEl.duration, file);
+          const dur = videoEl.duration;
           videoEl.currentTime = 0;
-          cleanup();
+          proceed(dur);
         };
       } else {
-        finishScan(videoEl.duration, file);
-        cleanup();
+        proceed(videoEl.duration);
       }
     };
 
@@ -1175,7 +1226,68 @@
     videoEl.src = URL.createObjectURL(file);
   }
 
-  function finishScan(duration, file){
+  // Browsers don't expose a video's encoded frame rate as plain metadata, so
+  // this plays a couple of silent, invisible frames and times the gaps between
+  // them via requestVideoFrameCallback, then snaps the result to the nearest
+  // common rate (24/25/30/50/60/120). Falls back to null (unknown) on browsers
+  // that don't support requestVideoFrameCallback, or if playback is blocked.
+  function detectFrameRate(videoEl){
+    return new Promise((resolve) => {
+      if (typeof videoEl.requestVideoFrameCallback !== 'function') {
+        resolve(null);
+        return;
+      }
+      const samples = [];
+      let settled = false;
+      let safetyTimer = null;
+
+      function finish(fps){
+        if (settled) return;
+        settled = true;
+        if (safetyTimer) clearTimeout(safetyTimer);
+        videoEl.pause();
+        resolve(fps);
+      }
+
+      function computeAndFinish(){
+        if (samples.length < 3) { finish(null); return; }
+        const deltas = [];
+        for (let i = 1; i < samples.length; i++) {
+          const d = samples[i] - samples[i - 1];
+          if (d > 0) deltas.push(d);
+        }
+        if (!deltas.length) { finish(null); return; }
+        deltas.sort((a, b) => a - b);
+        const mid = deltas[Math.floor(deltas.length / 2)];
+        const rawFps = 1 / mid;
+        const commonRates = [24, 25, 30, 50, 60, 120];
+        let closest = Math.round(rawFps);
+        let bestDiff = Infinity;
+        commonRates.forEach(r => {
+          const diff = Math.abs(r - rawFps);
+          if (diff < bestDiff) { bestDiff = diff; closest = r; }
+        });
+        finish(closest);
+      }
+
+      function onFrame(now, metadata){
+        samples.push(metadata.mediaTime);
+        if (samples.length < 10 && !settled) {
+          videoEl.requestVideoFrameCallback(onFrame);
+        } else {
+          computeAndFinish();
+        }
+      }
+
+      safetyTimer = setTimeout(() => computeAndFinish(), 1200);
+
+      videoEl.play().then(() => {
+        videoEl.requestVideoFrameCallback(onFrame);
+      }).catch(() => finish(null));
+    });
+  }
+
+  function finishScan(duration, file, width, height, fps){
     let s = Math.floor(duration);
     let ms = Math.round((duration - s) * 100);
     if (ms === 100) { ms = 0; s += 1; }
@@ -1186,11 +1298,27 @@
 
     secondsInput.value = sForCalc;
     msRange.value = msForCalc;
+
+    const hasDimensions = !!(width && height);
+    const detectedQuality = hasDimensions ? detectQualityTier(width, height, fps) : '1080_60';
+    selectQuality(detectedQuality);
+
     const price = refresh();
 
     srName.textContent = file.name.length > 24 ? file.name.slice(0,21) + '…' : file.name;
     srDuration.textContent = `${s}.${String(ms).padStart(2,'0')} ${t('srUnit')}`;
     srPrice.textContent = price + ' ₾';
+
+    if (hasDimensions) {
+      const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
+      srQuality.textContent = `${width}×${height} · ${fpsLabel}`;
+      srQualityRow.style.display = 'flex';
+      srAutoNote.textContent = `${t('srAutoPicked')}: ${QUALITY_LABELS[detectedQuality]}`;
+      srAutoNote.style.display = 'block';
+    } else {
+      srQualityRow.style.display = 'none';
+      srAutoNote.style.display = 'none';
+    }
 
     if (overLimit) {
       srWarn.style.display = 'block';
