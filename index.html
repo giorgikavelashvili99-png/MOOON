@@ -347,6 +347,130 @@
 
   .hint{ font-size:11.5px; color:var(--text-faint); margin-top:8px; }
 
+  /* ---------- Price comparison chart ---------- */
+  .chart-box{
+    margin-top:16px; padding:16px 16px 8px; background:#0a0a12;
+    border:1px solid var(--border); border-radius:14px;
+  }
+  .chart-box .chart-label{
+    font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--text-faint); margin-bottom:12px; font-weight:600;
+  }
+  .chart-row{
+    display:flex; align-items:center; gap:10px; margin-bottom:9px;
+  }
+  .chart-row .cr-name{
+    width:78px; flex-shrink:0; font-size:11.5px; color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+  }
+  .chart-row .cr-track{
+    flex:1; height:16px; background:#14141f; border-radius:8px; overflow:hidden;
+    border:1px solid var(--border-soft);
+  }
+  .chart-row .cr-fill{
+    height:100%; border-radius:8px;
+    background:linear-gradient(90deg, var(--purple), var(--cyan));
+    opacity:0.45; transition:width .35s ease, opacity .2s ease;
+  }
+  .chart-row.active .cr-fill{ opacity:1; box-shadow:0 0 12px var(--cyan-soft); }
+  .chart-row.active .cr-name{ color:var(--text); font-weight:700; }
+  .chart-row .cr-price{
+    width:56px; flex-shrink:0; text-align:right; font-size:11.5px;
+    font-family:'JetBrains Mono', monospace; color:var(--text-dim);
+  }
+  .chart-row.active .cr-price{ color:#9df4e9; font-weight:700; }
+
+  /* ---------- Comments section ---------- */
+  .comments-panel .c-form{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .comments-panel input.c-name,
+  .comments-panel textarea.c-text{
+    width:100%; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
+    color:var(--text); padding:12px 14px; font-family:'Space Grotesk', sans-serif;
+    font-size:14px; outline:none; transition:border-color .15s;
+  }
+  .comments-panel input.c-name:focus,
+  .comments-panel textarea.c-text:focus{ border-color: var(--purple-soft); }
+  .comments-panel textarea.c-text{ resize:vertical; min-height:70px; }
+  .comments-panel .c-submit{
+    align-self:flex-end; background:var(--purple); color:#fff; border:none;
+    border-radius:12px; padding:10px 20px; font-weight:700; font-size:13.5px;
+    cursor:pointer; transition:.15s;
+  }
+  .comments-panel .c-submit:hover{ filter:brightness(1.1); }
+  .comments-panel .c-error{
+    display:none; color:var(--warn); font-size:12.5px; background:var(--warn-soft);
+    padding:9px 12px; border-radius:10px;
+  }
+  .comments-panel .c-error.show{ display:block; }
+  .comments-panel .c-list{ display:flex; flex-direction:column; gap:12px; }
+  .comments-panel .c-item{
+    background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:12px 14px;
+  }
+  .comments-panel .c-item .c-head{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;
+  }
+  .comments-panel .c-item .c-author{ font-weight:700; font-size:13px; color:var(--cyan); }
+  .comments-panel .c-item .c-date{ font-size:10.5px; color:var(--text-faint); }
+  .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
+  .comments-panel .c-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
+
+  /* ---------- Admin gear + modal ---------- */
+  .admin-gear{
+    background:none; border:none; color:var(--text-faint); opacity:0.35; font-size:14px;
+    cursor:pointer; padding:6px; transition:opacity .15s; vertical-align:middle;
+  }
+  .admin-gear:hover{ opacity:0.9; }
+  .admin-overlay{
+    display:none; position:fixed; inset:0; z-index:100; background:rgba(4,4,8,0.72);
+    backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;
+  }
+  .admin-overlay.open{ display:flex; }
+  .admin-box{
+    width:100%; max-width:480px; max-height:82vh; overflow-y:auto; background:var(--panel);
+    border:1px solid var(--border); border-radius:20px; padding:22px;
+  }
+  .admin-box h3{ margin:0 0 14px; font-size:16px; }
+  .admin-box .a-pass-row{ display:flex; gap:8px; }
+  .admin-box input.a-pass{
+    flex:1; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
+    color:var(--text); padding:11px 14px; font-size:14px; outline:none; letter-spacing:2px;
+  }
+  .admin-box .a-go{
+    background:var(--cyan); color:#06231f; border:none; border-radius:12px; padding:0 18px;
+    font-weight:800; cursor:pointer;
+  }
+  .admin-box .a-err{ color:var(--warn); font-size:12px; margin-top:8px; display:none; }
+  .admin-box .a-err.show{ display:block; }
+  .admin-box .a-tabs{ display:flex; gap:8px; margin-bottom:14px; }
+  .admin-box .a-tab{
+    flex:1; background:#0a0a12; border:1px solid var(--border); color:var(--text-dim);
+    border-radius:10px; padding:9px; font-size:12.5px; font-weight:700; cursor:pointer;
+  }
+  .admin-box .a-tab.active{ background:var(--purple); color:#fff; border-color:transparent; }
+  .admin-box .a-panel{ display:none; }
+  .admin-box .a-panel.active{ display:block; }
+  .admin-box .a-visit-row{
+    display:flex; justify-content:space-between; gap:10px; font-size:12px; padding:9px 0;
+    border-bottom:1px solid var(--border-soft); color:var(--text-dim);
+  }
+  .admin-box .a-visit-row b{ color:var(--text); }
+  .admin-box .a-close{
+    width:100%; margin-top:14px; background:none; border:1px solid var(--border);
+    color:var(--text-dim); border-radius:10px; padding:9px; cursor:pointer;
+  }
+  .admin-box .a-cmt{ background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:10px; margin-bottom:10px; }
+  .admin-box .a-cmt .a-cmt-meta{ font-size:11px; color:var(--text-faint); margin-bottom:6px; }
+  .admin-box .a-cmt textarea{
+    width:100%; background:#12121c; border:1px solid var(--border); border-radius:8px;
+    color:var(--text); padding:8px; font-size:12.5px; font-family:'Space Grotesk',sans-serif; resize:vertical; min-height:50px;
+  }
+  .admin-box .a-cmt-actions{ display:flex; gap:8px; margin-top:8px; }
+  .admin-box .a-cmt-actions button{
+    flex:1; border:none; border-radius:8px; padding:7px; font-size:11.5px; font-weight:700; cursor:pointer;
+  }
+  .admin-box .a-save-btn{ background:var(--cyan); color:#06231f; }
+  .admin-box .a-del-btn{ background:var(--warn); color:#2a0a0a; }
+
   /* Quality selector */
   .quality-grid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;
@@ -749,7 +873,12 @@
           <span class="q-tag">120 FPS</span>
         </button>
       </div>
-      <div class="quality-warn" id="qualityWarn" data-i18n="qualityWarnText">⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედოთ ან შენელდეთ.</div>
+      <div class="quality-warn" id="qualityWarn" data-i18n="qualityWarnText">⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედოს.</div>
+
+      <div class="chart-box">
+        <div class="chart-label" data-i18n="chartLabel">ფასის შედარება ამჟამინდელი ხანგრძლივობით</div>
+        <div id="priceChart"></div>
+      </div>
     </div>
 
     <div class="field">
@@ -811,6 +940,22 @@
     <div class="copy-note" id="copyNote"></div>
   </div>
 
+  <!-- Comments -->
+  <div class="panel comments-panel" style="padding:22px;">
+    <div class="panel-head" style="margin-bottom:16px;">
+      <div class="label" data-i18n="commentsLabel">კომენტარები</div>
+    </div>
+    <div class="c-form">
+      <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი">
+      <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
+      <div class="c-error" id="commentError"></div>
+      <button class="c-submit" id="commentSubmit" data-i18n="commentSubmit">გამოქვეყნება</button>
+    </div>
+    <div class="c-list" id="commentList">
+      <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარია — იყავი პირველი!</div>
+    </div>
+  </div>
+
   <div class="warn-panel">
     <div class="w-head">
       <div class="ico">!</div>
@@ -823,8 +968,33 @@
     <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
   </div>
 
-  <footer data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</footer>
+  <footer data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
 
+</div>
+
+<!-- ---------- Admin panel ---------- -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-box" id="adminBox">
+    <div id="adminLogin">
+      <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
+      <div class="a-pass-row">
+        <input type="password" class="a-pass" id="adminPass" inputmode="numeric" maxlength="10" data-i18n-placeholder="adminPassPh" placeholder="პაროლი">
+        <button class="a-go" id="adminGo" data-i18n="adminEnter">შესვლა</button>
+      </div>
+      <div class="a-err" id="adminErr" data-i18n="adminWrongPass">არასწორი პაროლი</div>
+      <button class="a-close" id="adminCloseLogin" data-i18n="adminClose">დახურვა</button>
+    </div>
+    <div id="adminDashboard" style="display:none;">
+      <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
+      <div class="a-tabs">
+        <button class="a-tab active" id="adminTabVisits" data-i18n="adminTabVisits">ვიზიტორები</button>
+        <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
+      </div>
+      <div class="a-panel active" id="adminPanelVisits"></div>
+      <div class="a-panel" id="adminPanelComments"></div>
+      <button class="a-close" id="adminCloseDash" data-i18n="adminClose">დახურვა</button>
+    </div>
+  </div>
 </div>
 
 <!-- ---------- AI Chat Widget ---------- -->
@@ -868,7 +1038,7 @@
       msHint: 'მაქსიმალური სრული ხანგრძლივობა — 59:59. ამის ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
       qualityLabel: 'ვიდეოს ხარისხი (რეზოლუცია / fps)',
       qualityRecBadge: 'რეკომენდირებული',
-      qualityWarnText: '⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედოთ ან შენელდეთ.',
+      qualityWarnText: '⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედოს.',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
@@ -902,6 +1072,26 @@
       chatAssistant: 'ასისტენტი',
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
+      chartLabel: 'ფასის შედარება ამჟამინდელი ხანგრძლივობით',
+      commentsLabel: 'კომენტარები',
+      commentNamePh: 'სახელი',
+      commentTextPh: 'დაწერე კომენტარი…',
+      commentSubmit: 'გამოქვეყნება',
+      commentEmpty: 'ჯერ არცერთი კომენტარია — იყავი პირველი!',
+      commentErrEmpty: 'გთხოვთ შეავსოთ სახელი და კომენტარის ველი.',
+      commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
+      commentErrGeneric: 'კომენტარის გამოქვეყნება ვერ მოხერხდა — სცადეთ ხელახლა.',
+      adminTitle: 'ადმინის პანელი',
+      adminPassPh: 'პაროლი',
+      adminEnter: 'შესვლა',
+      adminWrongPass: 'არასწორი პაროლი',
+      adminClose: 'დახურვა',
+      adminTabVisits: 'ვიზიტორები',
+      adminTabComments: 'კომენტარები',
+      adminNoVisits: 'ვიზიტები ჯერ არ დაფიქსირებულა.',
+      adminNoComments: 'კომენტარები ჯერ არ არის.',
+      adminSave: 'შენახვა',
+      adminDelete: 'წაშლა',
     },
     en: {
       visitorsLabel: 'Total visitors:',
@@ -952,6 +1142,26 @@
       chatAssistant: 'Assistant',
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
+      chartLabel: 'Price comparison at the current duration',
+      commentsLabel: 'Comments',
+      commentNamePh: 'Name',
+      commentTextPh: 'Write a comment…',
+      commentSubmit: 'Post',
+      commentEmpty: 'No comments yet — be the first!',
+      commentErrEmpty: 'Please fill in both the name and comment fields.',
+      commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
+      commentErrGeneric: 'Could not post the comment — please try again.',
+      adminTitle: 'Admin panel',
+      adminPassPh: 'Password',
+      adminEnter: 'Enter',
+      adminWrongPass: 'Incorrect password',
+      adminClose: 'Close',
+      adminTabVisits: 'Visitors',
+      adminTabComments: 'Comments',
+      adminNoVisits: 'No visits recorded yet.',
+      adminNoComments: 'No comments yet.',
+      adminSave: 'Save',
+      adminDelete: 'Delete',
     }
   };
 
@@ -1086,6 +1296,8 @@
     priceDisplay.classList.add('bump');
 
     subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
+
+    if (typeof renderPriceChart === 'function') renderPriceChart();
 
     return price;
   }
@@ -1826,6 +2038,311 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   chatSend.addEventListener('click', sendChat);
   chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+  // ============================================================
+  // 6) PRICE COMPARISON CHART
+  // ============================================================
+  function renderPriceChart(){
+    const container = document.getElementById('priceChart');
+    if (!container) return;
+    const { s, ms, isSub } = currentValues();
+    const qualities = Object.keys(QUALITY_SCALES);
+    const prices = qualities.map(q => parseFloat(calculateExactPrice(s, ms, isSub, q)));
+    const maxPrice = Math.max(...prices, 0.01);
+    container.innerHTML = qualities.map((q, i) => {
+      const price = prices[i];
+      const pct = Math.max(6, Math.round((price / maxPrice) * 100));
+      const isActive = q === currentQuality;
+      return '<div class="chart-row' + (isActive ? ' active' : '') + '">' +
+        '<div class="cr-name">' + QUALITY_LABELS[q] + '</div>' +
+        '<div class="cr-track"><div class="cr-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="cr-price">' + price.toFixed(2) + '₾</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ============================================================
+  // 7) SHARED BACKEND — lightweight anonymous JSON store used to
+  // sync comments and the admin visit log across every visitor's
+  // browser (this site has no server of its own, so this fills that
+  // gap). Reads/writes a small number of fixed paths under one
+  // namespace; failures are silent and never block the page.
+  // ============================================================
+  const MDB_BASE = 'https://mantledb.sh/v2';
+  const MDB_NS = 'moonge-tbilisi-vc7f3q';
+
+  async function mdbRead(path){
+    try{
+      const r = await fetch(MDB_BASE + '/' + MDB_NS + '/' + path, { cache: 'no-store' });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch(e){ return null; }
+  }
+  async function mdbWrite(path, data){
+    try{
+      const r = await fetch(MDB_BASE + '/' + MDB_NS + '/' + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return r.ok;
+    } catch(e){ return false; }
+  }
+
+  // ============================================================
+  // 8) COMMENTS SYSTEM
+  // ============================================================
+  const commentName = document.getElementById('commentName');
+  const commentText = document.getElementById('commentText');
+  const commentError = document.getElementById('commentError');
+  const commentSubmit = document.getElementById('commentSubmit');
+  const commentList = document.getElementById('commentList');
+  const commentEmpty = document.getElementById('commentEmpty');
+
+  // Basic uncensored-language filter — blocks the most common Georgian
+  // and English profanity/slurs before a comment is ever published.
+  // This runs in the browser, so it's a courtesy filter, not a hard
+  // security boundary; the admin panel can still remove anything that
+  // slips through.
+  const PROFANITY_LIST = [
+    'ყლე','ყლეო','ტიტინა','ჯავრიანი','დებილ','იდიოტ','ლახტი','დედაშენ','დედას',
+    'მამაშენ','ჰუიო','ხუი','пизд','блять','бля','сука','хуй','нахуй','ебал',
+    'fuck','shit','bitch','asshole','bastard','cunt','dick','whore','slut',
+    'nigger','faggot','retard'
+  ];
+  function containsProfanity(str){
+    const lower = str.toLowerCase();
+    return PROFANITY_LIST.some(w => lower.includes(w));
+  }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function formatCommentDate(ts){
+    try{
+      return new Date(ts).toLocaleString(currentLang === 'ka' ? 'ka-GE' : 'en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e){ return ''; }
+  }
+
+  let commentsCache = [];
+
+  function renderComments(){
+    if (!commentList) return;
+    if (!commentsCache.length) {
+      commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
+      return;
+    }
+    commentList.innerHTML = commentsCache.map(c =>
+      '<div class="c-item"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
+      '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
+      '<div class="c-body">' + escapeHtml(c.text) + '</div></div>'
+    ).join('');
+  }
+
+  async function loadComments(){
+    const data = await mdbRead('comments');
+    commentsCache = (data && Array.isArray(data.list)) ? data.list : [];
+    renderComments();
+  }
+
+  function showCommentError(msg){
+    commentError.textContent = msg;
+    commentError.classList.add('show');
+  }
+  function hideCommentError(){
+    commentError.classList.remove('show');
+  }
+
+  if (commentSubmit) {
+    commentSubmit.addEventListener('click', async () => {
+      hideCommentError();
+      const name = (commentName.value || '').trim();
+      const text = (commentText.value || '').trim();
+      if (!name || !text) {
+        showCommentError(t('commentErrEmpty'));
+        return;
+      }
+      if (containsProfanity(name) || containsProfanity(text)) {
+        showCommentError(t('commentErrProfanity'));
+        return;
+      }
+      commentSubmit.disabled = true;
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), ts: Date.now() };
+      // Re-read the latest list right before writing to minimize (not
+      // fully eliminate) lost updates from concurrent commenters.
+      const fresh = await mdbRead('comments');
+      const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
+      const updated = [entry, ...list].slice(0, 200);
+      const ok = await mdbWrite('comments', { list: updated });
+      commentSubmit.disabled = false;
+      if (!ok) {
+        showCommentError(t('commentErrGeneric'));
+        return;
+      }
+      commentsCache = updated;
+      renderComments();
+      commentName.value = '';
+      commentText.value = '';
+    });
+  }
+
+  loadComments();
+
+  // ============================================================
+  // 9) VISITOR LOG (device + approximate location) — feeds the
+  // admin panel's "Visitors" tab. Logged once per browser session.
+  // ============================================================
+  function detectDevice(){
+    const ua = navigator.userAgent || '';
+    let os = 'Unknown OS';
+    if (/Windows/i.test(ua)) os = 'Windows';
+    else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+    else if (/Android/i.test(ua)) os = 'Android';
+    else if (/Mac OS X/i.test(ua)) os = 'macOS';
+    else if (/Linux/i.test(ua)) os = 'Linux';
+
+    let browser = 'Unknown';
+    if (/Edg\//i.test(ua)) browser = 'Edge';
+    else if (/OPR\//i.test(ua)) browser = 'Opera';
+    else if (/Chrome\//i.test(ua) && !/Chromium/i.test(ua)) browser = 'Chrome';
+    else if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+    else if (/Firefox\//i.test(ua)) browser = 'Firefox';
+
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+    return os + ' · ' + browser + (isMobile ? ' · Mobile' : ' · Desktop');
+  }
+
+  async function detectLocation(){
+    try{
+      const r = await fetch('https://ipapi.co/json/');
+      if (!r.ok) throw new Error('bad response');
+      const data = await r.json();
+      if (data && data.city) return data.city + (data.country_name ? ', ' + data.country_name : '');
+      return 'Unknown';
+    } catch(e){ return 'Unknown'; }
+  }
+
+  async function logVisit(){
+    if (sessionStorage.getItem('moon_visit_logged')) return;
+    sessionStorage.setItem('moon_visit_logged', '1');
+    const device = detectDevice();
+    const location = await detectLocation();
+    const entry = { ts: Date.now(), device, location };
+    const fresh = await mdbRead('visits');
+    const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
+    const updated = [entry, ...list].slice(0, 300);
+    mdbWrite('visits', { list: updated });
+  }
+
+  logVisit();
+
+  // ============================================================
+  // 10) ADMIN PANEL — gated with a password, shows the visit log
+  // and lets the admin edit/remove comments.
+  // ============================================================
+  const ADMIN_PASSWORD = '0070';
+  const adminGear = document.getElementById('adminGear');
+  const adminOverlay = document.getElementById('adminOverlay');
+  const adminLogin = document.getElementById('adminLogin');
+  const adminDashboard = document.getElementById('adminDashboard');
+  const adminPass = document.getElementById('adminPass');
+  const adminGo = document.getElementById('adminGo');
+  const adminErr = document.getElementById('adminErr');
+  const adminTabVisits = document.getElementById('adminTabVisits');
+  const adminTabComments = document.getElementById('adminTabComments');
+  const adminPanelVisits = document.getElementById('adminPanelVisits');
+  const adminPanelComments = document.getElementById('adminPanelComments');
+
+  function openAdmin(){
+    adminOverlay.classList.add('open');
+    adminLogin.style.display = 'block';
+    adminDashboard.style.display = 'none';
+    adminPass.value = '';
+    adminErr.classList.remove('show');
+  }
+  function closeAdmin(){
+    adminOverlay.classList.remove('open');
+  }
+
+  if (adminGear) adminGear.addEventListener('click', openAdmin);
+  document.getElementById('adminCloseLogin').addEventListener('click', closeAdmin);
+  document.getElementById('adminCloseDash').addEventListener('click', closeAdmin);
+  adminOverlay.addEventListener('click', (e) => { if (e.target === adminOverlay) closeAdmin(); });
+
+  async function renderAdminVisits(){
+    adminPanelVisits.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('visits');
+    const list = (data && Array.isArray(data.list)) ? data.list : [];
+    if (!list.length) {
+      adminPanelVisits.innerHTML = '<div class="c-empty">' + t('adminNoVisits') + '</div>';
+      return;
+    }
+    adminPanelVisits.innerHTML = list.map(v =>
+      '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
+    ).join('');
+  }
+
+  async function renderAdminComments(){
+    adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('comments');
+    const list = (data && Array.isArray(data.list)) ? data.list : [];
+    if (!list.length) {
+      adminPanelComments.innerHTML = '<div class="c-empty">' + t('adminNoComments') + '</div>';
+      return;
+    }
+    adminPanelComments.innerHTML = list.map(c =>
+      '<div class="a-cmt" data-id="' + c.id + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + ' · ' + formatCommentDate(c.ts) + '</div>' +
+        '<textarea>' + escapeHtml(c.text) + '</textarea>' +
+        '<div class="a-cmt-actions">' +
+          '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
+          '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  adminPanelComments.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    const action = btn.getAttribute('data-action');
+    const fresh = await mdbRead('comments');
+    let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
+    if (action === 'delete') {
+      list = list.filter(c => String(c.id) !== String(id));
+    } else if (action === 'save') {
+      const wrap = btn.closest('.a-cmt');
+      const newText = wrap.querySelector('textarea').value.slice(0, 500);
+      list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { text: newText }) : c);
+    }
+    await mdbWrite('comments', { list });
+    commentsCache = list;
+    renderComments();
+    renderAdminComments();
+  });
+
+  function switchAdminTab(tab){
+    const showVisits = tab === 'visits';
+    adminTabVisits.classList.toggle('active', showVisits);
+    adminTabComments.classList.toggle('active', !showVisits);
+    adminPanelVisits.classList.toggle('active', showVisits);
+    adminPanelComments.classList.toggle('active', !showVisits);
+    if (showVisits) renderAdminVisits(); else renderAdminComments();
+  }
+  adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
+  adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
+
+  function tryAdminLogin(){
+    if (adminPass.value === ADMIN_PASSWORD) {
+      adminLogin.style.display = 'none';
+      adminDashboard.style.display = 'block';
+      switchAdminTab('visits');
+    } else {
+      adminErr.classList.add('show');
+    }
+  }
+  adminGo.addEventListener('click', tryAdminLogin);
+  adminPass.addEventListener('keydown', e => { if (e.key === 'Enter') tryAdminLogin(); });
 
   // Apply the saved/default language once everything is wired up.
   applyTranslations();
