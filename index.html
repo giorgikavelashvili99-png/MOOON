@@ -65,25 +65,15 @@
   }
   .orb{
     position:absolute; border-radius:50%;
-    filter:blur(70px);
+    filter:blur(90px);
     opacity:0.35;
-    will-change:transform;
-    transform:translateZ(0);
   }
   .orb.o1{ width:520px; height:520px; top:-160px; left:-120px; background:radial-gradient(circle, var(--purple), transparent 70%); animation: drift1 22s ease-in-out infinite; }
   .orb.o2{ width:460px; height:460px; bottom:-140px; right:-100px; background:radial-gradient(circle, var(--cyan), transparent 70%); animation: drift2 26s ease-in-out infinite; }
   .orb.o3{ width:340px; height:340px; top:40%; left:60%; background:radial-gradient(circle, var(--purple), transparent 70%); opacity:0.18; animation: drift1 18s ease-in-out infinite reverse; }
 
-  @keyframes drift1{ 0%,100%{ transform:translate3d(0,0,0) } 50%{ transform:translate3d(40px,30px,0) } }
-  @keyframes drift2{ 0%,100%{ transform:translate3d(0,0,0) } 50%{ transform:translate3d(-30px,-40px,0) } }
-
-  @media (prefers-reduced-motion: reduce){
-    .orb, .badge-float.ae, .badge-float.topaz, .chat-fab{ animation:none !important; }
-  }
-  @media (max-width: 640px){
-    .orb{ filter:blur(46px); }
-    .orb.o3{ display:none; }
-  }
+  @keyframes drift1{ 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(40px,30px) } }
+  @keyframes drift2{ 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(-30px,-40px) } }
 
   .badge-float{
     position:absolute;
@@ -390,6 +380,39 @@
   }
   .chart-row.active .cr-price{ color:#9df4e9; font-weight:700; }
 
+  /* ---------- Comments section ---------- */
+  .comments-panel .c-form{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .comments-panel input.c-name,
+  .comments-panel textarea.c-text{
+    width:100%; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
+    color:var(--text); padding:12px 14px; font-family:'Space Grotesk', sans-serif;
+    font-size:14px; outline:none; transition:border-color .15s;
+  }
+  .comments-panel input.c-name:focus,
+  .comments-panel textarea.c-text:focus{ border-color: var(--purple-soft); }
+  .comments-panel textarea.c-text{ resize:vertical; min-height:70px; }
+  .comments-panel .c-submit{
+    align-self:flex-end; background:var(--purple); color:#fff; border:none;
+    border-radius:12px; padding:10px 20px; font-weight:700; font-size:13.5px;
+    cursor:pointer; transition:.15s;
+  }
+  .comments-panel .c-submit:hover{ filter:brightness(1.1); }
+  .comments-panel .c-error{
+    display:none; color:var(--warn); font-size:12.5px; background:var(--warn-soft);
+    padding:9px 12px; border-radius:10px;
+  }
+  .comments-panel .c-error.show{ display:block; }
+  .comments-panel .c-list{ display:flex; flex-direction:column; gap:12px; }
+  .comments-panel .c-item{
+    background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:12px 14px;
+  }
+  .comments-panel .c-item .c-head{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;
+  }
+  .comments-panel .c-item .c-author{ font-weight:700; font-size:13px; color:var(--cyan); }
+  .comments-panel .c-item .c-date{ font-size:10.5px; color:var(--text-faint); }
+  .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
+  .comments-panel .c-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
 
   /* ---------- Admin gear + modal ---------- */
   .admin-gear{
@@ -578,39 +601,87 @@
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
   /* ---------- Video compressor ---------- */
-  .comp-intro{ font-size:13px; color:var(--text-dim); margin:-6px 0 16px; line-height:1.55; }
-  .comp-start-btn{
-    width:100%; margin-top:18px;
-    background:linear-gradient(90deg, var(--purple), var(--cyan));
-    color:#04101a; box-shadow:0 10px 30px rgba(155,92,255,0.25);
+  .comp-loading{
+    display:none; align-items:center; gap:10px; margin-top:14px;
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim);
   }
-  .comp-start-btn:hover{ box-shadow:0 14px 40px rgba(155,92,255,0.35); }
+  .comp-loading.show{ display:flex; }
+
+  .comp-module-error{
+    display:none; flex-direction:column; align-items:flex-start; gap:10px;
+    margin-top:14px; padding:14px 16px; border-radius:12px;
+    border:1px solid var(--warn-soft); background:rgba(255,107,107,0.08);
+    color:#ffb3b3; font-size:13px; line-height:1.55;
+  }
+  .comp-module-error.show{ display:flex; }
+  .comp-retry-btn{
+    align-self:flex-start; background:rgba(255,107,107,0.15);
+    border:1px solid var(--warn-soft); color:#fff; padding:8px 14px;
+    border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer;
+    font-family:'Space Grotesk', sans-serif; transition:.15s;
+  }
+  .comp-retry-btn:hover{ background:rgba(255,107,107,0.25); }
+
+  .comp-size-row{ display:flex; align-items:center; gap:10px; }
+  .comp-size-row .num-input{ width:110px; flex:0 0 auto; text-align:center; }
+
+  .comp-start-btn{
+    width:100%; padding:17px; border:none; border-radius:14px;
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:15.5px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#0a0616;
+    box-shadow:0 10px 30px rgba(155,92,255,0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity .15s ease;
+    margin-top:4px;
+  }
+  .comp-start-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 40px rgba(155,92,255,0.4); }
+  .comp-start-btn:active{ transform:translateY(0); }
   .comp-start-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
-  .comp-progressbar-wrap{ display:none; margin-top:16px; }
-  .comp-progressbar-wrap.show{ display:block; }
-  .comp-progressbar{
-    width:100%; height:10px; border-radius:6px; background:#12121c;
+
+  .comp-progress-wrap{ margin-top:18px; }
+  .comp-progress-bar{
+    height:10px; border-radius:6px; background:#0a0a12;
     border:1px solid var(--border); overflow:hidden;
   }
-  .comp-progressbar-fill{
-    height:100%; width:0%; border-radius:6px;
+  .comp-progress-fill{
+    height:100%; width:0%;
     background:linear-gradient(90deg, var(--purple), var(--cyan));
-    transition:width .25s ease; box-shadow:0 0 12px var(--purple-soft);
+    box-shadow:0 0 12px rgba(155,92,255,0.5);
+    transition:width .25s ease;
   }
-  .comp-percent{
-    margin-top:7px; text-align:center; font-family:'JetBrains Mono', monospace;
-    font-size:13px; color:var(--cyan); text-shadow:0 0 10px rgba(46,230,214,0.5);
+  .comp-progress-label{
+    text-align:center; font-family:'JetBrains Mono', monospace; font-size:12px;
+    color:var(--text-dim); margin-top:8px; letter-spacing:0.04em;
   }
-  .comp-download-btn{ margin-top:14px; text-decoration:none; }
-  .comp-reset-btn{
-    width:100%; margin-top:10px; padding:12px; border:1px solid var(--border);
-    border-radius:12px; background:transparent; color:var(--text-dim);
-    font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:13px;
-    cursor:pointer; transition:border-color .2s, color .2s;
+
+  .comp-error{
+    display:none; margin-top:14px; padding:12px 16px; border-radius:12px;
+    border:1px solid var(--warn-soft); background:rgba(255,107,107,0.08);
+    color:#ffb3b3; font-size:13px; font-weight:600; line-height:1.55;
   }
-  .comp-reset-btn:hover{ border-color:var(--purple); color:#fff; }
-  .comp-note{ margin-top:16px; }
-  .comp-error{ display:none; }
+  .comp-error.show{ display:block; }
+
+  .comp-done{
+    display:none; margin-top:16px; padding:16px 18px; border-radius:14px;
+    border:1px solid var(--cyan-soft); background:rgba(46,230,214,0.06);
+  }
+  .comp-done.show{ display:block; }
+  .comp-download-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:12px; width:100%; padding:14px; border-radius:12px;
+    background:linear-gradient(90deg, #25D366, #1fb055); color:#062b12;
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:14.5px;
+    text-decoration:none; cursor:pointer; box-shadow:0 10px 26px rgba(37,211,102,0.25);
+    transition: transform 0.15s ease;
+  }
+  .comp-download-btn:hover{ transform:translateY(-2px); }
+
+  .comp-warn-note{
+    margin-top:18px; padding:14px 16px; border-radius:12px;
+    border:1px solid rgba(255,210,122,0.3); background:rgba(255,210,122,0.06);
+    color:var(--gold); font-size:12px; line-height:1.65;
+  }
+
 
   /* ---------- Order buttons (multi-channel) ---------- */
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
@@ -686,49 +757,6 @@
     font-family:'JetBrains Mono', monospace; font-size:12.5px;
     color:var(--cyan); text-shadow:0 0 10px rgba(46,230,214,0.5);
   }
-
-  /* Tutorial */
-  .tutorial-panel{ padding:22px 24px; }
-  .tutorial-panel .panel-head{
-    margin-bottom:0; cursor:pointer; user-select:none;
-  }
-  .tutorial-toggle-btn{
-    display:flex; align-items:center; gap:6px;
-    background:rgba(155,92,255,0.12); border:1px solid var(--purple-soft);
-    color:#c9b8ff; font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700;
-    letter-spacing:0.04em; border-radius:10px; padding:7px 12px; cursor:pointer;
-    transition:all .2s ease;
-  }
-  .tutorial-toggle-btn:hover{ border-color:var(--purple); color:#fff; box-shadow:0 0 14px rgba(155,92,255,0.35); }
-  .tutorial-toggle-btn .chev{ display:inline-block; transition:transform .25s ease; }
-  .tutorial-panel.open .tutorial-toggle-btn .chev{ transform:rotate(180deg); }
-  .tutorial-body{
-    max-height:0; overflow:hidden; opacity:0;
-    transition:max-height .35s ease, opacity .3s ease, margin-top .3s ease;
-  }
-  .tutorial-panel.open .tutorial-body{
-    max-height:900px; opacity:1; margin-top:20px;
-  }
-  .tutorial-steps{
-    list-style:none; margin:0; padding:0;
-    display:flex; flex-direction:column; gap:14px;
-  }
-  .tutorial-steps li{
-    display:flex; align-items:flex-start; gap:14px;
-    font-size:13.5px; line-height:1.65; color:#cfd3e6;
-  }
-  .tutorial-steps .t-num{
-    flex:none; width:26px; height:26px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(135deg, var(--purple), var(--cyan));
-    color:#0a0a14; font-family:'JetBrains Mono', monospace; font-weight:800; font-size:12.5px;
-    box-shadow:0 0 12px rgba(155,92,255,0.45);
-  }
-  .tutorial-steps li a{
-    color:var(--cyan); text-decoration:underline; text-underline-offset:2px;
-  }
-  .tutorial-steps li a:hover{ text-shadow:0 0 10px rgba(46,230,214,0.6); }
-  .tutorial-steps li b{ color:#fff; }
 
   footer{
     text-align:center; margin-top:34px; color:var(--text-faint); font-size:12px;
@@ -865,25 +893,6 @@
     <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
   </div>
 
-  <div class="panel tutorial-panel" id="tutorialPanel">
-    <div class="panel-head" id="tutorialToggleHead">
-      <div class="label" data-i18n="tutorialLabel">როგორ გავაკეთო შეკვეთა?</div>
-      <button type="button" class="tutorial-toggle-btn" id="tutorialToggleBtn">
-        <span data-i18n="tutorialToggleText">ვრცლად</span> <span class="chev">▾</span>
-      </button>
-    </div>
-    <div class="tutorial-body" id="tutorialBody">
-      <ol class="tutorial-steps">
-        <li><span class="t-num">1</span><span data-i18n="tutorialStep1">აირჩიეთ სასურველი ვიდეოს <b>ფორმატი / ხარისხი</b> (რეზოლუცია და fps) კალკულატორში.</span></li>
-        <li><span class="t-num">2</span><span data-i18n="tutorialStep2">თუ <b>ზუსტად არ იცით</b> ვიდეოს ხანგრძლივობა — ატვირთეთ ვიდეო <b>VIDEO SCANNER</b>-ში და ხანგრძლივობა ავტომატურად გაიზომება და ჩაისმება კალკულატორში.</span></li>
-        <li><span class="t-num">3</span><span data-i18n="tutorialStep3">თუ ხანგრძლივობა <b>ზუსტად იცით</b> — ხელით მონიშნეთ შესაბამის ველში: „მონიშნე ზუსტი დრო (წამი)" და „წამის მეასედი / კადრი (Milliseconds)".</span></li>
-        <li><span class="t-num">4</span><span data-i18n="tutorialStep4">ეკრანზე დაუყოვნებლივ ნახავთ ვიდეოს მონტაჟის <b>საბოლოო ღირებულებას</b> რეალურ დროში.</span></li>
-        <li><span class="t-num">5</span><span data-i18n="tutorialStep5">სურვილის შემთხვევაში, დააჭირეთ <b>„გაგზავნე შეკვეთა"</b> და გამომიგზავნეთ შეკვეთა <b>WhatsApp</b>-ზე ან <b>Telegram</b>-ზე.</span></li>
-        <li><span class="t-num">6</span><span data-i18n="tutorialStep6">ვიდეოს გამოსაგზავნად ატვირთეთ ის <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>-ზე, შემდეგ კი მიღებული ლინკი გამომიგზავნეთ <b>Telegram</b>-ზე ან <b>WhatsApp</b>-ზე.</span></li>
-      </ol>
-    </div>
-  </div>
-
   <div class="panel">
     <div class="panel-head">
       <div class="label" data-i18n="priceReadout">PRICE READOUT</div>
@@ -1002,60 +1011,65 @@
     </div>
   </div>
 
-  <!-- Video compressor (client-side, ffmpeg.wasm / WebAssembly — no upload to any server) -->
+  <!-- Video compressor -->
   <div class="panel">
     <div class="panel-head">
       <div class="label" data-i18n="compressorLabel">VIDEO COMPRESSOR</div>
     </div>
-    <p class="comp-intro" data-i18n="compIntro">ატვირთე მძიმე ვიდეო ფაილი და შეკუმშე სასურველ ზომამდე — დამუშავება 100% ხდება შენს ბრაუზერში (WebAssembly), ფაილი არსად იგზავნება და არავინ ხედავს მას.</p>
 
     <div class="drop-zone" id="compDropZone">
       <input type="file" id="compVideoInput" accept="video/*">
-      <div class="dz-icon">🗜</div>
-      <div class="dz-title" data-i18n="compDzTitle">ჩააგდე ან აირჩიე ვიდეო შესაკუმშად</div>
-      <div class="dz-sub" data-i18n="compDzSub">რეკომენდებულია 1.5GB-მდე ფაილები — ყველა დამუშავება ხდება ლოკალურად</div>
+      <div class="dz-icon">&#10052;</div>
+      <div class="dz-title" data-i18n="compDzTitle">დააგდე ან აირჩიე ვიდეო ფაილი</div>
+      <div class="dz-sub" data-i18n="compDzSub">რეკომენდებული 1.5GB-მდე ფაილები &mdash; მთელი დამუშავება ხდება ლოკალურად</div>
     </div>
+
+    <div class="comp-loading" id="compLoading"><span class="spin"></span> <span data-i18n="compModuleLoading">იტვირთება შეკუმშვის მოდული&hellip;</span></div>
+
+    <div class="comp-module-error" id="compModuleError">
+      <div>&#9888;&#65039; <span data-i18n="compModuleErrorText">ვერ ჩაიტვირთა შეკუმშვის მოდული &mdash; შეამოწმეთ ინტერნეტ კავშირი და სცადეთ ხელახლა.</span></div>
+      <button type="button" class="comp-retry-btn" id="compRetryBtn" data-i18n="compRetry">ხელახლა ცდა</button>
+    </div>
+
+    <div class="scan-progress" id="compScanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება&hellip;</span></div>
 
     <div class="scan-result" id="compFileInfo">
-      <div class="sr-row"><span data-i18n="srFile">ფაილი</span><b id="compFileName">—</b></div>
-      <div class="sr-row"><span data-i18n="srDuration">ხანგრძლივობა</span><b id="compFileDuration">—</b></div>
-      <div class="sr-row"><span data-i18n="compOrigSize">ორიგინალი ზომა</span><b id="compFileSize">—</b></div>
+      <div class="sr-row"><span data-i18n="srFile">ფაილი</span><b id="compFileName">&mdash;</b></div>
+      <div class="sr-row"><span data-i18n="srDuration">ხანგრძლივობა</span><b id="compFileDuration">&mdash;</b></div>
+      <div class="sr-row"><span data-i18n="compOrigSize">ორიგინალი ზომა</span><b id="compFileSize">&mdash;</b></div>
     </div>
 
-    <div class="field" id="compTargetField" style="display:none;">
+    <div class="field" id="compSizeField" style="display:none; margin-top:20px;">
       <div class="field-top">
-        <label data-i18n="compTargetLabel">სასურველი საბოლოო ზომა (MB)</label>
-        <span class="val" id="compTargetVal">30</span>
+        <label data-i18n="compTargetSize">სასურველი საბოლოო ზომა (MB)</label>
+        <span class="val" id="compSizeVal">30</span>
       </div>
       <div class="timeline">
-        <input type="range" id="compTargetRange" min="5" max="500" step="1" value="30">
+        <input type="range" id="compSizeRange" min="1" max="500" step="1" value="30">
       </div>
-      <input type="number" class="num-input" id="compTargetInput" min="5" max="2000" value="30" style="margin-top:10px;">
+      <div class="comp-size-row" style="margin-top:10px;">
+        <input type="number" class="num-input" id="compSizeInput" min="1" max="99999" value="30">
+      </div>
       <div class="hint" id="compBitrateHint"></div>
     </div>
 
-    <button type="button" class="order-btn comp-start-btn" id="compStartBtn" style="display:none;">
-      <span class="ico">🗜</span> <span data-i18n="compStartBtnText">შეკუმშვის დაწყება</span>
+    <button type="button" class="comp-start-btn" id="compStartBtn" style="display:none;" disabled>
+      <span>&#10052;</span> <span data-i18n="compStart">შეკუმშვის დაწყება</span>
     </button>
 
-    <div class="scan-progress" id="compProgress">
-      <span class="spin"></span> <span id="compProgressLabel" data-i18n="compLoadingModule">იტვირთება შეკუმშვის მოდული…</span>
-    </div>
-    <div class="comp-progressbar-wrap" id="compProgressBarWrap">
-      <div class="comp-progressbar"><div class="comp-progressbar-fill" id="compProgressFill"></div></div>
-      <div class="comp-percent" id="compProgressPercent">0%</div>
+    <div class="comp-progress-wrap" id="compProgressWrap" style="display:none;">
+      <div class="comp-progress-bar"><div class="comp-progress-fill" id="compProgressFill"></div></div>
+      <div class="comp-progress-label" id="compProgressLabel">0%</div>
     </div>
 
-    <div class="scan-result" id="compResult">
-      <div class="sr-row"><span data-i18n="compOrigSize">ორიგინალი ზომა</span><b id="compResOrig">—</b></div>
-      <div class="sr-row"><span data-i18n="compFinalSize">საბოლოო ზომა</span><b id="compResFinal">—</b></div>
-      <div class="sr-row"><span data-i18n="compReduction">შემცირდა</span><b id="compResReduction">—</b></div>
-      <a class="order-btn wa comp-download-btn" id="compDownloadBtn" download="compressed.mp4"><span class="ico">⬇</span> <span data-i18n="compDownloadBtnText">გადმოწერე შეკუმშული ვიდეო</span></a>
-      <button type="button" class="comp-reset-btn" id="compResetBtn" data-i18n="compResetBtnText">კიდევ ერთის შეკუმშვა</button>
+    <div class="comp-error" id="compRunError"></div>
+
+    <div class="comp-done" id="compDone">
+      <div class="sr-row"><span data-i18n="compFinalSize">საბოლოო ზომა</span><b id="compFinalSize">&mdash;</b></div>
+      <a class="comp-download-btn" id="compDownloadBtn" download>&#11015;&#65039; <span data-i18n="compDownload">ჩამოტვირთვა</span></a>
     </div>
 
-    <div class="sr-warn comp-error" id="compError" style="display:none;"></div>
-    <div class="hint comp-note" data-i18n="compNote">⚠️ შეკუმშვა ხდება პირდაპირ შენს ბრაუზერში (WebAssembly-ით), სერვერზე არაფერი იტვირთება. ძალიან დიდი ან გრძელი ფაილების დამუშავებას შეიძლება რამდენიმე წუთი დასჭირდეს — გთხოვთ არ დახუროთ ტაბი პროცესის დასრულებამდე. მნიშვნელოვანია გვახსოვდეს: 100%-ით უხარისხოდ შეკუმშვა ფიზიკურად შეუძლებელია — რაც უფრო მცირე საბოლოო ზომას ირჩევთ, მით მეტი ხარისხი იკარგება მოცემულობის კანონის მიხედვით.</div>
+    <div class="comp-warn-note" data-i18n="compWarnNote">&#9888;&#65039; შეკუმშვა ხდება პირდაპირ თქვენს ბრაუზერში (WebAssembly), სერვერზე არაფერი იტვირთება. მსხვილი ფაილების დამუშავებას შეიძლება რამდენიმე წუთი დასჭირდეს &mdash; გთხოვთ არ დახუროთ ეს ჩანართი პროცესის დასრულებამდე. ასევე გაითვალისწინეთ, რომ 100%-ით ზუსტი შედეგი გარანტირებული არ არის &mdash; რაც უფრო მცირე საბოლოო ზომას აირჩევთ, მით მეტი ხარისხის დაკარგვა მოხდება ამის საკომპენსაციოდ.</div>
   </div>
 
   <!-- Order channels -->
@@ -1070,6 +1084,22 @@
     <div class="copy-note" id="copyNote"></div>
   </div>
 
+  <!-- Comments -->
+  <div class="panel comments-panel" style="padding:22px;">
+    <div class="panel-head" style="margin-bottom:16px;">
+      <div class="label" data-i18n="commentsLabel">კომენტარები</div>
+    </div>
+    <div class="c-form">
+      <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი">
+      <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
+      <div class="c-error" id="commentError"></div>
+      <button class="c-submit" id="commentSubmit" data-i18n="commentSubmit">გამოქვეყნება</button>
+    </div>
+    <div class="c-list" id="commentList">
+      <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარია — იყავი პირველი!</div>
+    </div>
+  </div>
+
   <div class="warn-panel">
     <div class="w-head">
       <div class="ico">!</div>
@@ -1082,7 +1112,7 @@
     <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
   </div>
 
-  <footer><span data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
+  <footer data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
 
 </div>
 
@@ -1100,7 +1130,12 @@
     </div>
     <div id="adminDashboard" style="display:none;">
       <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
+      <div class="a-tabs">
+        <button class="a-tab active" id="adminTabVisits" data-i18n="adminTabVisits">ვიზიტორები</button>
+        <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
+      </div>
       <div class="a-panel active" id="adminPanelVisits"></div>
+      <div class="a-panel" id="adminPanelComments"></div>
       <button class="a-close" id="adminCloseDash" data-i18n="adminClose">დახურვა</button>
     </div>
   </div>
@@ -1126,6 +1161,14 @@
     <button class="chat-send" id="chatSend">➤</button>
   </div>
 </div>
+
+<!-- ffmpeg.wasm - client-side video compression. Single-thread "core"
+     build is used on purpose: it needs no cross-origin-isolation
+     (COOP/COEP) headers, unlike the multi-thread "core-mt" build, so it
+     works on plain static hosting. All video processing happens locally
+     in the visitor's browser; nothing is ever uploaded to a server. -->
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 
 <script>
   // ============================================================
@@ -1182,45 +1225,42 @@
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
       chartLabel: 'ფასის შედარება ამჟამინდელი ხანგრძლივობით',
+      commentsLabel: 'კომენტარები',
+      commentNamePh: 'სახელი',
+      commentTextPh: 'დაწერე კომენტარი…',
+      commentSubmit: 'გამოქვეყნება',
+      commentEmpty: 'ჯერ არცერთი კომენტარია — იყავი პირველი!',
+      commentErrEmpty: 'გთხოვთ შეავსოთ სახელი და კომენტარის ველი.',
+      commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
+      commentErrGeneric: 'კომენტარის გამოქვეყნება ვერ მოხერხდა — სცადეთ ხელახლა.',
       adminTitle: 'ადმინის პანელი',
       adminPassPh: 'პაროლი',
       adminEnter: 'შესვლა',
       adminWrongPass: 'არასწორი პაროლი',
       adminClose: 'დახურვა',
       adminTabVisits: 'ვიზიტორები',
+      adminTabComments: 'კომენტარები',
       adminNoVisits: 'ვიზიტები ჯერ არ დაფიქსირებულა.',
-      tutorialLabel: 'როგორ გავაკეთო შეკვეთა?',
-      tutorialToggleText: 'ვრცლად',
-      tutorialStep1: 'აირჩიეთ სასურველი ვიდეოს <b>ფორმატი / ხარისხი</b> (რეზოლუცია და fps) კალკულატორში.',
-      tutorialStep2: 'თუ <b>ზუსტად არ იცით</b> ვიდეოს ხანგრძლივობა — ატვირთეთ ვიდეო <b>VIDEO SCANNER</b>-ში და ხანგრძლივობა ავტომატურად გაიზომება და ჩაისმება კალკულატორში.',
-      tutorialStep3: 'თუ ხანგრძლივობა <b>ზუსტად იცით</b> — ხელით მონიშნეთ შესაბამის ველში: „მონიშნე ზუსტი დრო (წამი)" და „წამის მეასედი / კადრი (Milliseconds)".',
-      tutorialStep4: 'ეკრანზე დაუყოვნებლივ ნახავთ ვიდეოს მონტაჟის <b>საბოლოო ღირებულებას</b> რეალურ დროში.',
-      tutorialStep5: 'სურვილის შემთხვევაში, დააჭირეთ <b>„გაგზავნე შეკვეთა"</b> და გამომიგზავნეთ შეკვეთა <b>WhatsApp</b>-ზე ან <b>Telegram</b>-ზე.',
-      tutorialStep6: 'ვიდეოს გამოსაგზავნად ატვირთეთ ის <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>-ზე, შემდეგ კი მიღებული ლინკი გამომიგზავნეთ <b>Telegram</b>-ზე ან <b>WhatsApp</b>-ზე.',
-
+      adminNoComments: 'კომენტარები ჯერ არ არის.',
+      adminSave: 'შენახვა',
+      adminDelete: 'წაშლა',
       compressorLabel: 'VIDEO COMPRESSOR',
-      compIntro: 'ატვირთე მძიმე ვიდეო ფაილი და შეკუმშე სასურველ ზომამდე — დამუშავება 100% ხდება შენს ბრაუზერში (WebAssembly), ფაილი არსად იგზავნება და არავინ ხედავს მას.',
-      compDzTitle: 'ჩააგდე ან აირჩიე ვიდეო შესაკუმშად',
-      compDzSub: 'რეკომენდებულია 1.5GB-მდე ფაილები — ყველა დამუშავება ხდება ლოკალურად',
+      compDzTitle: 'დააგდე ან აირჩიე ვიდეო ფაილი',
+      compDzSub: 'რეკომენდებული 1.5GB-მდე ფაილები — მთელი დამუშავება ხდება ლოკალურად',
+      compModuleLoading: 'იტვირთება შეკუმშვის მოდული…',
+      compModuleErrorText: 'ვერ ჩაიტვირთა შეკუმშვის მოდული — შეამოწმეთ ინტერნეტ კავშირი და სცადეთ ხელახლა.',
+      compRetry: 'ხელახლა ცდა',
       compOrigSize: 'ორიგინალი ზომა',
-      compTargetLabel: 'სასურველი საბოლოო ზომა (MB)',
-      compTargetHint: 'რაც უფრო პატარა ზომას აირჩევ ორიგინალთან შედარებით, მით მეტად დაეცემა ვიდეოს ხარისხი — სავარაუდო ბიტრეიტი: {BR} კბ/წმ',
-      compTargetHintLow: '⚠️ ეს ბიტრეიტი ძალიან დაბალია ({BR} კბ/წმ) — ვიდეოში შესამჩნევი იქნება ხარისხის დაკარგვა. სცადე უფრო დიდი სასურველი ზომა.',
-      compStartBtnText: 'შეკუმშვის დაწყება',
-      compLoadingModule: 'იტვირთება შეკუმშვის მოდული (პირველად შეიძლება ცოტა დრო დასჭირდეს)…',
-      compReadingFile: 'ფაილი იტვირთება...',
-      compEncoding: 'მიმდინარეობს შეკუმშვა…',
-      compFinalizing: 'საბოლოო ფაილი ემზადება…',
+      compTargetSize: 'სასურველი საბოლოო ზომა (MB)',
+      compStart: 'შეკუმშვის დაწყება',
+      compCompressing: 'იკუმშება…',
       compFinalSize: 'საბოლოო ზომა',
-      compReduction: 'შემცირდა',
-      compDownloadBtnText: 'გადმოწერე შეკუმშული ვიდეო',
-      compResetBtnText: 'კიდევ ერთის შეკუმშვა',
-      compErrNotVideo: '⚠️ გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
-      compErrTooBig: '⚠️ ეს ფაილი ძალიან დიდია ბრაუზერში დასამუშავებლად (მაქს. ~1.5GB) — ბრაუზერს შეიძლება არ ეყოს მეხსიერება. სცადეთ უფრო პატარა ან უფრო მოკლე ვიდეო.',
-      compErrGeneric: '❌ შეკუმშვისას მოხდა შეცდომა — სცადეთ ხელახლა, ან სცადეთ უფრო პატარა ფაილით. თუ ბრაუზერის ტაბი ბევრ სხვა პროგრამასთან ერთად მუშაობდა, სცადეთ დახუროთ დანარჩენი ტაბები და კვლავ სცადეთ.',
-      compErrLoadModule: '❌ ვერ ჩაიტვირთა შეკუმშვის მოდული — შეამოწმეთ ინტერნეტ კავშირი და სცადეთ ხელახლა.',
-      compErrFileProtocol: '⚠️ ეს ფუნქცია არ მუშაობს, თუ index.html ფაილს პირდაპირ, ორჯერდაწკაპებით ხსნით ბრაუზერში (მისამართში წერია file://...). საჭიროა საიტი განთავსდეს რეალურ ჰოსტინგზე (მაგ. Netlify, GitHub Pages, ან თქვენი დომენი) — მხოლოდ მაშინ ჩაიტვირთება შეკუმშვის მოდული სწორად. ტესტირებისთვის შეგიძლიათ გამოიყენოთ ლოკალური სერვერიც.',
-      compNote: '⚠️ შეკუმშვა ხდება პირდაპირ შენს ბრაუზერში (WebAssembly-ით), სერვერზე არაფერი იტვირთება. ძალიან დიდი ან გრძელი ფაილების დამუშავებას შეიძლება რამდენიმე წუთი დასჭირდეს — გთხოვთ არ დახუროთ ტაბი პროცესის დასრულებამდე. მნიშვნელოვანია გვახსოვდეს: 100%-ით უხარისხოდ შეკუმშვა ფიზიკურად შეუძლებელია — რაც უფრო მცირე საბოლოო ზომას ირჩევთ, მით მეტი ხარისხი იკარგება მოცემულობის კანონის მიხედვით.',
+      compDownload: 'ჩამოტვირთვა',
+      compWarnNote: '⚠️ შეკუმშვა ხდება პირდაპირ თქვენს ბრაუზერში (WebAssembly), სერვერზე არაფერი იტვირთება. მსხვილი ფაილების დამუშავებას შეიძლება რამდენიმე წუთი დასჭირდეს — გთხოვთ არ დახუროთ ეს ჩანართი პროცესის დასრულებამდე. ასევე გაითვალისწინეთ, რომ 100%-ით ზუსტი შედეგი გარანტირებული არ არის — რაც უფრო მცირე საბოლოო ზომას აირჩევთ, მით მეტი ხარისხის დაკარგვა მოხდება ამის საკომპენსაციოდ.',
+      compBitrateHint: 'სავარაუდო ვიდეო ბიტრეიტი: {BR} კბ/წმ',
+      compTooSmall: 'მითითებული ზომა ძალიან მცირეა ამ ხანგრძლივობის ვიდეოსთვის — აირჩიეთ დიდი ზომა.',
+      compRunErrorGeneric: 'შეკუმშვისას მოხდა შეცდომა — სცადეთ სხვა ფაილით ან ხელახლა.',
+      compNotReady: 'შეკუმშვის მოდული ჯერ არ არის მზად — დაელოდეთ ჩატვირთვას.',
     },
     en: {
       visitorsLabel: 'Total visitors:',
@@ -1272,45 +1312,42 @@
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
       chartLabel: 'Price comparison at the current duration',
+      commentsLabel: 'Comments',
+      commentNamePh: 'Name',
+      commentTextPh: 'Write a comment…',
+      commentSubmit: 'Post',
+      commentEmpty: 'No comments yet — be the first!',
+      commentErrEmpty: 'Please fill in both the name and comment fields.',
+      commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
+      commentErrGeneric: 'Could not post the comment — please try again.',
       adminTitle: 'Admin panel',
       adminPassPh: 'Password',
       adminEnter: 'Enter',
       adminWrongPass: 'Incorrect password',
       adminClose: 'Close',
       adminTabVisits: 'Visitors',
+      adminTabComments: 'Comments',
       adminNoVisits: 'No visits recorded yet.',
-      tutorialLabel: 'How to place an order?',
-      tutorialToggleText: 'Show details',
-      tutorialStep1: 'Choose the <b>video format / quality</b> you want (resolution and fps) in the calculator.',
-      tutorialStep2: 'If you <b>don\'t know the exact duration</b> of your video — upload it to the <b>VIDEO SCANNER</b> and the duration will be measured automatically and filled into the calculator.',
-      tutorialStep3: 'If you <b>know the exact duration</b> — enter it manually in the "Select exact duration (seconds)" and "Hundredths of a second / frame (Milliseconds)" fields.',
-      tutorialStep4: 'You\'ll immediately see the <b>final editing price</b> on screen, in real time.',
-      tutorialStep5: 'If you\'d like to order, click <b>"Send order"</b> and send it to us via <b>WhatsApp</b> or <b>Telegram</b>.',
-      tutorialStep6: 'To send the video itself, upload it to <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>, then send us the resulting link via <b>Telegram</b> or <b>WhatsApp</b>.',
-
+      adminNoComments: 'No comments yet.',
+      adminSave: 'Save',
+      adminDelete: 'Delete',
       compressorLabel: 'VIDEO COMPRESSOR',
-      compIntro: 'Upload a heavy video file and shrink it to your target size — everything runs 100% in your browser (WebAssembly), the file is never uploaded anywhere and no one sees it.',
-      compDzTitle: 'Drag it here or click to select a video to compress',
+      compDzTitle: 'Drop or select a video file',
       compDzSub: 'Recommended up to 1.5GB — all processing happens locally',
+      compModuleLoading: 'Loading compression module…',
+      compModuleErrorText: 'Failed to load the compression module — check your internet connection and try again.',
+      compRetry: 'Retry',
       compOrigSize: 'Original size',
-      compTargetLabel: 'Target final size (MB)',
-      compTargetHint: 'The smaller the target size compared to the original, the more quality will drop — estimated bitrate: {BR} kbps',
-      compTargetHintLow: '⚠️ This bitrate is very low ({BR} kbps) — noticeable quality loss is expected. Try a larger target size.',
-      compStartBtnText: 'Start compressing',
-      compLoadingModule: 'Loading the compression module (may take a moment on first use)…',
-      compReadingFile: 'Loading the file...',
-      compEncoding: 'Compressing…',
-      compFinalizing: 'Finalizing the output file…',
+      compTargetSize: 'Desired final size (MB)',
+      compStart: 'Start compression',
+      compCompressing: 'Compressing…',
       compFinalSize: 'Final size',
-      compReduction: 'Reduced by',
-      compDownloadBtnText: 'Download compressed video',
-      compResetBtnText: 'Compress another one',
-      compErrNotVideo: '⚠️ Please upload a video file (mp4, mov, webm, etc.)',
-      compErrTooBig: '⚠️ This file is too large to process in a browser (max ~1.5GB) — the browser may run out of memory. Try a smaller or shorter video.',
-      compErrGeneric: '❌ Something went wrong while compressing — please try again, or try a smaller file. If the browser tab has a lot of other tabs/apps running, try closing them and retry.',
-      compErrLoadModule: '❌ Could not load the compression module — check your internet connection and try again.',
-      compErrFileProtocol: '⚠️ This feature doesn\'t work if you open index.html directly by double-clicking it (the address bar shows file://...). The site needs to be served over http(s):// — deployed on real hosting (e.g. Netlify, GitHub Pages, or your own domain), or run through a local dev server for testing.',
-      compNote: '⚠️ Compression runs entirely in your browser (WebAssembly) — nothing is uploaded to a server. Very large or long files may take several minutes; please don\'t close the tab until it finishes. Important: perfectly lossless compression is not physically possible — the smaller the target size you choose, the more quality is lost.',
+      compDownload: 'Download',
+      compWarnNote: '⚠️ Compression happens directly in your browser (WebAssembly) — nothing is uploaded to any server. Large files may take several minutes to process — please don\'t close this tab until it finishes. Also note that a 100% exact result isn\'t guaranteed — the smaller the target size you pick, the more quality is sacrificed to reach it.',
+      compBitrateHint: 'Estimated video bitrate: {BR} kbps',
+      compTooSmall: 'The target size is too small for this video\'s length — choose a larger size.',
+      compRunErrorGeneric: 'Something went wrong during compression — try another file or try again.',
+      compNotReady: 'The compression module isn\'t ready yet — please wait for it to finish loading.',
     }
   };
 
@@ -1337,7 +1374,6 @@
     document.getElementById('langKa').classList.toggle('active', currentLang === 'ka');
     document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
     if (typeof refresh === 'function') refresh();
-    if (typeof window.updateCompBitrateHint === 'function') window.updateCompBitrateHint();
   }
 
   function setLanguage(lang){
@@ -1442,7 +1478,8 @@
     const price = calculateExactPrice(s, ms, isSub, quality);
     priceDisplay.innerHTML = price + '<sup>₾</sup>';
     priceDisplay.classList.remove('bump');
-    requestAnimationFrame(() => requestAnimationFrame(() => priceDisplay.classList.add('bump')));
+    void priceDisplay.offsetWidth;
+    priceDisplay.classList.add('bump');
 
     subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
 
@@ -1451,25 +1488,11 @@
     return price;
   }
 
-  // Slider 'input' events can fire far more often than the screen can
-  // repaint (especially while dragging on touch devices). Coalesce
-  // bursts of events into a single refresh() per animation frame so
-  // the chart rebuild + price calc doesn't run dozens of times a second.
-  let refreshQueued = false;
-  function scheduleRefresh(){
-    if (refreshQueued) return;
-    refreshQueued = true;
-    requestAnimationFrame(() => {
-      refreshQueued = false;
-      refresh();
-    });
-  }
-
   secondsRange.addEventListener('input', () => {
     secondsInput.value = secondsRange.value;
-    scheduleRefresh();
+    refresh();
   });
-  secondsInput.addEventListener('input', () => scheduleRefresh());
+  secondsInput.addEventListener('input', () => refresh());
   secondsInput.addEventListener('blur', () => {
     let v = parseFloat(secondsInput.value || 0);
     if (isNaN(v) || v < 0) v = 0;
@@ -1477,7 +1500,7 @@
     secondsInput.value = v;
     refresh();
   });
-  msRange.addEventListener('input', () => scheduleRefresh());
+  msRange.addEventListener('input', () => refresh());
   subToggle.addEventListener('change', () => refresh());
 
   const qualityGrid = document.getElementById('qualityGrid');
@@ -1729,344 +1752,292 @@
   }
 
   // ============================================================
-  // 2B) VIDEO COMPRESSOR — 100% client-side, WebAssembly (ffmpeg.wasm)
-  // No file is ever uploaded to any server: everything below runs
-  // inside the visitor's own browser tab.
+  // 2.5) VIDEO COMPRESSOR (client-side, via ffmpeg.wasm)
   // ============================================================
-  (function initCompressor(){
-    const compDropZone = document.getElementById('compDropZone');
-    const compVideoInput = document.getElementById('compVideoInput');
-    const compFileInfo = document.getElementById('compFileInfo');
-    const compFileName = document.getElementById('compFileName');
-    const compFileDuration = document.getElementById('compFileDuration');
-    const compFileSize = document.getElementById('compFileSize');
-    const compTargetField = document.getElementById('compTargetField');
-    const compTargetVal = document.getElementById('compTargetVal');
-    const compTargetRange = document.getElementById('compTargetRange');
-    const compTargetInput = document.getElementById('compTargetInput');
-    const compBitrateHint = document.getElementById('compBitrateHint');
-    const compStartBtn = document.getElementById('compStartBtn');
-    const compProgress = document.getElementById('compProgress');
-    const compProgressLabel = document.getElementById('compProgressLabel');
-    const compProgressBarWrap = document.getElementById('compProgressBarWrap');
-    const compProgressFill = document.getElementById('compProgressFill');
-    const compProgressPercent = document.getElementById('compProgressPercent');
-    const compResult = document.getElementById('compResult');
-    const compResOrig = document.getElementById('compResOrig');
-    const compResFinal = document.getElementById('compResFinal');
-    const compResReduction = document.getElementById('compResReduction');
-    const compDownloadBtn = document.getElementById('compDownloadBtn');
-    const compResetBtn = document.getElementById('compResetBtn');
-    const compError = document.getElementById('compError');
+  const compDropZone = document.getElementById('compDropZone');
+  const compVideoInput = document.getElementById('compVideoInput');
+  const compLoading = document.getElementById('compLoading');
+  const compModuleError = document.getElementById('compModuleError');
+  const compRetryBtn = document.getElementById('compRetryBtn');
+  const compScanProgress = document.getElementById('compScanProgress');
+  const compFileInfo = document.getElementById('compFileInfo');
+  const compFileName = document.getElementById('compFileName');
+  const compFileDuration = document.getElementById('compFileDuration');
+  const compFileSize = document.getElementById('compFileSize');
+  const compSizeField = document.getElementById('compSizeField');
+  const compSizeRange = document.getElementById('compSizeRange');
+  const compSizeVal = document.getElementById('compSizeVal');
+  const compSizeInput = document.getElementById('compSizeInput');
+  const compBitrateHint = document.getElementById('compBitrateHint');
+  const compStartBtn = document.getElementById('compStartBtn');
+  const compProgressWrap = document.getElementById('compProgressWrap');
+  const compProgressFill = document.getElementById('compProgressFill');
+  const compProgressLabel = document.getElementById('compProgressLabel');
+  const compRunError = document.getElementById('compRunError');
+  const compDone = document.getElementById('compDone');
+  const compFinalSize = document.getElementById('compFinalSize');
+  const compDownloadBtn = document.getElementById('compDownloadBtn');
 
-    const MAX_BYTES = 1.5 * 1024 * 1024 * 1024; // ~1.5GB soft cap — browser wasm memory is limited
-    const FFMPEG_VER = '0.12.10';
-    const UTIL_VER = '0.12.1'; // NOTE: @ffmpeg/util@0.12.2's UMD build has a known bug
-                                // where it doesn't set window.FFmpegUtil correctly — stick to 0.12.1
-    const CORE_VER = '0.12.10';
+  let ffmpeg = null;
+  let ffmpegReady = false;
+  let ffmpegLoading = false;
+  let compFile = null;
+  let compDuration = 0;
+  let compRunning = false;
 
-    let compState = {
-      file: null,
-      duration: 0,
-      lastObjectUrl: null
-    };
-    let ffmpegInstance = null;
-    let ffmpegLoadPromise = null;
+  function formatBytes(bytes){
+    if (bytes === null || bytes === undefined || isNaN(bytes)) return '—';
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 1024) return (mb / 1024).toFixed(2) + ' GB';
+    return mb.toFixed(2) + ' MB';
+  }
 
-    function fmtMB(bytes){ return (bytes / (1024 * 1024)).toFixed(2) + ' MB'; }
-    function fmtDuration(sec){
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60);
-      return `${m}:${String(s).padStart(2,'0')}`;
+  function formatCompDuration(sec){
+    sec = Math.max(0, Math.round(sec || 0));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  function updateStartBtnState(){
+    compStartBtn.disabled = !ffmpegReady || !compFile || compRunning;
+  }
+
+  async function loadFFmpeg(){
+    if (ffmpegLoading || ffmpegReady) return;
+    if (typeof FFmpegWASM === 'undefined' || typeof FFmpegUtil === 'undefined') {
+      compModuleError.classList.add('show');
+      return;
     }
-
-    function showError(msg){
-      compError.textContent = msg;
-      compError.style.display = 'block';
-    }
-    function clearError(){
-      compError.style.display = 'none';
-      compError.textContent = '';
-    }
-
-    // Estimates a video bitrate (kbps) that lands close to the requested
-    // final size, the same size-first approach the desktop app used
-    // (target bitrate) rather than a fixed quality/CRF value.
-    function estimateBitrate(targetMB, durationSec){
-      if (!durationSec || durationSec <= 0) return { video: 0, audio: 128 };
-      const totalKbps = (targetMB * 8192) / durationSec; // MB -> kilobits budget / seconds
-      let audioKbps = 128;
-      if (totalKbps > 800) audioKbps = 160;
-      else if (totalKbps > 300) audioKbps = 128;
-      else if (totalKbps > 150) audioKbps = 96;
-      else audioKbps = 64;
-      const videoKbps = Math.max(80, Math.floor(totalKbps - audioKbps));
-      return { video: videoKbps, audio: audioKbps };
-    }
-
-    function updateBitrateHint(){
-      if (!compState.duration) return;
-      const targetMB = parseFloat(compTargetInput.value) || 30;
-      const { video } = estimateBitrate(targetMB, compState.duration);
-      if (video < 300) {
-        compBitrateHint.innerHTML = t('compTargetHintLow').replace('{BR}', video);
-      } else {
-        compBitrateHint.innerHTML = t('compTargetHint').replace('{BR}', video);
-      }
-    }
-    window.updateCompBitrateHint = updateBitrateHint;
-
-    ['dragover','dragenter'].forEach(evt => compDropZone.addEventListener(evt, e => { e.preventDefault(); compDropZone.classList.add('dragover'); }));
-    ['dragleave','drop'].forEach(evt => compDropZone.addEventListener(evt, e => { compDropZone.classList.remove('dragover'); }));
-    compDropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleCompFile(e.dataTransfer.files[0]);
-    });
-    compVideoInput.addEventListener('change', e => {
-      if (e.target.files && e.target.files[0]) handleCompFile(e.target.files[0]);
-    });
-
-    function handleCompFile(file){
-      clearError();
-      compResult.classList.remove('show');
-      if (!file.type.startsWith('video/')) {
-        showError(t('compErrNotVideo'));
-        return;
-      }
-      if (file.size > MAX_BYTES) {
-        showError(t('compErrTooBig'));
-        return;
-      }
-
-      const videoEl = document.createElement('video');
-      videoEl.preload = 'metadata';
-      videoEl.muted = true;
-      videoEl.src = URL.createObjectURL(file);
-
-      const cleanup = () => URL.revokeObjectURL(videoEl.src);
-
-      const proceed = (duration) => {
-        compState.file = file;
-        compState.duration = duration;
-
-        compFileName.textContent = file.name.length > 28 ? file.name.slice(0,25) + '…' : file.name;
-        compFileDuration.textContent = fmtDuration(duration);
-        compFileSize.textContent = fmtMB(file.size);
-        compFileInfo.classList.add('show');
-
-        // Default target: 30MB, but never suggest a target larger than the
-        // original file itself.
-        const origMB = file.size / (1024 * 1024);
-        const defaultTarget = Math.max(5, Math.min(30, Math.floor(origMB * 0.9)));
-        compTargetRange.max = Math.max(50, Math.ceil(origMB));
-        compTargetRange.value = defaultTarget;
-        compTargetInput.value = defaultTarget;
-        compTargetVal.textContent = defaultTarget;
-
-        compTargetField.style.display = 'block';
-        compStartBtn.style.display = 'flex';
-        updateBitrateHint();
-        cleanup();
-      };
-
-      videoEl.onloadedmetadata = function(){
-        if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
-          videoEl.currentTime = 1e101;
-          videoEl.ontimeupdate = function(){
-            videoEl.ontimeupdate = null;
-            proceed(videoEl.duration);
-          };
-        } else {
-          proceed(videoEl.duration);
-        }
-      };
-      videoEl.onerror = function(){
-        cleanup();
-        showError(t('compErrNotVideo'));
-      };
-    }
-
-    compTargetRange.addEventListener('input', () => {
-      compTargetInput.value = compTargetRange.value;
-      compTargetVal.textContent = compTargetRange.value;
-      updateBitrateHint();
-    });
-    compTargetInput.addEventListener('input', () => {
-      let v = parseInt(compTargetInput.value, 10);
-      if (isNaN(v)) return;
-      compTargetVal.textContent = v;
-      if (v <= parseInt(compTargetRange.max, 10)) compTargetRange.value = v;
-      updateBitrateHint();
-    });
-
-    // Lazily injects the ffmpeg.wasm <script> tags — most visitors only
-    // want the price calculator, so this multi-MB module is fetched only
-    // once someone actually presses "start compressing".
-    function loadScript(src){
-      return new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('script load failed: ' + src));
-        document.head.appendChild(s);
+    ffmpegLoading = true;
+    compModuleError.classList.remove('show');
+    compLoading.classList.add('show');
+    try {
+      const { FFmpeg } = FFmpegWASM;
+      const { toBlobURL } = FFmpegUtil;
+      const inst = new FFmpeg();
+      const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+      const coreURL = await toBlobURL(base + '/ffmpeg-core.js', 'text/javascript');
+      const wasmURL = await toBlobURL(base + '/ffmpeg-core.wasm', 'application/wasm');
+      inst.on('progress', ({ progress }) => {
+        if (!compRunning) return;
+        const pct = Math.max(0, Math.min(100, Math.round(progress * 100)));
+        compProgressFill.style.width = pct + '%';
+        compProgressLabel.textContent = pct + '%';
       });
+      await inst.load({ coreURL: coreURL, wasmURL: wasmURL });
+      ffmpeg = inst;
+      ffmpegReady = true;
+      compLoading.classList.remove('show');
+      updateStartBtnState();
+    } catch (err) {
+      console.error('ffmpeg load failed', err);
+      compLoading.classList.remove('show');
+      compModuleError.classList.add('show');
+    } finally {
+      ffmpegLoading = false;
     }
+  }
 
-    async function ensureFFmpeg(){
-      if (ffmpegInstance) return ffmpegInstance;
-      if (ffmpegLoadPromise) return ffmpegLoadPromise;
+  compRetryBtn.addEventListener('click', loadFFmpeg);
+  loadFFmpeg();
 
-      ffmpegLoadPromise = (async () => {
-        if (typeof window.FFmpegWASM === 'undefined') {
-          await loadScript(`https://unpkg.com/@ffmpeg/ffmpeg@${FFMPEG_VER}/dist/umd/ffmpeg.js`);
-        }
-        if (typeof window.FFmpegWASM === 'undefined') {
-          throw new Error('window.FFmpegWASM did not load (CDN script loaded but global was not set)');
-        }
-        if (typeof window.FFmpegUtil === 'undefined') {
-          await loadScript(`https://unpkg.com/@ffmpeg/util@${UTIL_VER}/dist/umd/index.js`);
-        }
-        if (typeof window.FFmpegUtil === 'undefined') {
-          throw new Error('window.FFmpegUtil did not load (CDN script loaded but global was not set)');
-        }
-        const { FFmpeg } = window.FFmpegWASM;
-        const { toBlobURL } = window.FFmpegUtil;
-        const ffmpeg = new FFmpeg();
-        const baseURL = `https://unpkg.com/@ffmpeg/core@${CORE_VER}/dist/umd`;
-        await ffmpeg.load({
-          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-        });
-        ffmpegInstance = ffmpeg;
-        return ffmpeg;
-      })();
+  ['dragover', 'dragenter'].forEach(evt => compDropZone.addEventListener(evt, e => { e.preventDefault(); compDropZone.classList.add('dragover'); }));
+  ['dragleave', 'drop'].forEach(evt => compDropZone.addEventListener(evt, e => { compDropZone.classList.remove('dragover'); }));
+  compDropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleCompFile(e.dataTransfer.files[0]);
+  });
+  compVideoInput.addEventListener('change', e => {
+    if (e.target.files && e.target.files[0]) handleCompFile(e.target.files[0]);
+  });
 
-      // If loading fails, clear the cached promise so a retry (e.g. after
-      // the person switches network or CDN) can actually try again instead
-      // of forever returning the same rejected promise.
-      ffmpegLoadPromise.catch(() => { ffmpegLoadPromise = null; });
-
-      return ffmpegLoadPromise;
+  function handleCompFile(file){
+    if (!file.type.startsWith('video/')) {
+      alert(t('alertNotVideo'));
+      return;
     }
+    compFile = null;
+    compDone.classList.remove('show');
+    compRunError.classList.remove('show');
+    compProgressWrap.style.display = 'none';
+    compFileInfo.classList.remove('show');
+    compSizeField.style.display = 'none';
+    compStartBtn.style.display = 'none';
+    updateStartBtnState();
+    compScanProgress.classList.add('show');
 
-    compStartBtn.addEventListener('click', async () => {
-      if (!compState.file) return;
-      clearError();
+    const videoEl = document.createElement('video');
+    videoEl.preload = 'metadata';
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+    videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
+    document.body.appendChild(videoEl);
 
-      // ffmpeg.wasm fetches its core files via fetch()/toBlobURL, which
-      // browsers block for pages opened directly as file:// (double-clicked
-      // locally). It only works once the page is actually served over
-      // http(s):// — a real host, or a local dev server for testing.
-      if (location.protocol === 'file:') {
-        showError(t('compErrFileProtocol'));
-        return;
-      }
+    const cleanup = () => {
+      compScanProgress.classList.remove('show');
+      URL.revokeObjectURL(videoEl.src);
+      videoEl.remove();
+    };
 
-      compResult.classList.remove('show');
-      compStartBtn.disabled = true;
-      compProgress.classList.add('show');
-      compProgressLabel.textContent = t('compLoadingModule');
-      compProgressBarWrap.classList.remove('show');
-      compProgressFill.style.width = '0%';
-      compProgressPercent.textContent = '0%';
+    const proceed = (duration) => {
+      finishCompScan(duration, file);
+      cleanup();
+    };
 
-      let ffmpeg;
-      try {
-        ffmpeg = await ensureFFmpeg();
-      } catch (err) {
-        console.error('[compressor] failed to load ffmpeg.wasm:', err);
-        compProgress.classList.remove('show');
-        compStartBtn.disabled = false;
-        showError(t('compErrLoadModule'));
-        return;
-      }
-
-      try {
-        const { fetchFile } = window.FFmpegUtil;
-        const targetMB = parseFloat(compTargetInput.value) || 30;
-        const { video: vKbps, audio: aKbps } = estimateBitrate(targetMB, compState.duration);
-        const maxrate = Math.round(vKbps * 1.45);
-        const bufsize = Math.round(vKbps * 2);
-
-        const inputName = 'input' + (compState.file.name.match(/\.[a-zA-Z0-9]+$/)?.[0] || '.mp4');
-        const outputName = 'output.mp4';
-
-        compProgressLabel.textContent = t('compReadingFile');
-        await ffmpeg.writeFile(inputName, await fetchFile(compState.file));
-
-        compProgressLabel.textContent = t('compEncoding');
-        compProgressBarWrap.classList.add('show');
-
-        const onProgress = ({ progress }) => {
-          const pct = Math.max(0, Math.min(100, Math.round((progress || 0) * 100)));
-          compProgressFill.style.width = pct + '%';
-          compProgressPercent.textContent = pct + '%';
+    videoEl.onloadedmetadata = function(){
+      if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
+        videoEl.currentTime = 1e101;
+        videoEl.ontimeupdate = function(){
+          videoEl.ontimeupdate = null;
+          const dur = videoEl.duration;
+          videoEl.currentTime = 0;
+          proceed(dur);
         };
-        ffmpeg.on('progress', onProgress);
-
-        await ffmpeg.exec([
-          '-i', inputName,
-          '-c:v', 'libx264',
-          '-preset', 'veryfast',
-          '-b:v', `${vKbps}k`,
-          '-maxrate', `${maxrate}k`,
-          '-bufsize', `${bufsize}k`,
-          '-c:a', 'aac',
-          '-b:a', `${aKbps}k`,
-          '-movflags', '+faststart',
-          outputName
-        ]);
-
-        ffmpeg.off('progress', onProgress);
-        compProgressLabel.textContent = t('compFinalizing');
-
-        const data = await ffmpeg.readFile(outputName);
-        const blob = new Blob([data.buffer], { type: 'video/mp4' });
-
-        if (compState.lastObjectUrl) URL.revokeObjectURL(compState.lastObjectUrl);
-        const url = URL.createObjectURL(blob);
-        compState.lastObjectUrl = url;
-
-        const origBytes = compState.file.size;
-        const finalBytes = blob.size;
-        const reduction = origBytes > 0 ? ((origBytes - finalBytes) / origBytes * 100) : 0;
-
-        compResOrig.textContent = fmtMB(origBytes);
-        compResFinal.textContent = fmtMB(finalBytes);
-        compResReduction.textContent = reduction.toFixed(1) + '%';
-
-        const baseName = compState.file.name.replace(/\.[a-zA-Z0-9]+$/, '');
-        compDownloadBtn.href = url;
-        compDownloadBtn.download = `${baseName}_compressed.mp4`;
-
-        // Clean up the wasm virtual filesystem so a second run doesn't
-        // accumulate memory across files.
-        try { await ffmpeg.deleteFile(inputName); } catch(_) {}
-        try { await ffmpeg.deleteFile(outputName); } catch(_) {}
-
-        compProgress.classList.remove('show');
-        compResult.classList.add('show');
-      } catch (err) {
-        console.error('[compressor] compression failed:', err);
-        compProgress.classList.remove('show');
-        compProgressBarWrap.classList.remove('show');
-        showError(t('compErrGeneric'));
-      } finally {
-        compStartBtn.disabled = false;
+      } else {
+        proceed(videoEl.duration);
       }
-    });
+    };
 
-    compResetBtn.addEventListener('click', () => {
-      compState.file = null;
-      compState.duration = 0;
-      compVideoInput.value = '';
-      compFileInfo.classList.remove('show');
-      compTargetField.style.display = 'none';
-      compStartBtn.style.display = 'none';
-      compResult.classList.remove('show');
-      clearError();
-    });
-  })();
+    videoEl.onerror = function(){
+      cleanup();
+      alert(t('alertReadError'));
+    };
+
+    videoEl.src = URL.createObjectURL(file);
+  }
+
+  function finishCompScan(duration, file){
+    compFile = file;
+    compDuration = duration;
+
+    compFileName.textContent = file.name.length > 28 ? file.name.slice(0, 25) + '…' : file.name;
+    compFileDuration.textContent = formatCompDuration(duration);
+    compFileSize.textContent = formatBytes(file.size);
+    compFileInfo.classList.add('show');
+
+    const origSizeMB = file.size / (1024 * 1024);
+    const maxSlider = Math.max(2, Math.ceil(origSizeMB));
+    let defaultTarget = Math.round(Math.min(30, Math.max(1, origSizeMB * 0.5)));
+    if (defaultTarget < 1) defaultTarget = 1;
+    if (defaultTarget > maxSlider) defaultTarget = maxSlider;
+
+    compSizeRange.min = 1;
+    compSizeRange.max = maxSlider;
+    compSizeRange.value = defaultTarget;
+    compSizeInput.min = 1;
+    compSizeInput.max = maxSlider;
+    compSizeInput.value = defaultTarget;
+    compSizeVal.textContent = defaultTarget;
+
+    updateBitrateHint();
+
+    compSizeField.style.display = 'block';
+    compStartBtn.style.display = 'flex';
+    updateStartBtnState();
+  }
+
+  function syncCompSize(val){
+    let v = Math.round(Number(val));
+    if (isNaN(v) || v < 1) v = 1;
+    const max = Number(compSizeRange.max) || 99999;
+    if (v > max) v = max;
+    compSizeRange.value = v;
+    compSizeInput.value = v;
+    compSizeVal.textContent = v;
+    updateBitrateHint();
+  }
+
+  compSizeRange.addEventListener('input', () => syncCompSize(compSizeRange.value));
+  compSizeInput.addEventListener('input', () => syncCompSize(compSizeInput.value));
+
+  function computeVideoBitrateKbps(){
+    const targetMB = Number(compSizeInput.value) || 1;
+    const audioKbps = 128;
+    const totalKbits = targetMB * 8192; // 1 MB = 8192 kbit
+    const budgetKbits = totalKbits * 0.94; // small safety margin
+    const durationSec = Math.max(1, compDuration);
+    let videoKbps = Math.floor(budgetKbits / durationSec - audioKbps);
+    if (videoKbps < 100) videoKbps = 100;
+    return videoKbps;
+  }
+
+  function updateBitrateHint(){
+    if (!compDuration) { compBitrateHint.textContent = ''; return; }
+    const br = computeVideoBitrateKbps();
+    compBitrateHint.textContent = t('compBitrateHint').replace('{BR}', br);
+  }
+
+  compStartBtn.addEventListener('click', async () => {
+    if (!ffmpegReady) {
+      compRunError.textContent = t('compNotReady');
+      compRunError.classList.add('show');
+      return;
+    }
+    if (!compFile || compRunning) return;
+
+    compRunError.classList.remove('show');
+    compDone.classList.remove('show');
+
+    const targetMB = Number(compSizeInput.value) || 1;
+    const origSizeMB = compFile.size / (1024 * 1024);
+    const videoKbps = computeVideoBitrateKbps();
+    if (targetMB < origSizeMB && videoKbps <= 100) {
+      compRunError.textContent = t('compTooSmall');
+      compRunError.classList.add('show');
+      return;
+    }
+
+    compRunning = true;
+    updateStartBtnState();
+    compProgressWrap.style.display = 'block';
+    compProgressFill.style.width = '0%';
+    compProgressLabel.textContent = '0%';
+
+    const stamp = Date.now();
+    const inputExt = (compFile.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4';
+    const inFile = 'input_' + stamp + '.' + inputExt;
+    const outFile = 'output_' + stamp + '.mp4';
+
+    try {
+      const { fetchFile } = FFmpegUtil;
+      await ffmpeg.writeFile(inFile, await fetchFile(compFile));
+
+      await ffmpeg.exec([
+        '-i', inFile,
+        '-c:v', 'libx264',
+        '-b:v', videoKbps + 'k',
+        '-maxrate', Math.round(videoKbps * 1.45) + 'k',
+        '-bufsize', Math.round(videoKbps * 2) + 'k',
+        '-preset', 'veryfast',
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-movflags', '+faststart',
+        outFile
+      ]);
+
+      const data = await ffmpeg.readFile(outFile);
+      const blob = new Blob([data.buffer], { type: 'video/mp4' });
+      const url = URL.createObjectURL(blob);
+
+      compDownloadBtn.href = url;
+      const baseName = compFile.name.replace(/\.[^/.]+$/, '');
+      compDownloadBtn.download = baseName + '_compressed.mp4';
+      compFinalSize.textContent = formatBytes(blob.size);
+      compDone.classList.add('show');
+
+      try { await ffmpeg.deleteFile(inFile); } catch (e) {}
+      try { await ffmpeg.deleteFile(outFile); } catch (e) {}
+    } catch (err) {
+      console.error('compression failed', err);
+      compRunError.textContent = t('compRunErrorGeneric');
+      compRunError.classList.add('show');
+    } finally {
+      compRunning = false;
+      updateStartBtnState();
+      compProgressWrap.style.display = 'none';
+    }
+  });
 
   // ============================================================
   // 3) MULTI-CHANNEL ORDER SENDING (WhatsApp / Telegram)
@@ -2566,7 +2537,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   // ============================================================
   // 7) SHARED BACKEND — lightweight anonymous JSON store used to
-  // sync the admin visit log across every visitor's
+  // sync comments and the admin visit log across every visitor's
   // browser (this site has no server of its own, so this fills that
   // gap). Reads/writes a small number of fixed paths under one
   // namespace; failures are silent and never block the page.
@@ -2592,20 +2563,108 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     } catch(e){ return false; }
   }
 
+  // ============================================================
+  // 8) COMMENTS SYSTEM
+  // ============================================================
+  const commentName = document.getElementById('commentName');
+  const commentText = document.getElementById('commentText');
+  const commentError = document.getElementById('commentError');
+  const commentSubmit = document.getElementById('commentSubmit');
+  const commentList = document.getElementById('commentList');
+  const commentEmpty = document.getElementById('commentEmpty');
 
-  // ============================================================
-  // 8) VISITOR LOG (device + approximate location) — feeds the
-  // admin panel's "Visitors" tab. Logged once per browser session.
-  // ============================================================
+  // Basic uncensored-language filter — blocks the most common Georgian
+  // and English profanity/slurs before a comment is ever published.
+  // This runs in the browser, so it's a courtesy filter, not a hard
+  // security boundary; the admin panel can still remove anything that
+  // slips through.
+  const PROFANITY_LIST = [
+    'ყლე','ყლეო','ტიტინა','ჯავრიანი','დებილ','იდიოტ','ლახტი','დედაშენ','დედას',
+    'მამაშენ','ჰუიო','ხუი','пизд','блять','бля','сука','хуй','нахуй','ебал',
+    'fuck','shit','bitch','asshole','bastard','cunt','dick','whore','slut',
+    'nigger','faggot','retard'
+  ];
+  function containsProfanity(str){
+    const lower = str.toLowerCase();
+    return PROFANITY_LIST.some(w => lower.includes(w));
+  }
   function escapeHtml(str){
     return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   }
-  function formatVisitDate(ts){
+  function formatCommentDate(ts){
     try{
       return new Date(ts).toLocaleString(currentLang === 'ka' ? 'ka-GE' : 'en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
     } catch(e){ return ''; }
   }
 
+  let commentsCache = [];
+
+  function renderComments(){
+    if (!commentList) return;
+    if (!commentsCache.length) {
+      commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
+      return;
+    }
+    commentList.innerHTML = commentsCache.map(c =>
+      '<div class="c-item"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
+      '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
+      '<div class="c-body">' + escapeHtml(c.text) + '</div></div>'
+    ).join('');
+  }
+
+  async function loadComments(){
+    const data = await mdbRead('comments');
+    commentsCache = (data && Array.isArray(data.list)) ? data.list : [];
+    renderComments();
+  }
+
+  function showCommentError(msg){
+    commentError.textContent = msg;
+    commentError.classList.add('show');
+  }
+  function hideCommentError(){
+    commentError.classList.remove('show');
+  }
+
+  if (commentSubmit) {
+    commentSubmit.addEventListener('click', async () => {
+      hideCommentError();
+      const name = (commentName.value || '').trim();
+      const text = (commentText.value || '').trim();
+      if (!name || !text) {
+        showCommentError(t('commentErrEmpty'));
+        return;
+      }
+      if (containsProfanity(name) || containsProfanity(text)) {
+        showCommentError(t('commentErrProfanity'));
+        return;
+      }
+      commentSubmit.disabled = true;
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), ts: Date.now() };
+      // Re-read the latest list right before writing to minimize (not
+      // fully eliminate) lost updates from concurrent commenters.
+      const fresh = await mdbRead('comments');
+      const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
+      const updated = [entry, ...list].slice(0, 200);
+      const ok = await mdbWrite('comments', { list: updated });
+      commentSubmit.disabled = false;
+      if (!ok) {
+        showCommentError(t('commentErrGeneric'));
+        return;
+      }
+      commentsCache = updated;
+      renderComments();
+      commentName.value = '';
+      commentText.value = '';
+    });
+  }
+
+  loadComments();
+
+  // ============================================================
+  // 9) VISITOR LOG (device + approximate location) — feeds the
+  // admin panel's "Visitors" tab. Logged once per browser session.
+  // ============================================================
   function detectDevice(){
     const ua = navigator.userAgent || '';
     let os = 'Unknown OS';
@@ -2651,7 +2710,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   logVisit();
 
   // ============================================================
-  // 9) ADMIN PANEL — gated with a password, shows the visit log.
+  // 10) ADMIN PANEL — gated with a password, shows the visit log
+  // and lets the admin edit/remove comments.
   // ============================================================
   const ADMIN_PASSWORD = '0070';
   const adminGear = document.getElementById('adminGear');
@@ -2662,7 +2722,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const adminGo = document.getElementById('adminGo');
   const adminErr = document.getElementById('adminErr');
   const adminTabVisits = document.getElementById('adminTabVisits');
+  const adminTabComments = document.getElementById('adminTabComments');
   const adminPanelVisits = document.getElementById('adminPanelVisits');
+  const adminPanelComments = document.getElementById('adminPanelComments');
 
   function openAdmin(){
     adminOverlay.classList.add('open');
@@ -2673,15 +2735,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
   function closeAdmin(){
     adminOverlay.classList.remove('open');
-  }
-
-  // Tutorial panel toggle
-  const tutorialPanel = document.getElementById('tutorialPanel');
-  const tutorialToggleHead = document.getElementById('tutorialToggleHead');
-  if (tutorialPanel && tutorialToggleHead) {
-    tutorialToggleHead.addEventListener('click', () => {
-      tutorialPanel.classList.toggle('open');
-    });
   }
 
   if (adminGear) adminGear.addEventListener('click', openAdmin);
@@ -2698,15 +2751,66 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       return;
     }
     adminPanelVisits.innerHTML = list.map(v =>
-      '<div class="a-visit-row"><span>' + formatVisitDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
+      '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
     ).join('');
   }
+
+  async function renderAdminComments(){
+    adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('comments');
+    const list = (data && Array.isArray(data.list)) ? data.list : [];
+    if (!list.length) {
+      adminPanelComments.innerHTML = '<div class="c-empty">' + t('adminNoComments') + '</div>';
+      return;
+    }
+    adminPanelComments.innerHTML = list.map(c =>
+      '<div class="a-cmt" data-id="' + c.id + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + ' · ' + formatCommentDate(c.ts) + '</div>' +
+        '<textarea>' + escapeHtml(c.text) + '</textarea>' +
+        '<div class="a-cmt-actions">' +
+          '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
+          '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  adminPanelComments.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    const action = btn.getAttribute('data-action');
+    const fresh = await mdbRead('comments');
+    let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
+    if (action === 'delete') {
+      list = list.filter(c => String(c.id) !== String(id));
+    } else if (action === 'save') {
+      const wrap = btn.closest('.a-cmt');
+      const newText = wrap.querySelector('textarea').value.slice(0, 500);
+      list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { text: newText }) : c);
+    }
+    await mdbWrite('comments', { list });
+    commentsCache = list;
+    renderComments();
+    renderAdminComments();
+  });
+
+  function switchAdminTab(tab){
+    const showVisits = tab === 'visits';
+    adminTabVisits.classList.toggle('active', showVisits);
+    adminTabComments.classList.toggle('active', !showVisits);
+    adminPanelVisits.classList.toggle('active', showVisits);
+    adminPanelComments.classList.toggle('active', !showVisits);
+    if (showVisits) renderAdminVisits(); else renderAdminComments();
+  }
+  adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
+  adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
 
   function tryAdminLogin(){
     if (adminPass.value === ADMIN_PASSWORD) {
       adminLogin.style.display = 'none';
       adminDashboard.style.display = 'block';
-      renderAdminVisits();
+      switchAdminTab('visits');
     } else {
       adminErr.classList.add('show');
     }
