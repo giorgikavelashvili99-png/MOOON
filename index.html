@@ -577,6 +577,41 @@
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
+  /* ---------- Video compressor ---------- */
+  .comp-intro{ font-size:13px; color:var(--text-dim); margin:-6px 0 16px; line-height:1.55; }
+  .comp-start-btn{
+    width:100%; margin-top:18px;
+    background:linear-gradient(90deg, var(--purple), var(--cyan));
+    color:#04101a; box-shadow:0 10px 30px rgba(155,92,255,0.25);
+  }
+  .comp-start-btn:hover{ box-shadow:0 14px 40px rgba(155,92,255,0.35); }
+  .comp-start-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .comp-progressbar-wrap{ display:none; margin-top:16px; }
+  .comp-progressbar-wrap.show{ display:block; }
+  .comp-progressbar{
+    width:100%; height:10px; border-radius:6px; background:#12121c;
+    border:1px solid var(--border); overflow:hidden;
+  }
+  .comp-progressbar-fill{
+    height:100%; width:0%; border-radius:6px;
+    background:linear-gradient(90deg, var(--purple), var(--cyan));
+    transition:width .25s ease; box-shadow:0 0 12px var(--purple-soft);
+  }
+  .comp-percent{
+    margin-top:7px; text-align:center; font-family:'JetBrains Mono', monospace;
+    font-size:13px; color:var(--cyan); text-shadow:0 0 10px rgba(46,230,214,0.5);
+  }
+  .comp-download-btn{ margin-top:14px; text-decoration:none; }
+  .comp-reset-btn{
+    width:100%; margin-top:10px; padding:12px; border:1px solid var(--border);
+    border-radius:12px; background:transparent; color:var(--text-dim);
+    font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:13px;
+    cursor:pointer; transition:border-color .2s, color .2s;
+  }
+  .comp-reset-btn:hover{ border-color:var(--purple); color:#fff; }
+  .comp-note{ margin-top:16px; }
+  .comp-error{ display:none; }
+
   /* ---------- Order buttons (multi-channel) ---------- */
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
   .order-btn{
@@ -967,6 +1002,62 @@
     </div>
   </div>
 
+  <!-- Video compressor (client-side, ffmpeg.wasm / WebAssembly — no upload to any server) -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="label" data-i18n="compressorLabel">VIDEO COMPRESSOR</div>
+    </div>
+    <p class="comp-intro" data-i18n="compIntro">ატვირთე მძიმე ვიდეო ფაილი და შეკუმშე სასურველ ზომამდე — დამუშავება 100% ხდება შენს ბრაუზერში (WebAssembly), ფაილი არსად იგზავნება და არავინ ხედავს მას.</p>
+
+    <div class="drop-zone" id="compDropZone">
+      <input type="file" id="compVideoInput" accept="video/*">
+      <div class="dz-icon">🗜</div>
+      <div class="dz-title" data-i18n="compDzTitle">ჩააგდე ან აირჩიე ვიდეო შესაკუმშად</div>
+      <div class="dz-sub" data-i18n="compDzSub">რეკომენდებულია 1.5GB-მდე ფაილები — ყველა დამუშავება ხდება ლოკალურად</div>
+    </div>
+
+    <div class="scan-result" id="compFileInfo">
+      <div class="sr-row"><span data-i18n="srFile">ფაილი</span><b id="compFileName">—</b></div>
+      <div class="sr-row"><span data-i18n="srDuration">ხანგრძლივობა</span><b id="compFileDuration">—</b></div>
+      <div class="sr-row"><span data-i18n="compOrigSize">ორიგინალი ზომა</span><b id="compFileSize">—</b></div>
+    </div>
+
+    <div class="field" id="compTargetField" style="display:none;">
+      <div class="field-top">
+        <label data-i18n="compTargetLabel">სასურველი საბოლოო ზომა (MB)</label>
+        <span class="val" id="compTargetVal">30</span>
+      </div>
+      <div class="timeline">
+        <input type="range" id="compTargetRange" min="5" max="500" step="1" value="30">
+      </div>
+      <input type="number" class="num-input" id="compTargetInput" min="5" max="2000" value="30" style="margin-top:10px;">
+      <div class="hint" id="compBitrateHint"></div>
+    </div>
+
+    <button type="button" class="order-btn comp-start-btn" id="compStartBtn" style="display:none;">
+      <span class="ico">🗜</span> <span data-i18n="compStartBtnText">შეკუმშვის დაწყება</span>
+    </button>
+
+    <div class="scan-progress" id="compProgress">
+      <span class="spin"></span> <span id="compProgressLabel" data-i18n="compLoadingModule">იტვირთება შეკუმშვის მოდული…</span>
+    </div>
+    <div class="comp-progressbar-wrap" id="compProgressBarWrap">
+      <div class="comp-progressbar"><div class="comp-progressbar-fill" id="compProgressFill"></div></div>
+      <div class="comp-percent" id="compProgressPercent">0%</div>
+    </div>
+
+    <div class="scan-result" id="compResult">
+      <div class="sr-row"><span data-i18n="compOrigSize">ორიგინალი ზომა</span><b id="compResOrig">—</b></div>
+      <div class="sr-row"><span data-i18n="compFinalSize">საბოლოო ზომა</span><b id="compResFinal">—</b></div>
+      <div class="sr-row"><span data-i18n="compReduction">შემცირდა</span><b id="compResReduction">—</b></div>
+      <a class="order-btn wa comp-download-btn" id="compDownloadBtn" download="compressed.mp4"><span class="ico">⬇</span> <span data-i18n="compDownloadBtnText">გადმოწერე შეკუმშული ვიდეო</span></a>
+      <button type="button" class="comp-reset-btn" id="compResetBtn" data-i18n="compResetBtnText">კიდევ ერთის შეკუმშვა</button>
+    </div>
+
+    <div class="sr-warn comp-error" id="compError" style="display:none;"></div>
+    <div class="hint comp-note" data-i18n="compNote">⚠️ შეკუმშვა ხდება პირდაპირ შენს ბრაუზერში (WebAssembly-ით), სერვერზე არაფერი იტვირთება. ძალიან დიდი ან გრძელი ფაილების დამუშავებას შეიძლება რამდენიმე წუთი დასჭირდეს — გთხოვთ არ დახუროთ ტაბი პროცესის დასრულებამდე. მნიშვნელოვანია გვახსოვდეს: 100%-ით უხარისხოდ შეკუმშვა ფიზიკურად შეუძლებელია — რაც უფრო მცირე საბოლოო ზომას ირჩევთ, მით მეტი ხარისხი იკარგება მოცემულობის კანონის მიხედვით.</div>
+  </div>
+
   <!-- Order channels -->
   <div class="panel" style="padding:22px;">
     <div class="panel-head" style="margin-bottom:16px;">
@@ -1106,6 +1197,30 @@
       tutorialStep4: 'ეკრანზე დაუყოვნებლივ ნახავთ ვიდეოს მონტაჟის <b>საბოლოო ღირებულებას</b> რეალურ დროში.',
       tutorialStep5: 'სურვილის შემთხვევაში, დააჭირეთ <b>„გაგზავნე შეკვეთა"</b> და გამომიგზავნეთ შეკვეთა <b>WhatsApp</b>-ზე ან <b>Telegram</b>-ზე.',
       tutorialStep6: 'ვიდეოს გამოსაგზავნად ატვირთეთ ის <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>-ზე, შემდეგ კი მიღებული ლინკი გამომიგზავნეთ <b>Telegram</b>-ზე ან <b>WhatsApp</b>-ზე.',
+
+      compressorLabel: 'VIDEO COMPRESSOR',
+      compIntro: 'ატვირთე მძიმე ვიდეო ფაილი და შეკუმშე სასურველ ზომამდე — დამუშავება 100% ხდება შენს ბრაუზერში (WebAssembly), ფაილი არსად იგზავნება და არავინ ხედავს მას.',
+      compDzTitle: 'ჩააგდე ან აირჩიე ვიდეო შესაკუმშად',
+      compDzSub: 'რეკომენდებულია 1.5GB-მდე ფაილები — ყველა დამუშავება ხდება ლოკალურად',
+      compOrigSize: 'ორიგინალი ზომა',
+      compTargetLabel: 'სასურველი საბოლოო ზომა (MB)',
+      compTargetHint: 'რაც უფრო პატარა ზომას აირჩევ ორიგინალთან შედარებით, მით მეტად დაეცემა ვიდეოს ხარისხი — სავარაუდო ბიტრეიტი: {BR} კბ/წმ',
+      compTargetHintLow: '⚠️ ეს ბიტრეიტი ძალიან დაბალია ({BR} კბ/წმ) — ვიდეოში შესამჩნევი იქნება ხარისხის დაკარგვა. სცადე უფრო დიდი სასურველი ზომა.',
+      compStartBtnText: 'შეკუმშვის დაწყება',
+      compLoadingModule: 'იტვირთება შეკუმშვის მოდული (პირველად შეიძლება ცოტა დრო დასჭირდეს)…',
+      compReadingFile: 'ფაილი იტვირთება...',
+      compEncoding: 'მიმდინარეობს შეკუმშვა…',
+      compFinalizing: 'საბოლოო ფაილი ემზადება…',
+      compFinalSize: 'საბოლოო ზომა',
+      compReduction: 'შემცირდა',
+      compDownloadBtnText: 'გადმოწერე შეკუმშული ვიდეო',
+      compResetBtnText: 'კიდევ ერთის შეკუმშვა',
+      compErrNotVideo: '⚠️ გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
+      compErrTooBig: '⚠️ ეს ფაილი ძალიან დიდია ბრაუზერში დასამუშავებლად (მაქს. ~1.5GB) — ბრაუზერს შეიძლება არ ეყოს მეხსიერება. სცადეთ უფრო პატარა ან უფრო მოკლე ვიდეო.',
+      compErrGeneric: '❌ შეკუმშვისას მოხდა შეცდომა — სცადეთ ხელახლა, ან სცადეთ უფრო პატარა ფაილით. თუ ბრაუზერის ტაბი ბევრ სხვა პროგრამასთან ერთად მუშაობდა, სცადეთ დახუროთ დანარჩენი ტაბები და კვლავ სცადეთ.',
+      compErrLoadModule: '❌ ვერ ჩაიტვირთა შეკუმშვის მოდული — შეამოწმეთ ინტერნეტ კავშირი და სცადეთ ხელახლა.',
+      compErrFileProtocol: '⚠️ ეს ფუნქცია არ მუშაობს, თუ index.html ფაილს პირდაპირ, ორჯერდაწკაპებით ხსნით ბრაუზერში (მისამართში წერია file://...). საჭიროა საიტი განთავსდეს რეალურ ჰოსტინგზე (მაგ. Netlify, GitHub Pages, ან თქვენი დომენი) — მხოლოდ მაშინ ჩაიტვირთება შეკუმშვის მოდული სწორად. ტესტირებისთვის შეგიძლიათ გამოიყენოთ ლოკალური სერვერიც.',
+      compNote: '⚠️ შეკუმშვა ხდება პირდაპირ შენს ბრაუზერში (WebAssembly-ით), სერვერზე არაფერი იტვირთება. ძალიან დიდი ან გრძელი ფაილების დამუშავებას შეიძლება რამდენიმე წუთი დასჭირდეს — გთხოვთ არ დახუროთ ტაბი პროცესის დასრულებამდე. მნიშვნელოვანია გვახსოვდეს: 100%-ით უხარისხოდ შეკუმშვა ფიზიკურად შეუძლებელია — რაც უფრო მცირე საბოლოო ზომას ირჩევთ, მით მეტი ხარისხი იკარგება მოცემულობის კანონის მიხედვით.',
     },
     en: {
       visitorsLabel: 'Total visitors:',
@@ -1172,6 +1287,30 @@
       tutorialStep4: 'You\'ll immediately see the <b>final editing price</b> on screen, in real time.',
       tutorialStep5: 'If you\'d like to order, click <b>"Send order"</b> and send it to us via <b>WhatsApp</b> or <b>Telegram</b>.',
       tutorialStep6: 'To send the video itself, upload it to <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>, then send us the resulting link via <b>Telegram</b> or <b>WhatsApp</b>.',
+
+      compressorLabel: 'VIDEO COMPRESSOR',
+      compIntro: 'Upload a heavy video file and shrink it to your target size — everything runs 100% in your browser (WebAssembly), the file is never uploaded anywhere and no one sees it.',
+      compDzTitle: 'Drag it here or click to select a video to compress',
+      compDzSub: 'Recommended up to 1.5GB — all processing happens locally',
+      compOrigSize: 'Original size',
+      compTargetLabel: 'Target final size (MB)',
+      compTargetHint: 'The smaller the target size compared to the original, the more quality will drop — estimated bitrate: {BR} kbps',
+      compTargetHintLow: '⚠️ This bitrate is very low ({BR} kbps) — noticeable quality loss is expected. Try a larger target size.',
+      compStartBtnText: 'Start compressing',
+      compLoadingModule: 'Loading the compression module (may take a moment on first use)…',
+      compReadingFile: 'Loading the file...',
+      compEncoding: 'Compressing…',
+      compFinalizing: 'Finalizing the output file…',
+      compFinalSize: 'Final size',
+      compReduction: 'Reduced by',
+      compDownloadBtnText: 'Download compressed video',
+      compResetBtnText: 'Compress another one',
+      compErrNotVideo: '⚠️ Please upload a video file (mp4, mov, webm, etc.)',
+      compErrTooBig: '⚠️ This file is too large to process in a browser (max ~1.5GB) — the browser may run out of memory. Try a smaller or shorter video.',
+      compErrGeneric: '❌ Something went wrong while compressing — please try again, or try a smaller file. If the browser tab has a lot of other tabs/apps running, try closing them and retry.',
+      compErrLoadModule: '❌ Could not load the compression module — check your internet connection and try again.',
+      compErrFileProtocol: '⚠️ This feature doesn\'t work if you open index.html directly by double-clicking it (the address bar shows file://...). The site needs to be served over http(s):// — deployed on real hosting (e.g. Netlify, GitHub Pages, or your own domain), or run through a local dev server for testing.',
+      compNote: '⚠️ Compression runs entirely in your browser (WebAssembly) — nothing is uploaded to a server. Very large or long files may take several minutes; please don\'t close the tab until it finishes. Important: perfectly lossless compression is not physically possible — the smaller the target size you choose, the more quality is lost.',
     }
   };
 
@@ -1198,6 +1337,7 @@
     document.getElementById('langKa').classList.toggle('active', currentLang === 'ka');
     document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
     if (typeof refresh === 'function') refresh();
+    if (typeof window.updateCompBitrateHint === 'function') window.updateCompBitrateHint();
   }
 
   function setLanguage(lang){
@@ -1587,6 +1727,334 @@
 
     scanResult.classList.add('show');
   }
+
+  // ============================================================
+  // 2B) VIDEO COMPRESSOR — 100% client-side, WebAssembly (ffmpeg.wasm)
+  // No file is ever uploaded to any server: everything below runs
+  // inside the visitor's own browser tab.
+  // ============================================================
+  (function initCompressor(){
+    const compDropZone = document.getElementById('compDropZone');
+    const compVideoInput = document.getElementById('compVideoInput');
+    const compFileInfo = document.getElementById('compFileInfo');
+    const compFileName = document.getElementById('compFileName');
+    const compFileDuration = document.getElementById('compFileDuration');
+    const compFileSize = document.getElementById('compFileSize');
+    const compTargetField = document.getElementById('compTargetField');
+    const compTargetVal = document.getElementById('compTargetVal');
+    const compTargetRange = document.getElementById('compTargetRange');
+    const compTargetInput = document.getElementById('compTargetInput');
+    const compBitrateHint = document.getElementById('compBitrateHint');
+    const compStartBtn = document.getElementById('compStartBtn');
+    const compProgress = document.getElementById('compProgress');
+    const compProgressLabel = document.getElementById('compProgressLabel');
+    const compProgressBarWrap = document.getElementById('compProgressBarWrap');
+    const compProgressFill = document.getElementById('compProgressFill');
+    const compProgressPercent = document.getElementById('compProgressPercent');
+    const compResult = document.getElementById('compResult');
+    const compResOrig = document.getElementById('compResOrig');
+    const compResFinal = document.getElementById('compResFinal');
+    const compResReduction = document.getElementById('compResReduction');
+    const compDownloadBtn = document.getElementById('compDownloadBtn');
+    const compResetBtn = document.getElementById('compResetBtn');
+    const compError = document.getElementById('compError');
+
+    const MAX_BYTES = 1.5 * 1024 * 1024 * 1024; // ~1.5GB soft cap — browser wasm memory is limited
+    const FFMPEG_VER = '0.12.10';
+    const UTIL_VER = '0.12.2';
+    const CORE_VER = '0.12.10';
+
+    let compState = {
+      file: null,
+      duration: 0,
+      lastObjectUrl: null
+    };
+    let ffmpegInstance = null;
+    let ffmpegLoadPromise = null;
+
+    function fmtMB(bytes){ return (bytes / (1024 * 1024)).toFixed(2) + ' MB'; }
+    function fmtDuration(sec){
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    function showError(msg){
+      compError.textContent = msg;
+      compError.style.display = 'block';
+    }
+    function clearError(){
+      compError.style.display = 'none';
+      compError.textContent = '';
+    }
+
+    // Estimates a video bitrate (kbps) that lands close to the requested
+    // final size, the same size-first approach the desktop app used
+    // (target bitrate) rather than a fixed quality/CRF value.
+    function estimateBitrate(targetMB, durationSec){
+      if (!durationSec || durationSec <= 0) return { video: 0, audio: 128 };
+      const totalKbps = (targetMB * 8192) / durationSec; // MB -> kilobits budget / seconds
+      let audioKbps = 128;
+      if (totalKbps > 800) audioKbps = 160;
+      else if (totalKbps > 300) audioKbps = 128;
+      else if (totalKbps > 150) audioKbps = 96;
+      else audioKbps = 64;
+      const videoKbps = Math.max(80, Math.floor(totalKbps - audioKbps));
+      return { video: videoKbps, audio: audioKbps };
+    }
+
+    function updateBitrateHint(){
+      if (!compState.duration) return;
+      const targetMB = parseFloat(compTargetInput.value) || 30;
+      const { video } = estimateBitrate(targetMB, compState.duration);
+      if (video < 300) {
+        compBitrateHint.innerHTML = t('compTargetHintLow').replace('{BR}', video);
+      } else {
+        compBitrateHint.innerHTML = t('compTargetHint').replace('{BR}', video);
+      }
+    }
+    window.updateCompBitrateHint = updateBitrateHint;
+
+    ['dragover','dragenter'].forEach(evt => compDropZone.addEventListener(evt, e => { e.preventDefault(); compDropZone.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(evt => compDropZone.addEventListener(evt, e => { compDropZone.classList.remove('dragover'); }));
+    compDropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleCompFile(e.dataTransfer.files[0]);
+    });
+    compVideoInput.addEventListener('change', e => {
+      if (e.target.files && e.target.files[0]) handleCompFile(e.target.files[0]);
+    });
+
+    function handleCompFile(file){
+      clearError();
+      compResult.classList.remove('show');
+      if (!file.type.startsWith('video/')) {
+        showError(t('compErrNotVideo'));
+        return;
+      }
+      if (file.size > MAX_BYTES) {
+        showError(t('compErrTooBig'));
+        return;
+      }
+
+      const videoEl = document.createElement('video');
+      videoEl.preload = 'metadata';
+      videoEl.muted = true;
+      videoEl.src = URL.createObjectURL(file);
+
+      const cleanup = () => URL.revokeObjectURL(videoEl.src);
+
+      const proceed = (duration) => {
+        compState.file = file;
+        compState.duration = duration;
+
+        compFileName.textContent = file.name.length > 28 ? file.name.slice(0,25) + '…' : file.name;
+        compFileDuration.textContent = fmtDuration(duration);
+        compFileSize.textContent = fmtMB(file.size);
+        compFileInfo.classList.add('show');
+
+        // Default target: 30MB, but never suggest a target larger than the
+        // original file itself.
+        const origMB = file.size / (1024 * 1024);
+        const defaultTarget = Math.max(5, Math.min(30, Math.floor(origMB * 0.9)));
+        compTargetRange.max = Math.max(50, Math.ceil(origMB));
+        compTargetRange.value = defaultTarget;
+        compTargetInput.value = defaultTarget;
+        compTargetVal.textContent = defaultTarget;
+
+        compTargetField.style.display = 'block';
+        compStartBtn.style.display = 'flex';
+        updateBitrateHint();
+        cleanup();
+      };
+
+      videoEl.onloadedmetadata = function(){
+        if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
+          videoEl.currentTime = 1e101;
+          videoEl.ontimeupdate = function(){
+            videoEl.ontimeupdate = null;
+            proceed(videoEl.duration);
+          };
+        } else {
+          proceed(videoEl.duration);
+        }
+      };
+      videoEl.onerror = function(){
+        cleanup();
+        showError(t('compErrNotVideo'));
+      };
+    }
+
+    compTargetRange.addEventListener('input', () => {
+      compTargetInput.value = compTargetRange.value;
+      compTargetVal.textContent = compTargetRange.value;
+      updateBitrateHint();
+    });
+    compTargetInput.addEventListener('input', () => {
+      let v = parseInt(compTargetInput.value, 10);
+      if (isNaN(v)) return;
+      compTargetVal.textContent = v;
+      if (v <= parseInt(compTargetRange.max, 10)) compTargetRange.value = v;
+      updateBitrateHint();
+    });
+
+    // Lazily injects the ffmpeg.wasm <script> tags — most visitors only
+    // want the price calculator, so this multi-MB module is fetched only
+    // once someone actually presses "start compressing".
+    function loadScript(src){
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('script load failed: ' + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function ensureFFmpeg(){
+      if (ffmpegInstance) return ffmpegInstance;
+      if (ffmpegLoadPromise) return ffmpegLoadPromise;
+
+      ffmpegLoadPromise = (async () => {
+        if (typeof window.FFmpegWASM === 'undefined') {
+          await loadScript(`https://unpkg.com/@ffmpeg/ffmpeg@${FFMPEG_VER}/dist/umd/ffmpeg.js`);
+        }
+        if (typeof window.FFmpegUtil === 'undefined') {
+          await loadScript(`https://unpkg.com/@ffmpeg/util@${UTIL_VER}/dist/umd/index.js`);
+        }
+        const { FFmpeg } = window.FFmpegWASM;
+        const { toBlobURL } = window.FFmpegUtil;
+        const ffmpeg = new FFmpeg();
+        const baseURL = `https://unpkg.com/@ffmpeg/core@${CORE_VER}/dist/umd`;
+        await ffmpeg.load({
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+        });
+        ffmpegInstance = ffmpeg;
+        return ffmpeg;
+      })();
+
+      return ffmpegLoadPromise;
+    }
+
+    compStartBtn.addEventListener('click', async () => {
+      if (!compState.file) return;
+      clearError();
+
+      // ffmpeg.wasm fetches its core files via fetch()/toBlobURL, which
+      // browsers block for pages opened directly as file:// (double-clicked
+      // locally). It only works once the page is actually served over
+      // http(s):// — a real host, or a local dev server for testing.
+      if (location.protocol === 'file:') {
+        showError(t('compErrFileProtocol'));
+        return;
+      }
+
+      compResult.classList.remove('show');
+      compStartBtn.disabled = true;
+      compProgress.classList.add('show');
+      compProgressLabel.textContent = t('compLoadingModule');
+      compProgressBarWrap.classList.remove('show');
+      compProgressFill.style.width = '0%';
+      compProgressPercent.textContent = '0%';
+
+      let ffmpeg;
+      try {
+        ffmpeg = await ensureFFmpeg();
+      } catch (err) {
+        console.error('[compressor] failed to load ffmpeg.wasm:', err);
+        compProgress.classList.remove('show');
+        compStartBtn.disabled = false;
+        showError(t('compErrLoadModule'));
+        return;
+      }
+
+      try {
+        const { fetchFile } = window.FFmpegUtil;
+        const targetMB = parseFloat(compTargetInput.value) || 30;
+        const { video: vKbps, audio: aKbps } = estimateBitrate(targetMB, compState.duration);
+        const maxrate = Math.round(vKbps * 1.45);
+        const bufsize = Math.round(vKbps * 2);
+
+        const inputName = 'input' + (compState.file.name.match(/\.[a-zA-Z0-9]+$/)?.[0] || '.mp4');
+        const outputName = 'output.mp4';
+
+        compProgressLabel.textContent = t('compReadingFile');
+        await ffmpeg.writeFile(inputName, await fetchFile(compState.file));
+
+        compProgressLabel.textContent = t('compEncoding');
+        compProgressBarWrap.classList.add('show');
+
+        const onProgress = ({ progress }) => {
+          const pct = Math.max(0, Math.min(100, Math.round((progress || 0) * 100)));
+          compProgressFill.style.width = pct + '%';
+          compProgressPercent.textContent = pct + '%';
+        };
+        ffmpeg.on('progress', onProgress);
+
+        await ffmpeg.exec([
+          '-i', inputName,
+          '-c:v', 'libx264',
+          '-preset', 'veryfast',
+          '-b:v', `${vKbps}k`,
+          '-maxrate', `${maxrate}k`,
+          '-bufsize', `${bufsize}k`,
+          '-c:a', 'aac',
+          '-b:a', `${aKbps}k`,
+          '-movflags', '+faststart',
+          outputName
+        ]);
+
+        ffmpeg.off('progress', onProgress);
+        compProgressLabel.textContent = t('compFinalizing');
+
+        const data = await ffmpeg.readFile(outputName);
+        const blob = new Blob([data.buffer], { type: 'video/mp4' });
+
+        if (compState.lastObjectUrl) URL.revokeObjectURL(compState.lastObjectUrl);
+        const url = URL.createObjectURL(blob);
+        compState.lastObjectUrl = url;
+
+        const origBytes = compState.file.size;
+        const finalBytes = blob.size;
+        const reduction = origBytes > 0 ? ((origBytes - finalBytes) / origBytes * 100) : 0;
+
+        compResOrig.textContent = fmtMB(origBytes);
+        compResFinal.textContent = fmtMB(finalBytes);
+        compResReduction.textContent = reduction.toFixed(1) + '%';
+
+        const baseName = compState.file.name.replace(/\.[a-zA-Z0-9]+$/, '');
+        compDownloadBtn.href = url;
+        compDownloadBtn.download = `${baseName}_compressed.mp4`;
+
+        // Clean up the wasm virtual filesystem so a second run doesn't
+        // accumulate memory across files.
+        try { await ffmpeg.deleteFile(inputName); } catch(_) {}
+        try { await ffmpeg.deleteFile(outputName); } catch(_) {}
+
+        compProgress.classList.remove('show');
+        compResult.classList.add('show');
+      } catch (err) {
+        console.error('[compressor] compression failed:', err);
+        compProgress.classList.remove('show');
+        compProgressBarWrap.classList.remove('show');
+        showError(t('compErrGeneric'));
+      } finally {
+        compStartBtn.disabled = false;
+      }
+    });
+
+    compResetBtn.addEventListener('click', () => {
+      compState.file = null;
+      compState.duration = 0;
+      compVideoInput.value = '';
+      compFileInfo.classList.remove('show');
+      compTargetField.style.display = 'none';
+      compStartBtn.style.display = 'none';
+      compResult.classList.remove('show');
+      clearError();
+    });
+  })();
 
   // ============================================================
   // 3) MULTI-CHANNEL ORDER SENDING (WhatsApp / Telegram)
