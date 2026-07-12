@@ -1761,7 +1761,8 @@
 
     const MAX_BYTES = 1.5 * 1024 * 1024 * 1024; // ~1.5GB soft cap — browser wasm memory is limited
     const FFMPEG_VER = '0.12.10';
-    const UTIL_VER = '0.12.2';
+    const UTIL_VER = '0.12.1'; // NOTE: @ffmpeg/util@0.12.2's UMD build has a known bug
+                                // where it doesn't set window.FFmpegUtil correctly — stick to 0.12.1
     const CORE_VER = '0.12.10';
 
     let compState = {
@@ -1919,8 +1920,14 @@
         if (typeof window.FFmpegWASM === 'undefined') {
           await loadScript(`https://unpkg.com/@ffmpeg/ffmpeg@${FFMPEG_VER}/dist/umd/ffmpeg.js`);
         }
+        if (typeof window.FFmpegWASM === 'undefined') {
+          throw new Error('window.FFmpegWASM did not load (CDN script loaded but global was not set)');
+        }
         if (typeof window.FFmpegUtil === 'undefined') {
           await loadScript(`https://unpkg.com/@ffmpeg/util@${UTIL_VER}/dist/umd/index.js`);
+        }
+        if (typeof window.FFmpegUtil === 'undefined') {
+          throw new Error('window.FFmpegUtil did not load (CDN script loaded but global was not set)');
         }
         const { FFmpeg } = window.FFmpegWASM;
         const { toBlobURL } = window.FFmpegUtil;
@@ -1933,6 +1940,11 @@
         ffmpegInstance = ffmpeg;
         return ffmpeg;
       })();
+
+      // If loading fails, clear the cached promise so a retry (e.g. after
+      // the person switches network or CDN) can actually try again instead
+      // of forever returning the same rejected promise.
+      ffmpegLoadPromise.catch(() => { ffmpegLoadPromise = null; });
 
       return ffmpegLoadPromise;
     }
