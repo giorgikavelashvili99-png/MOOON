@@ -642,6 +642,49 @@
     color:var(--cyan); text-shadow:0 0 10px rgba(46,230,214,0.5);
   }
 
+  /* Tutorial */
+  .tutorial-panel{ padding:22px 24px; }
+  .tutorial-panel .panel-head{
+    margin-bottom:0; cursor:pointer; user-select:none;
+  }
+  .tutorial-toggle-btn{
+    display:flex; align-items:center; gap:6px;
+    background:rgba(155,92,255,0.12); border:1px solid var(--purple-soft);
+    color:#c9b8ff; font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700;
+    letter-spacing:0.04em; border-radius:10px; padding:7px 12px; cursor:pointer;
+    transition:all .2s ease;
+  }
+  .tutorial-toggle-btn:hover{ border-color:var(--purple); color:#fff; box-shadow:0 0 14px rgba(155,92,255,0.35); }
+  .tutorial-toggle-btn .chev{ display:inline-block; transition:transform .25s ease; }
+  .tutorial-panel.open .tutorial-toggle-btn .chev{ transform:rotate(180deg); }
+  .tutorial-body{
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height .35s ease, opacity .3s ease, margin-top .3s ease;
+  }
+  .tutorial-panel.open .tutorial-body{
+    max-height:900px; opacity:1; margin-top:20px;
+  }
+  .tutorial-steps{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .tutorial-steps li{
+    display:flex; align-items:flex-start; gap:14px;
+    font-size:13.5px; line-height:1.65; color:#cfd3e6;
+  }
+  .tutorial-steps .t-num{
+    flex:none; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, var(--purple), var(--cyan));
+    color:#0a0a14; font-family:'JetBrains Mono', monospace; font-weight:800; font-size:12.5px;
+    box-shadow:0 0 12px rgba(155,92,255,0.45);
+  }
+  .tutorial-steps li a{
+    color:var(--cyan); text-decoration:underline; text-underline-offset:2px;
+  }
+  .tutorial-steps li a:hover{ text-shadow:0 0 10px rgba(46,230,214,0.6); }
+  .tutorial-steps li b{ color:#fff; }
+
   footer{
     text-align:center; margin-top:34px; color:var(--text-faint); font-size:12px;
     font-family:'JetBrains Mono', monospace;
@@ -775,6 +818,25 @@
     <div class="eyebrow">VIDEO EDITING · PRICE ENGINE</div>
     <h1 data-i18n="heroTitle">გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
     <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
+  </div>
+
+  <div class="panel tutorial-panel" id="tutorialPanel">
+    <div class="panel-head" id="tutorialToggleHead">
+      <div class="label" data-i18n="tutorialLabel">როგორ გავაკეთო შეკვეთა?</div>
+      <button type="button" class="tutorial-toggle-btn" id="tutorialToggleBtn">
+        <span data-i18n="tutorialToggleText">ვრცლად</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="tutorial-body" id="tutorialBody">
+      <ol class="tutorial-steps">
+        <li><span class="t-num">1</span><span data-i18n="tutorialStep1">აირჩიეთ სასურველი ვიდეოს <b>ფორმატი / ხარისხი</b> (რეზოლუცია და fps) კალკულატორში.</span></li>
+        <li><span class="t-num">2</span><span data-i18n="tutorialStep2">თუ <b>ზუსტად არ იცით</b> ვიდეოს ხანგრძლივობა — ატვირთეთ ვიდეო <b>VIDEO SCANNER</b>-ში და ხანგრძლივობა ავტომატურად გაიზომება და ჩაისმება კალკულატორში.</span></li>
+        <li><span class="t-num">3</span><span data-i18n="tutorialStep3">თუ ხანგრძლივობა <b>ზუსტად იცით</b> — ხელით მონიშნეთ შესაბამის ველში: „მონიშნე ზუსტი დრო (წამი)" და „წამის მეასედი / კადრი (Milliseconds)".</span></li>
+        <li><span class="t-num">4</span><span data-i18n="tutorialStep4">ეკრანზე დაუყოვნებლივ ნახავთ ვიდეოს მონტაჟის <b>საბოლოო ღირებულებას</b> რეალურ დროში.</span></li>
+        <li><span class="t-num">5</span><span data-i18n="tutorialStep5">სურვილის შემთხვევაში, დააჭირეთ <b>„გაგზავნე შეკვეთა"</b> და გამომიგზავნეთ შეკვეთა <b>WhatsApp</b>-ზე ან <b>Telegram</b>-ზე.</span></li>
+        <li><span class="t-num">6</span><span data-i18n="tutorialStep6">ვიდეოს გამოსაგზავნად ატვირთეთ ის <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>-ზე, შემდეგ კი მიღებული ლინკი გამომიგზავნეთ <b>Telegram</b>-ზე ან <b>WhatsApp</b>-ზე.</span></li>
+      </ol>
+    </div>
   </div>
 
   <div class="panel">
@@ -1026,6 +1088,14 @@
       adminClose: 'დახურვა',
       adminTabVisits: 'ვიზიტორები',
       adminNoVisits: 'ვიზიტები ჯერ არ დაფიქსირებულა.',
+      tutorialLabel: 'როგორ გავაკეთო შეკვეთა?',
+      tutorialToggleText: 'ვრცლად',
+      tutorialStep1: 'აირჩიეთ სასურველი ვიდეოს <b>ფორმატი / ხარისხი</b> (რეზოლუცია და fps) კალკულატორში.',
+      tutorialStep2: 'თუ <b>ზუსტად არ იცით</b> ვიდეოს ხანგრძლივობა — ატვირთეთ ვიდეო <b>VIDEO SCANNER</b>-ში და ხანგრძლივობა ავტომატურად გაიზომება და ჩაისმება კალკულატორში.',
+      tutorialStep3: 'თუ ხანგრძლივობა <b>ზუსტად იცით</b> — ხელით მონიშნეთ შესაბამის ველში: „მონიშნე ზუსტი დრო (წამი)" და „წამის მეასედი / კადრი (Milliseconds)".',
+      tutorialStep4: 'ეკრანზე დაუყოვნებლივ ნახავთ ვიდეოს მონტაჟის <b>საბოლოო ღირებულებას</b> რეალურ დროში.',
+      tutorialStep5: 'სურვილის შემთხვევაში, დააჭირეთ <b>„გაგზავნე შეკვეთა"</b> და გამომიგზავნეთ შეკვეთა <b>WhatsApp</b>-ზე ან <b>Telegram</b>-ზე.',
+      tutorialStep6: 'ვიდეოს გამოსაგზავნად ატვირთეთ ის <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>-ზე, შემდეგ კი მიღებული ლინკი გამომიგზავნეთ <b>Telegram</b>-ზე ან <b>WhatsApp</b>-ზე.',
     },
     en: {
       visitorsLabel: 'Total visitors:',
@@ -1084,6 +1154,14 @@
       adminClose: 'Close',
       adminTabVisits: 'Visitors',
       adminNoVisits: 'No visits recorded yet.',
+      tutorialLabel: 'How to place an order?',
+      tutorialToggleText: 'Show details',
+      tutorialStep1: 'Choose the <b>video format / quality</b> you want (resolution and fps) in the calculator.',
+      tutorialStep2: 'If you <b>don\'t know the exact duration</b> of your video — upload it to the <b>VIDEO SCANNER</b> and the duration will be measured automatically and filled into the calculator.',
+      tutorialStep3: 'If you <b>know the exact duration</b> — enter it manually in the "Select exact duration (seconds)" and "Hundredths of a second / frame (Milliseconds)" fields.',
+      tutorialStep4: 'You\'ll immediately see the <b>final editing price</b> on screen, in real time.',
+      tutorialStep5: 'If you\'d like to order, click <b>"Send order"</b> and send it to us via <b>WhatsApp</b> or <b>Telegram</b>.',
+      tutorialStep6: 'To send the video itself, upload it to <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>, then send us the resulting link via <b>Telegram</b> or <b>WhatsApp</b>.',
     }
   };
 
@@ -2092,6 +2170,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
   function closeAdmin(){
     adminOverlay.classList.remove('open');
+  }
+
+  // Tutorial panel toggle
+  const tutorialPanel = document.getElementById('tutorialPanel');
+  const tutorialToggleHead = document.getElementById('tutorialToggleHead');
+  if (tutorialPanel && tutorialToggleHead) {
+    tutorialToggleHead.addEventListener('click', () => {
+      tutorialPanel.classList.toggle('open');
+    });
   }
 
   if (adminGear) adminGear.addEventListener('click', openAdmin);
