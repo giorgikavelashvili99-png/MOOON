@@ -1028,6 +1028,7 @@
 
     <div class="comp-module-error" id="compModuleError">
       <div>&#9888;&#65039; <span data-i18n="compModuleErrorText">ვერ ჩაიტვირთა შეკუმშვის მოდული &mdash; შეამოწმეთ ინტერნეტ კავშირი და სცადეთ ხელახლა.</span></div>
+      <div id="compModuleErrorDetail" style="font-family:'JetBrains Mono', monospace; font-size:11px; opacity:0.75; word-break:break-all;"></div>
       <button type="button" class="comp-retry-btn" id="compRetryBtn" data-i18n="compRetry">ხელახლა ცდა</button>
     </div>
 
@@ -1803,40 +1804,66 @@
     compStartBtn.disabled = !ffmpegReady || !compFile || compRunning;
   }
 
+  // Two CDN mirrors are tried in order. If unpkg is unreachable (blocked,
+  // rate-limited, regional DNS issue, etc.) jsDelivr is tried next, so a
+  // single CDN outage doesn't take the whole feature down.
+  const FFMPEG_CORE_BASES = [
+    'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',
+    'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd'
+  ];
+
+  function withTimeout(promise, ms, label){
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout: ' + label)), ms))
+    ]);
+  }
+
   async function loadFFmpeg(){
     if (ffmpegLoading || ffmpegReady) return;
     if (typeof FFmpegWASM === 'undefined' || typeof FFmpegUtil === 'undefined') {
       compModuleError.classList.add('show');
+      const detailEl = document.getElementById('compModuleErrorDetail');
+      if (detailEl) detailEl.textContent = 'FFmpegWASM/FFmpegUtil not defined — the CDN <script> tags for @ffmpeg/ffmpeg or @ffmpeg/util did not load.';
       return;
     }
     ffmpegLoading = true;
     compModuleError.classList.remove('show');
     compLoading.classList.add('show');
-    try {
-      const { FFmpeg } = FFmpegWASM;
-      const { toBlobURL } = FFmpegUtil;
-      const inst = new FFmpeg();
-      const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-      const coreURL = await toBlobURL(base + '/ffmpeg-core.js', 'text/javascript');
-      const wasmURL = await toBlobURL(base + '/ffmpeg-core.wasm', 'application/wasm');
-      inst.on('progress', ({ progress }) => {
-        if (!compRunning) return;
-        const pct = Math.max(0, Math.min(100, Math.round(progress * 100)));
-        compProgressFill.style.width = pct + '%';
-        compProgressLabel.textContent = pct + '%';
-      });
-      await inst.load({ coreURL: coreURL, wasmURL: wasmURL });
-      ffmpeg = inst;
-      ffmpegReady = true;
-      compLoading.classList.remove('show');
-      updateStartBtnState();
-    } catch (err) {
-      console.error('ffmpeg load failed', err);
-      compLoading.classList.remove('show');
-      compModuleError.classList.add('show');
-    } finally {
-      ffmpegLoading = false;
+
+    let lastErr = null;
+    for (const base of FFMPEG_CORE_BASES) {
+      try {
+        const { FFmpeg } = FFmpegWASM;
+        const { toBlobURL } = FFmpegUtil;
+        const inst = new FFmpeg();
+        const coreURL = await withTimeout(toBlobURL(base + '/ffmpeg-core.js', 'text/javascript'), 20000, 'ffmpeg-core.js fetch (' + base + ')');
+        const wasmURL = await withTimeout(toBlobURL(base + '/ffmpeg-core.wasm', 'application/wasm'), 30000, 'ffmpeg-core.wasm fetch (' + base + ')');
+        inst.on('progress', ({ progress }) => {
+          if (!compRunning) return;
+          const pct = Math.max(0, Math.min(100, Math.round(progress * 100)));
+          compProgressFill.style.width = pct + '%';
+          compProgressLabel.textContent = pct + '%';
+        });
+        await withTimeout(inst.load({ coreURL: coreURL, wasmURL: wasmURL }), 30000, 'ffmpeg.load()');
+        ffmpeg = inst;
+        ffmpegReady = true;
+        compLoading.classList.remove('show');
+        updateStartBtnState();
+        ffmpegLoading = false;
+        return;
+      } catch (err) {
+        console.error('ffmpeg load failed for base', base, err);
+        lastErr = err;
+      }
     }
+
+    const err = lastErr || new Error('Unknown error');
+    compLoading.classList.remove('show');
+    compModuleError.classList.add('show');
+    const detailEl = document.getElementById('compModuleErrorDetail');
+    if (detailEl) detailEl.textContent = String(err && (err.message || err));
+    ffmpegLoading = false;
   }
 
   compRetryBtn.addEventListener('click', loadFFmpeg);
