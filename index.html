@@ -680,6 +680,45 @@
     font-family:'JetBrains Mono', monospace;
   }
 
+  /* ---------- How-to / instructions section (collapsible) ---------- */
+  .howto-panel{ padding:24px 22px; }
+  .howto-head-row{
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; user-select:none;
+  }
+  .howto-toggle{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    width:30px; height:30px; border-radius:9px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
+  }
+  .howto-panel.open .howto-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
+  .howto-steps-wrap{
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+  }
+  .howto-panel.open .howto-steps-wrap{ grid-template-rows:1fr; }
+  .howto-steps-inner{ overflow:hidden; min-height:0; }
+  .howto-steps{ display:flex; flex-direction:column; gap:14px; margin-top:16px; }
+  .howto-step{
+    display:flex; gap:14px; align-items:flex-start;
+    background:#0a0a12; border:1px solid var(--border-soft);
+    border-radius:14px; padding:14px 16px;
+  }
+  .howto-step .hs-num{
+    flex:0 0 auto; width:28px; height:28px; border-radius:9px;
+    background:linear-gradient(135deg, var(--purple), var(--cyan));
+    color:#04101a; font-family:'JetBrains Mono', monospace; font-weight:800;
+    font-size:13px; display:flex; align-items:center; justify-content:center;
+  }
+  .howto-step .hs-body .hs-title{ font-size:14px; font-weight:700; margin-bottom:4px; }
+  .howto-step .hs-body .hs-text{ font-size:13px; color:var(--text-dim); line-height:1.55; }
+  .howto-step .hs-body a.hs-link{
+    color:var(--cyan); text-decoration:none; font-weight:700;
+    text-shadow:0 0 10px rgba(46,230,214,0.4);
+    word-break:break-all;
+  }
+  .howto-step .hs-body a.hs-link:hover{ text-decoration:underline; }
+
   /* ---------- AI Chat Widget ---------- */
   .chat-fab{
     position:fixed; right:20px; bottom:20px; z-index:50;
@@ -808,6 +847,48 @@
     <div class="eyebrow">VIDEO EDITING · PRICE ENGINE</div>
     <h1 data-i18n="heroTitle">გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
     <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
+  </div>
+
+  <!-- How to use / how to order (collapsible) -->
+  <div class="panel howto-panel" id="howtoPanel">
+    <div class="panel-head howto-head-row" id="howtoHeadRow" style="margin-bottom:0;">
+      <div class="label" data-i18n="howtoLabel">როგორ შევუკვეთო</div>
+      <button type="button" class="howto-toggle" id="howtoToggle" aria-label="toggle">▾</button>
+    </div>
+    <div class="howto-steps-wrap">
+      <div class="howto-steps-inner">
+        <div class="howto-steps">
+          <div class="howto-step">
+            <div class="hs-num">1</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep1Title">გამოთვალე ფასი</div>
+              <div class="hs-text" data-i18n="howtoStep1Text">ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო "VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.</div>
+            </div>
+          </div>
+          <div class="howto-step">
+            <div class="hs-num">2</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep2Title">ატვირთე ვიდეო</div>
+              <div class="hs-text" data-i18n="howtoStep2Text">გადადი ჩვენს ატვირთვის გვერდზე და ატვირთე შენი ვიდეო: <a class="hs-link" href="https://two313-3.onrender.com/" target="_blank" rel="noopener">two313-3.onrender.com</a></div>
+            </div>
+          </div>
+          <div class="howto-step">
+            <div class="hs-num">3</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep3Title">გამოაგზავნე ლინკი</div>
+              <div class="hs-text" data-i18n="howtoStep3Text">ატვირთვის შემდეგ მიღებული ლინკი, TikTok პროფილის ლინკთან ერთად, გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.</div>
+            </div>
+          </div>
+          <div class="howto-step">
+            <div class="hs-num">4</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep4Title">დაელოდე დადასტურებას</div>
+              <div class="hs-text" data-i18n="howtoStep4Text">მენეჯერი დაგიდასტურებს შეკვეთას და ვადას პირდაპირ ჩატში.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="panel">
@@ -1025,8 +1106,8 @@
   const TRANSLATIONS = {
     ka: {
       visitorsLabel: 'სულ ვიზიტორი საიტზე:',
-      topbarTagline: 'ფასი რეალურ დროში · AI მონტაჟი',
-      heroTitle: 'გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე',
+      topbarTagline: 'ისიამოვნე შენი ტიკტოკის ვიდეოებით',
+      heroTitle: 'შენ იმსახურებ საუკეთესო ხარისხს <span>შეუკვეთე ახლავე!</span>',
       heroSub: 'მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.',
       priceReadout: 'PRICE READOUT',
       finalPrice: 'საბოლოო ღირებულება',
@@ -1092,11 +1173,20 @@
       adminNoComments: 'კომენტარები ჯერ არ არის.',
       adminSave: 'შენახვა',
       adminDelete: 'წაშლა',
+      howtoLabel: 'როგორ შევუკვეთო',
+      howtoStep1Title: 'გამოთვალე ფასი',
+      howtoStep1Text: 'ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო "VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.',
+      howtoStep2Title: 'ატვირთე ვიდეო',
+      howtoStep2Text: 'გადადი ჩვენს ატვირთვის გვერდზე და ატვირთე შენი ვიდეო: <a class="hs-link" href="https://two313-3.onrender.com/" target="_blank" rel="noopener">two313-3.onrender.com</a>',
+      howtoStep3Title: 'გამოაგზავნე ლინკი',
+      howtoStep3Text: 'ატვირთვის შემდეგ მიღებული ლინკი, TikTok პროფილის ლინკთან ერთად, გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.',
+      howtoStep4Title: 'დაელოდე დადასტურებას',
+      howtoStep4Text: 'მენეჯერი დაგიდასტურებს შეკვეთას და ვადას პირდაპირ ჩატში.',
     },
     en: {
       visitorsLabel: 'Total visitors:',
-      topbarTagline: 'REAL-TIME PRICE ENGINE · AI EDITING',
-      heroTitle: 'Calculate your <span>video editing cost</span> down to the frame',
+      topbarTagline: 'Enjoy your TikTok videos',
+      heroTitle: 'You deserve the best quality <span>order now!</span>',
       heroSub: 'Enter your video\'s duration (or upload a video and it will measure it automatically) — the price is calculated in real time, for After Effects & Topaz quality editing.',
       priceReadout: 'PRICE READOUT',
       finalPrice: 'Final price',
@@ -1162,6 +1252,15 @@
       adminNoComments: 'No comments yet.',
       adminSave: 'Save',
       adminDelete: 'Delete',
+      howtoLabel: 'How to order',
+      howtoStep1Title: 'Calculate the price',
+      howtoStep1Text: 'Below, set the video duration and quality in the calculator — or upload a video in the "VIDEO SCANNER" block so the duration is measured automatically.',
+      howtoStep2Title: 'Upload your video',
+      howtoStep2Text: 'Go to our upload page and upload your video: <a class="hs-link" href="https://two313-3.onrender.com/" target="_blank" rel="noopener">two313-3.onrender.com</a>',
+      howtoStep3Title: 'Send us the link',
+      howtoStep3Text: 'After uploading, send us the link together with your TikTok profile link using the WhatsApp or Telegram button below — once the fields are filled in, pressing the button prepares the message automatically.',
+      howtoStep4Title: 'Wait for confirmation',
+      howtoStep4Text: 'A manager will confirm your order and the deadline directly in chat.',
     }
   };
 
@@ -1200,6 +1299,12 @@
   document.getElementById('langKa').addEventListener('click', () => setLanguage('ka'));
   document.getElementById('langEn').addEventListener('click', () => setLanguage('en'));
 
+  // ---------- Collapsible "How to order" panel ----------
+  const howtoPanel = document.getElementById('howtoPanel');
+  const howtoHeadRow = document.getElementById('howtoHeadRow');
+  function toggleHowto(){ howtoPanel.classList.toggle('open'); }
+  howtoHeadRow.addEventListener('click', toggleHowto);
+
   // ============================================================
   // 1) PRICE CALCULATOR (core logic, unchanged rate model)
   // ============================================================
@@ -1215,18 +1320,18 @@
   const tiktokError = document.getElementById('tiktokError');
 
   // PRICE_SCALE anchors the 5-second, non-subscriber rate (0.24₾/s) to a final
-  // 5s price for each video format. 1080p/60fps is the base format at 1.30₾,
+  // 5s price for each video format. 1080p/60fps is the base format at 1.00₾,
   // and every higher-quality format (more pixels and/or more frames to process)
   // is scaled up from that same base by the same method — only the scale
   // factor changes, the declining-rate shape (5s → 59.59s) is identical for
   // every format.
   const QUALITY_SCALES = {
-    '1080_60':  1.30 / 1.2,   // 1080p · 60fps  → 1.30₾ @5s / ~13.13₾ @59.59s (base, recommended)
-    '1080_120': 1.60 / 1.2,   // 1080p · 120fps → 1.60₾ @5s / ~16.16₾ @59.59s
-    '2k_60':    1.90 / 1.2,   // 2K    · 60fps  → 1.90₾ @5s / ~19.19₾ @59.59s
-    '2k_120':   2.20 / 1.2,   // 2K    · 120fps → 2.20₾ @5s / ~22.22₾ @59.59s
-    '4k_60':    2.60 / 1.2,   // 4K    · 60fps  → 2.60₾ @5s / ~26.26₾ @59.59s
-    '4k_120':   3.00 / 1.2    // 4K    · 120fps → 3.00₾ @5s / ~30.30₾ @59.59s
+    '1080_60':  1.00 / 1.2,          // 1080p · 60fps  → 1.00₾ @5s / ~10.10₾ @59.59s (base, recommended)
+    '1080_120': (1.60/1.3) / 1.2,    // 1080p · 120fps → 1.23₾ @5s / ~12.43₾ @59.59s
+    '2k_60':    (1.90/1.3) / 1.2,    // 2K    · 60fps  → 1.46₾ @5s / ~14.76₾ @59.59s
+    '2k_120':   (2.20/1.3) / 1.2,    // 2K    · 120fps → 1.69₾ @5s / ~17.09₾ @59.59s
+    '4k_60':    (2.60/1.3) / 1.2,    // 4K    · 60fps  → 2.00₾ @5s / ~20.20₾ @59.59s
+    '4k_120':   (3.00/1.3) / 1.2     // 4K    · 120fps → 2.31₾ @5s / ~23.31₾ @59.59s
   };
 
   const QUALITY_LABELS = {
@@ -1814,7 +1919,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const KB_KA = [
     {
       kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
-      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე და ხარისხზე (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). სტანდარტული 1080p/60fps ხარისხისთვის: მინ. 5 წამი → 1.30₾-დან, მაქს. 59.59 წამი → დაახლ. 13₾-მდე. მაღალი ხარისხის ფორმატები შესაბამისად ძვირდება. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა, აირჩიე ხარისხი ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
+      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე და ხარისხზე (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). სტანდარტული 1080p/60fps ხარისხისთვის: მინ. 5 წამი → 1.00₾-დან, მაქს. 59.59 წამი → დაახლ. 10₾-მდე. მაღალი ხარისხის ფორმატები შესაბამისად ძვირდება. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა, აირჩიე ხარისხი ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
       qr: ['არხის გამოწერით რამდენით იაფდება?', 'რა მოთხოვნაა ვიდეოზე?']
     },
     {
@@ -1834,8 +1939,12 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
     },
     {
+      kw: ['ატვირთვის გვერდ','ატვირთვის საიტ','two313','ატვირთვა'],
+      a: 'ვიდეოს ატვირთვისთვის გამოიყენე ეს გვერდი: https://two313-3.onrender.com/ — ატვირთე ვიდეო, მიღებული ლინკი კი გამოგვიგზავნე WhatsApp ან Telegram ღილაკით.',
+    },
+    {
       kw: ['როგორ შევუკვეთო','შეკვეთ','ორდერ','დაკვეთ'],
-      a: 'შეავსე ხანგრძლივობა (ხელით ან ვიდეოს ატვირთვით), მიუთითე TikTok ლინკი, და დააჭირე WhatsApp ან Telegram ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
+      a: 'გამოთვალე ფასი კალკულატორში, ატვირთე ვიდეო ატვირთვის გვერდზე (https://two313-3.onrender.com/), მიუთითე TikTok ლინკი, და დააჭირე WhatsApp ან Telegram ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
       qr: ['რომელი არხით შემიძლია შეკვეთა?']
     },
     {
@@ -1848,7 +1957,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['ატვირთ','ვიდეოს შემოწმ','scan','სკან','ხანგრძლივობის გაზომ'],
-      a: 'ზემოთ "VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოიტანო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებში და მილიწამებში და თავად ჩაასვამს კალკულატორში ფასის გამოსათვლელად. ფაილი არსად იტვირთება — ყველაფერი ხდება შენს მოწყობილობაზე.',
+      a: 'ზემოთ "VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოიტანო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებში და მილიწამებში და თავად ჩაასვამს კალკულატორში ფასის გამოსათვლელად. ეს მხოლოდ ხანგრძლივობის გასაზომად არის — შეკვეთის ვიდეო ცალკე უნდა ატვირთო ამ გვერდზე: https://two313-3.onrender.com/',
     },
     {
       kw: ['გადახდ','ანგარიშსწორ','ბარათ','ნაღდი'],
@@ -1883,7 +1992,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const KB_EN = [
     {
       kw: ['price','cost','how much','rate','discount'],
-      a: 'The price depends on both video duration and quality (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). For the standard 1080p/60fps format: min. 5 seconds → from 1.30₾, max. 59.59 seconds → up to about 13₾. Higher-quality formats cost proportionally more. Use the slider in the calculator to set the duration, pick a quality, or upload a video — the price is calculated automatically. Subscribers get a lower rate.',
+      a: 'The price depends on both video duration and quality (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). For the standard 1080p/60fps format: min. 5 seconds → from 1.00₾, max. 59.59 seconds → up to about 10₾. Higher-quality formats cost proportionally more. Use the slider in the calculator to set the duration, pick a quality, or upload a video — the price is calculated automatically. Subscribers get a lower rate.',
       qr: ['How much cheaper for subscribers?', 'What are the video requirements?']
     },
     {
@@ -1903,8 +2012,12 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       a: 'Editing is done only for the TikTok format. To send an order you must provide your TikTok profile link in the field.',
     },
     {
+      kw: ['upload page','upload site','two313','upload video'],
+      a: 'To upload your video use this page: https://two313-3.onrender.com/ — upload your video, then send us the resulting link via the WhatsApp or Telegram button.',
+    },
+    {
       kw: ['how to order','place an order','order process','how do i order'],
-      a: 'Fill in the duration (manually or by uploading a video), enter your TikTok link, and press the WhatsApp or Telegram button — the chosen app will open with a ready-made order message.',
+      a: 'Calculate the price in the calculator, upload your video on the upload page (https://two313-3.onrender.com/), enter your TikTok link, and press the WhatsApp or Telegram button — the chosen app will open with a ready-made order message.',
       qr: ['Which channel can I order through?']
     },
     {
@@ -1917,7 +2030,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['upload','check video','scan','measure duration'],
-      a: 'In the "VIDEO SCANNER" block above you can upload or drag in a video file — the browser will automatically read the duration in seconds and milliseconds and fill it into the calculator to compute the price. The file is never uploaded anywhere — everything happens on your device.',
+      a: 'In the "VIDEO SCANNER" block above you can upload or drag in a video file — the browser will automatically read the duration in seconds and milliseconds and fill it into the calculator to compute the price. That\'s just for measuring duration — your order video itself must be uploaded separately here: https://two313-3.onrender.com/',
     },
     {
       kw: ['payment','pay','card','cash'],
