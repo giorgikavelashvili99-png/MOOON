@@ -65,25 +65,15 @@
   }
   .orb{
     position:absolute; border-radius:50%;
-    filter:blur(70px);
+    filter:blur(90px);
     opacity:0.35;
-    will-change:transform;
-    transform:translateZ(0);
   }
   .orb.o1{ width:520px; height:520px; top:-160px; left:-120px; background:radial-gradient(circle, var(--purple), transparent 70%); animation: drift1 22s ease-in-out infinite; }
   .orb.o2{ width:460px; height:460px; bottom:-140px; right:-100px; background:radial-gradient(circle, var(--cyan), transparent 70%); animation: drift2 26s ease-in-out infinite; }
   .orb.o3{ width:340px; height:340px; top:40%; left:60%; background:radial-gradient(circle, var(--purple), transparent 70%); opacity:0.18; animation: drift1 18s ease-in-out infinite reverse; }
 
-  @keyframes drift1{ 0%,100%{ transform:translate3d(0,0,0) } 50%{ transform:translate3d(40px,30px,0) } }
-  @keyframes drift2{ 0%,100%{ transform:translate3d(0,0,0) } 50%{ transform:translate3d(-30px,-40px,0) } }
-
-  @media (prefers-reduced-motion: reduce){
-    .orb, .badge-float.ae, .badge-float.topaz, .chat-fab{ animation:none !important; }
-  }
-  @media (max-width: 640px){
-    .orb{ filter:blur(46px); }
-    .orb.o3{ display:none; }
-  }
+  @keyframes drift1{ 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(40px,30px) } }
+  @keyframes drift2{ 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(-30px,-40px) } }
 
   .badge-float{
     position:absolute;
@@ -390,6 +380,39 @@
   }
   .chart-row.active .cr-price{ color:#9df4e9; font-weight:700; }
 
+  /* ---------- Comments section ---------- */
+  .comments-panel .c-form{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .comments-panel input.c-name,
+  .comments-panel textarea.c-text{
+    width:100%; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
+    color:var(--text); padding:12px 14px; font-family:'Space Grotesk', sans-serif;
+    font-size:14px; outline:none; transition:border-color .15s;
+  }
+  .comments-panel input.c-name:focus,
+  .comments-panel textarea.c-text:focus{ border-color: var(--purple-soft); }
+  .comments-panel textarea.c-text{ resize:none; min-height:70px; }
+  .comments-panel .c-submit{
+    align-self:flex-end; background:var(--purple); color:#fff; border:none;
+    border-radius:12px; padding:10px 20px; font-weight:700; font-size:13.5px;
+    cursor:pointer; transition:.15s;
+  }
+  .comments-panel .c-submit:hover{ filter:brightness(1.1); }
+  .comments-panel .c-error{
+    display:none; color:var(--warn); font-size:12.5px; background:var(--warn-soft);
+    padding:9px 12px; border-radius:10px;
+  }
+  .comments-panel .c-error.show{ display:block; }
+  .comments-panel .c-list{ display:flex; flex-direction:column; gap:12px; }
+  .comments-panel .c-item{
+    background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:12px 14px;
+  }
+  .comments-panel .c-item .c-head{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;
+  }
+  .comments-panel .c-item .c-author{ font-weight:700; font-size:13px; color:var(--cyan); }
+  .comments-panel .c-item .c-date{ font-size:10.5px; color:var(--text-faint); }
+  .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
+  .comments-panel .c-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
 
   /* ---------- Admin gear + modal ---------- */
   .admin-gear{
@@ -652,49 +675,6 @@
     color:var(--cyan); text-shadow:0 0 10px rgba(46,230,214,0.5);
   }
 
-  /* Tutorial */
-  .tutorial-panel{ padding:22px 24px; }
-  .tutorial-panel .panel-head{
-    margin-bottom:0; cursor:pointer; user-select:none;
-  }
-  .tutorial-toggle-btn{
-    display:flex; align-items:center; gap:6px;
-    background:rgba(155,92,255,0.12); border:1px solid var(--purple-soft);
-    color:#c9b8ff; font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700;
-    letter-spacing:0.04em; border-radius:10px; padding:7px 12px; cursor:pointer;
-    transition:all .2s ease;
-  }
-  .tutorial-toggle-btn:hover{ border-color:var(--purple); color:#fff; box-shadow:0 0 14px rgba(155,92,255,0.35); }
-  .tutorial-toggle-btn .chev{ display:inline-block; transition:transform .25s ease; }
-  .tutorial-panel.open .tutorial-toggle-btn .chev{ transform:rotate(180deg); }
-  .tutorial-body{
-    max-height:0; overflow:hidden; opacity:0;
-    transition:max-height .35s ease, opacity .3s ease, margin-top .3s ease;
-  }
-  .tutorial-panel.open .tutorial-body{
-    max-height:900px; opacity:1; margin-top:20px;
-  }
-  .tutorial-steps{
-    list-style:none; margin:0; padding:0;
-    display:flex; flex-direction:column; gap:14px;
-  }
-  .tutorial-steps li{
-    display:flex; align-items:flex-start; gap:14px;
-    font-size:13.5px; line-height:1.65; color:#cfd3e6;
-  }
-  .tutorial-steps .t-num{
-    flex:none; width:26px; height:26px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(135deg, var(--purple), var(--cyan));
-    color:#0a0a14; font-family:'JetBrains Mono', monospace; font-weight:800; font-size:12.5px;
-    box-shadow:0 0 12px rgba(155,92,255,0.45);
-  }
-  .tutorial-steps li a{
-    color:var(--cyan); text-decoration:underline; text-underline-offset:2px;
-  }
-  .tutorial-steps li a:hover{ text-shadow:0 0 10px rgba(46,230,214,0.6); }
-  .tutorial-steps li b{ color:#fff; }
-
   footer{
     text-align:center; margin-top:34px; color:var(--text-faint); font-size:12px;
     font-family:'JetBrains Mono', monospace;
@@ -830,25 +810,6 @@
     <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
   </div>
 
-  <div class="panel tutorial-panel" id="tutorialPanel">
-    <div class="panel-head" id="tutorialToggleHead">
-      <div class="label" data-i18n="tutorialLabel">როგორ გავაკეთო შეკვეთა?</div>
-      <button type="button" class="tutorial-toggle-btn" id="tutorialToggleBtn">
-        <span data-i18n="tutorialToggleText">ვრცლად</span> <span class="chev">▾</span>
-      </button>
-    </div>
-    <div class="tutorial-body" id="tutorialBody">
-      <ol class="tutorial-steps">
-        <li><span class="t-num">1</span><span data-i18n="tutorialStep1">აირჩიეთ სასურველი ვიდეოს <b>ფორმატი / ხარისხი</b> (რეზოლუცია და fps) კალკულატორში.</span></li>
-        <li><span class="t-num">2</span><span data-i18n="tutorialStep2">თუ <b>ზუსტად არ იცით</b> ვიდეოს ხანგრძლივობა — ატვირთეთ ვიდეო <b>VIDEO SCANNER</b>-ში და ხანგრძლივობა ავტომატურად გაიზომება და ჩაისმება კალკულატორში.</span></li>
-        <li><span class="t-num">3</span><span data-i18n="tutorialStep3">თუ ხანგრძლივობა <b>ზუსტად იცით</b> — ხელით მონიშნეთ შესაბამის ველში: „მონიშნე ზუსტი დრო (წამი)" და „წამის მეასედი / კადრი (Milliseconds)".</span></li>
-        <li><span class="t-num">4</span><span data-i18n="tutorialStep4">ეკრანზე დაუყოვნებლივ ნახავთ ვიდეოს მონტაჟის <b>საბოლოო ღირებულებას</b> რეალურ დროში.</span></li>
-        <li><span class="t-num">5</span><span data-i18n="tutorialStep5">სურვილის შემთხვევაში, დააჭირეთ <b>„გაგზავნე შეკვეთა"</b> და გამომიგზავნეთ შეკვეთა <b>WhatsApp</b>-ზე ან <b>Telegram</b>-ზე.</span></li>
-        <li><span class="t-num">6</span><span data-i18n="tutorialStep6">ვიდეოს გამოსაგზავნად ატვირთეთ ის <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>-ზე, შემდეგ კი მიღებული ლინკი გამომიგზავნეთ <b>Telegram</b>-ზე ან <b>WhatsApp</b>-ზე.</span></li>
-      </ol>
-    </div>
-  </div>
-
   <div class="panel">
     <div class="panel-head">
       <div class="label" data-i18n="priceReadout">PRICE READOUT</div>
@@ -979,6 +940,22 @@
     <div class="copy-note" id="copyNote"></div>
   </div>
 
+  <!-- Comments -->
+  <div class="panel comments-panel" style="padding:22px;">
+    <div class="panel-head" style="margin-bottom:16px;">
+      <div class="label" data-i18n="commentsLabel">კომენტარები</div>
+    </div>
+    <div class="c-form">
+      <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი">
+      <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
+      <div class="c-error" id="commentError"></div>
+      <button class="c-submit" id="commentSubmit" data-i18n="commentSubmit">გამოქვეყნება</button>
+    </div>
+    <div class="c-list" id="commentList">
+      <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარია — იყავი პირველი!</div>
+    </div>
+  </div>
+
   <div class="warn-panel">
     <div class="w-head">
       <div class="ico">!</div>
@@ -1009,7 +986,12 @@
     </div>
     <div id="adminDashboard" style="display:none;">
       <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
+      <div class="a-tabs">
+        <button class="a-tab active" id="adminTabVisits" data-i18n="adminTabVisits">ვიზიტორები</button>
+        <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
+      </div>
       <div class="a-panel active" id="adminPanelVisits"></div>
+      <div class="a-panel" id="adminPanelComments"></div>
       <button class="a-close" id="adminCloseDash" data-i18n="adminClose">დახურვა</button>
     </div>
   </div>
@@ -1091,21 +1073,25 @@
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
       chartLabel: 'ფასის შედარება ამჟამინდელი ხანგრძლივობით',
+      commentsLabel: 'კომენტარები',
+      commentNamePh: 'სახელი',
+      commentTextPh: 'დაწერე კომენტარი…',
+      commentSubmit: 'გამოქვეყნება',
+      commentEmpty: 'ჯერ არცერთი კომენტარია — იყავი პირველი!',
+      commentErrEmpty: 'გთხოვთ შეავსოთ სახელი და კომენტარის ველი.',
+      commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
+      commentErrGeneric: 'კომენტარის გამოქვეყნება ვერ მოხერხდა — სცადეთ ხელახლა.',
       adminTitle: 'ადმინის პანელი',
       adminPassPh: 'პაროლი',
       adminEnter: 'შესვლა',
       adminWrongPass: 'არასწორი პაროლი',
       adminClose: 'დახურვა',
       adminTabVisits: 'ვიზიტორები',
+      adminTabComments: 'კომენტარები',
       adminNoVisits: 'ვიზიტები ჯერ არ დაფიქსირებულა.',
-      tutorialLabel: 'როგორ გავაკეთო შეკვეთა?',
-      tutorialToggleText: 'ვრცლად',
-      tutorialStep1: 'აირჩიეთ სასურველი ვიდეოს <b>ფორმატი / ხარისხი</b> (რეზოლუცია და fps) კალკულატორში.',
-      tutorialStep2: 'თუ <b>ზუსტად არ იცით</b> ვიდეოს ხანგრძლივობა — ატვირთეთ ვიდეო <b>VIDEO SCANNER</b>-ში და ხანგრძლივობა ავტომატურად გაიზომება და ჩაისმება კალკულატორში.',
-      tutorialStep3: 'თუ ხანგრძლივობა <b>ზუსტად იცით</b> — ხელით მონიშნეთ შესაბამის ველში: „მონიშნე ზუსტი დრო (წამი)" და „წამის მეასედი / კადრი (Milliseconds)".',
-      tutorialStep4: 'ეკრანზე დაუყოვნებლივ ნახავთ ვიდეოს მონტაჟის <b>საბოლოო ღირებულებას</b> რეალურ დროში.',
-      tutorialStep5: 'სურვილის შემთხვევაში, დააჭირეთ <b>„გაგზავნე შეკვეთა"</b> და გამომიგზავნეთ შეკვეთა <b>WhatsApp</b>-ზე ან <b>Telegram</b>-ზე.',
-      tutorialStep6: 'ვიდეოს გამოსაგზავნად ატვირთეთ ის <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>-ზე, შემდეგ კი მიღებული ლინკი გამომიგზავნეთ <b>Telegram</b>-ზე ან <b>WhatsApp</b>-ზე.',
+      adminNoComments: 'კომენტარები ჯერ არ არის.',
+      adminSave: 'შენახვა',
+      adminDelete: 'წაშლა',
     },
     en: {
       visitorsLabel: 'Total visitors:',
@@ -1157,21 +1143,25 @@
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
       chartLabel: 'Price comparison at the current duration',
+      commentsLabel: 'Comments',
+      commentNamePh: 'Name',
+      commentTextPh: 'Write a comment…',
+      commentSubmit: 'Post',
+      commentEmpty: 'No comments yet — be the first!',
+      commentErrEmpty: 'Please fill in both the name and comment fields.',
+      commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
+      commentErrGeneric: 'Could not post the comment — please try again.',
       adminTitle: 'Admin panel',
       adminPassPh: 'Password',
       adminEnter: 'Enter',
       adminWrongPass: 'Incorrect password',
       adminClose: 'Close',
       adminTabVisits: 'Visitors',
+      adminTabComments: 'Comments',
       adminNoVisits: 'No visits recorded yet.',
-      tutorialLabel: 'How to place an order?',
-      tutorialToggleText: 'Show details',
-      tutorialStep1: 'Choose the <b>video format / quality</b> you want (resolution and fps) in the calculator.',
-      tutorialStep2: 'If you <b>don\'t know the exact duration</b> of your video — upload it to the <b>VIDEO SCANNER</b> and the duration will be measured automatically and filled into the calculator.',
-      tutorialStep3: 'If you <b>know the exact duration</b> — enter it manually in the "Select exact duration (seconds)" and "Hundredths of a second / frame (Milliseconds)" fields.',
-      tutorialStep4: 'You\'ll immediately see the <b>final editing price</b> on screen, in real time.',
-      tutorialStep5: 'If you\'d like to order, click <b>"Send order"</b> and send it to us via <b>WhatsApp</b> or <b>Telegram</b>.',
-      tutorialStep6: 'To send the video itself, upload it to <a href="https://wetransfer.com/" target="_blank" rel="noopener">wetransfer.com</a>, then send us the resulting link via <b>Telegram</b> or <b>WhatsApp</b>.',
+      adminNoComments: 'No comments yet.',
+      adminSave: 'Save',
+      adminDelete: 'Delete',
     }
   };
 
@@ -1302,7 +1292,8 @@
     const price = calculateExactPrice(s, ms, isSub, quality);
     priceDisplay.innerHTML = price + '<sup>₾</sup>';
     priceDisplay.classList.remove('bump');
-    requestAnimationFrame(() => requestAnimationFrame(() => priceDisplay.classList.add('bump')));
+    void priceDisplay.offsetWidth;
+    priceDisplay.classList.add('bump');
 
     subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
 
@@ -1311,25 +1302,11 @@
     return price;
   }
 
-  // Slider 'input' events can fire far more often than the screen can
-  // repaint (especially while dragging on touch devices). Coalesce
-  // bursts of events into a single refresh() per animation frame so
-  // the chart rebuild + price calc doesn't run dozens of times a second.
-  let refreshQueued = false;
-  function scheduleRefresh(){
-    if (refreshQueued) return;
-    refreshQueued = true;
-    requestAnimationFrame(() => {
-      refreshQueued = false;
-      refresh();
-    });
-  }
-
   secondsRange.addEventListener('input', () => {
     secondsInput.value = secondsRange.value;
-    scheduleRefresh();
+    refresh();
   });
-  secondsInput.addEventListener('input', () => scheduleRefresh());
+  secondsInput.addEventListener('input', () => refresh());
   secondsInput.addEventListener('blur', () => {
     let v = parseFloat(secondsInput.value || 0);
     if (isNaN(v) || v < 0) v = 0;
@@ -1337,7 +1314,7 @@
     secondsInput.value = v;
     refresh();
   });
-  msRange.addEventListener('input', () => scheduleRefresh());
+  msRange.addEventListener('input', () => refresh());
   subToggle.addEventListener('change', () => refresh());
 
   const qualityGrid = document.getElementById('qualityGrid');
@@ -2086,7 +2063,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   // ============================================================
   // 7) SHARED BACKEND — lightweight anonymous JSON store used to
-  // sync the admin visit log across every visitor's
+  // sync comments and the admin visit log across every visitor's
   // browser (this site has no server of its own, so this fills that
   // gap). Reads/writes a small number of fixed paths under one
   // namespace; failures are silent and never block the page.
@@ -2112,20 +2089,108 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     } catch(e){ return false; }
   }
 
+  // ============================================================
+  // 8) COMMENTS SYSTEM
+  // ============================================================
+  const commentName = document.getElementById('commentName');
+  const commentText = document.getElementById('commentText');
+  const commentError = document.getElementById('commentError');
+  const commentSubmit = document.getElementById('commentSubmit');
+  const commentList = document.getElementById('commentList');
+  const commentEmpty = document.getElementById('commentEmpty');
 
-  // ============================================================
-  // 8) VISITOR LOG (device + approximate location) — feeds the
-  // admin panel's "Visitors" tab. Logged once per browser session.
-  // ============================================================
+  // Basic uncensored-language filter — blocks the most common Georgian
+  // and English profanity/slurs before a comment is ever published.
+  // This runs in the browser, so it's a courtesy filter, not a hard
+  // security boundary; the admin panel can still remove anything that
+  // slips through.
+  const PROFANITY_LIST = [
+    'ყლე','ყლეო','ტიტინა','ჯავრიანი','დებილ','იდიოტ','ლახტი','დედაშენ','დედას',
+    'მამაშენ','ჰუიო','ხუი','пизд','блять','бля','сука','хуй','нахуй','ебал',
+    'fuck','shit','bitch','asshole','bastard','cunt','dick','whore','slut',
+    'nigger','faggot','retard'
+  ];
+  function containsProfanity(str){
+    const lower = str.toLowerCase();
+    return PROFANITY_LIST.some(w => lower.includes(w));
+  }
   function escapeHtml(str){
     return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   }
-  function formatVisitDate(ts){
+  function formatCommentDate(ts){
     try{
       return new Date(ts).toLocaleString(currentLang === 'ka' ? 'ka-GE' : 'en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
     } catch(e){ return ''; }
   }
 
+  let commentsCache = [];
+
+  function renderComments(){
+    if (!commentList) return;
+    if (!commentsCache.length) {
+      commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
+      return;
+    }
+    commentList.innerHTML = commentsCache.map(c =>
+      '<div class="c-item"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
+      '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
+      '<div class="c-body">' + escapeHtml(c.text) + '</div></div>'
+    ).join('');
+  }
+
+  async function loadComments(){
+    const data = await mdbRead('comments');
+    commentsCache = (data && Array.isArray(data.list)) ? data.list : [];
+    renderComments();
+  }
+
+  function showCommentError(msg){
+    commentError.textContent = msg;
+    commentError.classList.add('show');
+  }
+  function hideCommentError(){
+    commentError.classList.remove('show');
+  }
+
+  if (commentSubmit) {
+    commentSubmit.addEventListener('click', async () => {
+      hideCommentError();
+      const name = (commentName.value || '').trim();
+      const text = (commentText.value || '').trim();
+      if (!name || !text) {
+        showCommentError(t('commentErrEmpty'));
+        return;
+      }
+      if (containsProfanity(name) || containsProfanity(text)) {
+        showCommentError(t('commentErrProfanity'));
+        return;
+      }
+      commentSubmit.disabled = true;
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), ts: Date.now() };
+      // Re-read the latest list right before writing to minimize (not
+      // fully eliminate) lost updates from concurrent commenters.
+      const fresh = await mdbRead('comments');
+      const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
+      const updated = [entry, ...list].slice(0, 200);
+      const ok = await mdbWrite('comments', { list: updated });
+      commentSubmit.disabled = false;
+      if (!ok) {
+        showCommentError(t('commentErrGeneric'));
+        return;
+      }
+      commentsCache = updated;
+      renderComments();
+      commentName.value = '';
+      commentText.value = '';
+    });
+  }
+
+  loadComments();
+
+  // ============================================================
+  // 9) VISITOR LOG (device + approximate location) — feeds the
+  // admin panel's "Visitors" tab. Logged once per browser session.
+  // ============================================================
   function detectDevice(){
     const ua = navigator.userAgent || '';
     let os = 'Unknown OS';
@@ -2171,7 +2236,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   logVisit();
 
   // ============================================================
-  // 9) ADMIN PANEL — gated with a password, shows the visit log.
+  // 10) ADMIN PANEL — gated with a password, shows the visit log
+  // and lets the admin edit/remove comments.
   // ============================================================
   const ADMIN_PASSWORD = '0070';
   const adminGear = document.getElementById('adminGear');
@@ -2182,7 +2248,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const adminGo = document.getElementById('adminGo');
   const adminErr = document.getElementById('adminErr');
   const adminTabVisits = document.getElementById('adminTabVisits');
+  const adminTabComments = document.getElementById('adminTabComments');
   const adminPanelVisits = document.getElementById('adminPanelVisits');
+  const adminPanelComments = document.getElementById('adminPanelComments');
 
   function openAdmin(){
     adminOverlay.classList.add('open');
@@ -2193,15 +2261,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
   function closeAdmin(){
     adminOverlay.classList.remove('open');
-  }
-
-  // Tutorial panel toggle
-  const tutorialPanel = document.getElementById('tutorialPanel');
-  const tutorialToggleHead = document.getElementById('tutorialToggleHead');
-  if (tutorialPanel && tutorialToggleHead) {
-    tutorialToggleHead.addEventListener('click', () => {
-      tutorialPanel.classList.toggle('open');
-    });
   }
 
   if (adminGear) adminGear.addEventListener('click', openAdmin);
@@ -2218,15 +2277,66 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       return;
     }
     adminPanelVisits.innerHTML = list.map(v =>
-      '<div class="a-visit-row"><span>' + formatVisitDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
+      '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
     ).join('');
   }
+
+  async function renderAdminComments(){
+    adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('comments');
+    const list = (data && Array.isArray(data.list)) ? data.list : [];
+    if (!list.length) {
+      adminPanelComments.innerHTML = '<div class="c-empty">' + t('adminNoComments') + '</div>';
+      return;
+    }
+    adminPanelComments.innerHTML = list.map(c =>
+      '<div class="a-cmt" data-id="' + c.id + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + ' · ' + formatCommentDate(c.ts) + '</div>' +
+        '<textarea>' + escapeHtml(c.text) + '</textarea>' +
+        '<div class="a-cmt-actions">' +
+          '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
+          '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  adminPanelComments.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    const action = btn.getAttribute('data-action');
+    const fresh = await mdbRead('comments');
+    let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
+    if (action === 'delete') {
+      list = list.filter(c => String(c.id) !== String(id));
+    } else if (action === 'save') {
+      const wrap = btn.closest('.a-cmt');
+      const newText = wrap.querySelector('textarea').value.slice(0, 500);
+      list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { text: newText }) : c);
+    }
+    await mdbWrite('comments', { list });
+    commentsCache = list;
+    renderComments();
+    renderAdminComments();
+  });
+
+  function switchAdminTab(tab){
+    const showVisits = tab === 'visits';
+    adminTabVisits.classList.toggle('active', showVisits);
+    adminTabComments.classList.toggle('active', !showVisits);
+    adminPanelVisits.classList.toggle('active', showVisits);
+    adminPanelComments.classList.toggle('active', !showVisits);
+    if (showVisits) renderAdminVisits(); else renderAdminComments();
+  }
+  adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
+  adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
 
   function tryAdminLogin(){
     if (adminPass.value === ADMIN_PASSWORD) {
       adminLogin.style.display = 'none';
       adminDashboard.style.display = 'block';
-      renderAdminVisits();
+      switchAdminTab('visits');
     } else {
       adminErr.classList.add('show');
     }
