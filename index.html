@@ -759,10 +759,28 @@
   }
   .howto-step .hs-body a.hs-link:hover{ text-decoration:underline; }
 
+  /* ---------- Generic collapsible toggle (reused by portfolio & trust panels) ---------- */
+  .collapsible-toggle{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    width:30px; height:30px; border-radius:9px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
+  }
+  .portfolio-panel.open .collapsible-toggle,
+  .trust-panel.open .collapsible-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
+  .collapsible-wrap{
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+  }
+  .portfolio-panel.open .collapsible-wrap,
+  .trust-panel.open .collapsible-wrap{ grid-template-rows:1fr; }
+  .collapsible-inner{ overflow:hidden; min-height:0; }
+
   /* ---------- Trust bar ---------- */
+  .trust-panel .panel-head{ cursor:pointer; user-select:none; }
   .trust-panel{ padding:22px 22px 20px; }
   .trust-grid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+    margin-top:16px;
   }
   @media (max-width:520px){ .trust-grid{ grid-template-columns:1fr; } }
   .trust-item{
@@ -788,9 +806,11 @@
   .trust-rating-row .tr-text b{ color:#fff; }
 
   /* ---------- Portfolio ---------- */
+  .portfolio-panel .panel-head{ cursor:pointer; user-select:none; }
   .portfolio-panel{ padding:22px 22px 20px; }
   .portfolio-grid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+    margin-top:16px;
   }
   @media (max-width:420px){ .portfolio-grid{ grid-template-columns:1fr; } }
   .portfolio-card{
@@ -1056,59 +1076,69 @@
 
   <!-- Portfolio -->
   <div class="panel portfolio-panel" id="portfolioPanel">
-    <div class="panel-head" style="margin-bottom:16px;">
+    <div class="panel-head" id="portfolioHeadRow" style="margin-bottom:0;">
       <div class="label" data-i18n="portfolioLabel">ნამუშევრების პორტფოლიო</div>
+      <button type="button" class="collapsible-toggle" id="portfolioToggle" aria-label="toggle">▾</button>
     </div>
-    <div class="portfolio-grid">
-      <a class="portfolio-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
-        <div class="portfolio-icon">
-          <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+    <div class="collapsible-wrap">
+      <div class="collapsible-inner">
+        <div class="portfolio-grid">
+          <a class="portfolio-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+            <div class="portfolio-icon">
+              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+            </div>
+            <div class="portfolio-name" id="portfolioName1">@moonaee26</div>
+            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+          </a>
+          <a class="portfolio-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+            <div class="portfolio-icon">
+              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+            </div>
+            <div class="portfolio-name" id="portfolioName2">@marveluniversee26</div>
+            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+          </a>
         </div>
-        <div class="portfolio-name" id="portfolioName1">@moonaee26</div>
-        <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
-      </a>
-      <a class="portfolio-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
-        <div class="portfolio-icon">
-          <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
-        </div>
-        <div class="portfolio-name" id="portfolioName2">@marveluniversee26</div>
-        <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
-      </a>
+      </div>
     </div>
   </div>
 
   <!-- Trust bar -->
   <div class="panel trust-panel" id="trustPanel">
-    <div class="panel-head" style="margin-bottom:16px;">
+    <div class="panel-head" id="trustHeadRow" style="margin-bottom:0;">
       <div class="label" data-i18n="trustLabel">რატომ MOON</div>
+      <button type="button" class="collapsible-toggle" id="trustToggle" aria-label="toggle">▾</button>
     </div>
-    <div class="trust-grid">
-      <div class="trust-item">
-        <div class="ti-ico">⭐</div>
-        <div>
-          <div class="ti-title" data-i18n="trust1Title">ნამდვილი შეფასებები</div>
-          <div class="ti-text" data-i18n="trust1Text">ყველა შეფასება ქვემოთ დატოვებულია რეალური კლიენტების მიერ — გაეცანი კომენტარებს გვერდის ბოლოში.</div>
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="ti-ico">🎬</div>
-        <div>
-          <div class="ti-title" data-i18n="trust2Title">ხელით მონტაჟი, არა შაბლონი</div>
-          <div class="ti-text" data-i18n="trust2Text">თითოეული ვიდეო მუშავდება ინდივიდუალურად After Effects & Topaz ტექნოლოგიით, ავტომატური შაბლონების გარეშე.</div>
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="ti-ico">💬</div>
-        <div>
-          <div class="ti-title" data-i18n="trust3Title">პირდაპირი კონტაქტი მენეჯერთან</div>
-          <div class="ti-text" data-i18n="trust3Text">შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.</div>
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="ti-ico">🔒</div>
-        <div>
-          <div class="ti-title" data-i18n="trust4Title">გამჭვირვალე ფასი წინასწარ</div>
-          <div class="ti-text" data-i18n="trust4Text">ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.</div>
+    <div class="collapsible-wrap">
+      <div class="collapsible-inner">
+        <div class="trust-grid">
+          <div class="trust-item">
+            <div class="ti-ico">⭐</div>
+            <div>
+              <div class="ti-title" data-i18n="trust1Title">ნამდვილი შეფასებები</div>
+              <div class="ti-text" data-i18n="trust1Text">ყველა შეფასება ქვემოთ დატოვებულია რეალური კლიენტების მიერ — გაეცანი კომენტარებს გვერდის ბოლოში.</div>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="ti-ico">🎬</div>
+            <div>
+              <div class="ti-title" data-i18n="trust2Title">ხელით მონტაჟი, არა შაბლონი</div>
+              <div class="ti-text" data-i18n="trust2Text">თითოეული ვიდეო მუშავდება ინდივიდუალურად After Effects & Topaz ტექნოლოგიით, ავტომატური შაბლონების გარეშე.</div>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="ti-ico">💬</div>
+            <div>
+              <div class="ti-title" data-i18n="trust3Title">პირდაპირი კონტაქტი მენეჯერთან</div>
+              <div class="ti-text" data-i18n="trust3Text">შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.</div>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="ti-ico">🔒</div>
+            <div>
+              <div class="ti-title" data-i18n="trust4Title">გამჭვირვალე ფასი წინასწარ</div>
+              <div class="ti-text" data-i18n="trust4Text">ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1282,7 +1312,7 @@
   </div>
 
   <!-- Order channels -->
-  <div class="panel" style="padding:22px;">
+  <div class="panel" id="orderChannelsPanel" style="padding:22px; margin-bottom:10px;">
     <div class="panel-head" style="margin-bottom:16px;">
       <div class="label" data-i18n="sendOrder">გაგზავნე შეკვეთა</div>
     </div>
@@ -1294,6 +1324,25 @@
       <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> <span data-i18n="sendTG">Telegram-ზე გაგზავნა</span></button>
     </div>
     <div class="copy-note" id="copyNote"></div>
+  </div>
+
+  <div class="warn-panel" id="warnPanel" style="margin-bottom:22px;">
+    <div class="w-head" id="warnHeadRow">
+      <div class="w-head-left">
+        <div class="ico">!</div>
+        <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
+      </div>
+      <button type="button" class="warn-toggle" id="warnToggle" aria-label="toggle">▾</button>
+    </div>
+    <div class="warn-content-wrap">
+      <div class="warn-content-inner">
+        <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
+        <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
+        <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
+        <p data-i18n="warnP4">კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედდეთ ან შენელდეთ.</p>
+        <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
+      </div>
+    </div>
   </div>
 
   <!-- Comments -->
@@ -1319,25 +1368,6 @@
     </div>
     <div class="c-list" id="commentList">
       <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!</div>
-    </div>
-  </div>
-
-  <div class="warn-panel" id="warnPanel">
-    <div class="w-head" id="warnHeadRow">
-      <div class="w-head-left">
-        <div class="ico">!</div>
-        <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
-      </div>
-      <button type="button" class="warn-toggle" id="warnToggle" aria-label="toggle">▾</button>
-    </div>
-    <div class="warn-content-wrap">
-      <div class="warn-content-inner">
-        <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
-        <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
-        <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
-        <p data-i18n="warnP4">კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედდეთ ან შენელდეთ.</p>
-        <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
-      </div>
     </div>
   </div>
 
@@ -1642,6 +1672,19 @@
   const warnHeadRow = document.getElementById('warnHeadRow');
   if (warnPanel && warnHeadRow) {
     warnHeadRow.addEventListener('click', () => warnPanel.classList.toggle('open'));
+  }
+
+  // ---------- Collapsible "Portfolio" & "Why MOON" panels (collapsed by default) ----------
+  const portfolioPanel = document.getElementById('portfolioPanel');
+  const portfolioHeadRow = document.getElementById('portfolioHeadRow');
+  if (portfolioPanel && portfolioHeadRow) {
+    portfolioHeadRow.addEventListener('click', () => portfolioPanel.classList.toggle('open'));
+  }
+
+  const trustPanel = document.getElementById('trustPanel');
+  const trustHeadRow = document.getElementById('trustHeadRow');
+  if (trustPanel && trustHeadRow) {
+    trustHeadRow.addEventListener('click', () => trustPanel.classList.toggle('open'));
   }
 
   const chartBox = document.getElementById('chartBox');
@@ -2155,890 +2198,4 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     : `https://countapi.mileshilliard.com/api/v1/hit/${VISIT_KEY}`;
 
   fetch(endpoint)
-    .then(r => { if (!r.ok) throw new Error('bad response'); return r.json(); })
-    .then(data => {
-      const count = parseInt(data && data.value, 10);
-      if (!isNaN(count)) {
-        const displayCount = count + VISITOR_BASE_OFFSET;
-        setVisitorDisplay(displayCount);
-        cacheKnownCount(displayCount);
-        sessionStorage.setItem('moon_visit_counted', '1');
-      } else {
-        showLastKnownOrBaseline();
-      }
-    })
-    .catch(() => showLastKnownOrBaseline());
-
-  // ============================================================
-  // 5) AI ASSISTANT — free, on-device rule-based FAQ engine
-  // ============================================================
-  const chatFab = document.getElementById('chatFab');
-  const chatPanel = document.getElementById('chatPanel');
-  const chatClose = document.getElementById('chatClose');
-  const chatBody = document.getElementById('chatBody');
-  const chatInput = document.getElementById('chatInput');
-  const chatSend = document.getElementById('chatSend');
-
-  chatFab.addEventListener('click', () => {
-    chatPanel.classList.toggle('open');
-    chatFab.querySelector('.badge-dot').style.display = 'none';
-    if (chatBody.children.length === 0) botGreet();
-  });
-  chatClose.addEventListener('click', () => chatPanel.classList.remove('open'));
-
-  function addMsg(role, html){
-    const div = document.createElement('div');
-    div.className = 'msg ' + role;
-    div.innerHTML = html;
-    chatBody.appendChild(div);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    return div;
-  }
-
-  function addQuickReplies(options){
-    const wrap = document.createElement('div');
-    wrap.className = 'quick-replies';
-    options.forEach(opt => {
-      const b = document.createElement('button');
-      b.className = 'qr-btn';
-      b.textContent = opt;
-      b.addEventListener('click', () => { chatInput.value = opt; sendChat(); });
-      wrap.appendChild(b);
-    });
-    chatBody.appendChild(wrap);
-    chatBody.scrollTop = chatBody.scrollHeight;
-  }
-
-  function botGreet(){
-    addMsg('bot', '🌙 გამარჯობა! ჩატის გასაგრძელებლად აირჩიე ენა 👇<br>Hi! Please choose a language to continue 👇');
-    addLangChoice();
-  }
-
-  function addLangChoice(){
-    const wrap = document.createElement('div');
-    wrap.className = 'quick-replies';
-
-    const btnKa = document.createElement('button');
-    btnKa.className = 'qr-btn';
-    btnKa.textContent = 'ქართული';
-    btnKa.addEventListener('click', () => {
-      wrap.remove();
-      addMsg('user', 'ქართული');
-      setLanguage('ka');
-      setTimeout(realGreeting, 300);
-    });
-
-    const btnEn = document.createElement('button');
-    btnEn.className = 'qr-btn';
-    btnEn.textContent = 'ENGLISH';
-    btnEn.addEventListener('click', () => {
-      wrap.remove();
-      addMsg('user', 'ENGLISH');
-      setLanguage('en');
-      setTimeout(realGreeting, 300);
-    });
-
-    wrap.appendChild(btnKa);
-    wrap.appendChild(btnEn);
-    chatBody.appendChild(wrap);
-    chatBody.scrollTop = chatBody.scrollHeight;
-  }
-
-  function realGreeting(){
-    if (currentLang === 'en') {
-      addMsg('bot', "Hi! 🌙 I'm MOON's assistant. Ask me about pricing, deadlines, video requirements, or the order process.");
-      addQuickReplies(['How much does it cost?', 'How long does it take?', 'What are the video requirements?', 'How do I place an order?']);
-    } else {
-      addMsg('bot', 'გამარჯობა! 🌙 მე ვარ MOON-ის ასისტენტი. დამისვი კითხვა ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.');
-      addQuickReplies(['რა ღირს?', 'რამდენ ხანში მზადდება?', 'რა მოთხოვნაა ვიდეოზე?', 'როგორ შევუკვეთო?']);
-    }
-  }
-
-  // Knowledge base: each rule = keywords[] + answer (+ optional quick replies)
-  const KB_KA = [
-    {
-      kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
-      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობასა და ხარისხზე (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). სტანდარტული 1080p/60fps ხარისხისთვის: მინ. 5 წამი — 1.00₾-დან, მაქს. 59.59 წამი — დაახლ. 10₾-მდე. მაღალი ხარისხის ფორმატები შესაბამისად უფრო ძვირია. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა, აირჩიე ხარისხი ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
-      qr: ['არხის გამოწერით რამდენით იაფდება?', 'რა მოთხოვნაა ვიდეოზე?']
-    },
-    {
-      kw: ['გამომწერ','subscriber','გამოწერ'],
-      a: 'თუ არხის გამომწერი ხარ, ჩართე გადამრთველი „ვარ არხის გამომწერი" — ფასი ავტომატურად დაბალდება ყველა ხანგრძლივობაზე.',
-    },
-    {
-      kw: ['ვად','რამდენ ხანში','მზადდება','deadline','დრო სჭირდება'],
-      a: 'სტანდარტული მონტაჟის ვადა დამოკიდებულია დატვირთვაზე — ზუსტი ვადისთვის საუკეთესოა პირდაპირ დაგვიკავშირდე შეკვეთის გაგზავნისას (WhatsApp/Telegram ღილაკებით ქვემოთ), მენეჯერი დაგიდასტურებთ ვადას შეკვეთისთანავე.',
-    },
-    {
-      kw: ['მოთხოვნ','ხარისხ','1080','60fps','ფორმატ','რეზოლუც'],
-      a: 'რეკომენდირებული ფორმატია 1080×1920 რეზოლუცია, 60fps. კალკულატორში ასევე ხელმისაწვდომია 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps ვარიანტები (მაღალი ფასით), მაგრამ არ გირჩევთ, რადგან შესაძლოა მაყურებელს ვიდეო თავისით გაუჭედდეს. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ფასდება ინდივიდუალურად.',
-    },
-    {
-      kw: ['tiktok','ტიკტოკ'],
-      a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
-    },
-    {
-      kw: ['პაბჯ','pubg'],
-      a: '1) EXIT GAME<br>2) DELETE GAME<br>3) YOU ARE DONE<br>4) მოიცა, არ დაგვიმთავრებია.<br>5) DELETE ANUKA FROM THE PLANET<br>6) NOW YOU ARE DONE',
-    },
-    {
-      kw: ['ატვირთვის გვერდ','ატვირთვის საიტ','two313','ატვირთვა'],
-      a: 'ვიდეოს ატვირთვისთვის გამოიყენე ეს გვერდი: mooontransferr.onrender.com — ატვირთე ვიდეო, მიღებული ლინკი კი გამოგვიგზავნე WhatsApp ან Telegram ღილაკით.',
-    },
-    {
-      kw: ['როგორ შევუკვეთო','შეკვეთ','ორდერ','დაკვეთ'],
-      a: 'გამოთვალე ფასი კალკულატორში, ატვირთე ვიდეო ატვირთვის გვერდზე (mooontransferr.onrender.com), მიუთითე TikTok ლინკი და დააჭირე WhatsApp ან Telegram ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
-      qr: ['რომელი არხით შემიძლია შეკვეთა?']
-    },
-    {
-      kw: ['არხ','whatsapp','telegram','ტელეგრამ','ვატსაპ'],
-      a: 'შეკვეთის გაგზავნა შესაძლებელია WhatsApp ან Telegram არხზე. WhatsApp +995 592 630 630 ნომერზეა მიბმული; Telegram-ზე პირდაპირ @Moonknight0012 ანგარიშთან იხსნება ჩატი, მზა ტექსტით.',
-    },
-    {
-      kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
-      a: 'საკონტაქტო ნომერი WhatsApp-ისთვის: +995 592 630 630. Telegram-ზე პირდაპირ მოგვწერე: @Moonknight0012.',
-    },
-    {
-      kw: ['ატვირთ','ვიდეოს შემოწმ','scan','სკან','ხანგრძლივობის გაზომ'],
-      a: 'ზემოთ „VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოიტანო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებსა და მილიწამებში და თავად ჩასვამს კალკულატორში ფასის გამოსათვლელად. ეს მხოლოდ ხანგრძლივობის გასაზომად არის — შეკვეთის ვიდეო ცალკე უნდა ატვირთო ამ გვერდზე: https://mooontransferr.onrender.com/',
-    },
-    {
-      kw: ['გადახდ','ანგარიშსწორ','ბარათ','ნაღდი'],
-      a: 'გადახდის დეტალებს მენეჯერი დაგიზუსტებთ პირდაპირ ჩატში შეკვეთის დადასტურების შემდეგ.',
-    },
-    {
-      kw: ['გამარჯობა','სალამ','hi','hello','მოგესალმ'],
-      a: 'გამარჯობა! რითი დაგეხმარო? შეგიძლია მკითხო ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.',
-    },
-    {
-      kw: ['მადლობ','გმადლობ','thanks','thank you'],
-      a: 'იყავი მოხარული დახმარებით! 🌙 კიდევ რამე თუ გაინტერესებს — მზად ვარ.',
-    },
-  ];
-
-  const KB_EN = [
-    {
-      kw: ['price','cost','how much','rate','discount'],
-      a: 'The price depends on both video duration and quality (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). For the standard 1080p/60fps format: min. 5 seconds → from 1.00₾, max. 59.59 seconds → up to about 10₾. Higher-quality formats cost proportionally more. Use the slider in the calculator to set the duration, pick a quality, or upload a video — the price is calculated automatically. Subscribers get a lower rate.',
-      qr: ['How much cheaper for subscribers?', 'What are the video requirements?']
-    },
-    {
-      kw: ['subscriber','subscribe','subscription'],
-      a: 'If you\'re a channel subscriber, turn on the "I\'m a channel subscriber" toggle — the price automatically drops for every duration.',
-    },
-    {
-      kw: ['deadline','how long','turnaround','time does it take','when will it be ready'],
-      a: 'The standard editing turnaround depends on current workload — for an exact deadline it\'s best to contact us directly when sending your order (WhatsApp/Telegram buttons below); a manager will confirm the deadline right after you order.',
-    },
-    {
-      kw: ['requirement','quality','1080','60fps','format','resolution'],
-      a: 'The recommended format is 1080×1920 resolution at 60fps. The calculator also offers 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps (at a higher price), but we don\'t recommend them, since the video may glitch for viewers. Duration must not exceed 59.59 seconds — anything longer is priced individually.',
-    },
-    {
-      kw: ['tiktok'],
-      a: 'Editing is done only for the TikTok format. To send an order you must provide your TikTok profile link in the field.',
-    },
-    {
-      kw: ['upload page','upload site','two313','upload video'],
-      a: 'To upload your video use this page: mooontransferr.onrender.com — upload your video, then send us the resulting link via the WhatsApp or Telegram button.',
-    },
-    {
-      kw: ['how to order','place an order','order process','how do i order'],
-      a: 'Calculate the price in the calculator, upload your video on the upload page (mooontransferr.onrender.com), enter your TikTok link, and press the WhatsApp or Telegram button — the chosen app will open with a ready-made order message.',
-      qr: ['Which channel can I order through?']
-    },
-    {
-      kw: ['channel','whatsapp','telegram'],
-      a: 'You can send your order via WhatsApp or Telegram. WhatsApp is linked to +995 592 630 630; Telegram opens a chat directly with @Moonknight0012, with the message pre-filled.',
-    },
-    {
-      kw: ['number','phone','contact'],
-      a: 'Contact number for WhatsApp: +995 592 630 630. On Telegram, message us directly: @Moonknight0012.',
-    },
-    {
-      kw: ['upload','check video','scan','measure duration'],
-      a: 'In the "VIDEO SCANNER" block above you can upload or drag in a video file — the browser will automatically read the duration in seconds and milliseconds and fill it into the calculator to compute the price. That\'s just for measuring duration — your order video itself must be uploaded separately here: https://mooontransferr.onrender.com/',
-    },
-    {
-      kw: ['payment','pay','card','cash'],
-      a: 'A manager will confirm payment details directly in chat after your order is confirmed.',
-    },
-    {
-      kw: ['hi','hello','hey'],
-      a: 'Hello! How can I help? You can ask me about pricing, deadlines, requirements, or the order process.',
-    },
-    {
-      kw: ['thanks','thank you'],
-      a: 'Happy to help! 🌙 If anything else comes up — I\'m here.',
-    },
-  ];
-
-  // Small built-in geography trivia, so the assistant isn't limited to only
-  // MOON-related topics. This is a hand-written lookup table, not a live AI
-  // model — it only knows what's listed here.
-  const CAPITALS_KA = {
-    'საქართველო': 'თბილისი',
-    'რუსეთ': 'მოსკოვი',
-    'საფრანგეთ': 'პარიზი',
-    'გერმანი': 'ბერლინი',
-    'იტალი': 'რომი',
-    'ესპანეთ': 'მადრიდი',
-    'თურქეთ': 'ანკარა',
-    'აშშ': 'ვაშინგტონი',
-    'ამერიკ': 'ვაშინგტონი',
-    'ინგლის': 'ლონდონი',
-    'ბრიტანეთ': 'ლონდონი',
-    'იაპონი': 'ტოკიო',
-    'ჩინეთ': 'პეკინი',
-    'უკრაინ': 'კიევი',
-    'სომხეთ': 'ერევანი',
-    'აზერბაიჯან': 'ბაქო',
-    'პოლონეთ': 'ვარშავა',
-    'ბერძნეთ': 'ათენი',
-  };
-
-  const CAPITALS_EN = {
-    'georgia': 'Tbilisi',
-    'russia': 'Moscow',
-    'france': 'Paris',
-    'germany': 'Berlin',
-    'italy': 'Rome',
-    'spain': 'Madrid',
-    'turkey': 'Ankara',
-    'usa': 'Washington, D.C.',
-    'united states': 'Washington, D.C.',
-    'america': 'Washington, D.C.',
-    'england': 'London',
-    'britain': 'London',
-    'uk': 'London',
-    'japan': 'Tokyo',
-    'china': 'Beijing',
-    'ukraine': 'Kyiv',
-    'armenia': 'Yerevan',
-    'azerbaijan': 'Baku',
-    'poland': 'Warsaw',
-    'greece': 'Athens',
-  };
-
-  function findCapitalAnswer(lowerText){
-    if (currentLang === 'en') {
-      if (!lowerText.includes('capital')) return null;
-      for (const country in CAPITALS_EN) {
-        if (lowerText.includes(country)) {
-          return `The capital is: ${CAPITALS_EN[country]} 🌍`;
-        }
-      }
-      return 'Name a specific country and I\'ll tell you its capital 🌍 (e.g. "capital of Georgia").';
-    }
-    if (!lowerText.includes('დედაქალაქ')) return null;
-    for (const country in CAPITALS_KA) {
-      if (lowerText.includes(country)) {
-        return `დედაქალაქია: ${CAPITALS_KA[country]} 🌍`;
-      }
-    }
-    return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: „საქართველოს დედაქალაქი").';
-  }
-
-  function findAnswer(text){
-    const lowerText = text.toLowerCase();
-    const kb = currentLang === 'en' ? KB_EN : KB_KA;
-    for (const rule of kb) {
-      if (rule.kw.some(k => lowerText.includes(k))) return rule;
-    }
-    return null;
-  }
-
-  function sendChat(){
-    const text = chatInput.value.trim();
-    if (!text) return;
-    addMsg('user', text.replace(/</g,'&lt;'));
-    chatInput.value = '';
-
-    setTimeout(() => {
-      const rule = findAnswer(text);
-      if (rule) {
-        addMsg('bot', rule.a);
-        if (rule.qr) addQuickReplies(rule.qr);
-        return;
-      }
-      const capitalAnswer = findCapitalAnswer(text.toLowerCase());
-      if (capitalAnswer) {
-        addMsg('bot', capitalAnswer);
-        return;
-      }
-      if (currentLang === 'en') {
-        addMsg('bot', "I don't know that specific detail — but I can help with pricing, deadlines, video requirements, or the order process. Or contact us directly using the buttons below.");
-        addQuickReplies(['How much does it cost?', 'How do I place an order?']);
-      } else {
-        addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნებისა თუ შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
-        addQuickReplies(['რა ღირს?', 'როგორ შევუკვეთო?']);
-      }
-    }, 350);
-  }
-
-  chatSend.addEventListener('click', sendChat);
-  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
-
-  // ============================================================
-  // 6) PRICE COMPARISON CHART
-  // ============================================================
-  function renderPriceChart(){
-    const container = document.getElementById('priceChart');
-    if (!container) return;
-    const { s, ms, isSub } = currentValues();
-    const qualities = Object.keys(QUALITY_SCALES);
-    const prices = qualities.map(q => parseFloat(calculateExactPrice(s, ms, isSub, q)));
-    const maxPrice = Math.max(...prices, 0.01);
-    container.innerHTML = qualities.map((q, i) => {
-      const price = prices[i];
-      const pct = Math.max(6, Math.round((price / maxPrice) * 100));
-      const isActive = q === currentQuality;
-      return '<div class="chart-row' + (isActive ? ' active' : '') + '">' +
-        '<div class="cr-name">' + QUALITY_LABELS[q] + '</div>' +
-        '<div class="cr-track"><div class="cr-fill" style="width:' + pct + '%"></div></div>' +
-        '<div class="cr-price">' + price.toFixed(2) + '₾</div>' +
-      '</div>';
-    }).join('');
-  }
-
-  // ============================================================
-  // 7) SHARED BACKEND — lightweight anonymous JSON store used to
-  // sync comments and the admin visit log across every visitor's
-  // browser (this site has no server of its own, so this fills that
-  // gap). Reads/writes a small number of fixed paths under one
-  // namespace; failures are silent and never block the page.
-  // ============================================================
-  const MDB_BASE = 'https://mantledb.sh/v2';
-  const MDB_NS = 'moonge-tbilisi-vc7f3q';
-
-  async function mdbRead(path){
-    try{
-      const r = await fetch(MDB_BASE + '/' + MDB_NS + '/' + path, { cache: 'no-store' });
-      if (!r.ok) return null;
-      return await r.json();
-    } catch(e){ return null; }
-  }
-  async function mdbWrite(path, data){
-    try{
-      const r = await fetch(MDB_BASE + '/' + MDB_NS + '/' + path, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      return r.ok;
-    } catch(e){ return false; }
-  }
-
-  // ============================================================
-  // 8) COMMENTS SYSTEM (with 1-5 star ratings, admin badge, replies)
-  // ============================================================
-  const commentName = document.getElementById('commentName');
-  const commentText = document.getElementById('commentText');
-  const commentError = document.getElementById('commentError');
-  const commentSubmit = document.getElementById('commentSubmit');
-  const commentList = document.getElementById('commentList');
-  const commentEmpty = document.getElementById('commentEmpty');
-  const rpStars = document.getElementById('rpStars');
-  const adminModeRow = document.getElementById('adminModeRow');
-  const adminModeCheckbox = document.getElementById('adminModeCheckbox');
-  let selectedRating = 0;
-
-  if (rpStars) {
-    const starEls = Array.from(rpStars.querySelectorAll('.rp-star'));
-    function paintStars(val){
-      starEls.forEach(el => el.classList.toggle('filled', parseInt(el.getAttribute('data-val'),10) <= val));
-    }
-    starEls.forEach(el => {
-      el.addEventListener('mouseenter', () => paintStars(parseInt(el.getAttribute('data-val'),10)));
-      el.addEventListener('click', () => {
-        selectedRating = parseInt(el.getAttribute('data-val'),10);
-        paintStars(selectedRating);
-      });
-    });
-    rpStars.addEventListener('mouseleave', () => paintStars(selectedRating));
-  }
-
-  // Basic uncensored-language filter — blocks the most common Georgian
-  // and English profanity/slurs before a comment is ever published.
-  // This runs in the browser, so it's a courtesy filter, not a hard
-  // security boundary; the admin panel can still remove anything that
-  // slips through.
-  const PROFANITY_LIST = [
-    'ყლე','ყლეო','ტიტინა','ჯავრიანი','დებილ','იდიოტ','ლახტი','დედაშენ','დედას',
-    'მამაშენ','ჰუიო','ხუი','пизд','блять','бля','сука','хуй','нахуй','ебал',
-    'fuck','shit','bitch','asshole','bastard','cunt','dick','whore','slut',
-    'nigger','faggot','retard'
-  ];
-  function containsProfanity(str){
-    const lower = str.toLowerCase();
-    return PROFANITY_LIST.some(w => lower.includes(w));
-  }
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-  }
-  function formatCommentDate(ts){
-    try{
-      return new Date(ts).toLocaleString(currentLang === 'ka' ? 'ka-GE' : 'en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-    } catch(e){ return ''; }
-  }
-  function starsString(n){
-    const r = Math.max(0, Math.min(5, Math.round(n || 0)));
-    return '★'.repeat(r) + '☆'.repeat(5 - r);
-  }
-
-  // ---------- Admin identity helper ----------
-  // Deliberately in-memory only — NOT saved to localStorage/sessionStorage.
-  // That means logging in as admin only lasts for the current page load:
-  // reload the page (or open it fresh) and it's gone, and the password has
-  // to be typed again. This is what stops a comment from silently defaulting
-  // to "ADMIN" for a visitor who never logged in this visit.
-  let adminAuthenticated = false;
-  let adminPostAsAdminPref = true;
-  function isAdminUser(){
-    return adminAuthenticated;
-  }
-  function adminDisplayName(){
-    return currentLang === 'en' ? 'Admin' : 'ადმინი';
-  }
-  // True only when this device is an authenticated admin AND the toggle is
-  // switched to "post as admin". False (normal visitor) otherwise.
-  function getAdminPostMode(){
-    return isAdminUser() && !!(adminModeCheckbox && adminModeCheckbox.checked);
-  }
-  // Called once right after a successful login — syncs the checkbox to the
-  // in-memory preference before anything reads it.
-  function initAdminModeCheckbox(){
-    if (!adminModeCheckbox || !isAdminUser()) return;
-    adminModeCheckbox.checked = adminPostAsAdminPref;
-  }
-  if (adminModeCheckbox) {
-    adminModeCheckbox.addEventListener('change', () => {
-      adminPostAsAdminPref = adminModeCheckbox.checked;
-      applyAdminNameLock();
-    });
-  }
-  function applyAdminNameLock(){
-    if (!commentName) return;
-    if (adminModeRow) adminModeRow.style.display = isAdminUser() ? 'flex' : 'none';
-    if (getAdminPostMode()) {
-      commentName.value = adminDisplayName();
-      commentName.setAttribute('readonly', 'readonly');
-      commentName.style.opacity = '0.75';
-    } else {
-      commentName.removeAttribute('readonly');
-      commentName.style.opacity = '';
-      if (commentName.value === adminDisplayName()) commentName.value = '';
-    }
-  }
-
-  let commentsCache = [];
-
-  function computeAverageRating(){
-    const rated = commentsCache.filter(c => typeof c.rating === 'number' && c.rating > 0);
-    if (!rated.length) return null;
-    const avg = rated.reduce((sum, c) => sum + c.rating, 0) / rated.length;
-    return { avg, count: rated.length };
-  }
-
-  function renderTrustRating(){
-    // Average rating is shown only in the comments section now — removed
-    // from the trust bar near the top of the page.
-    const stat = computeAverageRating();
-    const cRow = document.getElementById('commentsRatingRow');
-    const cStars = document.getElementById('commentsAvgStars');
-    const cText = document.getElementById('commentsAvgText');
-    if (!stat) {
-      if (cRow) cRow.style.display = 'none';
-      return;
-    }
-    const avgStr = stat.avg.toFixed(1);
-    if (cRow && cStars && cText) {
-      cStars.textContent = starsString(stat.avg);
-      cText.innerHTML = t('commentsAvgText').replace('{AVG}', avgStr).replace('{COUNT}', stat.count);
-      cRow.style.display = 'flex';
-    }
-  }
-
-  function renderReplies(comment){
-    const replies = Array.isArray(comment.replies) ? comment.replies : [];
-    if (!replies.length) return '';
-    return '<div class="c-replies">' + replies.map(r =>
-      '<div class="c-reply-item"><div class="c-head"><span class="c-author">' + escapeHtml(r.name) +
-      (r.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
-      '</span><span class="c-date">' + formatCommentDate(r.ts) + '</span></div>' +
-      '<div class="c-body">' + escapeHtml(r.text) + '</div></div>'
-    ).join('') + '</div>';
-  }
-
-  function renderComments(){
-    if (!commentList) return;
-    applyAdminNameLock();
-    if (!commentsCache.length) {
-      commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
-    } else {
-      commentList.innerHTML = commentsCache.map(c =>
-        '<div class="c-item" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
-        (c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
-        (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
-        '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
-        '<div class="c-body">' + escapeHtml(c.text) + '</div>' +
-        renderReplies(c) +
-        '<div class="c-actions"><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
-        '<div class="c-reply-form" id="replyForm_' + c.id + '">' +
-          '<input type="text" class="c-reply-name" maxlength="40" placeholder="' + t('commentNamePh') + '">' +
-          '<textarea class="c-reply-text" maxlength="300" placeholder="' + t('commentTextPh') + '"></textarea>' +
-          '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
-        '</div>' +
-        '</div>'
-      ).join('');
-    }
-    renderTrustRating();
-    wireReplyButtons();
-  }
-
-  function wireReplyButtons(){
-    commentList.querySelectorAll('.c-reply-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-id');
-        const form = document.getElementById('replyForm_' + id);
-        if (!form) return;
-        const wasOpen = form.classList.contains('open');
-        commentList.querySelectorAll('.c-reply-form.open').forEach(f => f.classList.remove('open'));
-        if (!wasOpen) {
-          form.classList.add('open');
-          const nameEl = form.querySelector('.c-reply-name');
-          if (getAdminPostMode()) {
-            nameEl.value = adminDisplayName();
-            nameEl.setAttribute('readonly', 'readonly');
-          } else {
-            nameEl.removeAttribute('readonly');
-          }
-          form.querySelector('.c-reply-text').focus();
-        }
-      });
-    });
-    commentList.querySelectorAll('.c-reply-submit').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.getAttribute('data-id');
-        const form = document.getElementById('replyForm_' + id);
-        if (!form) return;
-        const nameEl = form.querySelector('.c-reply-name');
-        const textEl = form.querySelector('.c-reply-text');
-        const name = (nameEl.value || '').trim();
-        const text = (textEl.value || '').trim();
-        if (!name || !text) return;
-        if (containsProfanity(name) || containsProfanity(text)) {
-          alert(t('commentErrProfanity'));
-          return;
-        }
-        btn.disabled = true;
-        const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: getAdminPostMode() };
-        const fresh = await mdbRead('comments');
-        let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
-        list = list.map(c => {
-          if (String(c.id) === String(id)) {
-            const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
-            replies.push(replyEntry);
-            return Object.assign({}, c, { replies });
-          }
-          return c;
-        });
-        const ok = await mdbWrite('comments', { list });
-        btn.disabled = false;
-        if (ok) {
-          commentsCache = list;
-          renderComments();
-        }
-      });
-    });
-  }
-
-  async function loadComments(){
-    const data = await mdbRead('comments');
-    commentsCache = (data && Array.isArray(data.list)) ? data.list : [];
-    renderComments();
-  }
-
-  function showCommentError(msg){
-    commentError.textContent = msg;
-    commentError.classList.add('show');
-  }
-  function hideCommentError(){
-    commentError.classList.remove('show');
-  }
-
-  if (commentSubmit) {
-    commentSubmit.addEventListener('click', async () => {
-      hideCommentError();
-      const asAdmin = getAdminPostMode();
-      const name = asAdmin ? adminDisplayName() : (commentName.value || '').trim();
-      const text = (commentText.value || '').trim();
-      if (!name || !text) {
-        showCommentError(t('commentErrEmpty'));
-        return;
-      }
-      if (containsProfanity(name) || containsProfanity(text)) {
-        showCommentError(t('commentErrProfanity'));
-        return;
-      }
-      commentSubmit.disabled = true;
-      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, replies: [] };
-      // Re-read the latest list right before writing to minimize (not
-      // fully eliminate) lost updates from concurrent commenters.
-      const fresh = await mdbRead('comments');
-      const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
-      const updated = [entry, ...list].slice(0, 200);
-      const ok = await mdbWrite('comments', { list: updated });
-      commentSubmit.disabled = false;
-      if (!ok) {
-        showCommentError(t('commentErrGeneric'));
-        return;
-      }
-      commentsCache = updated;
-      renderComments();
-      if (!asAdmin) commentName.value = '';
-      commentText.value = '';
-      selectedRating = 0;
-      if (rpStars) rpStars.querySelectorAll('.rp-star').forEach(el => el.classList.remove('filled'));
-    });
-  }
-
-  loadComments();
-
-  // ============================================================
-  // 9) VISITOR LOG (device + approximate location) — feeds the
-  // admin panel's "Visitors" tab. Logged once per browser session.
-  // ============================================================
-  function detectDevice(){
-    const ua = navigator.userAgent || '';
-    let os = 'Unknown OS';
-    if (/Windows/i.test(ua)) os = 'Windows';
-    else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
-    else if (/Android/i.test(ua)) os = 'Android';
-    else if (/Mac OS X/i.test(ua)) os = 'macOS';
-    else if (/Linux/i.test(ua)) os = 'Linux';
-
-    let browser = 'Unknown';
-    if (/Edg\//i.test(ua)) browser = 'Edge';
-    else if (/OPR\//i.test(ua)) browser = 'Opera';
-    else if (/Chrome\//i.test(ua) && !/Chromium/i.test(ua)) browser = 'Chrome';
-    else if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
-    else if (/Firefox\//i.test(ua)) browser = 'Firefox';
-
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
-    return os + ' · ' + browser + (isMobile ? ' · Mobile' : ' · Desktop');
-  }
-
-  async function detectLocation(){
-    try{
-      const r = await fetch('https://ipapi.co/json/');
-      if (!r.ok) throw new Error('bad response');
-      const data = await r.json();
-      if (data && data.city) return data.city + (data.country_name ? ', ' + data.country_name : '');
-      return 'Unknown';
-    } catch(e){ return 'Unknown'; }
-  }
-
-  async function logVisit(){
-    if (sessionStorage.getItem('moon_visit_logged')) return;
-    sessionStorage.setItem('moon_visit_logged', '1');
-    const device = detectDevice();
-    const location = await detectLocation();
-    const entry = { ts: Date.now(), device, location };
-    const fresh = await mdbRead('visits');
-    const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
-    const updated = [entry, ...list].slice(0, 300);
-    mdbWrite('visits', { list: updated });
-  }
-
-  logVisit();
-
-  // ============================================================
-  // 10) ADMIN PANEL — gated with a password, shows the visit log
-  // and lets the admin edit/remove comments. Successful login also
-  // flags this device so comments/replies show as "ADMIN".
-  // ============================================================
-  const ADMIN_PASSWORD = '0070';
-  const adminGear = document.getElementById('adminGear');
-
-  // The gear icon stays invisible until the password itself is typed
-  // anywhere on the page (no visible trigger otherwise) — then it fades
-  // in and can be clicked to open the normal login screen below.
-  (function initAdminGearReveal(){
-    function checkReveal(str){
-      if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (typeof str === 'string' && str.slice(-ADMIN_PASSWORD.length) === ADMIN_PASSWORD) {
-        adminGear.classList.add('revealed');
-      }
-    }
-    let typed = '';
-    document.addEventListener('keydown', (e) => {
-      if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (e.key.length !== 1) return; // ignore Shift, Enter, arrows, etc.
-      typed = (typed + e.key).slice(-ADMIN_PASSWORD.length);
-      checkReveal(typed);
-    });
-    // Mobile fallback: phones only show a keyboard once a text field is
-    // focused, and some virtual keyboards don't report real keydown keys.
-    // So also watch what actually lands in any visible text field on the
-    // page (e.g. the TikTok link or comment fields) — typing 0070 into
-    // any of them reveals the gear the same way.
-    document.addEventListener('input', (e) => {
-      const el = e.target;
-      if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
-      if (el.type === 'password') return;
-      checkReveal(String(el.value || ''));
-    });
-  })();
-
-  const adminOverlay = document.getElementById('adminOverlay');
-  const adminLogin = document.getElementById('adminLogin');
-  const adminDashboard = document.getElementById('adminDashboard');
-  const adminPass = document.getElementById('adminPass');
-  const adminGo = document.getElementById('adminGo');
-  const adminErr = document.getElementById('adminErr');
-  const adminTabVisits = document.getElementById('adminTabVisits');
-  const adminTabComments = document.getElementById('adminTabComments');
-  const adminPanelVisits = document.getElementById('adminPanelVisits');
-  const adminPanelComments = document.getElementById('adminPanelComments');
-
-  function openAdmin(){
-    adminOverlay.classList.add('open');
-    adminLogin.style.display = 'block';
-    adminDashboard.style.display = 'none';
-    adminPass.value = '';
-    adminErr.classList.remove('show');
-  }
-  function closeAdmin(){
-    adminOverlay.classList.remove('open');
-  }
-
-  if (adminGear) adminGear.addEventListener('click', openAdmin);
-  document.getElementById('adminCloseLogin').addEventListener('click', closeAdmin);
-  document.getElementById('adminCloseDash').addEventListener('click', closeAdmin);
-  adminOverlay.addEventListener('click', (e) => { if (e.target === adminOverlay) closeAdmin(); });
-
-  async function renderAdminVisits(){
-    adminPanelVisits.innerHTML = '<div class="c-empty">…</div>';
-    const data = await mdbRead('visits');
-    const list = (data && Array.isArray(data.list)) ? data.list : [];
-    if (!list.length) {
-      adminPanelVisits.innerHTML = '<div class="c-empty">' + t('adminNoVisits') + '</div>';
-      return;
-    }
-    adminPanelVisits.innerHTML = list.map(v =>
-      '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
-    ).join('');
-  }
-
-  async function renderAdminComments(){
-    adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
-    const data = await mdbRead('comments');
-    const list = (data && Array.isArray(data.list)) ? data.list : [];
-    if (!list.length) {
-      adminPanelComments.innerHTML = '<div class="c-empty">' + t('adminNoComments') + '</div>';
-      return;
-    }
-    adminPanelComments.innerHTML = list.map(c =>
-      '<div class="a-cmt" data-id="' + c.id + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
-        '<textarea>' + escapeHtml(c.text) + '</textarea>' +
-        '<div class="a-cmt-actions">' +
-          '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
-          '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
-        '</div>' +
-        renderAdminReplies(c) +
-      '</div>'
-    ).join('');
-  }
-
-  function renderAdminReplies(c){
-    const replies = Array.isArray(c.replies) ? c.replies : [];
-    if (!replies.length) return '';
-    return '<div class="a-cmt-replies">' + replies.map((r, i) =>
-      '<div class="a-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(r.name) + (r.isAdmin ? ' · ADMIN' : '') + ' · ' + formatCommentDate(r.ts) + '</div>' +
-        '<textarea>' + escapeHtml(r.text) + '</textarea>' +
-        '<div class="a-cmt-actions">' +
-          '<button class="a-save-btn" data-action="save-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminSave') + '</button>' +
-          '<button class="a-del-btn" data-action="delete-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminDelete') + '</button>' +
-        '</div>' +
-      '</div>'
-    ).join('') + '</div>';
-  }
-
-  adminPanelComments.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button[data-action]');
-    if (!btn) return;
-    const action = btn.getAttribute('data-action');
-    const fresh = await mdbRead('comments');
-    let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
-    if (action === 'delete') {
-      const id = btn.getAttribute('data-id');
-      list = list.filter(c => String(c.id) !== String(id));
-    } else if (action === 'save') {
-      const id = btn.getAttribute('data-id');
-      const wrap = btn.closest('.a-cmt');
-      const newText = wrap.querySelector('textarea').value.slice(0, 500);
-      list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { text: newText }) : c);
-    } else if (action === 'delete-reply') {
-      const parentId = btn.getAttribute('data-parent');
-      const ridx = parseInt(btn.getAttribute('data-ridx'), 10);
-      list = list.map(c => {
-        if (String(c.id) !== String(parentId)) return c;
-        const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
-        replies.splice(ridx, 1);
-        return Object.assign({}, c, { replies });
-      });
-    } else if (action === 'save-reply') {
-      const parentId = btn.getAttribute('data-parent');
-      const ridx = parseInt(btn.getAttribute('data-ridx'), 10);
-      const wrap = btn.closest('.a-reply');
-      const newText = wrap.querySelector('textarea').value.slice(0, 300);
-      list = list.map(c => {
-        if (String(c.id) !== String(parentId)) return c;
-        const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
-        if (replies[ridx]) replies[ridx] = Object.assign({}, replies[ridx], { text: newText });
-        return Object.assign({}, c, { replies });
-      });
-    }
-    await mdbWrite('comments', { list });
-    commentsCache = list;
-    renderComments();
-    renderAdminComments();
-  });
-
-  function switchAdminTab(tab){
-    const showVisits = tab === 'visits';
-    adminTabVisits.classList.toggle('active', showVisits);
-    adminTabComments.classList.toggle('active', !showVisits);
-    adminPanelVisits.classList.toggle('active', showVisits);
-    adminPanelComments.classList.toggle('active', !showVisits);
-    if (showVisits) renderAdminVisits(); else renderAdminComments();
-  }
-  adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
-  adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
-
-  function tryAdminLogin(){
-    if (adminPass.value === ADMIN_PASSWORD) {
-      adminAuthenticated = true;
-      initAdminModeCheckbox();
-      applyAdminNameLock();
-      adminLogin.style.display = 'none';
-      adminDashboard.style.display = 'block';
-      switchAdminTab('visits');
-    } else {
-      adminErr.classList.add('show');
-    }
-  }
-  adminGo.addEventListener('click', tryAdminLogin);
-  adminPass.addEventListener('keydown', e => { if (e.key === 'Enter') tryAdminLogin(); });
-
-  // Apply the saved/default language once everything is wired up.
-  applyTranslations();
-  initAdminModeCheckbox();
-  applyAdminNameLock();
-</script>
-
-</body>
-</html>
+    .th
