@@ -352,10 +352,29 @@
     margin-top:16px; padding:16px 16px 8px; background:#0a0a12;
     border:1px solid var(--border); border-radius:14px;
   }
+  .chart-head-row{
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; user-select:none; margin-bottom:12px;
+  }
   .chart-box .chart-label{
     font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
-    color:var(--text-faint); margin-bottom:12px; font-weight:600;
+    color:var(--text-faint); margin-bottom:0; font-weight:600;
   }
+  .chart-toggle{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    width:26px; height:26px; border-radius:8px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
+  }
+  .chart-box.open .chart-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
+  /* grid-template-rows 0fr -> 1fr is the smoothest cross-device collapse:
+     no fixed pixel heights to (mis)calculate, so it never jumps or jitters
+     on resize/rotation, and animates on the GPU on both mobile and desktop. */
+  .chart-content-wrap{
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+  }
+  .chart-box.open .chart-content-wrap{ grid-template-rows:1fr; }
+  .chart-content-inner{ overflow:hidden; min-height:0; }
   .chart-row{
     display:flex; align-items:center; gap:10px; margin-bottom:9px;
   }
@@ -369,7 +388,7 @@
   }
   .chart-row .cr-fill{
     height:100%; border-radius:8px;
-    background:linear-gradient(90deg, var(--purple), var(--cyan));
+    background:linear-gradient(90deg, var(--purple), var(--warn) 55%, var(--cyan));
     opacity:0.45; transition:width .35s ease, opacity .2s ease;
   }
   .chart-row.active .cr-fill{ opacity:1; box-shadow:0 0 12px var(--cyan-soft); }
@@ -470,6 +489,9 @@
   }
   .admin-box .a-save-btn{ background:var(--cyan); color:#06231f; }
   .admin-box .a-del-btn{ background:var(--warn); color:#2a0a0a; }
+  .admin-box .a-cmt-replies{ margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); display:flex; flex-direction:column; gap:8px; }
+  .admin-box .a-reply{ background:#0e0e17; border:1px solid var(--border-soft); border-radius:10px; padding:8px; }
+  .admin-box .a-reply textarea{ min-height:38px; }
 
   /* Quality selector */
   .quality-grid{
@@ -483,14 +505,15 @@
     background:#0a0a12; border:1px solid var(--border); border-radius:12px;
     cursor:pointer; text-align:left;
     font-family:'Space Grotesk', sans-serif;
-    color:var(--text); transition: border-color .2s, box-shadow .2s, background .2s;
+    color:var(--text); transition: border-color .2s, box-shadow .2s, background .2s, transform .15s ease;
   }
   .quality-btn .q-name{ font-size:13.5px; font-weight:700; }
   .quality-btn .q-tag{
     font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.06em;
     color:var(--text-faint); text-transform:uppercase;
   }
-  .quality-btn:hover{ border-color: var(--purple-soft); }
+  .quality-btn:hover{ border-color: var(--purple-soft); transform: translateY(-2px); }
+  .quality-btn:active{ transform: translateY(0) scale(0.97); }
   .quality-btn.active{
     border-color: var(--cyan-soft);
     background: rgba(46,230,214,0.06);
@@ -613,9 +636,10 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease, opacity .15s ease;
   }
   .order-btn:hover{ transform:translateY(-2px); }
-  .order-btn:active{ transform:translateY(0); }
+  .order-btn:active{ transform:translateY(0) scale(0.98); }
   .order-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
-  .order-btn .ico{ font-size:18px; line-height:1; }
+  .order-btn .ico{ font-size:18px; line-height:1; display:flex; align-items:center; }
+  .order-btn .ico svg{ width:19px; height:19px; }
 
   .order-btn.wa{
     background:linear-gradient(90deg, #25D366, #1fb055);
@@ -623,6 +647,7 @@
     box-shadow:0 10px 30px rgba(37,211,102,0.25);
   }
   .order-btn.wa:hover{ box-shadow:0 14px 40px rgba(37,211,102,0.35); }
+  .order-btn.wa .ico svg{ fill:#062b12; }
 
   .order-btn.tg{
     background:linear-gradient(90deg, #2ea6ff, #1e7fd6);
@@ -646,8 +671,23 @@
     padding:22px 22px;
   }
   .warn-panel .w-head{
-    display:flex; align-items:center; gap:10px; margin-bottom:12px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;
+    cursor:pointer; user-select:none;
   }
+  .warn-panel .w-head-left{ display:flex; align-items:center; gap:10px; }
+  .warn-toggle{
+    background:none; border:1px solid var(--warn-soft); color:var(--warn);
+    width:28px; height:28px; border-radius:9px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; cursor:pointer; transition: transform .25s ease, background .2s ease;
+  }
+  .warn-panel.open .warn-toggle{ transform:rotate(180deg); }
+  /* Same smooth grid-based collapse used by the how-to-order panel. */
+  .warn-content-wrap{
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+  }
+  .warn-panel.open .warn-content-wrap{ grid-template-rows:1fr; }
+  .warn-content-inner{ overflow:hidden; min-height:0; }
   .warn-panel .w-head .ico{
     width:26px; height:26px; border-radius:50%;
     background:rgba(255,107,107,0.15); border:1px solid var(--warn-soft);
@@ -718,6 +758,171 @@
     word-break:break-all;
   }
   .howto-step .hs-body a.hs-link:hover{ text-decoration:underline; }
+
+  /* ---------- Trust bar ---------- */
+  .trust-panel{ padding:22px 22px 20px; }
+  .trust-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+  }
+  @media (max-width:520px){ .trust-grid{ grid-template-columns:1fr; } }
+  .trust-item{
+    display:flex; gap:12px; align-items:flex-start;
+    background:#0a0a12; border:1px solid var(--border-soft);
+    border-radius:14px; padding:14px 16px;
+  }
+  .trust-item .ti-ico{
+    flex:0 0 auto; width:34px; height:34px; border-radius:10px;
+    background:rgba(155,92,255,0.1); border:1px solid var(--purple-soft);
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+  .trust-item .ti-title{ font-size:13.5px; font-weight:700; margin-bottom:2px; }
+  .trust-item .ti-text{ font-size:12px; color:var(--text-dim); line-height:1.5; }
+  .trust-rating-row{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin-top:16px; padding:12px 16px;
+    background:rgba(255,210,122,0.06); border:1px solid rgba(255,210,122,0.25);
+    border-radius:14px; flex-wrap:wrap; text-align:center;
+  }
+  .trust-rating-row .tr-stars{ color:var(--gold); font-size:15px; letter-spacing:2px; text-shadow:0 0 10px rgba(255,210,122,0.5); }
+  .trust-rating-row .tr-text{ font-size:12.5px; color:var(--text-dim); }
+  .trust-rating-row .tr-text b{ color:#fff; }
+
+  /* ---------- Portfolio ---------- */
+  .portfolio-panel{ padding:22px 22px 20px; }
+  .portfolio-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+  }
+  @media (max-width:420px){ .portfolio-grid{ grid-template-columns:1fr; } }
+  .portfolio-card{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px;
+    padding:22px 14px;
+    background:#0a0a12; border:1px solid var(--border-soft); border-radius:16px;
+    text-decoration:none; color:var(--text);
+    cursor:pointer; overflow:hidden;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .portfolio-card::after{
+    content:""; position:absolute; inset:0; border-radius:16px; opacity:0;
+    background: radial-gradient(circle at 50% 20%, rgba(46,230,214,0.14), transparent 70%);
+    transition: opacity .3s ease; pointer-events:none;
+  }
+  .portfolio-card:hover{
+    transform: translateY(-4px);
+    border-color: var(--cyan-soft);
+    background:#0d0d16;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.4), 0 0 24px rgba(46,230,214,0.12);
+  }
+  .portfolio-card:hover::after{ opacity:1; }
+  .portfolio-card:active{ transform: translateY(-1px) scale(0.97); }
+
+  .portfolio-icon{
+    position:relative;
+    width:56px; height:56px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle, rgba(155,92,255,0.16), rgba(46,230,214,0.06));
+    border:1px solid var(--border-soft);
+  }
+  .portfolio-icon::before{
+    content:""; position:absolute; inset:-6px; border-radius:20px;
+    border:1px solid rgba(46,230,214,0.3);
+    opacity:0; transform:scale(0.85);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .portfolio-card:hover .portfolio-icon::before{ opacity:1; transform:scale(1); }
+  .portfolio-icon svg{
+    width:26px; height:26px; fill:#eafffb;
+    filter: drop-shadow(0 0 6px rgba(46,230,214,0.85)) drop-shadow(0 0 16px rgba(155,92,255,0.6));
+    transition: filter .3s ease, transform .3s ease;
+  }
+  .portfolio-card:hover .portfolio-icon svg{
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(46,230,214,1)) drop-shadow(0 0 26px rgba(155,92,255,0.85));
+  }
+  .portfolio-name{ font-size:13.5px; font-weight:700; }
+  .portfolio-cta{
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.04em;
+    color:var(--text-faint); display:flex; align-items:center; gap:5px;
+  }
+  .portfolio-cta .pc-play{ color:var(--cyan); font-size:9px; }
+
+  /* Star rating input (comments) */
+  .rating-picker{ display:flex; align-items:center; gap:8px; }
+  .rating-picker .rp-label{ font-size:12.5px; color:var(--text-dim); }
+  .rating-picker .rp-stars{ display:flex; gap:4px; }
+  .rating-picker .rp-star{
+    font-size:20px; cursor:pointer; color:var(--border);
+    transition: color .12s, transform .12s;
+    line-height:1; user-select:none;
+  }
+  .rating-picker .rp-star.filled{ color:var(--gold); text-shadow:0 0 8px rgba(255,210,122,0.5); }
+  .rating-picker .rp-star:hover{ transform:scale(1.15); }
+  .c-item .c-stars{ color:var(--gold); font-size:12px; letter-spacing:1px; margin-left:8px; }
+
+  /* Admin post-mode toggle — lives inside the password-gated admin
+     dashboard; lets the admin switch between posting as ADMIN or as a
+     normal visitor. Never appears on the public comment form. */
+  .admin-mode-row{
+    display:none; align-items:center; justify-content:space-between; gap:10px;
+    padding:8px 12px; margin-bottom:14px; border-radius:10px;
+    border:1px solid rgba(155,92,255,0.3);
+    background:rgba(155,92,255,0.07);
+  }
+  .admin-mode-row .amt-label{ font-size:12px; font-weight:600; color:#c7aaff; }
+  .admin-mode-toggle{ position:relative; display:inline-flex; align-items:center; cursor:pointer; flex:0 0 auto; }
+  .admin-mode-toggle input{ position:absolute; opacity:0; width:0; height:0; }
+  .admin-mode-toggle .switch{
+    width:38px; height:20px; border-radius:20px;
+    background:#2a2a3d; border:1px solid var(--border);
+    position:relative; transition: background .2s, border-color .2s;
+  }
+  .admin-mode-toggle .switch::after{
+    content:''; position:absolute; top:1px; left:1px;
+    width:16px; height:16px; border-radius:50%;
+    background:var(--text-dim); transition: transform .2s, background .2s, box-shadow .2s;
+  }
+  .admin-mode-toggle input:checked + .switch{ background:rgba(155,92,255,0.35); border-color:var(--purple-soft); }
+  .admin-mode-toggle input:checked + .switch::after{
+    transform: translateX(18px); background:var(--purple); box-shadow:0 0 8px var(--purple);
+  }
+
+  /* ---------- Comment admin badge + replies ---------- */
+  .admin-badge{
+    display:inline-flex; align-items:center; gap:3px;
+    font-family:'JetBrains Mono', monospace; font-size:9.5px; font-weight:800; letter-spacing:0.05em;
+    background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#04101a;
+    padding:2px 7px; border-radius:6px; margin-left:8px; text-transform:uppercase;
+    vertical-align:middle;
+    box-shadow: 0 0 10px rgba(46,230,214,0.35);
+  }
+  .c-item .c-actions{ display:flex; justify-content:flex-end; margin-top:6px; }
+  .c-reply-btn{
+    background:none; border:none; color:var(--text-faint); font-size:11.5px;
+    font-family:'Space Grotesk', sans-serif; cursor:pointer; padding:4px 6px;
+    transition: color .15s ease;
+  }
+  .c-reply-btn:hover{ color:var(--cyan); }
+  .c-reply-form{
+    display:none; flex-direction:column; gap:8px; margin-top:10px;
+    padding-top:10px; border-top:1px dashed var(--border-soft);
+  }
+  .c-reply-form.open{ display:flex; }
+  .c-reply-form input, .c-reply-form textarea{
+    width:100%; background:#12121c; border:1px solid var(--border); border-radius:10px;
+    color:var(--text); padding:9px 11px; font-family:'Space Grotesk', sans-serif;
+    font-size:12.5px; outline:none;
+  }
+  .c-reply-form textarea{ resize:none; min-height:50px; }
+  .c-reply-form .c-reply-submit{
+    align-self:flex-end; background:var(--cyan); color:#06231f; border:none;
+    border-radius:9px; padding:7px 14px; font-weight:700; font-size:12px; cursor:pointer;
+  }
+  .c-replies{ display:flex; flex-direction:column; gap:8px; margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); }
+  .c-reply-item .c-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
+  .c-reply-item .c-author{ font-weight:700; font-size:12px; color:var(--cyan); }
+  .c-reply-item .c-date{ font-size:10px; color:var(--text-faint); }
+  .c-reply-item .c-body{ font-size:12.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
 
   /* ---------- AI Chat Widget ---------- */
   .chat-fab{
@@ -849,6 +1054,66 @@
     <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
   </div>
 
+  <!-- Portfolio -->
+  <div class="panel portfolio-panel" id="portfolioPanel">
+    <div class="panel-head" style="margin-bottom:16px;">
+      <div class="label" data-i18n="portfolioLabel">ნამუშევრების პორტფოლიო</div>
+    </div>
+    <div class="portfolio-grid">
+      <a class="portfolio-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+        <div class="portfolio-icon">
+          <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+        </div>
+        <div class="portfolio-name" id="portfolioName1">@moonaee26</div>
+        <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+      </a>
+      <a class="portfolio-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+        <div class="portfolio-icon">
+          <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+        </div>
+        <div class="portfolio-name" id="portfolioName2">@marveluniversee26</div>
+        <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Trust bar -->
+  <div class="panel trust-panel" id="trustPanel">
+    <div class="panel-head" style="margin-bottom:16px;">
+      <div class="label" data-i18n="trustLabel">რატომ MOON</div>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="ti-ico">⭐</div>
+        <div>
+          <div class="ti-title" data-i18n="trust1Title">ნამდვილი შეფასებები</div>
+          <div class="ti-text" data-i18n="trust1Text">ყველა შეფასება ქვემოთ დატოვებულია რეალური კლიენტების მიერ — გაეცანი კომენტარებს გვერდის ბოლოში.</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="ti-ico">🎬</div>
+        <div>
+          <div class="ti-title" data-i18n="trust2Title">ხელით მონტაჟი, არა შაბლონი</div>
+          <div class="ti-text" data-i18n="trust2Text">თითოეული ვიდეო მუშავდება ინდივიდუალურად After Effects & Topaz ტექნოლოგიით, ავტომატური შაბლონების გარეშე.</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="ti-ico">💬</div>
+        <div>
+          <div class="ti-title" data-i18n="trust3Title">პირდაპირი კონტაქტი მენეჯერთან</div>
+          <div class="ti-text" data-i18n="trust3Text">შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="ti-ico">🔒</div>
+        <div>
+          <div class="ti-title" data-i18n="trust4Title">გამჭვირვალე ფასი წინასწარ</div>
+          <div class="ti-text" data-i18n="trust4Text">ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- How to use / how to order (collapsible) -->
   <div class="panel howto-panel" id="howtoPanel">
     <div class="panel-head howto-head-row" id="howtoHeadRow" style="margin-bottom:0;">
@@ -862,7 +1127,7 @@
             <div class="hs-num">1</div>
             <div class="hs-body">
               <div class="hs-title" data-i18n="howtoStep1Title">გამოთვალე ფასი</div>
-              <div class="hs-text" data-i18n="howtoStep1Text">ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო "VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.</div>
+              <div class="hs-text" data-i18n="howtoStep1Text">ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო „VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.</div>
             </div>
           </div>
           <div class="howto-step">
@@ -876,14 +1141,14 @@
             <div class="hs-num">3</div>
             <div class="hs-body">
               <div class="hs-title" data-i18n="howtoStep3Title">გამოაგზავნე ლინკი</div>
-              <div class="hs-text" data-i18n="howtoStep3Text">ატვირთვის შემდეგ მიღებული ლინკი, TikTok პროფილის ლინკთან ერთად, გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.</div>
+              <div class="hs-text" data-i18n="howtoStep3Text">ატვირთვის შემდეგ მიღებული ლინკი TikTok პროფილის ლინკთან ერთად გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.</div>
             </div>
           </div>
           <div class="howto-step">
             <div class="hs-num">4</div>
             <div class="hs-body">
               <div class="hs-title" data-i18n="howtoStep4Title">დაელოდე დადასტურებას</div>
-              <div class="hs-text" data-i18n="howtoStep4Text">მენეჯერი დაგიდასტურებს შეკვეთას და ვადას პირდაპირ ჩატში.</div>
+              <div class="hs-text" data-i18n="howtoStep4Text">მენეჯერი დაგიდასტურებთ შეკვეთას და ვადას პირდაპირ ჩატში.</div>
             </div>
           </div>
         </div>
@@ -922,7 +1187,7 @@
       <div class="timeline">
         <input type="range" id="msRange" min="0" max="59" step="1" value="0">
       </div>
-      <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობა — 59:59. ამის ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
+      <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59:59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
     </div>
 
     <div class="field">
@@ -954,11 +1219,18 @@
           <span class="q-tag">120 FPS</span>
         </button>
       </div>
-      <div class="quality-warn" id="qualityWarn" data-i18n="qualityWarnText">⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედოს.</div>
+      <div class="quality-warn" id="qualityWarn" data-i18n="qualityWarnText">⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედდეს.</div>
 
-      <div class="chart-box">
-        <div class="chart-label" data-i18n="chartLabel">ფასის შედარება ამჟამინდელი ხანგრძლივობით</div>
-        <div id="priceChart"></div>
+      <div class="chart-box" id="chartBox">
+        <div class="chart-head-row" id="chartHeadRow">
+          <div class="chart-label" data-i18n="chartLabel">ფასის შედარება ამჟამინდელი ხანგრძლივობით</div>
+          <button type="button" class="chart-toggle" id="chartToggle" aria-label="toggle">▾</button>
+        </div>
+        <div class="chart-content-wrap">
+          <div class="chart-content-inner">
+            <div id="priceChart"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1015,7 +1287,10 @@
       <div class="label" data-i18n="sendOrder">გაგზავნე შეკვეთა</div>
     </div>
     <div class="order-grid">
-      <button class="order-btn wa" id="orderBtnWA"><span class="ico">✆</span> <span data-i18n="sendWA">WhatsApp-ზე გაგზავნა</span></button>
+      <button class="order-btn wa" id="orderBtnWA">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M20.52 3.449C12.831-3.984.106 5.845.061 12.68a12.94 12.94 0 001.767 6.583L0 24l5.001-1.79a12.914 12.914 0 006.482 1.658h.006c6.24 0 12.243-5.302 12.243-12.213 0-3.264-1.325-6.334-3.212-8.206zM12 22.121h-.005a10.13 10.13 0 01-5.185-1.421l-.372-.22-3.851 1.377 1.4-3.756-.242-.386a10.108 10.108 0 01-1.554-5.396c.005-5.579 4.548-10.115 10.133-10.115 2.703 0 5.243 1.057 7.148 2.978 1.905 1.921 2.952 4.464 2.951 7.153-.004 5.58-4.547 10.106-10.423 10.106zm5.556-7.596c-.303-.152-1.793-.885-2.07-.986-.278-.101-.48-.152-.682.152-.202.303-.783.986-.96 1.188-.176.202-.353.227-.655.076-.303-.152-1.279-.472-2.436-1.505-.9-.803-1.508-1.794-1.685-2.097-.176-.303-.019-.467.133-.618.136-.135.303-.353.454-.53.152-.176.202-.303.303-.505.101-.202.05-.379-.025-.53-.076-.152-.682-1.646-.934-2.253-.246-.591-.497-.511-.682-.52-.176-.008-.379-.01-.581-.01-.202 0-.53.076-.808.379-.278.303-1.06 1.036-1.06 2.528s1.085 2.933 1.236 3.135c.151.202 2.135 3.259 5.17 4.57.723.312 1.287.498 1.727.638.726.231 1.386.198 1.908.12.582-.087 1.793-.734 2.046-1.442.253-.708.253-1.315.177-1.442-.075-.126-.278-.202-.581-.353z"/></svg></span>
+        <span data-i18n="sendWA">WhatsApp-ზე გაგზავნა</span>
+      </button>
       <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> <span data-i18n="sendTG">Telegram-ზე გაგზავნა</span></button>
     </div>
     <div class="copy-note" id="copyNote"></div>
@@ -1023,30 +1298,47 @@
 
   <!-- Comments -->
   <div class="panel comments-panel" style="padding:22px;">
-    <div class="panel-head" style="margin-bottom:16px;">
+    <div class="panel-head" style="margin-bottom:10px;">
       <div class="label" data-i18n="commentsLabel">კომენტარები</div>
     </div>
+    <div class="trust-rating-row" id="commentsRatingRow" style="display:none; margin-top:0; margin-bottom:16px;">
+      <span class="tr-stars" id="commentsAvgStars">★★★★★</span>
+      <span class="tr-text" id="commentsAvgText"></span>
+    </div>
     <div class="c-form">
+      <div class="rating-picker" id="ratingPicker">
+        <span class="rp-label" data-i18n="commentRatingLabel">შენი შეფასება:</span>
+        <span class="rp-stars" id="rpStars">
+          <span class="rp-star" data-val="1">★</span><span class="rp-star" data-val="2">★</span><span class="rp-star" data-val="3">★</span><span class="rp-star" data-val="4">★</span><span class="rp-star" data-val="5">★</span>
+        </span>
+      </div>
       <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი">
       <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
       <div class="c-error" id="commentError"></div>
       <button class="c-submit" id="commentSubmit" data-i18n="commentSubmit">გამოქვეყნება</button>
     </div>
     <div class="c-list" id="commentList">
-      <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარია — იყავი პირველი!</div>
+      <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!</div>
     </div>
   </div>
 
-  <div class="warn-panel">
-    <div class="w-head">
-      <div class="ico">!</div>
-      <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
+  <div class="warn-panel" id="warnPanel">
+    <div class="w-head" id="warnHeadRow">
+      <div class="w-head-left">
+        <div class="ico">!</div>
+        <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
+      </div>
+      <button type="button" class="warn-toggle" id="warnToggle" aria-label="toggle">▾</button>
     </div>
-    <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უდანაკლო ხარისხით.</p>
-    <p data-i18n="warnP2">გთხოვთ, დარწმუნებული იყავით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ინდივიდუალურად ფასდება და კალკულატორში არ შედის.</p>
-    <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
-    <p data-i18n="warnP4">კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედოთ ან შენელდეთ.</p>
-    <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
+    <div class="warn-content-wrap">
+      <div class="warn-content-inner">
+        <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
+        <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
+        <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
+        <p data-i18n="warnP4">კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედდეთ ან შენელდეთ.</p>
+        <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
+      </div>
+    </div>
   </div>
 
   <footer><span data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
@@ -1067,6 +1359,13 @@
     </div>
     <div id="adminDashboard" style="display:none;">
       <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
+      <div class="admin-mode-row" id="adminModeRow">
+        <span class="amt-label" id="adminModeLabel" data-i18n="adminModeLabel">დაწერე ადმინის სახელით</span>
+        <label class="admin-mode-toggle">
+          <input type="checkbox" id="adminModeCheckbox" checked>
+          <span class="switch"></span>
+        </label>
+      </div>
       <div class="a-tabs">
         <button class="a-tab active" id="adminTabVisits" data-i18n="adminTabVisits">ვიზიტორები</button>
         <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
@@ -1109,6 +1408,18 @@
       topbarTagline: 'ისიამოვნე შენი ტიკტოკის ვიდეოებით',
       heroTitle: 'შენ იმსახურებ საუკეთესო ხარისხს <span>შეუკვეთე ახლავე!</span>',
       heroSub: 'მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.',
+      portfolioLabel: 'ნამუშევრების პორტფოლიო',
+      portfolioCta: 'ნამუშევრის ნახვა TikTok-ზე',
+      trustLabel: 'რატომ MOON',
+      trust1Title: 'ნამდვილი შეფასებები',
+      trust1Text: 'ყველა შეფასება ქვემოთ დატოვებულია რეალური კლიენტების მიერ — გაეცანი კომენტარებს გვერდის ბოლოში.',
+      trust2Title: 'ხელით მონტაჟი, არა შაბლონი',
+      trust2Text: 'თითოეული ვიდეო მუშავდება ინდივიდუალურად After Effects & Topaz ტექნოლოგიით, ავტომატური შაბლონების გარეშე.',
+      trust3Title: 'პირდაპირი კონტაქტი მენეჯერთან',
+      trust3Text: 'შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.',
+      trust4Title: 'გამჭვირვალე ფასი წინასწარ',
+      trust4Text: 'ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.',
+      trustRatingText: 'საშუალო შეფასება <b>{AVG}</b> — {COUNT} რეალური შეფასების საფუძველზე',
       priceReadout: 'PRICE READOUT',
       finalPrice: 'საბოლოო ღირებულება',
       subActive: '✓ გამომწერის ტარიფი აქტიურია — <b>თანხა უკვე დაზოგილია!</b>',
@@ -1116,10 +1427,10 @@
       markDuration: 'მონიშნე ზუსტი დრო (წამი)',
       secondsPlaceholder: 'შეიყვანე წამი (0–59)',
       msLabel: 'წამის მეასედი / კადრი (Milliseconds)',
-      msHint: 'მაქსიმალური სრული ხანგრძლივობა — 59:59. ამის ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
+      msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59:59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
       qualityLabel: 'ვიდეოს ხარისხი (რეზოლუცია / fps)',
       qualityRecBadge: 'რეკომენდირებული',
-      qualityWarnText: '⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედოს.',
+      qualityWarnText: '⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედდეს.',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
@@ -1136,32 +1447,36 @@
       srUnit: 'წმ',
       srFpsUnknown: 'fps უცნობია',
       srMatchNote: '✓ ატვირთული ვიდეო შეესაბამება მოთხოვნილ ხარისხს ({REQ})',
-      srMismatchNote: '⚠️ მოთხოვნილია {REQ}, თუმცა ატვირთული ვიდეო რეალურად არის {DET} ხარისხის — ფასი მაინც გამოთვლილია თქვენ მიერ მოთხოვნილი ({REQ}) ხარისხის მიხედვით.',
+      srMismatchNote: '⚠️ მოთხოვნილია {REQ}, თუმცა ატვირთული ვიდეო რეალურად {DET} ხარისხისაა — ფასი მაინც გამოთვლილია თქვენ მიერ მოთხოვნილი ({REQ}) ხარისხის მიხედვით.',
       srWarnOver: '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
       sendOrder: 'გაგზავნე შეკვეთა',
       sendWA: 'WhatsApp-ზე გაგზავნა',
       sendTG: 'Telegram-ზე გაგზავნა',
-      tgSentNote: '✓ იხსნება MOON-ის Telegram ჩატი (@MOON_TG) — ტექსტიც დაკოპირებულია დარეზერვებით',
+      tgSentNote: '✓ იხსნება MOON-ის Telegram ჩატი (@MOON_TG) — ტექსტი ასევე დაკოპირებულია სარეზერვოდ',
       warnTitle: 'გაფრთხილება შეკვეთამდე',
-      warnP1: 'ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უდანაკლო ხარისხით.',
-      warnP2: 'გთხოვთ, დარწმუნებული იყავით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ინდივიდუალურად ფასდება და კალკულატორში არ შედის.',
+      warnP1: 'ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.',
+      warnP2: 'გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.',
       warnP3: 'ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.',
-      warnP4: 'კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედოთ ან შენელდეთ.',
+      warnP4: 'კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედდეთ ან შენელდეთ.',
       footer: 'FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით',
       chatAssistant: 'ასისტენტი',
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
       chartLabel: 'ფასის შედარება ამჟამინდელი ხანგრძლივობით',
       commentsLabel: 'კომენტარები',
+      commentRatingLabel: 'შენი შეფასება:',
+      adminModeLabel: 'დაწერე ადმინის სახელით',
       commentNamePh: 'სახელი',
       commentTextPh: 'დაწერე კომენტარი…',
       commentSubmit: 'გამოქვეყნება',
-      commentEmpty: 'ჯერ არცერთი კომენტარია — იყავი პირველი!',
-      commentErrEmpty: 'გთხოვთ შეავსოთ სახელი და კომენტარის ველი.',
+      commentEmpty: 'ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!',
+      commentErrEmpty: 'გთხოვთ შეავსოთ სახელისა და კომენტარის ველები.',
+      commentErrRating: 'გთხოვთ მონიშნოთ შეფასება ვარსკვლავებით.',
       commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
       commentErrGeneric: 'კომენტარის გამოქვეყნება ვერ მოხერხდა — სცადეთ ხელახლა.',
+      commentsAvgText: 'საშუალო შეფასება <b>{AVG}</b> ({COUNT} შეფასება)',
       adminTitle: 'ადმინის პანელი',
       adminPassPh: 'პაროლი',
       adminEnter: 'შესვლა',
@@ -1175,19 +1490,31 @@
       adminDelete: 'წაშლა',
       howtoLabel: 'როგორ შევუკვეთო',
       howtoStep1Title: 'გამოთვალე ფასი',
-      howtoStep1Text: 'ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო "VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.',
+      howtoStep1Text: 'ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო „VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.',
       howtoStep2Title: 'ატვირთე ვიდეო',
       howtoStep2Text: 'გადადი ჩვენს ატვირთვის გვერდზე და ატვირთე შენი ვიდეო: <a class="hs-link" href="https://mooontransferr.onrender.com/" target="_blank" rel="noopener">mooontransferr.onrender.com</a>',
       howtoStep3Title: 'გამოაგზავნე ლინკი',
-      howtoStep3Text: 'ატვირთვის შემდეგ მიღებული ლინკი, TikTok პროფილის ლინკთან ერთად, გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.',
+      howtoStep3Text: 'ატვირთვის შემდეგ მიღებული ლინკი TikTok პროფილის ლინკთან ერთად გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.',
       howtoStep4Title: 'დაელოდე დადასტურებას',
-      howtoStep4Text: 'მენეჯერი დაგიდასტურებს შეკვეთას და ვადას პირდაპირ ჩატში.',
+      howtoStep4Text: 'მენეჯერი დაგიდასტურებთ შეკვეთას და ვადას პირდაპირ ჩატში.',
     },
     en: {
       visitorsLabel: 'Total visitors:',
       topbarTagline: 'Enjoy your TikTok videos',
       heroTitle: 'You deserve the best quality <span>order now!</span>',
       heroSub: 'Enter your video\'s duration (or upload a video and it will measure it automatically) — the price is calculated in real time, for After Effects & Topaz quality editing.',
+      portfolioLabel: 'Portfolio of work',
+      portfolioCta: 'View the work on TikTok',
+      trustLabel: 'Why MOON',
+      trust1Title: 'Real reviews',
+      trust1Text: 'Every rating below was left by an actual client — check out the comments at the bottom of the page.',
+      trust2Title: 'Hand-edited, not templated',
+      trust2Text: 'Every video is processed individually using After Effects & Topaz technology — no automatic templates.',
+      trust3Title: 'Direct contact with a manager',
+      trust3Text: 'A real person confirms your order on WhatsApp or Telegram — not a bot, not an automated system.',
+      trust4Title: 'Transparent pricing upfront',
+      trust4Text: 'You see the price in the calculator before ordering — no hidden fees before you send anything.',
+      trustRatingText: 'Average rating <b>{AVG}</b> — based on {COUNT} real reviews',
       priceReadout: 'PRICE READOUT',
       finalPrice: 'Final price',
       subActive: '✓ Subscriber rate is active — <b>you\'re already saving money!</b>',
@@ -1195,10 +1522,10 @@
       markDuration: 'Select exact duration (seconds)',
       secondsPlaceholder: 'Enter seconds (0–59)',
       msLabel: 'Hundredths of a second / frame (Milliseconds)',
-      msHint: 'Maximum total duration — 59:59. Within this range the price is calculated at the 59-second rate.',
+      msHint: 'Maximum total duration is 59:59. Within this range the price is calculated at the 59-second rate.',
       qualityLabel: 'Video quality (resolution / fps)',
       qualityRecBadge: 'Recommended',
-      qualityWarnText: '⚠️ We recommend the 1080p/60fps format — with the higher-quality formats, the video may glitch or slow down on its own for viewers.',
+      qualityWarnText: '⚠️ We recommend the 1080p/60fps format — with the higher-quality formats, the video may glitch or slow down for viewers.',
       subscriberT1: "I'm a channel subscriber",
       subscriberT2: '✓ Lower rate activates',
       tiktokLabel: 'Your TikTok profile link *',
@@ -1227,20 +1554,24 @@
       warnP1: 'Video editing is done <b>only for TikTok</b>, with flawless quality.',
       warnP2: 'Please make sure your video duration <b>does not exceed 59:59 seconds</b> — anything longer is priced individually and isn\'t included in the calculator.',
       warnP3: 'Also make sure the footage is shot and rendered in <b>1080p / 60fps</b> quality — this affects the cleanliness of the final result.',
-      warnP4: 'The calculator also offers <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps</b> options, but we don\'t recommend them — the video may glitch or slow down on its own for viewers.',
+      warnP4: 'The calculator also offers <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps</b> options, but we don\'t recommend them — the video may glitch or slow down for viewers.',
       footer: 'FRAME.RATE — precise calculation, down to the frame',
       chatAssistant: 'Assistant',
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
       chartLabel: 'Price comparison at the current duration',
       commentsLabel: 'Comments',
+      commentRatingLabel: 'Your rating:',
+      adminModeLabel: 'Post as Admin',
       commentNamePh: 'Name',
       commentTextPh: 'Write a comment…',
       commentSubmit: 'Post',
       commentEmpty: 'No comments yet — be the first!',
       commentErrEmpty: 'Please fill in both the name and comment fields.',
+      commentErrRating: 'Please select a star rating.',
       commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
       commentErrGeneric: 'Could not post the comment — please try again.',
+      commentsAvgText: 'Average rating <b>{AVG}</b> ({COUNT} reviews)',
       adminTitle: 'Admin panel',
       adminPassPh: 'Password',
       adminEnter: 'Enter',
@@ -1287,6 +1618,8 @@
     document.getElementById('langKa').classList.toggle('active', currentLang === 'ka');
     document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
     if (typeof refresh === 'function') refresh();
+    if (typeof renderComments === 'function') renderComments();
+    if (typeof renderTrustRating === 'function') renderTrustRating();
   }
 
   function setLanguage(lang){
@@ -1304,6 +1637,28 @@
   const howtoHeadRow = document.getElementById('howtoHeadRow');
   function toggleHowto(){ howtoPanel.classList.toggle('open'); }
   howtoHeadRow.addEventListener('click', toggleHowto);
+
+  const warnPanel = document.getElementById('warnPanel');
+  const warnHeadRow = document.getElementById('warnHeadRow');
+  if (warnPanel && warnHeadRow) {
+    warnHeadRow.addEventListener('click', () => warnPanel.classList.toggle('open'));
+  }
+
+  const chartBox = document.getElementById('chartBox');
+  const chartHeadRow = document.getElementById('chartHeadRow');
+  if (chartBox && chartHeadRow) {
+    chartHeadRow.addEventListener('click', () => chartBox.classList.toggle('open'));
+  }
+
+  // ---------- Portfolio cards (links kept out of visible text/markup content) ----------
+  const PORTFOLIO_LINKS = {
+    portfolioCard1: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbW9vbmFlZTI2L3ZpZGVvLzc2NjQ2OTk2MjU3ODk1OTA4MDQ/bGFuZz1lbg==',
+    portfolioCard2: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbWFydmVsdW5pdmVyc2VlMjYvdmlkZW8vNzY2MDE0NTgxNDE0MDAzMDIzMA=='
+  };
+  Object.keys(PORTFOLIO_LINKS).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.href = atob(PORTFOLIO_LINKS[id]);
+  });
 
   // ============================================================
   // 1) PRICE CALCULATOR (core logic, unchanged rate model)
@@ -1763,21 +2118,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   // 4) VISITOR COUNTER
   // ============================================================
   const visitorEl = document.getElementById('visitorBadge').querySelector('b');
-  // The old counterapi.dev v1 endpoint this used to call has become unreliable
-  // (the service migrated to a v2/workspace-based API), which is why the count
-  // used to drift apart between devices — whichever device's request failed
-  // silently fell back to its own separate local counter. This uses a single
-  // reliable global counter instead, so every device reads the same number.
   const VISIT_KEY = 'moon_framerate_ge_total_visits_v2';
-  // The counter previously reached close to 100 visits. This baseline restores
-  // that history so the displayed number continues from roughly where it left off
-  // instead of starting back over from zero.
   const VISITOR_BASE_OFFSET = 97;
   const LAST_KNOWN_KEY = 'moon_visits_last_known';
 
-  // Formats large counts in compact notation, truncating (not rounding) to one
-  // decimal place: 2999 -> "2.9K", 3000 -> "3K", 1000 -> "1K",
-  // 2,999,999 -> "2.9M", 3,000,000 -> "3M", 1,000,000 -> "1M".
   function formatVisitorCount(n){
     n = Math.max(0, Math.floor(n));
     if (n < 1000) return String(n);
@@ -1800,16 +2144,11 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     try { localStorage.setItem(LAST_KNOWN_KEY, String(n)); } catch(e){ /* ignore */ }
   }
 
-  // If the network request fails, show the last real number this device saw
-  // (instead of incrementing a private local counter) so it doesn't drift
-  // away from what every other device is showing.
   function showLastKnownOrBaseline(){
     const cached = parseInt(localStorage.getItem(LAST_KNOWN_KEY) || '', 10);
     setVisitorDisplay(!isNaN(cached) ? cached : VISITOR_BASE_OFFSET);
   }
 
-  // Only register a new visit once per browser session — reloading the page
-  // re-reads the current value instead of counting again.
   const alreadyCountedThisSession = sessionStorage.getItem('moon_visit_counted');
   const endpoint = alreadyCountedThisSession
     ? `https://countapi.mileshilliard.com/api/v1/get/${VISIT_KEY}`
@@ -1919,24 +2258,28 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const KB_KA = [
     {
       kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
-      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე და ხარისხზე (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). სტანდარტული 1080p/60fps ხარისხისთვის: მინ. 5 წამი → 1.00₾-დან, მაქს. 59.59 წამი → დაახლ. 10₾-მდე. მაღალი ხარისხის ფორმატები შესაბამისად ძვირდება. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა, აირჩიე ხარისხი ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
+      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობასა და ხარისხზე (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). სტანდარტული 1080p/60fps ხარისხისთვის: მინ. 5 წამი — 1.00₾-დან, მაქს. 59.59 წამი — დაახლ. 10₾-მდე. მაღალი ხარისხის ფორმატები შესაბამისად უფრო ძვირია. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა, აირჩიე ხარისხი ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
       qr: ['არხის გამოწერით რამდენით იაფდება?', 'რა მოთხოვნაა ვიდეოზე?']
     },
     {
       kw: ['გამომწერ','subscriber','გამოწერ'],
-      a: 'თუ არხის გამომწერი ხარ, ჩართე გადამრთველი "ვარ არხის გამომწერი" — ფასი ავტომატურად დაბალდება ყველა ხანგრძლივობაზე.',
+      a: 'თუ არხის გამომწერი ხარ, ჩართე გადამრთველი „ვარ არხის გამომწერი" — ფასი ავტომატურად დაბალდება ყველა ხანგრძლივობაზე.',
     },
     {
       kw: ['ვად','რამდენ ხანში','მზადდება','deadline','დრო სჭირდება'],
-      a: 'სტანდარტული მონტაჟის ვადა დამოკიდებულია დატვირთვაზე — ზუსტი ვადისთვის საუკეთესოა პირდაპირ დაგვიკავშირდე შეკვეთის გაგზავნისას (WhatsApp/Telegram ღილაკებით ქვემოთ), მენეჯერი დაგიდასტურებს ვადას შეკვეთისთანავე.',
+      a: 'სტანდარტული მონტაჟის ვადა დამოკიდებულია დატვირთვაზე — ზუსტი ვადისთვის საუკეთესოა პირდაპირ დაგვიკავშირდე შეკვეთის გაგზავნისას (WhatsApp/Telegram ღილაკებით ქვემოთ), მენეჯერი დაგიდასტურებთ ვადას შეკვეთისთანავე.',
     },
     {
       kw: ['მოთხოვნ','ხარისხ','1080','60fps','ფორმატ','რეზოლუც'],
-      a: 'რეკომენდირებული ფორმატია 1080×1920 რეზოლუცია, 60fps. კალკულატორში ასევე ხელმისაწვდომია 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps ვარიანტები (მაღალი ფასით), მაგრამ არ გირჩევთ, რადგან შესაძლოა მაყურებელს ვიდეო თავისით გაუჭედოთ. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ინდივიდუალურად ფასდება.',
+      a: 'რეკომენდირებული ფორმატია 1080×1920 რეზოლუცია, 60fps. კალკულატორში ასევე ხელმისაწვდომია 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps ვარიანტები (მაღალი ფასით), მაგრამ არ გირჩევთ, რადგან შესაძლოა მაყურებელს ვიდეო თავისით გაუჭედდეს. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ფასდება ინდივიდუალურად.',
     },
     {
       kw: ['tiktok','ტიკტოკ'],
       a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
+    },
+    {
+      kw: ['პაბჯ','pubg'],
+      a: '1) EXIT GAME<br>2) DELETE GAME<br>3) YOU ARE DONE<br>4) მოიცა, არ დაგვიმთავრებია.<br>5) DELETE ANUKA FROM THE PLANET<br>6) NOW YOU ARE DONE',
     },
     {
       kw: ['ატვირთვის გვერდ','ატვირთვის საიტ','two313','ატვირთვა'],
@@ -1944,7 +2287,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['როგორ შევუკვეთო','შეკვეთ','ორდერ','დაკვეთ'],
-      a: 'გამოთვალე ფასი კალკულატორში, ატვირთე ვიდეო ატვირთვის გვერდზე (mooontransferr.onrender.com), მიუთითე TikTok ლინკი, და დააჭირე WhatsApp ან Telegram ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
+      a: 'გამოთვალე ფასი კალკულატორში, ატვირთე ვიდეო ატვირთვის გვერდზე (mooontransferr.onrender.com), მიუთითე TikTok ლინკი და დააჭირე WhatsApp ან Telegram ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
       qr: ['რომელი არხით შემიძლია შეკვეთა?']
     },
     {
@@ -1953,15 +2296,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
-      a: 'საკონტაქტო ნომერი WhatsApp-სთვის: +995 592 630 630. Telegram-ზე პირდაპირ მოგვწერე: @Moonknight0012.',
+      a: 'საკონტაქტო ნომერი WhatsApp-ისთვის: +995 592 630 630. Telegram-ზე პირდაპირ მოგვწერე: @Moonknight0012.',
     },
     {
       kw: ['ატვირთ','ვიდეოს შემოწმ','scan','სკან','ხანგრძლივობის გაზომ'],
-      a: 'ზემოთ "VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოიტანო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებში და მილიწამებში და თავად ჩაასვამს კალკულატორში ფასის გამოსათვლელად. ეს მხოლოდ ხანგრძლივობის გასაზომად არის — შეკვეთის ვიდეო ცალკე უნდა ატვირთო ამ გვერდზე: https://mooontransferr.onrender.com/',
+      a: 'ზემოთ „VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოიტანო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებსა და მილიწამებში და თავად ჩასვამს კალკულატორში ფასის გამოსათვლელად. ეს მხოლოდ ხანგრძლივობის გასაზომად არის — შეკვეთის ვიდეო ცალკე უნდა ატვირთო ამ გვერდზე: https://mooontransferr.onrender.com/',
     },
     {
       kw: ['გადახდ','ანგარიშსწორ','ბარათ','ნაღდი'],
-      a: 'გადახდის დეტალებს მენეჯერი დაგიზუსტებს პირდაპირ ჩატში შეკვეთის დადასტურების შემდეგ.',
+      a: 'გადახდის დეტალებს მენეჯერი დაგიზუსტებთ პირდაპირ ჩატში შეკვეთის დადასტურების შემდეგ.',
     },
     {
       kw: ['გამარჯობა','სალამ','hi','hello','მოგესალმ'],
@@ -1969,23 +2312,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['მადლობ','გმადლობ','thanks','thank you'],
-      a: 'იყავი მოხარული დახმარებით! 🌙 კიდევ თუ რამე გაინტერესებს — მზად ვარ.',
-    },
-    {
-      kw: ['ანუკა ბოტ','ანუკა bot','ანუკა ხელოვნურ'],
-      a: 'კი 🤖',
-    },
-    {
-      kw: ['ანუკა კარგად თამაშ','ანუკა თამაშ'],
-      a: 'არა 😄',
-    },
-    {
-      kw: ['ნინა'],
-      a: 'MOON-ის გოგოა ნინა 💜',
-    },
-    {
-      kw: ['მუნი'],
-      a: 'ნინას ბიჭია MOON 🌙',
+      a: 'იყავი მოხარული დახმარებით! 🌙 კიდევ რამე თუ გაინტერესებს — მზად ვარ.',
     },
   ];
 
@@ -2005,7 +2332,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['requirement','quality','1080','60fps','format','resolution'],
-      a: 'The recommended format is 1080×1920 resolution at 60fps. The calculator also offers 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps (at a higher price), but we don\'t recommend them, since the video may glitch on its own for viewers. Duration must not exceed 59.59 seconds — anything longer is priced individually.',
+      a: 'The recommended format is 1080×1920 resolution at 60fps. The calculator also offers 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps (at a higher price), but we don\'t recommend them, since the video may glitch for viewers. Duration must not exceed 59.59 seconds — anything longer is priced individually.',
     },
     {
       kw: ['tiktok'],
@@ -2109,7 +2436,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         return `დედაქალაქია: ${CAPITALS_KA[country]} 🌍`;
       }
     }
-    return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: "საქართველოს დედაქალაქი").';
+    return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: „საქართველოს დედაქალაქი").';
   }
 
   function findAnswer(text){
@@ -2143,7 +2470,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         addMsg('bot', "I don't know that specific detail — but I can help with pricing, deadlines, video requirements, or the order process. Or contact us directly using the buttons below.");
         addQuickReplies(['How much does it cost?', 'How do I place an order?']);
       } else {
-        addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნების ან შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
+        addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნებისა თუ შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
         addQuickReplies(['რა ღირს?', 'როგორ შევუკვეთო?']);
       }
     }, 350);
@@ -2203,7 +2530,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   // ============================================================
-  // 8) COMMENTS SYSTEM
+  // 8) COMMENTS SYSTEM (with 1-5 star ratings, admin badge, replies)
   // ============================================================
   const commentName = document.getElementById('commentName');
   const commentText = document.getElementById('commentText');
@@ -2211,6 +2538,25 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const commentSubmit = document.getElementById('commentSubmit');
   const commentList = document.getElementById('commentList');
   const commentEmpty = document.getElementById('commentEmpty');
+  const rpStars = document.getElementById('rpStars');
+  const adminModeRow = document.getElementById('adminModeRow');
+  const adminModeCheckbox = document.getElementById('adminModeCheckbox');
+  let selectedRating = 0;
+
+  if (rpStars) {
+    const starEls = Array.from(rpStars.querySelectorAll('.rp-star'));
+    function paintStars(val){
+      starEls.forEach(el => el.classList.toggle('filled', parseInt(el.getAttribute('data-val'),10) <= val));
+    }
+    starEls.forEach(el => {
+      el.addEventListener('mouseenter', () => paintStars(parseInt(el.getAttribute('data-val'),10)));
+      el.addEventListener('click', () => {
+        selectedRating = parseInt(el.getAttribute('data-val'),10);
+        paintStars(selectedRating);
+      });
+    });
+    rpStars.addEventListener('mouseleave', () => paintStars(selectedRating));
+  }
 
   // Basic uncensored-language filter — blocks the most common Georgian
   // and English profanity/slurs before a comment is ever published.
@@ -2235,20 +2581,176 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       return new Date(ts).toLocaleString(currentLang === 'ka' ? 'ka-GE' : 'en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
     } catch(e){ return ''; }
   }
+  function starsString(n){
+    const r = Math.max(0, Math.min(5, Math.round(n || 0)));
+    return '★'.repeat(r) + '☆'.repeat(5 - r);
+  }
+
+  // ---------- Admin identity helper ----------
+  // Deliberately in-memory only — NOT saved to localStorage/sessionStorage.
+  // That means logging in as admin only lasts for the current page load:
+  // reload the page (or open it fresh) and it's gone, and the password has
+  // to be typed again. This is what stops a comment from silently defaulting
+  // to "ADMIN" for a visitor who never logged in this visit.
+  let adminAuthenticated = false;
+  let adminPostAsAdminPref = true;
+  function isAdminUser(){
+    return adminAuthenticated;
+  }
+  function adminDisplayName(){
+    return currentLang === 'en' ? 'Admin' : 'ადმინი';
+  }
+  // True only when this device is an authenticated admin AND the toggle is
+  // switched to "post as admin". False (normal visitor) otherwise.
+  function getAdminPostMode(){
+    return isAdminUser() && !!(adminModeCheckbox && adminModeCheckbox.checked);
+  }
+  // Called once right after a successful login — syncs the checkbox to the
+  // in-memory preference before anything reads it.
+  function initAdminModeCheckbox(){
+    if (!adminModeCheckbox || !isAdminUser()) return;
+    adminModeCheckbox.checked = adminPostAsAdminPref;
+  }
+  if (adminModeCheckbox) {
+    adminModeCheckbox.addEventListener('change', () => {
+      adminPostAsAdminPref = adminModeCheckbox.checked;
+      applyAdminNameLock();
+    });
+  }
+  function applyAdminNameLock(){
+    if (!commentName) return;
+    if (adminModeRow) adminModeRow.style.display = isAdminUser() ? 'flex' : 'none';
+    if (getAdminPostMode()) {
+      commentName.value = adminDisplayName();
+      commentName.setAttribute('readonly', 'readonly');
+      commentName.style.opacity = '0.75';
+    } else {
+      commentName.removeAttribute('readonly');
+      commentName.style.opacity = '';
+      if (commentName.value === adminDisplayName()) commentName.value = '';
+    }
+  }
 
   let commentsCache = [];
 
-  function renderComments(){
-    if (!commentList) return;
-    if (!commentsCache.length) {
-      commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
+  function computeAverageRating(){
+    const rated = commentsCache.filter(c => typeof c.rating === 'number' && c.rating > 0);
+    if (!rated.length) return null;
+    const avg = rated.reduce((sum, c) => sum + c.rating, 0) / rated.length;
+    return { avg, count: rated.length };
+  }
+
+  function renderTrustRating(){
+    // Average rating is shown only in the comments section now — removed
+    // from the trust bar near the top of the page.
+    const stat = computeAverageRating();
+    const cRow = document.getElementById('commentsRatingRow');
+    const cStars = document.getElementById('commentsAvgStars');
+    const cText = document.getElementById('commentsAvgText');
+    if (!stat) {
+      if (cRow) cRow.style.display = 'none';
       return;
     }
-    commentList.innerHTML = commentsCache.map(c =>
-      '<div class="c-item"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
-      '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
-      '<div class="c-body">' + escapeHtml(c.text) + '</div></div>'
-    ).join('');
+    const avgStr = stat.avg.toFixed(1);
+    if (cRow && cStars && cText) {
+      cStars.textContent = starsString(stat.avg);
+      cText.innerHTML = t('commentsAvgText').replace('{AVG}', avgStr).replace('{COUNT}', stat.count);
+      cRow.style.display = 'flex';
+    }
+  }
+
+  function renderReplies(comment){
+    const replies = Array.isArray(comment.replies) ? comment.replies : [];
+    if (!replies.length) return '';
+    return '<div class="c-replies">' + replies.map(r =>
+      '<div class="c-reply-item"><div class="c-head"><span class="c-author">' + escapeHtml(r.name) +
+      (r.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
+      '</span><span class="c-date">' + formatCommentDate(r.ts) + '</span></div>' +
+      '<div class="c-body">' + escapeHtml(r.text) + '</div></div>'
+    ).join('') + '</div>';
+  }
+
+  function renderComments(){
+    if (!commentList) return;
+    applyAdminNameLock();
+    if (!commentsCache.length) {
+      commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
+    } else {
+      commentList.innerHTML = commentsCache.map(c =>
+        '<div class="c-item" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
+        (c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
+        (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
+        '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
+        '<div class="c-body">' + escapeHtml(c.text) + '</div>' +
+        renderReplies(c) +
+        '<div class="c-actions"><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
+        '<div class="c-reply-form" id="replyForm_' + c.id + '">' +
+          '<input type="text" class="c-reply-name" maxlength="40" placeholder="' + t('commentNamePh') + '">' +
+          '<textarea class="c-reply-text" maxlength="300" placeholder="' + t('commentTextPh') + '"></textarea>' +
+          '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
+        '</div>' +
+        '</div>'
+      ).join('');
+    }
+    renderTrustRating();
+    wireReplyButtons();
+  }
+
+  function wireReplyButtons(){
+    commentList.querySelectorAll('.c-reply-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const form = document.getElementById('replyForm_' + id);
+        if (!form) return;
+        const wasOpen = form.classList.contains('open');
+        commentList.querySelectorAll('.c-reply-form.open').forEach(f => f.classList.remove('open'));
+        if (!wasOpen) {
+          form.classList.add('open');
+          const nameEl = form.querySelector('.c-reply-name');
+          if (getAdminPostMode()) {
+            nameEl.value = adminDisplayName();
+            nameEl.setAttribute('readonly', 'readonly');
+          } else {
+            nameEl.removeAttribute('readonly');
+          }
+          form.querySelector('.c-reply-text').focus();
+        }
+      });
+    });
+    commentList.querySelectorAll('.c-reply-submit').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        const form = document.getElementById('replyForm_' + id);
+        if (!form) return;
+        const nameEl = form.querySelector('.c-reply-name');
+        const textEl = form.querySelector('.c-reply-text');
+        const name = (nameEl.value || '').trim();
+        const text = (textEl.value || '').trim();
+        if (!name || !text) return;
+        if (containsProfanity(name) || containsProfanity(text)) {
+          alert(t('commentErrProfanity'));
+          return;
+        }
+        btn.disabled = true;
+        const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: getAdminPostMode() };
+        const fresh = await mdbRead('comments');
+        let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
+        list = list.map(c => {
+          if (String(c.id) === String(id)) {
+            const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
+            replies.push(replyEntry);
+            return Object.assign({}, c, { replies });
+          }
+          return c;
+        });
+        const ok = await mdbWrite('comments', { list });
+        btn.disabled = false;
+        if (ok) {
+          commentsCache = list;
+          renderComments();
+        }
+      });
+    });
   }
 
   async function loadComments(){
@@ -2268,7 +2770,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   if (commentSubmit) {
     commentSubmit.addEventListener('click', async () => {
       hideCommentError();
-      const name = (commentName.value || '').trim();
+      const asAdmin = getAdminPostMode();
+      const name = asAdmin ? adminDisplayName() : (commentName.value || '').trim();
       const text = (commentText.value || '').trim();
       if (!name || !text) {
         showCommentError(t('commentErrEmpty'));
@@ -2279,7 +2782,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         return;
       }
       commentSubmit.disabled = true;
-      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), ts: Date.now() };
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, replies: [] };
       // Re-read the latest list right before writing to minimize (not
       // fully eliminate) lost updates from concurrent commenters.
       const fresh = await mdbRead('comments');
@@ -2293,8 +2796,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       }
       commentsCache = updated;
       renderComments();
-      commentName.value = '';
+      if (!asAdmin) commentName.value = '';
       commentText.value = '';
+      selectedRating = 0;
+      if (rpStars) rpStars.querySelectorAll('.rp-star').forEach(el => el.classList.remove('filled'));
     });
   }
 
@@ -2350,10 +2855,42 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   // ============================================================
   // 10) ADMIN PANEL — gated with a password, shows the visit log
-  // and lets the admin edit/remove comments.
+  // and lets the admin edit/remove comments. Successful login also
+  // flags this device so comments/replies show as "ADMIN".
   // ============================================================
   const ADMIN_PASSWORD = '0070';
   const adminGear = document.getElementById('adminGear');
+
+  // The gear icon stays invisible until the password itself is typed
+  // anywhere on the page (no visible trigger otherwise) — then it fades
+  // in and can be clicked to open the normal login screen below.
+  (function initAdminGearReveal(){
+    function checkReveal(str){
+      if (!adminGear || adminGear.classList.contains('revealed')) return;
+      if (typeof str === 'string' && str.slice(-ADMIN_PASSWORD.length) === ADMIN_PASSWORD) {
+        adminGear.classList.add('revealed');
+      }
+    }
+    let typed = '';
+    document.addEventListener('keydown', (e) => {
+      if (!adminGear || adminGear.classList.contains('revealed')) return;
+      if (e.key.length !== 1) return; // ignore Shift, Enter, arrows, etc.
+      typed = (typed + e.key).slice(-ADMIN_PASSWORD.length);
+      checkReveal(typed);
+    });
+    // Mobile fallback: phones only show a keyboard once a text field is
+    // focused, and some virtual keyboards don't report real keydown keys.
+    // So also watch what actually lands in any visible text field on the
+    // page (e.g. the TikTok link or comment fields) — typing 0070 into
+    // any of them reveals the gear the same way.
+    document.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
+      if (el.type === 'password') return;
+      checkReveal(String(el.value || ''));
+    });
+  })();
+
   const adminOverlay = document.getElementById('adminOverlay');
   const adminLogin = document.getElementById('adminLogin');
   const adminDashboard = document.getElementById('adminDashboard');
@@ -2404,29 +2941,66 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     }
     adminPanelComments.innerHTML = list.map(c =>
       '<div class="a-cmt" data-id="' + c.id + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(c.name) + ' · ' + formatCommentDate(c.ts) + '</div>' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
         '<textarea>' + escapeHtml(c.text) + '</textarea>' +
         '<div class="a-cmt-actions">' +
           '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
           '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
         '</div>' +
+        renderAdminReplies(c) +
       '</div>'
     ).join('');
+  }
+
+  function renderAdminReplies(c){
+    const replies = Array.isArray(c.replies) ? c.replies : [];
+    if (!replies.length) return '';
+    return '<div class="a-cmt-replies">' + replies.map((r, i) =>
+      '<div class="a-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(r.name) + (r.isAdmin ? ' · ADMIN' : '') + ' · ' + formatCommentDate(r.ts) + '</div>' +
+        '<textarea>' + escapeHtml(r.text) + '</textarea>' +
+        '<div class="a-cmt-actions">' +
+          '<button class="a-save-btn" data-action="save-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminSave') + '</button>' +
+          '<button class="a-del-btn" data-action="delete-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('') + '</div>';
   }
 
   adminPanelComments.addEventListener('click', async (e) => {
     const btn = e.target.closest('button[data-action]');
     if (!btn) return;
-    const id = btn.getAttribute('data-id');
     const action = btn.getAttribute('data-action');
     const fresh = await mdbRead('comments');
     let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
     if (action === 'delete') {
+      const id = btn.getAttribute('data-id');
       list = list.filter(c => String(c.id) !== String(id));
     } else if (action === 'save') {
+      const id = btn.getAttribute('data-id');
       const wrap = btn.closest('.a-cmt');
       const newText = wrap.querySelector('textarea').value.slice(0, 500);
       list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { text: newText }) : c);
+    } else if (action === 'delete-reply') {
+      const parentId = btn.getAttribute('data-parent');
+      const ridx = parseInt(btn.getAttribute('data-ridx'), 10);
+      list = list.map(c => {
+        if (String(c.id) !== String(parentId)) return c;
+        const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
+        replies.splice(ridx, 1);
+        return Object.assign({}, c, { replies });
+      });
+    } else if (action === 'save-reply') {
+      const parentId = btn.getAttribute('data-parent');
+      const ridx = parseInt(btn.getAttribute('data-ridx'), 10);
+      const wrap = btn.closest('.a-reply');
+      const newText = wrap.querySelector('textarea').value.slice(0, 300);
+      list = list.map(c => {
+        if (String(c.id) !== String(parentId)) return c;
+        const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
+        if (replies[ridx]) replies[ridx] = Object.assign({}, replies[ridx], { text: newText });
+        return Object.assign({}, c, { replies });
+      });
     }
     await mdbWrite('comments', { list });
     commentsCache = list;
@@ -2447,6 +3021,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   function tryAdminLogin(){
     if (adminPass.value === ADMIN_PASSWORD) {
+      adminAuthenticated = true;
+      initAdminModeCheckbox();
+      applyAdminNameLock();
       adminLogin.style.display = 'none';
       adminDashboard.style.display = 'block';
       switchAdminTab('visits');
@@ -2459,6 +3036,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   // Apply the saved/default language once everything is wired up.
   applyTranslations();
+  initAdminModeCheckbox();
+  applyAdminNameLock();
 </script>
 
 </body>
