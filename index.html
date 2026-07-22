@@ -490,4 +490,2598 @@
   .admin-box .a-save-btn{ background:var(--cyan); color:#06231f; }
   .admin-box .a-del-btn{ background:var(--warn); color:#2a0a0a; }
   .admin-box .a-cmt-replies{ margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); display:flex; flex-direction:column; gap:8px; }
-  .admin-box .a-reply{ background:#0e0e17; border:1px solid 
+  .admin-box .a-reply{ background:#0e0e17; border:1px solid var(--border-soft); border-radius:10px; padding:8px; }
+  .admin-box .a-reply textarea{ min-height:38px; }
+
+  /* Quality selector */
+  .quality-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;
+  }
+  @media (max-width:480px){ .quality-grid{ grid-template-columns:1fr; } }
+  .quality-btn{
+    position:relative;
+    display:flex; flex-direction:column; align-items:flex-start; gap:3px;
+    padding:12px 14px;
+    background:#0a0a12; border:1px solid var(--border); border-radius:12px;
+    cursor:pointer; text-align:left;
+    font-family:'Space Grotesk', sans-serif;
+    color:var(--text); transition: border-color .2s, box-shadow .2s, background .2s, transform .15s ease;
+  }
+  .quality-btn .q-name{ font-size:13.5px; font-weight:700; }
+  .quality-btn .q-tag{
+    font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.06em;
+    color:var(--text-faint); text-transform:uppercase;
+  }
+  .quality-btn:hover{ border-color: var(--purple-soft); transform: translateY(-2px); }
+  .quality-btn:active{ transform: translateY(0) scale(0.97); }
+  .quality-btn.active{
+    border-color: var(--cyan-soft);
+    background: rgba(46,230,214,0.06);
+    box-shadow: 0 0 0 1px rgba(46,230,214,0.2), 0 0 20px rgba(46,230,214,0.12);
+  }
+  .quality-btn.active .q-name{ color:#9df4e9; text-shadow:0 0 10px rgba(46,230,214,0.5); }
+  .quality-btn.active .q-tag{ color:var(--cyan); }
+  .quality-btn .q-rec{
+    position:absolute; top:-8px; right:10px;
+    font-family:'JetBrains Mono', monospace; font-size:9px; font-weight:800; letter-spacing:0.05em;
+    background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#04101a;
+    padding:2px 7px; border-radius:6px; text-transform:uppercase;
+  }
+  .quality-warn{
+    display:none;
+    margin-top:12px; padding:11px 14px; border-radius:12px;
+    border:1px solid var(--warn-soft); background:rgba(255,107,107,0.06);
+    font-size:12.5px; color:#ffcfcf; line-height:1.5;
+  }
+  .quality-warn.show{ display:block; }
+
+  /* Toggle */
+  .toggle-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px;
+    background:#0a0a12;
+    border:1px solid var(--border);
+    border-radius:14px;
+  }
+  .toggle-copy .t1{ font-size:14px; font-weight:600; }
+  .toggle-copy .t2{ font-size:12.5px; color:var(--gold); margin-top:3px; }
+  .switch{ position:relative; width:52px; height:30px; flex:0 0 auto; }
+  .switch input{ opacity:0; width:0; height:0; position:absolute; }
+  .slider-toggle{
+    position:absolute; inset:0; border-radius:30px;
+    background:#26263a; border:1px solid var(--border);
+    cursor:pointer; transition:0.25s;
+  }
+  .slider-toggle:before{
+    content:""; position:absolute; width:22px; height:22px; left:3px; top:3px;
+    border-radius:50%; background:#cfcfe0; transition:0.25s;
+  }
+  .switch input:checked + .slider-toggle{ background:linear-gradient(90deg, var(--purple), var(--cyan)); border-color:transparent; }
+  .switch input:checked + .slider-toggle:before{ transform:translateX(22px); background:#fff; box-shadow:0 0 10px rgba(255,255,255,0.8); }
+
+  /* Link input */
+  .link-input-wrap{ position:relative; }
+  .link-input-wrap .icon{ position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-faint); font-size:13px; font-family:'JetBrains Mono', monospace; }
+  .link-input-wrap input{ padding-left:52px; }
+
+  /* ---------- Video checker ---------- */
+  .drop-zone{
+    border:1.5px dashed var(--border);
+    border-radius:16px;
+    padding:26px 18px;
+    text-align:center;
+    background:#0a0a12;
+    cursor:pointer;
+    transition: border-color .2s, background .2s;
+    position:relative;
+  }
+  .drop-zone:hover, .drop-zone.dragover{
+    border-color: var(--purple);
+    background: rgba(155,92,255,0.06);
+  }
+  .drop-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .drop-zone .dz-icon{
+    font-family:'JetBrains Mono', monospace; font-size:22px; margin-bottom:8px;
+    color:#c7aaff; text-shadow:0 0 14px rgba(155,92,255,0.6);
+  }
+  .drop-zone .dz-title{ font-size:14px; font-weight:600; margin-bottom:4px; }
+  .drop-zone .dz-sub{ font-size:12px; color:var(--text-faint); }
+
+  .scan-result{
+    display:none;
+    margin-top:16px;
+    padding:16px 18px;
+    border-radius:14px;
+    border:1px solid var(--cyan-soft);
+    background:rgba(46,230,214,0.06);
+  }
+  .scan-result.show{ display:block; }
+  .scan-result .sr-row{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:13px; padding:4px 0;
+  }
+  .scan-result .sr-row span:first-child{ color:var(--text-dim); }
+  .scan-result .sr-row b{
+    font-family:'JetBrains Mono', monospace; color:var(--cyan);
+    text-shadow:0 0 10px rgba(46,230,214,0.5);
+  }
+  .scan-result .sr-warn{
+    margin-top:8px; font-size:12px; color:var(--gold);
+  }
+  .scan-result .sr-info{
+    margin-top:8px; font-size:12px; color:var(--cyan);
+  }
+  .scan-progress{
+    display:none; align-items:center; gap:10px; margin-top:14px;
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim);
+  }
+  .scan-progress.show{ display:flex; }
+  .scan-progress .spin{
+    width:14px; height:14px; border-radius:50%;
+    border:2px solid var(--border); border-top-color:var(--purple);
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- Order buttons (multi-channel) ---------- */
+  .order-grid{ display:flex; flex-direction:column; gap:12px; }
+  .order-btn{
+    width:100%;
+    padding:17px;
+    border:none; border-radius:14px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:15.5px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity .15s ease;
+  }
+  .order-btn:hover{ transform:translateY(-2px); }
+  .order-btn:active{ transform:translateY(0) scale(0.98); }
+  .order-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .order-btn .ico{ font-size:18px; line-height:1; display:flex; align-items:center; }
+  .order-btn .ico svg{ width:19px; height:19px; }
+
+  .order-btn.wa{
+    background:linear-gradient(90deg, #25D366, #1fb055);
+    color:#062b12;
+    box-shadow:0 10px 30px rgba(37,211,102,0.25);
+  }
+  .order-btn.wa:hover{ box-shadow:0 14px 40px rgba(37,211,102,0.35); }
+  .order-btn.wa .ico svg{ fill:#062b12; }
+
+  .order-btn.tg{
+    background:linear-gradient(90deg, #2ea6ff, #1e7fd6);
+    color:#04182b;
+    box-shadow:0 10px 30px rgba(46,166,255,0.25);
+  }
+  .order-btn.tg:hover{ box-shadow:0 14px 40px rgba(46,166,255,0.35); }
+
+  .copy-note{
+    text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:4px;
+    font-family:'JetBrains Mono', monospace;
+    min-height:14px;
+  }
+  .copy-note.active{ color:var(--cyan); text-shadow:0 0 8px rgba(46,230,214,0.5); }
+
+  /* Warning */
+  .warn-panel{
+    border:1px solid var(--warn-soft);
+    background:linear-gradient(180deg, rgba(255,107,107,0.06), rgba(255,107,107,0.02));
+    border-radius:18px;
+    padding:22px 22px;
+  }
+  .warn-panel .w-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;
+    cursor:pointer; user-select:none;
+  }
+  .warn-panel .w-head-left{ display:flex; align-items:center; gap:10px; }
+  .warn-toggle{
+    background:none; border:1px solid var(--warn-soft); color:var(--warn);
+    width:28px; height:28px; border-radius:9px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; cursor:pointer; transition: transform .25s ease, background .2s ease;
+  }
+  .warn-panel.open .warn-toggle{ transform:rotate(180deg); }
+  /* Same smooth grid-based collapse used by the how-to-order panel. */
+  .warn-content-wrap{
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+  }
+  .warn-panel.open .warn-content-wrap{ grid-template-rows:1fr; }
+  .warn-content-inner{ overflow:hidden; min-height:0; }
+  .warn-panel .w-head .ico{
+    width:26px; height:26px; border-radius:50%;
+    background:rgba(255,107,107,0.15); border:1px solid var(--warn-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-weight:800; color:var(--warn);
+    font-size:14px;
+    text-shadow:0 0 10px var(--warn);
+  }
+  .warn-panel .w-head span.title{
+    font-weight:700; font-size:14.5px;
+    color:#ffb3b3;
+    text-shadow:0 0 12px rgba(255,107,107,0.7), 0 0 30px rgba(255,107,107,0.35);
+    letter-spacing:0.01em;
+  }
+  .warn-panel p{
+    margin:0 0 8px; font-size:13.5px; line-height:1.65; color:#e8c9c9;
+  }
+  .warn-panel b{
+    color:#fff;
+    text-shadow:0 0 10px rgba(255,107,107,0.8), 0 0 22px rgba(255,107,107,0.4);
+    font-weight:700;
+  }
+  .warn-panel .spec{
+    font-family:'JetBrains Mono', monospace; font-size:12.5px;
+    color:var(--cyan); text-shadow:0 0 10px rgba(46,230,214,0.5);
+  }
+
+  footer{
+    text-align:center; margin-top:34px; color:var(--text-faint); font-size:12px;
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  /* ---------- How-to / instructions section (collapsible) ---------- */
+  .howto-panel{ padding:24px 22px; }
+  .howto-head-row{
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; user-select:none;
+  }
+  .howto-toggle{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    width:30px; height:30px; border-radius:9px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
+  }
+  .howto-panel.open .howto-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
+  .howto-steps-wrap{
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+  }
+  .howto-panel.open .howto-steps-wrap{ grid-template-rows:1fr; }
+  .howto-steps-inner{ overflow:hidden; min-height:0; }
+  .howto-steps{ display:flex; flex-direction:column; gap:14px; margin-top:16px; }
+  .howto-step{
+    display:flex; gap:14px; align-items:flex-start;
+    background:#0a0a12; border:1px solid var(--border-soft);
+    border-radius:14px; padding:14px 16px;
+  }
+  .howto-step .hs-num{
+    flex:0 0 auto; width:28px; height:28px; border-radius:9px;
+    background:linear-gradient(135deg, var(--purple), var(--cyan));
+    color:#04101a; font-family:'JetBrains Mono', monospace; font-weight:800;
+    font-size:13px; display:flex; align-items:center; justify-content:center;
+  }
+  .howto-step .hs-body .hs-title{ font-size:14px; font-weight:700; margin-bottom:4px; }
+  .howto-step .hs-body .hs-text{ font-size:13px; color:var(--text-dim); line-height:1.55; }
+  .howto-step .hs-body a.hs-link{
+    color:var(--cyan); text-decoration:none; font-weight:700;
+    text-shadow:0 0 10px rgba(46,230,214,0.4);
+    word-break:break-all;
+  }
+  .howto-step .hs-body a.hs-link:hover{ text-decoration:underline; }
+
+  /* ---------- Generic collapsible toggle (reused by portfolio & trust panels) ---------- */
+  .collapsible-toggle{
+    background:none; border:1px solid var(--border); color:var(--text-dim);
+    width:30px; height:30px; border-radius:9px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
+  }
+  .portfolio-panel.open .collapsible-toggle,
+  .trust-panel.open .collapsible-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
+  .collapsible-wrap{
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+  }
+  .portfolio-panel.open .collapsible-wrap,
+  .trust-panel.open .collapsible-wrap{ grid-template-rows:1fr; }
+  .collapsible-inner{ overflow:hidden; min-height:0; }
+
+  /* ---------- Trust bar ---------- */
+  .trust-panel .panel-head{ cursor:pointer; user-select:none; }
+  .trust-panel{ padding:22px 22px 20px; }
+  .trust-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+    margin-top:16px;
+  }
+  @media (max-width:520px){ .trust-grid{ grid-template-columns:1fr; } }
+  .trust-item{
+    display:flex; gap:12px; align-items:flex-start;
+    background:#0a0a12; border:1px solid var(--border-soft);
+    border-radius:14px; padding:14px 16px;
+  }
+  .trust-item .ti-ico{
+    flex:0 0 auto; width:34px; height:34px; border-radius:10px;
+    background:rgba(155,92,255,0.1); border:1px solid var(--purple-soft);
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+  .trust-item .ti-title{ font-size:13.5px; font-weight:700; margin-bottom:2px; }
+  .trust-item .ti-text{ font-size:12px; color:var(--text-dim); line-height:1.5; }
+  .trust-rating-row{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin-top:16px; padding:12px 16px;
+    background:rgba(255,210,122,0.06); border:1px solid rgba(255,210,122,0.25);
+    border-radius:14px; flex-wrap:wrap; text-align:center;
+  }
+  .trust-rating-row .tr-stars{ color:var(--gold); font-size:15px; letter-spacing:2px; text-shadow:0 0 10px rgba(255,210,122,0.5); }
+  .trust-rating-row .tr-text{ font-size:12.5px; color:var(--text-dim); }
+  .trust-rating-row .tr-text b{ color:#fff; }
+
+  /* ---------- Portfolio ---------- */
+  .portfolio-panel .panel-head{ cursor:pointer; user-select:none; }
+  .portfolio-panel{ padding:22px 22px 20px; }
+  .portfolio-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+    margin-top:16px;
+  }
+  @media (max-width:420px){ .portfolio-grid{ grid-template-columns:1fr; } }
+  .portfolio-card{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px;
+    padding:22px 14px;
+    background:#0a0a12; border:1px solid var(--border-soft); border-radius:16px;
+    text-decoration:none; color:var(--text);
+    cursor:pointer; overflow:hidden;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .portfolio-card::after{
+    content:""; position:absolute; inset:0; border-radius:16px; opacity:0;
+    background: radial-gradient(circle at 50% 20%, rgba(46,230,214,0.14), transparent 70%);
+    transition: opacity .3s ease; pointer-events:none;
+  }
+  .portfolio-card:hover{
+    transform: translateY(-4px);
+    border-color: var(--cyan-soft);
+    background:#0d0d16;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.4), 0 0 24px rgba(46,230,214,0.12);
+  }
+  .portfolio-card:hover::after{ opacity:1; }
+  .portfolio-card:active{ transform: translateY(-1px) scale(0.97); }
+
+  .portfolio-icon{
+    position:relative;
+    width:56px; height:56px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle, rgba(155,92,255,0.16), rgba(46,230,214,0.06));
+    border:1px solid var(--border-soft);
+  }
+  .portfolio-icon::before{
+    content:""; position:absolute; inset:-6px; border-radius:20px;
+    border:1px solid rgba(46,230,214,0.3);
+    opacity:0; transform:scale(0.85);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .portfolio-card:hover .portfolio-icon::before{ opacity:1; transform:scale(1); }
+  .portfolio-icon svg{
+    width:26px; height:26px; fill:#eafffb;
+    filter: drop-shadow(0 0 6px rgba(46,230,214,0.85)) drop-shadow(0 0 16px rgba(155,92,255,0.6));
+    transition: filter .3s ease, transform .3s ease;
+  }
+  .portfolio-card:hover .portfolio-icon svg{
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(46,230,214,1)) drop-shadow(0 0 26px rgba(155,92,255,0.85));
+  }
+  .portfolio-name{ font-size:13.5px; font-weight:700; }
+  .portfolio-cta{
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.04em;
+    color:var(--text-faint); display:flex; align-items:center; gap:5px;
+  }
+  .portfolio-cta .pc-play{ color:var(--cyan); font-size:9px; }
+
+  /* Star rating input (comments) */
+  .rating-picker{ display:flex; align-items:center; gap:8px; }
+  .rating-picker .rp-label{ font-size:12.5px; color:var(--text-dim); }
+  .rating-picker .rp-stars{ display:flex; gap:4px; }
+  .rating-picker .rp-star{
+    font-size:20px; cursor:pointer; color:var(--border);
+    transition: color .12s, transform .12s;
+    line-height:1; user-select:none;
+  }
+  .rating-picker .rp-star.filled{ color:var(--gold); text-shadow:0 0 8px rgba(255,210,122,0.5); }
+  .rating-picker .rp-star:hover{ transform:scale(1.15); }
+  .c-item .c-stars{ color:var(--gold); font-size:12px; letter-spacing:1px; margin-left:8px; }
+
+  /* Admin post-mode toggle — lives inside the password-gated admin
+     dashboard; lets the admin switch between posting as ADMIN or as a
+     normal visitor. Never appears on the public comment form. */
+  .admin-mode-row{
+    display:none; align-items:center; justify-content:space-between; gap:10px;
+    padding:8px 12px; margin-bottom:14px; border-radius:10px;
+    border:1px solid rgba(155,92,255,0.3);
+    background:rgba(155,92,255,0.07);
+  }
+  .admin-mode-row .amt-label{ font-size:12px; font-weight:600; color:#c7aaff; }
+  .admin-mode-toggle{ position:relative; display:inline-flex; align-items:center; cursor:pointer; flex:0 0 auto; }
+  .admin-mode-toggle input{ position:absolute; opacity:0; width:0; height:0; }
+  .admin-mode-toggle .switch{
+    width:38px; height:20px; border-radius:20px;
+    background:#2a2a3d; border:1px solid var(--border);
+    position:relative; transition: background .2s, border-color .2s;
+  }
+  .admin-mode-toggle .switch::after{
+    content:''; position:absolute; top:1px; left:1px;
+    width:16px; height:16px; border-radius:50%;
+    background:var(--text-dim); transition: transform .2s, background .2s, box-shadow .2s;
+  }
+  .admin-mode-toggle input:checked + .switch{ background:rgba(155,92,255,0.35); border-color:var(--purple-soft); }
+  .admin-mode-toggle input:checked + .switch::after{
+    transform: translateX(18px); background:var(--purple); box-shadow:0 0 8px var(--purple);
+  }
+
+  /* ---------- Comment admin badge + replies ---------- */
+  .admin-badge{
+    display:inline-flex; align-items:center; gap:3px;
+    font-family:'JetBrains Mono', monospace; font-size:9.5px; font-weight:800; letter-spacing:0.05em;
+    background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#04101a;
+    padding:2px 7px; border-radius:6px; margin-left:8px; text-transform:uppercase;
+    vertical-align:middle;
+    box-shadow: 0 0 10px rgba(46,230,214,0.35);
+  }
+  .c-item .c-actions{ display:flex; justify-content:flex-end; margin-top:6px; }
+  .c-reply-btn{
+    background:none; border:none; color:var(--text-faint); font-size:11.5px;
+    font-family:'Space Grotesk', sans-serif; cursor:pointer; padding:4px 6px;
+    transition: color .15s ease;
+  }
+  .c-reply-btn:hover{ color:var(--cyan); }
+  .c-reply-form{
+    display:none; flex-direction:column; gap:8px; margin-top:10px;
+    padding-top:10px; border-top:1px dashed var(--border-soft);
+  }
+  .c-reply-form.open{ display:flex; }
+  .c-reply-form input, .c-reply-form textarea{
+    width:100%; background:#12121c; border:1px solid var(--border); border-radius:10px;
+    color:var(--text); padding:9px 11px; font-family:'Space Grotesk', sans-serif;
+    font-size:12.5px; outline:none;
+  }
+  .c-reply-form textarea{ resize:none; min-height:50px; }
+  .c-reply-form .c-reply-submit{
+    align-self:flex-end; background:var(--cyan); color:#06231f; border:none;
+    border-radius:9px; padding:7px 14px; font-weight:700; font-size:12px; cursor:pointer;
+  }
+  .c-replies{ display:flex; flex-direction:column; gap:8px; margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); }
+  .c-reply-item .c-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
+  .c-reply-item .c-author{ font-weight:700; font-size:12px; color:var(--cyan); }
+  .c-reply-item .c-date{ font-size:10px; color:var(--text-faint); }
+  .c-reply-item .c-body{ font-size:12.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
+
+  /* ---------- AI Chat Widget ---------- */
+  .chat-fab{
+    position:fixed; right:20px; bottom:20px; z-index:50;
+    width:60px; height:60px; border-radius:50%;
+    background:linear-gradient(135deg, var(--purple), var(--cyan));
+    border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 30px rgba(155,92,255,0.45), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    font-size:24px;
+    animation: fabPulse 3s ease-in-out infinite;
+  }
+  @keyframes fabPulse{ 0%,100%{ box-shadow:0 10px 30px rgba(155,92,255,0.45);} 50%{ box-shadow:0 10px 44px rgba(46,230,214,0.55);} }
+  .chat-fab .badge-dot{
+    position:absolute; top:-2px; right:-2px; width:14px; height:14px; border-radius:50%;
+    background:var(--warn); border:2px solid var(--bg); box-shadow:0 0 8px var(--warn);
+  }
+
+  .chat-panel{
+    position:fixed; right:20px; bottom:92px; z-index:50;
+    width:min(360px, calc(100vw - 32px));
+    height:min(520px, calc(100vh - 140px));
+    background:linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--border);
+    border-radius:20px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.55);
+    display:none;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .chat-panel.open{ display:flex; }
+
+  .chat-head{
+    padding:16px 18px;
+    border-bottom:1px solid var(--border-soft);
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(155,92,255,0.06);
+  }
+  .chat-head .ch-l{ display:flex; align-items:center; gap:10px; }
+  .chat-head .avatar{
+    width:34px; height:34px; border-radius:10px;
+    background:linear-gradient(135deg, var(--purple), var(--cyan));
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+  .chat-head .ch-name{ font-size:13.5px; font-weight:700; }
+  .chat-head .ch-status{ font-size:11px; color:var(--cyan); display:flex; align-items:center; gap:5px; }
+  .chat-head .ch-status .d{ width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); }
+  .chat-close{ background:none; border:none; color:var(--text-faint); font-size:18px; cursor:pointer; padding:4px 8px; }
+  .chat-close:hover{ color:var(--text); }
+
+  .chat-body{
+    flex:1; overflow-y:auto; padding:16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .msg{
+    max-width:82%; padding:10px 13px; border-radius:14px; font-size:13px; line-height:1.5;
+  }
+  .msg.bot{
+    align-self:flex-start;
+    background:#0a0a12; border:1px solid var(--border-soft);
+    border-bottom-left-radius:4px;
+  }
+  .msg.user{
+    align-self:flex-end;
+    background:linear-gradient(90deg, var(--purple), #7a4ae0);
+    color:#fff;
+    border-bottom-right-radius:4px;
+  }
+  .quick-replies{ display:flex; flex-wrap:wrap; gap:6px; margin-top:2px; }
+  .qr-btn{
+    font-family:'Space Grotesk', sans-serif; font-size:11.5px;
+    background:#12121c; border:1px solid var(--border); color:var(--text-dim);
+    padding:7px 11px; border-radius:20px; cursor:pointer; transition:.15s;
+  }
+  .qr-btn:hover{ border-color:var(--purple); color:#fff; background:rgba(155,92,255,0.1); }
+
+  .chat-input-row{
+    display:flex; gap:8px; padding:12px; border-top:1px solid var(--border-soft);
+  }
+  .chat-input-row input{
+    flex:1; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
+    padding:11px 13px; color:var(--text); font-family:'Space Grotesk', sans-serif; font-size:13px; outline:none;
+  }
+  .chat-input-row input:focus{ border-color:var(--purple); }
+  .chat-send{
+    width:40px; height:40px; border-radius:12px; border:none; flex:0 0 auto;
+    background:linear-gradient(135deg, var(--purple), var(--cyan)); color:#fff;
+    cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;
+  }
+
+  /* Mobile Responsive adjustments */
+  @media (max-width: 600px){
+    .wrap{ padding:16px 12px 60px; }
+    .panel{ padding:20px 16px; }
+    .hero h1{ font-size: 28px; }
+    .price{ font-size: 50px; }
+    .chat-panel{ bottom:84px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="ruler"></div>
+  <div class="grain"></div>
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+  <div class="badge-float ae">AFTER&nbsp;EFFECTS&nbsp;GRADE<span class="spark"></span></div>
+  <div class="badge-float topaz">TOPAZ&nbsp;AI&nbsp;ENHANCED<span class="gem"></span></div>
+</div>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
+    <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
+    <div class="topbar-right">
+      <div class="lang-switch" id="langSwitch">
+        <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">GEO</button>
+        <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">ENG</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">VIDEO EDITING · PRICE ENGINE</div>
+    <h1 data-i18n="heroTitle">გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
+    <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
+  </div>
+
+  <!-- Portfolio -->
+  <div class="panel portfolio-panel" id="portfolioPanel">
+    <div class="panel-head" id="portfolioHeadRow" style="margin-bottom:0;">
+      <div class="label" data-i18n="portfolioLabel">ნამუშევრების პორტფოლიო</div>
+      <button type="button" class="collapsible-toggle" id="portfolioToggle" aria-label="toggle">▾</button>
+    </div>
+    <div class="collapsible-wrap">
+      <div class="collapsible-inner">
+        <div class="portfolio-grid">
+          <a class="portfolio-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+            <div class="portfolio-icon">
+              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+            </div>
+            <div class="portfolio-name" id="portfolioName1">@moonaee26</div>
+            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+          </a>
+          <a class="portfolio-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+            <div class="portfolio-icon">
+              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+            </div>
+            <div class="portfolio-name" id="portfolioName2">@marveluniversee26</div>
+            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trust bar -->
+  <div class="panel trust-panel" id="trustPanel">
+    <div class="panel-head" id="trustHeadRow" style="margin-bottom:0;">
+      <div class="label" data-i18n="trustLabel">რატომ MOON</div>
+      <button type="button" class="collapsible-toggle" id="trustToggle" aria-label="toggle">▾</button>
+    </div>
+    <div class="collapsible-wrap">
+      <div class="collapsible-inner">
+        <div class="trust-grid">
+          <div class="trust-item">
+            <div class="ti-ico">⭐</div>
+            <div>
+              <div class="ti-title" data-i18n="trust1Title">ნამდვილი შეფასებები</div>
+              <div class="ti-text" data-i18n="trust1Text">ყველა შეფასება ქვემოთ დატოვებულია რეალური კლიენტების მიერ — გაეცანი კომენტარებს გვერდის ბოლოში.</div>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="ti-ico">🎬</div>
+            <div>
+              <div class="ti-title" data-i18n="trust2Title">ხელით მონტაჟი, არა შაბლონი</div>
+              <div class="ti-text" data-i18n="trust2Text">თითოეული ვიდეო მუშავდება ინდივიდუალურად After Effects & Topaz ტექნოლოგიით, ავტომატური შაბლონების გარეშე.</div>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="ti-ico">💬</div>
+            <div>
+              <div class="ti-title" data-i18n="trust3Title">პირდაპირი კონტაქტი მენეჯერთან</div>
+              <div class="ti-text" data-i18n="trust3Text">შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.</div>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="ti-ico">🔒</div>
+            <div>
+              <div class="ti-title" data-i18n="trust4Title">გამჭვირვალე ფასი წინასწარ</div>
+              <div class="ti-text" data-i18n="trust4Text">ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to use / how to order (collapsible) -->
+  <div class="panel howto-panel" id="howtoPanel">
+    <div class="panel-head howto-head-row" id="howtoHeadRow" style="margin-bottom:0;">
+      <div class="label" data-i18n="howtoLabel">როგორ შევუკვეთო</div>
+      <button type="button" class="howto-toggle" id="howtoToggle" aria-label="toggle">▾</button>
+    </div>
+    <div class="howto-steps-wrap">
+      <div class="howto-steps-inner">
+        <div class="howto-steps">
+          <div class="howto-step">
+            <div class="hs-num">1</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep1Title">გამოთვალე ფასი</div>
+              <div class="hs-text" data-i18n="howtoStep1Text">ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო „VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.</div>
+            </div>
+          </div>
+          <div class="howto-step">
+            <div class="hs-num">2</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep2Title">ატვირთე ვიდეო</div>
+              <div class="hs-text" data-i18n="howtoStep2Text">გადადი ჩვენს ატვირთვის გვერდზე და ატვირთე შენი ვიდეო: <a class="hs-link" href="https://mooontransferr.onrender.com/" target="_blank" rel="noopener">mooontransferr.onrender.com</a></div>
+            </div>
+          </div>
+          <div class="howto-step">
+            <div class="hs-num">3</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep3Title">გამოაგზავნე ლინკი</div>
+              <div class="hs-text" data-i18n="howtoStep3Text">ატვირთვის შემდეგ მიღებული ლინკი TikTok პროფილის ლინკთან ერთად გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.</div>
+            </div>
+          </div>
+          <div class="howto-step">
+            <div class="hs-num">4</div>
+            <div class="hs-body">
+              <div class="hs-title" data-i18n="howtoStep4Title">დაელოდე დადასტურებას</div>
+              <div class="hs-text" data-i18n="howtoStep4Text">მენეჯერი დაგიდასტურებთ შეკვეთას და ვადას პირდაპირ ჩატში.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div class="label" data-i18n="priceReadout">PRICE READOUT</div>
+      <div class="rec"><span class="r-dot"></span> LIVE</div>
+    </div>
+
+    <div class="readout">
+      <div class="tag" data-i18n="finalPrice">საბოლოო ღირებულება</div>
+      <div class="price" id="priceDisplay">1.50<sup>₾</sup></div>
+      <div class="sub-note" id="subNote" data-i18n="notSubscribed">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></div>
+    </div>
+
+    <div class="field">
+      <div class="field-top">
+        <label data-i18n="markDuration">მონიშნე ზუსტი დრო (წამი)</label>
+        <span class="val" id="secVal">5</span>
+      </div>
+      <div class="timeline">
+        <input type="range" id="secondsRange" min="5" max="59" step="1" value="5">
+      </div>
+      <input type="number" class="num-input" id="secondsInput" min="0" max="59" value="5" placeholder="შეიყვანე წამი (0–59)" data-i18n-placeholder="secondsPlaceholder" style="margin-top:10px;">
+    </div>
+
+    <div class="field">
+      <div class="field-top">
+        <label data-i18n="msLabel">წამის მეასედი / კადრი (Milliseconds)</label>
+        <span class="val" id="msVal">00</span>
+      </div>
+      <div class="timeline">
+        <input type="range" id="msRange" min="0" max="59" step="1" value="0">
+      </div>
+      <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59:59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
+    </div>
+
+    <div class="field">
+      <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი (რეზოლუცია / fps)</label></div>
+      <div class="quality-grid" id="qualityGrid">
+        <button type="button" class="quality-btn active" data-quality="1080_60">
+          <span class="q-rec" data-i18n="qualityRecBadge">რეკომენდირებული</span>
+          <span class="q-name">1080p</span>
+          <span class="q-tag">60 FPS</span>
+        </button>
+        <button type="button" class="quality-btn" data-quality="1080_120">
+          <span class="q-name">1080p</span>
+          <span class="q-tag">120 FPS</span>
+        </button>
+        <button type="button" class="quality-btn" data-quality="2k_60">
+          <span class="q-name">2K</span>
+          <span class="q-tag">60 FPS</span>
+        </button>
+        <button type="button" class="quality-btn" data-quality="2k_120">
+          <span class="q-name">2K</span>
+          <span class="q-tag">120 FPS</span>
+        </button>
+        <button type="button" class="quality-btn" data-quality="4k_60">
+          <span class="q-name">4K</span>
+          <span class="q-tag">60 FPS</span>
+        </button>
+        <button type="button" class="quality-btn" data-quality="4k_120">
+          <span class="q-name">4K</span>
+          <span class="q-tag">120 FPS</span>
+        </button>
+      </div>
+      <div class="quality-warn" id="qualityWarn" data-i18n="qualityWarnText">⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედდეს.</div>
+
+      <div class="chart-box" id="chartBox">
+        <div class="chart-head-row" id="chartHeadRow">
+          <div class="chart-label" data-i18n="chartLabel">ფასის შედარება ამჟამინდელი ხანგრძლივობით</div>
+          <button type="button" class="chart-toggle" id="chartToggle" aria-label="toggle">▾</button>
+        </div>
+        <div class="chart-content-wrap">
+          <div class="chart-content-inner">
+            <div id="priceChart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="toggle-row">
+        <div class="toggle-copy">
+          <div class="t1" data-i18n="subscriberT1">ვარ არხის გამომწერი</div>
+          <div class="t2" data-i18n="subscriberT2">✓ დაბალი ტარიფი აქტიურდება</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="subToggle">
+          <span class="slider-toggle"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">@</span>
+        <input type="text" class="num-input" id="tiktokLink" placeholder="tiktok.com/@username">
+      </div>
+      <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
+  </div>
+
+  <!-- Video duration checker -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="label" data-i18n="videoScanner">VIDEO SCANNER</div>
+    </div>
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="videoInput" accept="video/*">
+      <div class="dz-icon">▶</div>
+      <div class="dz-title" data-i18n="dzTitle">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
+      <div class="dz-sub" data-i18n="dzSub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
+    </div>
+    <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
+    <div class="scan-result" id="scanResult">
+      <div class="sr-row"><span data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
+      <div class="sr-row"><span data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
+      <div class="sr-row"><span data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
+      <div class="sr-row" id="srQualityRow" style="display:none;"><span data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
+      <div class="sr-row"><span data-i18n="srPrice">გამოთვლილი ფასი</span><b id="srPrice">—</b></div>
+      <div class="sr-info" id="srMatchNote" style="display:none;"></div>
+      <div class="sr-warn" id="srMismatchNote" style="display:none;"></div>
+      <div class="sr-warn" id="srWarn" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Order channels -->
+  <div class="panel" id="orderChannelsPanel" style="padding:22px; margin-bottom:10px;">
+    <div class="panel-head" style="margin-bottom:16px;">
+      <div class="label" data-i18n="sendOrder">გაგზავნე შეკვეთა</div>
+    </div>
+    <div class="order-grid">
+      <button class="order-btn wa" id="orderBtnWA">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M20.52 3.449C12.831-3.984.106 5.845.061 12.68a12.94 12.94 0 001.767 6.583L0 24l5.001-1.79a12.914 12.914 0 006.482 1.658h.006c6.24 0 12.243-5.302 12.243-12.213 0-3.264-1.325-6.334-3.212-8.206zM12 22.121h-.005a10.13 10.13 0 01-5.185-1.421l-.372-.22-3.851 1.377 1.4-3.756-.242-.386a10.108 10.108 0 01-1.554-5.396c.005-5.579 4.548-10.115 10.133-10.115 2.703 0 5.243 1.057 7.148 2.978 1.905 1.921 2.952 4.464 2.951 7.153-.004 5.58-4.547 10.106-10.423 10.106zm5.556-7.596c-.303-.152-1.793-.885-2.07-.986-.278-.101-.48-.152-.682.152-.202.303-.783.986-.96 1.188-.176.202-.353.227-.655.076-.303-.152-1.279-.472-2.436-1.505-.9-.803-1.508-1.794-1.685-2.097-.176-.303-.019-.467.133-.618.136-.135.303-.353.454-.53.152-.176.202-.303.303-.505.101-.202.05-.379-.025-.53-.076-.152-.682-1.646-.934-2.253-.246-.591-.497-.511-.682-.52-.176-.008-.379-.01-.581-.01-.202 0-.53.076-.808.379-.278.303-1.06 1.036-1.06 2.528s1.085 2.933 1.236 3.135c.151.202 2.135 3.259 5.17 4.57.723.312 1.287.498 1.727.638.726.231 1.386.198 1.908.12.582-.087 1.793-.734 2.046-1.442.253-.708.253-1.315.177-1.442-.075-.126-.278-.202-.581-.353z"/></svg></span>
+        <span data-i18n="sendWA">WhatsApp-ზე გაგზავნა</span>
+      </button>
+      <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> <span data-i18n="sendTG">Telegram-ზე გაგზავნა</span></button>
+    </div>
+    <div class="copy-note" id="copyNote"></div>
+  </div>
+
+  <div class="warn-panel" id="warnPanel" style="margin-bottom:22px;">
+    <div class="w-head" id="warnHeadRow">
+      <div class="w-head-left">
+        <div class="ico">!</div>
+        <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
+      </div>
+      <button type="button" class="warn-toggle" id="warnToggle" aria-label="toggle">▾</button>
+    </div>
+    <div class="warn-content-wrap">
+      <div class="warn-content-inner">
+        <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
+        <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
+        <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
+        <p data-i18n="warnP4">კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედდეთ ან შენელდეთ.</p>
+        <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments -->
+  <div class="panel comments-panel" style="padding:22px;">
+    <div class="panel-head" style="margin-bottom:10px;">
+      <div class="label" data-i18n="commentsLabel">კომენტარები</div>
+    </div>
+    <div class="trust-rating-row" id="commentsRatingRow" style="display:none; margin-top:0; margin-bottom:16px;">
+      <span class="tr-stars" id="commentsAvgStars">★★★★★</span>
+      <span class="tr-text" id="commentsAvgText"></span>
+    </div>
+    <div class="c-form">
+      <div class="rating-picker" id="ratingPicker">
+        <span class="rp-label" data-i18n="commentRatingLabel">შენი შეფასება:</span>
+        <span class="rp-stars" id="rpStars">
+          <span class="rp-star" data-val="1">★</span><span class="rp-star" data-val="2">★</span><span class="rp-star" data-val="3">★</span><span class="rp-star" data-val="4">★</span><span class="rp-star" data-val="5">★</span>
+        </span>
+      </div>
+      <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი">
+      <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
+      <div class="c-error" id="commentError"></div>
+      <button class="c-submit" id="commentSubmit" data-i18n="commentSubmit">გამოქვეყნება</button>
+    </div>
+    <div class="c-list" id="commentList">
+      <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!</div>
+    </div>
+  </div>
+
+  <footer><span data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
+
+</div>
+
+<!-- ---------- Admin panel ---------- -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-box" id="adminBox">
+    <div id="adminLogin">
+      <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
+      <div class="a-pass-row">
+        <input type="password" class="a-pass" id="adminPass" inputmode="numeric" maxlength="10" data-i18n-placeholder="adminPassPh" placeholder="პაროლი">
+        <button class="a-go" id="adminGo" data-i18n="adminEnter">შესვლა</button>
+      </div>
+      <div class="a-err" id="adminErr" data-i18n="adminWrongPass">არასწორი პაროლი</div>
+      <button class="a-close" id="adminCloseLogin" data-i18n="adminClose">დახურვა</button>
+    </div>
+    <div id="adminDashboard" style="display:none;">
+      <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
+      <div class="admin-mode-row" id="adminModeRow">
+        <span class="amt-label" id="adminModeLabel" data-i18n="adminModeLabel">დაწერე ადმინის სახელით</span>
+        <label class="admin-mode-toggle">
+          <input type="checkbox" id="adminModeCheckbox" checked>
+          <span class="switch"></span>
+        </label>
+      </div>
+      <div class="a-tabs">
+        <button class="a-tab active" id="adminTabVisits" data-i18n="adminTabVisits">ვიზიტორები</button>
+        <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
+      </div>
+      <div class="a-panel active" id="adminPanelVisits"></div>
+      <div class="a-panel" id="adminPanelComments"></div>
+      <button class="a-close" id="adminCloseDash" data-i18n="adminClose">დახურვა</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- AI Chat Widget ---------- -->
+<button class="chat-fab" id="chatFab" aria-label="დახმარების ასისტენტი">💬<span class="badge-dot"></span></button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="ch-l">
+      <div class="avatar">🌙</div>
+      <div>
+        <div class="ch-name">MOON <span data-i18n="chatAssistant">ასისტენტი</span></div>
+        <div class="ch-status"><span class="d"></span> <span data-i18n="chatOnline">ონლაინ</span></div>
+      </div>
+    </div>
+    <button class="chat-close" id="chatClose">✕</button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="დასვი კითხვა…" data-i18n-placeholder="chatInputPlaceholder">
+    <button class="chat-send" id="chatSend">➤</button>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // 0) LANGUAGE / i18n SYSTEM
+  // ============================================================
+  const TRANSLATIONS = {
+    ka: {
+      visitorsLabel: 'სულ ვიზიტორი საიტზე:',
+      topbarTagline: 'ისიამოვნე შენი ტიკტოკის ვიდეოებით',
+      heroTitle: 'შენ იმსახურებ საუკეთესო ხარისხს <span>შეუკვეთე ახლავე!</span>',
+      heroSub: 'მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.',
+      portfolioLabel: 'ნამუშევრების პორტფოლიო',
+      portfolioCta: 'ნამუშევრის ნახვა TikTok-ზე',
+      trustLabel: 'რატომ MOON',
+      trust1Title: 'ნამდვილი შეფასებები',
+      trust1Text: 'ყველა შეფასება ქვემოთ დატოვებულია რეალური კლიენტების მიერ — გაეცანი კომენტარებს გვერდის ბოლოში.',
+      trust2Title: 'ხელით მონტაჟი, არა შაბლონი',
+      trust2Text: 'თითოეული ვიდეო მუშავდება ინდივიდუალურად After Effects & Topaz ტექნოლოგიით, ავტომატური შაბლონების გარეშე.',
+      trust3Title: 'პირდაპირი კონტაქტი მენეჯერთან',
+      trust3Text: 'შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.',
+      trust4Title: 'გამჭვირვალე ფასი წინასწარ',
+      trust4Text: 'ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.',
+      trustRatingText: 'საშუალო შეფასება <b>{AVG}</b> — {COUNT} რეალური შეფასების საფუძველზე',
+      priceReadout: 'PRICE READOUT',
+      finalPrice: 'საბოლოო ღირებულება',
+      subActive: '✓ გამომწერის ტარიფი აქტიურია — <b>თანხა უკვე დაზოგილია!</b>',
+      notSubscribed: 'არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b>',
+      markDuration: 'მონიშნე ზუსტი დრო (წამი)',
+      secondsPlaceholder: 'შეიყვანე წამი (0–59)',
+      msLabel: 'წამის მეასედი / კადრი (Milliseconds)',
+      msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59:59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
+      qualityLabel: 'ვიდეოს ხარისხი (რეზოლუცია / fps)',
+      qualityRecBadge: 'რეკომენდირებული',
+      qualityWarnText: '⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედდეს.',
+      subscriberT1: 'ვარ არხის გამომწერი',
+      subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
+      tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
+      tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
+      videoScanner: 'VIDEO SCANNER',
+      dzTitle: 'ატვირთე ვიდეო ავტომატური გაზომვისთვის',
+      dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
+      scanProcessing: 'ვიდეო მუშავდება…',
+      srFile: 'ფაილი',
+      srDuration: 'ხანგრძლივობა',
+      srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
+      srRequestedFormat: 'მოთხოვნილი ხარისხი',
+      srPrice: 'გამოთვლილი ფასი',
+      srUnit: 'წმ',
+      srFpsUnknown: 'fps უცნობია',
+      srMatchNote: '✓ ატვირთული ვიდეო შეესაბამება მოთხოვნილ ხარისხს ({REQ})',
+      srMismatchNote: '⚠️ მოთხოვნილია {REQ}, თუმცა ატვირთული ვიდეო რეალურად {DET} ხარისხისაა — ფასი მაინც გამოთვლილია თქვენ მიერ მოთხოვნილი ({REQ}) ხარისხის მიხედვით.',
+      srWarnOver: '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.',
+      alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
+      alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
+      sendOrder: 'გაგზავნე შეკვეთა',
+      sendWA: 'WhatsApp-ზე გაგზავნა',
+      sendTG: 'Telegram-ზე გაგზავნა',
+      tgSentNote: '✓ იხსნება MOON-ის Telegram ჩატი (@MOON_TG) — ტექსტი ასევე დაკოპირებულია სარეზერვოდ',
+      warnTitle: 'გაფრთხილება შეკვეთამდე',
+      warnP1: 'ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.',
+      warnP2: 'გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59:59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.',
+      warnP3: 'ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.',
+      warnP4: 'კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებლებს ვიდეო თავისით გაუჭედდეთ ან შენელდეთ.',
+      footer: 'FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით',
+      chatAssistant: 'ასისტენტი',
+      chatOnline: 'ონლაინ',
+      chatInputPlaceholder: 'დასვი კითხვა…',
+      chartLabel: 'ფასის შედარება ამჟამინდელი ხანგრძლივობით',
+      commentsLabel: 'კომენტარები',
+      commentRatingLabel: 'შენი შეფასება:',
+      adminModeLabel: 'დაწერე ადმინის სახელით',
+      commentNamePh: 'სახელი',
+      commentTextPh: 'დაწერე კომენტარი…',
+      commentSubmit: 'გამოქვეყნება',
+      commentEmpty: 'ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!',
+      commentErrEmpty: 'გთხოვთ შეავსოთ სახელისა და კომენტარის ველები.',
+      commentErrRating: 'გთხოვთ მონიშნოთ შეფასება ვარსკვლავებით.',
+      commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
+      commentErrGeneric: 'კომენტარის გამოქვეყნება ვერ მოხერხდა — სცადეთ ხელახლა.',
+      commentsAvgText: 'საშუალო შეფასება <b>{AVG}</b> ({COUNT} შეფასება)',
+      adminTitle: 'ადმინის პანელი',
+      adminPassPh: 'პაროლი',
+      adminEnter: 'შესვლა',
+      adminWrongPass: 'არასწორი პაროლი',
+      adminClose: 'დახურვა',
+      adminTabVisits: 'ვიზიტორები',
+      adminTabComments: 'კომენტარები',
+      adminNoVisits: 'ვიზიტები ჯერ არ დაფიქსირებულა.',
+      adminNoComments: 'კომენტარები ჯერ არ არის.',
+      adminSave: 'შენახვა',
+      adminDelete: 'წაშლა',
+      howtoLabel: 'როგორ შევუკვეთო',
+      howtoStep1Title: 'გამოთვალე ფასი',
+      howtoStep1Text: 'ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო „VIDEO SCANNER" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.',
+      howtoStep2Title: 'ატვირთე ვიდეო',
+      howtoStep2Text: 'გადადი ჩვენს ატვირთვის გვერდზე და ატვირთე შენი ვიდეო: <a class="hs-link" href="https://mooontransferr.onrender.com/" target="_blank" rel="noopener">mooontransferr.onrender.com</a>',
+      howtoStep3Title: 'გამოაგზავნე ლინკი',
+      howtoStep3Text: 'ატვირთვის შემდეგ მიღებული ლინკი TikTok პროფილის ლინკთან ერთად გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.',
+      howtoStep4Title: 'დაელოდე დადასტურებას',
+      howtoStep4Text: 'მენეჯერი დაგიდასტურებთ შეკვეთას და ვადას პირდაპირ ჩატში.',
+    },
+    en: {
+      visitorsLabel: 'Total visitors:',
+      topbarTagline: 'Enjoy your TikTok videos',
+      heroTitle: 'You deserve the best quality <span>order now!</span>',
+      heroSub: 'Enter your video\'s duration (or upload a video and it will measure it automatically) — the price is calculated in real time, for After Effects & Topaz quality editing.',
+      portfolioLabel: 'Portfolio of work',
+      portfolioCta: 'View the work on TikTok',
+      trustLabel: 'Why MOON',
+      trust1Title: 'Real reviews',
+      trust1Text: 'Every rating below was left by an actual client — check out the comments at the bottom of the page.',
+      trust2Title: 'Hand-edited, not templated',
+      trust2Text: 'Every video is processed individually using After Effects & Topaz technology — no automatic templates.',
+      trust3Title: 'Direct contact with a manager',
+      trust3Text: 'A real person confirms your order on WhatsApp or Telegram — not a bot, not an automated system.',
+      trust4Title: 'Transparent pricing upfront',
+      trust4Text: 'You see the price in the calculator before ordering — no hidden fees before you send anything.',
+      trustRatingText: 'Average rating <b>{AVG}</b> — based on {COUNT} real reviews',
+      priceReadout: 'PRICE READOUT',
+      finalPrice: 'Final price',
+      subActive: '✓ Subscriber rate is active — <b>you\'re already saving money!</b>',
+      notSubscribed: 'Not a subscriber yet — <b>subscribe to save money!</b>',
+      markDuration: 'Select exact duration (seconds)',
+      secondsPlaceholder: 'Enter seconds (0–59)',
+      msLabel: 'Hundredths of a second / frame (Milliseconds)',
+      msHint: 'Maximum total duration is 59:59. Within this range the price is calculated at the 59-second rate.',
+      qualityLabel: 'Video quality (resolution / fps)',
+      qualityRecBadge: 'Recommended',
+      qualityWarnText: '⚠️ We recommend the 1080p/60fps format — with the higher-quality formats, the video may glitch or slow down for viewers.',
+      subscriberT1: "I'm a channel subscriber",
+      subscriberT2: '✓ Lower rate activates',
+      tiktokLabel: 'Your TikTok profile link *',
+      tiktokError: '⚠️ A TikTok profile link is required to send the order!',
+      videoScanner: 'VIDEO SCANNER',
+      dzTitle: 'Upload a video for automatic measurement',
+      dzSub: 'Drag it here or click — duration will be filled in automatically',
+      scanProcessing: 'Processing video…',
+      srFile: 'File',
+      srDuration: 'Duration',
+      srDetectedFormat: 'Uploaded video format',
+      srRequestedFormat: 'Requested quality',
+      srPrice: 'Calculated price',
+      srUnit: 's',
+      srFpsUnknown: 'fps unknown',
+      srMatchNote: '✓ The uploaded video matches the requested quality ({REQ})',
+      srMismatchNote: '⚠️ You requested {REQ}, but the uploaded video is actually {DET} quality — the price is still calculated based on your requested quality ({REQ}).',
+      srWarnOver: '⚠️ The video exceeds 59.59 seconds — it is priced individually; the calculator shows the 59.59 rate.',
+      alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
+      alertReadError: 'Could not read the video — please try another file.',
+      sendOrder: 'Send order',
+      sendWA: 'Send via WhatsApp',
+      sendTG: 'Send via Telegram',
+      tgSentNote: "✓ Opening MOON's Telegram chat (@MOON_TG) — the text has also been copied as a backup",
+      warnTitle: 'Notice before ordering',
+      warnP1: 'Video editing is done <b>only for TikTok</b>, with flawless quality.',
+      warnP2: 'Please make sure your video duration <b>does not exceed 59:59 seconds</b> — anything longer is priced individually and isn\'t included in the calculator.',
+      warnP3: 'Also make sure the footage is shot and rendered in <b>1080p / 60fps</b> quality — this affects the cleanliness of the final result.',
+      warnP4: 'The calculator also offers <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps</b> options, but we don\'t recommend them — the video may glitch or slow down for viewers.',
+      footer: 'FRAME.RATE — precise calculation, down to the frame',
+      chatAssistant: 'Assistant',
+      chatOnline: 'Online',
+      chatInputPlaceholder: 'Ask a question…',
+      chartLabel: 'Price comparison at the current duration',
+      commentsLabel: 'Comments',
+      commentRatingLabel: 'Your rating:',
+      adminModeLabel: 'Post as Admin',
+      commentNamePh: 'Name',
+      commentTextPh: 'Write a comment…',
+      commentSubmit: 'Post',
+      commentEmpty: 'No comments yet — be the first!',
+      commentErrEmpty: 'Please fill in both the name and comment fields.',
+      commentErrRating: 'Please select a star rating.',
+      commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
+      commentErrGeneric: 'Could not post the comment — please try again.',
+      commentsAvgText: 'Average rating <b>{AVG}</b> ({COUNT} reviews)',
+      adminTitle: 'Admin panel',
+      adminPassPh: 'Password',
+      adminEnter: 'Enter',
+      adminWrongPass: 'Incorrect password',
+      adminClose: 'Close',
+      adminTabVisits: 'Visitors',
+      adminTabComments: 'Comments',
+      adminNoVisits: 'No visits recorded yet.',
+      adminNoComments: 'No comments yet.',
+      adminSave: 'Save',
+      adminDelete: 'Delete',
+      howtoLabel: 'How to order',
+      howtoStep1Title: 'Calculate the price',
+      howtoStep1Text: 'Below, set the video duration and quality in the calculator — or upload a video in the "VIDEO SCANNER" block so the duration is measured automatically.',
+      howtoStep2Title: 'Upload your video',
+      howtoStep2Text: 'Go to our upload page and upload your video: <a class="hs-link" href="https://mooontransferr.onrender.com/" target="_blank" rel="noopener">mooontransferr.onrender.com</a>',
+      howtoStep3Title: 'Send us the link',
+      howtoStep3Text: 'After uploading, send us the link together with your TikTok profile link using the WhatsApp or Telegram button below — once the fields are filled in, pressing the button prepares the message automatically.',
+      howtoStep4Title: 'Wait for confirmation',
+      howtoStep4Text: 'A manager will confirm your order and the deadline directly in chat.',
+    }
+  };
+
+  let currentLang = localStorage.getItem('moon_lang') || 'ka';
+
+  function t(key){
+    return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.ka[key] || '');
+  }
+
+  function applyTranslations(){
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (TRANSLATIONS[currentLang][key] !== undefined) {
+        el.innerHTML = TRANSLATIONS[currentLang][key];
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (TRANSLATIONS[currentLang][key] !== undefined) {
+        el.placeholder = TRANSLATIONS[currentLang][key];
+      }
+    });
+    document.getElementById('langKa').classList.toggle('active', currentLang === 'ka');
+    document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
+    if (typeof refresh === 'function') refresh();
+    if (typeof renderComments === 'function') renderComments();
+    if (typeof renderTrustRating === 'function') renderTrustRating();
+  }
+
+  function setLanguage(lang){
+    if (lang !== 'ka' && lang !== 'en') return;
+    currentLang = lang;
+    localStorage.setItem('moon_lang', lang);
+    applyTranslations();
+  }
+
+  document.getElementById('langKa').addEventListener('click', () => setLanguage('ka'));
+  document.getElementById('langEn').addEventListener('click', () => setLanguage('en'));
+
+  // ---------- Collapsible "How to order" panel ----------
+  const howtoPanel = document.getElementById('howtoPanel');
+  const howtoHeadRow = document.getElementById('howtoHeadRow');
+  function toggleHowto(){ howtoPanel.classList.toggle('open'); }
+  howtoHeadRow.addEventListener('click', toggleHowto);
+
+  const warnPanel = document.getElementById('warnPanel');
+  const warnHeadRow = document.getElementById('warnHeadRow');
+  if (warnPanel && warnHeadRow) {
+    warnHeadRow.addEventListener('click', () => warnPanel.classList.toggle('open'));
+  }
+
+  // ---------- Collapsible "Portfolio" & "Why MOON" panels (collapsed by default) ----------
+  const portfolioPanel = document.getElementById('portfolioPanel');
+  const portfolioHeadRow = document.getElementById('portfolioHeadRow');
+  if (portfolioPanel && portfolioHeadRow) {
+    portfolioHeadRow.addEventListener('click', () => portfolioPanel.classList.toggle('open'));
+  }
+
+  const trustPanel = document.getElementById('trustPanel');
+  const trustHeadRow = document.getElementById('trustHeadRow');
+  if (trustPanel && trustHeadRow) {
+    trustHeadRow.addEventListener('click', () => trustPanel.classList.toggle('open'));
+  }
+
+  const chartBox = document.getElementById('chartBox');
+  const chartHeadRow = document.getElementById('chartHeadRow');
+  if (chartBox && chartHeadRow) {
+    chartHeadRow.addEventListener('click', () => chartBox.classList.toggle('open'));
+  }
+
+  // ---------- Portfolio cards (links kept out of visible text/markup content) ----------
+  const PORTFOLIO_LINKS = {
+    portfolioCard1: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbW9vbmFlZTI2L3ZpZGVvLzc2NjQ2OTk2MjU3ODk1OTA4MDQ/bGFuZz1lbg==',
+    portfolioCard2: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbWFydmVsdW5pdmVyc2VlMjYvdmlkZW8vNzY2MDE0NTgxNDE0MDAzMDIzMA=='
+  };
+  Object.keys(PORTFOLIO_LINKS).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.href = atob(PORTFOLIO_LINKS[id]);
+  });
+
+  // ============================================================
+  // 1) PRICE CALCULATOR (core logic, unchanged rate model)
+  // ============================================================
+  const secondsRange = document.getElementById('secondsRange');
+  const secondsInput = document.getElementById('secondsInput');
+  const msRange = document.getElementById('msRange');
+  const secVal = document.getElementById('secVal');
+  const msVal = document.getElementById('msVal');
+  const subToggle = document.getElementById('subToggle');
+  const priceDisplay = document.getElementById('priceDisplay');
+  const subNote = document.getElementById('subNote');
+  const tiktokLink = document.getElementById('tiktokLink');
+  const tiktokError = document.getElementById('tiktokError');
+
+  // PRICE_SCALE anchors the 5-second, non-subscriber rate (0.24₾/s) to a final
+  // 5s price for each video format. 1080p/60fps is the base format at 1.00₾,
+  // and every higher-quality format (more pixels and/or more frames to process)
+  // is scaled up from that same base by the same method — only the scale
+  // factor changes, the declining-rate shape (5s → 59.59s) is identical for
+  // every format.
+  const QUALITY_SCALES = {
+    '1080_60':  1.00 / 1.2,          // 1080p · 60fps  → 1.00₾ @5s / ~10.10₾ @59.59s (base, recommended)
+    '1080_120': (1.60/1.3) / 1.2,    // 1080p · 120fps → 1.23₾ @5s / ~12.43₾ @59.59s
+    '2k_60':    (1.90/1.3) / 1.2,    // 2K    · 60fps  → 1.46₾ @5s / ~14.76₾ @59.59s
+    '2k_120':   (2.20/1.3) / 1.2,    // 2K    · 120fps → 1.69₾ @5s / ~17.09₾ @59.59s
+    '4k_60':    (2.60/1.3) / 1.2,    // 4K    · 60fps  → 2.00₾ @5s / ~20.20₾ @59.59s
+    '4k_120':   (3.00/1.3) / 1.2     // 4K    · 120fps → 2.31₾ @5s / ~23.31₾ @59.59s
+  };
+
+  const QUALITY_LABELS = {
+    '1080_60':  '1080p · 60fps',
+    '1080_120': '1080p · 120fps',
+    '2k_60':    '2K · 60fps',
+    '2k_120':   '2K · 120fps',
+    '4k_60':    '4K · 60fps',
+    '4k_120':   '4K · 120fps'
+  };
+
+  let currentQuality = '1080_60';
+
+  function calculateExactPrice(seconds, milliseconds, isSubscriber, quality) {
+    const s = Math.max(0, Math.min(59, parseFloat(seconds || 0)));
+    const ms = Math.max(0, Math.min(59, parseFloat(milliseconds || 0)));
+    const totalSeconds = s + (ms / 100);
+
+    const billedSecondsForRate = Math.max(Math.min(s, 59), 5);
+
+    const PRICE_SCALE = QUALITY_SCALES[quality] || QUALITY_SCALES['1080_60'];
+
+    let ratePerSecond;
+    if (isSubscriber) {
+      ratePerSecond = 0.20 - ((billedSecondsForRate - 5) / 54) * (0.20 - 0.1525);
+    } else {
+      ratePerSecond = 0.24 - ((billedSecondsForRate - 5) / 54) * (0.24 - 0.2033);
+    }
+
+    let billedSeconds;
+    if (totalSeconds < 5) {
+      billedSeconds = 5;
+    } else if (s >= 59) {
+      billedSeconds = 59;
+    } else {
+      billedSeconds = totalSeconds;
+    }
+
+    const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE;
+    return totalPrice.toFixed(2);
+  }
+
+  function currentValues(){
+    let s = parseFloat(secondsInput.value || 0);
+    let ms = parseFloat(msRange.value || 0);
+    if (isNaN(s) || s < 0) s = 0;
+    if (s > 59) s = 59;
+    if (isNaN(ms) || ms < 0) ms = 0;
+    if (ms > 59) ms = 59;
+    return { s, ms, isSub: subToggle.checked, quality: currentQuality };
+  }
+
+  function refresh(){
+    const { s, ms, isSub, quality } = currentValues();
+
+    secondsInput.value = s;
+    secondsRange.value = Math.min(Math.max(s,5),59);
+    msRange.value = ms;
+
+    secVal.textContent = s;
+    msVal.textContent = String(ms).padStart(2,'0');
+
+    const price = calculateExactPrice(s, ms, isSub, quality);
+    priceDisplay.innerHTML = price + '<sup>₾</sup>';
+    priceDisplay.classList.remove('bump');
+    void priceDisplay.offsetWidth;
+    priceDisplay.classList.add('bump');
+
+    subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
+
+    if (typeof renderPriceChart === 'function') renderPriceChart();
+
+    return price;
+  }
+
+  secondsRange.addEventListener('input', () => {
+    secondsInput.value = secondsRange.value;
+    refresh();
+  });
+  secondsInput.addEventListener('input', () => refresh());
+  secondsInput.addEventListener('blur', () => {
+    let v = parseFloat(secondsInput.value || 0);
+    if (isNaN(v) || v < 0) v = 0;
+    if (v > 59) v = 59;
+    secondsInput.value = v;
+    refresh();
+  });
+  msRange.addEventListener('input', () => refresh());
+  subToggle.addEventListener('change', () => refresh());
+
+  const qualityGrid = document.getElementById('qualityGrid');
+  const qualityWarn = document.getElementById('qualityWarn');
+
+  function selectQuality(key){
+    if (!QUALITY_SCALES[key]) key = '1080_60';
+    currentQuality = key;
+    qualityGrid.querySelectorAll('.quality-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-quality') === key));
+    qualityWarn.classList.toggle('show', currentQuality !== '1080_60');
+  }
+
+  // Maps a scanned video's pixel dimensions + measured frame rate to the
+  // closest quality tier the calculator actually offers. Resolution is judged
+  // by the larger of the two dimensions (videos can be portrait or landscape);
+  // frame rate below 100fps is treated as the 60fps tier, since footage is
+  // essentially never shot at anything between 60 and 120 that isn't one or
+  // the other after rounding/variable-frame-rate jitter.
+  function detectQualityTier(width, height, fps){
+    const maxDim = Math.max(width || 0, height || 0);
+    let resTier = '1080';
+    if (maxDim >= 3600) resTier = '4k';
+    else if (maxDim >= 2400) resTier = '2k';
+    const fpsTier = (fps && fps >= 100) ? '120' : '60';
+    const key = `${resTier}_${fpsTier}`;
+    return QUALITY_SCALES[key] ? key : '1080_60';
+  }
+
+  qualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectQuality(btn.getAttribute('data-quality'));
+      refresh();
+    });
+  });
+
+  tiktokLink.addEventListener('input', () => {
+    if (tiktokLink.value.trim() !== '') {
+      tiktokLink.classList.remove('error');
+      tiktokError.style.display = 'none';
+    }
+  });
+
+  refresh();
+
+  // ============================================================
+  // 2) VIDEO DURATION SCANNER
+  // ============================================================
+  const dropZone = document.getElementById('dropZone');
+  const videoInput = document.getElementById('videoInput');
+  const scanProgress = document.getElementById('scanProgress');
+  const scanResult = document.getElementById('scanResult');
+  const srName = document.getElementById('srName');
+  const srDuration = document.getElementById('srDuration');
+  const srRequested = document.getElementById('srRequested');
+  const srQualityRow = document.getElementById('srQualityRow');
+  const srQuality = document.getElementById('srQuality');
+  const srPrice = document.getElementById('srPrice');
+  const srMatchNote = document.getElementById('srMatchNote');
+  const srMismatchNote = document.getElementById('srMismatchNote');
+  const srWarn = document.getElementById('srWarn');
+
+  ['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { dropZone.classList.remove('dragover'); }));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleVideoFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  videoInput.addEventListener('change', e => {
+    if (e.target.files && e.target.files[0]) handleVideoFile(e.target.files[0]);
+  });
+
+  function handleVideoFile(file){
+    if (!file.type.startsWith('video/')) {
+      alert(t('alertNotVideo'));
+      return;
+    }
+    scanResult.classList.remove('show');
+    scanProgress.classList.add('show');
+
+    const videoEl = document.createElement('video');
+    videoEl.preload = 'metadata';
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+    // Kept off-screen but still attached to the document: some browsers only
+    // fire requestVideoFrameCallback (used below for fps detection) reliably
+    // for elements that are part of the render tree.
+    videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
+    document.body.appendChild(videoEl);
+
+    const cleanup = () => {
+      scanProgress.classList.remove('show');
+      URL.revokeObjectURL(videoEl.src);
+      videoEl.remove();
+    };
+
+    const proceed = (duration) => {
+      const width = videoEl.videoWidth;
+      const height = videoEl.videoHeight;
+      detectFrameRate(videoEl).then(fps => {
+        finishScan(duration, file, width, height, fps);
+        cleanup();
+      });
+    };
+
+    videoEl.onloadedmetadata = function(){
+      // Chrome bug workaround: some containers report Infinity duration
+      // until a seek forces the real value to resolve.
+      if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
+        videoEl.currentTime = 1e101;
+        videoEl.ontimeupdate = function(){
+          videoEl.ontimeupdate = null;
+          const dur = videoEl.duration;
+          videoEl.currentTime = 0;
+          proceed(dur);
+        };
+      } else {
+        proceed(videoEl.duration);
+      }
+    };
+
+    videoEl.onerror = function(){
+      cleanup();
+      alert(t('alertReadError'));
+    };
+
+    videoEl.src = URL.createObjectURL(file);
+  }
+
+  // Browsers don't expose a video's encoded frame rate as plain metadata, so
+  // this plays a couple of silent, invisible frames and times the gaps between
+  // them via requestVideoFrameCallback, then snaps the result to the nearest
+  // common rate (24/25/30/50/60/120). Falls back to null (unknown) on browsers
+  // that don't support requestVideoFrameCallback, or if playback is blocked.
+  function detectFrameRate(videoEl){
+    return new Promise((resolve) => {
+      if (typeof videoEl.requestVideoFrameCallback !== 'function') {
+        resolve(null);
+        return;
+      }
+      const samples = [];
+      let settled = false;
+      let safetyTimer = null;
+
+      function finish(fps){
+        if (settled) return;
+        settled = true;
+        if (safetyTimer) clearTimeout(safetyTimer);
+        videoEl.pause();
+        resolve(fps);
+      }
+
+      function computeAndFinish(){
+        if (samples.length < 3) { finish(null); return; }
+        const deltas = [];
+        for (let i = 1; i < samples.length; i++) {
+          const d = samples[i] - samples[i - 1];
+          if (d > 0) deltas.push(d);
+        }
+        if (!deltas.length) { finish(null); return; }
+        deltas.sort((a, b) => a - b);
+        const mid = deltas[Math.floor(deltas.length / 2)];
+        const rawFps = 1 / mid;
+        const commonRates = [24, 25, 30, 50, 60, 120];
+        let closest = Math.round(rawFps);
+        let bestDiff = Infinity;
+        commonRates.forEach(r => {
+          const diff = Math.abs(r - rawFps);
+          if (diff < bestDiff) { bestDiff = diff; closest = r; }
+        });
+        finish(closest);
+      }
+
+      function onFrame(now, metadata){
+        samples.push(metadata.mediaTime);
+        if (samples.length < 10 && !settled) {
+          videoEl.requestVideoFrameCallback(onFrame);
+        } else {
+          computeAndFinish();
+        }
+      }
+
+      safetyTimer = setTimeout(() => computeAndFinish(), 1200);
+
+      videoEl.play().then(() => {
+        videoEl.requestVideoFrameCallback(onFrame);
+      }).catch(() => finish(null));
+    });
+  }
+
+  function finishScan(duration, file, width, height, fps){
+    let s = Math.floor(duration);
+    let ms = Math.round((duration - s) * 100);
+    if (ms === 100) { ms = 0; s += 1; }
+
+    const overLimit = (s > 59) || (s === 59 && ms > 59);
+    const sForCalc = Math.min(s, 59);
+    const msForCalc = overLimit ? 59 : ms;
+
+    secondsInput.value = sForCalc;
+    msRange.value = msForCalc;
+
+    // The user's own quality selection always drives the price — the scanner
+    // only reports what it found in the file for comparison, it never
+    // overrides the requested format.
+    const requestedQuality = currentQuality;
+    const hasDimensions = !!(width && height);
+    const detectedQuality = hasDimensions ? detectQualityTier(width, height, fps) : null;
+
+    const price = refresh();
+
+    srName.textContent = file.name.length > 24 ? file.name.slice(0,21) + '…' : file.name;
+    srDuration.textContent = `${s}.${String(ms).padStart(2,'0')} ${t('srUnit')}`;
+    srRequested.textContent = QUALITY_LABELS[requestedQuality] || QUALITY_LABELS['1080_60'];
+    srPrice.textContent = price + ' ₾';
+
+    if (hasDimensions) {
+      const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
+      srQuality.textContent = `${width}×${height} · ${fpsLabel}`;
+      srQualityRow.style.display = 'flex';
+
+      const reqLabel = QUALITY_LABELS[requestedQuality] || QUALITY_LABELS['1080_60'];
+      const detLabel = QUALITY_LABELS[detectedQuality] || QUALITY_LABELS['1080_60'];
+      if (detectedQuality === requestedQuality) {
+        srMatchNote.textContent = t('srMatchNote').replace('{REQ}', reqLabel);
+        srMatchNote.style.display = 'block';
+        srMismatchNote.style.display = 'none';
+      } else {
+        srMismatchNote.textContent = t('srMismatchNote').replace(/{REQ}/g, reqLabel).replace('{DET}', detLabel);
+        srMismatchNote.style.display = 'block';
+        srMatchNote.style.display = 'none';
+      }
+    } else {
+      srQualityRow.style.display = 'none';
+      srMatchNote.style.display = 'none';
+      srMismatchNote.style.display = 'none';
+    }
+
+    if (overLimit) {
+      srWarn.style.display = 'block';
+      srWarn.textContent = t('srWarnOver');
+    } else {
+      srWarn.style.display = 'none';
+    }
+
+    scanResult.classList.add('show');
+  }
+
+  // ============================================================
+  // 3) MULTI-CHANNEL ORDER SENDING (WhatsApp / Telegram)
+  // ============================================================
+  const PHONE_INTL = "995592630630"; // ნომერი WhatsApp-ისთვის
+  const TELEGRAM_USERNAME = "Moonknight0012"; // პირდაპირი Telegram ანგარიში შეკვეთებისთვის
+  const copyNote = document.getElementById('copyNote');
+
+  function buildOrderMessage(){
+    const { s, ms, isSub, quality } = currentValues();
+    const price = calculateExactPrice(s, ms, isSub, quality);
+    return `🎬 ახალი შეკვეთა — MOON
+ხანგრძლივობა: ${s}.${String(ms).padStart(2,'0')} წამი
+ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
+გამომწერი: ${isSub ? 'დიახ' : 'არა'}
+ღირებულება: ${price} ₾
+TikTok პროფილი: ${tiktokLink.value.trim()}`;
+  }
+
+  function validateBeforeSend(){
+    const linkVal = tiktokLink.value.trim();
+    if (!linkVal) {
+      tiktokLink.classList.add('error');
+      tiktokError.style.display = 'block';
+      tiktokLink.focus();
+      return false;
+    }
+    return true;
+  }
+
+  function copyToClipboard(text){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    // fallback for older/insecure contexts
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  function flashCopyNote(text){
+    copyNote.textContent = text;
+    copyNote.classList.add('active');
+    setTimeout(() => copyNote.classList.remove('active'), 4000);
+  }
+
+  // Tries to launch a native app via custom URI scheme. If the tab doesn't lose
+  // focus within the timeout (meaning no app intercepted the navigation), it runs
+  // the fallback instead. This avoids "always jumping to a bare webpage" when the
+  // app IS installed, and avoids "silently doing nothing" when it isn't.
+  function openNativeWithFallback(nativeUrl, fallback){
+    let handled = false;
+    const onBlur = () => { handled = true; };
+    window.addEventListener('blur', onBlur, { once: true });
+    window.addEventListener('visibilitychange', onBlur, { once: true });
+
+    window.location.href = nativeUrl;
+
+    setTimeout(() => {
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('visibilitychange', onBlur);
+      if (!handled) fallback();
+    }, 1200);
+  }
+
+  document.getElementById('orderBtnWA').addEventListener('click', () => {
+    if (!validateBeforeSend()) return;
+    const message = buildOrderMessage();
+    const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  });
+
+  document.getElementById('orderBtnTG').addEventListener('click', () => {
+    if (!validateBeforeSend()) return;
+    const message = buildOrderMessage();
+    copyToClipboard(message); // safety-net copy in case text prefill isn't supported on this client
+    // Opens the exact MOON Telegram account directly — no picker, one tap to send.
+    // Text prefill via ?text= works on most official Telegram apps; if a client
+    // ignores it, the message is already on the clipboard to paste in.
+    const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+    flashCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
+  });
+
+  // ============================================================
+  // 4) VISITOR COUNTER
+  // ============================================================
+  const visitorEl = document.getElementById('visitorBadge').querySelector('b');
+  const VISIT_KEY = 'moon_framerate_ge_total_visits_v2';
+  const VISITOR_BASE_OFFSET = 97;
+  const LAST_KNOWN_KEY = 'moon_visits_last_known';
+
+  function formatVisitorCount(n){
+    n = Math.max(0, Math.floor(n));
+    if (n < 1000) return String(n);
+    if (n < 1000000) {
+      const truncated = Math.floor(n / 100) / 10;
+      const str = (truncated % 1 === 0) ? truncated.toFixed(0) : truncated.toFixed(1);
+      return str + 'K';
+    }
+    const truncated = Math.floor(n / 100000) / 10;
+    const str = (truncated % 1 === 0) ? truncated.toFixed(0) : truncated.toFixed(1);
+    return str + 'M';
+  }
+
+  function setVisitorDisplay(n){
+    const formatted = formatVisitorCount(n);
+    visitorEl.textContent = formatted;
+  }
+
+  function cacheKnownCount(n){
+    try { localStorage.setItem(LAST_KNOWN_KEY, String(n)); } catch(e){ /* ignore */ }
+  }
+
+  function showLastKnownOrBaseline(){
+    const cached = parseInt(localStorage.getItem(LAST_KNOWN_KEY) || '', 10);
+    setVisitorDisplay(!isNaN(cached) ? cached : VISITOR_BASE_OFFSET);
+  }
+
+  const alreadyCountedThisSession = sessionStorage.getItem('moon_visit_counted');
+  const endpoint = alreadyCountedThisSession
+    ? `https://countapi.mileshilliard.com/api/v1/get/${VISIT_KEY}`
+    : `https://countapi.mileshilliard.com/api/v1/hit/${VISIT_KEY}`;
+
+  fetch(endpoint)
+    .then(r => { if (!r.ok) throw new Error('bad response'); return r.json(); })
+    .then(data => {
+      const count = parseInt(data && data.value, 10);
+      if (!isNaN(count)) {
+        const displayCount = count + VISITOR_BASE_OFFSET;
+        setVisitorDisplay(displayCount);
+        cacheKnownCount(displayCount);
+        sessionStorage.setItem('moon_visit_counted', '1');
+      } else {
+        showLastKnownOrBaseline();
+      }
+    })
+    .catch(() => showLastKnownOrBaseline());
+
+  // ============================================================
+  // 5) AI ASSISTANT — free, on-device rule-based FAQ engine
+  // ============================================================
+  const chatFab = document.getElementById('chatFab');
+  const chatPanel = document.getElementById('chatPanel');
+  const chatClose = document.getElementById('chatClose');
+  const chatBody = document.getElementById('chatBody');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+
+  chatFab.addEventListener('click', () => {
+    chatPanel.classList.toggle('open');
+    chatFab.querySelector('.badge-dot').style.display = 'none';
+    if (chatBody.children.length === 0) botGreet();
+  });
+  chatClose.addEventListener('click', () => chatPanel.classList.remove('open'));
+
+  function addMsg(role, html){
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.innerHTML = html;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return div;
+  }
+
+  function addQuickReplies(options){
+    const wrap = document.createElement('div');
+    wrap.className = 'quick-replies';
+    options.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'qr-btn';
+      b.textContent = opt;
+      b.addEventListener('click', () => { chatInput.value = opt; sendChat(); });
+      wrap.appendChild(b);
+    });
+    chatBody.appendChild(wrap);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function botGreet(){
+    addMsg('bot', '🌙 გამარჯობა! ჩატის გასაგრძელებლად აირჩიე ენა 👇<br>Hi! Please choose a language to continue 👇');
+    addLangChoice();
+  }
+
+  function addLangChoice(){
+    const wrap = document.createElement('div');
+    wrap.className = 'quick-replies';
+
+    const btnKa = document.createElement('button');
+    btnKa.className = 'qr-btn';
+    btnKa.textContent = 'ქართული';
+    btnKa.addEventListener('click', () => {
+      wrap.remove();
+      addMsg('user', 'ქართული');
+      setLanguage('ka');
+      setTimeout(realGreeting, 300);
+    });
+
+    const btnEn = document.createElement('button');
+    btnEn.className = 'qr-btn';
+    btnEn.textContent = 'ENGLISH';
+    btnEn.addEventListener('click', () => {
+      wrap.remove();
+      addMsg('user', 'ENGLISH');
+      setLanguage('en');
+      setTimeout(realGreeting, 300);
+    });
+
+    wrap.appendChild(btnKa);
+    wrap.appendChild(btnEn);
+    chatBody.appendChild(wrap);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function realGreeting(){
+    if (currentLang === 'en') {
+      addMsg('bot', "Hi! 🌙 I'm MOON's assistant. Ask me about pricing, deadlines, video requirements, or the order process.");
+      addQuickReplies(['How much does it cost?', 'How long does it take?', 'What are the video requirements?', 'How do I place an order?']);
+    } else {
+      addMsg('bot', 'გამარჯობა! 🌙 მე ვარ MOON-ის ასისტენტი. დამისვი კითხვა ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.');
+      addQuickReplies(['რა ღირს?', 'რამდენ ხანში მზადდება?', 'რა მოთხოვნაა ვიდეოზე?', 'როგორ შევუკვეთო?']);
+    }
+  }
+
+  // Knowledge base: each rule = keywords[] + answer (+ optional quick replies)
+  const KB_KA = [
+    {
+      kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
+      a: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობასა და ხარისხზე (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). სტანდარტული 1080p/60fps ხარისხისთვის: მინ. 5 წამი — 1.00₾-დან, მაქს. 59.59 წამი — დაახლ. 10₾-მდე. მაღალი ხარისხის ფორმატები შესაბამისად უფრო ძვირია. კალკულატორში სლაიდერით მონიშნე ხანგრძლივობა, აირჩიე ხარისხი ან ატვირთე ვიდეო — ფასი ავტომატურად გამოითვლება. გამომწერებისთვის ტარიფი დაბალია.',
+      qr: ['არხის გამოწერით რამდენით იაფდება?', 'რა მოთხოვნაა ვიდეოზე?']
+    },
+    {
+      kw: ['გამომწერ','subscriber','გამოწერ'],
+      a: 'თუ არხის გამომწერი ხარ, ჩართე გადამრთველი „ვარ არხის გამომწერი" — ფასი ავტომატურად დაბალდება ყველა ხანგრძლივობაზე.',
+    },
+    {
+      kw: ['ვად','რამდენ ხანში','მზადდება','deadline','დრო სჭირდება'],
+      a: 'სტანდარტული მონტაჟის ვადა დამოკიდებულია დატვირთვაზე — ზუსტი ვადისთვის საუკეთესოა პირდაპირ დაგვიკავშირდე შეკვეთის გაგზავნისას (WhatsApp/Telegram ღილაკებით ქვემოთ), მენეჯერი დაგიდასტურებთ ვადას შეკვეთისთანავე.',
+    },
+    {
+      kw: ['მოთხოვნ','ხარისხ','1080','60fps','ფორმატ','რეზოლუც'],
+      a: 'რეკომენდირებული ფორმატია 1080×1920 რეზოლუცია, 60fps. კალკულატორში ასევე ხელმისაწვდომია 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps ვარიანტები (მაღალი ფასით), მაგრამ არ გირჩევთ, რადგან შესაძლოა მაყურებელს ვიდეო თავისით გაუჭედდეს. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ფასდება ინდივიდუალურად.',
+    },
+    {
+      kw: ['tiktok','ტიკტოკ'],
+      a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
+    },
+    {
+      kw: ['პაბჯ','pubg'],
+      a: '1) EXIT GAME<br>2) DELETE GAME<br>3) YOU ARE DONE<br>4) მოიცა, არ დაგვიმთავრებია.<br>5) DELETE ANUKA FROM THE PLANET<br>6) NOW YOU ARE DONE',
+    },
+    {
+      kw: ['ატვირთვის გვერდ','ატვირთვის საიტ','two313','ატვირთვა'],
+      a: 'ვიდეოს ატვირთვისთვის გამოიყენე ეს გვერდი: mooontransferr.onrender.com — ატვირთე ვიდეო, მიღებული ლინკი კი გამოგვიგზავნე WhatsApp ან Telegram ღილაკით.',
+    },
+    {
+      kw: ['როგორ შევუკვეთო','შეკვეთ','ორდერ','დაკვეთ'],
+      a: 'გამოთვალე ფასი კალკულატორში, ატვირთე ვიდეო ატვირთვის გვერდზე (mooontransferr.onrender.com), მიუთითე TikTok ლინკი და დააჭირე WhatsApp ან Telegram ღილაკს — არჩეული პროგრამა გაიხსნება მზა შეკვეთის ტექსტით.',
+      qr: ['რომელი არხით შემიძლია შეკვეთა?']
+    },
+    {
+      kw: ['არხ','whatsapp','telegram','ტელეგრამ','ვატსაპ'],
+      a: 'შეკვეთის გაგზავნა შესაძლებელია WhatsApp ან Telegram არხზე. WhatsApp +995 592 630 630 ნომერზეა მიბმული; Telegram-ზე პირდაპირ @Moonknight0012 ანგარიშთან იხსნება ჩატი, მზა ტექსტით.',
+    },
+    {
+      kw: ['ნომერ','ტელეფონ','საკონტაქტო','დაკავშირ'],
+      a: 'საკონტაქტო ნომერი WhatsApp-ისთვის: +995 592 630 630. Telegram-ზე პირდაპირ მოგვწერე: @Moonknight0012.',
+    },
+    {
+      kw: ['ატვირთ','ვიდეოს შემოწმ','scan','სკან','ხანგრძლივობის გაზომ'],
+      a: 'ზემოთ „VIDEO SCANNER" ბლოკში შეგიძლია ატვირთო ან გადმოიტანო ვიდეო ფაილი — ბრაუზერი ავტომატურად წაიკითხავს ხანგრძლივობას წამებსა და მილიწამებში და თავად ჩასვამს კალკულატორში ფასის გამოსათვლელად. ეს მხოლოდ ხანგრძლივობის გასაზომად არის — შეკვეთის ვიდეო ცალკე უნდა ატვირთო ამ გვერდზე: https://mooontransferr.onrender.com/',
+    },
+    {
+      kw: ['გადახდ','ანგარიშსწორ','ბარათ','ნაღდი'],
+      a: 'გადახდის დეტალებს მენეჯერი დაგიზუსტებთ პირდაპირ ჩატში შეკვეთის დადასტურების შემდეგ.',
+    },
+    {
+      kw: ['გამარჯობა','სალამ','hi','hello','მოგესალმ'],
+      a: 'გამარჯობა! რითი დაგეხმარო? შეგიძლია მკითხო ფასზე, ვადებზე, მოთხოვნებზე ან შეკვეთის პროცესზე.',
+    },
+    {
+      kw: ['მადლობ','გმადლობ','thanks','thank you'],
+      a: 'იყავი მოხარული დახმარებით! 🌙 კიდევ რამე თუ გაინტერესებს — მზად ვარ.',
+    },
+  ];
+
+  const KB_EN = [
+    {
+      kw: ['price','cost','how much','rate','discount'],
+      a: 'The price depends on both video duration and quality (1080p/60fps → 1080p/120fps → 2K/60fps → 2K/120fps → 4K/60fps → 4K/120fps). For the standard 1080p/60fps format: min. 5 seconds → from 1.00₾, max. 59.59 seconds → up to about 10₾. Higher-quality formats cost proportionally more. Use the slider in the calculator to set the duration, pick a quality, or upload a video — the price is calculated automatically. Subscribers get a lower rate.',
+      qr: ['How much cheaper for subscribers?', 'What are the video requirements?']
+    },
+    {
+      kw: ['subscriber','subscribe','subscription'],
+      a: 'If you\'re a channel subscriber, turn on the "I\'m a channel subscriber" toggle — the price automatically drops for every duration.',
+    },
+    {
+      kw: ['deadline','how long','turnaround','time does it take','when will it be ready'],
+      a: 'The standard editing turnaround depends on current workload — for an exact deadline it\'s best to contact us directly when sending your order (WhatsApp/Telegram buttons below); a manager will confirm the deadline right after you order.',
+    },
+    {
+      kw: ['requirement','quality','1080','60fps','format','resolution'],
+      a: 'The recommended format is 1080×1920 resolution at 60fps. The calculator also offers 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps (at a higher price), but we don\'t recommend them, since the video may glitch for viewers. Duration must not exceed 59.59 seconds — anything longer is priced individually.',
+    },
+    {
+      kw: ['tiktok'],
+      a: 'Editing is done only for the TikTok format. To send an order you must provide your TikTok profile link in the field.',
+    },
+    {
+      kw: ['upload page','upload site','two313','upload video'],
+      a: 'To upload your video use this page: mooontransferr.onrender.com — upload your video, then send us the resulting link via the WhatsApp or Telegram button.',
+    },
+    {
+      kw: ['how to order','place an order','order process','how do i order'],
+      a: 'Calculate the price in the calculator, upload your video on the upload page (mooontransferr.onrender.com), enter your TikTok link, and press the WhatsApp or Telegram button — the chosen app will open with a ready-made order message.',
+      qr: ['Which channel can I order through?']
+    },
+    {
+      kw: ['channel','whatsapp','telegram'],
+      a: 'You can send your order via WhatsApp or Telegram. WhatsApp is linked to +995 592 630 630; Telegram opens a chat directly with @Moonknight0012, with the message pre-filled.',
+    },
+    {
+      kw: ['number','phone','contact'],
+      a: 'Contact number for WhatsApp: +995 592 630 630. On Telegram, message us directly: @Moonknight0012.',
+    },
+    {
+      kw: ['upload','check video','scan','measure duration'],
+      a: 'In the "VIDEO SCANNER" block above you can upload or drag in a video file — the browser will automatically read the duration in seconds and milliseconds and fill it into the calculator to compute the price. That\'s just for measuring duration — your order video itself must be uploaded separately here: https://mooontransferr.onrender.com/',
+    },
+    {
+      kw: ['payment','pay','card','cash'],
+      a: 'A manager will confirm payment details directly in chat after your order is confirmed.',
+    },
+    {
+      kw: ['hi','hello','hey'],
+      a: 'Hello! How can I help? You can ask me about pricing, deadlines, requirements, or the order process.',
+    },
+    {
+      kw: ['thanks','thank you'],
+      a: 'Happy to help! 🌙 If anything else comes up — I\'m here.',
+    },
+  ];
+
+  // Small built-in geography trivia, so the assistant isn't limited to only
+  // MOON-related topics. This is a hand-written lookup table, not a live AI
+  // model — it only knows what's listed here.
+  const CAPITALS_KA = {
+    'საქართველო': 'თბილისი',
+    'რუსეთ': 'მოსკოვი',
+    'საფრანგეთ': 'პარიზი',
+    'გერმანი': 'ბერლინი',
+    'იტალი': 'რომი',
+    'ესპანეთ': 'მადრიდი',
+    'თურქეთ': 'ანკარა',
+    'აშშ': 'ვაშინგტონი',
+    'ამერიკ': 'ვაშინგტონი',
+    'ინგლის': 'ლონდონი',
+    'ბრიტანეთ': 'ლონდონი',
+    'იაპონი': 'ტოკიო',
+    'ჩინეთ': 'პეკინი',
+    'უკრაინ': 'კიევი',
+    'სომხეთ': 'ერევანი',
+    'აზერბაიჯან': 'ბაქო',
+    'პოლონეთ': 'ვარშავა',
+    'ბერძნეთ': 'ათენი',
+  };
+
+  const CAPITALS_EN = {
+    'georgia': 'Tbilisi',
+    'russia': 'Moscow',
+    'france': 'Paris',
+    'germany': 'Berlin',
+    'italy': 'Rome',
+    'spain': 'Madrid',
+    'turkey': 'Ankara',
+    'usa': 'Washington, D.C.',
+    'united states': 'Washington, D.C.',
+    'america': 'Washington, D.C.',
+    'england': 'London',
+    'britain': 'London',
+    'uk': 'London',
+    'japan': 'Tokyo',
+    'china': 'Beijing',
+    'ukraine': 'Kyiv',
+    'armenia': 'Yerevan',
+    'azerbaijan': 'Baku',
+    'poland': 'Warsaw',
+    'greece': 'Athens',
+  };
+
+  function findCapitalAnswer(lowerText){
+    if (currentLang === 'en') {
+      if (!lowerText.includes('capital')) return null;
+      for (const country in CAPITALS_EN) {
+        if (lowerText.includes(country)) {
+          return `The capital is: ${CAPITALS_EN[country]} 🌍`;
+        }
+      }
+      return 'Name a specific country and I\'ll tell you its capital 🌍 (e.g. "capital of Georgia").';
+    }
+    if (!lowerText.includes('დედაქალაქ')) return null;
+    for (const country in CAPITALS_KA) {
+      if (lowerText.includes(country)) {
+        return `დედაქალაქია: ${CAPITALS_KA[country]} 🌍`;
+      }
+    }
+    return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: „საქართველოს დედაქალაქი").';
+  }
+
+  function findAnswer(text){
+    const lowerText = text.toLowerCase();
+    const kb = currentLang === 'en' ? KB_EN : KB_KA;
+    for (const rule of kb) {
+      if (rule.kw.some(k => lowerText.includes(k))) return rule;
+    }
+    return null;
+  }
+
+  function sendChat(){
+    const text = chatInput.value.trim();
+    if (!text) return;
+    addMsg('user', text.replace(/</g,'&lt;'));
+    chatInput.value = '';
+
+    setTimeout(() => {
+      const rule = findAnswer(text);
+      if (rule) {
+        addMsg('bot', rule.a);
+        if (rule.qr) addQuickReplies(rule.qr);
+        return;
+      }
+      const capitalAnswer = findCapitalAnswer(text.toLowerCase());
+      if (capitalAnswer) {
+        addMsg('bot', capitalAnswer);
+        return;
+      }
+      if (currentLang === 'en') {
+        addMsg('bot', "I don't know that specific detail — but I can help with pricing, deadlines, video requirements, or the order process. Or contact us directly using the buttons below.");
+        addQuickReplies(['How much does it cost?', 'How do I place an order?']);
+      } else {
+        addMsg('bot', 'ეს კონკრეტული დეტალი ჩემთვის უცნობია — მაგრამ შემიძლია დაგეხმარო ფასის, ვადების, ვიდეოს მოთხოვნებისა თუ შეკვეთის პროცესთან დაკავშირებით. ან პირდაპირ დაგვიკავშირდი ღილაკებით ქვემოთ.');
+        addQuickReplies(['რა ღირს?', 'როგორ შევუკვეთო?']);
+      }
+    }, 350);
+  }
+
+  chatSend.addEventListener('click', sendChat);
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+  // ============================================================
+  // 6) PRICE COMPARISON CHART
+  // ============================================================
+  function renderPriceChart(){
+    const container = document.getElementById('priceChart');
+    if (!container) return;
+    const { s, ms, isSub } = currentValues();
+    const qualities = Object.keys(QUALITY_SCALES);
+    const prices = qualities.map(q => parseFloat(calculateExactPrice(s, ms, isSub, q)));
+    const maxPrice = Math.max(...prices, 0.01);
+    container.innerHTML = qualities.map((q, i) => {
+      const price = prices[i];
+      const pct = Math.max(6, Math.round((price / maxPrice) * 100));
+      const isActive = q === currentQuality;
+      return '<div class="chart-row' + (isActive ? ' active' : '') + '">' +
+        '<div class="cr-name">' + QUALITY_LABELS[q] + '</div>' +
+        '<div class="cr-track"><div class="cr-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="cr-price">' + price.toFixed(2) + '₾</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ============================================================
+  // 7) SHARED BACKEND — lightweight anonymous JSON store used to
+  // sync comments and the admin visit log across every visitor's
+  // browser (this site has no server of its own, so this fills that
+  // gap). Reads/writes a small number of fixed paths under one
+  // namespace; failures are silent and never block the page.
+  // ============================================================
+  const MDB_BASE = 'https://mantledb.sh/v2';
+  const MDB_NS = 'moonge-tbilisi-vc7f3q';
+
+  async function mdbRead(path){
+    try{
+      const r = await fetch(MDB_BASE + '/' + MDB_NS + '/' + path, { cache: 'no-store' });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch(e){ return null; }
+  }
+  async function mdbWrite(path, data){
+    try{
+      const r = await fetch(MDB_BASE + '/' + MDB_NS + '/' + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return r.ok;
+    } catch(e){ return false; }
+  }
+
+  // ============================================================
+  // 8) COMMENTS SYSTEM (with 1-5 star ratings, admin badge, replies)
+  // ============================================================
+  const commentName = document.getElementById('commentName');
+  const commentText = document.getElementById('commentText');
+  const commentError = document.getElementById('commentError');
+  const commentSubmit = document.getElementById('commentSubmit');
+  const commentList = document.getElementById('commentList');
+  const commentEmpty = document.getElementById('commentEmpty');
+  const rpStars = document.getElementById('rpStars');
+  const adminModeRow = document.getElementById('adminModeRow');
+  const adminModeCheckbox = document.getElementById('adminModeCheckbox');
+  let selectedRating = 0;
+
+  if (rpStars) {
+    const starEls = Array.from(rpStars.querySelectorAll('.rp-star'));
+    function paintStars(val){
+      starEls.forEach(el => el.classList.toggle('filled', parseInt(el.getAttribute('data-val'),10) <= val));
+    }
+    starEls.forEach(el => {
+      el.addEventListener('mouseenter', () => paintStars(parseInt(el.getAttribute('data-val'),10)));
+      el.addEventListener('click', () => {
+        selectedRating = parseInt(el.getAttribute('data-val'),10);
+        paintStars(selectedRating);
+      });
+    });
+    rpStars.addEventListener('mouseleave', () => paintStars(selectedRating));
+  }
+
+  // Basic uncensored-language filter — blocks the most common Georgian
+  // and English profanity/slurs before a comment is ever published.
+  // This runs in the browser, so it's a courtesy filter, not a hard
+  // security boundary; the admin panel can still remove anything that
+  // slips through.
+  const PROFANITY_LIST = [
+    'ყლე','ყლეო','ტიტინა','ჯავრიანი','დებილ','იდიოტ','ლახტი','დედაშენ','დედას',
+    'მამაშენ','ჰუიო','ხუი','пизд','блять','бля','сука','хуй','нахуй','ебал',
+    'fuck','shit','bitch','asshole','bastard','cunt','dick','whore','slut',
+    'nigger','faggot','retard'
+  ];
+  function containsProfanity(str){
+    const lower = str.toLowerCase();
+    return PROFANITY_LIST.some(w => lower.includes(w));
+  }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function formatCommentDate(ts){
+    try{
+      return new Date(ts).toLocaleString(currentLang === 'ka' ? 'ka-GE' : 'en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e){ return ''; }
+  }
+  function starsString(n){
+    const r = Math.max(0, Math.min(5, Math.round(n || 0)));
+    return '★'.repeat(r) + '☆'.repeat(5 - r);
+  }
+
+  // ---------- Admin identity helper ----------
+  // Deliberately in-memory only — NOT saved to localStorage/sessionStorage.
+  // That means logging in as admin only lasts for the current page load:
+  // reload the page (or open it fresh) and it's gone, and the password has
+  // to be typed again. This is what stops a comment from silently defaulting
+  // to "ADMIN" for a visitor who never logged in this visit.
+  let adminAuthenticated = false;
+  let adminPostAsAdminPref = true;
+  function isAdminUser(){
+    return adminAuthenticated;
+  }
+  function adminDisplayName(){
+    return currentLang === 'en' ? 'Admin' : 'ადმინი';
+  }
+  // True only when this device is an authenticated admin AND the toggle is
+  // switched to "post as admin". False (normal visitor) otherwise.
+  function getAdminPostMode(){
+    return isAdminUser() && !!(adminModeCheckbox && adminModeCheckbox.checked);
+  }
+  // Called once right after a successful login — syncs the checkbox to the
+  // in-memory preference before anything reads it.
+  function initAdminModeCheckbox(){
+    if (!adminModeCheckbox || !isAdminUser()) return;
+    adminModeCheckbox.checked = adminPostAsAdminPref;
+  }
+  if (adminModeCheckbox) {
+    adminModeCheckbox.addEventListener('change', () => {
+      adminPostAsAdminPref = adminModeCheckbox.checked;
+      applyAdminNameLock();
+    });
+  }
+  function applyAdminNameLock(){
+    if (!commentName) return;
+    if (adminModeRow) adminModeRow.style.display = isAdminUser() ? 'flex' : 'none';
+    if (getAdminPostMode()) {
+      commentName.value = adminDisplayName();
+      commentName.setAttribute('readonly', 'readonly');
+      commentName.style.opacity = '0.75';
+    } else {
+      commentName.removeAttribute('readonly');
+      commentName.style.opacity = '';
+      if (commentName.value === adminDisplayName()) commentName.value = '';
+    }
+  }
+
+  let commentsCache = [];
+
+  function computeAverageRating(){
+    const rated = commentsCache.filter(c => typeof c.rating === 'number' && c.rating > 0);
+    if (!rated.length) return null;
+    const avg = rated.reduce((sum, c) => sum + c.rating, 0) / rated.length;
+    return { avg, count: rated.length };
+  }
+
+  function renderTrustRating(){
+    // Average rating is shown only in the comments section now — removed
+    // from the trust bar near the top of the page.
+    const stat = computeAverageRating();
+    const cRow = document.getElementById('commentsRatingRow');
+    const cStars = document.getElementById('commentsAvgStars');
+    const cText = document.getElementById('commentsAvgText');
+    if (!stat) {
+      if (cRow) cRow.style.display = 'none';
+      return;
+    }
+    const avgStr = stat.avg.toFixed(1);
+    if (cRow && cStars && cText) {
+      cStars.textContent = starsString(stat.avg);
+      cText.innerHTML = t('commentsAvgText').replace('{AVG}', avgStr).replace('{COUNT}', stat.count);
+      cRow.style.display = 'flex';
+    }
+  }
+
+  function renderReplies(comment){
+    const replies = Array.isArray(comment.replies) ? comment.replies : [];
+    if (!replies.length) return '';
+    return '<div class="c-replies">' + replies.map(r =>
+      '<div class="c-reply-item"><div class="c-head"><span class="c-author">' + escapeHtml(r.name) +
+      (r.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
+      '</span><span class="c-date">' + formatCommentDate(r.ts) + '</span></div>' +
+      '<div class="c-body">' + escapeHtml(r.text) + '</div></div>'
+    ).join('') + '</div>';
+  }
+
+  function renderComments(){
+    if (!commentList) return;
+    applyAdminNameLock();
+    if (!commentsCache.length) {
+      commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
+    } else {
+      commentList.innerHTML = commentsCache.map(c =>
+        '<div class="c-item" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
+        (c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
+        (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
+        '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
+        '<div class="c-body">' + escapeHtml(c.text) + '</div>' +
+        renderReplies(c) +
+        '<div class="c-actions"><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
+        '<div class="c-reply-form" id="replyForm_' + c.id + '">' +
+          '<input type="text" class="c-reply-name" maxlength="40" placeholder="' + t('commentNamePh') + '">' +
+          '<textarea class="c-reply-text" maxlength="300" placeholder="' + t('commentTextPh') + '"></textarea>' +
+          '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
+        '</div>' +
+        '</div>'
+      ).join('');
+    }
+    renderTrustRating();
+    wireReplyButtons();
+  }
+
+  function wireReplyButtons(){
+    commentList.querySelectorAll('.c-reply-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const form = document.getElementById('replyForm_' + id);
+        if (!form) return;
+        const wasOpen = form.classList.contains('open');
+        commentList.querySelectorAll('.c-reply-form.open').forEach(f => f.classList.remove('open'));
+        if (!wasOpen) {
+          form.classList.add('open');
+          const nameEl = form.querySelector('.c-reply-name');
+          if (getAdminPostMode()) {
+            nameEl.value = adminDisplayName();
+            nameEl.setAttribute('readonly', 'readonly');
+          } else {
+            nameEl.removeAttribute('readonly');
+          }
+          form.querySelector('.c-reply-text').focus();
+        }
+      });
+    });
+    commentList.querySelectorAll('.c-reply-submit').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        const form = document.getElementById('replyForm_' + id);
+        if (!form) return;
+        const nameEl = form.querySelector('.c-reply-name');
+        const textEl = form.querySelector('.c-reply-text');
+        const name = (nameEl.value || '').trim();
+        const text = (textEl.value || '').trim();
+        if (!name || !text) return;
+        if (containsProfanity(name) || containsProfanity(text)) {
+          alert(t('commentErrProfanity'));
+          return;
+        }
+        btn.disabled = true;
+        const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: getAdminPostMode() };
+        const fresh = await mdbRead('comments');
+        let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
+        list = list.map(c => {
+          if (String(c.id) === String(id)) {
+            const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
+            replies.push(replyEntry);
+            return Object.assign({}, c, { replies });
+          }
+          return c;
+        });
+        const ok = await mdbWrite('comments', { list });
+        btn.disabled = false;
+        if (ok) {
+          commentsCache = list;
+          renderComments();
+        }
+      });
+    });
+  }
+
+  async function loadComments(){
+    const data = await mdbRead('comments');
+    commentsCache = (data && Array.isArray(data.list)) ? data.list : [];
+    renderComments();
+  }
+
+  function showCommentError(msg){
+    commentError.textContent = msg;
+    commentError.classList.add('show');
+  }
+  function hideCommentError(){
+    commentError.classList.remove('show');
+  }
+
+  if (commentSubmit) {
+    commentSubmit.addEventListener('click', async () => {
+      hideCommentError();
+      const asAdmin = getAdminPostMode();
+      const name = asAdmin ? adminDisplayName() : (commentName.value || '').trim();
+      const text = (commentText.value || '').trim();
+      if (!name || !text) {
+        showCommentError(t('commentErrEmpty'));
+        return;
+      }
+      if (containsProfanity(name) || containsProfanity(text)) {
+        showCommentError(t('commentErrProfanity'));
+        return;
+      }
+      commentSubmit.disabled = true;
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, replies: [] };
+      // Re-read the latest list right before writing to minimize (not
+      // fully eliminate) lost updates from concurrent commenters.
+      const fresh = await mdbRead('comments');
+      const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
+      const updated = [entry, ...list].slice(0, 200);
+      const ok = await mdbWrite('comments', { list: updated });
+      commentSubmit.disabled = false;
+      if (!ok) {
+        showCommentError(t('commentErrGeneric'));
+        return;
+      }
+      commentsCache = updated;
+      renderComments();
+      if (!asAdmin) commentName.value = '';
+      commentText.value = '';
+      selectedRating = 0;
+      if (rpStars) rpStars.querySelectorAll('.rp-star').forEach(el => el.classList.remove('filled'));
+    });
+  }
+
+  loadComments();
+
+  // ============================================================
+  // 9) VISITOR LOG (device + approximate location) — feeds the
+  // admin panel's "Visitors" tab. Logged once per browser session.
+  // ============================================================
+  function detectDevice(){
+    const ua = navigator.userAgent || '';
+    let os = 'Unknown OS';
+    if (/Windows/i.test(ua)) os = 'Windows';
+    else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+    else if (/Android/i.test(ua)) os = 'Android';
+    else if (/Mac OS X/i.test(ua)) os = 'macOS';
+    else if (/Linux/i.test(ua)) os = 'Linux';
+
+    let browser = 'Unknown';
+    if (/Edg\//i.test(ua)) browser = 'Edge';
+    else if (/OPR\//i.test(ua)) browser = 'Opera';
+    else if (/Chrome\//i.test(ua) && !/Chromium/i.test(ua)) browser = 'Chrome';
+    else if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+    else if (/Firefox\//i.test(ua)) browser = 'Firefox';
+
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+    return os + ' · ' + browser + (isMobile ? ' · Mobile' : ' · Desktop');
+  }
+
+  async function detectLocation(){
+    try{
+      const r = await fetch('https://ipapi.co/json/');
+      if (!r.ok) throw new Error('bad response');
+      const data = await r.json();
+      if (data && data.city) return data.city + (data.country_name ? ', ' + data.country_name : '');
+      return 'Unknown';
+    } catch(e){ return 'Unknown'; }
+  }
+
+  async function logVisit(){
+    if (sessionStorage.getItem('moon_visit_logged')) return;
+    sessionStorage.setItem('moon_visit_logged', '1');
+    const device = detectDevice();
+    const location = await detectLocation();
+    const entry = { ts: Date.now(), device, location };
+    const fresh = await mdbRead('visits');
+    const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
+    const updated = [entry, ...list].slice(0, 300);
+    mdbWrite('visits', { list: updated });
+  }
+
+  logVisit();
+
+  // ============================================================
+  // 10) ADMIN PANEL — gated with a password, shows the visit log
+  // and lets the admin edit/remove comments. Successful login also
+  // flags this device so comments/replies show as "ADMIN".
+  // ============================================================
+  const ADMIN_PASSWORD = '0070';
+  const adminGear = document.getElementById('adminGear');
+
+  // The gear icon stays invisible until the password itself is typed
+  // anywhere on the page (no visible trigger otherwise) — then it fades
+  // in and can be clicked to open the normal login screen below.
+  (function initAdminGearReveal(){
+    function checkReveal(str){
+      if (!adminGear || adminGear.classList.contains('revealed')) return;
+      if (typeof str === 'string' && str.slice(-ADMIN_PASSWORD.length) === ADMIN_PASSWORD) {
+        adminGear.classList.add('revealed');
+      }
+    }
+    let typed = '';
+    document.addEventListener('keydown', (e) => {
+      if (!adminGear || adminGear.classList.contains('revealed')) return;
+      if (e.key.length !== 1) return; // ignore Shift, Enter, arrows, etc.
+      typed = (typed + e.key).slice(-ADMIN_PASSWORD.length);
+      checkReveal(typed);
+    });
+    // Mobile fallback: phones only show a keyboard once a text field is
+    // focused, and some virtual keyboards don't report real keydown keys.
+    // So also watch what actually lands in any visible text field on the
+    // page (e.g. the TikTok link or comment fields) — typing 0070 into
+    // any of them reveals the gear the same way.
+    document.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
+      if (el.type === 'password') return;
+      checkReveal(String(el.value || ''));
+    });
+  })();
+
+  const adminOverlay = document.getElementById('adminOverlay');
+  const adminLogin = document.getElementById('adminLogin');
+  const adminDashboard = document.getElementById('adminDashboard');
+  const adminPass = document.getElementById('adminPass');
+  const adminGo = document.getElementById('adminGo');
+  const adminErr = document.getElementById('adminErr');
+  const adminTabVisits = document.getElementById('adminTabVisits');
+  const adminTabComments = document.getElementById('adminTabComments');
+  const adminPanelVisits = document.getElementById('adminPanelVisits');
+  const adminPanelComments = document.getElementById('adminPanelComments');
+
+  function openAdmin(){
+    adminOverlay.classList.add('open');
+    adminLogin.style.display = 'block';
+    adminDashboard.style.display = 'none';
+    adminPass.value = '';
+    adminErr.classList.remove('show');
+  }
+  function closeAdmin(){
+    adminOverlay.classList.remove('open');
+  }
+
+  if (adminGear) adminGear.addEventListener('click', openAdmin);
+  document.getElementById('adminCloseLogin').addEventListener('click', closeAdmin);
+  document.getElementById('adminCloseDash').addEventListener('click', closeAdmin);
+  adminOverlay.addEventListener('click', (e) => { if (e.target === adminOverlay) closeAdmin(); });
+
+  async function renderAdminVisits(){
+    adminPanelVisits.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('visits');
+    const list = (data && Array.isArray(data.list)) ? data.list : [];
+    if (!list.length) {
+      adminPanelVisits.innerHTML = '<div class="c-empty">' + t('adminNoVisits') + '</div>';
+      return;
+    }
+    adminPanelVisits.innerHTML = list.map(v =>
+      '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
+    ).join('');
+  }
+
+  async function renderAdminComments(){
+    adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('comments');
+    const list = (data && Array.isArray(data.list)) ? data.list : [];
+    if (!list.length) {
+      adminPanelComments.innerHTML = '<div class="c-empty">' + t('adminNoComments') + '</div>';
+      return;
+    }
+    adminPanelComments.innerHTML = list.map(c =>
+      '<div class="a-cmt" data-id="' + c.id + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
+        '<textarea>' + escapeHtml(c.text) + '</textarea>' +
+        '<div class="a-cmt-actions">' +
+          '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
+          '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+        renderAdminReplies(c) +
+      '</div>'
+    ).join('');
+  }
+
+  function renderAdminReplies(c){
+    const replies = Array.isArray(c.replies) ? c.replies : [];
+    if (!replies.length) return '';
+    return '<div class="a-cmt-replies">' + replies.map((r, i) =>
+      '<div class="a-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(r.name) + (r.isAdmin ? ' · ADMIN' : '') + ' · ' + formatCommentDate(r.ts) + '</div>' +
+        '<textarea>' + escapeHtml(r.text) + '</textarea>' +
+        '<div class="a-cmt-actions">' +
+          '<button class="a-save-btn" data-action="save-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminSave') + '</button>' +
+          '<button class="a-del-btn" data-action="delete-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('') + '</div>';
+  }
+
+  adminPanelComments.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const action = btn.getAttribute('data-action');
+    const fresh = await mdbRead('comments');
+    let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
+    if (action === 'delete') {
+      const id = btn.getAttribute('data-id');
+      list = list.filter(c => String(c.id) !== String(id));
+    } else if (action === 'save') {
+      const id = btn.getAttribute('data-id');
+      const wrap = btn.closest('.a-cmt');
+      const newText = wrap.querySelector('textarea').value.slice(0, 500);
+      list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { text: newText }) : c);
+    } else if (action === 'delete-reply') {
+      const parentId = btn.getAttribute('data-parent');
+      const ridx = parseInt(btn.getAttribute('data-ridx'), 10);
+      list = list.map(c => {
+        if (String(c.id) !== String(parentId)) return c;
+        const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
+        replies.splice(ridx, 1);
+        return Object.assign({}, c, { replies });
+      });
+    } else if (action === 'save-reply') {
+      const parentId = btn.getAttribute('data-parent');
+      const ridx = parseInt(btn.getAttribute('data-ridx'), 10);
+      const wrap = btn.closest('.a-reply');
+      const newText = wrap.querySelector('textarea').value.slice(0, 300);
+      list = list.map(c => {
+        if (String(c.id) !== String(parentId)) return c;
+        const replies = Array.isArray(c.replies) ? c.replies.slice() : [];
+        if (replies[ridx]) replies[ridx] = Object.assign({}, replies[ridx], { text: newText });
+        return Object.assign({}, c, { replies });
+      });
+    }
+    await mdbWrite('comments', { list });
+    commentsCache = list;
+    renderComments();
+    renderAdminComments();
+  });
+
+  function switchAdminTab(tab){
+    const showVisits = tab === 'visits';
+    adminTabVisits.classList.toggle('active', showVisits);
+    adminTabComments.classList.toggle('active', !showVisits);
+    adminPanelVisits.classList.toggle('active', showVisits);
+    adminPanelComments.classList.toggle('active', !showVisits);
+    if (showVisits) renderAdminVisits(); else renderAdminComments();
+  }
+  adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
+  adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
+
+  function tryAdminLogin(){
+    if (adminPass.value === ADMIN_PASSWORD) {
+      adminAuthenticated = true;
+      initAdminModeCheckbox();
+      applyAdminNameLock();
+      adminLogin.style.display = 'none';
+      adminDashboard.style.display = 'block';
+      switchAdminTab('visits');
+    } else {
+      adminErr.classList.add('show');
+    }
+  }
+  adminGo.addEventListener('click', tryAdminLogin);
+  adminPass.addEventListener('keydown', e => { if (e.key === 'Enter') tryAdminLogin(); });
+
+  // Apply the saved/default language once everything is wired up.
+  applyTranslations();
+  initAdminModeCheckbox();
+  applyAdminNameLock();
+</script>
+
+</body>
+</html>
