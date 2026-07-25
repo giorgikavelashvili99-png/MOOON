@@ -158,8 +158,7 @@
     padding:14px 18px; margin-bottom:34px;
     border:1px solid var(--border-soft);
     border-radius:16px;
-    background:rgba(15,15,24,0.55);
-    backdrop-filter: blur(10px);
+    background:rgba(15,15,24,0.82);
   }
   .brand{ order:1; flex:0 0 auto; display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.05em; font-size:16px; }
   .brand .name{
@@ -262,8 +261,7 @@
     padding:9px 16px;
     border-radius:999px;
     border:1px solid var(--border);
-    background:rgba(18,18,28,0.55);
-    backdrop-filter: blur(6px);
+    background:rgba(18,18,28,0.85);
     color:#ffe6b8;
     cursor:pointer;
     -webkit-tap-highlight-color: transparent;
@@ -852,8 +850,17 @@
       radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.16), transparent 55%),
       radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
       linear-gradient(180deg, rgba(255,107,107,0.05), #08080d 70%);
+  }
+  /* The pulsing glow only runs while the panel is open — while collapsed it's
+     just a plain static box, so there's no reason to keep repainting a
+     box-shadow animation nobody's looking at. This also means the exact
+     moment you tap to collapse it, that animation stops immediately instead
+     of continuing to compete with the collapse transition for frame time,
+     which is what was making the collapse itself feel laggy. */
+  .warn-panel.warn-starry.open{
     animation: warnBorderGlow 3.2s ease-in-out infinite;
   }
+  .warn-panel:not(.open) .qn-stars span{ animation-play-state:paused; opacity:0; }
   @keyframes warnBorderGlow{
     0%,100%{ box-shadow: 0 0 0 rgba(255,92,61,0); border-color: var(--warn-soft); }
     50%{ box-shadow: 0 0 26px rgba(255,92,61,0.18); border-color: rgba(255,92,61,0.55); }
@@ -883,7 +890,7 @@
   /* Same smooth grid-based collapse used by the how-to-order panel. */
   .warn-content-wrap{
     position:relative; z-index:1;
-    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+    display:grid; grid-template-rows:0fr; transition: grid-template-rows .16s ease-out;
   }
   .warn-panel.open .warn-content-wrap{ grid-template-rows:1fr; }
   .warn-content-inner{ overflow:hidden; min-height:0; }
