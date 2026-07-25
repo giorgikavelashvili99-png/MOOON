@@ -145,6 +145,39 @@
   /* ---------- Layout ---------- */
   .wrap{ position:relative; z-index:1; max-width:760px; margin:0 auto; padding:28px 20px 80px; }
 
+  /* From tablet width upward, stop wasting the side margins: the
+     trust/portfolio/howto cards move into a sticky sidebar next to the
+     main column instead of stacking above it. Both column widths are
+     fluid (clamp/minmax) so they scale smoothly with the viewport —
+     no sudden jump at one fixed breakpoint, no overflow at in-between
+     sizes. Below the breakpoint this whole block is inert —
+     .page-grid/.sidebar-col/.main-col stay plain blocks and everything
+     stacks in document order, exactly as on a phone. */
+  @media (min-width: 680px){
+    .wrap{ max-width:1220px; }
+    .topbar,
+    .hero{ max-width:760px; margin-left:auto; margin-right:auto; }
+    .page-grid{
+      display:grid;
+      grid-template-columns: clamp(200px, 34vw, 380px) minmax(0, 760px);
+      gap:clamp(16px, 3vw, 36px);
+      justify-content:center;
+      align-items:start;
+    }
+    .sidebar-col{
+      display:flex; flex-direction:column; gap:clamp(14px, 2vw, 20px);
+      position:sticky; top:24px;
+    }
+    .sidebar-col .panel{ margin-bottom:0; }
+    .sidebar-col .trust-grid,
+    .sidebar-col .portfolio-grid{ grid-template-columns:1fr; }
+    .main-col{ position:relative; min-width:0; }
+    .main-col::before{
+      content:''; position:absolute; top:4px; bottom:4px; left:clamp(-18px, -1.5vw, -8px); width:1px;
+      background:linear-gradient(180deg, transparent, var(--border) 12%, var(--border) 88%, transparent);
+    }
+  }
+
   .topbar{
     display:flex; align-items:center; gap:8px 14px;
     padding:14px 18px; margin-bottom:34px;
@@ -263,6 +296,19 @@
     font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700; letter-spacing:0.16em;
     color:#a99cff; text-transform:uppercase;
     text-shadow: 0 0 6px rgba(255,255,255,0.4), 0 0 14px rgba(255,45,77,0.75), 0 0 30px rgba(255,45,77,0.4);
+  }
+  .panel-head .label.accordion-label{
+    display:flex; align-items:center; gap:10px;
+    font-size:13px; color:#ffffff;
+    text-shadow: 0 0 6px rgba(255,255,255,0.6), 0 0 16px rgba(255,45,77,0.85), 0 0 36px rgba(255,45,77,0.5);
+  }
+  .panel-head .label.accordion-label .al-icon{
+    flex:0 0 auto;
+    display:inline-flex; align-items:center; justify-content:center;
+    width:24px; height:24px; border-radius:8px;
+    background:rgba(255,45,77,0.14); border:1px solid rgba(255,45,77,0.35);
+    font-size:12px; line-height:1;
+    box-shadow:0 0 12px rgba(255,45,77,0.18);
   }
   .rec{ display:flex; align-items:center; gap:7px; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--warn); }
   .rec .r-dot{ width:7px; height:7px; border-radius:50%; background:var(--warn); box-shadow:0 0 10px var(--warn); animation:pulse 1.6s infinite; }
@@ -456,6 +502,22 @@
   .comments-panel .c-item .c-date{ font-size:10.5px; color:var(--text-faint); }
   .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
   .comments-panel .c-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
+  .comments-panel .c-pagination{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:16px; flex-wrap:wrap;
+  }
+  .comments-panel .c-page-btn{
+    font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:700;
+    min-width:32px; height:32px; padding:0 4px; border-radius:9px;
+    border:1px solid var(--border-soft); background:#0a0a12; color:var(--text-dim);
+    cursor:pointer; transition:.15s;
+  }
+  .comments-panel .c-page-btn:hover{ border-color:var(--purple-soft); color:var(--text); transform:translateY(-1px); }
+  .comments-panel .c-page-btn.active{
+    background:linear-gradient(180deg, var(--purple), #b8213a);
+    border-color:var(--purple); color:#fff;
+    box-shadow:0 0 14px rgba(255,45,77,0.45);
+  }
 
   /* ---------- Admin gear + modal ---------- */
   .admin-gear{
@@ -744,23 +806,14 @@
     font-family:'JetBrains Mono', monospace;
   }
 
-  /* ---------- How-to / instructions section (collapsible) ---------- */
+  /* ---------- How-to / instructions section (always expanded) ---------- */
   .howto-panel{ padding:24px 22px; }
   .howto-head-row{
     display:flex; align-items:center; justify-content:space-between;
-    cursor:pointer; user-select:none;
   }
-  .howto-toggle{
-    background:none; border:1px solid var(--border); color:var(--text-dim);
-    width:30px; height:30px; border-radius:9px; flex:0 0 auto;
-    display:flex; align-items:center; justify-content:center;
-    font-size:14px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
-  }
-  .howto-panel.open .howto-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
   .howto-steps-wrap{
-    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+    display:grid; grid-template-rows:1fr;
   }
-  .howto-panel.open .howto-steps-wrap{ grid-template-rows:1fr; }
   .howto-steps-inner{ overflow:hidden; min-height:0; }
   .howto-steps{ display:flex; flex-direction:column; gap:14px; margin-top:16px; }
   .howto-step{
@@ -783,24 +836,13 @@
   }
   .howto-step .hs-body a.hs-link:hover{ text-decoration:underline; }
 
-  /* ---------- Generic collapsible toggle (reused by portfolio & trust panels) ---------- */
-  .collapsible-toggle{
-    background:none; border:1px solid var(--border); color:var(--text-dim);
-    width:30px; height:30px; border-radius:9px; flex:0 0 auto;
-    display:flex; align-items:center; justify-content:center;
-    font-size:14px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
-  }
-  .portfolio-panel.open .collapsible-toggle,
-  .trust-panel.open .collapsible-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
+  /* ---------- Always-expanded wrap (reused by portfolio & trust panels) ---------- */
   .collapsible-wrap{
-    display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
+    display:grid; grid-template-rows:1fr;
   }
-  .portfolio-panel.open .collapsible-wrap,
-  .trust-panel.open .collapsible-wrap{ grid-template-rows:1fr; }
   .collapsible-inner{ overflow:hidden; min-height:0; }
 
   /* ---------- Trust bar ---------- */
-  .trust-panel .panel-head{ cursor:pointer; user-select:none; }
   .trust-panel{ padding:22px 22px 20px; }
   .trust-grid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
@@ -830,7 +872,6 @@
   .trust-rating-row .tr-text b{ color:#fff; }
 
   /* ---------- Portfolio ---------- */
-  .portfolio-panel .panel-head{ cursor:pointer; user-select:none; }
   .portfolio-panel{ padding:22px 22px 20px; }
   .portfolio-grid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
@@ -1098,39 +1139,14 @@
     <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
   </div>
 
-  <!-- Portfolio -->
-  <div class="panel portfolio-panel" id="portfolioPanel">
-    <div class="panel-head" id="portfolioHeadRow" style="margin-bottom:0;">
-      <div class="label" data-i18n="portfolioLabel">ნამუშევრების პორტფოლიო</div>
-      <button type="button" class="collapsible-toggle" id="portfolioToggle" aria-label="toggle">▾</button>
-    </div>
-    <div class="collapsible-wrap">
-      <div class="collapsible-inner">
-        <div class="portfolio-grid">
-          <a class="portfolio-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
-            <div class="portfolio-icon">
-              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
-            </div>
-            <div class="portfolio-name" id="portfolioName1">@moonaee26</div>
-            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
-          </a>
-          <a class="portfolio-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
-            <div class="portfolio-icon">
-              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
-            </div>
-            <div class="portfolio-name" id="portfolioName2">@marveluniversee26</div>
-            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="page-grid">
+  <aside class="sidebar-col">
 
-  <!-- Trust bar -->
+  <!-- Trust bar: comes first to build confidence before anything else -->
   <div class="panel trust-panel" id="trustPanel">
     <div class="panel-head" id="trustHeadRow" style="margin-bottom:0;">
-      <div class="label" data-i18n="trustLabel">რატომ MOON</div>
-      <button type="button" class="collapsible-toggle" id="trustToggle" aria-label="toggle">▾</button>
+      <div class="label accordion-label"><span class="al-icon">✅</span><span data-i18n="trustLabel">რატომ MOON</span></div>
+
     </div>
     <div class="collapsible-wrap">
       <div class="collapsible-inner">
@@ -1168,11 +1184,39 @@
     </div>
   </div>
 
-  <!-- How to use / how to order (collapsible) -->
+  <!-- Portfolio: proof of the claims made above -->
+  <div class="panel portfolio-panel" id="portfolioPanel">
+    <div class="panel-head" id="portfolioHeadRow" style="margin-bottom:0;">
+      <div class="label accordion-label"><span class="al-icon">🎬</span><span data-i18n="portfolioLabel">ნამუშევრების პორტფოლიო</span></div>
+
+    </div>
+    <div class="collapsible-wrap">
+      <div class="collapsible-inner">
+        <div class="portfolio-grid">
+          <a class="portfolio-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+            <div class="portfolio-icon">
+              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+            </div>
+            <div class="portfolio-name" id="portfolioName1">@moonaee26</div>
+            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+          </a>
+          <a class="portfolio-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+            <div class="portfolio-icon">
+              <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
+            </div>
+            <div class="portfolio-name" id="portfolioName2">@marveluniversee26</div>
+            <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to use / how to order (collapsible): right before the calculator it explains -->
   <div class="panel howto-panel" id="howtoPanel">
     <div class="panel-head howto-head-row" id="howtoHeadRow" style="margin-bottom:0;">
-      <div class="label" data-i18n="howtoLabel">როგორ შევუკვეთო</div>
-      <button type="button" class="howto-toggle" id="howtoToggle" aria-label="toggle">▾</button>
+      <div class="label accordion-label"><span class="al-icon">📝</span><span data-i18n="howtoLabel">როგორ შევუკვეთო</span></div>
+
     </div>
     <div class="howto-steps-wrap">
       <div class="howto-steps-inner">
@@ -1209,6 +1253,9 @@
       </div>
     </div>
   </div>
+
+  </aside>
+  <main class="main-col">
 
   <div class="panel">
     <div class="panel-head">
@@ -1393,6 +1440,9 @@
     <div class="c-list" id="commentList">
       <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!</div>
     </div>
+  </div>
+
+  </main>
   </div>
 
   <footer><span data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
@@ -1700,29 +1750,10 @@
     setTimeout(() => panel.classList.remove('scanner-flash'), 1600);
   });
 
-  // ---------- Collapsible "How to order" panel ----------
-  const howtoPanel = document.getElementById('howtoPanel');
-  const howtoHeadRow = document.getElementById('howtoHeadRow');
-  function toggleHowto(){ howtoPanel.classList.toggle('open'); }
-  howtoHeadRow.addEventListener('click', toggleHowto);
-
   const warnPanel = document.getElementById('warnPanel');
   const warnHeadRow = document.getElementById('warnHeadRow');
   if (warnPanel && warnHeadRow) {
     warnHeadRow.addEventListener('click', () => warnPanel.classList.toggle('open'));
-  }
-
-  // ---------- Collapsible "Portfolio" & "Why MOON" panels (collapsed by default) ----------
-  const portfolioPanel = document.getElementById('portfolioPanel');
-  const portfolioHeadRow = document.getElementById('portfolioHeadRow');
-  if (portfolioPanel && portfolioHeadRow) {
-    portfolioHeadRow.addEventListener('click', () => portfolioPanel.classList.toggle('open'));
-  }
-
-  const trustPanel = document.getElementById('trustPanel');
-  const trustHeadRow = document.getElementById('trustHeadRow');
-  if (trustPanel && trustHeadRow) {
-    trustHeadRow.addEventListener('click', () => trustPanel.classList.toggle('open'));
   }
 
   const chartBox = document.getElementById('chartBox');
@@ -2719,6 +2750,34 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   let commentsCache = [];
+  let commentsPage = 1;
+  const COMMENTS_PER_PAGE = 4;
+
+  function renderCommentsPagination(totalItems){
+    const totalPages = Math.max(1, Math.ceil(totalItems / COMMENTS_PER_PAGE));
+    if (commentsPage > totalPages) commentsPage = totalPages;
+    if (totalPages <= 1) return '';
+    let html = '<div class="c-pagination" id="commentsPagination">';
+    for (let p = 1; p <= totalPages; p++) {
+      html += '<button type="button" class="c-page-btn' + (p === commentsPage ? ' active' : '') + '" data-page="' + p + '">' + p + '</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function wireCommentsPagination(){
+    const pag = document.getElementById('commentsPagination');
+    if (!pag) return;
+    pag.querySelectorAll('.c-page-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = parseInt(btn.getAttribute('data-page'), 10);
+        if (!p || p === commentsPage) return;
+        commentsPage = p;
+        renderComments();
+        commentList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
 
   function computeAverageRating(){
     const rated = commentsCache.filter(c => typeof c.rating === 'number' && c.rating > 0);
@@ -2763,7 +2822,11 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (!commentsCache.length) {
       commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
     } else {
-      commentList.innerHTML = commentsCache.map(c =>
+      const totalPages = Math.max(1, Math.ceil(commentsCache.length / COMMENTS_PER_PAGE));
+      if (commentsPage > totalPages) commentsPage = totalPages;
+      const start = (commentsPage - 1) * COMMENTS_PER_PAGE;
+      const pageItems = commentsCache.slice(start, start + COMMENTS_PER_PAGE);
+      commentList.innerHTML = pageItems.map(c =>
         '<div class="c-item" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
         (c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
         (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
@@ -2777,10 +2840,11 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
           '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
         '</div>' +
         '</div>'
-      ).join('');
+      ).join('') + renderCommentsPagination(commentsCache.length);
     }
     renderTrustRating();
     wireReplyButtons();
+    wireCommentsPagination();
   }
 
   function wireReplyButtons(){
@@ -2882,6 +2946,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         return;
       }
       commentsCache = updated;
+      commentsPage = 1;
       renderComments();
       if (!asAdmin) commentName.value = '';
       commentText.value = '';
