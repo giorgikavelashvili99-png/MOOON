@@ -45,6 +45,10 @@
   /* ---------- Background atmosphere ---------- */
   .bg-layer{
     position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+    /* Promote to its own compositor layer so scrolling the page on top of it
+       doesn't force the browser to repaint this blurred layer every frame —
+       this was one of the biggest causes of scroll jank on phones. */
+    transform:translateZ(0); will-change:transform; contain:strict;
   }
   .grain{
     position:absolute; inset:-100px;
@@ -69,6 +73,8 @@
     position:absolute; border-radius:50%;
     filter:blur(90px);
     opacity:0.35;
+    will-change:transform;
+    transform:translateZ(0);
   }
   .orb.o1{ width:520px; height:520px; top:-160px; left:-120px; background:radial-gradient(circle, var(--purple), transparent 70%); animation: drift1 22s ease-in-out infinite; }
   .orb.o2{ width:460px; height:460px; bottom:-140px; right:-100px; background:radial-gradient(circle, var(--cyan), transparent 70%); animation: drift2 26s ease-in-out infinite; }
@@ -145,7 +151,7 @@
   }
 
   /* ---------- Layout ---------- */
-  .wrap{ position:relative; z-index:1; max-width:760px; margin:0 auto; padding:28px 20px 80px; }
+  .wrap{ position:relative; z-index:1; max-width:760px; margin:0 auto; padding:28px 20px 34px; }
 
   .topbar{
     display:flex; align-items:center; gap:8px 14px;
@@ -836,7 +842,10 @@
     background:linear-gradient(180deg, rgba(255,107,107,0.06), rgba(255,107,107,0.02));
     border-radius:14px;
     padding:17px 20px;
-    backdrop-filter: blur(6px);
+    /* backdrop-filter removed: this panel sits over the fixed animated
+       background, so blurring it every scroll frame was a major cause of
+       mobile scroll lag. The background gradient below is already dark
+       and opaque enough that the blur made almost no visible difference. */
   }
   .warn-panel.warn-starry{
     background:
@@ -920,8 +929,12 @@
       radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.16), transparent 55%),
       radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
       linear-gradient(180deg, rgba(255,107,107,0.05), #08080d 70%) !important;
-    backdrop-filter: blur(6px);
+    /* backdrop-filter removed here too — this class is reused on ~10 cards
+       on the page, so blurring all of them behind the fixed animated
+       background on every scroll frame was the single biggest cause of the
+       phone scroll lag. The gradient background already reads as opaque. */
     animation: warnBorderGlow 3.2s ease-in-out infinite;
+    contain: layout paint style;
   }
   .moon-glow-card .qn-stars{ z-index:0; }
   .moon-glow-card > *{ position:relative; z-index:1; }
@@ -1276,11 +1289,20 @@
     position:fixed; right:20px; bottom:20px; z-index:50;
     width:60px; height:60px; border-radius:50%;
     background:linear-gradient(135deg, var(--purple), var(--cyan));
-    border:none; cursor:pointer;
+    border:none; cursor:grab;
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 10px 30px rgba(255,45,77,0.45), 0 0 0 1px rgba(255,255,255,0.08) inset;
     font-size:24px;
     animation: fabPulse 3s ease-in-out infinite;
+    /* Lets us drag it by hand on both touch and mouse without the page
+       scrolling or text getting selected mid-drag. */
+    touch-action:none; user-select:none; -webkit-user-select:none;
+  }
+  .chat-fab.dragging{
+    cursor:grabbing;
+    animation-play-state:paused;
+    box-shadow:0 14px 40px rgba(255,45,77,0.55), 0 0 0 1px rgba(255,255,255,0.12) inset;
+    transition:none;
   }
   @keyframes fabPulse{ 0%,100%{ box-shadow:0 10px 30px rgba(255,45,77,0.45);} 50%{ box-shadow:0 10px 44px rgba(255,176,32,0.55);} }
   .chat-fab .badge-dot{
@@ -1362,7 +1384,7 @@
 
   /* Mobile Responsive adjustments */
   @media (max-width: 600px){
-    .wrap{ padding:16px 12px 60px; }
+    .wrap{ padding:16px 12px 26px; }
     .panel{ padding:20px 16px; }
     .hero h1{ font-size: 28px; }
     .price{ font-size: 50px; }
@@ -1408,6 +1430,34 @@
     .quick-nav{ gap:3px; }
     .qn-tab{ padding:6px 2px; }
   }
+
+  /* ---------- Scroll performance ---------- */
+  /* Several small decorative elements continuously animate box-shadow /
+     border-color (glow pulses). Those properties can't be handled by the
+     GPU compositor, so the browser repaints them every ~16ms even while
+     the user is mid-scroll, competing with scroll for frame budget. We
+     pause them for the brief moment the page is actually moving (see the
+     tiny scroll listener near the end of the script) and resume them the
+     instant scrolling stops — the pulse is decorative, so nobody notices
+     it pausing for a few hundred ms, but everybody notices scroll lag. */
+  body.is-scrolling .qn-tab.active,
+  body.is-scrolling .order-btn.wa,
+  body.is-scrolling .order-btn.tg,
+  body.is-scrolling .warn-panel.warn-starry,
+  body.is-scrolling .moon-glow-card,
+  body.is-scrolling .tt-confirm.tt-green,
+  body.is-scrolling .chat-fab{
+    animation-play-state: paused !important;
+  }
+  .panel, .trust-item, .portfolio-card, .howto-step, .moon-glow-card{
+    contain: layout paint style;
+  }
+  html{
+    scroll-behavior:auto;
+  }
+  body{
+    -webkit-overflow-scrolling: touch;
+  }
 </style>
 </head>
 <body>
@@ -1418,8 +1468,6 @@
   <div class="orb o1"></div>
   <div class="orb o2"></div>
   <div class="orb o3"></div>
-  <div class="badge-float ae">AFTER&nbsp;EFFECTS&nbsp;GRADE<span class="spark"></span></div>
-  <div class="badge-float topaz">TOPAZ&nbsp;AI&nbsp;ENHANCED<span class="gem"></span></div>
 </div>
 
 <div class="wrap">
@@ -1809,7 +1857,6 @@
           <div class="ico">!</div>
           <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
         </div>
-        <button type="button" class="warn-toggle" id="warnToggle" aria-label="toggle">▾</button>
       </div>
       <div class="warn-content-wrap">
         <div class="warn-content-inner">
@@ -2281,6 +2328,21 @@
   if (warnPanel && warnHeadRow) {
     warnHeadRow.addEventListener('click', () => warnPanel.classList.toggle('open'));
   }
+
+  // ---------- Scroll performance: pause decorative glow animations while
+  // the page is actually moving, resume ~150ms after it stops. Native
+  // scrolling already runs at the device's own refresh rate (60Hz/120Hz)
+  // on the compositor thread — this just stops competing with it. ----------
+  (function(){
+    let scrollTimer = null;
+    window.addEventListener('scroll', () => {
+      if (!document.body.classList.contains('is-scrolling')) {
+        document.body.classList.add('is-scrolling');
+      }
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => document.body.classList.remove('is-scrolling'), 150);
+    }, { passive: true });
+  })();
 
   const chartBox = document.getElementById('chartBox');
   const chartHeadRow = document.getElementById('chartHeadRow');
@@ -2856,12 +2918,86 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
 
-  chatFab.addEventListener('click', () => {
-    chatPanel.classList.toggle('open');
-    chatFab.querySelector('.badge-dot').style.display = 'none';
-    if (chatBody.children.length === 0) botGreet();
-  });
   chatClose.addEventListener('click', () => chatPanel.classList.remove('open'));
+
+  // ---------- Draggable MOON assistant bubble ----------
+  // Works with a finger on mobile and a mouse on desktop (Pointer Events
+  // cover both). A short drag is remembered (localStorage) so it stays put
+  // where you left it. A tap/click that didn't actually move the button
+  // still opens the chat as before.
+  (function(){
+    let dragging = false, moved = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+    const THRESHOLD = 6;
+
+    function currentPos(){
+      const r = chatFab.getBoundingClientRect();
+      return { left: r.left, top: r.top };
+    }
+    function clamp(left, top){
+      const w = chatFab.offsetWidth, h = chatFab.offsetHeight;
+      const maxLeft = window.innerWidth - w - 6;
+      const maxTop = window.innerHeight - h - 6;
+      return { left: Math.min(Math.max(6, left), Math.max(6, maxLeft)), top: Math.min(Math.max(6, top), Math.max(6, maxTop)) };
+    }
+    function applyPos(left, top){
+      chatFab.style.left = left + 'px';
+      chatFab.style.top = top + 'px';
+      chatFab.style.right = 'auto';
+      chatFab.style.bottom = 'auto';
+    }
+
+    try {
+      const saved = JSON.parse(localStorage.getItem('moonFabPos') || 'null');
+      if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
+        const p = clamp(saved.left, saved.top);
+        applyPos(p.left, p.top);
+      }
+    } catch(e){}
+
+    chatFab.addEventListener('pointerdown', (e) => {
+      dragging = true; moved = false;
+      const pos = currentPos();
+      startLeft = pos.left; startTop = pos.top;
+      startX = e.clientX; startY = e.clientY;
+      try { chatFab.setPointerCapture(e.pointerId); } catch(e){}
+      chatFab.classList.add('dragging');
+    });
+
+    chatFab.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if (!moved && (Math.abs(dx) > THRESHOLD || Math.abs(dy) > THRESHOLD)) moved = true;
+      if (moved) {
+        const p = clamp(startLeft + dx, startTop + dy);
+        applyPos(p.left, p.top);
+      }
+    });
+
+    function endDrag(){
+      if (!dragging) return;
+      dragging = false;
+      chatFab.classList.remove('dragging');
+      if (moved) {
+        const pos = currentPos();
+        try { localStorage.setItem('moonFabPos', JSON.stringify(pos)); } catch(e){}
+      }
+    }
+    chatFab.addEventListener('pointerup', endDrag);
+    chatFab.addEventListener('pointercancel', endDrag);
+
+    window.addEventListener('resize', () => {
+      const pos = currentPos();
+      const p = clamp(pos.left, pos.top);
+      if (p.left !== pos.left || p.top !== pos.top) applyPos(p.left, p.top);
+    });
+
+    chatFab.addEventListener('click', (e) => {
+      if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; return; }
+      chatPanel.classList.toggle('open');
+      chatFab.querySelector('.badge-dot').style.display = 'none';
+      if (chatBody.children.length === 0) botGreet();
+    });
+  })();
 
   function addMsg(role, html){
     const div = document.createElement('div');
