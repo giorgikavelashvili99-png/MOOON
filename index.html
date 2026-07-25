@@ -535,6 +535,22 @@
     background: linear-gradient(180deg, rgba(255,176,32,0.07), #0a0a12 60%);
     box-shadow: 0 0 18px rgba(255,176,32,0.08);
   }
+  .comments-panel .c-item .c-top{
+    display:flex; align-items:flex-start; gap:11px; margin-bottom:6px;
+  }
+  .comments-panel .c-item .c-avatar{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), transparent 60%),
+                linear-gradient(150deg, var(--panel-2), #0a0a12 75%);
+    border:1px solid var(--border-soft);
+  }
+  .comments-panel .c-item .c-avatar.c-avatar-admin{
+    border-color: rgba(255,176,32,0.55);
+    background: radial-gradient(circle at 32% 28%, rgba(255,176,32,0.22), transparent 60%),
+                linear-gradient(150deg, rgba(255,176,32,0.1), #0a0a12 75%);
+  }
+  .comments-panel .c-item .c-top .c-head{ flex:1 1 auto; min-width:0; }
   .comments-panel .c-item .c-head{
     display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;
   }
@@ -3522,12 +3538,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       // min-height kept on #commentList (below) still reserves the same box height,
       // and the pagination — anchored right under that fixed-height box — never
       // jumps up to sit closer to a shorter set of comments.
-      commentList.innerHTML = pageItems.map(c =>
-        '<div class="c-item' + (c.pinned ? ' c-pinned' : '') + '" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
+      const AVATAR_ICONS = ['🌕', '🌗', '☀️', '✨'];
+      commentList.innerHTML = pageItems.map((c, i) => {
+        const avatarIcon = c.isAdmin ? '🌙' : AVATAR_ICONS[(start + i) % AVATAR_ICONS.length];
+        const avatarClass = 'c-avatar' + (c.isAdmin ? ' c-avatar-admin' : '');
+        return '<div class="c-item' + (c.pinned ? ' c-pinned' : '') + '" data-id="' + c.id + '"><div class="c-top"><div class="' + avatarClass + '">' + avatarIcon + '</div><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
         (c.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
         (c.pinned ? '<span class="pin-badge">📌 ' + (currentLang === 'en' ? 'PINNED' : 'აპინული') + '</span>' : '') +
         (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
-        '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
+        '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div></div>' +
         '<div class="c-body">' + escapeHtml(c.text) + '</div>' +
         renderReplies(c) +
         '<div class="c-actions"><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
@@ -3536,8 +3555,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
           '<textarea class="c-reply-text" maxlength="300" placeholder="' + t('commentTextPh') + '"></textarea>' +
           '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
         '</div>' +
-        '</div>'
-      ).join('');
+        '</div>';
+      }).join('');
       if (paginationWrap) paginationWrap.innerHTML = renderCommentsPagination(displayList.length);
     }
     renderTrustRating();
