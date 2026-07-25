@@ -145,37 +145,39 @@
   /* ---------- Layout ---------- */
   .wrap{ position:relative; z-index:1; max-width:760px; margin:0 auto; padding:28px 20px 80px; }
 
-  /* From tablet width upward, stop wasting the side margins: the
-     trust/portfolio/howto cards move into a sticky sidebar next to the
-     main column instead of stacking above it. Both column widths are
-     fluid (clamp/minmax) so they scale smoothly with the viewport —
-     no sudden jump at one fixed breakpoint, no overflow at in-between
-     sizes. Below the breakpoint this whole block is inert —
-     .page-grid/.sidebar-col/.main-col stay plain blocks and everything
-     stacks in document order, exactly as on a phone. */
+  /* The trust/portfolio/howto cards live in a sticky sidebar next to the
+     main (pricing/order) column instead of stacking above it — on every
+     screen size, phones included. This is what actually shortens the
+     path to checkout: the order panel sits beside the trust content
+     instead of underneath a long scroll of it. Both column widths are
+     fluid (clamp/minmax) so they scale smoothly with the viewport, and
+     a dedicated max-width:680px block further below shrinks paddings
+     and font sizes so the narrow columns stay comfortably readable
+     instead of looking like a zoomed-out "desktop mode" page. */
+  .wrap{ max-width:1220px; }
+  .topbar,
+  .hero{ max-width:760px; margin-left:auto; margin-right:auto; }
+  .page-grid{
+    display:grid;
+    grid-template-columns: clamp(112px, 34vw, 380px) minmax(0, 1fr);
+    gap:clamp(10px, 3vw, 36px);
+    justify-content:center;
+    align-items:start;
+  }
+  .sidebar-col{
+    display:flex; flex-direction:column; gap:clamp(10px, 2vw, 20px);
+    position:sticky; top:24px;
+  }
+  .sidebar-col .panel{ margin-bottom:0; }
+  .sidebar-col .trust-grid,
+  .sidebar-col .portfolio-grid{ grid-template-columns:1fr; }
+  .main-col{ position:relative; min-width:0; }
+  .main-col::before{
+    content:''; position:absolute; top:4px; bottom:4px; left:clamp(-18px, -1.5vw, -8px); width:1px;
+    background:linear-gradient(180deg, transparent, var(--border) 12%, var(--border) 88%, transparent);
+  }
   @media (min-width: 680px){
-    .wrap{ max-width:1220px; }
-    .topbar,
-    .hero{ max-width:760px; margin-left:auto; margin-right:auto; }
-    .page-grid{
-      display:grid;
-      grid-template-columns: clamp(200px, 34vw, 380px) minmax(0, 760px);
-      gap:clamp(16px, 3vw, 36px);
-      justify-content:center;
-      align-items:start;
-    }
-    .sidebar-col{
-      display:flex; flex-direction:column; gap:clamp(14px, 2vw, 20px);
-      position:sticky; top:24px;
-    }
-    .sidebar-col .panel{ margin-bottom:0; }
-    .sidebar-col .trust-grid,
-    .sidebar-col .portfolio-grid{ grid-template-columns:1fr; }
-    .main-col{ position:relative; min-width:0; }
-    .main-col::before{
-      content:''; position:absolute; top:4px; bottom:4px; left:clamp(-18px, -1.5vw, -8px); width:1px;
-      background:linear-gradient(180deg, transparent, var(--border) 12%, var(--border) 88%, transparent);
-    }
+    .page-grid{ grid-template-columns: clamp(200px, 34vw, 380px) minmax(0, 760px); }
   }
 
   .topbar{
@@ -1105,6 +1107,54 @@
     .hero h1{ font-size: 28px; }
     .price{ font-size: 50px; }
     .chat-panel{ bottom:84px; }
+  }
+
+  /* ---------- Compact tuning for phone-width two-column layout ----------
+     Below 680px the sidebar column gets quite narrow, so paddings, icon
+     sizes and font sizes shrink here to keep everything legible without
+     needing to pinch-zoom or squint. Placed at the end of the stylesheet
+     on purpose: several of these selectors (.howto-panel, .trust-item,
+     .portfolio-card, etc.) are defined later in the file than the base
+     layout rules, so this block must come after all of them for the
+     overrides to actually win the cascade. */
+  @media (max-width: 680px){
+    .wrap{ padding:20px 12px 60px; }
+    .panel{ padding:16px 14px; margin-bottom:14px; border-radius:18px; }
+    .panel-head{ margin-bottom:14px; }
+    .panel-head .label{ font-size:10px; }
+    .panel-head .label.accordion-label{ font-size:12px; gap:8px; }
+    .panel-head .label.accordion-label .al-icon{ width:20px; height:20px; font-size:10.5px; }
+
+    .trust-panel, .portfolio-panel{ padding:14px 12px 12px; }
+    .trust-grid, .portfolio-grid{ gap:8px; margin-top:12px; }
+    .trust-item{ padding:10px 11px; gap:9px; border-radius:12px; }
+    .trust-item .ti-ico{ width:26px; height:26px; font-size:13px; border-radius:8px; }
+    .trust-item .ti-title{ font-size:11.5px; margin-bottom:1px; }
+    .trust-item .ti-text{ font-size:10.5px; line-height:1.45; }
+    .trust-rating-row{ padding:10px 12px; margin-top:12px; gap:6px; }
+    .trust-rating-row .tr-stars{ font-size:13px; }
+    .trust-rating-row .tr-text{ font-size:11px; }
+
+    .portfolio-card{ padding:14px 8px; gap:7px; border-radius:14px; }
+    .portfolio-icon{ width:38px; height:38px; border-radius:12px; }
+    .portfolio-icon svg{ width:19px; height:19px; }
+    .portfolio-name{ font-size:11px; }
+    .portfolio-cta{ font-size:8.5px; }
+
+    .howto-panel{ padding:16px 14px; }
+    .howto-steps{ gap:10px; margin-top:12px; }
+    .howto-step{ padding:10px 11px; gap:9px; border-radius:12px; }
+    .howto-step .hs-num{ width:22px; height:22px; font-size:11px; border-radius:7px; }
+    .howto-step .hs-body .hs-title{ font-size:11.5px; margin-bottom:2px; }
+    .howto-step .hs-body .hs-text{ font-size:10.5px; line-height:1.45; }
+
+    .readout{ padding:20px 8px 18px; margin-bottom:18px; }
+    .price{ font-size:clamp(30px, 9vw, 52px); }
+    .field{ margin-bottom:16px; }
+    .timeline{ height:48px; }
+    .toggle-row{ padding:12px 14px; }
+    .quality-grid{ grid-template-columns:1fr; }
+    .quality-btn{ padding:11px 12px; }
   }
 </style>
 </head>
