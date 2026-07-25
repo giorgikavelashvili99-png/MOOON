@@ -505,15 +505,20 @@
   .comments-panel textarea.c-text{
     width:100%; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
     color:var(--text); padding:12px 14px; font-family:'Space Grotesk', sans-serif;
-    font-size:14px; outline:none; transition:border-color .15s;
+    /* 16px, not 14px: mobile browsers (iOS Safari in particular) auto-zoom
+       the whole page when a text field smaller than 16px is focused — that
+       sudden zoom is what read as the field "growing" uncomfortably. */
+    font-size:16px; outline:none; transition:border-color .15s;
   }
   .comments-panel input.c-name:focus,
   .comments-panel textarea.c-text:focus{ border-color: var(--purple-soft); }
-  .comments-panel textarea.c-text{ resize:none; min-height:70px; }
+  .comments-panel textarea.c-text{
+    resize:none; height:90px; max-height:160px; overflow-y:auto; line-height:1.5;
+  }
   .comments-panel .c-submit{
     align-self:flex-end; background:var(--purple); color:#fff; border:none;
-    border-radius:12px; padding:10px 20px; font-weight:700; font-size:13.5px;
-    cursor:pointer; transition:.15s;
+    border-radius:12px; padding:11px 22px; font-weight:700; font-size:14px;
+    cursor:pointer; transition:.15s; min-height:44px;
   }
   .comments-panel .c-submit:hover{ filter:brightness(1.1); }
   .comments-panel .c-error{
@@ -1277,13 +1282,13 @@
   .c-reply-form.open{ display:flex; }
   .c-reply-form input, .c-reply-form textarea{
     width:100%; background:#12121c; border:1px solid var(--border); border-radius:10px;
-    color:var(--text); padding:9px 11px; font-family:'Space Grotesk', sans-serif;
-    font-size:12.5px; outline:none;
+    color:var(--text); padding:10px 12px; font-family:'Space Grotesk', sans-serif;
+    font-size:16px; outline:none;
   }
-  .c-reply-form textarea{ resize:none; min-height:50px; }
+  .c-reply-form textarea{ resize:none; height:70px; max-height:140px; overflow-y:auto; line-height:1.5; }
   .c-reply-form .c-reply-submit{
     align-self:flex-end; background:var(--cyan); color:#06231f; border:none;
-    border-radius:9px; padding:7px 14px; font-weight:700; font-size:12px; cursor:pointer;
+    border-radius:9px; padding:9px 16px; font-weight:700; font-size:13px; cursor:pointer; min-height:40px;
   }
   .c-replies{ display:flex; flex-direction:column; gap:8px; margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); }
   .c-reply-item .c-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
@@ -1439,23 +1444,6 @@
   }
 
   /* ---------- Scroll performance ---------- */
-  /* Several small decorative elements continuously animate box-shadow /
-     border-color (glow pulses). Those properties can't be handled by the
-     GPU compositor, so the browser repaints them every ~16ms even while
-     the user is mid-scroll, competing with scroll for frame budget. We
-     pause them for the brief moment the page is actually moving (see the
-     tiny scroll listener near the end of the script) and resume them the
-     instant scrolling stops — the pulse is decorative, so nobody notices
-     it pausing for a few hundred ms, but everybody notices scroll lag. */
-  body.is-scrolling .qn-tab.active,
-  body.is-scrolling .order-btn.wa,
-  body.is-scrolling .order-btn.tg,
-  body.is-scrolling .warn-panel.warn-starry,
-  body.is-scrolling .moon-glow-card,
-  body.is-scrolling .tt-confirm.tt-green,
-  body.is-scrolling .chat-fab{
-    animation-play-state: paused !important;
-  }
   .panel, .trust-item, .portfolio-card, .howto-step, .moon-glow-card{
     contain: layout paint style;
   }
@@ -2335,21 +2323,6 @@
   if (warnPanel && warnHeadRow) {
     warnHeadRow.addEventListener('click', () => warnPanel.classList.toggle('open'));
   }
-
-  // ---------- Scroll performance: pause decorative glow animations while
-  // the page is actually moving, resume ~150ms after it stops. Native
-  // scrolling already runs at the device's own refresh rate (60Hz/120Hz)
-  // on the compositor thread — this just stops competing with it. ----------
-  (function(){
-    let scrollTimer = null;
-    window.addEventListener('scroll', () => {
-      if (!document.body.classList.contains('is-scrolling')) {
-        document.body.classList.add('is-scrolling');
-      }
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => document.body.classList.remove('is-scrolling'), 150);
-    }, { passive: true });
-  })();
 
   const chartBox = document.getElementById('chartBox');
   const chartHeadRow = document.getElementById('chartHeadRow');
@@ -3460,7 +3433,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   let commentsCache = [];
   let commentsPage = 1;
-  const COMMENTS_PER_PAGE = 4;
+  const COMMENTS_PER_PAGE = 3;
   // Keeps the comment list from visually shrinking when a later page has
   // fewer items than an earlier one (e.g. page 1 has 4 comments, page 2
   // has only 1) — we remember the tallest page we've rendered and never
