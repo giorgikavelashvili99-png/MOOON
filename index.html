@@ -518,6 +518,11 @@
   .comments-panel .c-item{
     background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:12px 14px;
   }
+  .comments-panel .c-item.c-pinned{
+    border-color: rgba(255,176,32,0.45);
+    background: linear-gradient(180deg, rgba(255,176,32,0.07), #0a0a12 60%);
+    box-shadow: 0 0 18px rgba(255,176,32,0.08);
+  }
   .comments-panel .c-item .c-head{
     display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;
   }
@@ -587,6 +592,7 @@
     color:var(--text-dim); border-radius:10px; padding:9px; cursor:pointer;
   }
   .admin-box .a-cmt{ background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:10px; margin-bottom:10px; }
+  .admin-box .a-cmt.a-cmt-pinned{ border-color: rgba(255,176,32,0.5); }
   .admin-box .a-cmt .a-cmt-meta{ font-size:11px; color:var(--text-faint); margin-bottom:6px; }
   .admin-box .a-cmt textarea{
     width:100%; background:#12121c; border:1px solid var(--border); border-radius:8px;
@@ -598,6 +604,8 @@
   }
   .admin-box .a-save-btn{ background:var(--cyan); color:#06231f; }
   .admin-box .a-del-btn{ background:var(--warn); color:#2a0a0a; }
+  .admin-box .a-pin-btn{ background:#ffd27a; color:#2a1c00; }
+  .admin-box .a-pin-btn.is-pinned{ background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#fff; }
   .admin-box .a-cmt-replies{ margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); display:flex; flex-direction:column; gap:8px; }
   .admin-box .a-reply{ background:#0e0e17; border:1px solid var(--border-soft); border-radius:10px; padding:8px; }
   .admin-box .a-reply textarea{ min-height:38px; }
@@ -774,12 +782,26 @@
 
   /* Warning */
   .warn-panel{
+    position:relative;
+    overflow:hidden;
     border:1px solid var(--warn-soft);
     background:linear-gradient(180deg, rgba(255,107,107,0.06), rgba(255,107,107,0.02));
     border-radius:18px;
     padding:22px 22px;
   }
+  .warn-panel.warn-starry{
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.16), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
+      linear-gradient(180deg, rgba(255,107,107,0.05), #08080d 70%);
+    animation: warnBorderGlow 3.2s ease-in-out infinite;
+  }
+  @keyframes warnBorderGlow{
+    0%,100%{ box-shadow: 0 0 0 rgba(255,92,61,0); border-color: var(--warn-soft); }
+    50%{ box-shadow: 0 0 26px rgba(255,92,61,0.18); border-color: rgba(255,92,61,0.55); }
+  }
   .warn-panel .w-head{
+    position:relative; z-index:1;
     display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;
     cursor:pointer; user-select:none;
   }
@@ -793,6 +815,7 @@
   .warn-panel.open .warn-toggle{ transform:rotate(180deg); }
   /* Same smooth grid-based collapse used by the how-to-order panel. */
   .warn-content-wrap{
+    position:relative; z-index:1;
     display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
   }
   .warn-panel.open .warn-content-wrap{ grid-template-rows:1fr; }
@@ -1073,6 +1096,14 @@
     vertical-align:middle;
     box-shadow: 0 0 10px rgba(255,176,32,0.35);
   }
+  .pin-badge{
+    display:inline-flex; align-items:center; gap:3px;
+    font-family:'JetBrains Mono', monospace; font-size:9.5px; font-weight:800; letter-spacing:0.05em;
+    background:#ffd27a; color:#2a1c00;
+    padding:2px 7px; border-radius:6px; margin-left:8px; text-transform:uppercase;
+    vertical-align:middle;
+    box-shadow: 0 0 10px rgba(255,210,122,0.4);
+  }
   .c-item .c-actions{ display:flex; justify-content:flex-end; margin-top:6px; }
   .c-reply-btn{
     background:none; border:none; color:var(--text-faint); font-size:11.5px;
@@ -1197,6 +1228,42 @@
     .hero h1{ font-size: 28px; }
     .price{ font-size: 50px; }
     .chat-panel{ bottom:84px; }
+  }
+
+  /* ---------- Mobile refinements: keep the 3 quick-nav tabs on one row,
+     and shrink the opened-dropdown / warning-panel text so more detail
+     fits without the page feeling oversized. ---------- */
+  @media (max-width: 480px){
+    .quick-nav{ flex-wrap:nowrap; gap:5px; width:100%; }
+    .qn-tab{
+      flex:1 1 0; min-width:0;
+      padding:7px 6px; font-size:8.6px; letter-spacing:0.03em;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      text-align:center;
+    }
+    .qn-drop-body{ padding:32px 14px 18px; }
+    .qn-drop-head{ font-size:11px; letter-spacing:0.06em; margin-bottom:13px; }
+    .qn-drop-head .al-icon{ width:20px; height:20px; font-size:10px; }
+    .trust-grid{ gap:8px; }
+    .trust-item{ padding:10px 11px; gap:9px; }
+    .trust-item .ti-ico{ width:26px; height:26px; font-size:12px; border-radius:8px; }
+    .trust-item .ti-title{ font-size:11.5px; margin-bottom:1px; }
+    .trust-item .ti-text{ font-size:10.5px; line-height:1.4; }
+    .portfolio-card{ padding:14px 10px; gap:6px; }
+    .portfolio-icon{ width:40px; height:40px; border-radius:12px; }
+    .portfolio-icon svg{ width:19px; height:19px; }
+    .portfolio-name{ font-size:11.5px; }
+    .portfolio-cta{ font-size:9px; }
+    .howto-steps{ gap:9px; }
+    .howto-step{ padding:10px 11px; gap:9px; }
+    .howto-step .hs-num{ width:22px; height:22px; font-size:11px; border-radius:7px; }
+    .howto-step .hs-body .hs-title{ font-size:11.5px; margin-bottom:2px; }
+    .howto-step .hs-body .hs-text{ font-size:10.5px; line-height:1.45; }
+    .warn-panel{ padding:16px 14px; }
+    .warn-panel .w-head span.title{ font-size:12.5px; }
+    .warn-panel .w-head .ico{ width:22px; height:22px; font-size:12px; }
+    .warn-panel p{ font-size:11.5px; margin:0 0 6px; }
+    .warn-panel .spec{ font-size:10.5px; }
   }
 </style>
 </head>
@@ -1494,23 +1561,32 @@
       <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> <span data-i18n="sendTG">Telegram-ზე გაგზავნა</span></button>
     </div>
     <div class="copy-note" id="copyNote"></div>
-  </div>
 
-  <div class="warn-panel" id="warnPanel" style="margin-bottom:22px;">
-    <div class="w-head" id="warnHeadRow">
-      <div class="w-head-left">
-        <div class="ico">!</div>
-        <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
+    <div class="warn-panel warn-starry" id="warnPanel" style="margin-top:18px;">
+      <div class="qn-stars" aria-hidden="true">
+        <span style="top:10%;left:10%;animation-delay:0s;"></span>
+        <span style="top:20%;left:80%;animation-delay:.5s;"></span>
+        <span style="top:55%;left:90%;animation-delay:1s;"></span>
+        <span style="top:75%;left:12%;animation-delay:1.4s;"></span>
+        <span style="top:40%;left:45%;animation-delay:.8s;"></span>
+        <span style="top:85%;left:55%;animation-delay:1.7s;"></span>
+        <span style="top:8%;left:55%;animation-delay:2s;"></span>
       </div>
-      <button type="button" class="warn-toggle" id="warnToggle" aria-label="toggle">▾</button>
-    </div>
-    <div class="warn-content-wrap">
-      <div class="warn-content-inner">
-        <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
-        <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
-        <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
-        <p data-i18n="warnP4">კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებელს ვიდეო გაუჭედოს.</p>
-        <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
+      <div class="w-head" id="warnHeadRow">
+        <div class="w-head-left">
+          <div class="ico">!</div>
+          <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
+        </div>
+        <button type="button" class="warn-toggle" id="warnToggle" aria-label="toggle">▾</button>
+      </div>
+      <div class="warn-content-wrap">
+        <div class="warn-content-inner">
+          <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
+          <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
+          <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
+          <p data-i18n="warnP4">კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებელს ვიდეო გაუჭედოს.</p>
+          <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1693,6 +1769,8 @@
       adminNoComments: 'კომენტარები ჯერ არ არის.',
       adminSave: 'შენახვა',
       adminDelete: 'წაშლა',
+      adminPin: 'დაპინვა',
+      adminUnpin: 'პინის მოხსნა',
       howtoLabel: 'როგორ შევუკვეთო',
       howtoStep1Title: 'გამოთვალე ფასი',
       howtoStep1Text: 'ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო „<span class="scanner-jump-link" data-jump="videoScannerPanel">VIDEO SCANNER</span>" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.',
@@ -1791,6 +1869,8 @@
       adminNoComments: 'No comments yet.',
       adminSave: 'Save',
       adminDelete: 'Delete',
+      adminPin: 'Pin',
+      adminUnpin: 'Unpin',
       howtoLabel: 'How to order',
       howtoStep1Title: 'Calculate the price',
       howtoStep1Text: 'Below, set the video duration and quality in the calculator — or upload a video in the "<span class="scanner-jump-link" data-jump="videoScannerPanel">VIDEO SCANNER</span>" block so the duration is measured automatically.',
@@ -2815,7 +2895,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   // ============================================================
-  // 8) COMMENTS SYSTEM (with 1-5 star ratings, admin badge, replies)
+  // 8) COMMENTS SYSTEM (with 1-5 star ratings, admin badge, replies, pin)
   // ============================================================
   const commentName = document.getElementById('commentName');
   const commentText = document.getElementById('commentText');
@@ -2869,6 +2949,13 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   function starsString(n){
     const r = Math.max(0, Math.min(5, Math.round(n || 0)));
     return '★'.repeat(r) + '☆'.repeat(5 - r);
+  }
+
+  // Pinned comments float to the top of the list (page 1), keeping their
+  // relative order among themselves and among the rest. Array.prototype.sort
+  // is stable in all modern engines, so this never reshuffles same-status items.
+  function sortCommentsForDisplay(list){
+    return list.slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
   }
 
   // ---------- Admin identity helper ----------
@@ -2986,16 +3073,18 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   function renderComments(){
     if (!commentList) return;
     applyAdminNameLock();
-    if (!commentsCache.length) {
+    const displayList = sortCommentsForDisplay(commentsCache);
+    if (!displayList.length) {
       commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
     } else {
-      const totalPages = Math.max(1, Math.ceil(commentsCache.length / COMMENTS_PER_PAGE));
+      const totalPages = Math.max(1, Math.ceil(displayList.length / COMMENTS_PER_PAGE));
       if (commentsPage > totalPages) commentsPage = totalPages;
       const start = (commentsPage - 1) * COMMENTS_PER_PAGE;
-      const pageItems = commentsCache.slice(start, start + COMMENTS_PER_PAGE);
+      const pageItems = displayList.slice(start, start + COMMENTS_PER_PAGE);
       commentList.innerHTML = pageItems.map(c =>
-        '<div class="c-item" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
+        '<div class="c-item' + (c.pinned ? ' c-pinned' : '') + '" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
         (c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
+        (c.pinned ? '<span class="pin-badge">📌 ' + (currentLang === 'en' ? 'PINNED' : 'დაპინული') + '</span>' : '') +
         (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
         '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
         '<div class="c-body">' + escapeHtml(c.text) + '</div>' +
@@ -3007,7 +3096,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
           '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
         '</div>' +
         '</div>'
-      ).join('') + renderCommentsPagination(commentsCache.length);
+      ).join('') + renderCommentsPagination(displayList.length);
     }
     renderTrustRating();
     wireReplyButtons();
@@ -3100,7 +3189,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         return;
       }
       commentSubmit.disabled = true;
-      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, replies: [] };
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [] };
       // Re-read the latest list right before writing to minimize (not
       // fully eliminate) lost updates from concurrent commenters.
       const fresh = await mdbRead('comments');
@@ -3174,8 +3263,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   // ============================================================
   // 10) ADMIN PANEL — gated with a password, shows the visit log
-  // and lets the admin edit/remove comments. Successful login also
-  // flags this device so comments/replies show as "ADMIN".
+  // and lets the admin edit/remove/pin comments. Successful login
+  // also flags this device so comments/replies show as "ADMIN".
   // ============================================================
   const ADMIN_PASSWORD = '0070';
   const adminGear = document.getElementById('adminGear');
@@ -3253,17 +3342,18 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   async function renderAdminComments(){
     adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
     const data = await mdbRead('comments');
-    const list = (data && Array.isArray(data.list)) ? data.list : [];
+    const list = sortCommentsForDisplay((data && Array.isArray(data.list)) ? data.list : []);
     if (!list.length) {
       adminPanelComments.innerHTML = '<div class="c-empty">' + t('adminNoComments') + '</div>';
       return;
     }
     adminPanelComments.innerHTML = list.map(c =>
-      '<div class="a-cmt" data-id="' + c.id + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
+      '<div class="a-cmt' + (c.pinned ? ' a-cmt-pinned' : '') + '" data-id="' + c.id + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.pinned ? ' · 📌' : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
         '<textarea>' + escapeHtml(c.text) + '</textarea>' +
         '<div class="a-cmt-actions">' +
           '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
+          '<button class="a-pin-btn' + (c.pinned ? ' is-pinned' : '') + '" data-action="pin" data-id="' + c.id + '">' + (c.pinned ? t('adminUnpin') : t('adminPin')) + '</button>' +
           '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
         '</div>' +
         renderAdminReplies(c) +
@@ -3300,6 +3390,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       const wrap = btn.closest('.a-cmt');
       const newText = wrap.querySelector('textarea').value.slice(0, 500);
       list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { text: newText }) : c);
+    } else if (action === 'pin') {
+      const id = btn.getAttribute('data-id');
+      list = list.map(c => String(c.id) === String(id) ? Object.assign({}, c, { pinned: !c.pinned }) : c);
     } else if (action === 'delete-reply') {
       const parentId = btn.getAttribute('data-parent');
       const ridx = parseInt(btn.getAttribute('data-ridx'), 10);
