@@ -27,6 +27,8 @@
     --tg: #2ea6ff;
     --tg-soft: rgba(46,166,255,0.35);
     --wa: #25D366;
+    --volt: #d7ff2b;
+    --volt-soft: rgba(215,255,43,0.4);
   }
 
   *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -286,6 +288,7 @@
   }
   @media (prefers-reduced-motion: reduce){
     .qn-tab{ animation:none; }
+    .order-btn.wa, .order-btn.tg{ animation:none; }
   }
   @media (max-width:480px){
     .quick-nav{ gap:8px; }
@@ -671,10 +674,25 @@
   }
   .slider-toggle:before{
     content:""; position:absolute; width:22px; height:22px; left:3px; top:3px;
-    border-radius:50%; background:#cfcfe0; transition:0.25s;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(0,0,0,0.16) 0 3px, transparent 4px),
+      radial-gradient(circle at 63% 52%, rgba(0,0,0,0.13) 0 2px, transparent 3px),
+      radial-gradient(circle at 45% 70%, rgba(0,0,0,0.11) 0 2px, transparent 3px),
+      radial-gradient(circle at 38% 35%, #ffffff, #e7e7f2 55%, #b9b9cc 100%);
+    box-shadow: 0 0 6px 1px rgba(255,255,255,0.55);
+    transition:0.25s;
   }
   .switch input:checked + .slider-toggle{ background:linear-gradient(90deg, var(--purple), var(--cyan)); border-color:transparent; }
-  .switch input:checked + .slider-toggle:before{ transform:translateX(22px); background:#fff; box-shadow:0 0 10px rgba(255,255,255,0.8); }
+  .switch input:checked + .slider-toggle:before{
+    transform:translateX(22px);
+    background:
+      radial-gradient(circle at 32% 28%, rgba(0,0,0,0.14) 0 3px, transparent 4px),
+      radial-gradient(circle at 63% 52%, rgba(0,0,0,0.11) 0 2px, transparent 3px),
+      radial-gradient(circle at 45% 70%, rgba(0,0,0,0.09) 0 2px, transparent 3px),
+      radial-gradient(circle at 38% 35%, #ffffff, #fff6df 55%, #ffd27a 100%);
+    box-shadow:0 0 14px 3px rgba(255,255,255,0.85), 0 0 26px 6px rgba(255,210,122,0.55);
+  }
 
   /* Link input */
   .link-input-wrap{ position:relative; }
@@ -741,8 +759,14 @@
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
   /* ---------- Order buttons (multi-channel) ---------- */
+  /* Groups the WA/TG buttons + warning block together so they can be sized
+     and positioned as one unit: slightly narrower than the panel and nudged
+     right, while keeping left/right outer spacing visually balanced. */
+  .order-channels-body{ width:94%; margin:0 2% 0 4%; }
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
   .order-btn{
+    position:relative;
+    overflow:hidden;
     width:100%;
     padding:17px;
     border:none; border-radius:14px;
@@ -752,6 +776,8 @@
     display:flex; align-items:center; justify-content:center; gap:10px;
     transition: transform 0.15s ease, box-shadow 0.15s ease, opacity .15s ease;
   }
+  .order-btn .qn-stars{ z-index:0; }
+  .order-btn .ico, .order-btn > span{ position:relative; z-index:1; }
   .order-btn:hover{ transform:translateY(-2px); }
   .order-btn:active{ transform:translateY(0) scale(0.98); }
   .order-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
@@ -759,26 +785,48 @@
   .order-btn .ico svg{ width:19px; height:19px; }
 
   .order-btn.wa{
-    background:linear-gradient(90deg, #25D366, #1fb055);
-    color:#062b12;
-    box-shadow:0 10px 30px rgba(37,211,102,0.25);
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(37,211,102,0.10), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(0,255,102,0.06), transparent 55%),
+      #0C100D;
+    border:1px solid rgba(37,211,102,0.4);
+    color:#00FF66;
+    text-shadow:0 0 10px rgba(37,211,102,0.85), 0 0 24px rgba(0,255,102,0.4);
+    box-shadow:0 0 20px rgba(37,211,102,0.18), inset 0 0 24px rgba(37,211,102,0.05);
+    animation: waGlow 3.2s ease-in-out infinite;
   }
-  .order-btn.wa:hover{ box-shadow:0 14px 40px rgba(37,211,102,0.35); }
-  .order-btn.wa .ico svg{ fill:#062b12; }
+  .order-btn.wa:hover{ box-shadow:0 0 30px rgba(37,211,102,0.3), inset 0 0 24px rgba(37,211,102,0.08); border-color:rgba(37,211,102,0.7); animation-play-state:paused; }
+  .order-btn.wa .ico svg{ fill:#00FF66; filter:drop-shadow(0 0 6px rgba(37,211,102,0.8)); }
+  @keyframes waGlow{
+    0%,100%{ box-shadow:0 0 20px rgba(37,211,102,0.18), inset 0 0 24px rgba(37,211,102,0.05); border-color:rgba(37,211,102,0.4); }
+    50%{ box-shadow:0 0 32px rgba(37,211,102,0.32), inset 0 0 24px rgba(37,211,102,0.08); border-color:rgba(37,211,102,0.65); }
+  }
 
   .order-btn.tg{
-    background:linear-gradient(90deg, #2ea6ff, #1e7fd6);
-    color:#04182b;
-    box-shadow:0 10px 30px rgba(46,166,255,0.25);
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(0,136,204,0.10), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(0,200,255,0.06), transparent 55%),
+      #0B0E14;
+    border:1px solid rgba(0,200,255,0.4);
+    color:#00C8FF;
+    text-shadow:0 0 10px rgba(0,200,255,0.85), 0 0 24px rgba(0,136,204,0.4);
+    box-shadow:0 0 20px rgba(0,200,255,0.18), inset 0 0 24px rgba(0,200,255,0.05);
+    animation: tgGlow 3.2s ease-in-out infinite;
   }
-  .order-btn.tg:hover{ box-shadow:0 14px 40px rgba(46,166,255,0.35); }
+  .order-btn.tg:hover{ box-shadow:0 0 30px rgba(0,200,255,0.3), inset 0 0 24px rgba(0,200,255,0.08); border-color:rgba(0,200,255,0.7); animation-play-state:paused; }
+  .order-btn.tg .ico svg{ fill:#00C8FF; filter:drop-shadow(0 0 6px rgba(0,200,255,0.8)); }
+  @keyframes tgGlow{
+    0%,100%{ box-shadow:0 0 20px rgba(0,200,255,0.18), inset 0 0 24px rgba(0,200,255,0.05); border-color:rgba(0,200,255,0.4); }
+    50%{ box-shadow:0 0 32px rgba(0,200,255,0.32), inset 0 0 24px rgba(0,200,255,0.08); border-color:rgba(0,200,255,0.65); }
+  }
 
   .copy-note{
-    text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:4px;
+    text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:0; min-height:0;
     font-family:'JetBrains Mono', monospace;
-    min-height:14px;
+    overflow:hidden;
+    transition: margin-top .15s ease, min-height .15s ease;
   }
-  .copy-note.active{ color:var(--cyan); text-shadow:0 0 8px rgba(255,176,32,0.5); }
+  .copy-note.active{ color:var(--cyan); text-shadow:0 0 8px rgba(255,176,32,0.5); margin-top:4px; min-height:14px; }
 
   /* Warning */
   .warn-panel{
@@ -786,8 +834,9 @@
     overflow:hidden;
     border:1px solid var(--warn-soft);
     background:linear-gradient(180deg, rgba(255,107,107,0.06), rgba(255,107,107,0.02));
-    border-radius:18px;
-    padding:22px 22px;
+    border-radius:14px;
+    padding:17px 20px;
+    backdrop-filter: blur(6px);
   }
   .warn-panel.warn-starry{
     background:
@@ -802,17 +851,26 @@
   }
   .warn-panel .w-head{
     position:relative; z-index:1;
-    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;
+    display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:0;
     cursor:pointer; user-select:none;
   }
-  .warn-panel .w-head-left{ display:flex; align-items:center; gap:10px; }
+  .warn-panel .w-head-left{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  /* Collapsed height reference: the header row alone (no margin-bottom) is
+     sized to match the WA/TG buttons' ~54-55px total height, given the same
+     17px vertical padding on .warn-panel. The 9px gap that used to live on
+     the header's margin-bottom now lives on .warn-content-inner instead, so
+     it only appears once the panel is opened (its row is 0-height while
+     collapsed, so that padding is compressed away, not adding height here). */
   .warn-toggle{
+    position:absolute; right:0; top:50%;
     background:none; border:1px solid var(--warn-soft); color:var(--warn);
-    width:28px; height:28px; border-radius:9px; flex:0 0 auto;
+    width:26px; height:26px; border-radius:9px; flex:0 0 auto;
     display:flex; align-items:center; justify-content:center;
-    font-size:13px; cursor:pointer; transition: transform .25s ease, background .2s ease;
+    font-size:13px; cursor:pointer;
+    transform:translateY(-50%);
+    transition: transform .25s ease, background .2s ease;
   }
-  .warn-panel.open .warn-toggle{ transform:rotate(180deg); }
+  .warn-panel.open .warn-toggle{ transform:translateY(-50%) rotate(180deg); }
   /* Same smooth grid-based collapse used by the how-to-order panel. */
   .warn-content-wrap{
     position:relative; z-index:1;
@@ -820,12 +878,19 @@
   }
   .warn-panel.open .warn-content-wrap{ grid-template-rows:1fr; }
   .warn-content-inner{ overflow:hidden; min-height:0; }
+  /* Padding lives here (not as a permanent value above) because, unlike
+     margin, padding on the collapsing grid item doesn't shrink away when
+     grid-template-rows is 0fr — it would keep the panel's collapsed height
+     a few px taller than the WA/TG buttons. Applying it only in .open state
+     keeps the collapsed height exactly button-sized while still giving the
+     expanded text proper breathing room below the header. */
+  .warn-panel.open .warn-content-inner{ padding-top:9px; }
   .warn-panel .w-head .ico{
-    width:26px; height:26px; border-radius:50%;
+    width:19px; height:19px; border-radius:50%;
     background:rgba(255,107,107,0.15); border:1px solid var(--warn-soft);
     display:flex; align-items:center; justify-content:center;
     font-family:'JetBrains Mono', monospace; font-weight:800; color:var(--warn);
-    font-size:14px;
+    font-size:11px;
     text-shadow:0 0 10px var(--warn);
   }
   .warn-panel .w-head span.title{
@@ -847,15 +912,86 @@
     color:var(--cyan); text-shadow:0 0 10px rgba(255,176,32,0.5);
   }
 
+  /* Shared starry/blurred "warning panel" look, reused on trust / portfolio / howto cards */
+  .moon-glow-card{
+    position:relative; overflow:hidden;
+    border:1px solid var(--warn-soft) !important;
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.16), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
+      linear-gradient(180deg, rgba(255,107,107,0.05), #08080d 70%) !important;
+    backdrop-filter: blur(6px);
+    animation: warnBorderGlow 3.2s ease-in-out infinite;
+  }
+  .moon-glow-card .qn-stars{ z-index:0; }
+  .moon-glow-card > *{ position:relative; z-index:1; }
+  .moon-glow-card .ti-title, .moon-glow-card .hs-title, .moon-glow-card .portfolio-name{
+    color:#ffb3b3 !important;
+    text-shadow:0 0 12px rgba(255,107,107,0.7), 0 0 26px rgba(255,107,107,0.35);
+  }
+  .moon-glow-card .ti-text, .moon-glow-card .hs-text{ color:#e8c9c9 !important; }
+  .moon-glow-card .ti-ico, .moon-glow-card .hs-num{
+    background:rgba(255,107,107,0.15) !important; border:1px solid var(--warn-soft) !important;
+    color:var(--warn); text-shadow:0 0 10px var(--warn);
+  }
+
+  /* TikTok link confirmation badge */
+  .tt-confirm{
+    position:relative; overflow:hidden;
+    margin-top:9px;
+    padding:11px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    user-select:none;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px; font-weight:700; letter-spacing:0.01em;
+    transition: transform .15s ease;
+  }
+  .tt-confirm:active{ transform:scale(0.98); }
+  .tt-confirm .qn-stars{ z-index:0; }
+  .tt-confirm-text{ position:relative; z-index:1; }
+
+  .tt-confirm.tt-red{
+    border:1px solid var(--warn-soft);
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.18), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
+      linear-gradient(180deg, rgba(255,107,107,0.06), #08080d 70%);
+    animation: warnBorderGlow 3.2s ease-in-out infinite;
+  }
+  .tt-confirm.tt-red .tt-confirm-text{
+    color:#ffb3b3;
+    text-shadow:0 0 12px rgba(255,107,107,0.7), 0 0 26px rgba(255,107,107,0.35);
+  }
+
+  .tt-confirm.tt-green{
+    cursor:default;
+    border:1px solid rgba(37,211,102,0.4);
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(37,211,102,0.22), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(37,211,102,0.1), transparent 55%),
+      linear-gradient(180deg, rgba(37,211,102,0.08), #08080d 70%);
+    animation: ttGreenGlow 3.2s ease-in-out infinite;
+  }
+  .tt-confirm.tt-green .tt-confirm-text{
+    color:#8cffb0;
+    text-shadow:0 0 12px rgba(37,211,102,0.8), 0 0 28px rgba(37,211,102,0.4);
+  }
+  @keyframes ttGreenGlow{
+    0%,100%{ box-shadow: 0 0 0 rgba(37,211,102,0); border-color: rgba(37,211,102,0.35); }
+    50%{ box-shadow: 0 0 24px rgba(37,211,102,0.3); border-color: rgba(37,211,102,0.6); }
+  }
+
   footer{
-    text-align:center; margin-top:34px; color:var(--text-faint); font-size:12px;
+    text-align:center; margin-top:16px; color:var(--text-faint); font-size:12px;
     font-family:'JetBrains Mono', monospace;
   }
 
   /* ---------- How-to / instructions section ---------- */
   .howto-steps{ display:flex; flex-direction:column; gap:14px; }
   .howto-step{
-    display:flex; gap:14px; align-items:flex-start;
+    display:flex; gap:14px; align-items:center;
     background:#0a0a12; border:1px solid var(--border-soft);
     border-radius:14px; padding:14px 16px;
   }
@@ -865,12 +1001,15 @@
     color:#04101a; font-family:'JetBrains Mono', monospace; font-weight:800;
     font-size:13px; display:flex; align-items:center; justify-content:center;
   }
+  .howto-step .hs-body{ flex:1 1 auto; min-width:0; }
   .howto-step .hs-body .hs-title{ font-size:14px; font-weight:700; margin-bottom:4px; }
   .howto-step .hs-body .hs-text{ font-size:13px; color:var(--text-dim); line-height:1.55; }
   .howto-step .hs-body a.hs-link{
     color:var(--cyan); text-decoration:none; font-weight:700;
     text-shadow:0 0 10px rgba(255,176,32,0.4);
-    word-break:break-all;
+    word-break:keep-all;
+    overflow-wrap:normal;
+    white-space:nowrap;
   }
   .howto-step .hs-body a.hs-link:hover{ text-decoration:underline; }
 
@@ -1234,10 +1373,10 @@
      and shrink the opened-dropdown / warning-panel text so more detail
      fits without the page feeling oversized. ---------- */
   @media (max-width: 480px){
-    .quick-nav{ flex-wrap:nowrap; gap:5px; width:100%; }
+    .quick-nav{ flex-wrap:nowrap; gap:4px; width:100%; }
     .qn-tab{
       flex:1 1 0; min-width:0;
-      padding:7px 6px; font-size:8.6px; letter-spacing:0.03em;
+      padding:7px 3px; font-size:clamp(6.4px, 2.2vw, 7.8px); letter-spacing:0;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
       text-align:center;
     }
@@ -1264,6 +1403,10 @@
     .warn-panel .w-head .ico{ width:22px; height:22px; font-size:12px; }
     .warn-panel p{ font-size:11.5px; margin:0 0 6px; }
     .warn-panel .spec{ font-size:10.5px; }
+  }
+  @media (max-width: 360px){
+    .quick-nav{ gap:3px; }
+    .qn-tab{ padding:6px 2px; }
   }
 </style>
 </head>
@@ -1328,28 +1471,48 @@
             <div class="qn-drop-slot" id="qnSlotTrust">
               <div class="qn-drop-head"><span class="al-icon">✅</span><span data-i18n="trustLabel">რატომ MOON</span></div>
               <div class="trust-grid">
-                <div class="trust-item">
+                <div class="trust-item moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:12%;left:8%;animation-delay:0s;"></span>
+                    <span style="top:70%;left:20%;animation-delay:.6s;"></span>
+                    <span style="top:30%;left:85%;animation-delay:1.2s;"></span>
+                  </div>
                   <div class="ti-ico">⭐</div>
                   <div>
                     <div class="ti-title" data-i18n="trust1Title">ნამდვილი შეფასებები</div>
                     <div class="ti-text" data-i18n="trust1Text">ყველა შეფასება ქვემოთ დატოვებულია რეალური კლიენტების მიერ — გაეცანი კომენტარებს გვერდის ბოლოში.</div>
                   </div>
                 </div>
-                <div class="trust-item">
+                <div class="trust-item moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:15%;left:10%;animation-delay:.3s;"></span>
+                    <span style="top:65%;left:25%;animation-delay:.9s;"></span>
+                    <span style="top:25%;left:88%;animation-delay:1.5s;"></span>
+                  </div>
                   <div class="ti-ico">🎬</div>
                   <div>
                     <div class="ti-title" data-i18n="trust2Title">ხელით მონტაჟი, არა შაბლონი</div>
                     <div class="ti-text" data-i18n="trust2Text">თითოეული ვიდეო მუშავდება ინდივიდუალურად After Effects & Topaz ტექნოლოგიით, ავტომატური შაბლონების გარეშე.</div>
                   </div>
                 </div>
-                <div class="trust-item">
+                <div class="trust-item moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:18%;left:12%;animation-delay:.6s;"></span>
+                    <span style="top:68%;left:28%;animation-delay:1.2s;"></span>
+                    <span style="top:22%;left:90%;animation-delay:.2s;"></span>
+                  </div>
                   <div class="ti-ico">💬</div>
                   <div>
                     <div class="ti-title" data-i18n="trust3Title">პირდაპირი კონტაქტი მენეჯერთან</div>
                     <div class="ti-text" data-i18n="trust3Text">შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.</div>
                   </div>
                 </div>
-                <div class="trust-item">
+                <div class="trust-item moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:14%;left:9%;animation-delay:.9s;"></span>
+                    <span style="top:66%;left:24%;animation-delay:1.5s;"></span>
+                    <span style="top:28%;left:86%;animation-delay:.5s;"></span>
+                  </div>
                   <div class="ti-ico">🔒</div>
                   <div>
                     <div class="ti-title" data-i18n="trust4Title">გამჭვირვალე ფასი წინასწარ</div>
@@ -1362,14 +1525,26 @@
             <div class="qn-drop-slot" id="qnSlotPortfolio">
               <div class="qn-drop-head"><span class="al-icon">🎬</span><span data-i18n="portfolioLabel">ნამუშევრების პორტფოლიო</span></div>
               <div class="portfolio-grid">
-                <a class="portfolio-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+                <a class="portfolio-card moon-glow-card" id="portfolioCard1" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:10%;left:12%;animation-delay:0s;"></span>
+                    <span style="top:75%;left:20%;animation-delay:.7s;"></span>
+                    <span style="top:20%;left:85%;animation-delay:1.3s;"></span>
+                    <span style="top:80%;left:80%;animation-delay:.4s;"></span>
+                  </div>
                   <div class="portfolio-icon">
                     <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
                   </div>
                   <div class="portfolio-name" id="portfolioName1">@moonaee26</div>
                   <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
                 </a>
-                <a class="portfolio-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+                <a class="portfolio-card moon-glow-card" id="portfolioCard2" target="_blank" rel="noopener noreferrer" aria-label="TikTok video">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:12%;left:15%;animation-delay:.3s;"></span>
+                    <span style="top:78%;left:22%;animation-delay:1s;"></span>
+                    <span style="top:22%;left:82%;animation-delay:1.6s;"></span>
+                    <span style="top:82%;left:78%;animation-delay:.7s;"></span>
+                  </div>
                   <div class="portfolio-icon">
                     <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.99-.85-1.62-2.08-1.65-3.45h-3.09v13.85c0 1.73-1.4 3.13-3.13 3.13a3.13 3.13 0 01-3.13-3.13 3.13 3.13 0 013.13-3.13c.29 0 .57.04.83.12v-3.14a6.28 6.28 0 00-.83-.06A6.27 6.27 0 003.36 16.2a6.27 6.27 0 006.27 6.27 6.27 6.27 0 006.27-6.27V9.02a8.63 8.63 0 005.04 1.62V7.6a5.36 5.36 0 01-4.34-1.78z"/></svg>
                   </div>
@@ -1382,28 +1557,56 @@
             <div class="qn-drop-slot" id="qnSlotHowto">
               <div class="qn-drop-head"><span class="al-icon">📝</span><span data-i18n="howtoLabel">როგორ შევუკვეთო</span></div>
               <div class="howto-steps">
-                <div class="howto-step">
+                <div class="howto-step moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:14%;left:7%;animation-delay:0s;"></span>
+                    <span style="top:72%;left:18%;animation-delay:.5s;"></span>
+                    <span style="top:22%;left:52%;animation-delay:1s;"></span>
+                    <span style="top:76%;left:66%;animation-delay:.2s;"></span>
+                    <span style="top:26%;left:89%;animation-delay:1.4s;"></span>
+                  </div>
                   <div class="hs-num">1</div>
                   <div class="hs-body">
                     <div class="hs-title" data-i18n="howtoStep1Title">გამოთვალე ფასი</div>
                     <div class="hs-text" data-i18n="howtoStep1Text">ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო „<span class="scanner-jump-link" data-jump="videoScannerPanel">VIDEO SCANNER</span>" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.</div>
                   </div>
                 </div>
-                <div class="howto-step">
+                <div class="howto-step moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:16%;left:9%;animation-delay:.3s;"></span>
+                    <span style="top:74%;left:19%;animation-delay:.8s;"></span>
+                    <span style="top:24%;left:54%;animation-delay:1.3s;"></span>
+                    <span style="top:78%;left:68%;animation-delay:.5s;"></span>
+                    <span style="top:28%;left:91%;animation-delay:1.7s;"></span>
+                  </div>
                   <div class="hs-num">2</div>
                   <div class="hs-body">
                     <div class="hs-title" data-i18n="howtoStep2Title">ატვირთე ვიდეო</div>
                     <div class="hs-text" data-i18n="howtoStep2Text">გადადი ჩვენს ატვირთვის გვერდზე და ატვირთე შენი ვიდეო: <a class="hs-link" href="https://mooontransferr.onrender.com/" target="_blank" rel="noopener">mooontransferr.onrender.com</a></div>
                   </div>
                 </div>
-                <div class="howto-step">
+                <div class="howto-step moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:13%;left:8%;animation-delay:.6s;"></span>
+                    <span style="top:71%;left:17%;animation-delay:1.1s;"></span>
+                    <span style="top:23%;left:53%;animation-delay:1.6s;"></span>
+                    <span style="top:77%;left:67%;animation-delay:.4s;"></span>
+                    <span style="top:27%;left:90%;animation-delay:.9s;"></span>
+                  </div>
                   <div class="hs-num">3</div>
                   <div class="hs-body">
                     <div class="hs-title" data-i18n="howtoStep3Title">გამოაგზავნე ლინკი</div>
                     <div class="hs-text" data-i18n="howtoStep3Text">ატვირთვის შემდეგ მიღებული ლინკი TikTok პროფილის ლინკთან ერთად გამოგვიგზავნე WhatsApp ან Telegram ღილაკით ქვემოთ — ველების შევსების შემდეგ ღილაკზე დაჭერით შეტყობინება ავტომატურად მზადდება.</div>
                   </div>
                 </div>
-                <div class="howto-step">
+                <div class="howto-step moon-glow-card">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:12%;left:6%;animation-delay:0s;"></span>
+                    <span style="top:70%;left:16%;animation-delay:.6s;"></span>
+                    <span style="top:20%;left:50%;animation-delay:1.1s;"></span>
+                    <span style="top:75%;left:65%;animation-delay:.3s;"></span>
+                    <span style="top:25%;left:88%;animation-delay:1.5s;"></span>
+                  </div>
                   <div class="hs-num">4</div>
                   <div class="hs-body">
                     <div class="hs-title" data-i18n="howtoStep4Title">დაელოდე დადასტურებას</div>
@@ -1417,7 +1620,6 @@
       </div>
     </div>
     <h1 data-i18n="heroTitle">გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
-    <p data-i18n="heroSub">მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.</p>
   </div>
 
 
@@ -1486,7 +1688,7 @@
           <span class="q-tag">120 FPS</span>
         </button>
       </div>
-      <div class="quality-warn" id="qualityWarn" data-i18n="qualityWarnText">⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედდეს.</div>
+      <div class="quality-warn" id="qualityWarn" data-i18n="qualityWarnText">⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედოს.</div>
 
       <div class="chart-box" id="chartBox">
         <div class="chart-head-row" id="chartHeadRow">
@@ -1519,6 +1721,16 @@
       <div class="link-input-wrap">
         <span class="icon">@</span>
         <input type="text" class="num-input" id="tiktokLink" placeholder="tiktok.com/@username">
+      </div>
+      <div class="tt-confirm tt-red" id="tiktokConfirm" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="tiktokConfirmText">დააჭირეთ დასადასტურებლად</span>
       </div>
       <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
     </div>
@@ -1553,16 +1765,36 @@
     <div class="panel-head" style="margin-bottom:16px;">
       <div class="label" data-i18n="sendOrder">გაგზავნე შეკვეთა</div>
     </div>
+    <div class="order-channels-body">
     <div class="order-grid">
       <button class="order-btn wa" id="orderBtnWA">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:65%;left:20%;animation-delay:.6s;"></span>
+          <span style="top:25%;left:45%;animation-delay:1.1s;"></span>
+          <span style="top:70%;left:60%;animation-delay:.3s;"></span>
+          <span style="top:20%;left:78%;animation-delay:1.5s;"></span>
+          <span style="top:60%;left:92%;animation-delay:.9s;"></span>
+        </div>
         <span class="ico"><svg viewBox="0 0 24 24"><path d="M20.52 3.449C12.831-3.984.106 5.845.061 12.68a12.94 12.94 0 001.767 6.583L0 24l5.001-1.79a12.914 12.914 0 006.482 1.658h.006c6.24 0 12.243-5.302 12.243-12.213 0-3.264-1.325-6.334-3.212-8.206zM12 22.121h-.005a10.13 10.13 0 01-5.185-1.421l-.372-.22-3.851 1.377 1.4-3.756-.242-.386a10.108 10.108 0 01-1.554-5.396c.005-5.579 4.548-10.115 10.133-10.115 2.703 0 5.243 1.057 7.148 2.978 1.905 1.921 2.952 4.464 2.951 7.153-.004 5.58-4.547 10.106-10.423 10.106zm5.556-7.596c-.303-.152-1.793-.885-2.07-.986-.278-.101-.48-.152-.682.152-.202.303-.783.986-.96 1.188-.176.202-.353.227-.655.076-.303-.152-1.279-.472-2.436-1.505-.9-.803-1.508-1.794-1.685-2.097-.176-.303-.019-.467.133-.618.136-.135.303-.353.454-.53.152-.176.202-.303.303-.505.101-.202.05-.379-.025-.53-.076-.152-.682-1.646-.934-2.253-.246-.591-.497-.511-.682-.52-.176-.008-.379-.01-.581-.01-.202 0-.53.076-.808.379-.278.303-1.06 1.036-1.06 2.528s1.085 2.933 1.236 3.135c.151.202 2.135 3.259 5.17 4.57.723.312 1.287.498 1.727.638.726.231 1.386.198 1.908.12.582-.087 1.793-.734 2.046-1.442.253-.708.253-1.315.177-1.442-.075-.126-.278-.202-.581-.353z"/></svg></span>
         <span data-i18n="sendWA">WhatsApp-ზე გაგზავნა</span>
       </button>
-      <button class="order-btn tg" id="orderBtnTG"><span class="ico">✈</span> <span data-i18n="sendTG">Telegram-ზე გაგზავნა</span></button>
+      <button class="order-btn tg" id="orderBtnTG">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:.2s;"></span>
+          <span style="top:65%;left:20%;animation-delay:.8s;"></span>
+          <span style="top:25%;left:45%;animation-delay:1.3s;"></span>
+          <span style="top:70%;left:60%;animation-delay:.5s;"></span>
+          <span style="top:20%;left:78%;animation-delay:1.7s;"></span>
+          <span style="top:60%;left:92%;animation-delay:1.1s;"></span>
+        </div>
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M23.91 3.79L20.3 20.84c-.25 1.21-.98 1.5-2 .94l-5.5-4.07-2.66 2.57c-.3.3-.55.55-1.12.55l.4-5.7 10.38-9.4c.45-.4-.1-.63-.7-.23L7.28 13.55l-5.6-1.75c-1.22-.38-1.24-1.22.26-1.8L22.4 2.35c1.02-.38 1.9.24 1.51 1.44z"/></svg></span>
+        <span data-i18n="sendTG">Telegram-ზე გაგზავნა</span>
+      </button>
     </div>
     <div class="copy-note" id="copyNote"></div>
 
-    <div class="warn-panel warn-starry" id="warnPanel" style="margin-top:18px;">
+    <div class="warn-panel warn-starry" id="warnPanel" style="margin-top:12px;">
       <div class="qn-stars" aria-hidden="true">
         <span style="top:10%;left:10%;animation-delay:0s;"></span>
         <span style="top:20%;left:80%;animation-delay:.5s;"></span>
@@ -1588,6 +1820,7 @@
           <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
         </div>
       </div>
+    </div>
     </div>
   </div>
 
@@ -1615,11 +1848,12 @@
     <div class="c-list" id="commentList">
       <div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!</div>
     </div>
+    <div id="commentsPaginationWrap"></div>
   </div>
 
   </div>
 
-  <footer><span data-i18n="footer">FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
+  <footer><span data-i18n="footer">MOON ENHANCER — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
 
 </div>
 
@@ -1711,11 +1945,13 @@
       msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59.59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
       qualityLabel: 'ვიდეოს ხარისხი (რეზოლუცია / fps)',
       qualityRecBadge: 'რეკომენდირებული',
-      qualityWarnText: '⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედდეს.',
+      qualityWarnText: '⚠️ გირჩევთ 1080p/60fps ფორმატს — უფრო მაღალი ხარისხის ფორმატებზე შესაძლოა მაყურებელს ვიდეო გაუჭედოს.',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
       tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
+      tiktokConfirmPrompt: 'დააჭირეთ დასადასტურებლად',
+      tiktokConfirmDone: '✓ დადასტურებულია',
       videoScanner: 'VIDEO SCANNER',
       dzTitle: 'ატვირთე ვიდეო ავტომატური გაზომვისთვის',
       dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
@@ -1741,7 +1977,7 @@
       warnP2: 'გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.',
       warnP3: 'ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.',
       warnP4: 'კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებელს ვიდეო გაუჭედოს.',
-      footer: 'FRAME.RATE — ზუსტი კალკულაცია, კადრამდე სიზუსტით',
+      footer: 'MOON ENHANCER — ზუსტი კალკულაცია, კადრამდე სიზუსტით',
       chatAssistant: 'ასისტენტი',
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
@@ -1816,6 +2052,8 @@
       subscriberT2: '✓ Lower rate activates',
       tiktokLabel: 'Your TikTok profile link *',
       tiktokError: '⚠️ A TikTok profile link is required to send the order!',
+      tiktokConfirmPrompt: 'Click to confirm',
+      tiktokConfirmDone: '✓ Confirmed',
       videoScanner: 'VIDEO SCANNER',
       dzTitle: 'Upload a video for automatic measurement',
       dzSub: 'Drag it here or click — duration will be filled in automatically',
@@ -1841,7 +2079,7 @@
       warnP2: 'Please make sure your video duration <b>does not exceed 59.59 seconds</b> — anything longer is priced individually and isn\'t included in the calculator.',
       warnP3: 'Also make sure the footage is shot and rendered in <b>1080p / 60fps</b> quality — this affects the cleanliness of the final result.',
       warnP4: 'The calculator also offers <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps</b> options, but we don\'t recommend them — the video may lag for viewers.',
-      footer: 'FRAME.RATE — precise calculation, down to the frame',
+      footer: 'MOON ENHANCER — precise calculation, down to the frame',
       chatAssistant: 'Assistant',
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
@@ -1908,6 +2146,11 @@
     if (typeof refresh === 'function') refresh();
     if (typeof renderComments === 'function') renderComments();
     if (typeof renderTrustRating === 'function') renderTrustRating();
+    if (typeof updateTiktokConfirmBadge === 'function') updateTiktokConfirmBadge();
+    if (typeof equalizeHowtoStepHeights === 'function') {
+      const slot = document.getElementById('qnSlotHowto');
+      if (slot && slot.classList.contains('active')) requestAnimationFrame(equalizeHowtoStepHeights);
+    }
   }
 
   function setLanguage(lang){
@@ -1966,7 +2209,43 @@
     qnDrop.classList.add('open');
     if (qnScrim) qnScrim.classList.add('open');
     qnSetActiveTab(slotId);
+    if (slotId === 'qnSlotHowto') {
+      requestAnimationFrame(equalizeHowtoStepHeights);
+      setTimeout(equalizeHowtoStepHeights, 300);
+    }
   }
+
+  // Forces all 4 "how to order" step cards to share the exact same height
+  // (matching the tallest one) so step 4 — which naturally has less text —
+  // doesn't end up visibly shorter/disproportionate than steps 1-3.
+  function equalizeHowtoStepHeights(){
+    const steps = document.querySelectorAll('#qnSlotHowto .howto-step');
+    if (!steps.length) return;
+    steps.forEach(s => { s.style.minHeight = ''; });
+    let max = 0;
+    steps.forEach(s => { max = Math.max(max, s.offsetHeight); });
+    steps.forEach(s => { s.style.minHeight = max + 'px'; });
+  }
+  // Google Fonts load with display=swap, so on first page load the browser
+  // renders with a fallback font, then swaps to Space Grotesk/JetBrains Mono
+  // once downloaded. If that swap happens after equalizeHowtoStepHeights()
+  // already measured/locked in the heights, step 1-3's text can re-wrap to a
+  // different number of lines while step 4's min-height stays at the old
+  // (now too-short) value — recompute once the real fonts are actually ready.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      const slot = document.getElementById('qnSlotHowto');
+      if (slot && slot.classList.contains('active')) equalizeHowtoStepHeights();
+    });
+  }
+  let _howtoResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(_howtoResizeTimer);
+    _howtoResizeTimer = setTimeout(() => {
+      const slot = document.getElementById('qnSlotHowto');
+      if (slot && slot.classList.contains('active')) equalizeHowtoStepHeights();
+    }, 150);
+  });
 
   function closeQnDrop(){
     if (!qnDrop) return;
@@ -2175,6 +2454,39 @@
       tiktokError.style.display = 'none';
     }
   });
+
+  // TikTok link confirmation badge: shows a red starry prompt as soon as
+  // something is typed; clicking it turns it green/starry and marks the
+  // link as confirmed. Editing the link afterwards resets it back to red
+  // so the person re-confirms whatever they changed it to.
+  const tiktokConfirm = document.getElementById('tiktokConfirm');
+  const tiktokConfirmText = document.getElementById('tiktokConfirmText');
+  let tiktokLinkConfirmed = false;
+
+  function updateTiktokConfirmBadge(){
+    const hasValue = tiktokLink.value.trim() !== '';
+    if (!hasValue) {
+      tiktokConfirm.style.display = 'none';
+      return;
+    }
+    tiktokConfirm.style.display = 'block';
+    tiktokConfirm.classList.toggle('tt-red', !tiktokLinkConfirmed);
+    tiktokConfirm.classList.toggle('tt-green', tiktokLinkConfirmed);
+    tiktokConfirmText.textContent = tiktokLinkConfirmed ? t('tiktokConfirmDone') : t('tiktokConfirmPrompt');
+  }
+
+  tiktokLink.addEventListener('input', () => {
+    tiktokLinkConfirmed = false;
+    updateTiktokConfirmBadge();
+  });
+
+  tiktokConfirm.addEventListener('click', () => {
+    if (tiktokLinkConfirmed || tiktokLink.value.trim() === '') return;
+    tiktokLinkConfirmed = true;
+    updateTiktokConfirmBadge();
+  });
+
+  updateTiktokConfirmBadge();
 
   refresh();
 
@@ -2636,7 +2948,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
     {
       kw: ['მოთხოვნ','ხარისხ','1080','60fps','ფორმატ','რეზოლუც'],
-      a: 'რეკომენდირებული ფორმატია 1080×1920 რეზოლუცია, 60fps. კალკულატორში ასევე ხელმისაწვდომია 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps ვარიანტები (მაღალი ფასით), მაგრამ არ გირჩევთ, რადგან შესაძლოა მაყურებელს ვიდეო თავისით გაუჭედდეს. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ფასდება ინდივიდუალურად.',
+      a: 'რეკომენდირებული ფორმატია 1080×1920 რეზოლუცია, 60fps. კალკულატორში ასევე ხელმისაწვდომია 1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps ვარიანტები (მაღალი ფასით), მაგრამ არ გირჩევთ, რადგან შესაძლოა მაყურებელს ვიდეო თავისით გაუჭედოს. ხანგრძლივობა არ უნდა აღემატებოდეს 59.59 წამს — მეტი ხანგრძლივობა ფასდება ინდივიდუალურად.',
     },
     {
       kw: ['tiktok','ტიკტოკ'],
@@ -3006,6 +3318,11 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   let commentsCache = [];
   let commentsPage = 1;
   const COMMENTS_PER_PAGE = 4;
+  // Keeps the comment list from visually shrinking when a later page has
+  // fewer items than an earlier one (e.g. page 1 has 4 comments, page 2
+  // has only 1) — we remember the tallest page we've rendered and never
+  // let the container go shorter than that.
+  let commentsListMinHeight = 0;
 
   function renderCommentsPagination(totalItems){
     const totalPages = Math.max(1, Math.ceil(totalItems / COMMENTS_PER_PAGE));
@@ -3064,7 +3381,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (!replies.length) return '';
     return '<div class="c-replies">' + replies.map(r =>
       '<div class="c-reply-item"><div class="c-head"><span class="c-author">' + escapeHtml(r.name) +
-      (r.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
+      (r.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
       '</span><span class="c-date">' + formatCommentDate(r.ts) + '</span></div>' +
       '<div class="c-body">' + escapeHtml(r.text) + '</div></div>'
     ).join('') + '</div>';
@@ -3073,18 +3390,26 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   function renderComments(){
     if (!commentList) return;
     applyAdminNameLock();
+    const paginationWrap = document.getElementById('commentsPaginationWrap');
     const displayList = sortCommentsForDisplay(commentsCache);
     if (!displayList.length) {
       commentList.innerHTML = '<div class="c-empty" id="commentEmpty" data-i18n="commentEmpty">' + t('commentEmpty') + '</div>';
+      if (paginationWrap) paginationWrap.innerHTML = '';
     } else {
       const totalPages = Math.max(1, Math.ceil(displayList.length / COMMENTS_PER_PAGE));
       if (commentsPage > totalPages) commentsPage = totalPages;
       const start = (commentsPage - 1) * COMMENTS_PER_PAGE;
       const pageItems = displayList.slice(start, start + COMMENTS_PER_PAGE);
+      // Pagination is rendered into its own sibling wrapper (#commentsPaginationWrap)
+      // right after #commentList, instead of being appended as the last flex child
+      // inside #commentList. That way, when a later page has fewer comments, the
+      // min-height kept on #commentList (below) still reserves the same box height,
+      // and the pagination — anchored right under that fixed-height box — never
+      // jumps up to sit closer to a shorter set of comments.
       commentList.innerHTML = pageItems.map(c =>
         '<div class="c-item' + (c.pinned ? ' c-pinned' : '') + '" data-id="' + c.id + '"><div class="c-head"><span class="c-author">' + escapeHtml(c.name) +
-        (c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '') +
-        (c.pinned ? '<span class="pin-badge">📌 ' + (currentLang === 'en' ? 'PINNED' : 'დაპინული') + '</span>' : '') +
+        (c.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
+        (c.pinned ? '<span class="pin-badge">📌 ' + (currentLang === 'en' ? 'PINNED' : 'აპინული') + '</span>' : '') +
         (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
         '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div>' +
         '<div class="c-body">' + escapeHtml(c.text) + '</div>' +
@@ -3096,11 +3421,18 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
           '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
         '</div>' +
         '</div>'
-      ).join('') + renderCommentsPagination(displayList.length);
+      ).join('');
+      if (paginationWrap) paginationWrap.innerHTML = renderCommentsPagination(displayList.length);
     }
     renderTrustRating();
     wireReplyButtons();
     wireCommentsPagination();
+    requestAnimationFrame(() => {
+      commentList.style.minHeight = '';
+      const h = commentList.scrollHeight;
+      if (h > commentsListMinHeight) commentsListMinHeight = h;
+      commentList.style.minHeight = commentsListMinHeight + 'px';
+    });
   }
 
   function wireReplyButtons(){
