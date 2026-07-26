@@ -247,6 +247,10 @@
       order:2; flex:1 1 100%;
       font-size:9.5px; letter-spacing:0.08em; gap:6px;
       margin-top:2px;
+      white-space:normal; overflow:visible;
+    }
+    .topbar-center > span:not(.tc-dot){
+      white-space:normal; overflow:visible; text-overflow:clip; text-align:center;
     }
   }
   @media (max-width: 360px){
@@ -1189,6 +1193,11 @@
     20%,80%{ transform:translateX(2px); }
     30%,50%,70%{ transform:translateX(-4px); }
     40%,60%{ transform:translateX(4px); }
+  }
+  .tt-confirm.tt-error-flash{ animation: ttErrorFlash 0.6s ease; }
+  @keyframes ttErrorFlash{
+    0%, 100%{ box-shadow: 0 0 0 rgba(255,92,61,0); border-color: var(--warn-soft); }
+    30%{ box-shadow: 0 0 26px rgba(255,92,61,0.65); border-color: var(--warn); background-color: rgba(255,92,61,0.18); }
   }
   .tt-confirm .qn-stars{ z-index:0; }
   .tt-confirm-text{ position:relative; z-index:1; }
@@ -2987,9 +2996,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (!tiktokLinkConfirmed) {
       tiktokError.style.display = 'none';
       tiktokConfirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      tiktokConfirm.classList.remove('tt-shake');
+      tiktokConfirm.classList.remove('tt-shake', 'tt-error-flash');
       void tiktokConfirm.offsetWidth;
-      tiktokConfirm.classList.add('tt-shake');
+      tiktokConfirm.classList.add('tt-shake', 'tt-error-flash');
       return false;
     }
     return true;
@@ -3029,6 +3038,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       window.removeEventListener('visibilitychange', onBlur);
       if (!handled) fallback();
     }, 1200);
+  }
+
+  function isAppleMobileDevice(){
+    const ua = navigator.userAgent || '';
+    const iOSByUA = /iPad|iPhone|iPod/.test(ua);
+    // iPadOS 13+ reports itself as a Mac in the user agent, so it must be
+    // told apart from real desktop Macs using the touch-points check.
+    const iPadOSByPlatform = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    return iOSByUA || iPadOSByPlatform;
   }
 
   function writePendingTabLoader(tabWin){
@@ -3075,8 +3093,12 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     // Open the tab synchronously, inside the click gesture — iOS/iPadOS Safari
     // blocks window.open() calls that happen later inside a setTimeout, which is
     // why orders stopped opening on iPad once the "processing" delay was added.
-    const pendingTab = window.open('', '_blank');
-    writePendingTabLoader(pendingTab);
+    // The pre-opened-tab workaround is only needed on iOS/iPadOS Safari,
+    // which blocks window.open() calls made after a setTimeout delay.
+    // Other devices keep the original flow (nicer, no blank tab flash).
+    const needsIOSWorkaround = isAppleMobileDevice();
+    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
+    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const message = buildOrderMessage();
       sendTelegramNotification(buildOrderTgMessage('WhatsApp'));
@@ -3089,8 +3111,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (!validateBeforeSend()) return;
     const btn = document.getElementById('orderBtnTG');
     const textEl = document.getElementById('orderBtnTGText');
-    const pendingTab = window.open('', '_blank');
-    writePendingTabLoader(pendingTab);
+    const needsIOSWorkaround = isAppleMobileDevice();
+    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
+    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const message = buildOrderMessage();
       sendTelegramNotification(buildOrderTgMessage('Telegram'));
