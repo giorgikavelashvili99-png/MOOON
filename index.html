@@ -928,6 +928,16 @@
     border-color: rgba(255,92,61,0.5);
   }
   .warn-panel:not(.open) .qn-stars span{ animation-play-state:paused; opacity:0; }
+  /* The little "twinkling star" dots (shared decoration used across the
+     site) flash their opacity on/off every couple seconds. Inside this
+     panel there are 7 of them packed close together, so on open they all
+     start flashing at once — at normal speed that reads as the panel (and
+     because it sits low on the page, the area around it) flickering. Kept
+     as a plain static glow here instead, no animation. */
+  .warn-panel .qn-stars span{
+    animation: none;
+    opacity: 0.4;
+  }
   @keyframes warnBorderGlow{
     0%,100%{ box-shadow: 0 0 0 rgba(255,92,61,0); border-color: var(--warn-soft); }
     50%{ box-shadow: 0 0 26px rgba(255,92,61,0.18); border-color: rgba(255,92,61,0.55); }
