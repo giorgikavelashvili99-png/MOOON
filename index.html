@@ -228,17 +228,17 @@
       0 0 50px rgba(255,45,77,0.45);
   }
   @media (max-width: 640px){
-    .topbar{ flex-wrap:wrap; padding:12px 14px; }
+    .topbar{ flex-wrap:wrap; padding:12px 14px; row-gap:8px; }
     .topbar-group{
-      display:flex; flex-wrap:nowrap; align-items:center; justify-content:center;
-      gap:6px; width:100%; order:1; min-width:0;
+      display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+      gap:7px 9px; width:100%; order:1; min-width:0;
     }
-    .brand{ order:0; min-width:0; gap:5px; flex-shrink:1; }
-    .brand .name{ font-size:14px; }
-    .visitors-badge{ font-size:10px; padding:2px 5px; gap:3px; margin-left:0; }
-    .rating-topbar-badge{ order:0; font-size:10px; padding:3px 6px; gap:2px; }
-    .lang-switch{ order:0; gap:4px; flex-shrink:0; }
-    .lang-btn{ width:34px; height:28px; font-size:9.5px; }
+    .brand{ order:0; min-width:0; gap:5px; flex-shrink:0; }
+    .brand .name{ font-size:14px; white-space:nowrap; }
+    .visitors-badge{ font-size:10px; padding:3px 6px; gap:3px; margin-left:0; white-space:nowrap; flex-shrink:0; }
+    .rating-topbar-badge{ order:0; font-size:10px; padding:4px 8px; gap:3px; flex-shrink:0; }
+    .lang-switch{ order:0; gap:5px; flex-shrink:0; }
+    .lang-btn{ width:36px; height:30px; font-size:10px; }
     .topbar-center{
       order:2; flex:1 1 100%;
       font-size:9.5px; letter-spacing:0.08em; gap:6px;
@@ -246,12 +246,12 @@
     }
   }
   @media (max-width: 360px){
+    .topbar-group{ gap:6px 8px; row-gap:8px; }
     .brand .name{ font-size:12.5px; }
-    .visitors-badge{ font-size:9px; padding:2px 4px; }
-    .rating-topbar-badge{ font-size:9px; padding:2px 5px; }
-    .lang-btn{ width:30px; height:26px; font-size:8.5px; }
+    .visitors-badge{ font-size:9px; padding:2px 5px; }
+    .rating-topbar-badge{ font-size:9px; padding:3px 6px; }
+    .lang-btn{ width:32px; height:28px; font-size:9px; }
     .topbar{ padding:10px 10px; }
-    .topbar-group{ gap:4px; }
   }
 
   .hero{ text-align:center; margin-bottom:38px; }
@@ -564,6 +564,32 @@
   .comments-panel textarea.c-text{
     resize:none; height:90px; max-height:160px; overflow-y:auto; line-height:1.5;
   }
+  .c-text-wrap{ position:relative; }
+  .c-text-wrap textarea{ padding-right:44px !important; }
+  .c-emoji-btn{
+    position:absolute; right:8px; bottom:8px; z-index:2;
+    width:28px; height:28px; border-radius:8px;
+    background:rgba(255,255,255,0.05); border:1px solid var(--border-soft);
+    font-size:15px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0.75; transition:opacity .15s, background .15s;
+  }
+  .c-emoji-btn:hover{ opacity:1; background:rgba(255,255,255,0.09); }
+  .c-emoji-panel{
+    display:none; position:absolute; right:0; bottom:calc(100% + 6px); z-index:6;
+    grid-template-columns:repeat(7, 1fr); gap:2px;
+    width:238px; max-width:calc(100vw - 60px);
+    background:#0f0f18; border:1px solid var(--border);
+    border-radius:12px; padding:8px;
+    box-shadow:0 12px 28px rgba(0,0,0,0.45);
+  }
+  .c-emoji-panel.open{ display:grid; }
+  .c-emoji-panel .c-emoji-opt{
+    background:none; border:none; cursor:pointer;
+    font-size:19px; line-height:1; padding:5px;
+    border-radius:8px; transition:background .12s;
+  }
+  .c-emoji-panel .c-emoji-opt:hover{ background:rgba(255,255,255,0.08); }
   .comments-panel .c-submit{
     align-self:flex-end; background:var(--purple); color:#fff; border:none;
     border-radius:12px; padding:11px 22px; font-weight:700; font-size:14px;
@@ -605,9 +631,9 @@
   }
   .comments-panel .c-item .c-author{ font-weight:700; font-size:13px; color:var(--cyan); }
   .comments-panel .c-item .c-date{ font-size:10.5px; color:var(--text-faint); }
-  .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
+  .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
   .comments-panel .c-item .c-body.c-clamped{
-    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; line-clamp:4;
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:1; line-clamp:1;
     overflow:hidden;
   }
   .comments-panel .c-item .c-more-btn{
@@ -1312,7 +1338,7 @@
   .c-reply-item .c-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
   .c-reply-item .c-author{ font-weight:700; font-size:12px; color:var(--cyan); }
   .c-reply-item .c-date{ font-size:10px; color:var(--text-faint); }
-  .c-reply-item .c-body{ font-size:12.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
+  .c-reply-item .c-body{ font-size:12.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
 
   .chat-fab{
     position:fixed; right:20px; bottom:20px; z-index:50;
@@ -1905,7 +1931,11 @@
         </span>
       </div>
       <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი">
-      <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
+      <div class="c-text-wrap">
+        <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
+        <button type="button" class="c-emoji-btn" id="commentEmojiBtn" aria-label="emoji">🙂</button>
+        <div class="c-emoji-panel" id="commentEmojiPanel"></div>
+      </div>
       <div class="c-error" id="commentError"></div>
       <button class="c-submit" id="commentSubmit" data-i18n="commentSubmit">გამოქვეყნება</button>
     </div>
@@ -2055,6 +2085,7 @@
       commentSubmit: 'გამოქვეყნება',
       commentEmpty: 'ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!',
       commentReadMore: 'მეტის ნახვა',
+      commentReadLess: 'ნაკლების ნახვა',
       commentErrEmpty: 'გთხოვთ შეავსოთ სახელისა და კომენტარის ველები.',
       commentErrRating: 'გთხოვთ მონიშნოთ შეფასება ვარსკვლავებით.',
       commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
@@ -2159,6 +2190,7 @@
       commentSubmit: 'Post',
       commentEmpty: 'No comments yet — be the first!',
       commentReadMore: 'Read more',
+      commentReadLess: 'Show less',
       commentErrEmpty: 'Please fill in both the name and comment fields.',
       commentErrRating: 'Please select a star rating.',
       commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
@@ -3362,6 +3394,52 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     return '★'.repeat(r) + '☆'.repeat(5 - r);
   }
 
+  // Native unicode emoji — renders using each device's own emoji set
+  // (Apple's on iOS/macOS) since these are plain characters, not images.
+  const EMOJI_LIST = [
+    '😀','😁','😂','🤣','😊','😍','😘','😉','😎','🤩',
+    '🥳','😇','🙂','😴','😅','🤔','🙄','😬','😢','😭',
+    '😡','🥺','😱','🤗','👍','👎','👏','🙏','💪','🔥',
+    '✨','🎉','❤️','💯','😂','🤝','👌','✅','🙌','😅'
+  ];
+  function buildEmojiPanelHtml(){
+    return EMOJI_LIST.map(e => '<button type="button" class="c-emoji-opt">' + e + '</button>').join('');
+  }
+  function wireEmojiPickers(scopeEl){
+    if (!scopeEl) return;
+    scopeEl.querySelectorAll('.c-text-wrap').forEach(wrap => {
+      if (wrap.dataset.emojiWired === '1') return;
+      wrap.dataset.emojiWired = '1';
+      const btn = wrap.querySelector('.c-emoji-btn');
+      const panel = wrap.querySelector('.c-emoji-panel');
+      const textarea = wrap.querySelector('textarea');
+      if (!btn || !panel || !textarea) return;
+      panel.innerHTML = buildEmojiPanelHtml();
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = !panel.classList.contains('open');
+        document.querySelectorAll('.c-emoji-panel.open').forEach(p => p.classList.remove('open'));
+        if (willOpen) panel.classList.add('open');
+      });
+      panel.querySelectorAll('.c-emoji-opt').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const start = textarea.selectionStart || textarea.value.length;
+          const end = textarea.selectionEnd || textarea.value.length;
+          const emoji = opt.textContent;
+          textarea.value = textarea.value.slice(0, start) + emoji + textarea.value.slice(end);
+          const pos = start + emoji.length;
+          textarea.focus();
+          textarea.setSelectionRange(pos, pos);
+        });
+      });
+    });
+  }
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.c-emoji-btn') || e.target.closest('.c-emoji-panel')) return;
+    document.querySelectorAll('.c-emoji-panel.open').forEach(p => p.classList.remove('open'));
+  });
+
   function sortCommentsForDisplay(list){
     return list.slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
   }
@@ -3404,15 +3482,27 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   let commentsCache = [];
   let commentsPage = 1;
   const COMMENTS_PER_PAGE = 3;
+  const COMMENTS_PAGE_WINDOW = 5;
   let commentsListMinHeight = 0;
 
   function renderCommentsPagination(totalItems){
     const totalPages = Math.max(1, Math.ceil(totalItems / COMMENTS_PER_PAGE));
     if (commentsPage > totalPages) commentsPage = totalPages;
     if (totalPages <= 1) return '';
+
     let html = '<div class="c-pagination" id="commentsPagination">';
-    for (let p = 1; p <= totalPages; p++) {
+    const lastNumbered = Math.min(COMMENTS_PAGE_WINDOW, totalPages);
+    for (let p = 1; p <= lastNumbered; p++) {
       html += '<button type="button" class="c-page-btn' + (p === commentsPage ? ' active' : '') + '" data-page="' + p + '">' + p + '</button>';
+    }
+    if (totalPages > COMMENTS_PAGE_WINDOW) {
+      // Once the visible page moves past the first window, the "next"
+      // button keeps counting upward on its own (6, 7, 8, …) instead of
+      // ever printing every page number on screen.
+      const beyondWindow = commentsPage > COMMENTS_PAGE_WINDOW;
+      const nextP = Math.min(beyondWindow ? commentsPage + 1 : COMMENTS_PAGE_WINDOW + 1, totalPages);
+      const label = beyondWindow ? String(nextP) : '…';
+      html += '<button type="button" class="c-page-btn c-page-next" data-page="' + nextP + '">' + label + '</button>';
     }
     html += '</div>';
     return html;
@@ -3498,7 +3588,11 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         '<div class="c-actions"><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
         '<div class="c-reply-form" id="replyForm_' + c.id + '">' +
           '<input type="text" class="c-reply-name" maxlength="40" placeholder="' + t('commentNamePh') + '">' +
-          '<textarea class="c-reply-text" maxlength="300" placeholder="' + t('commentTextPh') + '"></textarea>' +
+          '<div class="c-text-wrap">' +
+            '<textarea class="c-reply-text" maxlength="300" placeholder="' + t('commentTextPh') + '"></textarea>' +
+            '<button type="button" class="c-emoji-btn" aria-label="emoji">🙂</button>' +
+            '<div class="c-emoji-panel"></div>' +
+          '</div>' +
           '<button type="button" class="c-reply-submit" data-id="' + c.id + '">' + t('commentSubmit') + '</button>' +
         '</div>' +
         '</div>';
@@ -3509,6 +3603,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     wireReplyButtons();
     wireCommentsPagination();
     wireMoreButtons();
+    wireEmojiPickers(commentList);
     requestAnimationFrame(() => {
       commentList.style.minHeight = '';
       commentList.querySelectorAll('.c-body.c-clamped').forEach(body => {
@@ -3526,8 +3621,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     commentList.querySelectorAll('.c-more-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const body = btn.previousElementSibling;
-        if (body) body.classList.remove('c-clamped');
-        btn.style.display = 'none';
+        if (!body) return;
+        const isExpanded = !body.classList.contains('c-clamped');
+        if (isExpanded) {
+          body.classList.add('c-clamped');
+          btn.textContent = t('commentReadMore');
+        } else {
+          body.classList.remove('c-clamped');
+          btn.textContent = t('commentReadLess');
+        }
       });
     });
   }
@@ -3642,6 +3744,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     });
   }
 
+  wireEmojiPickers(document);
   loadComments();
 
   // ============================================================
