@@ -437,13 +437,12 @@
 
   .sub-note{
     margin:16px auto 0; max-width:420px;
-    display:flex; align-items:flex-start; justify-content:center; gap:8px;
-    font-size:12.5px; line-height:1.5; color:var(--text-dim); text-align:center;
+    font-size:12.5px; line-height:1.6; color:var(--text-dim); text-align:center;
     background:rgba(255,210,122,0.05);
     border:1px solid rgba(255,210,122,0.16);
-    padding:10px 16px; border-radius:14px;
+    padding:12px 18px; border-radius:14px;
   }
-  .sub-note::before{ content:'💡'; flex:0 0 auto; font-size:13px; line-height:1.4; }
+  .sub-note::before{ content:'💡 '; }
   .sub-note b{ color:var(--gold); }
 
   .field{ margin-bottom:22px; }
@@ -787,13 +786,14 @@
 
   .quality-grid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:11px;
+    margin-top:10px;
   }
   @media (max-width:480px){ .quality-grid{ grid-template-columns:1fr; } }
   .quality-btn{
     position:relative;
-    overflow:hidden;
+    overflow:visible;
     display:flex; flex-direction:column; align-items:flex-start; gap:2px;
-    padding:15px 16px 15px 20px;
+    padding:19px 16px 15px 20px;
     background:
       linear-gradient(180deg, rgba(255,255,255,0.025), transparent 40%),
       #0a0a12;
@@ -835,11 +835,13 @@
   }
   .quality-btn.active .q-check{ display:flex; }
   .quality-btn .q-rec{
-    position:absolute; top:-8px; left:14px;
+    position:absolute; top:-10px; left:14px; z-index:2;
     font-family:'JetBrains Mono', monospace; font-size:9px; font-weight:800; letter-spacing:0.05em;
     background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#04101a;
-    padding:2px 7px; border-radius:6px; text-transform:uppercase;
+    padding:3px 8px; border-radius:6px; text-transform:uppercase;
+    white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,0.35);
   }
+  @media (max-width:380px){ .quality-btn .q-rec{ font-size:8px; padding:3px 6px; left:10px; } }
   .quality-warn{
     display:none;
     margin-top:12px; padding:11px 14px; border-radius:12px;
@@ -1181,6 +1183,13 @@
     transition: transform .15s ease;
   }
   .tt-confirm:active{ transform:scale(0.98); }
+  .tt-confirm.tt-shake{ animation: ttShake 0.4s ease; }
+  @keyframes ttShake{
+    10%,90%{ transform:translateX(-1px); }
+    20%,80%{ transform:translateX(2px); }
+    30%,50%,70%{ transform:translateX(-4px); }
+    40%,60%{ transform:translateX(4px); }
+  }
   .tt-confirm .qn-stars{ z-index:0; }
   .tt-confirm-text{ position:relative; z-index:1; }
 
@@ -2975,6 +2984,14 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       tiktokLink.focus();
       return false;
     }
+    if (!tiktokLinkConfirmed) {
+      tiktokError.style.display = 'none';
+      tiktokConfirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      tiktokConfirm.classList.remove('tt-shake');
+      void tiktokConfirm.offsetWidth;
+      tiktokConfirm.classList.add('tt-shake');
+      return false;
+    }
     return true;
   }
 
@@ -3014,6 +3031,21 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     }, 1200);
   }
 
+  function writePendingTabLoader(tabWin){
+    if (!tabWin) return;
+    try {
+      tabWin.document.write(
+        '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+        '<title>MOON</title></head><body style="margin:0;height:100vh;display:flex;' +
+        'align-items:center;justify-content:center;background:#08080d;' +
+        'font-family:sans-serif;color:#8b8ba3;">' +
+        '<p>' + escapeHtml(t('orderProcessing')) + '</p></body></html>'
+      );
+      tabWin.document.close();
+    } catch(e) { /* ignore — some browsers restrict document.write on foreign tabs */ }
+  }
+
   const ORDER_PROCESSING_MS = 2000;
   const ORDER_REDIRECT_DELAY_MS = 1000;
 
@@ -3040,11 +3072,16 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (!validateBeforeSend()) return;
     const btn = document.getElementById('orderBtnWA');
     const textEl = document.getElementById('orderBtnWAText');
+    // Open the tab synchronously, inside the click gesture — iOS/iPadOS Safari
+    // blocks window.open() calls that happen later inside a setTimeout, which is
+    // why orders stopped opening on iPad once the "processing" delay was added.
+    const pendingTab = window.open('', '_blank');
+    writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const message = buildOrderMessage();
       sendTelegramNotification(buildOrderTgMessage('WhatsApp'));
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
     });
   });
 
@@ -3052,12 +3089,14 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (!validateBeforeSend()) return;
     const btn = document.getElementById('orderBtnTG');
     const textEl = document.getElementById('orderBtnTGText');
+    const pendingTab = window.open('', '_blank');
+    writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const message = buildOrderMessage();
       sendTelegramNotification(buildOrderTgMessage('Telegram'));
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
       flashCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
     });
   });
@@ -4171,4 +4210,4 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 </script>
 
 </body>
-</html>>>>>>
+</html>>>>>>>>
