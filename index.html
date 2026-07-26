@@ -231,6 +231,21 @@
       0 0 28px rgba(77,95,255,0.7),
       0 0 50px rgba(77,95,255,0.45);
   }
+  @media (min-width: 641px) and (max-width: 1024px){
+    .topbar{ flex-wrap:wrap; row-gap:6px; }
+    .brand .name{ font-size:14px; }
+    .visitors-badge{ font-size:10px; padding:3px 6px; gap:3px; }
+    .rating-topbar-badge{ font-size:10.5px; padding:4px 8px; gap:3px; }
+    .lang-btn{ min-width:38px; height:30px; font-size:10.5px; }
+    .topbar-center{
+      font-size:10px; letter-spacing:0.08em; gap:6px;
+      white-space:normal; overflow:visible; flex-basis:100%; order:4;
+      margin-top:6px;
+    }
+    .topbar-center > span:not(.tc-dot){
+      white-space:normal; overflow:visible; text-overflow:clip; text-align:center;
+    }
+  }
   @media (max-width: 640px){
     .topbar{ flex-wrap:wrap; padding:12px 14px; row-gap:8px; }
     .topbar-group{
@@ -724,6 +739,11 @@
     background:linear-gradient(180deg, var(--purple), #29337a);
     border-color:var(--purple); color:#fff;
     box-shadow:0 0 14px rgba(77,95,255,0.45);
+  }
+  .comments-panel .c-page-btn:disabled{ opacity:0.35; cursor:default; pointer-events:none; }
+  .comments-panel .c-page-ellipsis{
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-faint);
+    padding:0 2px; user-select:none;
   }
 
   .admin-gear{
@@ -1480,7 +1500,24 @@
     vertical-align:middle;
     box-shadow: 0 0 10px rgba(255,210,122,0.4);
   }
-  .c-item .c-actions{ display:flex; justify-content:flex-end; margin-top:6px; }
+  .c-item .c-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:6px; gap:10px; }
+  .c-vote-row{ display:flex; align-items:center; gap:6px; }
+  .c-vote-btn{
+    display:inline-flex; align-items:center; gap:5px;
+    background:#0a0a12; border:1px solid var(--border-soft); border-radius:9px;
+    padding:5px 9px; font-family:'JetBrains Mono', monospace; font-size:11.5px;
+    color:var(--text-dim); cursor:pointer; transition:.15s;
+  }
+  .c-vote-btn:hover{ border-color:var(--purple-soft); color:var(--text); transform:translateY(-1px); }
+  .c-vote-btn .c-vote-count{ min-width:9px; text-align:left; }
+  .c-vote-btn.c-like.voted{
+    border-color: rgba(37,211,102,0.45); color:#8cffb0;
+    background:rgba(37,211,102,0.08);
+  }
+  .c-vote-btn.c-dislike.voted{
+    border-color: rgba(255,92,61,0.45); color:#ffb3b3;
+    background:rgba(255,92,61,0.08);
+  }
   .c-reply-btn{
     background:none; border:none; color:var(--text-faint); font-size:11.5px;
     font-family:'Space Grotesk', sans-serif; cursor:pointer; padding:4px 6px;
@@ -3740,7 +3777,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   let commentsCache = [];
   let commentsPage = 1;
   const COMMENTS_PER_PAGE = 3;
-  const COMMENTS_PAGE_WINDOW = 5;
   let commentsListMinHeight = 0;
 
   function renderCommentsPagination(totalItems){
@@ -3748,20 +3784,21 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (commentsPage > totalPages) commentsPage = totalPages;
     if (totalPages <= 1) return '';
 
+    // Always keep page 1, the last page, and the current page (with its
+    // immediate neighbours) visible, so the active page never disappears
+    // off the numbered list the way the old fixed 1-5 window did.
+    const keep = new Set([1, totalPages, commentsPage - 1, commentsPage, commentsPage + 1]);
+    const pages = [...keep].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+
     let html = '<div class="c-pagination" id="commentsPagination">';
-    const lastNumbered = Math.min(COMMENTS_PAGE_WINDOW, totalPages);
-    for (let p = 1; p <= lastNumbered; p++) {
+    html += '<button type="button" class="c-page-btn c-page-nav" data-page="' + Math.max(1, commentsPage - 1) + '"' + (commentsPage === 1 ? ' disabled' : '') + '>‹</button>';
+    let prev = 0;
+    pages.forEach(p => {
+      if (prev && p - prev > 1) html += '<span class="c-page-ellipsis">…</span>';
       html += '<button type="button" class="c-page-btn' + (p === commentsPage ? ' active' : '') + '" data-page="' + p + '">' + p + '</button>';
-    }
-    if (totalPages > COMMENTS_PAGE_WINDOW) {
-      // Once the visible page moves past the first window, the "next"
-      // button keeps counting upward on its own (6, 7, 8, …) instead of
-      // ever printing every page number on screen.
-      const beyondWindow = commentsPage > COMMENTS_PAGE_WINDOW;
-      const nextP = Math.min(beyondWindow ? commentsPage + 1 : COMMENTS_PAGE_WINDOW + 1, totalPages);
-      const label = beyondWindow ? String(nextP) : '…';
-      html += '<button type="button" class="c-page-btn c-page-next" data-page="' + nextP + '">' + label + '</button>';
-    }
+      prev = p;
+    });
+    html += '<button type="button" class="c-page-btn c-page-nav" data-page="' + Math.min(totalPages, commentsPage + 1) + '"' + (commentsPage === totalPages ? ' disabled' : '') + '>›</button>';
     html += '</div>';
     return html;
   }
@@ -3843,7 +3880,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         '<div class="c-body c-clamped">' + escapeHtml(c.text) + '</div>' +
         '<button type="button" class="c-more-btn">' + t('commentReadMore') + '</button>' +
         renderReplies(c) +
-        '<div class="c-actions"><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
+        '<div class="c-actions"><div class="c-vote-row">' +
+          '<button type="button" class="c-vote-btn c-like' + (getCommentVote(c.id) === 'like' ? ' voted' : '') + '" data-id="' + c.id + '">👍 <span class="c-vote-count">' + (c.likes || 0) + '</span></button>' +
+          '<button type="button" class="c-vote-btn c-dislike' + (getCommentVote(c.id) === 'dislike' ? ' voted' : '') + '" data-id="' + c.id + '">👎 <span class="c-vote-count">' + (c.dislikes || 0) + '</span></button>' +
+        '</div><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
         '<div class="c-reply-form" id="replyForm_' + c.id + '">' +
           '<input type="text" class="c-reply-name" maxlength="40" placeholder="' + t('commentNamePh') + '">' +
           '<div class="c-text-wrap">' +
@@ -3859,6 +3899,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     }
     renderTrustRating();
     wireReplyButtons();
+    wireVoteButtons();
     wireCommentsPagination();
     wireMoreButtons();
     wireEmojiPickers(commentList);
@@ -3887,6 +3928,62 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         } else {
           body.classList.remove('c-clamped');
           btn.textContent = t('commentReadLess');
+        }
+      });
+    });
+  }
+
+  const COMMENT_VOTES_KEY = 'moon_comment_votes_v1';
+
+  function getVoteMap(){
+    try{ return JSON.parse(localStorage.getItem(COMMENT_VOTES_KEY) || '{}'); } catch(e){ return {}; }
+  }
+  function saveVoteMap(map){
+    try{ localStorage.setItem(COMMENT_VOTES_KEY, JSON.stringify(map)); } catch(e){ /* ignore */ }
+  }
+  function getCommentVote(id){
+    return getVoteMap()[String(id)] || null;
+  }
+  function setCommentVote(id, vote){
+    const map = getVoteMap();
+    if (vote) map[String(id)] = vote; else delete map[String(id)];
+    saveVoteMap(map);
+  }
+
+  function wireVoteButtons(){
+    commentList.querySelectorAll('.c-vote-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (btn.disabled) return;
+        const id = btn.getAttribute('data-id');
+        const type = btn.classList.contains('c-like') ? 'like' : 'dislike';
+        const current = getCommentVote(id);
+        btn.disabled = true;
+        const fresh = await mdbRead('comments');
+        let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
+        let newVote = current;
+        list = list.map(c => {
+          if (String(c.id) !== String(id)) return c;
+          let likes = c.likes || 0;
+          let dislikes = c.dislikes || 0;
+          if (current === type) {
+            // clicking the same vote again cancels it
+            if (type === 'like') likes = Math.max(0, likes - 1);
+            else dislikes = Math.max(0, dislikes - 1);
+            newVote = null;
+          } else {
+            if (current === 'like') likes = Math.max(0, likes - 1);
+            if (current === 'dislike') dislikes = Math.max(0, dislikes - 1);
+            if (type === 'like') likes += 1; else dislikes += 1;
+            newVote = type;
+          }
+          return Object.assign({}, c, { likes, dislikes });
+        });
+        const ok = await mdbWrite('comments', { list });
+        btn.disabled = false;
+        if (ok) {
+          setCommentVote(id, newVote);
+          commentsCache = list;
+          renderComments();
         }
       });
     });
@@ -4233,4 +4330,4 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 </script>
 
 </body>
-</html>>
+</html>
