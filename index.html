@@ -912,15 +912,24 @@
       radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.16), transparent 55%),
       radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
       linear-gradient(180deg, rgba(255,107,107,0.05), #08080d 70%);
+    /* Animation stays attached at all times and is only paused/resumed
+       (never added/removed) — re-adding the animation on every open used
+       to restart it from 0%, snapping the border-glow back to nothing and
+       then racing back up, which read as a harsh flicker each time the
+       panel was opened. Pausing/resuming keeps it continuous instead. */
+    animation: warnBorderGlow 3.2s ease-in-out infinite;
+    animation-play-state: paused;
+    box-shadow: 0 0 0 rgba(255,92,61,0);
+    border-color: var(--warn-soft);
   }
   /* The pulsing glow only runs while the panel is open — while collapsed it's
      just a plain static box, so there's no reason to keep repainting a
      box-shadow animation nobody's looking at. This also means the exact
-     moment you tap to collapse it, that animation stops immediately instead
+     moment you tap to collapse it, that animation pauses immediately instead
      of continuing to compete with the collapse transition for frame time,
      which is what was making the collapse itself feel laggy. */
   .warn-panel.warn-starry.open{
-    animation: warnBorderGlow 3.2s ease-in-out infinite;
+    animation-play-state: running;
   }
   .warn-panel:not(.open) .qn-stars span{ animation-play-state:paused; opacity:0; }
   @keyframes warnBorderGlow{
@@ -1356,12 +1365,12 @@
   /* ---------- AI Chat Widget ---------- */
   .chat-fab{
     position:fixed; right:20px; bottom:20px; z-index:50;
-    width:60px; height:60px; border-radius:50%;
+    width:50px; height:50px; border-radius:50%;
     background:linear-gradient(135deg, var(--purple), var(--cyan));
     border:none; cursor:grab;
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 10px 30px rgba(255,45,77,0.45), 0 0 0 1px rgba(255,255,255,0.08) inset;
-    font-size:24px;
+    font-size:20px;
     animation: fabPulse 3s ease-in-out infinite;
     /* Lets us drag it by hand on both touch and mouse without the page
        scrolling or text getting selected mid-drag. */
@@ -1375,12 +1384,12 @@
   }
   @keyframes fabPulse{ 0%,100%{ box-shadow:0 10px 30px rgba(255,45,77,0.45);} 50%{ box-shadow:0 10px 44px rgba(255,176,32,0.55);} }
   .chat-fab .badge-dot{
-    position:absolute; top:-2px; right:-2px; width:14px; height:14px; border-radius:50%;
+    position:absolute; top:-2px; right:-2px; width:12px; height:12px; border-radius:50%;
     background:var(--warn); border:2px solid var(--bg); box-shadow:0 0 8px var(--warn);
   }
 
   .chat-panel{
-    position:fixed; right:20px; bottom:92px; z-index:50;
+    position:fixed; right:20px; bottom:80px; z-index:50;
     width:min(360px, calc(100vw - 32px));
     height:min(520px, calc(100vh - 140px));
     background:linear-gradient(180deg, var(--panel), var(--panel-2));
