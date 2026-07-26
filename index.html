@@ -174,6 +174,7 @@
   .visitors-badge b{ color:var(--gold); font-weight:700; text-shadow:0 0 8px rgba(255,210,122,0.5); }
 
   .rating-topbar-badge{
+    order:3;
     font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:800;
     color:var(--gold); display:inline-flex; align-items:center; gap:3px;
     border:1px solid rgba(255,210,122,0.35); border-radius:9px;
@@ -204,8 +205,8 @@
     animation:pulse 1.6s infinite;
   }
 
-  .topbar-right{ order:3; flex:0 0 auto; display:flex; align-items:center; gap:14px; }
-  .lang-switch{ display:flex; align-items:center; gap:6px; }
+  .topbar-group{ display:contents; }
+  .lang-switch{ order:3; display:flex; align-items:center; gap:6px; }
   .lang-btn{
     width:44px; height:32px; border-radius:9px;
     background:#0e0e17; border:1px solid var(--border);
@@ -228,15 +229,19 @@
   }
   @media (max-width: 640px){
     .topbar{ flex-wrap:wrap; }
-    .topbar-right{ order:2; margin-left:auto; }
+    .topbar-group{
+      display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+      gap:8px 12px; width:100%; order:1;
+    }
+    .brand, .rating-topbar-badge, .lang-switch{ order:0; }
     .topbar-center{
-      order:3; flex:1 1 100%;
+      order:2; flex:1 1 100%;
       font-size:9.5px; letter-spacing:0.1em; gap:6px;
       margin-top:2px;
     }
   }
   @media (max-width: 420px){
-    .brand{ flex-wrap:wrap; row-gap:6px; }
+    .brand{ flex-wrap:wrap; row-gap:6px; justify-content:center; }
   }
 
   .hero{ text-align:center; margin-bottom:38px; }
@@ -591,6 +596,17 @@
   .comments-panel .c-item .c-author{ font-weight:700; font-size:13px; color:var(--cyan); }
   .comments-panel .c-item .c-date{ font-size:10.5px; color:var(--text-faint); }
   .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; }
+  .comments-panel .c-item .c-body.c-clamped{
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; line-clamp:4;
+    overflow:hidden;
+  }
+  .comments-panel .c-item .c-more-btn{
+    display:none; margin-top:6px; padding:0;
+    background:none; border:none; cursor:pointer;
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; font-weight:700;
+    letter-spacing:0.02em; color:var(--cyan);
+  }
+  .comments-panel .c-item .c-more-btn:hover{ text-decoration:underline; }
   .comments-panel .c-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
   .comments-panel .c-pagination{
     display:flex; align-items:center; justify-content:center; gap:8px;
@@ -1472,15 +1488,15 @@
 <div class="wrap">
 
   <div class="topbar">
-    <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
-    <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
-    <div class="topbar-right">
+    <div class="topbar-group">
+      <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
       <div class="rating-topbar-badge" id="ratingTopbarBadge">⭐ 4.9</div>
       <div class="lang-switch" id="langSwitch">
         <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">GEO</button>
         <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">ENG</button>
       </div>
     </div>
+    <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
   </div>
 
   <div class="hero">
@@ -2028,6 +2044,7 @@
       commentTextPh: 'დაწერე კომენტარი…',
       commentSubmit: 'გამოქვეყნება',
       commentEmpty: 'ჯერ არცერთი კომენტარი არ არის — იყავი პირველი!',
+      commentReadMore: 'მეტის ნახვა',
       commentErrEmpty: 'გთხოვთ შეავსოთ სახელისა და კომენტარის ველები.',
       commentErrRating: 'გთხოვთ მონიშნოთ შეფასება ვარსკვლავებით.',
       commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
@@ -2131,6 +2148,7 @@
       commentTextPh: 'Write a comment…',
       commentSubmit: 'Post',
       commentEmpty: 'No comments yet — be the first!',
+      commentReadMore: 'Read more',
       commentErrEmpty: 'Please fill in both the name and comment fields.',
       commentErrRating: 'Please select a star rating.',
       commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
@@ -3399,7 +3417,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         if (!p || p === commentsPage) return;
         commentsPage = p;
         renderComments();
-        commentList.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
   }
@@ -3438,7 +3455,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       '<div class="c-reply-item"><div class="c-head"><span class="c-author">' + escapeHtml(r.name) +
       (r.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
       '</span><span class="c-date">' + formatCommentDate(r.ts) + '</span></div>' +
-      '<div class="c-body">' + escapeHtml(r.text) + '</div></div>'
+      '<div class="c-body c-clamped">' + escapeHtml(r.text) + '</div>' +
+      '<button type="button" class="c-more-btn">' + t('commentReadMore') + '</button></div>'
     ).join('') + '</div>';
   }
 
@@ -3464,7 +3482,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         (c.pinned ? '<span class="pin-badge">📌 ' + (currentLang === 'en' ? 'PINNED' : 'აპინული') + '</span>' : '') +
         (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
         '</span><span class="c-date">' + formatCommentDate(c.ts) + '</span></div></div>' +
-        '<div class="c-body">' + escapeHtml(c.text) + '</div>' +
+        '<div class="c-body c-clamped">' + escapeHtml(c.text) + '</div>' +
+        '<button type="button" class="c-more-btn">' + t('commentReadMore') + '</button>' +
         renderReplies(c) +
         '<div class="c-actions"><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
         '<div class="c-reply-form" id="replyForm_' + c.id + '">' +
@@ -3479,11 +3498,27 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     renderTrustRating();
     wireReplyButtons();
     wireCommentsPagination();
+    wireMoreButtons();
     requestAnimationFrame(() => {
       commentList.style.minHeight = '';
+      commentList.querySelectorAll('.c-body.c-clamped').forEach(body => {
+        const btn = body.nextElementSibling;
+        if (!btn || !btn.classList.contains('c-more-btn')) return;
+        btn.style.display = (body.scrollHeight > body.clientHeight + 2) ? 'inline-block' : 'none';
+      });
       const h = commentList.scrollHeight;
       if (h > commentsListMinHeight) commentsListMinHeight = h;
       commentList.style.minHeight = commentsListMinHeight + 'px';
+    });
+  }
+
+  function wireMoreButtons(){
+    commentList.querySelectorAll('.c-more-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const body = btn.previousElementSibling;
+        if (body) body.classList.remove('c-clamped');
+        btn.style.display = 'none';
+      });
     });
   }
 
