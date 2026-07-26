@@ -228,20 +228,30 @@
       0 0 50px rgba(255,45,77,0.45);
   }
   @media (max-width: 640px){
-    .topbar{ flex-wrap:wrap; }
+    .topbar{ flex-wrap:wrap; padding:12px 14px; }
     .topbar-group{
-      display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
-      gap:8px 12px; width:100%; order:1;
+      display:flex; flex-wrap:nowrap; align-items:center; justify-content:center;
+      gap:6px; width:100%; order:1; min-width:0;
     }
-    .brand, .rating-topbar-badge, .lang-switch{ order:0; }
+    .brand{ order:0; min-width:0; gap:5px; flex-shrink:1; }
+    .brand .name{ font-size:14px; }
+    .visitors-badge{ font-size:10px; padding:2px 5px; gap:3px; margin-left:0; }
+    .rating-topbar-badge{ order:0; font-size:10px; padding:3px 6px; gap:2px; }
+    .lang-switch{ order:0; gap:4px; flex-shrink:0; }
+    .lang-btn{ width:34px; height:28px; font-size:9.5px; }
     .topbar-center{
       order:2; flex:1 1 100%;
-      font-size:9.5px; letter-spacing:0.1em; gap:6px;
+      font-size:9.5px; letter-spacing:0.08em; gap:6px;
       margin-top:2px;
     }
   }
-  @media (max-width: 420px){
-    .brand{ flex-wrap:wrap; row-gap:6px; justify-content:center; }
+  @media (max-width: 360px){
+    .brand .name{ font-size:12.5px; }
+    .visitors-badge{ font-size:9px; padding:2px 4px; }
+    .rating-topbar-badge{ font-size:9px; padding:2px 5px; }
+    .lang-btn{ width:30px; height:26px; font-size:8.5px; }
+    .topbar{ padding:10px 10px; }
+    .topbar-group{ gap:4px; }
   }
 
   .hero{ text-align:center; margin-bottom:38px; }
