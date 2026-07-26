@@ -499,6 +499,47 @@
   }
   .chart-row.active .cr-price{ color:#ffe0a3; font-weight:700; }
 
+  /* ---------- Tutorial deep-glow link (under the 3 quick-nav pills) ---------- */
+  .tutorial-link-wrap{ text-align:center; margin:2px 0 16px; }
+  .tutorial-link{
+    display:inline-block;
+    max-width:100%;
+    box-sizing:border-box;
+    padding:13px 26px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(14px, 4vw, 19px);
+    font-weight:700;
+    letter-spacing:0.01em;
+    color:#fff;
+    text-decoration:none;
+    border-radius:14px;
+    border:1px solid rgba(255,45,77,0.45);
+    background:linear-gradient(180deg, rgba(255,45,77,0.14), rgba(255,45,77,0.05));
+    cursor:pointer;
+    white-space:nowrap;
+    animation: tutorialDeepGlow 2.1s ease-in-out infinite;
+    transition: transform .15s;
+  }
+  .tutorial-link:active{ transform:scale(0.97); }
+  @keyframes tutorialDeepGlow{
+    0%,100%{
+      text-shadow: 0 0 8px rgba(255,45,77,0.65), 0 0 22px rgba(255,45,77,0.45), 0 0 42px rgba(255,45,77,0.25);
+      box-shadow: 0 0 12px rgba(255,45,77,0.3), 0 0 34px rgba(255,45,77,0.18);
+      border-color: rgba(255,45,77,0.5);
+    }
+    50%{
+      text-shadow: 0 0 18px rgba(255,45,77,1), 0 0 44px rgba(255,45,77,0.8), 0 0 88px rgba(255,45,77,0.5), 0 0 130px rgba(255,176,32,0.3);
+      box-shadow: 0 0 24px rgba(255,45,77,0.7), 0 0 70px rgba(255,45,77,0.45);
+      border-color: rgba(255,45,77,0.95);
+    }
+  }
+  @media (max-width:480px){
+    .tutorial-link{ padding:11px 18px; font-size:clamp(13px, 4.4vw, 16px); }
+  }
+  @media (max-width:360px){
+    .tutorial-link{ padding:10px 14px; }
+  }
+
   /* ---------- Comments section ---------- */
   .comments-panel .c-form{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
   .comments-panel input.c-name,
@@ -1502,6 +1543,10 @@
         <button type="button" class="qn-tab scanner-jump-link" data-jump="howtoPanel" data-i18n="qnHowto">როგორ შევუკვეთო</button>
       </div>
 
+      <div class="tutorial-link-wrap">
+        <a class="tutorial-link" href="https://www.mediafire.com/file/7csav42120ngpjg/%E1%83%A2%E1%83%A3%E1%83%A2%E1%83%9D%E1%83%A0%E1%83%98%E1%83%90%E1%83%9A%E1%83%98.mp4/file" target="_blank" rel="noopener noreferrer" data-i18n="tutorialLink">🎬 ტუტორიალი</a>
+      </div>
+
       <div class="qn-scrim" id="qnScrim"></div>
 
       <!-- Quick-nav dropdown: a single dark "sheet" that unfurls directly
@@ -2040,6 +2085,7 @@
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
       chartLabel: 'ფასის შედარება ამჟამინდელი ხანგრძლივობით',
+      tutorialLink: '🎬 ტუტორიალი',
       commentsLabel: 'კომენტარები',
       commentRatingLabel: 'შენი შეფასება:',
       adminModeLabel: 'დაწერე ადმინის სახელით',
@@ -2142,6 +2188,7 @@
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
       chartLabel: 'Price comparison at the current duration',
+      tutorialLink: '🎬 Tutorial',
       commentsLabel: 'Comments',
       commentRatingLabel: 'Your rating:',
       adminModeLabel: 'Post as Admin',
