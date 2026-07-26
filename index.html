@@ -1486,6 +1486,17 @@
       box-shadow: 0 0 16px rgba(255,45,77,0.3);
       text-shadow: 0 0 10px rgba(255,45,77,0.55), 0 0 24px rgba(255,45,77,0.3);
     }
+    /* The little twinkling star dots are reused in ~14 places across the
+       page (order buttons, trust/portfolio/howto cards, etc.) — 71
+       individual dots, each animating opacity+transform forever. Cheap
+       individually, but 71 of them at once was adding up. Frozen to a
+       plain static dot on phones. */
+    .qn-stars span{ animation:none !important; opacity:0.45 !important; transform:none !important; }
+    /* Same reasoning as the warning panel below: animating
+       grid-template-rows to open/close an accordion forces a full layout
+       recalculation on every frame of the transition. Instant on phones
+       removes that repeated layout+paint cost. */
+    .chart-content-wrap{ transition:none !important; }
   }
 
   /* ---------- Mobile refinements: keep the 3 quick-nav tabs on one row,
