@@ -1459,6 +1459,35 @@
     .chat-panel{ bottom:84px; }
   }
 
+  /* ---------- Mobile performance: freeze the always-on glow/blur
+     animations ----------
+     A handful of elements animate box-shadow or filter:blur() forever,
+     from the moment the page loads, whether or not anyone's looking at
+     them: the 3 background orbs (drifting + blurred), the 3 quick-nav
+     tabs, the WA/TG order buttons, the chat bubble, and the tutorial
+     link. Both box-shadow blurs and filter:blur() force the GPU to
+     repaint their area on every single frame — there's no cheap
+     compositor shortcut for either the way there is for transform/
+     opacity. Running 7+ of these at once, permanently, is what was
+     making phones heat up during use, and on weaker GPUs that couldn't
+     keep up with the repaint load, frames get dropped/torn — which is
+     what was showing up as flicker across the page. Desktops have more
+     GPU headroom so they're left animated; on phones everything below
+     is frozen to a plain, static look instead. */
+  @media (max-width: 820px){
+    .orb{ animation:none !important; filter:blur(60px); }
+    .qn-tab{ animation:none !important; }
+    .order-btn.wa, .order-btn.tg{ animation:none !important; }
+    .chat-fab{ animation:none !important; }
+    .moon-glow-card{ animation:none !important; }
+    .tt-confirm.tt-red, .tt-confirm.tt-green{ animation:none !important; }
+    .tutorial-link{
+      animation:none !important;
+      box-shadow: 0 0 16px rgba(255,45,77,0.3);
+      text-shadow: 0 0 10px rgba(255,45,77,0.55), 0 0 24px rgba(255,45,77,0.3);
+    }
+  }
+
   /* ---------- Mobile refinements: keep the 3 quick-nav tabs on one row,
      and shrink the opened-dropdown / warning-panel text so more detail
      fits without the page feeling oversized. ---------- */
@@ -3957,4 +3986,4 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 </script>
 
 </body>
-</html></html>
+</html>
