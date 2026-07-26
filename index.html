@@ -912,24 +912,20 @@
       radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.16), transparent 55%),
       radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
       linear-gradient(180deg, rgba(255,107,107,0.05), #08080d 70%);
-    /* Animation stays attached at all times and is only paused/resumed
-       (never added/removed) — re-adding the animation on every open used
-       to restart it from 0%, snapping the border-glow back to nothing and
-       then racing back up, which read as a harsh flicker each time the
-       panel was opened. Pausing/resuming keeps it continuous instead. */
-    animation: warnBorderGlow 3.2s ease-in-out infinite;
-    animation-play-state: paused;
+    /* A continuously-animated box-shadow here used to force a repaint of
+       this panel every frame, and because it visually overlaps the fixed,
+       blurred background orbs behind it, mobile browsers ended up
+       repainting those blurred layers too — that's what read as the whole
+       page flickering while this panel was open. Swapped for a single,
+       static glow that only transitions once on open/close, so nothing
+       repaints on a loop anymore. */
     box-shadow: 0 0 0 rgba(255,92,61,0);
     border-color: var(--warn-soft);
+    transition: box-shadow .4s ease, border-color .4s ease;
   }
-  /* The pulsing glow only runs while the panel is open — while collapsed it's
-     just a plain static box, so there's no reason to keep repainting a
-     box-shadow animation nobody's looking at. This also means the exact
-     moment you tap to collapse it, that animation pauses immediately instead
-     of continuing to compete with the collapse transition for frame time,
-     which is what was making the collapse itself feel laggy. */
   .warn-panel.warn-starry.open{
-    animation-play-state: running;
+    box-shadow: 0 0 22px rgba(255,92,61,0.16);
+    border-color: rgba(255,92,61,0.5);
   }
   .warn-panel:not(.open) .qn-stars span{ animation-play-state:paused; opacity:0; }
   @keyframes warnBorderGlow{
