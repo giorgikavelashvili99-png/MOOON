@@ -173,6 +173,18 @@
   }
   .visitors-badge b{ color:var(--gold); font-weight:700; text-shadow:0 0 8px rgba(255,210,122,0.5); }
 
+  .rating-topbar-badge{
+    font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:800;
+    color:var(--gold); display:inline-flex; align-items:center; gap:3px;
+    border:1px solid rgba(255,210,122,0.35); border-radius:9px;
+    padding:5px 10px; background:rgba(255,210,122,0.08);
+    text-shadow:0 0 8px rgba(255,210,122,0.5);
+    white-space:nowrap; flex:0 0 auto;
+  }
+  @media (max-width: 480px){
+    .rating-topbar-badge{ font-size:10.5px; padding:4px 8px; }
+  }
+
   .topbar-center{
     order:2;
     flex:1;
@@ -1097,7 +1109,8 @@
     .qn-drop.open{ transition: opacity .15s ease, visibility 0s linear 0s; }
   }
   @media (max-width:600px){
-    .qn-drop{ max-height:70vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .qn-drop{ max-height:78vh; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:6px; }
+    #qnSlotHowto .howto-step{ min-height:0 !important; }
   }
 
   .qn-scrim{
@@ -1440,6 +1453,10 @@
   body{
     -webkit-overflow-scrolling: touch;
   }
+
+  @media (min-width: 821px){
+    html{ zoom: 1.5; }
+  }
 </style>
 </head>
 <body>
@@ -1458,6 +1475,7 @@
     <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
     <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
     <div class="topbar-right">
+      <div class="rating-topbar-badge" id="ratingTopbarBadge">⭐ 4.9</div>
       <div class="lang-switch" id="langSwitch">
         <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">GEO</button>
         <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">ENG</button>
@@ -2224,7 +2242,7 @@
     qnDrop.classList.add('open');
     if (qnScrim) qnScrim.classList.add('open');
     qnSetActiveTab(slotId);
-    if (slotId === 'qnSlotHowto') {
+    if (slotId === 'qnSlotHowto' && window.innerWidth > 600) {
       requestAnimationFrame(equalizeHowtoStepHeights);
       setTimeout(equalizeHowtoStepHeights, 300);
     }
@@ -2241,7 +2259,7 @@
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
       const slot = document.getElementById('qnSlotHowto');
-      if (slot && slot.classList.contains('active')) equalizeHowtoStepHeights();
+      if (slot && slot.classList.contains('active') && window.innerWidth > 600) equalizeHowtoStepHeights();
     });
   }
   let _howtoResizeTimer = null;
@@ -2249,7 +2267,7 @@
     clearTimeout(_howtoResizeTimer);
     _howtoResizeTimer = setTimeout(() => {
       const slot = document.getElementById('qnSlotHowto');
-      if (slot && slot.classList.contains('active')) equalizeHowtoStepHeights();
+      if (slot && slot.classList.contains('active') && window.innerWidth > 600) equalizeHowtoStepHeights();
     }, 150);
   });
 
@@ -3398,8 +3416,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     const cRow = document.getElementById('commentsRatingRow');
     const cStars = document.getElementById('commentsAvgStars');
     const cText = document.getElementById('commentsAvgText');
+    const topBadge = document.getElementById('ratingTopbarBadge');
     if (!stat) {
       if (cRow) cRow.style.display = 'none';
+      if (topBadge) topBadge.textContent = '⭐ 4.9';
       return;
     }
     const avgStr = stat.avg.toFixed(1);
@@ -3408,6 +3428,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       cText.innerHTML = t('commentsAvgText').replace('{AVG}', avgStr).replace('{COUNT}', stat.count);
       cRow.style.display = 'flex';
     }
+    if (topBadge) topBadge.textContent = '⭐ ' + avgStr;
   }
 
   function renderReplies(comment){
