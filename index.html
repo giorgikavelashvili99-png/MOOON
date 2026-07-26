@@ -45,9 +45,6 @@
   /* ---------- Background atmosphere ---------- */
   .bg-layer{
     position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-    /* Promote to its own compositor layer so scrolling the page on top of it
-       doesn't force the browser to repaint this blurred layer every frame —
-       this was one of the biggest causes of scroll jank on phones. */
     transform:translateZ(0); will-change:transform; contain:strict;
   }
   .grain{
@@ -467,9 +464,6 @@
     font-size:12px; cursor:pointer; transition: transform .25s ease, border-color .2s, color .2s;
   }
   .chart-box.open .chart-toggle{ transform:rotate(180deg); border-color:var(--purple-soft); color:var(--text); }
-  /* grid-template-rows 0fr -> 1fr is the smoothest cross-device collapse:
-     no fixed pixel heights to (mis)calculate, so it never jumps or jitters
-     on resize/rotation, and animates on the GPU on both mobile and desktop. */
   .chart-content-wrap{
     display:grid; grid-template-rows:0fr; transition: grid-template-rows .3s ease;
   }
@@ -546,9 +540,6 @@
   .comments-panel textarea.c-text{
     width:100%; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
     color:var(--text); padding:12px 14px; font-family:'Space Grotesk', sans-serif;
-    /* 16px, not 14px: mobile browsers (iOS Safari in particular) auto-zoom
-       the whole page when a text field smaller than 16px is focused — that
-       sudden zoom is what read as the field "growing" uncomfortably. */
     font-size:16px; outline:none; transition:border-color .15s;
   }
   .comments-panel input.c-name:focus,
@@ -825,9 +816,6 @@
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
   /* ---------- Order buttons (multi-channel) ---------- */
-  /* Groups the WA/TG buttons + warning block together so they can be sized
-     and positioned as one unit: slightly narrower than the panel and nudged
-     right, while keeping left/right outer spacing visually balanced. */
   .order-channels-body{ width:94%; margin:0 2% 0 4%; }
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
   .order-btn{
@@ -902,18 +890,8 @@
     background:linear-gradient(180deg, rgba(255,107,107,0.06), rgba(255,107,107,0.02));
     border-radius:14px;
     padding:17px 20px;
-    /* backdrop-filter removed: this panel sits over the fixed animated
-       background, so blurring it every scroll frame was a major cause of
-       mobile scroll lag. The background gradient below is already dark
-       and opaque enough that the blur made almost no visible difference. */
   }
   .warn-panel.warn-starry{
-    /* Simplified to a flat, fully static background — no layered
-       gradients, no glow, nothing that repaints on open. The multi-layer
-       radial-gradient background plus a box-shadow glow, repainted the
-       instant this panel's height changed, was still costly enough on
-       phones to read as a flash/flicker even with no animation running.
-       A plain flat panel removes that repaint cost entirely. */
     background: rgba(255,92,61,0.05);
     border-color: var(--warn-soft);
   }
@@ -927,12 +905,6 @@
     cursor:pointer; user-select:none;
   }
   .warn-panel .w-head-left{ display:flex; align-items:center; justify-content:center; gap:10px; }
-  /* Collapsed height reference: the header row alone (no margin-bottom) is
-     sized to match the WA/TG buttons' ~54-55px total height, given the same
-     17px vertical padding on .warn-panel. The 9px gap that used to live on
-     the header's margin-bottom now lives on .warn-content-inner instead, so
-     it only appears once the panel is opened (its row is 0-height while
-     collapsed, so that padding is compressed away, not adding height here). */
   .warn-toggle{
     position:absolute; right:0; top:50%;
     background:none; border:1px solid var(--warn-soft); color:var(--warn);
@@ -943,24 +915,12 @@
     transition: transform .25s ease, background .2s ease;
   }
   .warn-panel.open .warn-toggle{ transform:translateY(-50%) rotate(180deg); }
-  /* Instant toggle, no transition — animating grid-template-rows here
-     forces the browser to recompute layout on every frame of the open/close,
-     and on phones that repeated layout+paint was what read as the whole
-     page flickering while this panel was open. Everything else on the
-     panel (glow, stars) is now static too, so opening it is now a single,
-     immediate layout change instead of a a multi-frame animation. */
   .warn-content-wrap{
     position:relative; z-index:1;
     display:grid; grid-template-rows:0fr;
   }
   .warn-panel.open .warn-content-wrap{ grid-template-rows:1fr; }
   .warn-content-inner{ overflow:hidden; min-height:0; }
-  /* Padding lives here (not as a permanent value above) because, unlike
-     margin, padding on the collapsing grid item doesn't shrink away when
-     grid-template-rows is 0fr — it would keep the panel's collapsed height
-     a few px taller than the WA/TG buttons. Applying it only in .open state
-     keeps the collapsed height exactly button-sized while still giving the
-     expanded text proper breathing room below the header. */
   .warn-panel.open .warn-content-inner{ padding-top:9px; }
   .warn-panel .w-head .ico{
     width:19px; height:19px; border-radius:50%;
@@ -989,7 +949,6 @@
     color:var(--cyan); text-shadow:0 0 10px rgba(255,176,32,0.5);
   }
 
-  /* Shared starry/blurred "warning panel" look, reused on trust / portfolio / howto cards */
   .moon-glow-card{
     position:relative; overflow:hidden;
     border:1px solid var(--warn-soft) !important;
@@ -997,10 +956,6 @@
       radial-gradient(ellipse at 15% 0%, rgba(255,92,61,0.16), transparent 55%),
       radial-gradient(ellipse at 100% 100%, rgba(255,176,32,0.09), transparent 55%),
       linear-gradient(180deg, rgba(255,107,107,0.05), #08080d 70%) !important;
-    /* backdrop-filter removed here too — this class is reused on ~10 cards
-       on the page, so blurring all of them behind the fixed animated
-       background on every scroll frame was the single biggest cause of the
-       phone scroll lag. The gradient background already reads as opaque. */
     animation: warnBorderGlow 3.2s ease-in-out infinite;
     contain: layout paint style;
   }
@@ -1094,11 +1049,7 @@
   }
   .howto-step .hs-body a.hs-link:hover{ text-decoration:underline; }
 
-  /* ---------- Quick-nav dropdown: a floating panel that unfurls under
-     the tabs and overlays whatever content sits below it, instead of
-     pushing that content down. Positioned absolutely so opening or
-     switching tabs never changes the page's scroll position or the
-     layout of anything else on the page. ---------- */
+  /* ---------- Quick-nav dropdown ---------- */
   .qn-drop{
     position:absolute;
     top:calc(100% + 10px);
@@ -1169,7 +1120,6 @@
     .qn-drop{ max-height:70vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   }
 
-  /* Dimmed backdrop shown behind the quick-nav dropdown; click it to close. */
   .qn-scrim{
     position:fixed; inset:0; z-index:39;
     background:rgba(4,4,8,0.5);
@@ -1280,9 +1230,6 @@
   .rating-picker .rp-star:hover{ transform:scale(1.15); }
   .c-item .c-stars{ color:var(--gold); font-size:12px; letter-spacing:1px; margin-left:8px; }
 
-  /* Admin post-mode toggle — lives inside the password-gated admin
-     dashboard; lets the admin switch between posting as ADMIN or as a
-     normal visitor. Never appears on the public comment form. */
   .admin-mode-row{
     display:none; align-items:center; justify-content:space-between; gap:10px;
     padding:8px 12px; margin-bottom:14px; border-radius:10px;
@@ -1362,8 +1309,6 @@
     box-shadow:0 10px 30px rgba(255,45,77,0.45), 0 0 0 1px rgba(255,255,255,0.08) inset;
     font-size:20px;
     animation: fabPulse 3s ease-in-out infinite;
-    /* Lets us drag it by hand on both touch and mouse without the page
-       scrolling or text getting selected mid-drag. */
     touch-action:none; user-select:none; -webkit-user-select:none;
   }
   .chat-fab.dragging{
@@ -1459,21 +1404,6 @@
     .chat-panel{ bottom:84px; }
   }
 
-  /* ---------- Mobile performance: freeze the always-on glow/blur
-     animations ----------
-     A handful of elements animate box-shadow or filter:blur() forever,
-     from the moment the page loads, whether or not anyone's looking at
-     them: the 3 background orbs (drifting + blurred), the 3 quick-nav
-     tabs, the WA/TG order buttons, the chat bubble, and the tutorial
-     link. Both box-shadow blurs and filter:blur() force the GPU to
-     repaint their area on every single frame — there's no cheap
-     compositor shortcut for either the way there is for transform/
-     opacity. Running 7+ of these at once, permanently, is what was
-     making phones heat up during use, and on weaker GPUs that couldn't
-     keep up with the repaint load, frames get dropped/torn — which is
-     what was showing up as flicker across the page. Desktops have more
-     GPU headroom so they're left animated; on phones everything below
-     is frozen to a plain, static look instead. */
   @media (max-width: 820px){
     .orb{ animation:none !important; filter:blur(60px); }
     .qn-tab{ animation:none !important; }
@@ -1486,22 +1416,10 @@
       box-shadow: 0 0 16px rgba(255,45,77,0.3);
       text-shadow: 0 0 10px rgba(255,45,77,0.55), 0 0 24px rgba(255,45,77,0.3);
     }
-    /* The little twinkling star dots are reused in ~14 places across the
-       page (order buttons, trust/portfolio/howto cards, etc.) — 71
-       individual dots, each animating opacity+transform forever. Cheap
-       individually, but 71 of them at once was adding up. Frozen to a
-       plain static dot on phones. */
     .qn-stars span{ animation:none !important; opacity:0.45 !important; transform:none !important; }
-    /* Same reasoning as the warning panel below: animating
-       grid-template-rows to open/close an accordion forces a full layout
-       recalculation on every frame of the transition. Instant on phones
-       removes that repeated layout+paint cost. */
     .chart-content-wrap{ transition:none !important; }
   }
 
-  /* ---------- Mobile refinements: keep the 3 quick-nav tabs on one row,
-     and shrink the opened-dropdown / warning-panel text so more detail
-     fits without the page feeling oversized. ---------- */
   @media (max-width: 480px){
     .quick-nav{ flex-wrap:nowrap; gap:4px; width:100%; }
     .qn-tab{
@@ -1588,10 +1506,6 @@
 
       <div class="qn-scrim" id="qnScrim"></div>
 
-      <!-- Quick-nav dropdown: a single dark "sheet" that unfurls directly
-           under the tabs, right where it was opened, and floats over
-           whatever content sits below it instead of pushing it down. Only
-           one section is visible at a time, and it starts fully closed. -->
       <div class="qn-drop" id="qnDrop">
         <div class="qn-drop-inner">
           <div class="qn-drop-body">
@@ -2303,7 +2217,7 @@
     const link = e.target.closest('.scanner-jump-link');
     if (!link) return;
     const targetId = link.getAttribute('data-jump') || 'videoScannerPanel';
-    if (QN_SLOT_MAP[targetId]) return; // handled by the quick-nav dropdown logic below
+    if (QN_SLOT_MAP[targetId]) return;
     if (typeof closeQnDrop === 'function') closeQnDrop();
     const panel = document.getElementById(targetId);
     if (!panel) return;
@@ -2314,12 +2228,7 @@
     setTimeout(() => panel.classList.remove('scanner-flash'), 1600);
   });
 
-  // ---------- Quick-nav dropdown: "რატომ MOON? / პორტფოლიო / როგორ შევუკვეთო" ----------
-  // A single dark sheet floats directly under the tabs, overlapping the
-  // page instead of pushing it, and is fully hidden on load. Tapping a tab
-  // opens it with the matching content in place; tapping the same tab
-  // again, the ✕ button, the dimmed backdrop, clicking outside, or Escape
-  // all close it — without ever scrolling or reflowing the rest of the page.
+  // ---------- Quick-nav dropdown ----------
   const QN_SLOT_MAP = { trustPanel: 'qnSlotTrust', portfolioPanel: 'qnSlotPortfolio', howtoPanel: 'qnSlotHowto' };
   const qnDrop = document.getElementById('qnDrop');
   const qnScrim = document.getElementById('qnScrim');
@@ -2350,9 +2259,6 @@
     }
   }
 
-  // Forces all 4 "how to order" step cards to share the exact same height
-  // (matching the tallest one) so step 4 — which naturally has less text —
-  // doesn't end up visibly shorter/disproportionate than steps 1-3.
   function equalizeHowtoStepHeights(){
     const steps = document.querySelectorAll('#qnSlotHowto .howto-step');
     if (!steps.length) return;
@@ -2361,12 +2267,6 @@
     steps.forEach(s => { max = Math.max(max, s.offsetHeight); });
     steps.forEach(s => { s.style.minHeight = max + 'px'; });
   }
-  // Google Fonts load with display=swap, so on first page load the browser
-  // renders with a fallback font, then swaps to Space Grotesk/JetBrains Mono
-  // once downloaded. If that swap happens after equalizeHowtoStepHeights()
-  // already measured/locked in the heights, step 1-3's text can re-wrap to a
-  // different number of lines while step 4's min-height stays at the old
-  // (now too-short) value — recompute once the real fonts are actually ready.
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
       const slot = document.getElementById('qnSlotHowto');
@@ -2401,7 +2301,6 @@
     }
     if (e.target.closest('#qnDropClose')) { closeQnDrop(); return; }
     if (e.target.closest('#qnScrim')) { closeQnDrop(); return; }
-    // Click anywhere outside the tabs/dropdown while it's open -> close it.
     if (qnDrop.classList.contains('open') && qnNavWrap && !qnNavWrap.contains(e.target)) {
       closeQnDrop();
     }
@@ -2423,7 +2322,7 @@
     chartHeadRow.addEventListener('click', () => chartBox.classList.toggle('open'));
   }
 
-  // ---------- Portfolio cards (links kept out of visible text/markup content) ----------
+  // ---------- Portfolio cards ----------
   const PORTFOLIO_LINKS = {
     portfolioCard1: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbW9vbmFlZTI2L3ZpZGVvLzc2NjQ2OTk2MjU3ODk1OTA4MDQ/bGFuZz1lbg==',
     portfolioCard2: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbWFydmVsdW5pdmVyc2VlMjYvdmlkZW8vNzY2MDE0NTgxNDE0MDAzMDIzMA=='
@@ -2434,7 +2333,7 @@
   });
 
   // ============================================================
-  // 1) PRICE CALCULATOR (core logic, unchanged rate model)
+  // 1) PRICE CALCULATOR
   // ============================================================
   const secondsRange = document.getElementById('secondsRange');
   const secondsInput = document.getElementById('secondsInput');
@@ -2447,19 +2346,13 @@
   const tiktokLink = document.getElementById('tiktokLink');
   const tiktokError = document.getElementById('tiktokError');
 
-  // PRICE_SCALE anchors the 5-second, non-subscriber rate (0.24₾/s) to a final
-  // 5s price for each video format. 1080p/60fps is the base format at 1.00₾,
-  // and every higher-quality format (more pixels and/or more frames to process)
-  // is scaled up from that same base by the same method — only the scale
-  // factor changes, the declining-rate shape (5s → 59.59s) is identical for
-  // every format.
   const QUALITY_SCALES = {
-    '1080_60':  1.00 / 1.2,          // 1080p · 60fps  → 1.00₾ @5s / ~10.10₾ @59.59s (base, recommended)
-    '1080_120': (1.60/1.3) / 1.2,    // 1080p · 120fps → 1.23₾ @5s / ~12.43₾ @59.59s
-    '2k_60':    (1.90/1.3) / 1.2,    // 2K    · 60fps  → 1.46₾ @5s / ~14.76₾ @59.59s
-    '2k_120':   (2.20/1.3) / 1.2,    // 2K    · 120fps → 1.69₾ @5s / ~17.09₾ @59.59s
-    '4k_60':    (2.60/1.3) / 1.2,    // 4K    · 60fps  → 2.00₾ @5s / ~20.20₾ @59.59s
-    '4k_120':   (3.00/1.3) / 1.2     // 4K    · 120fps → 2.31₾ @5s / ~23.31₾ @59.59s
+    '1080_60':  1.00 / 1.2,
+    '1080_120': (1.60/1.3) / 1.2,
+    '2k_60':    (1.90/1.3) / 1.2,
+    '2k_120':   (2.20/1.3) / 1.2,
+    '4k_60':    (2.60/1.3) / 1.2,
+    '4k_120':   (3.00/1.3) / 1.2
   };
 
   const QUALITY_LABELS = {
@@ -2560,12 +2453,6 @@
     qualityWarn.classList.toggle('show', currentQuality !== '1080_60');
   }
 
-  // Maps a scanned video's pixel dimensions + measured frame rate to the
-  // closest quality tier the calculator actually offers. Resolution is judged
-  // by the larger of the two dimensions (videos can be portrait or landscape);
-  // frame rate below 100fps is treated as the 60fps tier, since footage is
-  // essentially never shot at anything between 60 and 120 that isn't one or
-  // the other after rounding/variable-frame-rate jitter.
   function detectQualityTier(width, height, fps){
     const maxDim = Math.max(width || 0, height || 0);
     let resTier = '1080';
@@ -2590,10 +2477,6 @@
     }
   });
 
-  // TikTok link confirmation badge: shows a red starry prompt as soon as
-  // something is typed; clicking it turns it green/starry and marks the
-  // link as confirmed. Editing the link afterwards resets it back to red
-  // so the person re-confirms whatever they changed it to.
   const tiktokConfirm = document.getElementById('tiktokConfirm');
   const tiktokConfirmText = document.getElementById('tiktokConfirmText');
   let tiktokLinkConfirmed = false;
@@ -2667,9 +2550,6 @@
     videoEl.preload = 'metadata';
     videoEl.muted = true;
     videoEl.playsInline = true;
-    // Kept off-screen but still attached to the document: some browsers only
-    // fire requestVideoFrameCallback (used below for fps detection) reliably
-    // for elements that are part of the render tree.
     videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
     document.body.appendChild(videoEl);
 
@@ -2689,8 +2569,6 @@
     };
 
     videoEl.onloadedmetadata = function(){
-      // Chrome bug workaround: some containers report Infinity duration
-      // until a seek forces the real value to resolve.
       if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
         videoEl.currentTime = 1e101;
         videoEl.ontimeupdate = function(){
@@ -2712,11 +2590,6 @@
     videoEl.src = URL.createObjectURL(file);
   }
 
-  // Browsers don't expose a video's encoded frame rate as plain metadata, so
-  // this plays a couple of silent, invisible frames and times the gaps between
-  // them via requestVideoFrameCallback, then snaps the result to the nearest
-  // common rate (24/25/30/50/60/120). Falls back to null (unknown) on browsers
-  // that don't support requestVideoFrameCallback, or if playback is blocked.
   function detectFrameRate(videoEl){
     return new Promise((resolve) => {
       if (typeof videoEl.requestVideoFrameCallback !== 'function') {
@@ -2777,11 +2650,6 @@
     let s = Math.floor(duration);
     let frac = duration - s;
     if (frac >= 0.999999) { frac = 0; s += 1; }
-    // The sub-second unit here is 0–59 (60 steps per second, matching the
-    // 60fps output timeline), not 0–99 centiseconds — so we map the actual
-    // fractional second onto that 60-step scale instead of clamping a
-    // centisecond value (which used to flatten anything above .59 to a
-    // constant 59).
     let ms = Math.min(59, Math.floor(frac * 60));
 
     const overLimit = s > 59;
@@ -2791,9 +2659,6 @@
     secondsInput.value = sForCalc;
     msRange.value = msForCalc;
 
-    // The user's own quality selection always drives the price — the scanner
-    // only reports what it found in the file for comparison, it never
-    // overrides the requested format.
     const requestedQuality = currentQuality;
     const hasDimensions = !!(width && height);
     const detectedQuality = hasDimensions ? detectQualityTier(width, height, fps) : null;
@@ -2840,8 +2705,8 @@
   // ============================================================
   // 3) MULTI-CHANNEL ORDER SENDING (WhatsApp / Telegram)
   // ============================================================
-  const PHONE_INTL = "995592630630"; // ნომერი WhatsApp-ისთვის
-  const TELEGRAM_USERNAME = "Moonknight0012"; // პირდაპირი Telegram ანგარიში შეკვეთებისთვის
+  const PHONE_INTL = "995592630630";
+  const TELEGRAM_USERNAME = "Moonknight0012";
   const copyNote = document.getElementById('copyNote');
 
   function buildOrderMessage(){
@@ -2870,7 +2735,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       return navigator.clipboard.writeText(text);
     }
-    // fallback for older/insecure contexts
     const ta = document.createElement('textarea');
     ta.value = text;
     ta.style.position = 'fixed';
@@ -2888,10 +2752,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     setTimeout(() => copyNote.classList.remove('active'), 4000);
   }
 
-  // Tries to launch a native app via custom URI scheme. If the tab doesn't lose
-  // focus within the timeout (meaning no app intercepted the navigation), it runs
-  // the fallback instead. This avoids "always jumping to a bare webpage" when the
-  // app IS installed, and avoids "silently doing nothing" when it isn't.
   function openNativeWithFallback(nativeUrl, fallback){
     let handled = false;
     const onBlur = () => { handled = true; };
@@ -2907,9 +2767,52 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     }, 1200);
   }
 
+  // ---- Telegram notifications (site owner alerts) ----
+  const TG_BOT_TOKEN = '8897048538:AAEkPn5ZM_4yVcRyynXWQC9ovTf_DqYEkHg';
+  const TG_CHAT_ID   = '5677328127';
+
+  function escTg(str){
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function sendTelegramNotification(text){
+    try{
+      await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TG_CHAT_ID,
+          text,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true
+        })
+      });
+    } catch(e){ /* silent — never block the UI on a failed notification */ }
+  }
+
+  function buildCommentTgMessage(entry){
+    const stars = entry.rating ? '⭐'.repeat(entry.rating) + '☆'.repeat(5 - entry.rating) : '—';
+    return `💬 <b>ახალი კომენტარი — MOON</b>\n\n` +
+      `👤 <b>${escTg(entry.name)}</b>\n` +
+      `${stars}\n\n` +
+      `<i>${escTg(entry.text)}</i>`;
+  }
+
+  function buildOrderTgMessage(channel){
+    const { s, ms, isSub, quality } = currentValues();
+    const price = calculateExactPrice(s, ms, isSub, quality);
+    return `🛒 <b>ახალი შეკვეთა — MOON</b> (${channel})\n\n` +
+      `⏱ ხანგრძლივობა: <b>${s}.${String(ms).padStart(2,'0')}</b> წმ\n` +
+      `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
+      `⭐ გამომწერი: <b>${isSub ? 'დიახ' : 'არა'}</b>\n` +
+      `💰 ღირებულება: <b>${price} ₾</b>\n` +
+      `🔗 TikTok: <code>${escTg(tiktokLink.value.trim())}</code>`;
+  }
+
   document.getElementById('orderBtnWA').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
+    sendTelegramNotification(buildOrderTgMessage('WhatsApp'));
     const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   });
@@ -2917,10 +2820,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   document.getElementById('orderBtnTG').addEventListener('click', () => {
     if (!validateBeforeSend()) return;
     const message = buildOrderMessage();
-    copyToClipboard(message); // safety-net copy in case text prefill isn't supported on this client
-    // Opens the exact MOON Telegram account directly — no picker, one tap to send.
-    // Text prefill via ?text= works on most official Telegram apps; if a client
-    // ignores it, the message is already on the clipboard to paste in.
+    sendTelegramNotification(buildOrderTgMessage('Telegram'));
+    copyToClipboard(message);
     const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
     flashCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
@@ -2993,11 +2894,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   chatClose.addEventListener('click', () => chatPanel.classList.remove('open'));
 
-  // ---------- Draggable MOON assistant bubble ----------
-  // Works with a finger on mobile and a mouse on desktop (Pointer Events
-  // cover both). A short drag is remembered (localStorage) so it stays put
-  // where you left it. A tap/click that didn't actually move the button
-  // still opens the chat as before.
   (function(){
     let dragging = false, moved = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
     const THRESHOLD = 6;
@@ -3140,7 +3036,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     }
   }
 
-  // Knowledge base: each rule = keywords[] + answer (+ optional quick replies)
   const KB_KA = [
     {
       kw: ['ფას','ღირს','ტარიფ','რამდენი ღირს','ფასდაკლ'],
@@ -3259,9 +3154,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     },
   ];
 
-  // Small built-in geography trivia, so the assistant isn't limited to only
-  // MOON-related topics. This is a hand-written lookup table, not a live AI
-  // model — it only knows what's listed here.
   const CAPITALS_KA = {
     'საქართველო': 'თბილისი',
     'რუსეთ': 'მოსკოვი',
@@ -3388,11 +3280,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   // ============================================================
-  // 7) SHARED BACKEND — lightweight anonymous JSON store used to
-  // sync comments and the admin visit log across every visitor's
-  // browser (this site has no server of its own, so this fills that
-  // gap). Reads/writes a small number of fixed paths under one
-  // namespace; failures are silent and never block the page.
+  // 7) SHARED BACKEND
   // ============================================================
   const MDB_BASE = 'https://mantledb.sh/v2';
   const MDB_NS = 'moonge-tbilisi-vc7f3q';
@@ -3416,7 +3304,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   // ============================================================
-  // 8) COMMENTS SYSTEM (with 1-5 star ratings, admin badge, replies, pin)
+  // 8) COMMENTS SYSTEM
   // ============================================================
   const commentName = document.getElementById('commentName');
   const commentText = document.getElementById('commentText');
@@ -3444,11 +3332,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     rpStars.addEventListener('mouseleave', () => paintStars(selectedRating));
   }
 
-  // Basic uncensored-language filter — blocks the most common Georgian
-  // and English profanity/slurs before a comment is ever published.
-  // This runs in the browser, so it's a courtesy filter, not a hard
-  // security boundary; the admin panel can still remove anything that
-  // slips through.
   const PROFANITY_LIST = [
     'ყლე','ყლეო','ტიტინა','ჯავრიანი','დებილ','იდიოტ','ლახტი','დედაშენ','დედას',
     'მამაშენ','ჰუიო','ხუი','пизд','блять','бля','сука','хуй','нахуй','ебал',
@@ -3472,19 +3355,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     return '★'.repeat(r) + '☆'.repeat(5 - r);
   }
 
-  // Pinned comments float to the top of the list (page 1), keeping their
-  // relative order among themselves and among the rest. Array.prototype.sort
-  // is stable in all modern engines, so this never reshuffles same-status items.
   function sortCommentsForDisplay(list){
     return list.slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
   }
 
-  // ---------- Admin identity helper ----------
-  // Deliberately in-memory only — NOT saved to localStorage/sessionStorage.
-  // That means logging in as admin only lasts for the current page load:
-  // reload the page (or open it fresh) and it's gone, and the password has
-  // to be typed again. This is what stops a comment from silently defaulting
-  // to "ADMIN" for a visitor who never logged in this visit.
   let adminAuthenticated = false;
   let adminPostAsAdminPref = true;
   function isAdminUser(){
@@ -3493,13 +3367,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   function adminDisplayName(){
     return currentLang === 'en' ? 'Admin' : 'ადმინი';
   }
-  // True only when this device is an authenticated admin AND the toggle is
-  // switched to "post as admin". False (normal visitor) otherwise.
   function getAdminPostMode(){
     return isAdminUser() && !!(adminModeCheckbox && adminModeCheckbox.checked);
   }
-  // Called once right after a successful login — syncs the checkbox to the
-  // in-memory preference before anything reads it.
   function initAdminModeCheckbox(){
     if (!adminModeCheckbox || !isAdminUser()) return;
     adminModeCheckbox.checked = adminPostAsAdminPref;
@@ -3527,10 +3397,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   let commentsCache = [];
   let commentsPage = 1;
   const COMMENTS_PER_PAGE = 3;
-  // Keeps the comment list from visually shrinking when a later page has
-  // fewer items than an earlier one (e.g. page 1 has 4 comments, page 2
-  // has only 1) — we remember the tallest page we've rendered and never
-  // let the container go shorter than that.
   let commentsListMinHeight = 0;
 
   function renderCommentsPagination(totalItems){
@@ -3567,8 +3433,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   function renderTrustRating(){
-    // Average rating is shown only in the comments section now — removed
-    // from the trust bar near the top of the page.
     const stat = computeAverageRating();
     const cRow = document.getElementById('commentsRatingRow');
     const cStars = document.getElementById('commentsAvgStars');
@@ -3609,12 +3473,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       if (commentsPage > totalPages) commentsPage = totalPages;
       const start = (commentsPage - 1) * COMMENTS_PER_PAGE;
       const pageItems = displayList.slice(start, start + COMMENTS_PER_PAGE);
-      // Pagination is rendered into its own sibling wrapper (#commentsPaginationWrap)
-      // right after #commentList, instead of being appended as the last flex child
-      // inside #commentList. That way, when a later page has fewer comments, the
-      // min-height kept on #commentList (below) still reserves the same box height,
-      // and the pagination — anchored right under that fixed-height box — never
-      // jumps up to sit closer to a shorter set of comments.
       const AVATAR_ICONS = ['🌕', '🌗', '☀️', '✨'];
       commentList.innerHTML = pageItems.map((c, i) => {
         const avatarIcon = c.isAdmin ? '🌙' : AVATAR_ICONS[(start + i) % AVATAR_ICONS.length];
@@ -3698,6 +3556,9 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         btn.disabled = false;
         if (ok) {
           commentsCache = list;
+          sendTelegramNotification(
+            `↪️ <b>პასუხი კომენტარზე — MOON</b>\n\n👤 <b>${escTg(replyEntry.name)}</b>\n\n<i>${escTg(replyEntry.text)}</i>`
+          );
           renderComments();
         }
       });
@@ -3734,8 +3595,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       }
       commentSubmit.disabled = true;
       const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [] };
-      // Re-read the latest list right before writing to minimize (not
-      // fully eliminate) lost updates from concurrent commenters.
       const fresh = await mdbRead('comments');
       const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
       const updated = [entry, ...list].slice(0, 200);
@@ -3746,6 +3605,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
         return;
       }
       commentsCache = updated;
+      sendTelegramNotification(buildCommentTgMessage(entry));
       commentsPage = 1;
       renderComments();
       if (!asAdmin) commentName.value = '';
@@ -3758,8 +3618,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   loadComments();
 
   // ============================================================
-  // 9) VISITOR LOG (device + approximate location) — feeds the
-  // admin panel's "Visitors" tab. Logged once per browser session.
+  // 9) VISITOR LOG
   // ============================================================
   function detectDevice(){
     const ua = navigator.userAgent || '';
@@ -3806,16 +3665,11 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   logVisit();
 
   // ============================================================
-  // 10) ADMIN PANEL — gated with a password, shows the visit log
-  // and lets the admin edit/remove/pin comments. Successful login
-  // also flags this device so comments/replies show as "ADMIN".
+  // 10) ADMIN PANEL
   // ============================================================
   const ADMIN_PASSWORD = '0070';
   const adminGear = document.getElementById('adminGear');
 
-  // The gear icon stays invisible until the password itself is typed
-  // anywhere on the page (no visible trigger otherwise) — then it fades
-  // in and can be clicked to open the normal login screen below.
   (function initAdminGearReveal(){
     function checkReveal(str){
       if (!adminGear || adminGear.classList.contains('revealed')) return;
@@ -3826,15 +3680,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     let typed = '';
     document.addEventListener('keydown', (e) => {
       if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (e.key.length !== 1) return; // ignore Shift, Enter, arrows, etc.
+      if (e.key.length !== 1) return;
       typed = (typed + e.key).slice(-ADMIN_PASSWORD.length);
       checkReveal(typed);
     });
-    // Mobile fallback: phones only show a keyboard once a text field is
-    // focused, and some virtual keyboards don't report real keydown keys.
-    // So also watch what actually lands in any visible text field on the
-    // page (e.g. the TikTok link or comment fields) — typing 0070 into
-    // any of them reveals the gear the same way.
     document.addEventListener('input', (e) => {
       const el = e.target;
       if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
@@ -3990,7 +3839,6 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   adminGo.addEventListener('click', tryAdminLogin);
   adminPass.addEventListener('keydown', e => { if (e.key === 'Enter') tryAdminLogin(); });
 
-  // Apply the saved/default language once everything is wired up.
   applyTranslations();
   initAdminModeCheckbox();
   applyAdminNameLock();
