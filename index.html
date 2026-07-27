@@ -190,7 +190,7 @@
   }
 
   .social-proof-bar{
-    display:flex; align-items:center; justify-content:center; gap:8px;
+    display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;
     margin:0 0 22px; padding:9px 16px;
     border:1px solid rgba(215,255,43,0.25); border-radius:14px;
     background:rgba(215,255,43,0.06);
@@ -198,7 +198,8 @@
     color:#eaffa0; text-align:center;
   }
   .social-proof-bar b{ color:#fff; font-size:13.5px; text-shadow:0 0 10px rgba(215,255,43,0.5); }
-  @media (max-width: 480px){ .social-proof-bar{ font-size:10.5px; padding:8px 10px; gap:6px; } .social-proof-bar b{ font-size:12px; } }
+  .social-proof-bar .sp-sep{ color:var(--text-faint); opacity:0.6; }
+  @media (max-width: 480px){ .social-proof-bar{ font-size:10.5px; padding:8px 10px; gap:5px; } .social-proof-bar b{ font-size:12px; } }
 
   .promo-box{
     margin:0 0 22px; padding:14px 16px;
@@ -1963,6 +1964,24 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* --- Global overflow guard: nothing should ever push past the viewport edge --- */
+  html, body{
+    max-width:100vw;
+    overflow-x:hidden;
+  }
+  img, svg, video, canvas, iframe{
+    max-width:100%;
+    height:auto;
+  }
+
+  /* --- Desktop-only 125% zoom (real computers: fine pointer + hover) ---
+     Mobile / tablet / touch devices stay at the standard 100% as before. */
+  @media (min-width: 1024px) and (hover:hover) and (pointer:fine){
+    html{
+      zoom:1.25;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -1989,7 +2008,13 @@
     </div>
   </div>
 
-  <div class="social-proof-bar" id="socialProofBar">✅ <b id="socialProofNum">15</b> <span data-i18n="socialProofText">წარმატებული მონტაჟი უკვე დასრულებულია</span></div>
+  <div class="social-proof-bar" id="socialProofBar">
+    📊 <span data-i18n="socialProofTotalLabel">სულ</span> <b id="socialProofTotal">15</b> <span data-i18n="socialProofOrdersLabel">შეკვეთა</span>
+    <span class="sp-sep">·</span>
+    ✅ <b id="socialProofSuccess">15</b> <span data-i18n="socialProofSuccessLabel">წარმატებული</span>
+    <span class="sp-sep">·</span>
+    ⚠️ <b id="socialProofFail">0</b> <span data-i18n="socialProofFailLabel">წარუმატებელი</span>
+  </div>
 
   <div class="promo-box" id="promoBox">
     <div class="promo-label" data-i18n="promoLabel">🎟 REFERRAL / PROMO კოდი გაქვს?</div>
@@ -2771,7 +2796,7 @@
       adminOrdersTotal: 'სულ შეკვეთა',
       adminOrdersSuccess: 'წარმატებული',
       adminOrdersFail: 'წარუმატებელი',
-      adminOrdersNote: 'ეს რიცხვები ჩანს საიტზე, როგორც სოციალური მტკიცება (✅ X წარმატებული მონტაჟი).',
+      adminOrdersNote: 'სამივე რიცხვი (სულ / წარმატებული / წარუმატებელი) ჩანს საჯაროდ, საიტის ზედა ნაწილში, სოციალურ მტკიცებულების ზოლში.',
       adminUrgencyWeek: '1-კვირიანი — დარჩენილი ადგილები',
       adminUrgencyMonth: '1-თვიანი — დარჩენილი ადგილები',
       adminUrgencyNote: 'გამოჩნდება წითელი 🔥 ბეჯად პრაისინგ-პანელებში.',
@@ -2780,7 +2805,10 @@
       adminPromoSingleDiscount: 'ფასდაკლება ცალკეულ შეკვეთაზე (%)',
       adminPromoActive: 'აქტიურია',
       adminPromoNote: 'გააქტიურების შემდეგ ეს ფასდაკლება ავტომატურად აისახება 1-კვირიან/1-თვიან პანელებში (₾ ფასდაკლება) და ცალკეული ვიდეოს კალკულატორში (% ფასდაკლება), როცა სტუმარი სწორ კოდს შეიყვანს.',
-      socialProofText: 'წარმატებული მონტაჟი უკვე დასრულებულია',
+      socialProofTotalLabel: 'სულ',
+      socialProofOrdersLabel: 'შეკვეთა',
+      socialProofSuccessLabel: 'წარმატებული',
+      socialProofFailLabel: 'წარუმატებელი',
       spotsLeftWeek: 'ადგილი დარჩა კვირის გამოწერისთვის',
       spotsLeftMonth: 'ადგილი დარჩა ამ თვის გამოწერისთვის',
       promoLabel: '🎟 REFERRAL / PROMO კოდი გაქვს?',
@@ -2913,7 +2941,7 @@
       adminOrdersTotal: 'Total orders',
       adminOrdersSuccess: 'Successful',
       adminOrdersFail: 'Failed',
-      adminOrdersNote: 'These numbers are shown on the site as social proof (✅ X successful edits).',
+      adminOrdersNote: 'All three numbers (total / successful / failed) are shown publicly, in the social-proof bar near the top of the site.',
       adminUrgencyWeek: '1-Week — spots remaining',
       adminUrgencyMonth: '1-Month — spots remaining',
       adminUrgencyNote: 'Shows as a red 🔥 badge on the pricing panels.',
@@ -2922,7 +2950,10 @@
       adminPromoSingleDiscount: 'Discount on single order (%)',
       adminPromoActive: 'Active',
       adminPromoNote: 'Once active, this discount is automatically reflected in the 1-Week/1-Month panels (₾ off) and the single-video calculator (% off) as soon as a visitor enters the correct code.',
-      socialProofText: 'successful edits completed so far',
+      socialProofTotalLabel: 'total',
+      socialProofOrdersLabel: 'orders',
+      socialProofSuccessLabel: 'successful',
+      socialProofFailLabel: 'failed',
       spotsLeftWeek: 'spots left for the weekly subscription',
       spotsLeftMonth: 'spots left for the monthly subscription',
       promoLabel: '🎟 Have a referral / promo code?',
@@ -4525,8 +4556,12 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   async function loadStats(){
     const data = await mdbRead('stats');
     const s = Object.assign({}, DEFAULT_STATS, data || {});
-    const el = document.getElementById('socialProofNum');
-    if (el) el.textContent = s.success;
+    const totalEl = document.getElementById('socialProofTotal');
+    const successEl = document.getElementById('socialProofSuccess');
+    const failEl = document.getElementById('socialProofFail');
+    if (totalEl) totalEl.textContent = s.total;
+    if (successEl) successEl.textContent = s.success;
+    if (failEl) failEl.textContent = s.fail;
   }
 
   async function loadPromo(){
