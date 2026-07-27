@@ -154,7 +154,13 @@
     border-radius:16px;
     background:rgba(15,15,24,0.82);
   }
-  .brand{ flex:0 0 auto; display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.05em; font-size:16px; }
+  .topbar-top{
+    display:contents;
+  }
+  .brand{ flex:0 0 auto; display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.05em; font-size:16px; order:1; }
+  .topbar-moon{ order:2; }
+  .topbar-center{ order:3; }
+  .topbar-right{ order:4; }
   .brand .name{
     color:#f2ecff;
     text-shadow:
@@ -307,7 +313,13 @@
     .topbar-center{ font-size:10px; letter-spacing:0.08em; }
   }
   @media (max-width: 640px){
-    .topbar{ flex-wrap:wrap; padding:12px 14px; row-gap:8px; justify-content:space-between; }
+    .topbar{ flex-wrap:wrap; padding:12px 14px; row-gap:8px; }
+    .topbar-top{
+      display:flex; flex-wrap:nowrap; align-items:center; justify-content:space-between;
+      flex:1 1 100%; width:100%; gap:8px; min-width:0;
+    }
+    .brand{ gap:6px; min-width:0; flex-shrink:1; }
+    .topbar-right{ gap:6px; flex-shrink:0; }
     .topbar-moon{ display:inline-flex; }
     .brand .name{ font-size:14px; white-space:nowrap; }
     .visitors-badge{ font-size:10px; padding:3px 6px; gap:3px; margin-left:0; white-space:nowrap; }
@@ -318,6 +330,12 @@
       font-size:9.5px; letter-spacing:0.08em; gap:6px; margin-top:2px;
     }
     .topbar-center > span:not(.tc-dot){ white-space:normal; overflow:visible; text-overflow:clip; }
+  }
+  @media (max-width: 480px){
+    .topbar-top{ gap:5px; }
+    .brand{ gap:4px; }
+    .brand .dot{ display:none; }
+    .topbar-moon{ width:22px; height:22px; max-width:22px; max-height:22px; font-size:11px; }
   }
   @media (max-width: 360px){
     .brand .name{ font-size:12.5px; }
@@ -2024,16 +2042,18 @@
 <div class="wrap">
 
   <div class="topbar">
-    <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
-    <span class="topbar-moon" aria-hidden="true">🌙</span>
-    <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
-    <div class="topbar-right">
-      <div class="rating-topbar-badge" id="ratingTopbarBadge">⭐ 4.9</div>
-      <div class="lang-switch" id="langSwitch">
-        <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">GEO</button>
-        <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">ENG</button>
+    <div class="topbar-top">
+      <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
+      <span class="topbar-moon" aria-hidden="true">🌙</span>
+      <div class="topbar-right">
+        <div class="rating-topbar-badge" id="ratingTopbarBadge">⭐ 4.9</div>
+        <div class="lang-switch" id="langSwitch">
+          <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული">GEO</button>
+          <button class="lang-btn" id="langEn" data-lang="en" aria-label="English">ENG</button>
+        </div>
       </div>
     </div>
+    <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
   </div>
 
   <div class="social-proof-bar" id="socialProofBar">
