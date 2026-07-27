@@ -198,6 +198,7 @@
     color:#eaffa0; text-align:center;
   }
   .social-proof-bar b{ color:#fff; font-size:13.5px; text-shadow:0 0 10px rgba(215,255,43,0.5); }
+  .social-proof-bar .sp-item{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
   .social-proof-bar .sp-sep{ color:var(--text-faint); opacity:0.6; }
   @media (max-width: 480px){ .social-proof-bar{ font-size:10.5px; padding:8px 10px; gap:5px; } .social-proof-bar b{ font-size:12px; } }
 
@@ -257,6 +258,26 @@
     min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
 
+  .topbar-moon{
+    display:none;
+    flex:0 0 auto;
+    width:28px; height:28px;
+    align-items:center; justify-content:center;
+    border-radius:50%;
+    font-size:14px; line-height:1;
+    background:radial-gradient(circle at 35% 30%, #fff8e6 0%, #ffd27a 45%, #4d5fff 100%);
+    box-shadow:0 0 10px rgba(255,210,122,0.5), 0 0 16px rgba(77,95,255,0.3);
+    animation: moonSpin 7s linear infinite, moonGlow 2.6s ease-in-out infinite;
+  }
+  @keyframes moonSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  @keyframes moonGlow{
+    0%,100%{ box-shadow:0 0 10px rgba(255,210,122,0.5), 0 0 16px rgba(77,95,255,0.3); }
+    50%{ box-shadow:0 0 16px rgba(255,210,122,0.85), 0 0 26px rgba(77,95,255,0.55); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .topbar-moon{ animation:none; }
+  }
+
   .lang-switch{ flex-shrink:0; display:flex; align-items:center; gap:6px; }
   .lang-btn{
     min-width:44px; height:32px; padding:0 4px; border-radius:9px;
@@ -284,6 +305,7 @@
   }
   @media (max-width: 640px){
     .topbar{ flex-wrap:wrap; padding:12px 14px; row-gap:8px; justify-content:space-between; }
+    .topbar-moon{ display:inline-flex; }
     .brand .name{ font-size:14px; white-space:nowrap; }
     .visitors-badge{ font-size:10px; padding:3px 6px; gap:3px; margin-left:0; white-space:nowrap; }
     .rating-topbar-badge{ font-size:10px; padding:4px 8px; gap:3px; }
@@ -1998,6 +2020,7 @@
 
   <div class="topbar">
     <div class="brand"><span class="dot"></span> <span class="name">MOON</span> <span class="visitors-badge" id="visitorBadge">👁 <b>···</b></span></div>
+    <span class="topbar-moon" aria-hidden="true">🌙</span>
     <div class="topbar-center"><span class="tc-dot"></span> <span data-i18n="topbarTagline">REAL-TIME PRICE ENGINE</span></div>
     <div class="topbar-right">
       <div class="rating-topbar-badge" id="ratingTopbarBadge">⭐ 4.9</div>
@@ -2009,11 +2032,11 @@
   </div>
 
   <div class="social-proof-bar" id="socialProofBar">
-    📊 <span data-i18n="socialProofTotalLabel">სულ</span> <b id="socialProofTotal">15</b> <span data-i18n="socialProofOrdersLabel">შეკვეთა</span>
+    <span class="sp-item">📊 <span data-i18n="socialProofTotalLabel">სულ</span> <b id="socialProofTotal">15</b> <span data-i18n="socialProofOrdersLabel">შეკვეთა</span></span>
     <span class="sp-sep">·</span>
-    ✅ <b id="socialProofSuccess">15</b> <span data-i18n="socialProofSuccessLabel">წარმატებული</span>
+    <span class="sp-item">✅ <b id="socialProofSuccess">15</b> <span data-i18n="socialProofSuccessLabel">წარმატებული</span></span>
     <span class="sp-sep">·</span>
-    ⚠️ <b id="socialProofFail">0</b> <span data-i18n="socialProofFailLabel">წარუმატებელი</span>
+    <span class="sp-item">⚠️ <b id="socialProofFail">0</b> <span data-i18n="socialProofFailLabel">წარუმატებელი</span></span>
   </div>
 
   <div class="promo-box" id="promoBox">
