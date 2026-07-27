@@ -189,6 +189,52 @@
     .rating-topbar-badge{ font-size:10.5px; padding:4px 8px; }
   }
 
+  .social-proof-bar{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin:0 0 22px; padding:9px 16px;
+    border:1px solid rgba(215,255,43,0.25); border-radius:14px;
+    background:rgba(215,255,43,0.06);
+    font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:700; letter-spacing:0.03em;
+    color:#eaffa0; text-align:center;
+  }
+  .social-proof-bar b{ color:#fff; font-size:13.5px; text-shadow:0 0 10px rgba(215,255,43,0.5); }
+  @media (max-width: 480px){ .social-proof-bar{ font-size:10.5px; padding:8px 10px; gap:6px; } .social-proof-bar b{ font-size:12px; } }
+
+  .promo-box{
+    margin:0 0 22px; padding:14px 16px;
+    border:1px dashed var(--border); border-radius:14px;
+    background:rgba(77,95,255,0.05);
+  }
+  .promo-box .promo-row{ display:flex; gap:8px; align-items:center; }
+  .promo-box input{
+    flex:1 1 auto; min-width:0;
+    background:var(--panel-2); border:1px solid var(--border); border-radius:10px;
+    color:var(--text); font-family:'JetBrains Mono', monospace; font-size:13px;
+    padding:9px 12px; outline:none;
+  }
+  .promo-box input:focus{ border-color:var(--purple); }
+  .promo-box button{
+    flex:0 0 auto; border:none; border-radius:10px; padding:9px 16px;
+    background:var(--purple); color:#fff; font-weight:700; font-size:12.5px;
+    cursor:pointer; font-family:'Space Grotesk', sans-serif;
+  }
+  .promo-box .promo-msg{ font-size:11.5px; margin-top:8px; color:var(--text-dim); min-height:14px; }
+  .promo-box .promo-msg.ok{ color:#eaffa0; }
+  .promo-box .promo-msg.bad{ color:var(--warn); }
+  .promo-box .promo-label{ font-size:11px; color:var(--text-faint); margin-bottom:8px; font-family:'JetBrains Mono', monospace; letter-spacing:0.05em; }
+
+  .a-form-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .a-form-row label{ flex:1 1 auto; font-size:12.5px; color:var(--text-dim); }
+  .a-form-row input{
+    flex:0 0 110px;
+    background:var(--panel-2); border:1px solid var(--border); border-radius:8px;
+    color:var(--text); font-family:'JetBrains Mono', monospace; font-size:13px;
+    padding:7px 10px; outline:none; text-align:center;
+  }
+  .a-form-row input[type="text"]{ flex:1 1 auto; text-align:left; }
+  .a-save-row{ margin-top:6px; }
+  .a-stat-note{ font-size:11px; color:var(--text-faint); margin:-4px 0 12px; }
+
   .topbar-center{
     flex:1 1 auto; min-width:0;
     display:flex; align-items:center; justify-content:center; gap:8px;
@@ -1121,6 +1167,19 @@
     text-shadow:0 0 10px rgba(215,255,43,0.45);
     white-space:nowrap;
   }
+  .urgency-badge{
+    display:inline-flex; align-items:center; gap:6px; flex:0 0 auto;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:800; letter-spacing:0.06em;
+    color:#ffd7ca;
+    background:rgba(255,92,61,0.1);
+    border:1px solid var(--warn-soft);
+    padding:6px 13px; border-radius:20px;
+    text-shadow:0 0 10px rgba(255,92,61,0.5);
+    white-space:nowrap;
+    animation: urgencyPulse 1.8s ease-in-out infinite;
+  }
+  .urgency-badge b{ color:#fff; }
+  @keyframes urgencyPulse{ 0%,100%{ box-shadow:0 0 0 rgba(255,92,61,0); } 50%{ box-shadow:0 0 14px rgba(255,92,61,0.45); } }
   .wp-grid{
     display:grid; grid-template-columns:repeat(3, 1fr); gap:9px;
     margin:16px 0 14px;
@@ -1930,6 +1989,17 @@
     </div>
   </div>
 
+  <div class="social-proof-bar" id="socialProofBar">✅ <b id="socialProofNum">15</b> <span data-i18n="socialProofText">წარმატებული მონტაჟი უკვე დასრულებულია</span></div>
+
+  <div class="promo-box" id="promoBox">
+    <div class="promo-label" data-i18n="promoLabel">🎟 REFERRAL / PROMO კოდი გაქვს?</div>
+    <div class="promo-row">
+      <input type="text" id="promoInput" data-i18n-placeholder="promoPlaceholder" placeholder="შეიყვანე კოდი">
+      <button type="button" id="promoBtn" data-i18n="promoApply">გააქტიურება</button>
+    </div>
+    <div class="promo-msg" id="promoMsg"></div>
+  </div>
+
   <div class="hero">
     <div class="qn-nav-wrap">
       <div class="quick-nav" id="quickNav">
@@ -2319,6 +2389,7 @@
     <div class="panel-head">
       <div class="label" data-i18n="wpLabel">1-კვირიანი გამოწერა</div>
       <div class="wp-count-badge" data-i18n="wpBadge">5 ვიდეო / 7 დღე</div>
+      <div class="urgency-badge" id="wpUrgencyBadge">🔥 <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">ადგილი დარჩა ამ კვირას</span></div>
     </div>
 
     <div class="wp-grid" id="wpQualityGrid">
@@ -2404,6 +2475,7 @@
     <div class="panel-head">
       <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
       <div class="mp-count-badge" data-i18n="mpBadge">მაქს. 20 ვიდეო / თვე</div>
+      <div class="urgency-badge" id="mpUrgencyBadge">🔥 <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">ადგილი დარჩა ამ თვეს</span></div>
     </div>
 
     <div class="mp-grid" id="mpQualityGrid">
@@ -2513,7 +2585,7 @@
     <div id="adminLogin">
       <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
       <div class="a-pass-row">
-        <input type="password" class="a-pass" id="adminPass" inputmode="numeric" maxlength="10" data-i18n-placeholder="adminPassPh" placeholder="პაროლი">
+        <input type="password" class="a-pass" id="adminPass" maxlength="60" data-i18n-placeholder="adminPassPh" placeholder="პაროლი">
         <button class="a-go" id="adminGo" data-i18n="adminEnter">შესვლა</button>
       </div>
       <div class="a-err" id="adminErr" data-i18n="adminWrongPass">არასწორი პაროლი</div>
@@ -2531,9 +2603,33 @@
       <div class="a-tabs">
         <button class="a-tab active" id="adminTabVisits" data-i18n="adminTabVisits">ვიზიტორები</button>
         <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
+        <button class="a-tab" id="adminTabOrders" data-i18n="adminTabOrders">შეკვეთები</button>
+        <button class="a-tab" id="adminTabUrgency" data-i18n="adminTabUrgency">ადგილები</button>
+        <button class="a-tab" id="adminTabPromo" data-i18n="adminTabPromo">Promo</button>
       </div>
       <div class="a-panel active" id="adminPanelVisits"></div>
       <div class="a-panel" id="adminPanelComments"></div>
+      <div class="a-panel" id="adminPanelOrders">
+        <div class="a-form-row"><label data-i18n="adminOrdersTotal">სულ შეკვეთა</label><input type="number" id="ordersTotalInput" min="0"></div>
+        <div class="a-form-row"><label data-i18n="adminOrdersSuccess">წარმატებული</label><input type="number" id="ordersSuccessInput" min="0"></div>
+        <div class="a-form-row"><label data-i18n="adminOrdersFail">წარუმატებელი</label><input type="number" id="ordersFailInput" min="0"></div>
+        <div class="a-stat-note" data-i18n="adminOrdersNote">ეს რიცხვები ჩანს საიტზე, როგორც სოციალური მტკიცება (✅ X წარმატებული მონტაჟი).</div>
+        <button class="a-go a-save-row" id="ordersSaveBtn" data-i18n="adminSave">შენახვა</button>
+      </div>
+      <div class="a-panel" id="adminPanelUrgency">
+        <div class="a-form-row"><label data-i18n="adminUrgencyWeek">1-კვირიანი — დარჩენილი ადგილები</label><input type="number" id="urgencyWeekInput" min="0"></div>
+        <div class="a-form-row"><label data-i18n="adminUrgencyMonth">1-თვიანი — დარჩენილი ადგილები</label><input type="number" id="urgencyMonthInput" min="0"></div>
+        <div class="a-stat-note" data-i18n="adminUrgencyNote">გამოჩნდება წითელი 🔥 ბეჯად პრაისინგ-პანელებში.</div>
+        <button class="a-go a-save-row" id="urgencySaveBtn" data-i18n="adminSave">შენახვა</button>
+      </div>
+      <div class="a-panel" id="adminPanelPromo">
+        <div class="a-form-row"><label data-i18n="adminPromoCode">კოდი</label><input type="text" id="promoCodeInput" placeholder="MOON10"></div>
+        <div class="a-form-row"><label data-i18n="adminPromoSubDiscount">ფასდაკლება გამოწერებზე (₾)</label><input type="number" id="promoSubDiscountInput" min="0" step="0.01"></div>
+        <div class="a-form-row"><label data-i18n="adminPromoSingleDiscount">ფასდაკლება ცალკეულ შეკვეთაზე (%)</label><input type="number" id="promoSingleDiscountInput" min="0" max="100" step="1"></div>
+        <div class="a-form-row"><label data-i18n="adminPromoActive">აქტიურია</label><input type="checkbox" id="promoActiveInput"></div>
+        <div class="a-stat-note" data-i18n="adminPromoNote">გააქტიურების შემდეგ ეს ფასდაკლება ავტომატურად აისახება 1-კვირიან/1-თვიან პანელებში (₾ ფასდაკლება) და ცალკეული ვიდეოს კალკულატორში (% ფასდაკლება), როცა სტუმარი სწორ კოდს შეიყვანს.</div>
+        <button class="a-go a-save-row" id="promoSaveBtn" data-i18n="adminSave">შენახვა</button>
+      </div>
       <button class="a-close" id="adminCloseDash" data-i18n="adminClose">დახურვა</button>
     </div>
   </div>
@@ -2561,6 +2657,14 @@
 </div>
 
 <script>
+  // ============================================================
+  // -1) GLOBAL PROMO STATE (declared early so any function can
+  //     safely read it, even ones invoked during initial load)
+  // ============================================================
+  const DEFAULT_PROMO = { code: '', active: false, subDiscount: 5, singleDiscountPercent: 10 };
+  let currentPromo = Object.assign({}, DEFAULT_PROMO);
+  let promoApplied = false; // becomes true only once the visitor enters a correct, active code
+
   // ============================================================
   // 0) LANGUAGE / i18n SYSTEM
   // ============================================================
@@ -2661,6 +2765,30 @@
       adminDelete: 'წაშლა',
       adminPin: 'დაპინვა',
       adminUnpin: 'პინის მოხსნა',
+      adminTabOrders: 'შეკვეთები',
+      adminTabUrgency: 'ადგილები',
+      adminTabPromo: 'Promo',
+      adminOrdersTotal: 'სულ შეკვეთა',
+      adminOrdersSuccess: 'წარმატებული',
+      adminOrdersFail: 'წარუმატებელი',
+      adminOrdersNote: 'ეს რიცხვები ჩანს საიტზე, როგორც სოციალური მტკიცება (✅ X წარმატებული მონტაჟი).',
+      adminUrgencyWeek: '1-კვირიანი — დარჩენილი ადგილები',
+      adminUrgencyMonth: '1-თვიანი — დარჩენილი ადგილები',
+      adminUrgencyNote: 'გამოჩნდება წითელი 🔥 ბეჯად პრაისინგ-პანელებში.',
+      adminPromoCode: 'კოდი',
+      adminPromoSubDiscount: 'ფასდაკლება გამოწერებზე (₾)',
+      adminPromoSingleDiscount: 'ფასდაკლება ცალკეულ შეკვეთაზე (%)',
+      adminPromoActive: 'აქტიურია',
+      adminPromoNote: 'გააქტიურების შემდეგ ეს ფასდაკლება ავტომატურად აისახება 1-კვირიან/1-თვიან პანელებში (₾ ფასდაკლება) და ცალკეული ვიდეოს კალკულატორში (% ფასდაკლება), როცა სტუმარი სწორ კოდს შეიყვანს.',
+      socialProofText: 'წარმატებული მონტაჟი უკვე დასრულებულია',
+      spotsLeftWeek: 'ადგილი დარჩა კვირის გამოწერისთვის',
+      spotsLeftMonth: 'ადგილი დარჩა ამ თვის გამოწერისთვის',
+      promoLabel: '🎟 REFERRAL / PROMO კოდი გაქვს?',
+      promoPlaceholder: 'შეიყვანე კოდი',
+      promoApply: 'გააქტიურება',
+      promoOk: 'კოდი აქტიურია — გააქტიურებულია {SUB}₾-იანი ფასდაკლება 1-კვირიან და 1-თვიან გამოწერებზე, ხოლო ცალკეულ შეკვეთაზე დამატებით {PCT}%-იანი ფასდაკლება! შეკვეთისას მიუთითე ეს კოდი.',
+      promoBad: 'ასეთი კოდი არ არსებობს ან აღარ არის აქტიური.',
+      promoEmpty: 'გთხოვთ შეიყვანოთ კოდი.',
       howtoLabel: 'როგორ შევუკვეთო',
       howtoStep1Title: 'გამოთვალე ფასი',
       howtoStep1Text: 'ქვემოთ კალკულატორში მონიშნე ვიდეოს ხანგრძლივობა და ხარისხი — ან ატვირთე ვიდეო „<span class="scanner-jump-link" data-jump="videoScannerPanel">VIDEO SCANNER</span>" ბლოკში, რომ ხანგრძლივობა ავტომატურად გამოითვალოს.',
@@ -2779,6 +2907,30 @@
       adminDelete: 'Delete',
       adminPin: 'Pin',
       adminUnpin: 'Unpin',
+      adminTabOrders: 'Orders',
+      adminTabUrgency: 'Spots',
+      adminTabPromo: 'Promo',
+      adminOrdersTotal: 'Total orders',
+      adminOrdersSuccess: 'Successful',
+      adminOrdersFail: 'Failed',
+      adminOrdersNote: 'These numbers are shown on the site as social proof (✅ X successful edits).',
+      adminUrgencyWeek: '1-Week — spots remaining',
+      adminUrgencyMonth: '1-Month — spots remaining',
+      adminUrgencyNote: 'Shows as a red 🔥 badge on the pricing panels.',
+      adminPromoCode: 'Code',
+      adminPromoSubDiscount: 'Discount on subscriptions (₾)',
+      adminPromoSingleDiscount: 'Discount on single order (%)',
+      adminPromoActive: 'Active',
+      adminPromoNote: 'Once active, this discount is automatically reflected in the 1-Week/1-Month panels (₾ off) and the single-video calculator (% off) as soon as a visitor enters the correct code.',
+      socialProofText: 'successful edits completed so far',
+      spotsLeftWeek: 'spots left for the weekly subscription',
+      spotsLeftMonth: 'spots left for the monthly subscription',
+      promoLabel: '🎟 Have a referral / promo code?',
+      promoPlaceholder: 'Enter code',
+      promoApply: 'Apply',
+      promoOk: 'Code active — a {SUB}₾ discount is now applied to the 1-Week and 1-Month subscriptions, plus an extra {PCT}% off a single order! Mention this code when you place your order.',
+      promoBad: 'This code doesn\'t exist or is no longer active.',
+      promoEmpty: 'Please enter a code.',
       howtoLabel: 'How to order',
       howtoStep1Title: 'Calculate the price',
       howtoStep1Text: 'Below, set the video duration and quality in the calculator — or upload a video in the "<span class="scanner-jump-link" data-jump="videoScannerPanel">VIDEO SCANNER</span>" block so the duration is measured automatically.',
@@ -3015,7 +3167,10 @@
     }
 
     const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE;
-    return totalPrice.toFixed(2);
+    const discounted = (typeof promoApplied !== 'undefined' && promoApplied && currentPromo && currentPromo.singleDiscountPercent)
+      ? totalPrice * (1 - currentPromo.singleDiscountPercent / 100)
+      : totalPrice;
+    return Math.max(0, discounted).toFixed(2);
   }
 
   function currentValues(){
@@ -3052,20 +3207,27 @@
   function getWeeklyTotal(quality){
     const base = SUB_PRICES[quality] || SUB_PRICES['1080_60'];
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
-    return isChannelSub ? Math.max(0, base - WP_CHANNEL_DISCOUNT) : base;
+    let price = isChannelSub ? Math.max(0, base - WP_CHANNEL_DISCOUNT) : base;
+    if (promoApplied && currentPromo && currentPromo.subDiscount) {
+      price = Math.max(0, price - currentPromo.subDiscount);
+    }
+    return price;
   }
 
   function updateWpBoxPrices(){
     if (!wpQualityGrid) return;
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
+    const promoOff = (promoApplied && currentPromo && currentPromo.subDiscount) ? currentPromo.subDiscount : 0;
     wpQualityGrid.querySelectorAll('.wp-box').forEach(box => {
       const q = box.getAttribute('data-quality');
       const base = SUB_PRICES[q] || SUB_PRICES['1080_60'];
       const oldEl = box.querySelector('.wp-old-price');
       const newEl = box.querySelector('.wp-new-price');
-      box.classList.toggle('discounted', isChannelSub);
-      if (isChannelSub) {
-        const finalPrice = Math.max(0, base - WP_CHANNEL_DISCOUNT);
+      const afterChannel = isChannelSub ? Math.max(0, base - WP_CHANNEL_DISCOUNT) : base;
+      const finalPrice = Math.max(0, afterChannel - promoOff);
+      const anyDiscount = isChannelSub || promoOff > 0;
+      box.classList.toggle('discounted', anyDiscount);
+      if (anyDiscount) {
         oldEl.textContent = base.toFixed(2) + '₾';
         oldEl.classList.add('show');
         newEl.innerHTML = finalPrice.toFixed(2) + '<sup>₾</sup>';
@@ -3104,6 +3266,27 @@
   };
   let monthSelectedQuality = '1080_60';
   const mpQualityGrid = document.getElementById('mpQualityGrid');
+
+  function getMonthlyTotal(quality){
+    const base = MONTH_PRICES[quality] || MONTH_PRICES['1080_60'];
+    if (promoApplied && currentPromo && currentPromo.subDiscount) {
+      return Math.max(0, base - currentPromo.subDiscount);
+    }
+    return base;
+  }
+
+  function updateMpBoxPrices(){
+    if (!mpQualityGrid) return;
+    const promoOff = (promoApplied && currentPromo && currentPromo.subDiscount) ? currentPromo.subDiscount : 0;
+    mpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
+      const q = box.getAttribute('data-quality');
+      const base = MONTH_PRICES[q] || MONTH_PRICES['1080_60'];
+      const newEl = box.querySelector('.mp-new-price');
+      const finalPrice = Math.max(0, base - promoOff);
+      if (newEl) newEl.innerHTML = finalPrice.toFixed(2) + '<sup>₾</sup>';
+    });
+  }
+
   if (mpQualityGrid) {
     mpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
       box.addEventListener('click', () => {
@@ -3114,6 +3297,7 @@
       });
     });
   }
+  updateMpBoxPrices();
 
 
   function refresh(){
@@ -3704,7 +3888,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   function buildMonthlySubOrderTgMessage(channel){
     const quality = monthSelectedQuality;
-    const total = MONTH_PRICES[quality] || MONTH_PRICES['1080_60'];
+    const total = getMonthlyTotal(quality);
     const perVideo = total / MONTH_SUB_VIDEO_LIMIT;
     return `🗓 <b>ახალი შეკვეთა — MOON 1-თვიანი გამოწერა</b> (${channel})\n\n` +
       `🎬 ლიმიტი: <b>${MONTH_SUB_VIDEO_LIMIT} ვიდეო / 30 დღე</b>\n` +
@@ -3717,7 +3901,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   function buildMonthlySubOrderMessage(){
     const quality = monthSelectedQuality;
-    const total = MONTH_PRICES[quality] || MONTH_PRICES['1080_60'];
+    const total = getMonthlyTotal(quality);
     const perVideo = total / MONTH_SUB_VIDEO_LIMIT;
     return `🗓 ახალი შეკვეთა — MOON 1-თვიანი გამოწერა
 ლიმიტი: ${MONTH_SUB_VIDEO_LIMIT} ვიდეო / 30 დღე
@@ -3996,6 +4180,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       a: '„1-კვირიანი გამოწერა" — 5 ვიდეო კვირაში, ჩვეულებრივი ტარიფით. „1-თვიანი გამოწერა" — მაქს. 20 ვიდეო თვეში, უკვე ჩაშენებული ფასდაკლებით — თუ გინდა ხანგრძლივი, სტაბილური თანამშრომლობა, თვიური უფრო ხელსაყრელია.',
     },
     {
+      kw: ['პრომო კოდ','promo კოდ','რეფერალ','referral','ფასდაკლების კოდ','მაქვს კოდი'],
+      a: function(){
+        if (typeof currentPromo !== 'undefined' && currentPromo && currentPromo.active && currentPromo.code) {
+          return 'დიახ! ამჟამად აქტიურია პრომო კოდი — გააქტიურებულია ' + currentPromo.subDiscount + '₾-იანი ფასდაკლება 1-კვირიან და 1-თვიან გამოწერებზე, ხოლო ცალკეულ შეკვეთაზე დამატებით ' + currentPromo.singleDiscountPercent + '%-იანი ფასდაკლება. შეიყვანე კოდი გვერდზე, ჰერო-ს ქვეშ არსებულ „REFERRAL / PROMO კოდი" ველში — ფასდაკლება პირდაპირ პანელებში აისახება. კოდი მიუთითე შეკვეთისასაც.';
+        }
+        return 'ამჟამად აქტიური პრომო/რეფერალ კოდი არ გვაქვს, მაგრამ გვერდზე არის სპეციალური ველი — როგორც კი კოდი გააქტიურდება, იქ შეგეძლება მისი გამოყენება.';
+      },
+    },
+    {
       kw: ['შეფასებ','კომენტარ','რევიუ','ვარსკვლავ'],
       a: 'გვერდის ბოლოში, „კომენტარები" სექციაში შეგიძლია დატოვო ვარსკვლავებიანი შეფასება და ტექსტური კომენტარი — ყველა შეფასება საჯაროდ ჩანს და საშუალო რეიტინგშიც აისახება.',
     },
@@ -4097,6 +4290,15 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     {
       kw: ['weekly and monthly', 'week vs month', 'difference between subscriptions'],
       a: 'The "1-Week Subscription" gives 5 videos per week at the standard subscription rate. The "1-Month Subscription" gives up to 20 videos per month at an already-discounted price — better if you need a longer, steady arrangement.',
+    },
+    {
+      kw: ['promo code','referral','discount code','have a code'],
+      a: function(){
+        if (typeof currentPromo !== 'undefined' && currentPromo && currentPromo.active && currentPromo.code) {
+          return 'Yes! There\'s an active promo code right now — it gives a ' + currentPromo.subDiscount + '₾ discount on the 1-Week and 1-Month subscriptions, plus an extra ' + currentPromo.singleDiscountPercent + '% off a single order. Enter it in the "Referral / Promo code" box below the hero section — the discount is applied straight to the price panels. Mention the code again when you place your order.';
+        }
+        return 'There\'s no active promo/referral code right now, but there\'s a dedicated box on the page for it — as soon as one goes live, you\'ll be able to use it there.';
+      },
     },
     {
       kw: ['review','rating','comment','stars'],
@@ -4255,7 +4457,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     setTimeout(() => {
       const rule = findAnswer(text);
       if (rule) {
-        addMsg('bot', rule.a);
+        addMsg('bot', typeof rule.a === 'function' ? rule.a() : rule.a);
         if (rule.qr) addQuickReplies(rule.qr);
         return;
       }
@@ -4299,6 +4501,72 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       });
       return r.ok;
     } catch(e){ return false; }
+  }
+
+  // ============================================================
+  // 7b) URGENCY BADGES / SOCIAL PROOF / PROMO CODE
+  // ============================================================
+  const DEFAULT_URGENCY = { week: 4, month: 8 };
+  const DEFAULT_STATS = { total: 15, success: 15, fail: 0 };
+
+  async function loadUrgency(){
+    const data = await mdbRead('urgency');
+    const u = Object.assign({}, DEFAULT_URGENCY, data || {});
+    const wpEl = document.getElementById('wpSpotsLeft');
+    const mpEl = document.getElementById('mpSpotsLeft');
+    if (wpEl) wpEl.textContent = u.week;
+    if (mpEl) mpEl.textContent = u.month;
+    const wpBadge = document.getElementById('wpUrgencyBadge');
+    const mpBadge = document.getElementById('mpUrgencyBadge');
+    if (wpBadge) wpBadge.style.display = (u.week <= 0) ? 'none' : '';
+    if (mpBadge) mpBadge.style.display = (u.month <= 0) ? 'none' : '';
+  }
+
+  async function loadStats(){
+    const data = await mdbRead('stats');
+    const s = Object.assign({}, DEFAULT_STATS, data || {});
+    const el = document.getElementById('socialProofNum');
+    if (el) el.textContent = s.success;
+  }
+
+  async function loadPromo(){
+    const data = await mdbRead('promo');
+    currentPromo = Object.assign({}, DEFAULT_PROMO, data || {});
+  }
+
+  loadUrgency();
+  loadStats();
+  loadPromo();
+
+  const promoInput = document.getElementById('promoInput');
+  const promoBtn = document.getElementById('promoBtn');
+  const promoMsg = document.getElementById('promoMsg');
+  if (promoBtn) {
+    promoBtn.addEventListener('click', () => {
+      const val = (promoInput.value || '').trim();
+      promoMsg.classList.remove('ok', 'bad');
+      if (!val) {
+        promoMsg.textContent = t('promoEmpty');
+        promoMsg.classList.add('bad');
+        return;
+      }
+      if (currentPromo.active && currentPromo.code && val.toLowerCase() === String(currentPromo.code).toLowerCase()) {
+        promoApplied = true;
+        promoMsg.textContent = t('promoOk')
+          .replace('{SUB}', currentPromo.subDiscount)
+          .replace('{PCT}', currentPromo.singleDiscountPercent);
+        promoMsg.classList.add('ok');
+        // Reflect the discount live in every price panel
+        if (typeof updateWpBoxPrices === 'function') updateWpBoxPrices();
+        if (typeof updateMpBoxPrices === 'function') updateMpBoxPrices();
+        if (typeof refresh === 'function') refresh();
+      } else {
+        promoApplied = false;
+        promoMsg.textContent = t('promoBad');
+        promoMsg.classList.add('bad');
+      }
+    });
+    promoInput.addEventListener('keydown', e => { if (e.key === 'Enter') promoBtn.click(); });
   }
 
   // ============================================================
@@ -4816,7 +5084,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   // ============================================================
   // 10) ADMIN PANEL
   // ============================================================
-  const ADMIN_PASSWORD = '0070';
+  const ADMIN_PASSWORD = '37HcM)4bv1fZ7\'LR~9YE&epXj|HUE2|Xg`upUg1(T£XX\\r\\miG';
   const adminGear = document.getElementById('adminGear');
 
   (function initAdminGearReveal(){
@@ -4849,8 +5117,14 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   const adminErr = document.getElementById('adminErr');
   const adminTabVisits = document.getElementById('adminTabVisits');
   const adminTabComments = document.getElementById('adminTabComments');
+  const adminTabOrders = document.getElementById('adminTabOrders');
+  const adminTabUrgency = document.getElementById('adminTabUrgency');
+  const adminTabPromo = document.getElementById('adminTabPromo');
   const adminPanelVisits = document.getElementById('adminPanelVisits');
   const adminPanelComments = document.getElementById('adminPanelComments');
+  const adminPanelOrders = document.getElementById('adminPanelOrders');
+  const adminPanelUrgency = document.getElementById('adminPanelUrgency');
+  const adminPanelPromo = document.getElementById('adminPanelPromo');
 
   function openAdmin(){
     adminOverlay.classList.add('open');
@@ -4918,6 +5192,54 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     ).join('') + '</div>';
   }
 
+  async function renderAdminOrders(){
+    const data = await mdbRead('stats');
+    const s = Object.assign({}, DEFAULT_STATS, data || {});
+    document.getElementById('ordersTotalInput').value = s.total;
+    document.getElementById('ordersSuccessInput').value = s.success;
+    document.getElementById('ordersFailInput').value = s.fail;
+  }
+  document.getElementById('ordersSaveBtn').addEventListener('click', async () => {
+    const total = parseInt(document.getElementById('ordersTotalInput').value, 10) || 0;
+    const success = parseInt(document.getElementById('ordersSuccessInput').value, 10) || 0;
+    const fail = parseInt(document.getElementById('ordersFailInput').value, 10) || 0;
+    await mdbWrite('stats', { total, success, fail });
+    loadStats();
+    renderAdminOrders();
+  });
+
+  async function renderAdminUrgency(){
+    const data = await mdbRead('urgency');
+    const u = Object.assign({}, DEFAULT_URGENCY, data || {});
+    document.getElementById('urgencyWeekInput').value = u.week;
+    document.getElementById('urgencyMonthInput').value = u.month;
+  }
+  document.getElementById('urgencySaveBtn').addEventListener('click', async () => {
+    const week = parseInt(document.getElementById('urgencyWeekInput').value, 10) || 0;
+    const month = parseInt(document.getElementById('urgencyMonthInput').value, 10) || 0;
+    await mdbWrite('urgency', { week, month });
+    loadUrgency();
+    renderAdminUrgency();
+  });
+
+  async function renderAdminPromo(){
+    const data = await mdbRead('promo');
+    const p = Object.assign({}, DEFAULT_PROMO, data || {});
+    document.getElementById('promoCodeInput').value = p.code;
+    document.getElementById('promoSubDiscountInput').value = p.subDiscount;
+    document.getElementById('promoSingleDiscountInput').value = p.singleDiscountPercent;
+    document.getElementById('promoActiveInput').checked = !!p.active;
+  }
+  document.getElementById('promoSaveBtn').addEventListener('click', async () => {
+    const code = (document.getElementById('promoCodeInput').value || '').trim();
+    const subDiscount = parseFloat(document.getElementById('promoSubDiscountInput').value) || 0;
+    const singleDiscountPercent = parseFloat(document.getElementById('promoSingleDiscountInput').value) || 0;
+    const active = document.getElementById('promoActiveInput').checked;
+    await mdbWrite('promo', { code, subDiscount, singleDiscountPercent, active });
+    loadPromo();
+    renderAdminPromo();
+  });
+
   adminPanelComments.addEventListener('click', async (e) => {
     const btn = e.target.closest('button[data-action]');
     if (!btn) return;
@@ -4963,15 +5285,27 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   });
 
   function switchAdminTab(tab){
-    const showVisits = tab === 'visits';
-    adminTabVisits.classList.toggle('active', showVisits);
-    adminTabComments.classList.toggle('active', !showVisits);
-    adminPanelVisits.classList.toggle('active', showVisits);
-    adminPanelComments.classList.toggle('active', !showVisits);
-    if (showVisits) renderAdminVisits(); else renderAdminComments();
+    adminTabVisits.classList.toggle('active', tab === 'visits');
+    adminTabComments.classList.toggle('active', tab === 'comments');
+    adminTabOrders.classList.toggle('active', tab === 'orders');
+    adminTabUrgency.classList.toggle('active', tab === 'urgency');
+    adminTabPromo.classList.toggle('active', tab === 'promo');
+    adminPanelVisits.classList.toggle('active', tab === 'visits');
+    adminPanelComments.classList.toggle('active', tab === 'comments');
+    adminPanelOrders.classList.toggle('active', tab === 'orders');
+    adminPanelUrgency.classList.toggle('active', tab === 'urgency');
+    adminPanelPromo.classList.toggle('active', tab === 'promo');
+    if (tab === 'visits') renderAdminVisits();
+    else if (tab === 'comments') renderAdminComments();
+    else if (tab === 'orders') renderAdminOrders();
+    else if (tab === 'urgency') renderAdminUrgency();
+    else if (tab === 'promo') renderAdminPromo();
   }
   adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
   adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
+  adminTabOrders.addEventListener('click', () => switchAdminTab('orders'));
+  adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
+  adminTabPromo.addEventListener('click', () => switchAdminTab('promo'));
 
   function tryAdminLogin(){
     if (adminPass.value === ADMIN_PASSWORD) {
