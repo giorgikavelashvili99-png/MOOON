@@ -29,6 +29,18 @@
     --wa: #25D366;
     --volt: #d7ff2b;
     --volt-soft: rgba(215,255,43,0.4);
+
+    /* --- Moonfade palette (admin panel) --- */
+    --moon-bg: #060611;
+    --moon-deep: #0a0a1a;
+    --moon-silver: #e8ecff;
+    --moon-silver-dim: #aab0d6;
+    --moon-glow: #cfd8ff;
+    --moon-blue: #7c8fff;
+    --moon-blue-soft: rgba(124,143,255,0.35);
+    --moon-gold: #ffd27a;
+    --moon-crater: rgba(255,255,255,0.05);
+    --moon-line: rgba(207,216,255,0.14);
   }
 
   *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -240,7 +252,9 @@
     padding:7px 10px; outline:none; text-align:center;
   }
   .a-form-row input[type="text"]{ flex:1 1 auto; text-align:left; }
-  .a-save-row{ margin-top:6px; }
+  .a-form-row input:focus{ border-color:var(--moon-blue-soft, var(--purple-soft)); box-shadow:0 0 0 3px rgba(124,143,255,0.15); }
+  .a-save-row{ margin-top:6px; transition:transform .15s ease; }
+  .a-save-row:active{ transform:scale(0.97); }
   .a-stat-note{ font-size:11px; color:var(--text-faint); margin:-4px 0 12px; }
 
   .topbar-center{
@@ -793,61 +807,171 @@
   }
   .admin-gear:hover{ opacity:0.9; }
   .admin-overlay{
-    display:none; position:fixed; inset:0; z-index:100; background:rgba(4,4,8,0.72);
-    backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;
+    display:none; position:fixed; inset:0; z-index:100;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(124,143,255,0.10), transparent 45%),
+      radial-gradient(circle at 82% 88%, rgba(207,216,255,0.06), transparent 50%),
+      rgba(3,3,9,0.82);
+    backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:20px;
   }
   .admin-overlay.open{ display:flex; }
-  .admin-box{
-    width:100%; max-width:480px; max-height:82vh; overflow-y:auto; background:var(--panel);
-    border:1px solid var(--border); border-radius:20px; padding:22px;
+  .admin-overlay::before{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 22%, rgba(255,255,255,0.55), transparent 60%),
+      radial-gradient(1.5px 1.5px at 78% 15%, rgba(255,255,255,0.4), transparent 60%),
+      radial-gradient(1px 1px at 45% 65%, rgba(255,255,255,0.5), transparent 60%),
+      radial-gradient(1px 1px at 88% 72%, rgba(255,255,255,0.35), transparent 60%),
+      radial-gradient(1.5px 1.5px at 30% 85%, rgba(255,255,255,0.4), transparent 60%),
+      radial-gradient(1px 1px at 60% 38%, rgba(255,255,255,0.3), transparent 60%);
+    animation: starTwinkle 5s ease-in-out infinite;
   }
-  .admin-box h3{ margin:0 0 14px; font-size:16px; }
+  @keyframes starTwinkle{ 0%,100%{ opacity:0.6; } 50%{ opacity:1; } }
+  @keyframes moonRise{
+    0%{ opacity:0; transform:translateY(28px) scale(0.96); }
+    100%{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .admin-box{
+    position:relative; z-index:1;
+    width:100%; max-width:480px; max-height:82vh; overflow-y:auto;
+    background:
+      radial-gradient(circle at 85% -10%, rgba(207,216,255,0.10), transparent 55%),
+      linear-gradient(165deg, #10101f 0%, var(--moon-deep) 55%, #080814 100%);
+    border:1px solid rgba(207,216,255,0.16); border-radius:22px; padding:22px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.02) inset,
+      0 -1px 0 rgba(255,255,255,0.06) inset,
+      0 30px 70px rgba(0,0,0,0.55),
+      0 0 60px rgba(124,143,255,0.08);
+    animation: moonRise .5s cubic-bezier(.2,.8,.2,1);
+  }
+  .admin-box::-webkit-scrollbar{ width:6px; }
+  .admin-box::-webkit-scrollbar-thumb{ background:rgba(207,216,255,0.18); border-radius:6px; }
+  .admin-box h3{
+    margin:0 0 14px; font-size:16px; display:flex; align-items:center; gap:8px;
+    color:var(--moon-silver);
+  }
+  .admin-box h3::before{
+    content:''; display:inline-block; width:15px; height:15px; border-radius:50%; flex:0 0 auto;
+    background:radial-gradient(circle at 32% 32%, #fff, var(--moon-glow) 45%, #8f9ad6 100%);
+    box-shadow:0 0 14px rgba(207,216,255,0.75), 0 0 28px rgba(124,143,255,0.35);
+    animation: moonGlowPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes moonGlowPulse{
+    0%,100%{ box-shadow:0 0 14px rgba(207,216,255,0.75), 0 0 28px rgba(124,143,255,0.35); }
+    50%{ box-shadow:0 0 20px rgba(207,216,255,0.95), 0 0 40px rgba(124,143,255,0.55); }
+  }
   .admin-box .a-pass-row{ display:flex; gap:8px; }
   .admin-box input.a-pass{
-    flex:1; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
-    color:var(--text); padding:11px 14px; font-size:14px; outline:none; letter-spacing:2px;
+    flex:1; background:#0a0a16; border:1px solid var(--border); border-radius:12px;
+    color:var(--moon-silver); padding:11px 14px; font-size:14px; outline:none; letter-spacing:2px;
+    transition:border-color .2s, box-shadow .2s;
   }
+  .admin-box input.a-pass:focus{ border-color:var(--moon-blue-soft); box-shadow:0 0 0 3px rgba(124,143,255,0.15); }
   .admin-box .a-go{
-    background:var(--cyan); color:#06231f; border:none; border-radius:12px; padding:0 18px;
-    font-weight:800; cursor:pointer;
+    background:linear-gradient(135deg, var(--moon-glow), var(--moon-blue));
+    color:#0a0a1a; border:none; border-radius:12px; padding:0 18px;
+    font-weight:800; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 4px 16px rgba(124,143,255,0.3);
   }
+  .admin-box .a-go:hover{ transform:translateY(-1px); box-shadow:0 6px 22px rgba(124,143,255,0.45); }
+  .admin-box .a-go:active{ transform:translateY(0) scale(0.97); }
   .admin-box .a-err{ color:var(--warn); font-size:12px; margin-top:8px; display:none; }
-  .admin-box .a-err.show{ display:block; }
-  .admin-box .a-tabs{ display:flex; gap:8px; margin-bottom:14px; }
-  .admin-box .a-tab{
-    flex:1; background:#0a0a12; border:1px solid var(--border); color:var(--text-dim);
-    border-radius:10px; padding:9px; font-size:12.5px; font-weight:700; cursor:pointer;
+  .admin-box .a-err.show{ display:block; animation: shakeErr .35s; }
+  @keyframes shakeErr{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-4px); } 75%{ transform:translateX(4px); } }
+  .admin-box .a-tabs{
+    display:flex; gap:4px; margin-bottom:16px; padding:4px;
+    background:rgba(255,255,255,0.03); border:1px solid var(--moon-line); border-radius:14px;
   }
-  .admin-box .a-tab.active{ background:var(--purple); color:#fff; border-color:transparent; }
+  .admin-box .a-tab{
+    flex:1; background:transparent; border:1px solid transparent; color:var(--moon-silver-dim);
+    border-radius:10px; padding:9px 4px; font-size:12px; font-weight:700; cursor:pointer;
+    transition:background .25s ease, color .25s ease, box-shadow .25s ease, transform .15s ease;
+  }
+  .admin-box .a-tab:hover{ color:var(--moon-silver); }
+  .admin-box .a-tab.active{
+    background:linear-gradient(135deg, rgba(207,216,255,0.95), rgba(124,143,255,0.9));
+    color:#0a0a1a; border-color:transparent;
+    box-shadow:0 4px 16px rgba(124,143,255,0.35);
+  }
+  .admin-box .a-tab:active{ transform:scale(0.96); }
   .admin-box .a-panel{ display:none; }
-  .admin-box .a-panel.active{ display:block; }
+  .admin-box .a-panel.active{ display:block; animation: panelFadeIn .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes panelFadeIn{
+    0%{ opacity:0; transform:translateY(8px); }
+    100%{ opacity:1; transform:translateY(0); }
+  }
   .admin-box .a-visit-row{
     display:flex; justify-content:space-between; gap:10px; font-size:12px; padding:9px 0;
-    border-bottom:1px solid var(--border-soft); color:var(--text-dim);
+    border-bottom:1px solid var(--moon-line); color:var(--moon-silver-dim);
+    transition:background .15s;
   }
-  .admin-box .a-visit-row b{ color:var(--text); }
+  .admin-box .a-visit-row:hover{ background:rgba(207,216,255,0.03); }
+  .admin-box .a-visit-row b{ color:var(--moon-silver); }
   .admin-box .a-close{
-    width:100%; margin-top:14px; background:none; border:1px solid var(--border);
-    color:var(--text-dim); border-radius:10px; padding:9px; cursor:pointer;
+    width:100%; margin-top:14px; background:none; border:1px solid var(--moon-line);
+    color:var(--moon-silver-dim); border-radius:10px; padding:9px; cursor:pointer;
+    transition:border-color .2s, color .2s;
   }
-  .admin-box .a-cmt{ background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:10px; margin-bottom:10px; }
-  .admin-box .a-cmt.a-cmt-pinned{ border-color: rgba(255,176,32,0.5); }
+  .admin-box .a-close:hover{ border-color:var(--moon-blue-soft); color:var(--moon-silver); }
+  .admin-box .a-cmt{ background:#0a0a16; border:1px solid var(--moon-line); border-radius:12px; padding:10px; margin-bottom:10px; }
+  .admin-box .a-cmt.a-cmt-pinned{ border-color: rgba(255,210,122,0.5); }
   .admin-box .a-cmt .a-cmt-meta{ font-size:11px; color:var(--text-faint); margin-bottom:6px; }
   .admin-box .a-cmt textarea{
-    width:100%; background:#12121c; border:1px solid var(--border); border-radius:8px;
-    color:var(--text); padding:8px; font-size:12.5px; font-family:'Space Grotesk',sans-serif; resize:vertical; min-height:50px;
+    width:100%; background:#12121e; border:1px solid var(--border); border-radius:8px;
+    color:var(--moon-silver); padding:8px; font-size:12.5px; font-family:'Space Grotesk',sans-serif; resize:vertical; min-height:50px;
   }
   .admin-box .a-cmt-actions{ display:flex; gap:8px; margin-top:8px; }
   .admin-box .a-cmt-actions button{
     flex:1; border:none; border-radius:8px; padding:7px; font-size:11.5px; font-weight:700; cursor:pointer;
+    transition:transform .15s ease, filter .15s ease;
   }
-  .admin-box .a-save-btn{ background:var(--cyan); color:#06231f; }
+  .admin-box .a-cmt-actions button:hover{ filter:brightness(1.12); }
+  .admin-box .a-cmt-actions button:active{ transform:scale(0.95); }
+  .admin-box .a-save-btn{ background:var(--moon-glow); color:#06231f; }
   .admin-box .a-del-btn{ background:var(--warn); color:#2a0a0a; }
   .admin-box .a-pin-btn{ background:#ffd27a; color:#2a1c00; }
-  .admin-box .a-pin-btn.is-pinned{ background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#fff; }
-  .admin-box .a-cmt-replies{ margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); display:flex; flex-direction:column; gap:8px; }
-  .admin-box .a-reply{ background:#0e0e17; border:1px solid var(--border-soft); border-radius:10px; padding:8px; }
+  .admin-box .a-pin-btn.is-pinned{ background:linear-gradient(90deg, var(--moon-blue), var(--moon-glow)); color:#0a0a1a; }
+  .admin-box .a-cmt-replies{ margin-top:10px; padding-left:14px; border-left:2px solid var(--moon-line); display:flex; flex-direction:column; gap:8px; }
+  .admin-box .a-reply{ background:#0e0e19; border:1px solid var(--moon-line); border-radius:10px; padding:8px; }
   .admin-box .a-reply textarea{ min-height:38px; }
+
+  /* --- Moonfade stat cards & animated charts (admin dashboard) --- */
+  .a-stat-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .a-stat-card{
+    position:relative; overflow:hidden; padding:12px 10px; border-radius:14px;
+    background:linear-gradient(160deg, rgba(207,216,255,0.06), rgba(124,143,255,0.02));
+    border:1px solid var(--moon-line); text-align:center;
+  }
+  .a-stat-card .asc-num{
+    font-family:'JetBrains Mono', monospace; font-weight:800; font-size:20px; color:var(--moon-silver);
+    text-shadow:0 0 14px rgba(207,216,255,0.35);
+  }
+  .a-stat-card .asc-label{ margin-top:4px; font-size:10px; color:var(--moon-silver-dim); letter-spacing:0.04em; text-transform:uppercase; }
+  .a-chart-card{
+    padding:14px 14px 8px; border-radius:16px; margin-bottom:16px;
+    background:linear-gradient(160deg, rgba(207,216,255,0.05), rgba(124,143,255,0.015));
+    border:1px solid var(--moon-line);
+  }
+  .a-chart-card .acc-title{
+    font-size:11px; font-weight:700; color:var(--moon-silver-dim); text-transform:uppercase;
+    letter-spacing:0.05em; margin-bottom:8px;
+  }
+  .a-chart-svg{ display:block; width:100%; height:auto; overflow:visible; }
+  .a-chart-svg .acs-area{ opacity:0; animation:acsFadeIn .6s ease forwards .15s; }
+  .a-chart-svg .acs-line{
+    fill:none; stroke:var(--moon-glow); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;
+    filter:drop-shadow(0 0 6px rgba(207,216,255,0.55));
+  }
+  .a-chart-svg .acs-dot{ fill:var(--moon-silver); filter:drop-shadow(0 0 5px rgba(207,216,255,0.8)); }
+  @keyframes acsFadeIn{ to{ opacity:1; } }
+  .a-donut-wrap{ display:flex; align-items:center; gap:18px; }
+  .a-donut-ring{ transform:rotate(-90deg); flex:0 0 auto; }
+  .a-donut-ring circle{ transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1); }
+  .a-donut-legend{ display:flex; flex-direction:column; gap:8px; font-size:12px; }
+  .a-donut-legend .adl-row{ display:flex; align-items:center; gap:7px; color:var(--moon-silver-dim); }
+  .a-donut-legend .adl-dot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .a-donut-legend b{ color:var(--moon-silver); }
 
   .quality-grid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:11px;
@@ -2881,6 +3005,7 @@
       <div class="a-panel active" id="adminPanelVisits"></div>
       <div class="a-panel" id="adminPanelComments"></div>
       <div class="a-panel" id="adminPanelOrders">
+        <div class="a-chart-card" id="ordersDonutCard"></div>
         <div class="a-form-row"><label data-i18n="adminOrdersTotal">სულ შეკვეთა</label><input type="number" id="ordersTotalInput" min="0"></div>
         <div class="a-form-row"><label data-i18n="adminOrdersSuccess">წარმატებული</label><input type="number" id="ordersSuccessInput" min="0"></div>
         <div class="a-form-row"><label data-i18n="adminOrdersFail">წარუმატებელი</label><input type="number" id="ordersFailInput" min="0"></div>
@@ -3054,6 +3179,11 @@
       adminOrdersSuccess: 'წარმატებული',
       adminOrdersFail: 'წარუმატებელი',
       adminOrdersNote: 'სამივე რიცხვი (სულ / წარმატებული / წარუმატებელი) ჩანს საჯაროდ, საიტის ზედა ნაწილში, სოციალურ მტკიცებულების ზოლში.',
+      adminVisitsChart: 'ვიზიტები — ბოლო 7 დღე',
+      adminVisitsTotal: 'სულ',
+      adminVisitsToday: 'დღეს',
+      adminVisitsLocations: 'ლოკაცია',
+      adminOrdersChart: 'წარმატების მაჩვენებელი',
       adminUrgencyWeek: '1-კვირიანი — დარჩენილი ადგილები',
       adminUrgencyMonth: '1-თვიანი — დარჩენილი ადგილები',
       adminUrgencyNote: 'გამოჩნდება წითელი 🔥 ბეჯად პრაისინგ-პანელებში.',
@@ -3210,6 +3340,11 @@
       adminOrdersSuccess: 'Successful',
       adminOrdersFail: 'Failed',
       adminOrdersNote: 'All three numbers (total / successful / failed) are shown publicly, in the social-proof bar near the top of the site.',
+      adminVisitsChart: 'Visits — last 7 days',
+      adminVisitsTotal: 'Total',
+      adminVisitsToday: 'Today',
+      adminVisitsLocations: 'Locations',
+      adminOrdersChart: 'Success rate',
       adminUrgencyWeek: '1-Week — spots remaining',
       adminUrgencyMonth: '1-Month — spots remaining',
       adminUrgencyNote: 'Shows as a red 🔥 badge on the pricing panels.',
@@ -5455,6 +5590,78 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   document.getElementById('adminCloseDash').addEventListener('click', closeAdmin);
   adminOverlay.addEventListener('click', (e) => { if (e.target === adminOverlay) closeAdmin(); });
 
+  // ---- Moonfade animated chart helpers ----
+  function animateCountUp(el, target, duration){
+    if (!el) return;
+    target = Math.max(0, Math.round(target || 0));
+    duration = duration || 850;
+    const startTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    function step(now){
+      const p = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = String(target);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function buildSparklineSVG(values){
+    const w = 260, h = 66, pad = 6;
+    const max = Math.max(1, ...values);
+    const n = values.length || 1;
+    const stepX = (w - pad * 2) / Math.max(1, n - 1);
+    const pts = values.map((v, i) => [
+      pad + i * stepX,
+      h - pad - (v / max) * (h - pad * 2)
+    ]);
+    const line = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const area = line + ' L' + pts[pts.length - 1][0].toFixed(1) + ',' + (h - pad) + ' L' + pts[0][0].toFixed(1) + ',' + (h - pad) + ' Z';
+    const dots = pts.map(p => '<circle class="acs-dot" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="2.6"></circle>').join('');
+    return '<svg class="a-chart-svg" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+      '<defs><linearGradient id="acsGrad" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="var(--moon-glow)" stop-opacity="0.35"/>' +
+      '<stop offset="100%" stop-color="var(--moon-glow)" stop-opacity="0"/></linearGradient></defs>' +
+      '<path class="acs-area" d="' + area + '" fill="url(#acsGrad)"></path>' +
+      '<path class="acs-line" d="' + line + '"></path>' +
+      dots +
+      '</svg>';
+  }
+
+  function animateChartLine(container){
+    if (!container) return;
+    const line = container.querySelector('.acs-line');
+    if (!line || !line.getTotalLength) return;
+    const len = line.getTotalLength();
+    line.style.strokeDasharray = len;
+    line.style.strokeDashoffset = len;
+    requestAnimationFrame(() => {
+      line.style.transition = 'stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)';
+      line.style.strokeDashoffset = 0;
+    });
+  }
+
+  function buildDonutSVG(fraction){
+    const size = 100, r = 40, cx = 50, cy = 50, sw = 11;
+    const circ = 2 * Math.PI * r;
+    fraction = Math.max(0, Math.min(1, fraction || 0));
+    return '<svg class="a-donut-ring" width="112" height="112" viewBox="0 0 ' + size + ' ' + size + '">' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(207,216,255,0.12)" stroke-width="' + sw + '"></circle>' +
+      '<circle class="a-donut-fg" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#donutGrad)" stroke-width="' + sw + '" ' +
+      'stroke-linecap="round" stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + circ.toFixed(1) + '" data-target-offset="' + (circ * (1 - fraction)).toFixed(1) + '"></circle>' +
+      '<defs><linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0%" stop-color="var(--moon-glow)"/><stop offset="100%" stop-color="var(--moon-blue)"/></linearGradient></defs>' +
+      '</svg>';
+  }
+
+  function animateDonut(container){
+    if (!container) return;
+    const fg = container.querySelector('.a-donut-fg');
+    if (!fg) return;
+    const target = fg.getAttribute('data-target-offset');
+    requestAnimationFrame(() => { fg.style.strokeDashoffset = target; });
+  }
+
   async function renderAdminVisits(){
     adminPanelVisits.innerHTML = '<div class="c-empty">…</div>';
     const data = await mdbRead('visits');
@@ -5463,9 +5670,42 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       adminPanelVisits.innerHTML = '<div class="c-empty">' + t('adminNoVisits') + '</div>';
       return;
     }
-    adminPanelVisits.innerHTML = list.map(v =>
+
+    // Group visits into the last 7 days for the sparkline
+    const days = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      days.push(d.toISOString().slice(0, 10));
+    }
+    const perDay = days.map(day => list.filter(v => {
+      try { return new Date(v.ts).toISOString().slice(0, 10) === day; } catch (e) { return false; }
+    }).length);
+
+    const todayKey = now.toISOString().slice(0, 10);
+    const todayCount = list.filter(v => { try { return new Date(v.ts).toISOString().slice(0, 10) === todayKey; } catch (e) { return false; } }).length;
+    const uniqueLocations = new Set(list.map(v => v.location || 'Unknown')).size;
+
+    const chartHtml =
+      '<div class="a-chart-card" id="visitsChartCard">' +
+        '<div class="acc-title" data-i18n="adminVisitsChart">ვიზიტები — ბოლო 7 დღე</div>' +
+        buildSparklineSVG(perDay) +
+      '</div>' +
+      '<div class="a-stat-cards">' +
+        '<div class="a-stat-card"><div class="asc-num" id="vsTotal">0</div><div class="asc-label" data-i18n="adminVisitsTotal">სულ</div></div>' +
+        '<div class="a-stat-card"><div class="asc-num" id="vsToday">0</div><div class="asc-label" data-i18n="adminVisitsToday">დღეს</div></div>' +
+        '<div class="a-stat-card"><div class="asc-num" id="vsLoc">0</div><div class="asc-label" data-i18n="adminVisitsLocations">ლოკაცია</div></div>' +
+      '</div>';
+
+    adminPanelVisits.innerHTML = chartHtml + list.map(v =>
       '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
     ).join('');
+
+    animateChartLine(document.getElementById('visitsChartCard'));
+    animateCountUp(document.getElementById('vsTotal'), list.length);
+    animateCountUp(document.getElementById('vsToday'), todayCount);
+    animateCountUp(document.getElementById('vsLoc'), uniqueLocations);
   }
 
   async function renderAdminComments(){
@@ -5511,6 +5751,29 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     document.getElementById('ordersTotalInput').value = s.total;
     document.getElementById('ordersSuccessInput').value = s.success;
     document.getElementById('ordersFailInput').value = s.fail;
+
+    const total = Math.max(0, s.total || 0);
+    const success = Math.max(0, s.success || 0);
+    const fail = Math.max(0, s.fail || 0);
+    const fraction = total > 0 ? success / total : 0;
+
+    const donutCard = document.getElementById('ordersDonutCard');
+    if (donutCard) {
+      donutCard.innerHTML =
+        '<div class="acc-title" data-i18n="adminOrdersChart">წარმატების მაჩვენებელი</div>' +
+        '<div class="a-donut-wrap">' +
+          buildDonutSVG(fraction) +
+          '<div class="a-donut-legend">' +
+            '<div class="adl-row"><span class="adl-dot" style="background:var(--moon-silver-dim)"></span><span data-i18n="adminOrdersTotal">სულ შეკვეთა</span>: <b id="odTotal">0</b></div>' +
+            '<div class="adl-row"><span class="adl-dot" style="background:var(--moon-glow)"></span><span data-i18n="adminOrdersSuccess">წარმატებული</span>: <b id="odSuccess">0</b></div>' +
+            '<div class="adl-row"><span class="adl-dot" style="background:var(--warn)"></span><span data-i18n="adminOrdersFail">წარუმატებელი</span>: <b id="odFail">0</b></div>' +
+          '</div>' +
+        '</div>';
+      animateDonut(donutCard);
+      animateCountUp(document.getElementById('odTotal'), total);
+      animateCountUp(document.getElementById('odSuccess'), success);
+      animateCountUp(document.getElementById('odFail'), fail);
+    }
   }
   document.getElementById('ordersSaveBtn').addEventListener('click', async () => {
     const total = parseInt(document.getElementById('ordersTotalInput').value, 10) || 0;
@@ -5693,4 +5956,4 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 </script>
 
 </body>
-</html>
+</html>>
