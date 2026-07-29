@@ -2157,6 +2157,18 @@
                     <div class="ti-text" data-i18n="trust4Text">ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.</div>
                   </div>
                 </div>
+                <div class="trust-item moon-glow-card" style="grid-column:1 / -1;">
+                  <div class="qn-stars" aria-hidden="true">
+                    <span style="top:16%;left:11%;animation-delay:1.2s;"></span>
+                    <span style="top:67%;left:26%;animation-delay:.4s;"></span>
+                    <span style="top:24%;left:87%;animation-delay:1.8s;"></span>
+                  </div>
+                  <div class="ti-ico">🛡️</div>
+                  <div>
+                    <div class="ti-title" data-i18n="trust5Title">გარანტია — უფასო შესწორება</div>
+                    <div class="ti-text" data-i18n="trust5Text">თუ პირველი ვერსია ზუსტად ისე არ გამოვიდა, როგორც შეთანხმდით, ერთხელ უფასოდ შეგისწორებთ ვიდეოს — დამატებითი გადახდის გარეშე.</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2697,7 +2709,8 @@
       </div>
       <div class="a-panel" id="adminPanelPromo">
         <div class="a-form-row"><label data-i18n="adminPromoCode">კოდი</label><input type="text" id="promoCodeInput" placeholder="MOON10"></div>
-        <div class="a-form-row"><label data-i18n="adminPromoSubDiscount">ფასდაკლება გამოწერებზე (₾)</label><input type="number" id="promoSubDiscountInput" min="0" step="0.01"></div>
+        <div class="a-form-row"><label data-i18n="adminPromoWeekDiscount">ფასდაკლება 1-კვირიან გამოწერაზე (₾)</label><input type="number" id="promoWeekDiscountInput" min="0" step="0.01"></div>
+        <div class="a-form-row"><label data-i18n="adminPromoMonthDiscount">ფასდაკლება 1-თვიან გამოწერაზე (₾)</label><input type="number" id="promoMonthDiscountInput" min="0" step="0.01"></div>
         <div class="a-form-row"><label data-i18n="adminPromoSingleDiscount">ფასდაკლება ცალკეულ შეკვეთაზე (%)</label><input type="number" id="promoSingleDiscountInput" min="0" max="100" step="1"></div>
         <div class="a-form-row"><label data-i18n="adminPromoActive">აქტიურია</label><input type="checkbox" id="promoActiveInput"></div>
         <div class="a-stat-note" data-i18n="adminPromoNote">გააქტიურების შემდეგ ეს ფასდაკლება ავტომატურად აისახება 1-კვირიან/1-თვიან პანელებში (₾ ფასდაკლება) და ცალკეული ვიდეოს კალკულატორში (% ფასდაკლება), როცა სტუმარი სწორ კოდს შეიყვანს.</div>
@@ -2734,7 +2747,7 @@
   // -1) GLOBAL PROMO STATE (declared early so any function can
   //     safely read it, even ones invoked during initial load)
   // ============================================================
-  const DEFAULT_PROMO = { code: '', active: false, subDiscount: 5, singleDiscountPercent: 10 };
+  const DEFAULT_PROMO = { code: '', active: false, weekSubDiscount: 5, monthSubDiscount: 5, singleDiscountPercent: 10 };
   let currentPromo = Object.assign({}, DEFAULT_PROMO);
   let promoApplied = false; // becomes true only once the visitor enters a correct, active code
 
@@ -2761,6 +2774,8 @@
       trust3Text: 'შეკვეთას ადასტურებს რეალური ადამიანი WhatsApp ან Telegram-ში — არა ბოტი და არა ავტომატური სისტემა.',
       trust4Title: 'გამჭვირვალე ფასი წინასწარ',
       trust4Text: 'ფასს ხედავ კალკულატორში შეკვეთამდე — არანაირი დამალული საკომისიო თანხის გაგზავნამდე.',
+      trust5Title: 'გარანტია — უფასო შესწორება',
+      trust5Text: 'თუ პირველი ვერსია ზუსტად ისე არ გამოვიდა, როგორც შეთანხმდით, ერთხელ უფასოდ შეგისწორებთ ვიდეოს — დამატებითი გადახდის გარეშე.',
       trustRatingText: 'საშუალო შეფასება <b>{AVG}</b> — {COUNT} რეალური შეფასების საფუძველზე',
       priceReadout: 'ფასის მაჩვენებელი',
       finalPrice: 'საბოლოო ღირებულება',
@@ -2849,7 +2864,8 @@
       adminUrgencyMonth: '1-თვიანი — დარჩენილი ადგილები',
       adminUrgencyNote: 'გამოჩნდება წითელი 🔥 ბეჯად პრაისინგ-პანელებში.',
       adminPromoCode: 'კოდი',
-      adminPromoSubDiscount: 'ფასდაკლება გამოწერებზე (₾)',
+      adminPromoWeekDiscount: 'ფასდაკლება 1-კვირიან გამოწერაზე (₾)',
+      adminPromoMonthDiscount: 'ფასდაკლება 1-თვიან გამოწერაზე (₾)',
       adminPromoSingleDiscount: 'ფასდაკლება ცალკეულ შეკვეთაზე (%)',
       adminPromoActive: 'აქტიურია',
       adminPromoNote: 'გააქტიურების შემდეგ ეს ფასდაკლება ავტომატურად აისახება 1-კვირიან/1-თვიან პანელებში (₾ ფასდაკლება) და ცალკეული ვიდეოს კალკულატორში (% ფასდაკლება), როცა სტუმარი სწორ კოდს შეიყვანს.',
@@ -2862,7 +2878,7 @@
       promoLabel: '🎟 REFERRAL / PROMO კოდი გაქვს?',
       promoPlaceholder: 'შეიყვანე კოდი',
       promoApply: 'გააქტიურება',
-      promoOk: 'კოდი აქტიურია — გააქტიურებულია {SUB}₾-იანი ფასდაკლება 1-კვირიან და 1-თვიან გამოწერებზე, ხოლო ცალკეულ შეკვეთაზე დამატებით {PCT}%-იანი ფასდაკლება! შეკვეთისას მიუთითე ეს კოდი.',
+      promoOk: 'კოდი აქტიურია — 1-კვირიან გამოწერაზე −{WEEK}₾, 1-თვიან გამოწერაზე −{MONTH}₾, ხოლო ცალკეულ შეკვეთაზე დამატებით {PCT}%-იანი ფასდაკლება! შეკვეთისას მიუთითე ეს კოდი.',
       promoBad: 'ასეთი კოდი არ არსებობს ან აღარ არის აქტიური.',
       promoEmpty: 'გთხოვთ შეიყვანოთ კოდი.',
       howtoLabel: 'როგორ შევუკვეთო',
@@ -2906,6 +2922,8 @@
       trust3Text: 'A real person confirms your order on WhatsApp or Telegram — not a bot, not an automated system.',
       trust4Title: 'Transparent pricing upfront',
       trust4Text: 'You see the price in the calculator before ordering — no hidden fees before you send anything.',
+      trust5Title: 'Guarantee — one free revision',
+      trust5Text: "If the first version doesn't come out exactly as agreed, we'll fix it once, free of charge — no extra payment.",
       trustRatingText: 'Average rating <b>{AVG}</b> — based on {COUNT} real reviews',
       priceReadout: 'PRICE READOUT',
       finalPrice: 'Final price',
@@ -2994,7 +3012,8 @@
       adminUrgencyMonth: '1-Month — spots remaining',
       adminUrgencyNote: 'Shows as a red 🔥 badge on the pricing panels.',
       adminPromoCode: 'Code',
-      adminPromoSubDiscount: 'Discount on subscriptions (₾)',
+      adminPromoWeekDiscount: 'Discount on 1-Week subscription (₾)',
+      adminPromoMonthDiscount: 'Discount on 1-Month subscription (₾)',
       adminPromoSingleDiscount: 'Discount on single order (%)',
       adminPromoActive: 'Active',
       adminPromoNote: 'Once active, this discount is automatically reflected in the 1-Week/1-Month panels (₾ off) and the single-video calculator (% off) as soon as a visitor enters the correct code.',
@@ -3007,7 +3026,7 @@
       promoLabel: '🎟 Have a referral / promo code?',
       promoPlaceholder: 'Enter code',
       promoApply: 'Apply',
-      promoOk: 'Code active — a {SUB}₾ discount is now applied to the 1-Week and 1-Month subscriptions, plus an extra {PCT}% off a single order! Mention this code when you place your order.',
+      promoOk: 'Code active — −{WEEK}₾ on the 1-Week subscription, −{MONTH}₾ on the 1-Month subscription, plus an extra {PCT}% off a single order! Mention this code when you place your order.',
       promoBad: 'This code doesn\'t exist or is no longer active.',
       promoEmpty: 'Please enter a code.',
       howtoLabel: 'How to order',
@@ -3287,8 +3306,8 @@
     const base = SUB_PRICES[quality] || SUB_PRICES['1080_60'];
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
     let price = isChannelSub ? Math.max(0, base - WP_CHANNEL_DISCOUNT) : base;
-    if (promoApplied && currentPromo && currentPromo.subDiscount) {
-      price = Math.max(0, price - currentPromo.subDiscount);
+    if (promoApplied && currentPromo && currentPromo.weekSubDiscount) {
+      price = Math.max(0, price - currentPromo.weekSubDiscount);
     }
     return price;
   }
@@ -3296,7 +3315,7 @@
   function updateWpBoxPrices(){
     if (!wpQualityGrid) return;
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
-    const promoOff = (promoApplied && currentPromo && currentPromo.subDiscount) ? currentPromo.subDiscount : 0;
+    const promoOff = (promoApplied && currentPromo && currentPromo.weekSubDiscount) ? currentPromo.weekSubDiscount : 0;
     wpQualityGrid.querySelectorAll('.wp-box').forEach(box => {
       const q = box.getAttribute('data-quality');
       const base = SUB_PRICES[q] || SUB_PRICES['1080_60'];
@@ -3348,15 +3367,15 @@
 
   function getMonthlyTotal(quality){
     const base = MONTH_PRICES[quality] || MONTH_PRICES['1080_60'];
-    if (promoApplied && currentPromo && currentPromo.subDiscount) {
-      return Math.max(0, base - currentPromo.subDiscount);
+    if (promoApplied && currentPromo && currentPromo.monthSubDiscount) {
+      return Math.max(0, base - currentPromo.monthSubDiscount);
     }
     return base;
   }
 
   function updateMpBoxPrices(){
     if (!mpQualityGrid) return;
-    const promoOff = (promoApplied && currentPromo && currentPromo.subDiscount) ? currentPromo.subDiscount : 0;
+    const promoOff = (promoApplied && currentPromo && currentPromo.monthSubDiscount) ? currentPromo.monthSubDiscount : 0;
     mpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
       const q = box.getAttribute('data-quality');
       const base = MONTH_PRICES[q] || MONTH_PRICES['1080_60'];
@@ -4237,6 +4256,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   const KB_KA = [
     {
+      kw: ['გარანტ','შესწორება','არ მომეწონ','თუ არ მოვეწონ'],
+      a: 'დიახ — თუ პირველი ვერსია ზუსტად ისე არ გამოვა, როგორც შეთანხმდით, ერთხელ სრულიად უფასოდ შეგისწორებთ ვიდეოს, დამატებითი გადახდის გარეშე.',
+    },
+    {
       kw: ['1-კვირიან','1 კვირიან','კვირიან გამოწერა','კვირიანი გამოწერა','5 ვიდეო','გამოწერის პაკეტ','გამოწერის ბლოკ'],
       a: '„1-კვირიანი გამოწერა" — კვირაში 5 მონტაჟი, თითო ვიდეო მაქს. 59.59 წამი. აირჩიე ხარისხი (1080p/60fps-დან 4K/120fps-მდე) — ფასი ფიქსირებულია მთელი პაკეტისთვის და ჩანს პირდაპირ ბლოკში. შეკვეთა იმავე WhatsApp/Telegram ღილაკებით იგზავნება.',
       qr: ['არხის გამომწერს გამოწერაზეც აქვს ფასდაკლება?', 'რა განსხვავებაა ჩვეულებრივ შეკვეთასა და გამოწერას შორის?']
@@ -4262,7 +4285,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       kw: ['პრომო კოდ','promo კოდ','რეფერალ','referral','ფასდაკლების კოდ','მაქვს კოდი'],
       a: function(){
         if (typeof currentPromo !== 'undefined' && currentPromo && currentPromo.active && currentPromo.code) {
-          return 'დიახ! ამჟამად აქტიურია პრომო კოდი — გააქტიურებულია ' + currentPromo.subDiscount + '₾-იანი ფასდაკლება 1-კვირიან და 1-თვიან გამოწერებზე, ხოლო ცალკეულ შეკვეთაზე დამატებით ' + currentPromo.singleDiscountPercent + '%-იანი ფასდაკლება. შეიყვანე კოდი გვერდზე, ჰერო-ს ქვეშ არსებულ „REFERRAL / PROMO კოდი" ველში — ფასდაკლება პირდაპირ პანელებში აისახება. კოდი მიუთითე შეკვეთისასაც.';
+          return 'დიახ! ამჟამად აქტიურია პრომო კოდი — 1-კვირიან გამოწერაზე −' + currentPromo.weekSubDiscount + '₾, 1-თვიან გამოწერაზე −' + currentPromo.monthSubDiscount + '₾, ხოლო ცალკეულ შეკვეთაზე დამატებით ' + currentPromo.singleDiscountPercent + '%-იანი ფასდაკლება. შეიყვანე კოდი გვერდზე, ჰერო-ს ქვეშ არსებულ „REFERRAL / PROMO კოდი" ველში — ფასდაკლება პირდაპირ პანელებში აისახება. კოდი მიუთითე შეკვეთისასაც.';
         }
         return 'ამჟამად აქტიური პრომო/რეფერალ კოდი არ გვაქვს, მაგრამ გვერდზე არის სპეციალური ველი — როგორც კი კოდი გააქტიურდება, იქ შეგეძლება მისი გამოყენება.';
       },
@@ -4349,6 +4372,10 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   const KB_EN = [
     {
+      kw: ['guarantee','revision','not happy','if i dont like','if i don\'t like'],
+      a: "Yes — if the first version doesn't come out exactly as agreed, we'll revise it once, completely free, with no extra payment.",
+    },
+    {
       kw: ['1-week','1 week','weekly subscription','5 videos','subscription package','subscription plan'],
       a: 'The "1-Week Subscription" gives you 5 edits per week, up to 59.59s each. Pick a quality (1080p/60fps up to 4K/120fps) — the price is fixed for the whole package and shown right on the tile. Orders go through the same WhatsApp/Telegram buttons.',
       qr: ['Does the channel-subscriber discount apply to the subscription too?', "What's the difference between a one-time order and the subscription?"]
@@ -4374,7 +4401,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       kw: ['promo code','referral','discount code','have a code'],
       a: function(){
         if (typeof currentPromo !== 'undefined' && currentPromo && currentPromo.active && currentPromo.code) {
-          return 'Yes! There\'s an active promo code right now — it gives a ' + currentPromo.subDiscount + '₾ discount on the 1-Week and 1-Month subscriptions, plus an extra ' + currentPromo.singleDiscountPercent + '% off a single order. Enter it in the "Referral / Promo code" box below the hero section — the discount is applied straight to the price panels. Mention the code again when you place your order.';
+          return 'Yes! There\'s an active promo code right now — it gives −' + currentPromo.weekSubDiscount + '₾ on the 1-Week subscription and −' + currentPromo.monthSubDiscount + '₾ on the 1-Month subscription, plus an extra ' + currentPromo.singleDiscountPercent + '% off a single order. Enter it in the "Referral / Promo code" box below the hero section — the discount is applied straight to the price panels. Mention the code again when you place your order.';
         }
         return 'There\'s no active promo/referral code right now, but there\'s a dedicated box on the page for it — as soon as one goes live, you\'ll be able to use it there.';
       },
@@ -4636,7 +4663,8 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       if (currentPromo.active && currentPromo.code && val.toLowerCase() === String(currentPromo.code).toLowerCase()) {
         promoApplied = true;
         promoMsg.textContent = t('promoOk')
-          .replace('{SUB}', currentPromo.subDiscount)
+          .replace('{WEEK}', currentPromo.weekSubDiscount)
+          .replace('{MONTH}', currentPromo.monthSubDiscount)
           .replace('{PCT}', currentPromo.singleDiscountPercent);
         promoMsg.classList.add('ok');
         // Reflect the discount live in every price panel
@@ -5309,16 +5337,18 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     const data = await mdbRead('promo');
     const p = Object.assign({}, DEFAULT_PROMO, data || {});
     document.getElementById('promoCodeInput').value = p.code;
-    document.getElementById('promoSubDiscountInput').value = p.subDiscount;
+    document.getElementById('promoWeekDiscountInput').value = p.weekSubDiscount;
+    document.getElementById('promoMonthDiscountInput').value = p.monthSubDiscount;
     document.getElementById('promoSingleDiscountInput').value = p.singleDiscountPercent;
     document.getElementById('promoActiveInput').checked = !!p.active;
   }
   document.getElementById('promoSaveBtn').addEventListener('click', async () => {
     const code = (document.getElementById('promoCodeInput').value || '').trim();
-    const subDiscount = parseFloat(document.getElementById('promoSubDiscountInput').value) || 0;
+    const weekSubDiscount = parseFloat(document.getElementById('promoWeekDiscountInput').value) || 0;
+    const monthSubDiscount = parseFloat(document.getElementById('promoMonthDiscountInput').value) || 0;
     const singleDiscountPercent = parseFloat(document.getElementById('promoSingleDiscountInput').value) || 0;
     const active = document.getElementById('promoActiveInput').checked;
-    await mdbWrite('promo', { code, subDiscount, singleDiscountPercent, active });
+    await mdbWrite('promo', { code, weekSubDiscount, monthSubDiscount, singleDiscountPercent, active });
     loadPromo();
     renderAdminPromo();
   });
