@@ -2027,6 +2027,135 @@
     }
   }
 
+  /* --- Direct contact panel --- */
+  .contact-panel{ position:relative; overflow:hidden; }
+  .contact-panel::before{
+    content:''; position:absolute; inset:-40% -10% auto -10%; height:180%;
+    background:radial-gradient(circle at 30% 20%, rgba(37,211,102,0.10), transparent 55%),
+               radial-gradient(circle at 75% 80%, rgba(0,200,255,0.08), transparent 55%);
+    pointer-events:none;
+  }
+  .contact-top{ position:relative; display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .contact-icon{
+    flex:0 0 auto; width:40px; height:40px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+    background:linear-gradient(150deg, rgba(215,255,43,0.16), rgba(77,95,255,0.08));
+    border:1px solid rgba(215,255,43,0.3);
+    box-shadow:0 0 18px rgba(215,255,43,0.14);
+  }
+  .contact-title-wrap{ min-width:0; }
+  .contact-title{
+    font-size:16px; font-weight:700; color:var(--text); line-height:1.25;
+  }
+  .contact-online{
+    display:inline-flex; align-items:center; gap:5px; margin-top:2px;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700;
+    letter-spacing:0.06em; color:#8affb0; text-transform:uppercase;
+  }
+  .contact-online .co-dot{
+    width:7px; height:7px; border-radius:50%; background:#25D366;
+    box-shadow:0 0 8px #25D366; animation:pulse 1.6s infinite;
+  }
+  .contact-sub{
+    position:relative; font-size:13.5px; line-height:1.55; color:var(--text-dim);
+    margin:10px 0 18px;
+  }
+  .contact-grid{
+    position:relative; display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  @media (max-width:480px){ .contact-grid{ grid-template-columns:1fr; } }
+  .contact-btn{
+    display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+    padding:16px 16px 15px; border-radius:14px; text-decoration:none;
+    font-family:'Space Grotesk', sans-serif;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .contact-btn:hover{ transform:translateY(-2px); }
+  .contact-btn:active{ transform:translateY(0) scale(0.98); }
+  .contact-btn .cb-row{ display:flex; align-items:center; gap:9px; width:100%; }
+  .contact-btn .cb-ico{ display:flex; align-items:center; flex:0 0 auto; }
+  .contact-btn .cb-ico svg{ width:21px; height:21px; }
+  .contact-btn .cb-name{ font-weight:700; font-size:14.5px; }
+  .contact-btn .cb-handle{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; opacity:0.75; letter-spacing:0.02em;
+  }
+  .contact-btn .cb-arrow{ margin-left:auto; opacity:0.6; font-size:13px; }
+  .contact-btn.wa{
+    background:radial-gradient(ellipse at 15% 0%, rgba(37,211,102,0.10), transparent 55%), #0C100D;
+    border:1px solid rgba(37,211,102,0.4);
+    color:#00FF66; box-shadow:0 0 18px rgba(37,211,102,0.14), inset 0 0 20px rgba(37,211,102,0.04);
+  }
+  .contact-btn.wa:hover{ border-color:rgba(37,211,102,0.7); box-shadow:0 0 26px rgba(37,211,102,0.26), inset 0 0 20px rgba(37,211,102,0.07); }
+  .contact-btn.wa .cb-ico svg{ fill:#00FF66; filter:drop-shadow(0 0 5px rgba(37,211,102,0.7)); }
+  .contact-btn.tg{
+    background:radial-gradient(ellipse at 15% 0%, rgba(0,136,204,0.10), transparent 55%), #0B0E14;
+    border:1px solid rgba(0,200,255,0.4);
+    color:#00C8FF; box-shadow:0 0 18px rgba(0,200,255,0.14), inset 0 0 20px rgba(0,200,255,0.04);
+  }
+  .contact-btn.tg:hover{ border-color:rgba(0,200,255,0.7); box-shadow:0 0 26px rgba(0,200,255,0.26), inset 0 0 20px rgba(0,200,255,0.07); }
+  .contact-btn.tg .cb-ico svg{ fill:#00C8FF; filter:drop-shadow(0 0 5px rgba(0,200,255,0.7)); }
+
+  /* --- Before / After comparison slider --- */
+  .ba-panel{ padding:22px; }
+  .ba-sub{ font-size:13px; line-height:1.55; color:var(--text-dim); margin:-2px 0 16px; }
+  .ba-slider-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .ba-slider{
+    position:relative; width:100%; max-width:340px;
+    aspect-ratio:4/5; border-radius:16px; overflow:hidden;
+    border:1px solid var(--border); background:#000;
+    box-shadow:0 16px 40px rgba(0,0,0,0.45);
+    touch-action:none; cursor:ew-resize; user-select:none;
+  }
+  .ba-img{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; display:block; pointer-events:none;
+  }
+  .ba-before-wrap{
+    position:absolute; inset:0; width:50%; overflow:hidden;
+    will-change:width;
+  }
+  .ba-before-wrap .ba-img{ width:var(--ba-img-w, 340px); max-width:none; height:100%; }
+  .ba-divider{
+    position:absolute; top:0; bottom:0; left:50%;
+    width:0; transform:translateX(-50%);
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .ba-divider::before{
+    content:''; position:absolute; top:0; bottom:0; left:50%;
+    width:2.5px; transform:translateX(-50%);
+    background:rgba(255,255,255,0.9);
+    box-shadow:0 0 12px rgba(255,255,255,0.7), 0 0 22px rgba(77,95,255,0.5);
+  }
+  .ba-handle{
+    position:relative; z-index:1;
+    width:36px; height:36px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg, var(--purple), #1c2470);
+    border:2px solid rgba(255,255,255,0.85);
+    box-shadow:0 0 18px rgba(77,95,255,0.55), 0 4px 12px rgba(0,0,0,0.4);
+    color:#fff; font-size:12px; font-weight:800; letter-spacing:-1px;
+  }
+  .ba-tag{
+    position:absolute; top:10px; z-index:2;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:800; letter-spacing:0.08em;
+    padding:4px 9px; border-radius:7px; text-transform:uppercase;
+    background:rgba(4,4,8,0.68); backdrop-filter:blur(4px);
+    border:1px solid var(--border-soft); color:var(--text-dim);
+    pointer-events:none;
+  }
+  .ba-tag-before{ left:10px; }
+  .ba-tag-after{ right:10px; color:#ffe0a3; border-color:rgba(255,176,32,0.35); text-shadow:0 0 8px rgba(255,176,32,0.4); }
+  .ba-hint{
+    margin-top:10px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-faint);
+    letter-spacing:0.04em;
+  }
+  @media (max-width:480px){
+    .ba-slider{ max-width:280px; }
+    .ba-handle{ width:32px; height:32px; }
+  }
+
 </style>
 </head>
 <body>
@@ -2272,7 +2401,27 @@
     <h1 data-i18n="heroTitle">გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
   </div>
 
-
+  <!-- Before / After comparison -->
+  <div class="panel ba-panel" id="beforeAfterPanel">
+    <div class="panel-head" style="margin-bottom:12px;">
+      <div class="label" data-i18n="baLabel">მონტაჟის გარეშე vs მონტაჟის შემდეგ</div>
+    </div>
+    <div class="ba-sub" data-i18n="baSub">ჩამოასრიალე ხაზი და ნახე რეალური სხვაობა — After Effects &amp; Topaz ტექნოლოგიით დამუშავებული ვიდეოს ხარისხი.</div>
+    <div class="ba-slider-wrap">
+      <div class="ba-slider" id="baSlider">
+        <img class="ba-img ba-after" src="after.jpg" alt="After enhancement" draggable="false">
+        <div class="ba-before-wrap" id="baBeforeWrap">
+          <img class="ba-img ba-before" src="before.jpg" alt="Before enhancement" draggable="false">
+        </div>
+        <span class="ba-tag ba-tag-before" data-i18n="baBeforeTag">გარეშე</span>
+        <span class="ba-tag ba-tag-after" data-i18n="baAfterTag">შემდეგ</span>
+        <div class="ba-divider" id="baDivider">
+          <div class="ba-handle">◂▸</div>
+        </div>
+      </div>
+      <div class="ba-hint" data-i18n="baHint">↔ ჩამოასრიალე შესადარებლად</div>
+    </div>
+  </div>
 
 
   <div class="panel">
@@ -2658,6 +2807,36 @@
     <div id="commentsPaginationWrap"></div>
   </div>
 
+  <!-- Direct contact -->
+  <div class="panel contact-panel" style="padding:22px;">
+    <div class="contact-top">
+      <div class="contact-icon">💬</div>
+      <div class="contact-title-wrap">
+        <div class="contact-title" data-i18n="contactPanelTitle">კითხვა გაქვს? მომწერე პირდაპირ</div>
+        <div class="contact-online"><span class="co-dot"></span><span data-i18n="contactPanelOnline">ჩვეულებრივ სწრაფად ვპასუხობთ</span></div>
+      </div>
+    </div>
+    <div class="contact-sub" data-i18n="contactPanelSub">არ არის საჭირო კალკულატორის შევსება — უბრალოდ დამიწერე ნებისმიერი კითხვა WhatsApp-ზე ან Telegram-ზე და პირადად გიპასუხებ.</div>
+    <div class="contact-grid">
+      <a class="contact-btn wa" id="contactBtnWA" href="https://wa.me/995592630630" target="_blank" rel="noopener noreferrer">
+        <div class="cb-row">
+          <span class="cb-ico"><svg viewBox="0 0 24 24"><path d="M20.52 3.449C12.831-3.984.106 5.845.061 12.68a12.94 12.94 0 001.767 6.583L0 24l5.001-1.79a12.914 12.914 0 006.482 1.658h.006c6.24 0 12.243-5.302 12.243-12.213 0-3.264-1.325-6.334-3.212-8.206zM12 22.121h-.005a10.13 10.13 0 01-5.185-1.421l-.372-.22-3.851 1.377 1.4-3.756-.242-.386a10.108 10.108 0 01-1.554-5.396c.005-5.579 4.548-10.115 10.133-10.115 2.703 0 5.243 1.057 7.148 2.978 1.905 1.921 2.952 4.464 2.951 7.153-.004 5.58-4.547 10.106-10.423 10.106zm5.556-7.596c-.303-.152-1.793-.885-2.07-.986-.278-.101-.48-.152-.682.152-.202.303-.783.986-.96 1.188-.176.202-.353.227-.655.076-.303-.152-1.279-.472-2.436-1.505-.9-.803-1.508-1.794-1.685-2.097-.176-.303-.019-.467.133-.618.136-.135.303-.353.454-.53.152-.176.202-.303.303-.505.101-.202.05-.379-.025-.53-.076-.152-.682-1.646-.934-2.253-.246-.591-.497-.511-.682-.52-.176-.008-.379-.01-.581-.01-.202 0-.53.076-.808.379-.278.303-1.06 1.036-1.06 2.528s1.085 2.933 1.236 3.135c.151.202 2.135 3.259 5.17 4.57.723.312 1.287.498 1.727.638.726.231 1.386.198 1.908.12.582-.087 1.793-.734 2.046-1.442.253-.708.253-1.315.177-1.442-.075-.126-.278-.202-.581-.353z"/></svg></span>
+          <span class="cb-name">WhatsApp</span>
+          <span class="cb-arrow">↗</span>
+        </div>
+        <span class="cb-handle">+995 592 630 630</span>
+      </a>
+      <a class="contact-btn tg" id="contactBtnTG" href="https://t.me/Moonknight0012" target="_blank" rel="noopener noreferrer">
+        <div class="cb-row">
+          <span class="cb-ico"><svg viewBox="0 0 24 24"><path d="M23.91 3.79L20.3 20.84c-.25 1.21-.98 1.5-2 .94l-5.5-4.07-2.66 2.57c-.3.3-.55.55-1.12.55l.4-5.7 10.38-9.4c.45-.4-.1-.63-.7-.23L7.28 13.55l-5.6-1.75c-1.22-.38-1.24-1.22.26-1.8L22.4 2.35c1.02-.38 1.9.24 1.51 1.44z"/></svg></span>
+          <span class="cb-name">Telegram</span>
+          <span class="cb-arrow">↗</span>
+        </div>
+        <span class="cb-handle">@Moonknight0012</span>
+      </a>
+    </div>
+  </div>
+
   </div>
 
   <footer><span data-i18n="footer">MOON ENHANCER — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
@@ -2821,6 +3000,14 @@
       warnP2: 'გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.',
       warnP3: 'ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.',
       warnP4: 'კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებელს ვიდეო გაუჭედოს.',
+      baLabel: 'მონტაჟის გარეშე vs მონტაჟის შემდეგ',
+      baSub: 'ჩამოასრიალე ხაზი და ნახე რეალური სხვაობა — After Effects & Topaz ტექნოლოგიით დამუშავებული ვიდეოს ხარისხი.',
+      baBeforeTag: 'გარეშე',
+      baAfterTag: 'შემდეგ',
+      baHint: '↔ ჩამოასრიალე შესადარებლად',
+      contactPanelTitle: 'კითხვა გაქვს? მომწერე პირდაპირ',
+      contactPanelOnline: 'ჩვეულებრივ სწრაფად ვპასუხობთ',
+      contactPanelSub: 'უბრალოდ მომწერე ნებისმიერი კითხვა WhatsApp-ზე ან Telegram-ზე და პირადად გიპასუხებ.',
       footer: 'MOON ENHANCER — ზუსტი კალკულაცია, კადრამდე სიზუსტით',
       chatAssistant: 'ასისტენტი',
       chatOnline: 'ონლაინ',
@@ -2969,6 +3156,14 @@
       warnP2: 'Please make sure your video duration <b>does not exceed 59.59 seconds</b> — anything longer is priced individually and isn\'t included in the calculator.',
       warnP3: 'Also make sure the footage is shot and rendered in <b>1080p / 60fps</b> quality — this affects the cleanliness of the final result.',
       warnP4: 'The calculator also offers <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps</b> options, but we don\'t recommend them — the video may lag for viewers.',
+      baLabel: 'Without editing vs after editing',
+      baSub: 'Drag the line to see the real difference — quality achieved with After Effects & Topaz technology.',
+      baBeforeTag: 'BEFORE',
+      baAfterTag: 'AFTER',
+      baHint: '↔ drag to compare',
+      contactPanelTitle: 'Have a question? Message me directly',
+      contactPanelOnline: 'Usually replies fast',
+      contactPanelSub: "Just send me any question on WhatsApp or Telegram and I'll answer you personally.",
       footer: 'MOON ENHANCER — precise calculation, down to the frame',
       chatAssistant: 'Assistant',
       chatOnline: 'Online',
@@ -5435,9 +5630,59 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   adminGo.addEventListener('click', tryAdminLogin);
   adminPass.addEventListener('keydown', e => { if (e.key === 'Enter') tryAdminLogin(); });
 
+  // ============================================================
+  // BEFORE / AFTER COMPARISON SLIDER
+  // ============================================================
+  function initBeforeAfterSlider(){
+    const slider = document.getElementById('baSlider');
+    if (!slider) return;
+    const beforeWrap = document.getElementById('baBeforeWrap');
+    const divider = document.getElementById('baDivider');
+    let dragging = false;
+
+    function syncImgWidth(){
+      const w = slider.getBoundingClientRect().width;
+      beforeWrap.style.setProperty('--ba-img-w', w + 'px');
+    }
+
+    function setPos(pct){
+      pct = Math.max(0, Math.min(100, pct));
+      beforeWrap.style.width = pct + '%';
+      divider.style.left = pct + '%';
+    }
+
+    function posFromEvent(e){
+      const rect = slider.getBoundingClientRect();
+      const x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX)) - rect.left;
+      return (x / rect.width) * 100;
+    }
+
+    function onDown(e){
+      dragging = true;
+      slider.setPointerCapture && e.pointerId != null && slider.setPointerCapture(e.pointerId);
+      setPos(posFromEvent(e));
+    }
+    function onMove(e){
+      if (!dragging) return;
+      setPos(posFromEvent(e));
+    }
+    function onUp(){ dragging = false; }
+
+    slider.addEventListener('pointerdown', onDown);
+    slider.addEventListener('pointermove', onMove);
+    slider.addEventListener('pointerup', onUp);
+    slider.addEventListener('pointerleave', onUp);
+    slider.addEventListener('pointercancel', onUp);
+
+    window.addEventListener('resize', syncImgWidth);
+    syncImgWidth();
+    setPos(50);
+  }
+
   applyTranslations();
   initAdminModeCheckbox();
   applyAdminNameLock();
+  initBeforeAfterSlider();
 </script>
 
 </body>
