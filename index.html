@@ -5545,7 +5545,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     let typed = '';
     document.addEventListener('keydown', (e) => {
       if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (typeof e.key !== 'string' || e.key.length !== 1) return;
+      if (e.key.length !== 1) return;
       typed = (typed + e.key).slice(-ADMIN_PASSWORD.length);
       checkReveal(typed);
     });
