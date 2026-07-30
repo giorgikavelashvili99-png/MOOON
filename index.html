@@ -2221,7 +2221,22 @@
 
   /* --- Before / After comparison slider --- */
   .ba-panel{ padding:22px; }
-  .ba-sub{ font-size:13px; line-height:1.55; color:var(--text-dim); margin:-2px 0 16px; }
+  .ba-tabs{
+    display:flex; gap:8px; margin:-2px 0 16px;
+  }
+  .ba-tab{
+    flex:1; text-align:center; cursor:pointer;
+    font-family:'Space Grotesk', sans-serif; font-size:13px; font-weight:700;
+    padding:9px 10px; border-radius:10px;
+    border:1px solid var(--border-soft); background:rgba(18,18,28,0.5);
+    color:var(--text-dim); transition:all .15s ease;
+  }
+  .ba-tab:hover{ border-color:var(--purple-soft); color:var(--text); }
+  .ba-tab.active{
+    color:#ffe0a3; border-color:rgba(255,210,122,0.4);
+    background:rgba(255,210,122,0.08);
+    box-shadow:0 0 16px rgba(255,210,122,0.12);
+  }
   .ba-slider-wrap{ display:flex; flex-direction:column; align-items:center; }
   .ba-slider{
     position:relative; width:100%; max-width:340px;
@@ -2234,11 +2249,24 @@
     position:absolute; inset:0; width:100%; height:100%;
     object-fit:cover; display:block; pointer-events:none;
   }
-  .ba-before-wrap{
-    position:absolute; inset:0; width:50%; overflow:hidden;
-    will-change:width;
+  .ba-before{
+    clip-path: inset(0 50% 0 0);
+    will-change: clip-path;
   }
-  .ba-before-wrap .ba-img{ width:var(--ba-img-w, 340px); max-width:none; height:100%; }
+  .ba-caption{
+    position:absolute; top:10px; left:50%; transform:translateX(-50%);
+    z-index:3; max-width:calc(100% - 24px);
+    font-family:'Space Grotesk', sans-serif; font-size:13px; font-weight:700;
+    text-align:center; line-height:1.3; color:#fff;
+    padding:7px 14px; border-radius:10px;
+    background:rgba(4,4,8,0.62); backdrop-filter:blur(4px);
+    border:1px solid rgba(255,255,255,0.14);
+    text-shadow:0 0 10px rgba(0,0,0,0.6);
+    pointer-events:none;
+  }
+  @media (max-width:480px){
+    .ba-caption{ font-size:11px; padding:6px 10px; top:7px; }
+  }
   .ba-divider{
     position:absolute; top:0; bottom:0; left:50%;
     width:0; transform:translateX(-50%);
@@ -2261,7 +2289,7 @@
     color:#fff; font-size:12px; font-weight:800; letter-spacing:-1px;
   }
   .ba-tag{
-    position:absolute; top:10px; z-index:2;
+    position:absolute; top:46px; z-index:2;
     font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:800; letter-spacing:0.08em;
     padding:4px 9px; border-radius:7px; text-transform:uppercase;
     background:rgba(4,4,8,0.68); backdrop-filter:blur(4px);
@@ -2277,10 +2305,9 @@
   }
   @media (max-width:480px){
     .ba-panel{ padding:16px; }
-    .ba-sub{ font-size:11.5px; margin:-2px 0 10px; }
     .ba-slider{ max-width:190px; }
     .ba-handle{ width:26px; height:26px; font-size:10px; }
-    .ba-tag{ font-size:9px; padding:3px 7px; top:7px; }
+    .ba-tag{ font-size:9px; padding:3px 7px; top:36px; }
     .ba-hint{ font-size:10px; margin-top:7px; }
   }
   @media (max-width:360px){
@@ -2560,18 +2587,20 @@
     <h1 data-i18n="heroTitle">გამოთვალე შენი <span>მონტაჟის ღირებულება</span> ზუსტად კადრამდე</h1>
   </div>
 
-  <!-- Before / After comparison -->
+  <!-- Before / After comparison — single panel, tab-switched between movies and games -->
   <div class="panel ba-panel" id="beforeAfterPanel">
     <div class="panel-head" style="margin-bottom:12px;">
       <div class="label" data-i18n="baLabel">მონტაჟის გარეშე vs მონტაჟის შემდეგ</div>
     </div>
-    <div class="ba-sub" data-i18n="baSub">ჩამოასრიალე ხაზი და ნახე რეალური სხვაობა — After Effects &amp; Topaz ტექნოლოგიით დამუშავებული ვიდეოს ხარისხი.</div>
+    <div class="ba-tabs" id="baTabs">
+      <button type="button" class="ba-tab active" data-ba-tab="movies" data-i18n="baTabMovies">ფილმები</button>
+      <button type="button" class="ba-tab" data-ba-tab="games" data-i18n="baTabGames">თამაშები</button>
+    </div>
     <div class="ba-slider-wrap">
       <div class="ba-slider" id="baSlider">
-        <img class="ba-img ba-after" src="after.jpg" alt="After enhancement" draggable="false">
-        <div class="ba-before-wrap" id="baBeforeWrap">
-          <img class="ba-img ba-before" src="before.jpg" alt="Before enhancement" draggable="false">
-        </div>
+        <img class="ba-img ba-after" id="baAfterImg" src="after.jpg" alt="After enhancement" draggable="false">
+        <img class="ba-img ba-before" id="baBeforeImg" src="before.jpg" alt="Before enhancement" draggable="false">
+        <div class="ba-caption" id="baCaption">ხარისხი ფილმებისთვის<br>(სერიალებისთვის, ანიმეებისთვის და ა.შ)</div>
         <span class="ba-tag ba-tag-before" data-i18n="baBeforeTag">გარეშე</span>
         <span class="ba-tag ba-tag-after" data-i18n="baAfterTag">შემდეგ</span>
         <div class="ba-divider" id="baDivider">
@@ -3161,7 +3190,10 @@
       warnP3: 'ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.',
       warnP4: 'კალკულატორში ხელმისაწვდომია <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps და 4K/120fps</b> ვარიანტებიც, თუმცა ამ ფორმატებს არ გირჩევთ — შესაძლოა მაყურებელს ვიდეო გაუჭედოს.',
       baLabel: 'მონტაჟის გარეშე vs მონტაჟის შემდეგ',
-      baSub: 'ჩამოასრიალე ხაზი და ნახე რეალური სხვაობა — After Effects & Topaz ტექნოლოგიით დამუშავებული ვიდეოს ხარისხი.',
+      baTabMovies: 'ფილმები',
+      baTabGames: 'თამაშები',
+      baCaptionMovies: 'ხარისხი ფილმებისთვის<br>(სერიალებისთვის, ანიმეებისთვის და ა.შ)',
+      baCaptionGames: 'ხარისხი თამაშებისთვის',
       baBeforeTag: 'გარეშე',
       baAfterTag: 'შემდეგ',
       baHint: '↔ ჩამოასრიალე შესადარებლად',
@@ -3322,7 +3354,10 @@
       warnP3: 'Also make sure the footage is shot and rendered in <b>1080p / 60fps</b> quality — this affects the cleanliness of the final result.',
       warnP4: 'The calculator also offers <b>1080p/120fps, 2K/60fps, 2K/120fps, 4K/60fps and 4K/120fps</b> options, but we don\'t recommend them — the video may lag for viewers.',
       baLabel: 'Without editing vs after editing',
-      baSub: 'Drag the line to see the real difference — quality achieved with After Effects & Topaz technology.',
+      baTabMovies: 'Movies',
+      baTabGames: 'Games',
+      baCaptionMovies: 'Quality for movies<br>(series, anime, etc.)',
+      baCaptionGames: 'Quality for games',
       baBeforeTag: 'BEFORE',
       baAfterTag: 'AFTER',
       baHint: '↔ drag to compare',
@@ -3440,6 +3475,7 @@
     });
     document.getElementById('langKa').classList.toggle('active', currentLang === 'ka');
     document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
+    if (typeof applyBaTabContent === 'function') applyBaTabContent();
     if (typeof refresh === 'function') refresh();
     if (typeof renderComments === 'function') renderComments();
     if (typeof renderTrustRating === 'function') renderTrustRating();
@@ -5932,21 +5968,57 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   // ============================================================
   // BEFORE / AFTER COMPARISON SLIDER
   // ============================================================
-  function initBeforeAfterSlider(){
-    const slider = document.getElementById('baSlider');
+  const BA_GALLERY = {
+    movies: { after: 'after.jpg', before: 'before.jpg', captionKey: 'baCaptionMovies' },
+    games:  { after: 'after-games.jpg', before: 'before-games.jpg', captionKey: 'baCaptionGames' }
+  };
+  let baCurrentTab = 'movies';
+  let baResetPos = null; // set by initBeforeAfterSlider, resets handle to center
+
+  function applyBaTabContent(){
+    const cfg = BA_GALLERY[baCurrentTab];
+    const afterImg = document.getElementById('baAfterImg');
+    const beforeImg = document.getElementById('baBeforeImg');
+    const caption = document.getElementById('baCaption');
+    if (!cfg || !afterImg || !beforeImg || !caption) return;
+    afterImg.src = cfg.after;
+    beforeImg.src = cfg.before;
+    if (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][cfg.captionKey] !== undefined) {
+      caption.innerHTML = TRANSLATIONS[currentLang][cfg.captionKey];
+    }
+    if (typeof baResetPos === 'function') baResetPos();
+  }
+
+  function initBaTabs(){
+    const tabsWrap = document.getElementById('baTabs');
+    if (!tabsWrap) return;
+    tabsWrap.addEventListener('click', (e) => {
+      const btn = e.target.closest('.ba-tab');
+      if (!btn) return;
+      const tab = btn.getAttribute('data-ba-tab');
+      if (!tab || tab === baCurrentTab) return;
+      baCurrentTab = tab;
+      tabsWrap.querySelectorAll('.ba-tab').forEach(b => b.classList.toggle('active', b === btn));
+      applyBaTabContent();
+    });
+    applyBaTabContent();
+  }
+
+  function initBeforeAfterSlider(sliderId, beforeImgId, dividerId){
+    const slider = document.getElementById(sliderId);
     if (!slider) return;
-    const beforeWrap = document.getElementById('baBeforeWrap');
-    const divider = document.getElementById('baDivider');
+    const beforeImg = document.getElementById(beforeImgId);
+    const divider = document.getElementById(dividerId);
     let dragging = false;
 
-    function syncImgWidth(){
-      const w = slider.getBoundingClientRect().width;
-      beforeWrap.style.setProperty('--ba-img-w', w + 'px');
-    }
-
+    // The "before" image is the exact same size as the "after" image
+    // (both position:absolute, inset:0, object-fit:cover) — we simply
+    // clip it with clip-path. Because both images always share the
+    // same box, there is nothing to resync on resize / across devices,
+    // so it renders identically everywhere (phone, tablet, desktop).
     function setPos(pct){
       pct = Math.max(0, Math.min(100, pct));
-      beforeWrap.style.width = pct + '%';
+      beforeImg.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
       divider.style.left = pct + '%';
     }
 
@@ -5973,9 +6045,13 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     slider.addEventListener('pointerleave', onUp);
     slider.addEventListener('pointercancel', onUp);
 
-    window.addEventListener('resize', syncImgWidth);
-    syncImgWidth();
     setPos(50);
+    baResetPos = () => setPos(50);
+  }
+
+  function initBeforeAfterSliders(){
+    initBeforeAfterSlider('baSlider', 'baBeforeImg', 'baDivider');
+    initBaTabs();
   }
 
   // ============================================================
@@ -6039,7 +6115,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   applyTranslations();
   initAdminModeCheckbox();
   applyAdminNameLock();
-  initBeforeAfterSlider();
+  initBeforeAfterSliders();
   initTilt3D();
 </script>
 
