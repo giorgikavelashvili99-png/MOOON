@@ -1097,48 +1097,79 @@
     overflow-wrap:break-word; word-break:break-word;
   }
   .quality-btn.active .q-price{ color:var(--qb-accent); text-shadow:0 0 8px color-mix(in srgb, var(--qb-accent) 45%, transparent); }
+  .quality-btn .q-price .q-p-dur{ color:var(--text-faint); font-weight:500; }
+  .quality-btn.active .q-price .q-p-dur{ color: color-mix(in srgb, var(--qb-accent) 55%, var(--text-dim)); }
+  .quality-btn .q-price .q-p-arrow{ color:var(--text-faint); margin:0 1px; opacity:.7; }
+  .quality-btn .q-price .q-p-amt{ color:var(--text); font-weight:800; }
+  .quality-btn.active .q-price .q-p-amt{ color:#fff; }
 
   .quality-btn .q-check{
     position:absolute; top:10px; right:10px;
-    width:18px; height:18px; border-radius:50%; flex:0 0 auto;
-    display:none; align-items:center; justify-content:center;
-    background: color-mix(in srgb, var(--qb-accent) 22%, transparent);
-    border:1px solid color-mix(in srgb, var(--qb-accent) 55%, transparent);
-    color:#fff; font-size:9.5px; font-weight:800; line-height:1;
+    width:19px; height:19px; border-radius:50%; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,0.03);
+    border:1.5px solid var(--border);
+    color:transparent; font-size:10px; font-weight:800; line-height:1;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
   }
-  .quality-btn.active .q-check{ display:flex; }
+  .quality-btn.active .q-check{
+    background: linear-gradient(135deg, var(--qb-accent), var(--qb-accent-2));
+    border-color: transparent;
+    color:#04101a;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--qb-accent) 55%, transparent);
+  }
 
   .quality-btn .q-rec{
-    display:inline-block; align-self:flex-start; max-width:100%;
+    display:inline-block; align-self:flex-start; max-width:calc(100% - 30px);
     font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif; font-size:8.5px; font-weight:800; letter-spacing:0.03em;
     background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#04101a;
     padding:3px 7px; border-radius:6px; text-transform:uppercase;
     white-space:normal; overflow-wrap:break-word; margin-bottom:2px; box-shadow:0 2px 6px rgba(0,0,0,0.3);
   }
 
+  .quality-btn .q-info{ display:contents; }
+
   @media (max-width:720px){
     .quality-grid{ gap:8px; }
     .quality-btn{ padding:14px 12px 12px; }
   }
 
+  /* --- Mobile: clean single-column list rows (radio-style), replaces the cramped grid --- */
   @media (max-width:560px){
-    .quality-grid{ --qg-cols: 2; gap:8px; }
-    .quality-btn{ padding:13px 11px 11px; gap:3px; }
-    .quality-btn .q-res{ font-size:15px; }
-    .quality-btn .q-fps{ font-size:9.5px; }
-    .quality-btn .q-rec{ font-size:8px; padding:2px 6px; }
-    .quality-btn .q-price{ font-size:10px; margin-top:6px; }
+    .quality-grid{ --qg-cols: 1; gap:9px; margin-top:10px; }
+    .quality-btn{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        "rec   check"
+        "info  price";
+      align-items:center;
+      column-gap:12px; row-gap:7px;
+      padding:14px 16px 14px 18px;
+    }
+    .quality-btn::before{ top:12px; bottom:12px; }
+    .quality-btn .q-rec{ grid-area:rec; margin-bottom:0; max-width:100%; justify-self:start; }
+    .quality-btn .q-check{
+      grid-area:check; position:static; justify-self:end; align-self:start;
+      width:22px; height:22px; font-size:11px;
+    }
+    .quality-btn .q-info{
+      display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 9px;
+      grid-area:info; justify-self:start;
+    }
+    .quality-btn .q-res{ font-size:16px; }
+    .quality-btn .q-fps{ font-size:10px; }
+    .quality-btn .q-price{
+      grid-area:price; justify-self:end; align-self:end;
+      margin-top:0; font-size:12px; text-align:right; white-space:nowrap;
+    }
   }
 
-  @media (max-width:360px){
-    .quality-grid{ --qg-cols: 1; }
-    .quality-btn{ flex-direction:row; flex-wrap:wrap; align-items:center; gap:8px 10px; padding:12px 14px; }
-    .quality-btn .q-rec{ order:1; margin-bottom:0; }
-    .quality-btn .q-res{ order:2; }
-    .quality-btn .q-fps{ order:3; }
-    .quality-btn .q-check{ order:0; position:static; margin-left:auto; display:flex; opacity:0; width:16px; height:16px; }
-    .quality-btn.active .q-check{ opacity:1; }
-    .quality-btn .q-price{ order:4; width:100%; margin-top:2px; }
+  @media (max-width:380px){
+    .quality-btn{ padding:13px 14px 13px 16px; column-gap:10px; }
+    .quality-btn .q-res{ font-size:15px; }
+    .quality-btn .q-price{ font-size:11px; }
   }
 
   .quality-warn{
@@ -2741,41 +2772,35 @@
     <div class="field">
       <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი (რეზოლუცია / fps)</label></div>
       <div class="quality-grid" id="qualityGrid">
-        <button type="button" class="quality-btn active" data-quality="1080_60">
+        <button type="button" class="quality-btn active" data-quality="1080_60" data-tier="1080">
           <span class="q-rec" data-i18n="qualityRecBadge">რეკომენდირებული</span>
           <span class="q-check">✓</span>
-          <span class="q-res">1080p</span>
-          <span class="q-fps">60 FPS</span>
+          <span class="q-info"><span class="q-res">1080p</span><span class="q-fps">60 FPS</span></span>
           <span class="q-price" data-price-for="1080_60">—</span>
         </button>
-        <button type="button" class="quality-btn" data-quality="1080_120">
+        <button type="button" class="quality-btn" data-quality="1080_120" data-tier="1080">
           <span class="q-check">✓</span>
-          <span class="q-res">1080p</span>
-          <span class="q-fps">120 FPS</span>
+          <span class="q-info"><span class="q-res">1080p</span><span class="q-fps">120 FPS</span></span>
           <span class="q-price" data-price-for="1080_120">—</span>
         </button>
-        <button type="button" class="quality-btn" data-quality="2k_60">
+        <button type="button" class="quality-btn" data-quality="2k_60" data-tier="2k">
           <span class="q-check">✓</span>
-          <span class="q-res">2K</span>
-          <span class="q-fps">60 FPS</span>
+          <span class="q-info"><span class="q-res">2K</span><span class="q-fps">60 FPS</span></span>
           <span class="q-price" data-price-for="2k_60">—</span>
         </button>
-        <button type="button" class="quality-btn" data-quality="2k_120">
+        <button type="button" class="quality-btn" data-quality="2k_120" data-tier="2k">
           <span class="q-check">✓</span>
-          <span class="q-res">2K</span>
-          <span class="q-fps">120 FPS</span>
+          <span class="q-info"><span class="q-res">2K</span><span class="q-fps">120 FPS</span></span>
           <span class="q-price" data-price-for="2k_120">—</span>
         </button>
-        <button type="button" class="quality-btn" data-quality="4k_60">
+        <button type="button" class="quality-btn" data-quality="4k_60" data-tier="4k">
           <span class="q-check">✓</span>
-          <span class="q-res">4K</span>
-          <span class="q-fps">60 FPS</span>
+          <span class="q-info"><span class="q-res">4K</span><span class="q-fps">60 FPS</span></span>
           <span class="q-price" data-price-for="4k_60">—</span>
         </button>
-        <button type="button" class="quality-btn" data-quality="4k_120">
+        <button type="button" class="quality-btn" data-quality="4k_120" data-tier="4k">
           <span class="q-check">✓</span>
-          <span class="q-res">4K</span>
-          <span class="q-fps">120 FPS</span>
+          <span class="q-info"><span class="q-res">4K</span><span class="q-fps">120 FPS</span></span>
           <span class="q-price" data-price-for="4k_120">—</span>
         </button>
       </div>
