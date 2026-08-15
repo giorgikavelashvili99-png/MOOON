@@ -747,16 +747,17 @@
   @keyframes bump{ 0%{ transform:scale(1) } 40%{ transform:scale(1.045) } 100%{ transform:scale(1) } }
 
   .sub-note{
-    margin:16px auto 0; max-width:420px;
-    font-size:12.5px; line-height:1.6; color:var(--text-dim); text-align:center;
+    margin:16px auto 0; max-width:100%;
+    font-size:12.5px; line-height:1.5; color:var(--text-dim); text-align:center;
     background:rgba(207,216,255,0.05);
     border:1px solid rgba(207,216,255,0.16);
     padding:14px 18px; border-radius:14px;
+    white-space:nowrap;
   }
   .sub-note .sub-note-icon{ margin-right:6px; font-size:14px; }
   .sub-note b{ color:var(--gold); }
   @media (max-width:480px){
-    .sub-note{ max-width:100%; padding:12px 14px; font-size:12px; border-radius:12px; }
+    .sub-note{ max-width:100%; padding:11px 10px; font-size:clamp(9.5px, 3.1vw, 12px); border-radius:12px; letter-spacing:-0.01em; }
   }
 
   .field{ margin-bottom:22px; }
@@ -1540,6 +1541,92 @@
     animation: spin 0.7s linear infinite;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- Scanner as the PRIMARY input method ---------- */
+  .panel-section.scanner-primary{ margin-top:2px; }
+  .scanner-head-row{ gap:10px; flex-wrap:wrap; }
+  .scanner-primary-badge{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-size:10.5px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;
+    color:#dbe2ff;
+    background:rgba(124,143,255,0.12);
+    border:1px solid rgba(124,143,255,0.4);
+    padding:6px 13px; border-radius:20px;
+    text-shadow:0 0 10px rgba(124,143,255,0.5);
+    box-shadow:0 0 16px rgba(124,143,255,0.15);
+  }
+  .scanner-primary-badge .spb-dot{
+    width:6px; height:6px; border-radius:50%; flex:0 0 auto;
+    background:#9fb0ff;
+    box-shadow:0 0 8px #7c8fff, 0 0 2px #fff;
+    animation: spbPulse 1.7s ease-in-out infinite;
+  }
+  @keyframes spbPulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.35; transform:scale(0.6); } }
+  @media (prefers-reduced-motion: reduce){ .scanner-primary-badge .spb-dot{ animation:none; } }
+
+  .scanner-primary .scanner-stage{
+    padding:26px;
+    border-radius:24px;
+    border:1.5px solid rgba(124,143,255,0.4);
+    box-shadow: 0 0 0 1px rgba(124,143,255,0.05), 0 24px 60px rgba(124,143,255,0.14), inset 0 1px 0 rgba(255,255,255,0.05);
+    animation: scannerBreathe 4.5s ease-in-out infinite;
+  }
+  @keyframes scannerBreathe{
+    0%,100%{ box-shadow: 0 0 0 1px rgba(124,143,255,0.05), 0 24px 60px rgba(124,143,255,0.14), inset 0 1px 0 rgba(255,255,255,0.05); }
+    50%{ box-shadow: 0 0 0 1px rgba(124,143,255,0.12), 0 24px 70px rgba(124,143,255,0.24), inset 0 1px 0 rgba(255,255,255,0.08); }
+  }
+  @media (prefers-reduced-motion: reduce){ .scanner-primary .scanner-stage{ animation:none; } }
+  @media (max-width:600px){ .scanner-primary .scanner-stage{ padding:18px; border-radius:18px; } }
+
+  .scanner-primary .drop-zone{ padding:38px 22px; border-radius:20px; }
+  .scanner-primary .drop-zone .dz-icon{
+    width:74px; height:74px; margin-bottom:18px;
+    box-shadow: 0 0 40px rgba(124,143,255,0.3), inset 0 1px 1px rgba(255,255,255,0.1);
+  }
+  .scanner-primary .drop-zone .dz-icon svg{ width:30px; height:30px; }
+  .scanner-primary .drop-zone .dz-title{ font-size:18.5px; }
+  .scanner-primary .drop-zone .dz-sub{ font-size:13.5px; max-width:360px; }
+  @media (max-width:560px){
+    .scanner-primary .drop-zone{ padding:26px 16px; }
+    .scanner-primary .drop-zone .dz-icon{ width:58px; height:58px; margin-bottom:14px; }
+    .scanner-primary .drop-zone .dz-icon svg{ width:24px; height:24px; }
+    .scanner-primary .drop-zone .dz-title{ font-size:16px; }
+    .scanner-primary .drop-zone .dz-sub{ font-size:12.5px; max-width:300px; }
+  }
+
+  /* ---------- Manual duration fallback (collapsed accordion) ---------- */
+  .manual-fallback-toggle{
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    width:100%; margin:16px 0 4px;
+    padding:11px 14px;
+    background:transparent; border:none;
+    font-family:'Space Grotesk', 'Noto Sans Georgian', sans-serif;
+    font-size:13px; font-weight:600;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition: color .2s;
+  }
+  .manual-fallback-toggle:hover, .manual-fallback-toggle:focus-visible{ color:var(--text); outline:none; }
+  .manual-fallback-toggle .mft-icon{ font-size:13px; opacity:0.8; }
+  .manual-fallback-toggle .mft-arrow{
+    display:inline-block; font-size:12px; color:var(--text-faint);
+    transition: transform .25s ease;
+  }
+  .manual-fallback-toggle[aria-expanded="true"] .mft-arrow{ transform:rotate(180deg); }
+
+  .manual-fallback{
+    display:grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .32s ease;
+  }
+  .manual-fallback.open{ grid-template-rows: 1fr; }
+  .manual-fallback .manual-fallback-inner{ overflow:hidden; min-height:0; }
+  .manual-fallback .manual-fallback-pad{ padding-top:4px; }
+
+  .field-row-manual{ display:flex; gap:12px; margin-bottom:10px; }
+  .field-row-manual .field-manual{ flex:1; margin-bottom:0; }
+  @media (max-width:420px){ .field-row-manual{ gap:8px; } }
 
   .order-channels-body{ width:94%; margin:0 2% 0 4%; }
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
@@ -3009,26 +3096,61 @@
       <div class="sub-note" id="subNote" data-i18n="notSubscribed"><span class="sub-note-icon">💡</span><span class="sub-note-text">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></span></div>
     </div>
 
-    <div class="field">
-      <div class="field-top">
-        <label data-i18n="markDuration">მონიშნე ზუსტი დრო (წამი)</label>
-        <span class="val" id="secVal">5</span>
+    <!-- Video duration checker — PRIMARY input method -->
+    <div class="panel-section scanner-primary" id="videoScannerPanel">
+      <div class="panel-head scanner-head-row">
+        <div class="scanner-primary-badge"><span class="spb-dot"></span><span data-i18n="scannerPrimaryBadge">⚡ ავტომატური და ზუსტი</span></div>
+        <div class="label label-scanner" data-i18n="videoScanner">VIDEO SCANNER</div>
       </div>
-      <div class="timeline">
-        <input type="range" id="secondsRange" min="5" max="59" step="1" value="5">
+      <div class="scanner-stage">
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="videoInput" accept="video/*">
+          <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M12 4L7.2 8.8M12 4l4.8 4.8"/><path d="M4.5 15.5v2.8a2.2 2.2 0 002.2 2.2h10.6a2.2 2.2 0 002.2-2.2v-2.8"/></svg></div>
+          <div class="dz-title" data-i18n="dzTitle">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
+          <div class="dz-sub" data-i18n="dzSub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
+        </div>
+        <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
+        <div class="scan-result" id="scanResult">
+          <div class="sr-specs">
+            <div class="sr-row"><span class="sr-ico">📄</span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
+            <div class="sr-row"><span class="sr-ico">⏱️</span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
+            <div class="sr-row"><span class="sr-ico">🎯</span><span class="sr-label" data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
+            <div class="sr-row" id="srQualityRow" style="display:none;"><span class="sr-ico">🔎</span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
+          </div>
+          <div class="sr-price-hero">
+            <span class="sr-price-tag" data-i18n="srPrice">გამოთვლილი ფასი</span>
+            <span class="sr-price-value"><b id="srPrice">—</b></span>
+          </div>
+          <div class="sr-info" id="srMatchNote" style="display:none;"></div>
+          <div class="sr-warn" id="srMismatchNote" style="display:none;"></div>
+          <div class="sr-warn" id="srWarn" style="display:none;"></div>
+        </div>
       </div>
-      <input type="number" class="num-input" id="secondsInput" min="0" max="59" value="5" placeholder="შეიყვანე წამი (0–59)" data-i18n-placeholder="secondsPlaceholder" style="display:none;">
     </div>
 
-    <div class="field">
-      <div class="field-top">
-        <label data-i18n="msLabel">წამის მეასედები (00–59)</label>
-        <span class="val" id="msVal">00</span>
+    <!-- Manual duration entry — collapsed fallback -->
+    <button type="button" class="manual-fallback-toggle" id="manualFallbackToggle" aria-expanded="false" aria-controls="manualFallback">
+      <span class="mft-icon">✏️</span>
+      <span data-i18n="manualFallbackPrompt">არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით</span>
+      <span class="mft-arrow">⌄</span>
+    </button>
+
+    <div class="manual-fallback" id="manualFallback">
+      <div class="manual-fallback-inner">
+        <div class="manual-fallback-pad">
+          <div class="field-row-manual">
+            <div class="field field-manual">
+              <div class="field-top"><label data-i18n="secLabelShort">წამები</label></div>
+              <input type="number" inputmode="numeric" class="num-input" id="secondsInput" min="0" max="59" value="5" placeholder="0–59" data-i18n-placeholder="secondsPlaceholder">
+            </div>
+            <div class="field field-manual">
+              <div class="field-top"><label data-i18n="msLabelShort">მეასედები</label></div>
+              <input type="number" inputmode="numeric" class="num-input" id="msRange" min="0" max="59" value="0" placeholder="00">
+            </div>
+          </div>
+          <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59.59 წამი. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
+        </div>
       </div>
-      <div class="timeline">
-        <input type="range" id="msRange" min="0" max="59" step="1" value="0">
-      </div>
-      <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59.59 წამი. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
     </div>
 
     <div class="field">
@@ -3078,39 +3200,6 @@
         <span class="tt-confirm-text" id="tiktokConfirmText">დააჭირეთ დასადასტურებლად</span>
       </div>
       <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
-    </div>
-
-    <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
-
-    <!-- Video duration checker -->
-    <div class="panel-section" id="videoScannerPanel">
-      <div class="panel-head">
-        <div class="label label-scanner" data-i18n="videoScanner">VIDEO SCANNER</div>
-      </div>
-      <div class="scanner-stage">
-        <div class="drop-zone" id="dropZone">
-          <input type="file" id="videoInput" accept="video/*">
-          <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M12 4L7.2 8.8M12 4l4.8 4.8"/><path d="M4.5 15.5v2.8a2.2 2.2 0 002.2 2.2h10.6a2.2 2.2 0 002.2-2.2v-2.8"/></svg></div>
-          <div class="dz-title" data-i18n="dzTitle">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
-          <div class="dz-sub" data-i18n="dzSub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
-        </div>
-        <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
-        <div class="scan-result" id="scanResult">
-          <div class="sr-specs">
-            <div class="sr-row"><span class="sr-ico">📄</span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
-            <div class="sr-row"><span class="sr-ico">⏱️</span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
-            <div class="sr-row"><span class="sr-ico">🎯</span><span class="sr-label" data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
-            <div class="sr-row" id="srQualityRow" style="display:none;"><span class="sr-ico">🔎</span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
-          </div>
-          <div class="sr-price-hero">
-            <span class="sr-price-tag" data-i18n="srPrice">გამოთვლილი ფასი</span>
-            <span class="sr-price-value"><b id="srPrice">—</b></span>
-          </div>
-          <div class="sr-info" id="srMatchNote" style="display:none;"></div>
-          <div class="sr-warn" id="srMismatchNote" style="display:none;"></div>
-          <div class="sr-warn" id="srWarn" style="display:none;"></div>
-        </div>
-      </div>
     </div>
 
     <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
@@ -3474,10 +3563,14 @@
       subActive: '<span class="sub-note-icon">💡</span><span class="sub-note-text">გამომწერის ტარიფი აქტიურია — <b>თანხა უკვე დაზოგილია!</b></span>',
       notSubscribed: '<span class="sub-note-icon">💡</span><span class="sub-note-text">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></span>',
       markDuration: 'მონიშნე ზუსტი დრო (წამი)',
+      secLabelShort: 'წამები',
+      msLabelShort: 'მეასედები',
       secondsPlaceholder: 'შეიყვანე წამი (0–59)',
       msLabel: 'წამის მეასედები (00–59)',
       msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59.59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
       qualityLabel: 'ვიდეოს ხარისხი',
+      scannerPrimaryBadge: '⚡ ავტომატური და ზუსტი',
+      manualFallbackPrompt: 'არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით',
       qualityRecBadge: 'ერთადერთი ფორმატი',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
@@ -3660,10 +3753,14 @@
       subActive: '<span class="sub-note-icon">💡</span><span class="sub-note-text">✓ Subscriber rate is active — <b>you\'re already saving money!</b></span>',
       notSubscribed: '<span class="sub-note-icon">💡</span><span class="sub-note-text">Not a subscriber yet — <b>subscribe to save money!</b></span>',
       markDuration: 'Select exact duration (seconds)',
+      secLabelShort: 'Seconds',
+      msLabelShort: 'Hundredths',
       secondsPlaceholder: 'Enter seconds (0–59)',
       msLabel: 'Hundredths of a second (00–59)',
       msHint: 'Maximum total duration is 59.59. Within this range the price is calculated at the 59-second rate.',
       qualityLabel: 'Video quality',
+      scannerPrimaryBadge: '⚡ Automatic & precise',
+      manualFallbackPrompt: "Don't have a file? Enter the duration manually",
       qualityRecBadge: 'Only format',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
@@ -4033,11 +4130,8 @@
     if (el) el.href = atob(PORTFOLIO_LINKS[id]);
   });
 
-  const secondsRange = document.getElementById('secondsRange');
   const secondsInput = document.getElementById('secondsInput');
   const msRange = document.getElementById('msRange');
-  const secVal = document.getElementById('secVal');
-  const msVal = document.getElementById('msVal');
   const subToggle = document.getElementById('subToggle');
   const priceDisplay = document.getElementById('priceDisplay');
   const subNote = document.getElementById('subNote');
@@ -4219,13 +4313,7 @@
     const { s, ms, isSub, quality } = currentValues();
 
     secondsInput.value = s;
-    secondsRange.value = Math.min(Math.max(s,5),59);
     msRange.value = ms;
-    updateRangeFill(secondsRange);
-    updateRangeFill(msRange);
-
-    secVal.textContent = s;
-    msVal.textContent = String(ms).padStart(2,'0');
 
     const price = calculateExactPrice(s, ms, isSub, quality);
     if (priceDisplay.dataset.price !== price) {
@@ -4254,37 +4342,6 @@
     });
   }
 
-  function updateRangeFill(rangeEl){
-    if (!rangeEl) return;
-    const min = parseFloat(rangeEl.min || 0);
-    const max = parseFloat(rangeEl.max || 100);
-    const val = parseFloat(rangeEl.value || 0);
-    const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
-    rangeEl.style.setProperty('--fill', pct + '%');
-  }
-  [secondsRange, msRange].forEach(el => {
-    if (!el) return;
-    updateRangeFill(el);
-    el.addEventListener('input', () => updateRangeFill(el));
-  });
-
-  // Range inputs can fire 'input' many times per frame while being dragged.
-  // Updating price text/animations on every single tick is what caused the
-  // stutter — so we coalesce rapid ticks into at most one refresh per
-  // animation frame, while the thumb fill above still tracks instantly.
-  let refreshRAF = null;
-  function refreshThrottled(){
-    if (refreshRAF) return;
-    refreshRAF = requestAnimationFrame(() => {
-      refreshRAF = null;
-      refresh();
-    });
-  }
-
-  secondsRange.addEventListener('input', () => {
-    secondsInput.value = secondsRange.value;
-    refreshThrottled();
-  });
   secondsInput.addEventListener('input', () => refresh());
   secondsInput.addEventListener('blur', () => {
     let v = parseFloat(secondsInput.value || 0);
@@ -4293,8 +4350,26 @@
     secondsInput.value = v;
     refresh();
   });
-  msRange.addEventListener('input', () => refreshThrottled());
+  msRange.addEventListener('input', () => refresh());
+  msRange.addEventListener('blur', () => {
+    let v = parseFloat(msRange.value || 0);
+    if (isNaN(v) || v < 0) v = 0;
+    if (v > 59) v = 59;
+    msRange.value = v;
+    refresh();
+  });
   subToggle.addEventListener('change', () => refresh());
+
+  // ---- Manual duration fallback (collapsed by default; the scanner above
+  // is the primary path) ----
+  const manualFallbackToggle = document.getElementById('manualFallbackToggle');
+  const manualFallback = document.getElementById('manualFallback');
+  if (manualFallbackToggle && manualFallback) {
+    manualFallbackToggle.addEventListener('click', () => {
+      const isOpen = manualFallback.classList.toggle('open');
+      manualFallbackToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  }
 
   const qualityGrid = document.getElementById('qualityGrid');
 
