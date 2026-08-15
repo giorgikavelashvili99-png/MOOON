@@ -2641,6 +2641,19 @@
   html.low-power .moon-glow-card,
   html.low-power .qn-stars span,
   html.low-power .chat-fab{ animation:none !important; }
+  html.low-power .mec-colon,
+  html.low-power .urgency-badge,
+  html.low-power .qn-stars,
+  html.low-power .tt-confirm.tt-red,
+  html.low-power .tt-confirm.tt-green{ animation:none !important; }
+  html.low-power .mec-step,
+  html.low-power .mec-digit-input,
+  html.low-power .order-btn,
+  html.low-power .trust-item,
+  html.low-power .portfolio-card,
+  html.low-power .quality-btn,
+  html.low-power .wp-box,
+  html.low-power .mp-box{ transition:none !important; }
 
   @media (max-width: 480px){
     .quick-nav{ gap:8px; width:100%; }
@@ -3700,7 +3713,9 @@
     applyPauseState();
     try {
       const dm = navigator.deviceMemory; // undefined on unsupported browsers
-      if (typeof dm === 'number' && dm <= 3) {
+      const cores = navigator.hardwareConcurrency;
+      const narrow = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+      if ((typeof dm === 'number' && dm <= 4) || (typeof cores === 'number' && cores <= 4) || narrow) {
         document.documentElement.classList.add('low-power');
       }
     } catch(e) {}
