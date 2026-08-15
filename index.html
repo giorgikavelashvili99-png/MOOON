@@ -1599,25 +1599,64 @@
     .scanner-primary .drop-zone .dz-sub{ font-size:12.5px; max-width:300px; }
   }
 
-  /* ---------- Manual duration fallback (collapsed accordion) ---------- */
-  .manual-fallback-toggle{
-    display:flex; align-items:center; justify-content:center; gap:7px;
-    width:100%; margin:16px 0 4px;
-    padding:11px 14px;
-    background:transparent; border:none;
-    font-family:'Space Grotesk', 'Noto Sans Georgian', sans-serif;
-    font-size:13px; font-weight:600;
-    color:var(--text-dim);
+  /* ---------- Manual duration entry (collapsed accordion, stopwatch card) ---------- */
+  .manual-entry-toggle{
+    display:flex; align-items:center; gap:14px;
+    width:100%; margin:18px 0 4px;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1.5px dashed var(--border);
+    background: rgba(255,159,64,0.03);
+    text-align:left;
     cursor:pointer;
-    transition: color .2s;
+    transition: border-color .2s, background .2s, transform .15s;
   }
-  .manual-fallback-toggle:hover, .manual-fallback-toggle:focus-visible{ color:var(--text); outline:none; }
-  .manual-fallback-toggle .mft-icon{ font-size:13px; opacity:0.8; }
-  .manual-fallback-toggle .mft-arrow{
-    display:inline-block; font-size:12px; color:var(--text-faint);
-    transition: transform .25s ease;
+  .manual-entry-toggle:hover, .manual-entry-toggle:focus-visible{
+    border-color: rgba(255,159,64,0.55);
+    background: rgba(255,159,64,0.07);
+    outline:none;
   }
-  .manual-fallback-toggle[aria-expanded="true"] .mft-arrow{ transform:rotate(180deg); }
+  .manual-entry-toggle:active{ transform:scale(0.99); }
+  .manual-entry-toggle[aria-expanded="true"]{
+    border-style:solid;
+    border-color: rgba(255,159,64,0.4);
+    background: rgba(255,159,64,0.06);
+  }
+  .met-badge{
+    flex:0 0 auto; width:42px; height:42px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(160deg, rgba(255,159,64,0.24), rgba(255,79,163,0.08));
+    border:1px solid rgba(255,159,64,0.4);
+    box-shadow: 0 0 18px rgba(255,159,64,0.2), inset 0 1px 1px rgba(255,255,255,0.08);
+  }
+  .met-badge svg{
+    width:20px; height:20px;
+    fill:none; stroke:#ffd88a; stroke-width:2;
+    stroke-linecap:round; stroke-linejoin:round;
+    filter: drop-shadow(0 0 6px rgba(255,159,64,0.7));
+  }
+  .met-text{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .met-title{ font-size:13.5px; font-weight:700; color:var(--text); line-height:1.35; }
+  .met-sub{ font-size:11.5px; color:var(--text-faint); line-height:1.3; }
+  .met-chevron{
+    flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--border); color:var(--text-faint);
+    transition: transform .28s ease, color .2s, border-color .2s;
+  }
+  .met-chevron svg{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+  .manual-entry-toggle[aria-expanded="true"] .met-chevron{
+    transform:rotate(180deg);
+    border-color: rgba(255,159,64,0.5);
+    color: var(--cyan);
+  }
+  @media (max-width:480px){
+    .manual-entry-toggle{ padding:12px 12px; gap:10px; }
+    .met-badge{ width:36px; height:36px; }
+    .met-badge svg{ width:17px; height:17px; }
+    .met-title{ font-size:12.5px; }
+    .met-sub{ font-size:10.5px; }
+  }
 
   .manual-fallback{
     display:grid;
@@ -1626,34 +1665,90 @@
   }
   .manual-fallback.open{ grid-template-rows: 1fr; }
   .manual-fallback .manual-fallback-inner{ overflow:hidden; min-height:0; }
-  .manual-fallback .manual-fallback-pad{ padding-top:4px; }
+  .manual-fallback .manual-fallback-pad{ padding-top:12px; }
 
-  .field-row-manual{ display:flex; gap:12px; margin-bottom:10px; }
-  .field-row-manual .field-manual{ flex:1; margin-bottom:0; }
-  @media (max-width:420px){ .field-row-manual{ gap:8px; } }
-
-  .manual-input-wrap{ position:relative; display:flex; align-items:center; }
-  .manual-input-wrap .num-input{
-    text-align:center;
-    font-size:19px; font-weight:700;
-    padding:14px 64px 14px 16px;
-    letter-spacing:0.02em;
+  .manual-entry-card{
+    border:1.5px dashed rgba(255,159,64,0.35);
+    border-radius:18px;
+    padding:20px 18px 18px;
+    background:
+      radial-gradient(ellipse 70% 70% at 50% 0%, rgba(255,159,64,0.08), transparent 70%),
+      #0a0a12;
   }
-  .manual-input-wrap .num-input::-webkit-outer-spin-button,
-  .manual-input-wrap .num-input::-webkit-inner-spin-button{
-    -webkit-appearance:none; margin:0;
+  .mec-head{
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    margin-bottom:18px;
   }
-  .manual-input-wrap .num-input{ -moz-appearance:textfield; }
-  .manual-input-wrap .miw-suffix{
-    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  .mec-head-ico{ font-size:14px; line-height:1; }
+  .mec-head-label{
     font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
-    font-size:10.5px; font-weight:600; letter-spacing:0.04em;
-    color:var(--text-faint);
-    pointer-events:none;
+    font-weight:700; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color:#ffd88a;
+    text-shadow:0 0 10px rgba(255,159,64,0.35);
   }
+
+  .mec-stopwatch{ display:flex; align-items:flex-start; justify-content:center; gap:12px; }
+  .mec-group{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .mec-group-label{
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-size:10px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase;
+    color:var(--text-faint);
+  }
+  .mec-stepper{ display:flex; align-items:center; gap:8px; }
+  .mec-step{
+    flex:0 0 auto; width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:#0a0a12; border:1px solid var(--border);
+    color:var(--text-dim); font-family:'JetBrains Mono', sans-serif; font-size:17px; font-weight:700;
+    cursor:pointer; user-select:none;
+    transition: border-color .18s, color .18s, box-shadow .18s, transform .12s;
+  }
+  .mec-step:hover{ border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 14px rgba(255,159,64,0.3); }
+  .mec-step:active{ transform:scale(0.9); }
+  .mec-digit-input{
+    width:74px;
+    text-align:center;
+    background:#08080f;
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    padding:10px 4px;
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-weight:800; font-size:24px;
+    color:var(--gold);
+    text-shadow:0 0 12px rgba(255,210,63,0.45);
+    outline:none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .mec-digit-input:focus{ border-color:var(--cyan); box-shadow:0 0 0 3px rgba(255,159,64,0.16), 0 0 20px rgba(255,159,64,0.3); }
+  .mec-digit-input.error{ border-color:var(--warn) !important; box-shadow:0 0 15px rgba(255,107,107,0.4) !important; }
+  .mec-digit-input::-webkit-outer-spin-button,
+  .mec-digit-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .mec-digit-input{ -moz-appearance:textfield; }
+  .mec-group-unit{
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-size:10.5px; color:var(--text-faint);
+  }
+  .mec-colon{
+    align-self:center;
+    margin-top:34px;
+    font-family:'JetBrains Mono', sans-serif;
+    font-weight:800; font-size:26px;
+    color:var(--cyan);
+    text-shadow:0 0 10px rgba(255,159,64,0.6);
+    animation: mecColonBlink 1.4s steps(1) infinite;
+  }
+  @keyframes mecColonBlink{ 50%{ opacity:0.25; } }
+  @media (prefers-reduced-motion: reduce){ .mec-colon{ animation:none; } }
+
+  .manual-entry-card .hint{ margin-top:16px; justify-content:center; text-align:center; }
+
   @media (max-width:420px){
-    .manual-input-wrap .num-input{ font-size:17px; padding:12px 54px 12px 14px; }
-    .manual-input-wrap .miw-suffix{ font-size:9.5px; right:12px; }
+    .manual-entry-card{ padding:16px 12px 14px; border-radius:16px; }
+    .mec-stopwatch{ gap:8px; }
+    .mec-stepper{ gap:6px; }
+    .mec-step{ width:30px; height:30px; font-size:15px; }
+    .mec-digit-input{ width:60px; font-size:20px; padding:9px 2px; }
+    .mec-colon{ margin-top:29px; font-size:21px; }
   }
 
   .order-channels-body{ width:94%; margin:0 2% 0 4%; }
@@ -3131,7 +3226,7 @@
     <div class="readout">
       <div class="tag" data-i18n="finalPrice">საბოლოო ღირებულება</div>
       <div class="price" id="priceDisplay">1.50<sup>₾</sup></div>
-      <div class="sub-note" id="subNote" data-i18n="notSubscribed"><span class="sub-note-icon">💡</span><span class="sub-note-text">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></span></div>
+      <div class="sub-note" id="subNote" data-i18n="notSubscribed"><span class="sub-note-icon">💡</span><span class="sub-note-text"><b>გახდი გამომწერი და დაზოგე თანხა!</b></span></div>
     </div>
 
     <!-- Video duration checker — PRIMARY input method -->
@@ -3167,32 +3262,50 @@
     </div>
 
     <!-- Manual duration entry — collapsed fallback -->
-    <button type="button" class="manual-fallback-toggle" id="manualFallbackToggle" aria-expanded="false" aria-controls="manualFallback">
-      <span class="mft-icon">✏️</span>
-      <span data-i18n="manualFallbackPrompt">არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით</span>
-      <span class="mft-arrow">⌄</span>
+    <button type="button" class="manual-entry-toggle" id="manualFallbackToggle" aria-expanded="false" aria-controls="manualFallback">
+      <span class="met-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg>
+      </span>
+      <span class="met-text">
+        <span class="met-title" data-i18n="manualFallbackPrompt">არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით</span>
+        <span class="met-sub" data-i18n="manualFallbackSub">სწრაფი ხელით შეყვანა — წამები და მეასედები</span>
+      </span>
+      <span class="met-chevron" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </span>
     </button>
 
     <div class="manual-fallback" id="manualFallback">
       <div class="manual-fallback-inner">
         <div class="manual-fallback-pad">
-          <div class="field-row-manual">
-            <div class="field field-manual">
-              <div class="field-top"><label data-i18n="secLabelShort">წამები</label></div>
-              <div class="manual-input-wrap">
-                <input type="number" inputmode="numeric" class="num-input" id="secondsInput" min="5" max="59" value="5" placeholder="5–59" data-i18n-placeholder="secondsPlaceholder">
-                <span class="miw-suffix" data-i18n="secUnit">წამი</span>
+          <div class="manual-entry-card">
+            <div class="mec-head">
+              <span class="mec-head-ico" aria-hidden="true">⏱️</span>
+              <span class="mec-head-label" data-i18n="manualEntryBadge">ხელით შეყვანა</span>
+            </div>
+            <div class="mec-stopwatch">
+              <div class="mec-group">
+                <div class="mec-group-label" data-i18n="secLabelShort">წამები</div>
+                <div class="mec-stepper">
+                  <button type="button" class="mec-step" data-target="secondsInput" data-step="-1" aria-label="−1">−</button>
+                  <input type="number" inputmode="numeric" class="mec-digit-input" id="secondsInput" min="5" max="59" value="5" placeholder="5–59" data-i18n-placeholder="secondsPlaceholder">
+                  <button type="button" class="mec-step" data-target="secondsInput" data-step="1" aria-label="+1">+</button>
+                </div>
+                <div class="mec-group-unit" data-i18n="secUnit">წამი</div>
+              </div>
+              <div class="mec-colon" aria-hidden="true">:</div>
+              <div class="mec-group">
+                <div class="mec-group-label" data-i18n="msLabelShort">მეასედები</div>
+                <div class="mec-stepper">
+                  <button type="button" class="mec-step" data-target="msRange" data-step="-1" aria-label="−1">−</button>
+                  <input type="number" inputmode="numeric" class="mec-digit-input" id="msRange" min="0" max="59" value="0" placeholder="00">
+                  <button type="button" class="mec-step" data-target="msRange" data-step="1" aria-label="+1">+</button>
+                </div>
+                <div class="mec-group-unit" data-i18n="msUnit">მეასედი</div>
               </div>
             </div>
-            <div class="field field-manual">
-              <div class="field-top"><label data-i18n="msLabelShort">მეასედები</label></div>
-              <div class="manual-input-wrap">
-                <input type="number" inputmode="numeric" class="num-input" id="msRange" min="0" max="59" value="0" placeholder="00">
-                <span class="miw-suffix" data-i18n="msUnit">მეასედი</span>
-              </div>
-            </div>
+            <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59.59 წამი. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
           </div>
-          <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59.59 წამი. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
         </div>
       </div>
     </div>
@@ -3334,6 +3447,26 @@
       </div>
     </div>
 
+    <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
+
+    <div class="field field-tiktok" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">@</span>
+        <input type="text" class="num-input" id="tiktokLinkWp" placeholder="tiktok.com/@username">
+      </div>
+      <div class="tt-confirm tt-red" id="tiktokConfirmWp" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="tiktokConfirmTextWp">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="tiktokErrorWp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
 
     <div class="order-grid" style="margin-top:18px;">
       <button class="order-btn wa" id="wpOrderBtnWA">
@@ -3383,6 +3516,27 @@
     </div>
 
     <div class="mp-note" data-i18n="mpNote">მაქსიმუმ 20 ვიდეოს მონტაჟი თვეში (5 კვირაში), თითო მაქს. 59.59 წმ, ფიქსირებული 1080p/60fps ხარისხით — უბრალოდ შეუკვეთე.</div>
+
+    <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
+
+    <div class="field field-tiktok" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">@</span>
+        <input type="text" class="num-input" id="tiktokLinkMp" placeholder="tiktok.com/@username">
+      </div>
+      <div class="tt-confirm tt-red" id="tiktokConfirmMp" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="tiktokConfirmTextMp">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="tiktokErrorMp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
 
     <div class="order-grid" style="margin-top:18px;">
       <button class="order-btn wa" id="mpOrderBtnWA">
@@ -3607,7 +3761,7 @@
       trustRatingText: 'საშუალო შეფასება <b>{AVG}</b> — {COUNT} რეალური შეფასების საფუძველზე',
       finalPrice: 'საბოლოო ღირებულება',
       subActive: '<span class="sub-note-icon">💡</span><span class="sub-note-text">გამომწერის ტარიფი აქტიურია — <b>თანხა უკვე დაზოგილია!</b></span>',
-      notSubscribed: '<span class="sub-note-icon">💡</span><span class="sub-note-text">არ ხართ გამომწერი — <b>გახდი გამომწერი და დაზოგე თანხა!</b></span>',
+      notSubscribed: '<span class="sub-note-icon">💡</span><span class="sub-note-text"><b>გახდი გამომწერი და დაზოგე თანხა!</b></span>',
       markDuration: 'მონიშნე ზუსტი დრო (წამი)',
       secLabelShort: 'წამები',
       msLabelShort: 'მეასედები',
@@ -3619,6 +3773,8 @@
       qualityLabel: 'ვიდეოს ხარისხი',
       scannerPrimaryBadge: '⚡ ავტომატური და ზუსტი',
       manualFallbackPrompt: 'არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით',
+      manualFallbackSub: 'სწრაფი ხელით შეყვანა — წამები და მეასედები',
+      manualEntryBadge: 'ხელით შეყვანა',
       qualityRecBadge: 'ერთადერთი ფორმატი',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
@@ -3799,7 +3955,7 @@
       trustRatingText: 'Average rating <b>{AVG}</b> — based on {COUNT} real reviews',
       finalPrice: 'Final price',
       subActive: '<span class="sub-note-icon">💡</span><span class="sub-note-text">✓ Subscriber rate is active — <b>you\'re already saving money!</b></span>',
-      notSubscribed: '<span class="sub-note-icon">💡</span><span class="sub-note-text">Not a subscriber yet — <b>subscribe to save money!</b></span>',
+      notSubscribed: '<span class="sub-note-icon">💡</span><span class="sub-note-text"><b>Subscribe to save money!</b></span>',
       markDuration: 'Select exact duration (seconds)',
       secLabelShort: 'Seconds',
       msLabelShort: 'Hundredths',
@@ -3811,6 +3967,8 @@
       qualityLabel: 'Video quality',
       scannerPrimaryBadge: '⚡ Automatic & precise',
       manualFallbackPrompt: "Don't have a file? Enter the duration manually",
+      manualFallbackSub: 'Quick manual entry — seconds and hundredths',
+      manualEntryBadge: 'Manual entry',
       qualityRecBadge: 'Only format',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
@@ -4185,8 +4343,6 @@
   const subToggle = document.getElementById('subToggle');
   const priceDisplay = document.getElementById('priceDisplay');
   const subNote = document.getElementById('subNote');
-  const tiktokLink = document.getElementById('tiktokLink');
-  const tiktokError = document.getElementById('tiktokError');
 
   // Only one format is offered any more, so the scale is a fixed constant.
   // Back-calculated so the minimum 5-second price (non-subscriber) lands
@@ -4414,6 +4570,23 @@
   // is the primary path) ----
   const manualFallbackToggle = document.getElementById('manualFallbackToggle');
   const manualFallback = document.getElementById('manualFallback');
+  document.querySelectorAll('.mec-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetEl = document.getElementById(btn.getAttribute('data-target'));
+      if (!targetEl) return;
+      const delta = parseFloat(btn.getAttribute('data-step')) || 0;
+      const min = parseFloat(targetEl.min);
+      const max = parseFloat(targetEl.max);
+      let v = parseFloat(targetEl.value || 0);
+      if (isNaN(v)) v = 0;
+      v += delta;
+      if (!isNaN(min)) v = Math.max(min, v);
+      if (!isNaN(max)) v = Math.min(max, v);
+      targetEl.value = v;
+      targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+
   if (manualFallbackToggle && manualFallback) {
     manualFallbackToggle.addEventListener('click', () => {
       const isOpen = manualFallback.classList.toggle('open');
@@ -4442,38 +4615,87 @@
     return `${resTier}_${fpsTier}`;
   }
 
-  tiktokLink.addEventListener('input', () => {
-    if (tiktokLink.value.trim() !== '') {
-      tiktokLink.classList.remove('error');
-      tiktokError.style.display = 'none';
+  // ---- Synced TikTok profile link — one field per order panel (main /
+  // weekly / monthly), all mirroring the same value + confirmation state so
+  // the visitor never has to re-type it no matter which panel they order
+  // from. ----
+  const tiktokGroups = {
+    main: {
+      link: document.getElementById('tiktokLink'),
+      confirm: document.getElementById('tiktokConfirm'),
+      confirmText: document.getElementById('tiktokConfirmText'),
+      error: document.getElementById('tiktokError')
+    },
+    wp: {
+      link: document.getElementById('tiktokLinkWp'),
+      confirm: document.getElementById('tiktokConfirmWp'),
+      confirmText: document.getElementById('tiktokConfirmTextWp'),
+      error: document.getElementById('tiktokErrorWp')
+    },
+    mp: {
+      link: document.getElementById('tiktokLinkMp'),
+      confirm: document.getElementById('tiktokConfirmMp'),
+      confirmText: document.getElementById('tiktokConfirmTextMp'),
+      error: document.getElementById('tiktokErrorMp')
     }
-  });
+  };
 
-  const tiktokConfirm = document.getElementById('tiktokConfirm');
-  const tiktokConfirmText = document.getElementById('tiktokConfirmText');
   let tiktokLinkConfirmed = false;
 
-  function updateTiktokConfirmBadge(){
-    const hasValue = tiktokLink.value.trim() !== '';
-    if (!hasValue) {
-      tiktokConfirm.style.display = 'none';
-      return;
+  function getTiktokValue(){
+    for (const key in tiktokGroups) {
+      const g = tiktokGroups[key];
+      if (g.link) return g.link.value.trim();
     }
-    tiktokConfirm.style.display = 'block';
-    tiktokConfirm.classList.toggle('tt-red', !tiktokLinkConfirmed);
-    tiktokConfirm.classList.toggle('tt-green', tiktokLinkConfirmed);
-    tiktokConfirmText.textContent = tiktokLinkConfirmed ? t('tiktokConfirmDone') : t('tiktokConfirmPrompt');
+    return '';
   }
 
-  tiktokLink.addEventListener('input', () => {
-    tiktokLinkConfirmed = false;
-    updateTiktokConfirmBadge();
-  });
+  function updateTiktokConfirmBadge(){
+    Object.values(tiktokGroups).forEach(g => {
+      if (!g.link || !g.confirm) return;
+      const hasValue = g.link.value.trim() !== '';
+      if (!hasValue) {
+        g.confirm.style.display = 'none';
+        return;
+      }
+      g.confirm.style.display = 'block';
+      g.confirm.classList.toggle('tt-red', !tiktokLinkConfirmed);
+      g.confirm.classList.toggle('tt-green', tiktokLinkConfirmed);
+      if (g.confirmText) g.confirmText.textContent = tiktokLinkConfirmed ? t('tiktokConfirmDone') : t('tiktokConfirmPrompt');
+    });
+  }
 
-  tiktokConfirm.addEventListener('click', () => {
-    if (tiktokLinkConfirmed || tiktokLink.value.trim() === '') return;
-    tiktokLinkConfirmed = true;
-    updateTiktokConfirmBadge();
+  function syncTiktokValue(sourceKey, value){
+    Object.keys(tiktokGroups).forEach(key => {
+      if (key === sourceKey) return;
+      const g = tiktokGroups[key];
+      if (g.link) g.link.value = value;
+    });
+  }
+
+  function clearTiktokErrors(){
+    Object.values(tiktokGroups).forEach(g => {
+      if (g.link) g.link.classList.remove('error');
+      if (g.error) g.error.style.display = 'none';
+    });
+  }
+
+  Object.keys(tiktokGroups).forEach(key => {
+    const g = tiktokGroups[key];
+    if (!g.link) return;
+    g.link.addEventListener('input', () => {
+      syncTiktokValue(key, g.link.value);
+      tiktokLinkConfirmed = false;
+      clearTiktokErrors();
+      updateTiktokConfirmBadge();
+    });
+    if (g.confirm) {
+      g.confirm.addEventListener('click', () => {
+        if (tiktokLinkConfirmed || g.link.value.trim() === '') return;
+        tiktokLinkConfirmed = true;
+        updateTiktokConfirmBadge();
+      });
+    }
   });
 
   updateTiktokConfirmBadge();
@@ -4706,7 +4928,7 @@
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `⭐ გამომწერი: <b>${isSub ? 'დიახ' : 'არა'}</b>\n` +
       `💰 ღირებულება: <b>${price} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(tiktokLink.value.trim())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
   }
 
   function buildCommentTgMessage(entry){
@@ -4725,23 +4947,27 @@
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 გამომწერი: ${isSub ? 'დიახ' : 'არა'}
 ღირებულება: ${price} ₾
-TikTok პროფილი: ${tiktokLink.value.trim()}`;
+TikTok პროფილი: ${getTiktokValue()}`;
   }
 
-  function validateBeforeSend(){
-    const linkVal = tiktokLink.value.trim();
+  function validateBeforeSend(panelKey){
+    const g = tiktokGroups[panelKey] || tiktokGroups.main;
+    if (!g.link) return true;
+    const linkVal = g.link.value.trim();
     if (!linkVal) {
-      tiktokLink.classList.add('error');
-      tiktokError.style.display = 'block';
-      tiktokLink.focus();
+      g.link.classList.add('error');
+      if (g.error) g.error.style.display = 'block';
+      g.link.focus();
       return false;
     }
     if (!tiktokLinkConfirmed) {
-      tiktokError.style.display = 'none';
-      tiktokConfirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      tiktokConfirm.classList.remove('tt-shake', 'tt-error-flash');
-      void tiktokConfirm.offsetWidth;
-      tiktokConfirm.classList.add('tt-shake', 'tt-error-flash');
+      if (g.error) g.error.style.display = 'none';
+      if (g.confirm) {
+        g.confirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        g.confirm.classList.remove('tt-shake', 'tt-error-flash');
+        void g.confirm.offsetWidth;
+        g.confirm.classList.add('tt-shake', 'tt-error-flash');
+      }
       return false;
     }
     return true;
@@ -4830,7 +5056,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   }
 
   document.getElementById('orderBtnWA').addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
+    if (!validateBeforeSend('main')) return;
     const btn = document.getElementById('orderBtnWA');
     const textEl = document.getElementById('orderBtnWAText');
     // Open the tab synchronously, inside the click gesture — iOS/iPadOS Safari
@@ -4851,7 +5077,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   });
 
   document.getElementById('orderBtnTG').addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
+    if (!validateBeforeSend('main')) return;
     const btn = document.getElementById('orderBtnTG');
     const textEl = document.getElementById('orderBtnTGText');
     const needsIOSWorkaround = isAppleMobileDevice();
@@ -4889,7 +5115,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       `📢 არხის გამომწერი: <b>${isChannelSub ? 'კი (−3₾)' : 'არა'}</b>\n` +
       `💳 1 ვიდეო (საშუალოდ): <b>${perVideo.toFixed(2)} ₾</b>\n` +
       `💰 სულ ${SUB_VIDEO_LIMIT} ვიდეოზე (1 კვირა): <b>${total.toFixed(2)} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(tiktokLink.value.trim())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
   }
 
   function buildWeeklySubOrderMessage(){
@@ -4904,14 +5130,14 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 არხის გამომწერი: ${isChannelSub ? 'კი (−3₾)' : 'არა'}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${SUB_VIDEO_LIMIT} ვიდეოზე (1 კვირა): ${total.toFixed(2)} ₾
-TikTok პროფილი: ${tiktokLink.value.trim()}`;
+TikTok პროფილი: ${getTiktokValue()}`;
   }
 
   const wpOrderBtnWA = document.getElementById('wpOrderBtnWA');
   const wpOrderBtnTG = document.getElementById('wpOrderBtnTG');
 
   if (wpOrderBtnWA) wpOrderBtnWA.addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
+    if (!validateBeforeSend('wp')) return;
     const btn = wpOrderBtnWA;
     const textEl = document.getElementById('wpOrderBtnWAText');
     const needsIOSWorkaround = isAppleMobileDevice();
@@ -4926,7 +5152,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   });
 
   if (wpOrderBtnTG) wpOrderBtnTG.addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
+    if (!validateBeforeSend('wp')) return;
     const btn = wpOrderBtnTG;
     const textEl = document.getElementById('wpOrderBtnTGText');
     const needsIOSWorkaround = isAppleMobileDevice();
@@ -4962,7 +5188,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `💳 1 ვიდეო (საშუალოდ): <b>${perVideo.toFixed(2)} ₾</b>\n` +
       `💰 სულ ${MONTH_SUB_VIDEO_LIMIT} ვიდეოზე (1 თვე): <b>${total.toFixed(2)} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(tiktokLink.value.trim())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
   }
 
   function buildMonthlySubOrderMessage(){
@@ -4975,14 +5201,14 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${MONTH_SUB_VIDEO_LIMIT} ვიდეოზე (1 თვე): ${total.toFixed(2)} ₾
-TikTok პროფილი: ${tiktokLink.value.trim()}`;
+TikTok პროფილი: ${getTiktokValue()}`;
   }
 
   const mpOrderBtnWA = document.getElementById('mpOrderBtnWA');
   const mpOrderBtnTG = document.getElementById('mpOrderBtnTG');
 
   if (mpOrderBtnWA) mpOrderBtnWA.addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
+    if (!validateBeforeSend('mp')) return;
     const btn = mpOrderBtnWA;
     const textEl = document.getElementById('mpOrderBtnWAText');
     const needsIOSWorkaround = isAppleMobileDevice();
@@ -4997,7 +5223,7 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
   });
 
   if (mpOrderBtnTG) mpOrderBtnTG.addEventListener('click', () => {
-    if (!validateBeforeSend()) return;
+    if (!validateBeforeSend('mp')) return;
     const btn = mpOrderBtnTG;
     const textEl = document.getElementById('mpOrderBtnTGText');
     const needsIOSWorkaround = isAppleMobileDevice();
@@ -6876,4 +7102,4 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 </script>
 
 </body>
-</html></html>
+</html>
