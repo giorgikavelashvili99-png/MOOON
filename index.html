@@ -757,7 +757,11 @@
   .sub-note .sub-note-icon{ margin-right:6px; font-size:14px; }
   .sub-note b{ color:var(--gold); }
   @media (max-width:480px){
-    .sub-note{ max-width:100%; padding:11px 10px; font-size:clamp(9.5px, 3.1vw, 12px); border-radius:12px; letter-spacing:-0.01em; }
+    .sub-note{ max-width:100%; padding:9px 8px; font-size:9.5px; border-radius:12px; letter-spacing:-0.015em; }
+    .sub-note .sub-note-icon{ margin-right:4px; font-size:11px; }
+  }
+  @media (max-width:360px){
+    .sub-note{ font-size:8.5px; padding:8px 6px; }
   }
 
   .field{ margin-bottom:22px; }
@@ -1627,6 +1631,30 @@
   .field-row-manual{ display:flex; gap:12px; margin-bottom:10px; }
   .field-row-manual .field-manual{ flex:1; margin-bottom:0; }
   @media (max-width:420px){ .field-row-manual{ gap:8px; } }
+
+  .manual-input-wrap{ position:relative; display:flex; align-items:center; }
+  .manual-input-wrap .num-input{
+    text-align:center;
+    font-size:19px; font-weight:700;
+    padding:14px 64px 14px 16px;
+    letter-spacing:0.02em;
+  }
+  .manual-input-wrap .num-input::-webkit-outer-spin-button,
+  .manual-input-wrap .num-input::-webkit-inner-spin-button{
+    -webkit-appearance:none; margin:0;
+  }
+  .manual-input-wrap .num-input{ -moz-appearance:textfield; }
+  .manual-input-wrap .miw-suffix{
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-size:10.5px; font-weight:600; letter-spacing:0.04em;
+    color:var(--text-faint);
+    pointer-events:none;
+  }
+  @media (max-width:420px){
+    .manual-input-wrap .num-input{ font-size:17px; padding:12px 54px 12px 14px; }
+    .manual-input-wrap .miw-suffix{ font-size:9.5px; right:12px; }
+  }
 
   .order-channels-body{ width:94%; margin:0 2% 0 4%; }
   .order-grid{ display:flex; flex-direction:column; gap:12px; }
@@ -3141,11 +3169,17 @@
           <div class="field-row-manual">
             <div class="field field-manual">
               <div class="field-top"><label data-i18n="secLabelShort">წამები</label></div>
-              <input type="number" inputmode="numeric" class="num-input" id="secondsInput" min="0" max="59" value="5" placeholder="0–59" data-i18n-placeholder="secondsPlaceholder">
+              <div class="manual-input-wrap">
+                <input type="number" inputmode="numeric" class="num-input" id="secondsInput" min="5" max="59" value="5" placeholder="5–59" data-i18n-placeholder="secondsPlaceholder">
+                <span class="miw-suffix" data-i18n="secUnit">წამი</span>
+              </div>
             </div>
             <div class="field field-manual">
               <div class="field-top"><label data-i18n="msLabelShort">მეასედები</label></div>
-              <input type="number" inputmode="numeric" class="num-input" id="msRange" min="0" max="59" value="0" placeholder="00">
+              <div class="manual-input-wrap">
+                <input type="number" inputmode="numeric" class="num-input" id="msRange" min="0" max="59" value="0" placeholder="00">
+                <span class="miw-suffix" data-i18n="msUnit">მეასედი</span>
+              </div>
             </div>
           </div>
           <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59.59 წამი. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
@@ -3565,6 +3599,8 @@
       markDuration: 'მონიშნე ზუსტი დრო (წამი)',
       secLabelShort: 'წამები',
       msLabelShort: 'მეასედები',
+      secUnit: 'წამი',
+      msUnit: 'მეასედი',
       secondsPlaceholder: 'შეიყვანე წამი (0–59)',
       msLabel: 'წამის მეასედები (00–59)',
       msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59.59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
@@ -3755,6 +3791,8 @@
       markDuration: 'Select exact duration (seconds)',
       secLabelShort: 'Seconds',
       msLabelShort: 'Hundredths',
+      secUnit: 'sec',
+      msUnit: 'hundredth',
       secondsPlaceholder: 'Enter seconds (0–59)',
       msLabel: 'Hundredths of a second (00–59)',
       msHint: 'Maximum total duration is 59.59. Within this range the price is calculated at the 59-second rate.',
@@ -4345,7 +4383,7 @@
   secondsInput.addEventListener('input', () => refresh());
   secondsInput.addEventListener('blur', () => {
     let v = parseFloat(secondsInput.value || 0);
-    if (isNaN(v) || v < 0) v = 0;
+    if (isNaN(v) || v < 5) v = 5;
     if (v > 59) v = 59;
     secondsInput.value = v;
     refresh();
