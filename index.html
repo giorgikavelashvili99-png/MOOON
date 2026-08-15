@@ -1880,6 +1880,16 @@
     background:linear-gradient(90deg, transparent, rgba(207,216,255,0.7), transparent);
   }
   .mp-panel .panel-head{ gap:10px; flex-wrap:wrap; }
+  .mp-panel-head{ flex-direction:column; align-items:stretch; }
+  .mp-head-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; flex-wrap:nowrap; width:100%;
+  }
+  .mp-head-row .label{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  @media (max-width:380px){
+    .mp-head-row .label{ font-size:10px; }
+    .mp-count-badge{ font-size:9.5px; padding:5px 10px; }
+  }
   .mp-crown{ font-size:13px; margin-right:5px; filter:drop-shadow(0 0 6px rgba(207,216,255,0.6)); }
   .mp-count-badge{
     display:inline-flex; align-items:center; gap:6px; flex:0 0 auto;
@@ -3356,9 +3366,11 @@
 
   <!-- Monthly subscription -->
   <div class="panel mp-panel" id="monthlySubPanel">
-    <div class="panel-head">
-      <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
-      <div class="mp-count-badge" data-i18n="mpBadge">მაქს. 20 ვიდეო / თვე</div>
+    <div class="panel-head mp-panel-head">
+      <div class="mp-head-row">
+        <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
+        <div class="mp-count-badge" data-i18n="mpBadge">მაქს. 20 ვიდეო / თვე</div>
+      </div>
       <div class="urgency-badge" id="mpUrgencyBadge">🔥 <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">ადგილი დარჩა ამ თვეს</span></div>
     </div>
 
@@ -6864,4 +6876,4 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 </script>
 
 </body>
-</html>
+</html></html>
