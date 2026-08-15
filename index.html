@@ -1863,9 +1863,10 @@
     color:#ffd7ca;
     background:rgba(255,92,61,0.1);
     border:1px solid var(--warn-soft);
-    padding:6px 13px; border-radius:20px;
+    padding:7px 16px; border-radius:20px;
     text-shadow:0 0 10px rgba(255,92,61,0.5);
     white-space:nowrap;
+    box-sizing:border-box; max-width:100%;
     animation: urgencyPulse 1.8s ease-in-out infinite;
   }
   .urgency-badge b{ color:#fff; }
@@ -1975,14 +1976,8 @@
     background:linear-gradient(90deg, transparent, rgba(207,216,255,0.7), transparent);
   }
   .mp-panel .panel-head{ gap:10px; flex-wrap:wrap; }
-  .mp-panel-head{ flex-direction:column; align-items:stretch; }
-  .mp-head-row{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:8px; flex-wrap:nowrap; width:100%;
-  }
-  .mp-head-row .label{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
   @media (max-width:380px){
-    .mp-head-row .label{ font-size:10px; }
+    .mp-panel-head .label{ font-size:10px; }
     .mp-count-badge{ font-size:9.5px; padding:5px 10px; }
   }
   .mp-crown{ font-size:13px; margin-right:5px; filter:drop-shadow(0 0 6px rgba(207,216,255,0.6)); }
@@ -3500,10 +3495,8 @@
   <!-- Monthly subscription -->
   <div class="panel mp-panel" id="monthlySubPanel">
     <div class="panel-head mp-panel-head">
-      <div class="mp-head-row">
-        <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
-        <div class="mp-count-badge" data-i18n="mpBadge">მაქს. 20 ვიდეო / თვე</div>
-      </div>
+      <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
+      <div class="mp-count-badge" data-i18n="mpBadge">20 ვიდეო / თვე</div>
       <div class="urgency-badge" id="mpUrgencyBadge">🔥 <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">ადგილი დარჩა ამ თვეს</span></div>
     </div>
 
@@ -3922,7 +3915,7 @@
       wpSendWA: 'გამოწერის შეკვეთა — WhatsApp',
       wpSendTG: 'გამოწერის შეკვეთა — Telegram',
       mpLabel: '<span class="mp-crown">👑</span>1-თვიანი გამოწერა',
-      mpBadge: 'მაქს. 20 ვიდეო / თვე',
+      mpBadge: '20 ვიდეო / თვე',
       mpNote: 'მაქსიმუმ 20 ვიდეოს მონტაჟი თვეში (5 კვირაში), თითო მაქს. 59.59 წმ, ფიქსირებული 1080p/60fps ხარისხით — უბრალოდ შეუკვეთე.',
       mpSendWA: 'გამოწერის შეკვეთა — WhatsApp',
       mpSendTG: 'გამოწერის შეკვეთა — Telegram',
@@ -4116,7 +4109,7 @@
       wpSendWA: 'Order the subscription — WhatsApp',
       wpSendTG: 'Order the subscription — Telegram',
       mpLabel: '<span class="mp-crown">👑</span>1-Month Subscription',
-      mpBadge: 'Max. 20 videos / month',
+      mpBadge: '20 videos / month',
       mpNote: 'Up to 20 video edits per month (5 per week), max 59.59s each, fixed at 1080p/60fps — just order.',
       mpSendWA: 'Order the subscription — WhatsApp',
       mpSendTG: 'Order the subscription — Telegram',
