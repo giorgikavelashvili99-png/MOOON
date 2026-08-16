@@ -3297,54 +3297,9 @@
       </div>
     </div>
 
-    <!-- Manual duration entry — collapsed fallback -->
-    <button type="button" class="manual-entry-toggle" id="manualFallbackToggle" aria-expanded="false" aria-controls="manualFallback">
-      <span class="met-badge" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg>
-      </span>
-      <span class="met-text">
-        <span class="met-title" data-i18n="manualFallbackPrompt">არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით</span>
-        <span class="met-sub" data-i18n="manualFallbackSub">სწრაფი ხელით შეყვანა — წამები და მეასედები</span>
-      </span>
-      <span class="met-chevron" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-      </span>
-    </button>
-
-    <div class="manual-fallback" id="manualFallback">
-      <div class="manual-fallback-inner">
-        <div class="manual-fallback-pad">
-          <div class="manual-entry-card">
-            <div class="mec-head">
-              <span class="mec-head-ico" aria-hidden="true">⏱️</span>
-              <span class="mec-head-label" data-i18n="manualEntryBadge">ხელით შეყვანა</span>
-            </div>
-            <div class="mec-stopwatch">
-              <div class="mec-group">
-                <div class="mec-group-label" data-i18n="secLabelShort">წამები</div>
-                <div class="mec-stepper">
-                  <button type="button" class="mec-step" data-target="secondsInput" data-step="-1" aria-label="−1">−</button>
-                  <input type="number" inputmode="numeric" class="mec-digit-input" id="secondsInput" min="5" max="59" value="5" placeholder="5–59" data-i18n-placeholder="secondsPlaceholder">
-                  <button type="button" class="mec-step" data-target="secondsInput" data-step="1" aria-label="+1">+</button>
-                </div>
-                <div class="mec-group-unit" data-i18n="secUnit">წამი</div>
-              </div>
-              <div class="mec-colon" aria-hidden="true">:</div>
-              <div class="mec-group">
-                <div class="mec-group-label" data-i18n="msLabelShort">მეასედები</div>
-                <div class="mec-stepper">
-                  <button type="button" class="mec-step" data-target="msRange" data-step="-1" aria-label="−1">−</button>
-                  <input type="number" inputmode="numeric" class="mec-digit-input" id="msRange" min="0" max="59" value="0" placeholder="00">
-                  <button type="button" class="mec-step" data-target="msRange" data-step="1" aria-label="+1">+</button>
-                </div>
-                <div class="mec-group-unit" data-i18n="msUnit">მეასედი</div>
-              </div>
-            </div>
-            <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59.59 წამი. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Manual duration inputs — kept hidden; populated automatically by the video scanner. -->
+    <input type="hidden" id="secondsInput" value="5">
+    <input type="hidden" id="msRange" value="0">
 
     <div class="field">
       <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი</label></div>
@@ -5554,8 +5509,12 @@ TikTok პროფილი: ${getTiktokValue()}`;
       a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
     },
     {
-      kw: ['პაბჯ','pubg'],
+      kw: ['პაბჯ','pubg','ნანამ სენსეტივ','სენსეტივები გაასწოროს','ნანას სენსეტივ'],
       a: '1) EXIT GAME<br>2) DELETE GAME<br>3) YOU ARE DONE<br>4) მოიცა, არ დაგვიმთავრებია.<br>5) DELETE ANUKA FROM THE PLANET<br>6) NOW YOU ARE DONE',
+    },
+    {
+      kw: ['ანუკა ბოტია','ანუკა ბოტი'],
+      a: 'კი, ბოტია.',
     },
     {
       kw: ['ატვირთვის გვერდ','ატვირთვის საიტ','two313','ატვირთვა'],
@@ -5695,6 +5654,10 @@ TikTok პროფილი: ${getTiktokValue()}`;
       a: 'A manager will confirm payment details directly in chat after your order is confirmed.',
     },
     {
+      kw: ['is anuka a bot','anuka a bot','anuka bot'],
+      a: 'Yes, it\'s a bot.',
+    },
+    {
       kw: ['hi','hello','hey'],
       a: 'Hello! How can I help? You can ask me about pricing, deadlines, requirements, or the order process.',
     },
@@ -5767,13 +5730,23 @@ TikTok პროფილი: ${getTiktokValue()}`;
     return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: „საქართველოს დედაქალაქი").';
   }
 
+  // Score-based matcher: instead of returning the first rule whose keyword
+  // appears anywhere in the text, we score every rule by how many distinct
+  // keywords match plus a small bonus for longer (more specific) keywords,
+  // then return the best match. This avoids short/generic keywords in an
+  // earlier rule accidentally winning over a more specific, later rule.
   function findAnswer(text){
     const lowerText = text.toLowerCase();
     const kb = currentLang === 'en' ? KB_EN : KB_KA;
+    let best = null, bestScore = 0;
     for (const rule of kb) {
-      if (rule.kw.some(k => lowerText.includes(k))) return rule;
+      let score = 0;
+      for (const k of rule.kw) {
+        if (lowerText.includes(k.toLowerCase())) score += 1 + Math.min(2, k.length / 10);
+      }
+      if (score > bestScore) { bestScore = score; best = rule; }
     }
-    return null;
+    return best;
   }
 
   function sendChat(){
