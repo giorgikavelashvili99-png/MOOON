@@ -1667,12 +1667,23 @@
   .drop-zone .dz-req::before{ content:'🎯'; font-size:11px; }
   @media (max-width:900px){
     .drop-zone .dz-req{
-      font-size: clamp(8.5px,2.3vw,9.5px);
-      padding: clamp(3px,1vw,4px) clamp(8px,2.6vw,11px);
+      font-size: clamp(7px,2.1vw,9.5px);
+      padding: clamp(3px,0.9vw,4px) clamp(6px,2.2vw,11px);
       margin-top: clamp(8px,2.2vw,10px);
-      gap:4px;
+      gap:3px;
+      letter-spacing:0.01em;
+      max-width:100%;
     }
-    .drop-zone .dz-req::before{ font-size:9.5px; }
+    .drop-zone .dz-req::before{ font-size: clamp(7px,2.1vw,9.5px); }
+  }
+  @media (max-width:400px){
+    .drop-zone .dz-req{
+      font-size: clamp(6.2px,1.9vw,7.5px);
+      padding: 3px clamp(5px,1.8vw,8px);
+      letter-spacing:0;
+      gap:2px;
+    }
+    .drop-zone .dz-req::before{ font-size: clamp(6.2px,1.9vw,7.5px); }
   }
 
   /* ---------- Cancel / remove-upload button on the scan-result card ---------- */
@@ -3567,6 +3578,25 @@
       <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
     </div>
 
+    <div class="field field-tiktok field-video-link" id="videoLinkField" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">🔗</span>
+        <input type="text" class="num-input" id="videoLink" placeholder="mooontransferr.onrender.com/...">
+      </div>
+      <div class="tt-confirm tt-red" id="videoLinkConfirm" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="videoLinkConfirmText">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="videoLinkError" data-i18n="videoLinkError">⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!</div>
+    </div>
+
     <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
 
     <!-- Order channels -->
@@ -3674,6 +3704,25 @@
       <div class="error-msg" id="tiktokErrorWp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
     </div>
 
+    <div class="field field-tiktok field-video-link" id="videoLinkFieldWp" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">🔗</span>
+        <input type="text" class="num-input" id="videoLinkWp" placeholder="mooontransferr.onrender.com/...">
+      </div>
+      <div class="tt-confirm tt-red" id="videoLinkConfirmWp" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="videoLinkConfirmTextWp">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="videoLinkErrorWp" data-i18n="videoLinkError">⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!</div>
+    </div>
+
     <div class="order-grid" style="margin-top:18px;">
       <button class="order-btn wa" id="wpOrderBtnWA">
         <div class="qn-stars" aria-hidden="true">
@@ -3738,6 +3787,25 @@
         <span class="tt-confirm-text" id="tiktokConfirmTextMp">დააჭირეთ დასადასტურებლად</span>
       </div>
       <div class="error-msg" id="tiktokErrorMp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
+
+    <div class="field field-tiktok field-video-link" id="videoLinkFieldMp" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">🔗</span>
+        <input type="text" class="num-input" id="videoLinkMp" placeholder="mooontransferr.onrender.com/...">
+      </div>
+      <div class="tt-confirm tt-red" id="videoLinkConfirmMp" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="videoLinkConfirmTextMp">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="videoLinkErrorMp" data-i18n="videoLinkError">⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!</div>
     </div>
 
     <div class="order-grid" style="margin-top:18px;">
@@ -3985,6 +4053,8 @@
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
       tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
+      videoLinkLabel: 'ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *',
+      videoLinkError: '⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!',
       tiktokConfirmPrompt: 'დააჭირეთ დასადასტურებლად',
       tiktokConfirmDone: '✓ დადასტურებულია',
       videoScanner: 'VIDEO SCANNER',
@@ -4012,8 +4082,8 @@
       srTransferQ: 'გსურთ ატვირთული ვიდეო გაეგზავნოს <b>mooontransferr.onrender.com</b>-ზე, რომ ჩვენმა მენეჯერმა შეამოწმოს?',
       srTransferYes: 'დიახ',
       srTransferNo: 'არა',
-      srTransferTimerMsg: 'აუცილებლად იქონიეთ ატვირთული ვიდეოს ლინკი, რომ გადაუგზავნოთ მენეჯერს.',
-      srTransferOpened: 'გვერდი გაიხსნა — არ დაგავიწყდეთ ვიდეოს ლინკის გაგზავნა მენეჯერისთვის',
+      srTransferTimerMsg: 'აუცილებლად იქონიეთ ატვირთული ვიდეოს ლინკი — mooontransferr-ზე ატვირთვის შემდეგ დააკოპირეთ ლინკი და ქვემოთ ველში ჩასვით.',
+      srTransferOpened: 'გვერდი გაიხსნა — ატვირთვის შემდეგ დაბრუნდით აქ, ჩასვით მიღებული ლინკი ქვემოთ ველში და დაადასტურეთ',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
       sendOrder: 'გაგზავნე შეკვეთა',
@@ -4190,6 +4260,8 @@
       subscriberT2: '✓ Lower rate activates',
       tiktokLabel: 'Your TikTok profile link *',
       tiktokError: '⚠️ A TikTok profile link is required to send the order!',
+      videoLinkLabel: 'Uploaded video link (mooontransferr.onrender.com) *',
+      videoLinkError: '⚠️ A link to your uploaded video is required to send the order!',
       tiktokConfirmPrompt: 'Click to confirm',
       tiktokConfirmDone: '✓ Confirmed',
       videoScanner: 'VIDEO SCANNER',
@@ -4217,8 +4289,8 @@
       srTransferQ: 'Would you like the uploaded video sent to <b>mooontransferr.onrender.com</b> so our manager can review it?',
       srTransferYes: 'Yes',
       srTransferNo: 'No',
-      srTransferTimerMsg: "Make sure you have the uploaded video's link ready to send to the manager.",
-      srTransferOpened: "The page has opened — don't forget to send the video link to the manager",
+      srTransferTimerMsg: "Make sure to copy your uploaded video's link on mooontransferr, then paste it into the field below once you're back.",
+      srTransferOpened: "The page has opened — after uploading, come back here, paste the link you received into the field below and confirm it",
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
       alertReadError: 'Could not read the video — please try another file.',
       sendOrder: 'Send order',
@@ -4958,6 +5030,113 @@
 
   updateTiktokConfirmBadge();
 
+  // ---- Video link — one field per order panel (main / weekly / monthly),
+  // synced the same way as the TikTok link, so it's filled everywhere no
+  // matter which panel the visitor orders from. ----
+  const videoLinkGroups = {
+    main: {
+      link: document.getElementById('videoLink'),
+      confirm: document.getElementById('videoLinkConfirm'),
+      confirmText: document.getElementById('videoLinkConfirmText'),
+      error: document.getElementById('videoLinkError'),
+      field: document.getElementById('videoLinkField')
+    },
+    wp: {
+      link: document.getElementById('videoLinkWp'),
+      confirm: document.getElementById('videoLinkConfirmWp'),
+      confirmText: document.getElementById('videoLinkConfirmTextWp'),
+      error: document.getElementById('videoLinkErrorWp'),
+      field: document.getElementById('videoLinkFieldWp')
+    },
+    mp: {
+      link: document.getElementById('videoLinkMp'),
+      confirm: document.getElementById('videoLinkConfirmMp'),
+      confirmText: document.getElementById('videoLinkConfirmTextMp'),
+      error: document.getElementById('videoLinkErrorMp'),
+      field: document.getElementById('videoLinkFieldMp')
+    }
+  };
+
+  let videoLinkConfirmed = false;
+
+  function getVideoLinkValue(){
+    for (const key in videoLinkGroups) {
+      const g = videoLinkGroups[key];
+      if (g.link) return g.link.value.trim();
+    }
+    return '';
+  }
+
+  function updateVideoLinkConfirmBadge(){
+    Object.values(videoLinkGroups).forEach(g => {
+      if (!g.link || !g.confirm) return;
+      const hasValue = g.link.value.trim() !== '';
+      if (!hasValue) {
+        g.confirm.style.display = 'none';
+        return;
+      }
+      g.confirm.style.display = 'block';
+      g.confirm.classList.toggle('tt-red', !videoLinkConfirmed);
+      g.confirm.classList.toggle('tt-green', videoLinkConfirmed);
+      if (g.confirmText) g.confirmText.textContent = videoLinkConfirmed ? t('tiktokConfirmDone') : t('tiktokConfirmPrompt');
+    });
+  }
+
+  function syncVideoLinkValue(sourceKey, value){
+    Object.keys(videoLinkGroups).forEach(key => {
+      if (key === sourceKey) return;
+      const g = videoLinkGroups[key];
+      if (g.link) g.link.value = value;
+    });
+  }
+
+  function clearVideoLinkErrors(){
+    Object.values(videoLinkGroups).forEach(g => {
+      if (g.link) g.link.classList.remove('error');
+      if (g.error) g.error.style.display = 'none';
+    });
+  }
+
+  Object.keys(videoLinkGroups).forEach(key => {
+    const g = videoLinkGroups[key];
+    if (!g.link) return;
+    g.link.addEventListener('input', () => {
+      syncVideoLinkValue(key, g.link.value);
+      videoLinkConfirmed = false;
+      clearVideoLinkErrors();
+      updateVideoLinkConfirmBadge();
+    });
+    if (g.confirm) {
+      g.confirm.addEventListener('click', () => {
+        if (videoLinkConfirmed || g.link.value.trim() === '') return;
+        videoLinkConfirmed = true;
+        updateVideoLinkConfirmBadge();
+      });
+    }
+  });
+
+  updateVideoLinkConfirmBadge();
+
+  // When the visitor clicks "Yes" on the transfer prompt, they leave for
+  // mooontransferr.onrender.com in a new tab. This flag makes us watch for
+  // them coming back to THIS tab, so we can point them straight at whichever
+  // video-link field is currently visible, to paste what they copied.
+  let awaitingVideoLinkReturn = false;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || !awaitingVideoLinkReturn) return;
+    awaitingVideoLinkReturn = false;
+    const visibleGroup = Object.values(videoLinkGroups).find(g => g.field && g.field.offsetParent !== null);
+    if (!visibleGroup) return;
+    setTimeout(() => {
+      visibleGroup.field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      visibleGroup.link.focus({ preventScroll: true });
+      visibleGroup.field.classList.remove('scanner-flash');
+      void visibleGroup.field.offsetWidth;
+      visibleGroup.field.classList.add('scanner-flash');
+    }, 350);
+  });
+
   refresh();
 
   const dropZone = document.getElementById('dropZone');
@@ -5025,6 +5204,7 @@
     if (doneNote) doneNote.remove();
     srTransferYes.disabled = false;
     srTransferNo.disabled = false;
+    awaitingVideoLinkReturn = false;
   }
 
   srResetBtn.addEventListener('click', resetScanner);
@@ -5054,6 +5234,7 @@
       srTransferTimer.classList.remove('show');
 
       window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
+      awaitingVideoLinkReturn = true;
       if (!srTransfer.querySelector('.sr-transfer-done')) {
         const done = document.createElement('div');
         done.className = 'sr-transfer-done';
@@ -5287,7 +5468,8 @@
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `⭐ გამომწერი: <b>${isSub ? 'დიახ' : 'არა'}</b>\n` +
       `💰 ღირებულება: <b>${price} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>\n` +
+      `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
   function buildCommentTgMessage(entry){
@@ -5306,7 +5488,8 @@
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 გამომწერი: ${isSub ? 'დიახ' : 'არა'}
 ღირებულება: ${price} ₾
-TikTok პროფილი: ${getTiktokValue()}`;
+TikTok პროფილი: ${getTiktokValue()}
+ვიდეო ლინკი: ${getVideoLinkValue()}`;
   }
 
   function validateBeforeSend(panelKey){
@@ -5328,6 +5511,27 @@ TikTok პროფილი: ${getTiktokValue()}`;
         g.confirm.classList.add('tt-shake', 'tt-error-flash');
       }
       return false;
+    }
+    // Uploaded-video link — required on every order panel, same as TikTok.
+    const vg = videoLinkGroups[panelKey] || videoLinkGroups.main;
+    if (vg.link) {
+      const vlVal = vg.link.value.trim();
+      if (!vlVal) {
+        vg.link.classList.add('error');
+        if (vg.error) vg.error.style.display = 'block';
+        vg.link.focus();
+        return false;
+      }
+      if (!videoLinkConfirmed) {
+        if (vg.error) vg.error.style.display = 'none';
+        if (vg.confirm) {
+          vg.confirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          vg.confirm.classList.remove('tt-shake', 'tt-error-flash');
+          void vg.confirm.offsetWidth;
+          vg.confirm.classList.add('tt-shake', 'tt-error-flash');
+        }
+        return false;
+      }
     }
     return true;
   }
@@ -5474,7 +5678,8 @@ TikTok პროფილი: ${getTiktokValue()}`;
       `📢 არხის გამომწერი: <b>${isChannelSub ? 'კი (−3₾)' : 'არა'}</b>\n` +
       `💳 1 ვიდეო (საშუალოდ): <b>${perVideo.toFixed(2)} ₾</b>\n` +
       `💰 სულ ${SUB_VIDEO_LIMIT} ვიდეოზე (1 კვირა): <b>${total.toFixed(2)} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>\n` +
+      `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
   function buildWeeklySubOrderMessage(){
@@ -5489,7 +5694,8 @@ TikTok პროფილი: ${getTiktokValue()}`;
 არხის გამომწერი: ${isChannelSub ? 'კი (−3₾)' : 'არა'}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${SUB_VIDEO_LIMIT} ვიდეოზე (1 კვირა): ${total.toFixed(2)} ₾
-TikTok პროფილი: ${getTiktokValue()}`;
+TikTok პროფილი: ${getTiktokValue()}
+ვიდეო ლინკი: ${getVideoLinkValue()}`;
   }
 
   const wpOrderBtnWA = document.getElementById('wpOrderBtnWA');
@@ -5547,7 +5753,8 @@ TikTok პროფილი: ${getTiktokValue()}`;
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `💳 1 ვიდეო (საშუალოდ): <b>${perVideo.toFixed(2)} ₾</b>\n` +
       `💰 სულ ${MONTH_SUB_VIDEO_LIMIT} ვიდეოზე (1 თვე): <b>${total.toFixed(2)} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>\n` +
+      `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
   function buildMonthlySubOrderMessage(){
@@ -5560,7 +5767,8 @@ TikTok პროფილი: ${getTiktokValue()}`;
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${MONTH_SUB_VIDEO_LIMIT} ვიდეოზე (1 თვე): ${total.toFixed(2)} ₾
-TikTok პროფილი: ${getTiktokValue()}`;
+TikTok პროფილი: ${getTiktokValue()}
+ვიდეო ლინკი: ${getVideoLinkValue()}`;
   }
 
   const mpOrderBtnWA = document.getElementById('mpOrderBtnWA');
