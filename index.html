@@ -7064,13 +7064,20 @@ TikTok პროფილი: ${getTiktokValue()}
   // ============================================================
   // 10) ADMIN PANEL
   // ============================================================
-  const ADMIN_PASSWORD = '37HcM)4bv1fZ7\'LR~9YE&epXj|HUE2|Xg`upUg1(T£XX\\r\\miG';
+  // ---- ნამდვილი admin პაროლი ამ ფაილში აღარსად ინახება. ----
+  // შემოწმება ხდება სერვერზე (Cloudflare Worker), იხ. tryAdminLogin().
+  // ADMIN_AUTH_URL შეცვალე შენი დეპლოირებული Worker-ის URL-ით.
+  const ADMIN_AUTH_URL = 'https://moon-admin-auth.YOUR-SUBDOMAIN.workers.dev';
+
+  // ეს ფრაზა მხოლოდ gear ხატულის გამოსაჩენად გამოიყენება (UX-ტრიგერია,
+  // არა რეალური secret) — შეგიძლია თავისუფლად შეცვალო ნებისმიერ სტრიქონზე.
+  const GEAR_REVEAL_PHRASE = 'moonadmin';
   const adminGear = document.getElementById('adminGear');
 
   (function initAdminGearReveal(){
     function checkReveal(str){
       if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (typeof str === 'string' && str.slice(-ADMIN_PASSWORD.length) === ADMIN_PASSWORD) {
+      if (typeof str === 'string' && str.slice(-GEAR_REVEAL_PHRASE.length) === GEAR_REVEAL_PHRASE) {
         adminGear.classList.add('revealed');
       }
     }
@@ -7078,7 +7085,7 @@ TikTok პროფილი: ${getTiktokValue()}
     document.addEventListener('keydown', (e) => {
       if (!adminGear || adminGear.classList.contains('revealed')) return;
       if (e.key.length !== 1) return;
-      typed = (typed + e.key).slice(-ADMIN_PASSWORD.length);
+      typed = (typed + e.key).slice(-GEAR_REVEAL_PHRASE.length);
       checkReveal(typed);
     });
     document.addEventListener('input', (e) => {
@@ -7733,16 +7740,40 @@ TikTok პროფილი: ${getTiktokValue()}
   adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
   adminTabPromo.addEventListener('click', () => switchAdminTab('promo'));
 
-  function tryAdminLogin(){
-    if (adminPass.value === ADMIN_PASSWORD) {
-      adminAuthenticated = true;
-      initAdminModeCheckbox();
-      applyAdminNameLock();
-      adminLogin.style.display = 'none';
-      adminDashboard.style.display = 'block';
-      switchAdminTab('visits');
-    } else {
+  let adminCheckInFlight = false;
+  async function tryAdminLogin(){
+    if (adminCheckInFlight) return;
+    const entered = adminPass.value;
+    adminErr.classList.remove('show');
+    adminCheckInFlight = true;
+    const prevLabel = adminGo.textContent;
+    adminGo.disabled = true;
+    adminGo.textContent = '...';
+    try {
+      const res = await fetch(ADMIN_AUTH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: entered }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (res.ok && data && data.ok === true) {
+        adminAuthenticated = true;
+        initAdminModeCheckbox();
+        applyAdminNameLock();
+        adminLogin.style.display = 'none';
+        adminDashboard.style.display = 'block';
+        switchAdminTab('visits');
+      } else {
+        adminErr.classList.add('show');
+      }
+    } catch (err) {
+      // ქსელის შეცდომა (Worker მიუწვდომელია და ა.შ.) — არ ვუშვებთ შიგნით
       adminErr.classList.add('show');
+    } finally {
+      adminCheckInFlight = false;
+      adminGo.disabled = false;
+      adminGo.textContent = prevLabel;
     }
   }
   adminGo.addEventListener('click', tryAdminLogin);
