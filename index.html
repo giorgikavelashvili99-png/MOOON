@@ -1703,6 +1703,39 @@
     display:flex; align-items:center; gap:7px;
     font-size:12.5px; font-weight:700; color:var(--wa);
   }
+  .sr-transfer-timer{
+    display:none;
+    align-items:center; gap:14px;
+    padding:13px 16px;
+    border-radius:14px;
+    border:1px solid rgba(255,210,63,0.4);
+    background:
+      radial-gradient(ellipse 100% 130% at 0% 50%, rgba(255,210,63,0.14), transparent 70%),
+      rgba(255,255,255,0.03);
+  }
+  .sr-transfer-timer.show{ display:flex; }
+  .stt-count{
+    flex:0 0 auto;
+    width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    border:2px solid var(--gold);
+    font-family:'JetBrains Mono', monospace;
+    font-weight:800; font-size:16px;
+    color:var(--gold);
+    box-shadow:0 0 16px rgba(255,210,63,0.4);
+    animation: sttPulse 1s ease-in-out infinite;
+  }
+  @keyframes sttPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.1); } }
+  @media (prefers-reduced-motion: reduce){ .stt-count{ animation:none; } }
+  .stt-msg{
+    font-family:'Space Grotesk','Noto Sans Georgian',sans-serif;
+    font-style:italic;
+    font-size:12.5px; line-height:1.5;
+    color:var(--text);
+    letter-spacing:0.01em;
+  }
+  .stt-msg b{ color:var(--gold); }
 
   /* ---------- Rejected-format panel (wrong resolution / fps) ---------- */
   .sr-reject{
@@ -3401,7 +3434,7 @@
           <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M12 4L7.2 8.8M12 4l4.8 4.8"/><path d="M4.5 15.5v2.8a2.2 2.2 0 002.2 2.2h10.6a2.2 2.2 0 002.2-2.2v-2.8"/></svg></div>
           <div class="dz-title" data-i18n="dzTitle">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
           <div class="dz-sub" data-i18n="dzSub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
-          <div class="dz-req" data-i18n="dzReq">მინიმალური მოთხოვნა: 1080p · 30fps+</div>
+          <div class="dz-req" data-i18n="dzReq">სავალდებულო ფორმატი: ზუსტად 1080p · 60fps</div>
         </div>
         <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
 
@@ -3427,6 +3460,10 @@
               <button type="button" class="st-btn st-yes" id="srTransferYes" data-i18n="srTransferYes">დიახ</button>
               <button type="button" class="st-btn st-no" id="srTransferNo" data-i18n="srTransferNo">არა</button>
             </div>
+            <div class="sr-transfer-timer" id="srTransferTimer">
+              <span class="stt-count" id="srTransferCountdown">3</span>
+              <span class="stt-msg" data-i18n="srTransferTimerMsg">აუცილებლად იქონიეთ ატვირთული ვიდეოს ლინკი, რომ გადაუგზავნოთ მენეჯერს.</span>
+            </div>
           </div>
         </div>
 
@@ -3436,9 +3473,9 @@
             <span class="sr-reject-title" data-i18n="srRejectTitle">ფაილი არ შეესაბამება მოთხოვნებს</span>
           </div>
           <div class="sr-reject-detected-row"><span data-i18n="srRejectDetectedLabel">ატვირთული ფაილის მონაცემები:</span> <b id="srRejectDetected">—</b></div>
-          <p class="sr-reject-text" data-i18n="srRejectText">ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში. მინიმალურად დასაშვებია <b>1080p / 30fps</b> — ამაზე დაბალი ან განსხვავებული გარჩევადობა (მაგ. 720p, 2K, 4K) არ მიიღება.</p>
+          <p class="sr-reject-text" data-i18n="srRejectText">ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.</p>
           <div class="sr-reject-apps-row">
-            <span class="sr-reject-apps-label" data-i18n="srRejectAppsMobile">მობილურისთვის / აიფონისთვის:</span>
+            <span class="sr-reject-apps-label" data-i18n="srRejectAppsMobile">მობილურებისთვის / აიფონისთვის / აიპადებისთვის:</span>
             <span class="sr-chip">CapCut</span><span class="sr-chip">InShot</span><span class="sr-reject-etc" data-i18n="srRejectEtc">და ა.შ.</span>
           </div>
           <div class="sr-reject-apps-row">
@@ -3937,6 +3974,19 @@
       srMatchNote: '✓ ატვირთული ვიდეო შეესაბამება მოთხოვნილ ხარისხს ({REQ})',
       srMismatchNote: '⚠️ მოთხოვნილია {REQ}, თუმცა ატვირთული ვიდეო რეალურად {DET} ხარისხისაა — ფასი მაინც გამოთვლილია თქვენ მიერ მოთხოვნილი ({REQ}) ხარისხის მიხედვით.',
       srWarnOver: '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.',
+      dzReq: 'სავალდებულო ფორმატი: ზუსტად 1080p · 60fps',
+      srRejectTitle: 'ფაილი არ შეესაბამება მოთხოვნებს',
+      srRejectDetectedLabel: 'ატვირთული ფაილის მონაცემები:',
+      srRejectText: 'ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.',
+      srRejectAppsMobile: 'მობილურებისთვის / აიფონისთვის / აიპადებისთვის:',
+      srRejectAppsDesktop: 'კომპიუტერისთვის:',
+      srRejectEtc: 'და ა.შ.',
+      srRejectRetry: '↻ სცადე სხვა ვიდეოთი',
+      srTransferQ: 'გსურთ ატვირთული ვიდეო გაეგზავნოს <b>mooontransferr.onrender.com</b>-ზე, რომ ჩვენმა მენეჯერმა შეამოწმოს?',
+      srTransferYes: 'დიახ',
+      srTransferNo: 'არა',
+      srTransferTimerMsg: 'აუცილებლად იქონიეთ ატვირთული ვიდეოს ლინკი, რომ გადაუგზავნოთ მენეჯერს.',
+      srTransferOpened: 'გვერდი გაიხსნა — არ დაგავიწყდეთ ვიდეოს ლინკის გაგზავნა მენეჯერისთვის',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
       sendOrder: 'გაგზავნე შეკვეთა',
@@ -4129,6 +4179,19 @@
       srMatchNote: '✓ The uploaded video matches the requested quality ({REQ})',
       srMismatchNote: '⚠️ You requested {REQ}, but the uploaded video is actually {DET} quality — the price is still calculated based on your requested quality ({REQ}).',
       srWarnOver: '⚠️ The video exceeds 59.59 seconds — it is priced individually; the calculator shows the 59.59 rate.',
+      dzReq: 'Required format: exactly 1080p · 60fps',
+      srRejectTitle: "This file doesn't meet the requirements",
+      srRejectDetectedLabel: 'Uploaded file details:',
+      srRejectText: 'Dear user, you must upload the video in <b>1080p / 60fps</b> format — exactly this format, no more and no less. Any other resolution or frame rate (e.g. 720p, 2K, 4K, 30fps, 120fps) will not be accepted.',
+      srRejectAppsMobile: 'For mobile / iPhone / iPad:',
+      srRejectAppsDesktop: 'For desktop:',
+      srRejectEtc: 'etc.',
+      srRejectRetry: '↻ Try a different video',
+      srTransferQ: 'Would you like the uploaded video sent to <b>mooontransferr.onrender.com</b> so our manager can review it?',
+      srTransferYes: 'Yes',
+      srTransferNo: 'No',
+      srTransferTimerMsg: "Make sure you have the uploaded video's link ready to send to the manager.",
+      srTransferOpened: "The page has opened — don't forget to send the video link to the manager",
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
       alertReadError: 'Could not read the video — please try another file.',
       sendOrder: 'Send order',
@@ -4757,25 +4820,26 @@
     return `${resTier}_${fpsTier}`;
   }
 
-  // ---- Hard upload gate: only 1080p footage at 30fps or higher is ever
-  // accepted — nothing lower (720p, etc.) and nothing higher (2K/4K) gets
-  // through, no matter the fps. FPS itself only has a floor (>=30); we
-  // don't reject a higher fps on its own. Resolution is read straight off
-  // the <video> element so it's always known; fps detection can fail on
-  // some browsers, so an unknown fps is treated as "can't disprove it" and
-  // is not, by itself, a rejection reason. ----
-  const REQUIRED_MIN_DIM = 1080;
+  // ---- Hard upload gate: ONLY exactly-1080p footage at exactly 60fps is
+  // ever accepted — nothing lower (720p, 30fps…) and nothing higher (2K,
+  // 4K, 120fps…) gets through. This is a strict match, not a floor, on
+  // both resolution and fps. Resolution is read straight off the <video>
+  // element so it's always known; fps detection can fail on some browsers
+  // (no requestVideoFrameCallback support), so an unknown fps is treated
+  // as "can't disprove it" and is not, by itself, a rejection reason —
+  // only a *confirmed* mismatch blocks the upload. ----
+  const REQUIRED_DIM = 1080;
   const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
-  const REQUIRED_MIN_FPS = 30;
+  const REQUIRED_FPS = 60;
 
   function checkUploadAcceptable(width, height, fps){
     const hasDims = !!(width && height);
     let resOk = null;
     if (hasDims) {
       const minDim = Math.min(width, height);
-      resOk = Math.abs(minDim - REQUIRED_MIN_DIM) <= REQUIRED_DIM_TOLERANCE;
+      resOk = Math.abs(minDim - REQUIRED_DIM) <= REQUIRED_DIM_TOLERANCE;
     }
-    const fpsOk = (fps != null) ? (fps >= REQUIRED_MIN_FPS) : null;
+    const fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
     // Reject only on a *confirmed* violation — an unknown value never
     // blocks the upload on its own.
     const rejected = (resOk === false) || (fpsOk === false);
@@ -4891,8 +4955,12 @@
   const srTransferActions = document.getElementById('srTransferActions');
   const srTransferYes = document.getElementById('srTransferYes');
   const srTransferNo = document.getElementById('srTransferNo');
+  const srTransferTimer = document.getElementById('srTransferTimer');
+  const srTransferCountdown = document.getElementById('srTransferCountdown');
 
   const VIDEO_REVIEW_TRANSFER_URL = 'https://mooontransferr.onrender.com';
+  const TRANSFER_COUNTDOWN_SECONDS = 3;
+  let transferCountdownInterval = null;
 
   ['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
   ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { dropZone.classList.remove('dragover'); }));
@@ -4923,6 +4991,9 @@
     srTransfer.classList.remove('show');
     srTransferQ.style.display = '';
     srTransferActions.style.display = '';
+    if (transferCountdownInterval) { clearInterval(transferCountdownInterval); transferCountdownInterval = null; }
+    srTransferTimer.classList.remove('show');
+    srTransferCountdown.textContent = String(TRANSFER_COUNTDOWN_SECONDS);
     const doneNote = srTransfer.querySelector('.sr-transfer-done');
     if (doneNote) doneNote.remove();
     srTransferYes.disabled = false;
@@ -4933,17 +5004,36 @@
   srRejectRetry.addEventListener('click', resetScanner);
 
   srTransferYes.addEventListener('click', () => {
-    window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
     srTransferYes.disabled = true;
     srTransferNo.disabled = true;
     srTransferQ.style.display = 'none';
     srTransferActions.style.display = 'none';
-    if (!srTransfer.querySelector('.sr-transfer-done')) {
-      const done = document.createElement('div');
-      done.className = 'sr-transfer-done';
-      done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('srTransferOpened')) + '</span>';
-      srTransfer.appendChild(done);
-    }
+
+    // Run a visible 3-second countdown — reminding the visitor to have
+    // their uploaded video's link ready for the manager — before the
+    // review site actually opens.
+    let remaining = TRANSFER_COUNTDOWN_SECONDS;
+    srTransferCountdown.textContent = String(remaining);
+    srTransferTimer.classList.add('show');
+
+    transferCountdownInterval = setInterval(() => {
+      remaining -= 1;
+      if (remaining > 0) {
+        srTransferCountdown.textContent = String(remaining);
+        return;
+      }
+      clearInterval(transferCountdownInterval);
+      transferCountdownInterval = null;
+      srTransferTimer.classList.remove('show');
+
+      window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
+      if (!srTransfer.querySelector('.sr-transfer-done')) {
+        const done = document.createElement('div');
+        done.className = 'sr-transfer-done';
+        done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('srTransferOpened')) + '</span>';
+        srTransfer.appendChild(done);
+      }
+    }, 1000);
   });
 
   srTransferNo.addEventListener('click', () => {
@@ -5061,6 +5151,21 @@
   }
 
   function finishScan(duration, file, width, height, fps){
+    const hasDimensions = !!(width && height);
+
+    // Hard gate FIRST: a video that isn't exactly 1080p/60fps is rejected
+    // outright — nothing about it (duration, price, etc.) gets used, and
+    // the styled warning panel is shown instead of the scan result.
+    const acceptability = checkUploadAcceptable(width, height, fps);
+    if (acceptability.rejected) {
+      const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
+      srRejectDetected.textContent = hasDimensions ? `${width}×${height} · ${fpsLabel}` : fpsLabel;
+      scanResult.classList.remove('show');
+      srReject.classList.add('show');
+      return;
+    }
+    srReject.classList.remove('show');
+
     let s = Math.floor(duration);
     let frac = duration - s;
     if (frac >= 0.999999) { frac = 0; s += 1; }
@@ -5074,7 +5179,6 @@
     msRange.value = msForCalc;
 
     const requestedQuality = currentQuality;
-    const hasDimensions = !!(width && height);
     const detectedQuality = hasDimensions ? detectQualityTier(width, height, fps) : null;
 
     const price = refresh();
@@ -5114,6 +5218,11 @@
     }
 
     scanResult.classList.add('show');
+
+    // Video passed the strict 1080p/60fps gate — offer to send it to the
+    // manager for review.
+    resetTransferPrompt();
+    srTransfer.classList.add('show');
   }
 
   // ============================================================
