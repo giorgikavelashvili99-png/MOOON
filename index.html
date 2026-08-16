@@ -1492,10 +1492,6 @@
   }
   .scan-result .sr-row:first-child,
   .scan-result .sr-row#srQualityRow{ grid-column:1 / -1; }
-  @media (max-width:480px){
-    .scan-result .sr-specs{ grid-template-columns:1fr; gap:7px; }
-    .scan-result .sr-row{ padding:9px 11px; }
-  }
   .scan-result .sr-ico{
     width:28px; height:28px; flex:0 0 auto; border-radius:10px;
     display:flex; align-items:center; justify-content:center;
@@ -1523,9 +1519,10 @@
     font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif; font-size:11px; font-weight:700;
     letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);
   }
+  .scan-result .sr-price-value{ flex:0 0 auto; }
   .scan-result .sr-price-value b{
     font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif; font-size:25px; font-weight:800;
-    color:var(--gold);
+    color:var(--gold); white-space:nowrap;
     text-shadow:0 0 12px rgba(207,216,255,0.6), 0 0 12px rgba(207,216,255,0.4);
   }
   .scan-result .sr-warn{
@@ -1533,6 +1530,38 @@
   }
   .scan-result .sr-info{
     margin:10px 12px 8px; font-size:12px; color:var(--cyan); padding:0 2px;
+  }
+  @media (max-width:480px){
+    .scan-result .sr-specs{ grid-template-columns:1fr; gap:7px; }
+    .scan-result .sr-row{
+      display:grid;
+      grid-template-columns:28px 1fr;
+      grid-template-areas:
+        "icon label"
+        "val  val";
+      align-items:center;
+      row-gap:6px;
+      padding:10px 12px;
+    }
+    .scan-result .sr-ico{ grid-area:icon; }
+    .scan-result .sr-label{ grid-area:label; flex:none; }
+    .scan-result .sr-row b{
+      grid-area:val;
+      text-align:right;
+      white-space:normal;
+      overflow-wrap:break-word;
+      word-break:break-word;
+      font-size:13px;
+    }
+    .scan-result .sr-price-hero{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:8px;
+      padding:14px 16px;
+      margin:10px 2px 4px;
+    }
+    .scan-result .sr-price-value{ width:100%; display:flex; justify-content:flex-end; }
+    .scan-result .sr-price-value b{ font-size:23px; }
   }
   .scan-progress{
     display:none; align-items:center; gap:10px; margin-top:14px;
