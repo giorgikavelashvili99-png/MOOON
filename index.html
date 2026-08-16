@@ -320,6 +320,32 @@
   .a-save-row{ margin-top:6px; transition:transform .15s ease; }
   .a-save-row:active{ transform:scale(0.97); }
   .a-stat-note{ font-size:11px; color:var(--text-faint); margin:-4px 0 12px; }
+  .a-subheading{
+    font-size:13px; font-weight:700; color:var(--moon-silver, var(--text));
+    margin:22px 0 10px; padding-top:16px; border-top:1px solid var(--moon-line, var(--border-soft));
+    display:flex; align-items:center; gap:8px;
+  }
+  .a-subheading::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--moon-glow, var(--cyan)); box-shadow:0 0 8px var(--moon-glow, var(--cyan)); flex:0 0 auto; }
+  .a-order-row{
+    background:#0a0a16; border:1px solid var(--moon-line); border-radius:12px;
+    padding:10px 12px; margin-bottom:8px; display:flex; flex-direction:column; gap:6px;
+  }
+  .a-order-row .aor-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .a-order-row .aor-id{
+    font-family:'JetBrains Mono', monospace; font-weight:800; letter-spacing:0.02em;
+    color:var(--moon-silver, var(--text)); font-size:13px;
+    background:rgba(255,159,64,0.12); border:1px solid var(--moon-line); border-radius:8px; padding:2px 8px;
+  }
+  .a-order-row .aor-type{
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--moon-silver-dim, var(--text-dim));
+  }
+  .a-order-row .aor-meta{ font-size:11.5px; color:var(--text-faint); line-height:1.6; }
+  .a-order-row .aor-meta b{ color:var(--moon-silver-dim, var(--text-dim)); font-weight:600; }
+  .a-order-row .aor-actions{ display:flex; gap:8px; margin-top:2px; }
+  .a-order-row .aor-actions button{
+    flex:1; border:none; border-radius:8px; padding:7px 0; font-size:11.5px; font-weight:700; cursor:pointer;
+  }
   .analytics-tiktok-link{
     display:block; margin-top:2px; font-size:11.5px; color:var(--moon-blue);
     text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere;
@@ -1403,65 +1429,59 @@
     padding:30px 20px;
     text-align:center;
     background:
-      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(124,143,255,0.09), transparent 70%),
+      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(255,159,64,0.10), transparent 70%),
       #0a0a12;
     cursor:pointer;
     transition: border-color .3s cubic-bezier(.4,0,.2,1), background .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1);
     position:relative;
     overflow:hidden;
   }
-  .drop-zone::before{
-    content:'';
-    position:absolute; left:8%; right:8%; top:10%;
-    height:2px; border-radius:2px;
-    background:linear-gradient(90deg, transparent, var(--cyan), transparent);
-    opacity:0; pointer-events:none;
-    filter: drop-shadow(0 0 6px rgba(207,216,255,0.85));
-    animation: scanSweep 3.4s ease-in-out infinite;
-  }
-  @keyframes scanSweep{
-    0%{ top:10%; opacity:0; }
-    12%{ opacity:0.65; }
-    50%{ opacity:0.65; }
-    88%{ opacity:0; }
-    100%{ top:88%; opacity:0; }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .drop-zone::before{ animation:none; opacity:0; }
-  }
   .drop-zone:hover, .drop-zone.dragover{
     border-color: var(--purple);
     background:
-      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(124,143,255,0.14), transparent 70%),
-      rgba(124,143,255,0.06);
+      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(255,159,64,0.16), transparent 70%),
+      rgba(255,79,163,0.06);
     transform:translateY(-1px);
-    box-shadow: 0 10px 30px rgba(124,143,255,0.12);
+    box-shadow: 0 10px 30px rgba(255,79,163,0.14);
   }
   .drop-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
   .drop-zone .dz-icon{
     width:60px; height:60px; margin:0 auto 16px;
     display:flex; align-items:center; justify-content:center;
     border-radius:50%;
-    background: linear-gradient(160deg, rgba(124,143,255,0.2), rgba(124,143,255,0.05));
-    border:1px solid rgba(124,143,255,0.4);
-    color:#dbe2ff;
-    box-shadow: 0 0 30px rgba(124,143,255,0.22), inset 0 1px 1px rgba(255,255,255,0.1);
+    background: linear-gradient(160deg, rgba(255,159,64,0.22), rgba(255,79,163,0.08));
+    border:1px solid rgba(255,159,64,0.45);
+    color:#ffe9c7;
+    box-shadow: 0 0 30px rgba(255,159,64,0.24), inset 0 1px 1px rgba(255,255,255,0.1);
     transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1);
+  }
+  /* Static dashed "orbit" ring behind the icon — a quiet MOON-brand
+     signature that replaces the old animated scan-line without adding
+     any motion of its own. */
+  .drop-zone .dz-icon::before{
+    content:'';
+    position:absolute;
+    width:132%; height:132%;
+    border-radius:50%;
+    border:1px dashed rgba(255,210,63,0.35);
+    pointer-events:none;
   }
   .drop-zone:hover .dz-icon{
     transform: translateY(-2px) scale(1.04);
-    box-shadow: 0 0 38px rgba(124,143,255,0.3), inset 0 1px 1px rgba(255,255,255,0.12);
+    box-shadow: 0 0 38px rgba(255,159,64,0.34), inset 0 1px 1px rgba(255,255,255,0.12);
   }
   .drop-zone .dz-icon svg{
     display:block;
     width:24px; height:24px;
     fill:none;
-    stroke:#dbe2ff;
-    stroke-width:2;
+    stroke:#ffe9c7;
+    stroke-width:1.7;
     stroke-linecap:round;
     stroke-linejoin:round;
-    filter: drop-shadow(0 0 8px rgba(124,143,255,0.8));
+    filter: drop-shadow(0 0 8px rgba(255,159,64,0.8));
+    position:relative;
   }
+  .drop-zone .dz-icon svg .dz-icon-play{ fill:#ffe9c7; stroke:none; }
   .drop-zone .dz-title{ font-size:16px; font-weight:700; margin-bottom:8px; line-height:1.35; letter-spacing:0.005em; }
   .drop-zone .dz-sub{ font-size:13px; color:var(--text-dim); max-width:320px; margin:0 auto; line-height:1.5; }
 
@@ -1632,7 +1652,7 @@
   .scanner-primary .drop-zone{ padding:38px 22px; border-radius:20px; }
   .scanner-primary .drop-zone .dz-icon{
     width:74px; height:74px; margin-bottom:18px;
-    box-shadow: 0 0 40px rgba(124,143,255,0.3), inset 0 1px 1px rgba(255,255,255,0.1);
+    box-shadow: 0 0 40px rgba(255,159,64,0.32), inset 0 1px 1px rgba(255,255,255,0.1);
   }
   .scanner-primary .drop-zone .dz-icon svg{ width:30px; height:30px; }
   .scanner-primary .drop-zone .dz-title{ font-size:18.5px; }
@@ -3470,7 +3490,7 @@
       <div class="scanner-stage">
         <div class="drop-zone" id="dropZone">
           <input type="file" id="videoInput" accept="video/*">
-          <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M12 4L7.2 8.8M12 4l4.8 4.8"/><path d="M4.5 15.5v2.8a2.2 2.2 0 002.2 2.2h10.6a2.2 2.2 0 002.2-2.2v-2.8"/></svg></div>
+          <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 13.2A8 8 0 1110.6 3.4 6.3 6.3 0 0020.4 13.2z"/><path class="dz-icon-play" d="M10.1 9.7l4 2.3-4 2.3z"/></svg></div>
           <div class="dz-title" data-i18n="dzTitle">ატვირთეთ ვიდეო ფასის გამოსათვლელად</div>
           <div class="dz-req" data-i18n="dzReq">სავალდებულო ფორმატი: ზუსტად 1080p · 60fps</div>
         </div>
@@ -3913,6 +3933,10 @@
         <div class="a-form-row"><label data-i18n="adminOrdersFail">წარუმატებელი</label><input type="number" id="ordersFailInput" min="0"></div>
         <div class="a-stat-note" data-i18n="adminOrdersNote">ეს რიცხვები ჩანს საიტზე, როგორც სოციალური მტკიცება (✅ X წარმატებული მონტაჟი).</div>
         <button class="a-go a-save-row" id="ordersSaveBtn" data-i18n="adminSave">შენახვა</button>
+
+        <div class="a-subheading" data-i18n="adminPendingOrdersTitle">დაუდასტურებელი შეკვეთები</div>
+        <div class="a-form-row"><input type="text" id="pendingOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+        <div id="pendingOrdersList"></div>
       </div>
       <div class="a-panel" id="adminPanelAnalytics">
         <div class="a-chart-card" id="analyticsSummaryCard"></div>
@@ -4153,6 +4177,14 @@
       adminOrdersSuccess: 'წარმატებული',
       adminOrdersFail: 'წარუმატებელი',
       adminOrdersNote: 'სამივე რიცხვი (სულ / წარმატებული / წარუმატებელი) ჩანს საჯაროდ, საიტის ზედა ნაწილში, სოციალურ მტკიცებულების ზოლში.',
+      adminPendingOrdersTitle: 'დაუდასტურებელი შეკვეთები',
+      adminPendingOrdersSearchPh: 'ძებნა ID-ით...',
+      adminNoPendingOrders: 'დაუდასტურებელი შეკვეთა არ არის.',
+      adminNoPendingOrdersMatch: 'ამ ID-ით შეკვეთა ვერ მოიძებნა.',
+      adminOrderConfirm: 'დადასტურება',
+      adminOrderTypeSingle: 'ცალობითი',
+      adminOrderTypeWeekly: 'კვირის',
+      adminOrderTypeMonthly: 'თვის',
       analyticsSummaryTitle: 'ანალიტიკა და მოგება',
       analyticsTotalOrders: 'სულ შეკვეთა',
       analyticsTotalRevenue: 'მოგება (₾)',
@@ -4360,6 +4392,14 @@
       adminOrdersSuccess: 'Successful',
       adminOrdersFail: 'Failed',
       adminOrdersNote: 'All three numbers (total / successful / failed) are shown publicly, in the social-proof bar near the top of the site.',
+      adminPendingOrdersTitle: 'Pending orders',
+      adminPendingOrdersSearchPh: 'Search by ID...',
+      adminNoPendingOrders: 'No pending orders.',
+      adminNoPendingOrdersMatch: 'No order found with that ID.',
+      adminOrderConfirm: 'Confirm',
+      adminOrderTypeSingle: 'Single',
+      adminOrderTypeWeekly: 'Weekly',
+      adminOrderTypeMonthly: 'Monthly',
       analyticsSummaryTitle: 'Analytics & profit',
       analyticsTotalOrders: 'Total orders',
       analyticsTotalRevenue: 'Profit (₾)',
@@ -5480,10 +5520,27 @@
     } catch(e){ /* silent — never block the UI on a failed notification */ }
   }
 
-  function buildOrderTgMessage(channel){
+  // 7-digit order ID, generated once per order — shown to the manager in
+  // the Telegram notification and stored alongside the order so it can be
+  // looked up / deleted later in the admin panel's pending-orders list.
+  function generateOrderId(){
+    return String(Math.floor(1000000 + Math.random() * 9000000));
+  }
+
+  async function addPendingOrder(order){
+    try{
+      const data = await mdbRead('pendingOrders');
+      const list = (data && Array.isArray(data.list)) ? data.list : [];
+      list.push(order);
+      await mdbWrite('pendingOrders', { list });
+    } catch(e){ /* silent — never block the order flow on a storage failure */ }
+  }
+
+  function buildOrderTgMessage(channel, orderId){
     const { s, ms, isSub, quality } = currentValues();
     const price = calculateExactPrice(s, ms, isSub, quality);
     return `🛒 <b>ახალი შეკვეთა — MOON</b> (${channel})\n\n` +
+      `🆔 ID: <b>${orderId}</b>\n` +
       `⏱ ხანგრძლივობა: <b>${s}.${String(ms).padStart(2,'0')}</b> წმ\n` +
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `⭐ გამომწერი: <b>${isSub ? 'დიახ' : 'არა'}</b>\n` +
@@ -5500,10 +5557,11 @@
       `<i>${escTg(entry.text)}</i>`;
   }
 
-  function buildOrderMessage(){
+  function buildOrderMessage(orderId){
     const { s, ms, isSub, quality } = currentValues();
     const price = calculateExactPrice(s, ms, isSub, quality);
     return `🎬 ახალი შეკვეთა — MOON
+ID: ${orderId}
 ხანგრძლივობა: ${s}.${String(ms).padStart(2,'0')} წამი
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 გამომწერი: ${isSub ? 'დიახ' : 'არა'}
@@ -5652,8 +5710,16 @@ TikTok პროფილი: ${getTiktokValue()}
     const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
     if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildOrderMessage();
-      sendTelegramNotification(buildOrderTgMessage('WhatsApp'));
+      const orderId = generateOrderId();
+      const message = buildOrderMessage(orderId);
+      sendTelegramNotification(buildOrderTgMessage('WhatsApp', orderId));
+      const { s, ms, isSub, quality } = currentValues();
+      const price = calculateExactPrice(s, ms, isSub, quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'single', channel: 'WhatsApp',
+        duration: `${s}.${String(ms).padStart(2,'0')}`, quality, isSub, price,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
     });
@@ -5667,8 +5733,16 @@ TikTok პროფილი: ${getTiktokValue()}
     const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
     if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildOrderMessage();
-      sendTelegramNotification(buildOrderTgMessage('Telegram'));
+      const orderId = generateOrderId();
+      const message = buildOrderMessage(orderId);
+      sendTelegramNotification(buildOrderTgMessage('Telegram', orderId));
+      const { s, ms, isSub, quality } = currentValues();
+      const price = calculateExactPrice(s, ms, isSub, quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'single', channel: 'Telegram',
+        duration: `${s}.${String(ms).padStart(2,'0')}`, quality, isSub, price,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
@@ -5686,12 +5760,13 @@ TikTok პროფილი: ${getTiktokValue()}
     setTimeout(() => wpCopyNote.classList.remove('active'), 4000);
   }
 
-  function buildWeeklySubOrderTgMessage(channel){
+  function buildWeeklySubOrderTgMessage(channel, orderId){
     const quality = subSelectedQuality;
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
     const total = getWeeklyTotal(quality);
     const perVideo = total / SUB_VIDEO_LIMIT;
     return `🗓 <b>ახალი შეკვეთა — MOON 1-კვირიანი გამოწერა</b> (${channel})\n\n` +
+      `🆔 ID: <b>${orderId}</b>\n` +
       `🎬 ლიმიტი: <b>${SUB_VIDEO_LIMIT} ვიდეო / 7 დღე</b>\n` +
       `⏱ თითო ვიდეო მაქს: <b>59.59</b> წმ\n` +
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
@@ -5702,12 +5777,13 @@ TikTok პროფილი: ${getTiktokValue()}
       `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
-  function buildWeeklySubOrderMessage(){
+  function buildWeeklySubOrderMessage(orderId){
     const quality = subSelectedQuality;
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
     const total = getWeeklyTotal(quality);
     const perVideo = total / SUB_VIDEO_LIMIT;
     return `🗓 ახალი შეკვეთა — MOON 1-კვირიანი გამოწერა
+ID: ${orderId}
 ლიმიტი: ${SUB_VIDEO_LIMIT} ვიდეო / 7 დღე
 თითო ვიდეო მაქს: 59.59 წამი
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
@@ -5729,8 +5805,17 @@ TikTok პროფილი: ${getTiktokValue()}
     const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
     if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildWeeklySubOrderMessage();
-      sendTelegramNotification(buildWeeklySubOrderTgMessage('WhatsApp'));
+      const orderId = generateOrderId();
+      const message = buildWeeklySubOrderMessage(orderId);
+      sendTelegramNotification(buildWeeklySubOrderTgMessage('WhatsApp', orderId));
+      const quality = subSelectedQuality;
+      const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
+      const total = getWeeklyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'weekly', channel: 'WhatsApp',
+        quality, isSub: isChannelSub, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
     });
@@ -5744,8 +5829,17 @@ TikTok პროფილი: ${getTiktokValue()}
     const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
     if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildWeeklySubOrderMessage();
-      sendTelegramNotification(buildWeeklySubOrderTgMessage('Telegram'));
+      const orderId = generateOrderId();
+      const message = buildWeeklySubOrderMessage(orderId);
+      sendTelegramNotification(buildWeeklySubOrderTgMessage('Telegram', orderId));
+      const quality = subSelectedQuality;
+      const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
+      const total = getWeeklyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'weekly', channel: 'Telegram',
+        quality, isSub: isChannelSub, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
@@ -5763,11 +5857,12 @@ TikTok პროფილი: ${getTiktokValue()}
     setTimeout(() => mpCopyNote.classList.remove('active'), 4000);
   }
 
-  function buildMonthlySubOrderTgMessage(channel){
+  function buildMonthlySubOrderTgMessage(channel, orderId){
     const quality = monthSelectedQuality;
     const total = getMonthlyTotal(quality);
     const perVideo = total / MONTH_SUB_VIDEO_LIMIT;
     return `🗓 <b>ახალი შეკვეთა — MOON 1-თვიანი გამოწერა</b> (${channel})\n\n` +
+      `🆔 ID: <b>${orderId}</b>\n` +
       `🎬 ლიმიტი: <b>${MONTH_SUB_VIDEO_LIMIT} ვიდეო / 30 დღე</b>\n` +
       `⏱ თითო ვიდეო მაქს: <b>59.59</b> წმ\n` +
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
@@ -5777,11 +5872,12 @@ TikTok პროფილი: ${getTiktokValue()}
       `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
-  function buildMonthlySubOrderMessage(){
+  function buildMonthlySubOrderMessage(orderId){
     const quality = monthSelectedQuality;
     const total = getMonthlyTotal(quality);
     const perVideo = total / MONTH_SUB_VIDEO_LIMIT;
     return `🗓 ახალი შეკვეთა — MOON 1-თვიანი გამოწერა
+ID: ${orderId}
 ლიმიტი: ${MONTH_SUB_VIDEO_LIMIT} ვიდეო / 30 დღე
 თითო ვიდეო მაქს: 59.59 წამი
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
@@ -5802,8 +5898,16 @@ TikTok პროფილი: ${getTiktokValue()}
     const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
     if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildMonthlySubOrderMessage();
-      sendTelegramNotification(buildMonthlySubOrderTgMessage('WhatsApp'));
+      const orderId = generateOrderId();
+      const message = buildMonthlySubOrderMessage(orderId);
+      sendTelegramNotification(buildMonthlySubOrderTgMessage('WhatsApp', orderId));
+      const quality = monthSelectedQuality;
+      const total = getMonthlyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'monthly', channel: 'WhatsApp',
+        quality, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
     });
@@ -5817,8 +5921,16 @@ TikTok პროფილი: ${getTiktokValue()}
     const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
     if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildMonthlySubOrderMessage();
-      sendTelegramNotification(buildMonthlySubOrderTgMessage('Telegram'));
+      const orderId = generateOrderId();
+      const message = buildMonthlySubOrderMessage(orderId);
+      sendTelegramNotification(buildMonthlySubOrderTgMessage('Telegram', orderId));
+      const quality = monthSelectedQuality;
+      const total = getMonthlyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'monthly', channel: 'Telegram',
+        quality, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
@@ -7259,6 +7371,7 @@ TikTok პროფილი: ${getTiktokValue()}
   }
 
   async function renderAdminOrders(){
+    renderAdminPendingOrders();
     const data = await mdbRead('stats');
     const s = Object.assign({}, DEFAULT_STATS, data || {});
     document.getElementById('ordersTotalInput').value = s.total;
@@ -7296,6 +7409,85 @@ TikTok პროფილი: ${getTiktokValue()}
     loadStats();
     renderAdminOrders();
   });
+
+  // ============================================================
+  // PENDING ORDERS: every WhatsApp/Telegram order gets a 7-digit ID
+  // (generated at send time). They land here until the admin either
+  // confirms them (order fulfilled) or deletes them (never confirmed —
+  // e.g. spam, duplicate, or a video that didn't actually check out).
+  // ============================================================
+  let pendingOrdersCache = [];
+
+  function pendingOrderTypeLabel(type){
+    if (type === 'weekly') return t('adminOrderTypeWeekly');
+    if (type === 'monthly') return t('adminOrderTypeMonthly');
+    return t('adminOrderTypeSingle');
+  }
+
+  function renderPendingOrdersList(){
+    const listEl = document.getElementById('pendingOrdersList');
+    if (!listEl) return;
+    const query = (document.getElementById('pendingOrdersSearch').value || '').trim();
+    const sorted = pendingOrdersCache.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    const filtered = query ? sorted.filter(o => String(o.id).includes(query)) : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoPendingOrders') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoPendingOrdersMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(o => {
+      const metaBits = [];
+      if (o.duration) metaBits.push('⏱ ' + escapeHtml(o.duration) + ' წმ');
+      if (o.quality) metaBits.push('🎞 ' + escapeHtml(QUALITY_LABELS[o.quality] || o.quality));
+      if (o.price !== undefined && o.price !== null) metaBits.push('💰 <b>' + escapeHtml(String(o.price)) + ' ₾</b>');
+      if (o.tiktok) metaBits.push('🔗 ' + escapeHtml(o.tiktok));
+      return (
+        '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+          '<div class="aor-top">' +
+            '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+            '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
+          '</div>' +
+          '<div class="aor-meta">' + metaBits.join(' · ') + (o.ts ? '<br>' + formatCommentDate(o.ts) : '') + '</div>' +
+          '<div class="aor-actions">' +
+            '<button class="a-save-btn" data-action="confirm-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminOrderConfirm') + '</button>' +
+            '<button class="a-del-btn" data-action="delete-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDelete') + '</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+  }
+
+  async function renderAdminPendingOrders(){
+    const listEl = document.getElementById('pendingOrdersList');
+    if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('pendingOrders');
+    pendingOrdersCache = (data && Array.isArray(data.list)) ? data.list : [];
+    renderPendingOrdersList();
+  }
+
+  const pendingOrdersSearchInput = document.getElementById('pendingOrdersSearch');
+  if (pendingOrdersSearchInput) {
+    pendingOrdersSearchInput.addEventListener('input', renderPendingOrdersList);
+  }
+
+  const pendingOrdersListEl = document.getElementById('pendingOrdersList');
+  if (pendingOrdersListEl) {
+    pendingOrdersListEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+      const id = btn.getAttribute('data-id');
+      if (action !== 'delete-order' && action !== 'confirm-order') return;
+      pendingOrdersCache = pendingOrdersCache.filter(o => String(o.id) !== String(id));
+      await mdbWrite('pendingOrders', { list: pendingOrdersCache });
+      renderPendingOrdersList();
+    });
+  }
 
   // ============================================================
   // ORDER ANALYTICS: manually-logged real orders (TikTok link,
