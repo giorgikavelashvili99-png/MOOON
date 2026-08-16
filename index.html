@@ -5266,16 +5266,16 @@
     srTransferQ.style.display = 'none';
     srTransferActions.style.display = 'none';
 
-    // Only iOS Safari (and other WebKit-based iOS browsers) blocks a
-    // window.open() that fires later from inside a setInterval — so only
-    // there do we pre-open a tab on the click itself, and even then we
-    // immediately fill it with a friendly loading screen (not a blank
-    // about:blank, which reads as broken for the ~3s it sits there).
-    // Android and desktop keep the simple original behaviour: nothing
-    // opens until the countdown finishes, then the real URL opens directly.
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank', 'noopener') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
+    // Any browser (not just iOS Safari) can block a window.open() that
+    // fires late, from inside a setInterval — and when that happens, the
+    // old fallback here used to redirect THIS tab to the review site too,
+    // which is why the visitor's own page was navigating away. To avoid
+    // that entirely, we now always pre-open the tab synchronously, right
+    // on the click itself (same trick already used for the order buttons
+    // below), and immediately fill it with a friendly loading screen
+    // instead of a blank about:blank.
+    const pendingTab = window.open('', '_blank', 'noopener');
+    writePendingTabLoader(pendingTab);
 
     // Run a visible 3-second countdown — reminding the visitor to have
     // their uploaded video's link ready for the manager — before the
@@ -5294,22 +5294,28 @@
       transferCountdownInterval = null;
       srTransferTimer.classList.remove('show');
 
+      // Tab was pre-opened synchronously on click — just navigate it now.
+      // The current page (this tab) is never touched, so it can no longer
+      // redirect away by itself.
       if (pendingTab) {
-        // iOS: tab was pre-opened on click — just navigate it now.
         try { pendingTab.location.href = VIDEO_REVIEW_TRANSFER_URL; }
         catch (err) { pendingTab.location = VIDEO_REVIEW_TRANSFER_URL; }
-      } else {
-        // Android / desktop: open directly, same as before.
-        const fallbackTab = window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
-        if (!fallbackTab) {
-          window.location.href = VIDEO_REVIEW_TRANSFER_URL;
-        }
       }
       awaitingVideoLinkReturn = true;
       if (!srTransfer.querySelector('.sr-transfer-done')) {
         const done = document.createElement('div');
         done.className = 'sr-transfer-done';
         done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('srTransferOpened')) + '</span>';
+        if (!pendingTab) {
+          const manualLink = document.createElement('a');
+          manualLink.href = VIDEO_REVIEW_TRANSFER_URL;
+          manualLink.target = '_blank';
+          manualLink.rel = 'noopener';
+          manualLink.className = 'scanner-jump-link';
+          manualLink.textContent = VIDEO_REVIEW_TRANSFER_URL;
+          done.appendChild(document.createTextNode(' '));
+          done.appendChild(manualLink);
+        }
         srTransfer.appendChild(done);
       }
     }, 1000);
