@@ -5266,20 +5266,16 @@
     srTransferQ.style.display = 'none';
     srTransferActions.style.display = 'none';
 
-    // Any browser (not just iOS Safari) can block a window.open() that
-    // fires late, from inside a setInterval — and when that happens, the
-    // old fallback here used to redirect THIS tab to the review site too,
-    // which is why the visitor's own page was navigating away. To avoid
-    // that entirely, we now always pre-open the tab synchronously, right
-    // on the click itself (same trick already used for the order buttons
-    // below), and immediately fill it with a friendly loading screen
-    // instead of a blank about:blank.
-    const pendingTab = window.open('', '_blank', 'noopener');
-    writePendingTabLoader(pendingTab);
+    // Open the review site immediately, synchronously, as the direct
+    // continuation of the click — this is what keeps the popup reliable
+    // on every platform, including iOS Safari, with no pre-opened blank
+    // tab and no platform detection needed. This page itself is never
+    // touched, so it can never redirect away on its own.
+    window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
+    awaitingVideoLinkReturn = true;
 
-    // Run a visible 3-second countdown — reminding the visitor to have
-    // their uploaded video's link ready for the manager — before the
-    // review site actually opens.
+    // The countdown below is now purely a friendly on-screen reminder to
+    // have the uploaded video's link ready — it no longer gates the open.
     let remaining = TRANSFER_COUNTDOWN_SECONDS;
     srTransferCountdown.textContent = String(remaining);
     srTransferTimer.classList.add('show');
@@ -5293,29 +5289,10 @@
       clearInterval(transferCountdownInterval);
       transferCountdownInterval = null;
       srTransferTimer.classList.remove('show');
-
-      // Tab was pre-opened synchronously on click — just navigate it now.
-      // The current page (this tab) is never touched, so it can no longer
-      // redirect away by itself.
-      if (pendingTab) {
-        try { pendingTab.location.href = VIDEO_REVIEW_TRANSFER_URL; }
-        catch (err) { pendingTab.location = VIDEO_REVIEW_TRANSFER_URL; }
-      }
-      awaitingVideoLinkReturn = true;
       if (!srTransfer.querySelector('.sr-transfer-done')) {
         const done = document.createElement('div');
         done.className = 'sr-transfer-done';
         done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('srTransferOpened')) + '</span>';
-        if (!pendingTab) {
-          const manualLink = document.createElement('a');
-          manualLink.href = VIDEO_REVIEW_TRANSFER_URL;
-          manualLink.target = '_blank';
-          manualLink.rel = 'noopener';
-          manualLink.className = 'scanner-jump-link';
-          manualLink.textContent = VIDEO_REVIEW_TRANSFER_URL;
-          done.appendChild(document.createTextNode(' '));
-          done.appendChild(manualLink);
-        }
         srTransfer.appendChild(done);
       }
     }, 1000);
@@ -5674,36 +5651,19 @@ TikTok პროფილი: ${getTiktokValue()}
     }, 1200);
   }
 
-  function isAppleMobileDevice(){
-    const ua = navigator.userAgent || '';
-    const iOSByUA = /iPad|iPhone|iPod/.test(ua);
-    // iPadOS 13+ reports itself as a Mac in the user agent, so it must be
-    // told apart from real desktop Macs using the touch-points check.
-    const iPadOSByPlatform = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-    return iOSByUA || iPadOSByPlatform;
-  }
-
-  function writePendingTabLoader(tabWin){
-    if (!tabWin) return;
-    try {
-      tabWin.document.write(
-        '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-        '<title>MOON</title></head><body style="margin:0;height:100vh;display:flex;' +
-        'align-items:center;justify-content:center;background:#08080d;' +
-        'font-family:sans-serif;color:#8b8ba3;">' +
-        '<p>' + escapeHtml(t('orderProcessing')) + '</p></body></html>'
-      );
-      tabWin.document.close();
-    } catch(e) { /* ignore — some browsers restrict document.write on foreign tabs */ }
-  }
-
   const ORDER_PROCESSING_MS = 2000;
   const ORDER_REDIRECT_DELAY_MS = 1000;
 
+  // doSend() now runs immediately, synchronously, as the direct
+  // continuation of the click handler — before any setTimeout. That is
+  // what keeps window.open() reliable as a real popup on every platform,
+  // including iOS Safari, without needing a pre-opened blank tab or any
+  // platform detection. The animation below is purely cosmetic and no
+  // longer gates anything.
   function runOrderFlow(btn, textEl, doSend){
     if (btn.disabled) return;
     const idleKey = textEl.getAttribute('data-i18n');
+    doSend();
     btn.disabled = true;
     btn.classList.add('processing');
     textEl.textContent = t('orderProcessing');
@@ -5711,11 +5671,8 @@ TikTok პროფილი: ${getTiktokValue()}
       btn.classList.remove('processing');
       textEl.textContent = t('orderProcessed');
       setTimeout(() => {
-        doSend();
-        setTimeout(() => {
-          textEl.textContent = t(idleKey);
-          btn.disabled = false;
-        }, 500);
+        textEl.textContent = t(idleKey);
+        btn.disabled = false;
       }, ORDER_REDIRECT_DELAY_MS);
     }, ORDER_PROCESSING_MS);
   }
@@ -5724,15 +5681,6 @@ TikTok პროფილი: ${getTiktokValue()}
     if (!validateBeforeSend('main')) return;
     const btn = document.getElementById('orderBtnWA');
     const textEl = document.getElementById('orderBtnWAText');
-    // Open the tab synchronously, inside the click gesture — iOS/iPadOS Safari
-    // blocks window.open() calls that happen later inside a setTimeout, which is
-    // why orders stopped opening on iPad once the "processing" delay was added.
-    // The pre-opened-tab workaround is only needed on iOS/iPadOS Safari,
-    // which blocks window.open() calls made after a setTimeout delay.
-    // Other devices keep the original flow (nicer, no blank tab flash).
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const orderId = generateOrderId();
       const message = buildOrderMessage(orderId);
@@ -5745,7 +5693,7 @@ TikTok პროფილი: ${getTiktokValue()}
         tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
       });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
     });
   });
 
@@ -5753,9 +5701,6 @@ TikTok პროფილი: ${getTiktokValue()}
     if (!validateBeforeSend('main')) return;
     const btn = document.getElementById('orderBtnTG');
     const textEl = document.getElementById('orderBtnTGText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const orderId = generateOrderId();
       const message = buildOrderMessage(orderId);
@@ -5769,7 +5714,7 @@ TikTok პროფილი: ${getTiktokValue()}
       });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
       flashCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
     });
   });
@@ -5825,9 +5770,6 @@ TikTok პროფილი: ${getTiktokValue()}
     if (!validateBeforeSend('wp')) return;
     const btn = wpOrderBtnWA;
     const textEl = document.getElementById('wpOrderBtnWAText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const orderId = generateOrderId();
       const message = buildWeeklySubOrderMessage(orderId);
@@ -5841,7 +5783,7 @@ TikTok პროფილი: ${getTiktokValue()}
         tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
       });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
     });
   });
 
@@ -5849,9 +5791,6 @@ TikTok პროფილი: ${getTiktokValue()}
     if (!validateBeforeSend('wp')) return;
     const btn = wpOrderBtnTG;
     const textEl = document.getElementById('wpOrderBtnTGText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const orderId = generateOrderId();
       const message = buildWeeklySubOrderMessage(orderId);
@@ -5866,7 +5805,7 @@ TikTok პროფილი: ${getTiktokValue()}
       });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
       flashWpCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
     });
   });
@@ -5918,9 +5857,6 @@ TikTok პროფილი: ${getTiktokValue()}
     if (!validateBeforeSend('mp')) return;
     const btn = mpOrderBtnWA;
     const textEl = document.getElementById('mpOrderBtnWAText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const orderId = generateOrderId();
       const message = buildMonthlySubOrderMessage(orderId);
@@ -5933,7 +5869,7 @@ TikTok პროფილი: ${getTiktokValue()}
         tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
       });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
     });
   });
 
@@ -5941,9 +5877,6 @@ TikTok პროფილი: ${getTiktokValue()}
     if (!validateBeforeSend('mp')) return;
     const btn = mpOrderBtnTG;
     const textEl = document.getElementById('mpOrderBtnTGText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
       const orderId = generateOrderId();
       const message = buildMonthlySubOrderMessage(orderId);
@@ -5957,7 +5890,7 @@ TikTok პროფილი: ${getTiktokValue()}
       });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
       flashMpCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
     });
   });
