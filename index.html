@@ -1492,6 +1492,8 @@
   }
   .scan-result .sr-row:first-child,
   .scan-result .sr-row#srQualityRow{ grid-column:1 / -1; }
+  .scan-result .sr-row#srQualityRow{ display:none; }
+  .scan-result .sr-row#srQualityRow.show{ display:flex; }
   .scan-result .sr-ico{
     width:28px; height:28px; flex:0 0 auto; border-radius:10px;
     display:flex; align-items:center; justify-content:center;
@@ -1562,6 +1564,7 @@
     }
     .scan-result .sr-price-value{ width:100%; display:flex; justify-content:flex-end; }
     .scan-result .sr-price-value b{ font-size:23px; }
+    .scan-result .sr-row#srQualityRow.show{ display:grid; }
   }
   .scan-progress{
     display:none; align-items:center; gap:10px; margin-top:14px;
@@ -3281,7 +3284,7 @@
             <div class="sr-row"><span class="sr-ico">📄</span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
             <div class="sr-row"><span class="sr-ico">⏱️</span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
             <div class="sr-row"><span class="sr-ico">🎯</span><span class="sr-label" data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
-            <div class="sr-row" id="srQualityRow" style="display:none;"><span class="sr-ico">🔎</span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
+            <div class="sr-row" id="srQualityRow"><span class="sr-ico">🔎</span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
           </div>
           <div class="sr-price-hero">
             <span class="sr-price-tag" data-i18n="srPrice">გამოთვლილი ფასი</span>
@@ -4889,7 +4892,7 @@
     if (hasDimensions) {
       const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
       srQuality.textContent = `${width}×${height} · ${fpsLabel}`;
-      srQualityRow.style.display = 'flex';
+      srQualityRow.classList.add('show');
 
       const reqLabel = QUALITY_LABELS[requestedQuality] || QUALITY_LABELS['1080_60'];
       const detLabel = QUALITY_LABELS[detectedQuality] || QUALITY_LABELS['1080_60'];
@@ -4903,7 +4906,7 @@
         srMatchNote.style.display = 'none';
       }
     } else {
-      srQualityRow.style.display = 'none';
+      srQualityRow.classList.remove('show');
       srMatchNote.style.display = 'none';
       srMismatchNote.style.display = 'none';
     }
