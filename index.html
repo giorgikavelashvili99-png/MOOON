@@ -3937,6 +3937,10 @@
         <div class="a-subheading" data-i18n="adminPendingOrdersTitle">დაუდასტურებელი შეკვეთები</div>
         <div class="a-form-row"><input type="text" id="pendingOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
         <div id="pendingOrdersList"></div>
+
+        <div class="a-subheading" data-i18n="adminConfirmedOrdersTitle">დადასტურებული შეკვეთების არქივი</div>
+        <div class="a-form-row"><input type="text" id="confirmedOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+        <div id="confirmedOrdersList"></div>
       </div>
       <div class="a-panel" id="adminPanelAnalytics">
         <div class="a-chart-card" id="analyticsSummaryCard"></div>
@@ -4185,6 +4189,9 @@
       adminOrderTypeSingle: 'ცალობითი',
       adminOrderTypeWeekly: 'კვირის',
       adminOrderTypeMonthly: 'თვის',
+      adminConfirmedOrdersTitle: 'დადასტურებული შეკვეთების არქივი',
+      adminNoConfirmedOrders: 'დადასტურებული შეკვეთა ჯერ არ არის.',
+      adminNoConfirmedOrdersMatch: 'ამ ID-ით დადასტურებულ შეკვეთებში ვერაფერი მოიძებნა.',
       analyticsSummaryTitle: 'ანალიტიკა და მოგება',
       analyticsTotalOrders: 'სულ შეკვეთა',
       analyticsTotalRevenue: 'მოგება (₾)',
@@ -4400,6 +4407,9 @@
       adminOrderTypeSingle: 'Single',
       adminOrderTypeWeekly: 'Weekly',
       adminOrderTypeMonthly: 'Monthly',
+      adminConfirmedOrdersTitle: 'Confirmed orders archive',
+      adminNoConfirmedOrders: 'No confirmed orders yet.',
+      adminNoConfirmedOrdersMatch: 'No confirmed order found with that ID.',
       analyticsSummaryTitle: 'Analytics & profit',
       analyticsTotalOrders: 'Total orders',
       analyticsTotalRevenue: 'Profit (₾)',
@@ -5256,13 +5266,16 @@
     srTransferQ.style.display = 'none';
     srTransferActions.style.display = 'none';
 
-    // iOS Safari (and any WebKit-based mobile browser) only allows
-    // window.open() to succeed when it runs synchronously inside the
-    // click handler itself — anything opened later from a setTimeout/
-    // setInterval callback is treated as a popup and silently blocked.
-    // So we open a blank tab right here, on the click, and just point
-    // it at the real URL once the countdown below finishes.
-    const pendingTab = window.open('', '_blank', 'noopener');
+    // Only iOS Safari (and other WebKit-based iOS browsers) blocks a
+    // window.open() that fires later from inside a setInterval — so only
+    // there do we pre-open a tab on the click itself, and even then we
+    // immediately fill it with a friendly loading screen (not a blank
+    // about:blank, which reads as broken for the ~3s it sits there).
+    // Android and desktop keep the simple original behaviour: nothing
+    // opens until the countdown finishes, then the real URL opens directly.
+    const needsIOSWorkaround = isAppleMobileDevice();
+    const pendingTab = needsIOSWorkaround ? window.open('', '_blank', 'noopener') : null;
+    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
 
     // Run a visible 3-second countdown — reminding the visitor to have
     // their uploaded video's link ready for the manager — before the
@@ -5282,13 +5295,11 @@
       srTransferTimer.classList.remove('show');
 
       if (pendingTab) {
-        // Tab was successfully opened on click — just navigate it now.
+        // iOS: tab was pre-opened on click — just navigate it now.
         try { pendingTab.location.href = VIDEO_REVIEW_TRANSFER_URL; }
         catch (err) { pendingTab.location = VIDEO_REVIEW_TRANSFER_URL; }
       } else {
-        // Fallback: popup got blocked anyway (e.g. browser settings) —
-        // try a normal open, and if that also fails, send the user
-        // there in the current tab so they're never stuck.
+        // Android / desktop: open directly, same as before.
         const fallbackTab = window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
         if (!fallbackTab) {
           window.location.href = VIDEO_REVIEW_TRANSFER_URL;
@@ -5523,8 +5534,15 @@
   // 7-digit order ID, generated once per order — shown to the manager in
   // the Telegram notification and stored alongside the order so it can be
   // looked up / deleted later in the admin panel's pending-orders list.
+  // Format: MMDD + 3 random digits (e.g. 0817042 for Aug 17th), so IDs
+  // are easy to eyeball chronologically and a date search ("0817") also
+  // works as a search filter for free.
   function generateOrderId(){
-    return String(Math.floor(1000000 + Math.random() * 9000000));
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const rand = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    return mm + dd + rand;
   }
 
   async function addPendingOrder(order){
@@ -7413,15 +7431,26 @@ TikTok პროფილი: ${getTiktokValue()}
   // ============================================================
   // PENDING ORDERS: every WhatsApp/Telegram order gets a 7-digit ID
   // (generated at send time). They land here until the admin either
-  // confirms them (order fulfilled) or deletes them (never confirmed —
+  // confirms them (order fulfilled — moved into the confirmed archive
+  // below so the history isn't lost) or deletes them (never confirmed —
   // e.g. spam, duplicate, or a video that didn't actually check out).
   // ============================================================
   let pendingOrdersCache = [];
+  let confirmedOrdersCache = [];
 
   function pendingOrderTypeLabel(type){
     if (type === 'weekly') return t('adminOrderTypeWeekly');
     if (type === 'monthly') return t('adminOrderTypeMonthly');
     return t('adminOrderTypeSingle');
+  }
+
+  function orderRowMetaBits(o){
+    const metaBits = [];
+    if (o.duration) metaBits.push('⏱ ' + escapeHtml(o.duration) + ' წმ');
+    if (o.quality) metaBits.push('🎞 ' + escapeHtml(QUALITY_LABELS[o.quality] || o.quality));
+    if (o.price !== undefined && o.price !== null) metaBits.push('💰 <b>' + escapeHtml(String(o.price)) + ' ₾</b>');
+    if (o.tiktok) metaBits.push('🔗 ' + escapeHtml(o.tiktok));
+    return metaBits;
   }
 
   function renderPendingOrdersList(){
@@ -7440,39 +7469,73 @@ TikTok პროფილი: ${getTiktokValue()}
       return;
     }
 
-    listEl.innerHTML = filtered.map(o => {
-      const metaBits = [];
-      if (o.duration) metaBits.push('⏱ ' + escapeHtml(o.duration) + ' წმ');
-      if (o.quality) metaBits.push('🎞 ' + escapeHtml(QUALITY_LABELS[o.quality] || o.quality));
-      if (o.price !== undefined && o.price !== null) metaBits.push('💰 <b>' + escapeHtml(String(o.price)) + ' ₾</b>');
-      if (o.tiktok) metaBits.push('🔗 ' + escapeHtml(o.tiktok));
-      return (
-        '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
-          '<div class="aor-top">' +
-            '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
-            '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
-          '</div>' +
-          '<div class="aor-meta">' + metaBits.join(' · ') + (o.ts ? '<br>' + formatCommentDate(o.ts) : '') + '</div>' +
-          '<div class="aor-actions">' +
-            '<button class="a-save-btn" data-action="confirm-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminOrderConfirm') + '</button>' +
-            '<button class="a-del-btn" data-action="delete-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDelete') + '</button>' +
-          '</div>' +
-        '</div>'
-      );
-    }).join('');
+    listEl.innerHTML = filtered.map(o =>
+      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="aor-top">' +
+          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
+        '</div>' +
+        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.ts ? '<br>' + formatCommentDate(o.ts) : '') + '</div>' +
+        '<div class="aor-actions">' +
+          '<button class="a-save-btn" data-action="confirm-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminOrderConfirm') + '</button>' +
+          '<button class="a-del-btn" data-action="delete-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  function renderConfirmedOrdersList(){
+    const listEl = document.getElementById('confirmedOrdersList');
+    if (!listEl) return;
+    const query = (document.getElementById('confirmedOrdersSearch').value || '').trim();
+    const sorted = confirmedOrdersCache.slice().sort((a, b) => (b.confirmedAt || b.ts || 0) - (a.confirmedAt || a.ts || 0));
+    const filtered = query ? sorted.filter(o => String(o.id).includes(query)) : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoConfirmedOrders') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoConfirmedOrdersMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(o =>
+      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="aor-top">' +
+          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
+        '</div>' +
+        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
+        '<div class="aor-actions">' +
+          '<button class="a-del-btn" data-action="delete-confirmed-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDeleteForever') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
   }
 
   async function renderAdminPendingOrders(){
     const listEl = document.getElementById('pendingOrdersList');
+    const confirmedEl = document.getElementById('confirmedOrdersList');
     if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
-    const data = await mdbRead('pendingOrders');
-    pendingOrdersCache = (data && Array.isArray(data.list)) ? data.list : [];
+    if (confirmedEl) confirmedEl.innerHTML = '<div class="c-empty">…</div>';
+    const [pendingData, confirmedData] = await Promise.all([
+      mdbRead('pendingOrders'),
+      mdbRead('confirmedOrders')
+    ]);
+    pendingOrdersCache = (pendingData && Array.isArray(pendingData.list)) ? pendingData.list : [];
+    confirmedOrdersCache = (confirmedData && Array.isArray(confirmedData.list)) ? confirmedData.list : [];
     renderPendingOrdersList();
+    renderConfirmedOrdersList();
   }
 
   const pendingOrdersSearchInput = document.getElementById('pendingOrdersSearch');
   if (pendingOrdersSearchInput) {
     pendingOrdersSearchInput.addEventListener('input', renderPendingOrdersList);
+  }
+  const confirmedOrdersSearchInput = document.getElementById('confirmedOrdersSearch');
+  if (confirmedOrdersSearchInput) {
+    confirmedOrdersSearchInput.addEventListener('input', renderConfirmedOrdersList);
   }
 
   const pendingOrdersListEl = document.getElementById('pendingOrdersList');
@@ -7483,9 +7546,31 @@ TikTok პროფილი: ${getTiktokValue()}
       const action = btn.getAttribute('data-action');
       const id = btn.getAttribute('data-id');
       if (action !== 'delete-order' && action !== 'confirm-order') return;
+
+      const order = pendingOrdersCache.find(o => String(o.id) === String(id));
       pendingOrdersCache = pendingOrdersCache.filter(o => String(o.id) !== String(id));
       await mdbWrite('pendingOrders', { list: pendingOrdersCache });
+
+      if (action === 'confirm-order' && order) {
+        confirmedOrdersCache = confirmedOrdersCache.concat([
+          Object.assign({}, order, { confirmedAt: Date.now() })
+        ]);
+        await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+        renderConfirmedOrdersList();
+      }
       renderPendingOrdersList();
+    });
+  }
+
+  const confirmedOrdersListEl = document.getElementById('confirmedOrdersList');
+  if (confirmedOrdersListEl) {
+    confirmedOrdersListEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn || btn.getAttribute('data-action') !== 'delete-confirmed-order') return;
+      const id = btn.getAttribute('data-id');
+      confirmedOrdersCache = confirmedOrdersCache.filter(o => String(o.id) !== String(id));
+      await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+      renderConfirmedOrdersList();
     });
   }
 
