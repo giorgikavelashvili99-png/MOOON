@@ -7757,6 +7757,7 @@ TikTok პროფილი: ${getTiktokValue()}
       });
       let data = null;
       try { data = await res.json(); } catch {}
+      console.log('[admin-auth] status:', res.status, 'body:', data);
       if (res.ok && data && data.ok === true) {
         adminAuthenticated = true;
         initAdminModeCheckbox();
@@ -7764,11 +7765,16 @@ TikTok პროფილი: ${getTiktokValue()}
         adminLogin.style.display = 'none';
         adminDashboard.style.display = 'block';
         switchAdminTab('visits');
+      } else if (data && data.error === 'locked') {
+        adminErr.textContent = 'დროებით დაბლოკილია — სცადე 15 წუთში';
+        adminErr.classList.add('show');
       } else {
+        adminErr.textContent = 'არასწორი პაროლი';
         adminErr.classList.add('show');
       }
     } catch (err) {
-      // ქსელის შეცდომა (Worker მიუწვდომელია და ა.შ.) — არ ვუშვებთ შიგნით
+      console.error('[admin-auth] network/CORS error:', err);
+      adminErr.textContent = 'Worker-თან კავშირი ვერ დამყარდა (იხ. Console)';
       adminErr.classList.add('show');
     } finally {
       adminCheckInFlight = false;
@@ -7954,4 +7960,4 @@ TikTok პროფილი: ${getTiktokValue()}
 </script>
 
 </body>
-</html></html>
+</html>
