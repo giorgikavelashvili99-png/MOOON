@@ -1469,6 +1469,7 @@
 
   .scan-result{
     display:none;
+    position:relative;
     margin-top:16px;
     padding:6px;
     border-radius:20px;
@@ -1629,6 +1630,135 @@
     .scanner-primary .drop-zone .dz-icon svg{ width:24px; height:24px; }
     .scanner-primary .drop-zone .dz-title{ font-size:16px; }
     .scanner-primary .drop-zone .dz-sub{ font-size:12.5px; max-width:300px; }
+  }
+
+  .drop-zone .dz-req{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:14px;
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-size:10.5px; font-weight:700; letter-spacing:0.05em;
+    color:var(--text-faint);
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(207,216,255,0.16);
+    padding:5px 13px; border-radius:20px;
+  }
+  .drop-zone .dz-req::before{ content:'🎯'; font-size:11px; }
+  @media (max-width:560px){
+    .drop-zone .dz-req{ font-size:9.5px; padding:4px 11px; margin-top:10px; }
+  }
+
+  /* ---------- Cancel / remove-upload button on the scan-result card ---------- */
+  .sr-reset-btn{
+    position:absolute; top:10px; right:10px; z-index:2;
+    width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(207,216,255,0.2);
+    color:var(--text-dim);
+    font-size:13px; line-height:1; cursor:pointer;
+    transition: background .2s, border-color .2s, color .2s, transform .15s;
+  }
+  .sr-reset-btn:hover{
+    background:rgba(255,56,96,0.14);
+    border-color:rgba(255,56,96,0.5);
+    color:#ff9db0;
+    transform:rotate(90deg);
+  }
+  .sr-reset-btn:active{ transform:rotate(90deg) scale(0.9); }
+
+  /* ---------- "Send to manager for review" prompt (Yes / No) ---------- */
+  .sr-transfer{
+    display:none;
+    margin:14px 6px 4px;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(207,216,255,0.16);
+    background:rgba(255,255,255,0.025);
+  }
+  .sr-transfer.show{ display:block; }
+  .sr-transfer-q{ font-size:12.5px; line-height:1.5; color:var(--text-dim); margin-bottom:12px; }
+  .sr-transfer-q b{ color:var(--text); }
+  .sr-transfer-actions{ display:flex; gap:10px; }
+  .st-btn{
+    flex:1; padding:11px 14px; border-radius:12px;
+    font-family:'Space Grotesk','Noto Sans Georgian',sans-serif;
+    font-weight:700; font-size:13px; cursor:pointer;
+    border:1.5px solid transparent;
+    transition: transform .15s, box-shadow .2s, opacity .2s, background .2s;
+  }
+  .st-btn:disabled{ opacity:0.55; cursor:default; transform:none !important; }
+  .st-yes{
+    background:linear-gradient(135deg, #25D366, #1aa851);
+    color:#08210f;
+    box-shadow:0 8px 20px rgba(37,211,102,0.32);
+  }
+  .st-yes:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 10px 26px rgba(37,211,102,0.4); }
+  .st-no{
+    background:rgba(255,56,96,0.06);
+    border-color:rgba(255,56,96,0.5);
+    color:#ff9db0;
+  }
+  .st-no:hover:not(:disabled){ background:rgba(255,56,96,0.14); transform:translateY(-1px); }
+  .sr-transfer-done{
+    display:flex; align-items:center; gap:7px;
+    font-size:12.5px; font-weight:700; color:var(--wa);
+  }
+
+  /* ---------- Rejected-format panel (wrong resolution / fps) ---------- */
+  .sr-reject{
+    display:none;
+    margin-top:16px;
+    padding:20px 18px;
+    border-radius:20px;
+    border:1.5px solid rgba(255,56,96,0.4);
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,56,96,0.14), transparent 60%),
+      linear-gradient(180deg, rgba(36,10,20,0.92), rgba(20,8,16,0.92));
+    box-shadow:0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .sr-reject.show{ display:block; }
+  .sr-reject-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .sr-reject-ico{ font-size:18px; filter:drop-shadow(0 0 8px rgba(255,56,96,0.6)); }
+  .sr-reject-title{
+    font-family:'JetBrains Mono','Noto Sans Georgian',sans-serif;
+    font-size:12.5px; font-weight:800; letter-spacing:0.04em;
+    color:#ff9db0; text-transform:uppercase;
+  }
+  .sr-reject-detected-row{
+    font-size:12px; color:var(--text-dim); margin-bottom:10px;
+    padding:9px 12px; border-radius:12px;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+  }
+  .sr-reject-detected-row b{ color:#ffb3c0; }
+  .sr-reject-text{ font-size:13px; line-height:1.6; color:var(--text); margin:0 0 14px; }
+  .sr-reject-text b{ color:#ffd23f; }
+  .sr-reject-apps-row{
+    display:flex; flex-wrap:wrap; align-items:center; gap:7px;
+    margin-bottom:8px; font-size:12px;
+  }
+  .sr-reject-apps-label{ color:var(--text-faint); margin-right:2px; }
+  .sr-chip{
+    display:inline-flex; align-items:center;
+    padding:4px 11px; border-radius:20px;
+    font-family:'JetBrains Mono','Noto Sans Georgian',sans-serif;
+    font-size:11px; font-weight:700;
+    background:rgba(207,216,255,0.08);
+    border:1px solid rgba(207,216,255,0.3);
+    color:#dbe2ff;
+  }
+  .sr-reject-etc{ color:var(--text-faint); font-size:11.5px; }
+  .sr-reject-retry{
+    margin-top:10px; width:100%;
+    padding:11px 14px; border-radius:12px;
+    background:rgba(255,255,255,0.04);
+    border:1.5px solid rgba(255,56,96,0.4);
+    color:#ff9db0; font-weight:700; font-size:13px; cursor:pointer;
+    transition: background .2s, transform .15s;
+  }
+  .sr-reject-retry:hover{ background:rgba(255,56,96,0.12); transform:translateY(-1px); }
+  @media (max-width:480px){
+    .sr-reject{ padding:16px 14px; }
+    .sr-reject-apps-row{ font-size:11px; }
   }
 
   /* ---------- Manual duration entry (collapsed accordion, stopwatch card) ---------- */
@@ -3259,13 +3389,7 @@
   </div>
 
   <div class="panel" id="orderFlowPanel">
-    <div class="readout">
-      <div class="tag" data-i18n="finalPrice">საბოლოო ღირებულება</div>
-      <div class="price" id="priceDisplay">1.50<sup>₾</sup></div>
-      <div class="sub-note" id="subNote" data-i18n="notSubscribed"><span class="sub-note-icon">💡</span><span class="sub-note-text"><b>გახდი გამომწერი და დაზოგე თანხა!</b></span></div>
-    </div>
-
-    <!-- Video duration checker — PRIMARY input method -->
+    <!-- Video duration checker — PRIMARY input method, now the very first thing in the panel -->
     <div class="panel-section scanner-primary" id="videoScannerPanel">
       <div class="panel-head scanner-head-row">
         <div class="scanner-primary-badge"><span class="spb-dot"></span><span data-i18n="scannerPrimaryBadge">⚡ ავტომატური და ზუსტი</span></div>
@@ -3277,9 +3401,12 @@
           <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M12 4L7.2 8.8M12 4l4.8 4.8"/><path d="M4.5 15.5v2.8a2.2 2.2 0 002.2 2.2h10.6a2.2 2.2 0 002.2-2.2v-2.8"/></svg></div>
           <div class="dz-title" data-i18n="dzTitle">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
           <div class="dz-sub" data-i18n="dzSub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
+          <div class="dz-req" data-i18n="dzReq">მინიმალური მოთხოვნა: 1080p · 30fps+</div>
         </div>
         <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
+
         <div class="scan-result" id="scanResult">
+          <button type="button" class="sr-reset-btn" id="srResetBtn" aria-label="გაუქმება" title="გაუქმება">✕</button>
           <div class="sr-specs">
             <div class="sr-row"><span class="sr-ico">📄</span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
             <div class="sr-row"><span class="sr-ico">⏱️</span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
@@ -3293,6 +3420,32 @@
           <div class="sr-info" id="srMatchNote" style="display:none;"></div>
           <div class="sr-warn" id="srMismatchNote" style="display:none;"></div>
           <div class="sr-warn" id="srWarn" style="display:none;"></div>
+
+          <div class="sr-transfer" id="srTransfer">
+            <div class="sr-transfer-q" id="srTransferQ" data-i18n="srTransferQ">გსურთ ატვირთული ვიდეო გაეგზავნოს <b>mooontransferr.onrender.com</b>-ზე, რომ ჩვენმა მენეჯერმა შეამოწმოს?</div>
+            <div class="sr-transfer-actions" id="srTransferActions">
+              <button type="button" class="st-btn st-yes" id="srTransferYes" data-i18n="srTransferYes">დიახ</button>
+              <button type="button" class="st-btn st-no" id="srTransferNo" data-i18n="srTransferNo">არა</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sr-reject" id="srReject">
+          <div class="sr-reject-head">
+            <span class="sr-reject-ico">⚠️</span>
+            <span class="sr-reject-title" data-i18n="srRejectTitle">ფაილი არ შეესაბამება მოთხოვნებს</span>
+          </div>
+          <div class="sr-reject-detected-row"><span data-i18n="srRejectDetectedLabel">ატვირთული ფაილის მონაცემები:</span> <b id="srRejectDetected">—</b></div>
+          <p class="sr-reject-text" data-i18n="srRejectText">ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში. მინიმალურად დასაშვებია <b>1080p / 30fps</b> — ამაზე დაბალი ან განსხვავებული გარჩევადობა (მაგ. 720p, 2K, 4K) არ მიიღება.</p>
+          <div class="sr-reject-apps-row">
+            <span class="sr-reject-apps-label" data-i18n="srRejectAppsMobile">მობილურისთვის / აიფონისთვის:</span>
+            <span class="sr-chip">CapCut</span><span class="sr-chip">InShot</span><span class="sr-reject-etc" data-i18n="srRejectEtc">და ა.შ.</span>
+          </div>
+          <div class="sr-reject-apps-row">
+            <span class="sr-reject-apps-label" data-i18n="srRejectAppsDesktop">კომპიუტერისთვის:</span>
+            <span class="sr-chip">After Effects</span><span class="sr-chip">Premiere Pro</span><span class="sr-reject-etc" data-i18n="srRejectEtc">და ა.შ.</span>
+          </div>
+          <button type="button" class="sr-reject-retry" id="srRejectRetry" data-i18n="srRejectRetry">↻ სცადე სხვა ვიდეოთი</button>
         </div>
       </div>
     </div>
@@ -4329,9 +4482,9 @@
 
   // Only one format is offered any more, so the scale is a fixed constant.
   // Back-calculated so the minimum 5-second price (non-subscriber) lands
-  // exactly on 0.99 ₾.
+  // exactly on 1.49 ₾.
   const QUALITY_SCALES = {
-    '1080_60': 0.99 / 1.2
+    '1080_60': 1.49 / 1.2
   };
 
   // Kept as a full lookup (not trimmed) because it's also used to label
@@ -4505,16 +4658,22 @@
     msRange.value = ms;
 
     const price = calculateExactPrice(s, ms, isSub, quality);
-    if (priceDisplay.dataset.price !== price) {
-      priceDisplay.dataset.price = price;
-      priceDisplay.innerHTML = price + '<sup>₾</sup>';
-      priceDisplay.classList.remove('bump');
-      void priceDisplay.offsetWidth;
-      priceDisplay.classList.add('bump');
+    // priceDisplay / subNote belonged to the top "final price" readout,
+    // which has been removed from the page — these guards keep refresh()
+    // safe if that markup is ever reintroduced.
+    if (priceDisplay) {
+      if (priceDisplay.dataset.price !== price) {
+        priceDisplay.dataset.price = price;
+        priceDisplay.innerHTML = price + '<sup>₾</sup>';
+        priceDisplay.classList.remove('bump');
+        void priceDisplay.offsetWidth;
+        priceDisplay.classList.add('bump');
+      }
     }
-
-    subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
-    subNote.classList.toggle('sub-note-active', !!isSub);
+    if (subNote) {
+      subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
+      subNote.classList.toggle('sub-note-active', !!isSub);
+    }
 
     updateQualityTilePrices(s, ms, isSub);
 
@@ -4596,6 +4755,31 @@
     else if (maxDim >= 2400) resTier = '2k';
     const fpsTier = (fps && fps >= 100) ? '120' : '60';
     return `${resTier}_${fpsTier}`;
+  }
+
+  // ---- Hard upload gate: only 1080p footage at 30fps or higher is ever
+  // accepted — nothing lower (720p, etc.) and nothing higher (2K/4K) gets
+  // through, no matter the fps. FPS itself only has a floor (>=30); we
+  // don't reject a higher fps on its own. Resolution is read straight off
+  // the <video> element so it's always known; fps detection can fail on
+  // some browsers, so an unknown fps is treated as "can't disprove it" and
+  // is not, by itself, a rejection reason. ----
+  const REQUIRED_MIN_DIM = 1080;
+  const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
+  const REQUIRED_MIN_FPS = 30;
+
+  function checkUploadAcceptable(width, height, fps){
+    const hasDims = !!(width && height);
+    let resOk = null;
+    if (hasDims) {
+      const minDim = Math.min(width, height);
+      resOk = Math.abs(minDim - REQUIRED_MIN_DIM) <= REQUIRED_DIM_TOLERANCE;
+    }
+    const fpsOk = (fps != null) ? (fps >= REQUIRED_MIN_FPS) : null;
+    // Reject only on a *confirmed* violation — an unknown value never
+    // blocks the upload on its own.
+    const rejected = (resOk === false) || (fpsOk === false);
+    return { rejected, resOk, fpsOk };
   }
 
   // ---- Synced TikTok profile link — one field per order panel (main /
@@ -4698,6 +4882,17 @@
   const srMatchNote = document.getElementById('srMatchNote');
   const srMismatchNote = document.getElementById('srMismatchNote');
   const srWarn = document.getElementById('srWarn');
+  const srResetBtn = document.getElementById('srResetBtn');
+  const srReject = document.getElementById('srReject');
+  const srRejectDetected = document.getElementById('srRejectDetected');
+  const srRejectRetry = document.getElementById('srRejectRetry');
+  const srTransfer = document.getElementById('srTransfer');
+  const srTransferQ = document.getElementById('srTransferQ');
+  const srTransferActions = document.getElementById('srTransferActions');
+  const srTransferYes = document.getElementById('srTransferYes');
+  const srTransferNo = document.getElementById('srTransferNo');
+
+  const VIDEO_REVIEW_TRANSFER_URL = 'https://mooontransferr.onrender.com';
 
   ['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
   ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { dropZone.classList.remove('dragover'); }));
@@ -4712,12 +4907,57 @@
     if (e.target.files && e.target.files[0]) handleVideoFile(e.target.files[0]);
   });
 
+  // Fully resets the scanner back to its empty state — this is the
+  // "cancel upload" action that was previously missing.
+  function resetScanner(){
+    videoInput.value = '';
+    scanResult.classList.remove('show');
+    srReject.classList.remove('show');
+    resetTransferPrompt();
+    secondsInput.value = 5;
+    msRange.value = 0;
+    refresh();
+  }
+
+  function resetTransferPrompt(){
+    srTransfer.classList.remove('show');
+    srTransferQ.style.display = '';
+    srTransferActions.style.display = '';
+    const doneNote = srTransfer.querySelector('.sr-transfer-done');
+    if (doneNote) doneNote.remove();
+    srTransferYes.disabled = false;
+    srTransferNo.disabled = false;
+  }
+
+  srResetBtn.addEventListener('click', resetScanner);
+  srRejectRetry.addEventListener('click', resetScanner);
+
+  srTransferYes.addEventListener('click', () => {
+    window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
+    srTransferYes.disabled = true;
+    srTransferNo.disabled = true;
+    srTransferQ.style.display = 'none';
+    srTransferActions.style.display = 'none';
+    if (!srTransfer.querySelector('.sr-transfer-done')) {
+      const done = document.createElement('div');
+      done.className = 'sr-transfer-done';
+      done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('srTransferOpened')) + '</span>';
+      srTransfer.appendChild(done);
+    }
+  });
+
+  srTransferNo.addEventListener('click', () => {
+    srTransfer.classList.remove('show');
+  });
+
   function handleVideoFile(file){
     if (!file.type.startsWith('video/')) {
       alert(t('alertNotVideo'));
       return;
     }
     scanResult.classList.remove('show');
+    srReject.classList.remove('show');
+    resetTransferPrompt();
     scanProgress.classList.add('show');
 
     const videoEl = document.createElement('video');
