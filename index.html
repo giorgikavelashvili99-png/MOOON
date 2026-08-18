@@ -646,9 +646,17 @@
     font-weight:700;
   }
   .hero h1 span{
-    background:linear-gradient(90deg, var(--purple), var(--cyan));
-    -webkit-background-clip:text; background-clip:text;
-    -webkit-text-fill-color:transparent; color:transparent;
+    /* Solid, always-visible color first — same safety pattern as
+       .dz-title — so this never renders invisible on a browser with
+       partial/odd support for clipped-gradient text. */
+    color:#cfe8ff;
+  }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .hero h1 span{
+      background:linear-gradient(90deg, var(--purple), var(--cyan));
+      -webkit-background-clip:text; background-clip:text;
+      -webkit-text-fill-color:transparent; color:transparent;
+    }
   }
   .hero p{ color:var(--text-dim); font-size:15px; max-width:520px; margin:0 auto; }
 
@@ -804,13 +812,21 @@
     line-height:1;
     letter-spacing:0.01em;
     display:inline-block;
-    background:linear-gradient(180deg, #ffffff 8%, #eef1ff 55%, #cfd8ff 100%);
-    -webkit-background-clip:text; background-clip:text;
-    -webkit-text-fill-color:transparent; color:transparent;
+    /* Solid, always-visible color first — this is the number the
+       customer is about to pay, so it must never render invisible on a
+       browser with partial/odd clipped-gradient-text support. */
+    color:#eef1ff;
     filter:
       drop-shadow(0 0 12px rgba(124,143,255,0.6))
       drop-shadow(0 0 30px rgba(207,216,255,0.4));
     transition: filter 0.25s ease;
+  }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .price{
+      background:linear-gradient(180deg, #ffffff 8%, #eef1ff 55%, #cfd8ff 100%);
+      -webkit-background-clip:text; background-clip:text;
+      -webkit-text-fill-color:transparent; color:transparent;
+    }
   }
   .price sup{
     display:inline-flex; align-items:center; justify-content:center;
@@ -948,6 +964,8 @@
 
   .num-input{
     width:100%;
+    min-height:48px;
+    box-sizing:border-box;
     background:#0a0a12;
     border:1px solid var(--border);
     border-radius:12px;
@@ -1363,8 +1381,8 @@
   .quality-btn.active .q-fps{ color: rgba(4,16,26,0.75); }
 
   .quality-btn .q-price{
-    font-family:'JetBrains Mono', 'BPG Glaho', sans-serif; font-size:11px; font-weight:700; letter-spacing:0.01em;
-    color:var(--text-dim); margin-top:8px; line-height:1.3;
+    font-family:'JetBrains Mono', 'BPG Glaho', sans-serif; font-size:13px; font-weight:700; letter-spacing:0.01em;
+    color:#dbe2f5; margin-top:8px; line-height:1.35;
     overflow-wrap:break-word; word-break:break-word;
   }
   .quality-btn.active .q-price{ color:#04101a; text-shadow:none; }
@@ -1400,7 +1418,7 @@
     .quality-btn .q-res{ font-size:15px; }
     .quality-btn .q-fps{ font-size:9.5px; }
     .quality-btn .q-rec{ font-size:8px; padding:2px 6px; }
-    .quality-btn .q-price{ font-size:10px; }
+    .quality-btn .q-price{ font-size:12px; }
   }
 
   .quality-warn{
@@ -1533,31 +1551,13 @@
     position:relative;
     width:60px; height:60px; margin:0 auto 16px;
     display:flex; align-items:center; justify-content:center;
-    border-radius:20px; transform:rotate(45deg);
-    background-color:var(--cyan);
-    background-image: linear-gradient(160deg, var(--purple), var(--cyan));
-    box-shadow: 0 0 30px rgba(34,195,255,0.4), inset 0 1px 1px rgba(255,255,255,0.25);
-    transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1);
-    overflow:hidden;
-  }
-  .drop-zone .dz-icon::after{
-    content:'';
-    position:absolute; inset:-40%;
-    background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.55) 50%, transparent 65%);
-    background-size: 220% 220%;
-    background-position: -120% -120%;
-    transition: background-position .7s cubic-bezier(.4,0,.2,1);
-    pointer-events:none;
-  }
-  .drop-zone:hover .dz-icon::after{ background-position: 120% 120%; }
-  .drop-zone:hover .dz-icon{
-    transform: rotate(45deg) scale(1.08);
-    box-shadow: 0 0 40px rgba(34,195,255,0.55), inset 0 1px 1px rgba(255,255,255,0.3);
+    border-radius:50%;
+    background: radial-gradient(circle at 32% 28%, #eaf6ff, var(--cyan) 55%, var(--purple) 130%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.12) inset, 0 10px 26px -8px rgba(34,195,255,0.55);
   }
   .drop-zone .dz-icon svg{
     display:block;
-    width:24px; height:24px;
-    transform:rotate(-45deg);
+    width:23px; height:23px;
     fill:none;
     stroke:#04101a;
     stroke-width:2.1;
@@ -4152,7 +4152,7 @@
     </div>
 
     <div class="field field-tiktok field-video-link" id="videoLinkField" style="margin-bottom:6px;">
-      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი *</label></div>
       <div class="link-input-wrap">
         <span class="icon">🔗</span>
         <input type="text" class="num-input" id="videoLink" placeholder="mooontransferr.onrender.com/...">
@@ -4322,7 +4322,7 @@
     </div>
 
     <div class="field field-tiktok field-video-link" id="videoLinkFieldWp" style="margin-bottom:6px;">
-      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი *</label></div>
       <div class="link-input-wrap">
         <span class="icon">🔗</span>
         <input type="text" class="num-input" id="videoLinkWp" placeholder="mooontransferr.onrender.com/...">
@@ -4452,7 +4452,7 @@
     </div>
 
     <div class="field field-tiktok field-video-link" id="videoLinkFieldMp" style="margin-bottom:6px;">
-      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი *</label></div>
       <div class="link-input-wrap">
         <span class="icon">🔗</span>
         <input type="text" class="num-input" id="videoLinkMp" placeholder="mooontransferr.onrender.com/...">
@@ -4799,7 +4799,7 @@
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
       tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
-      videoLinkLabel: 'ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *',
+      videoLinkLabel: 'ატვირთული ვიდეოს ლინკი *',
       videoLinkError: '⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!',
       tiktokConfirmPrompt: 'დააჭირეთ დასადასტურებლად',
       tiktokConfirmDone: '✓ დადასტურებულია',
@@ -4836,7 +4836,7 @@
       srTransferOpened: 'გვერდი გაიხსნა — ატვირთვის შემდეგ დაბრუნდით აქ, ჩასვით მიღებული ლინკი ქვემოთ ველში და დაადასტურეთ',
       mooonAutoUploading: 'ვიდეო იტვირთება mooontransferr-ზე…',
       mooonAutoFinalizing: 'ბმულის მომზადება…',
-      mooonAutoDone: '✓ ატვირთულია — ლინკი ავტომატურად ჩაისვა ველში.',
+      mooonAutoDone: 'ატვირთულია — ლინკი ავტომატურად ჩაისვა ველში.',
       mooonAutoError: '⚠️ ავტომატურმა ატვირთვამ ვერ იმუშავა. ',
       mooonAutoManualLink: 'ატვირთეთ ხელით mooontransferr.onrender.com-ზე →',
       mooonAutoRetry: '↻ ხელახლა ცდა',
@@ -5069,7 +5069,7 @@
       subscriberT2: '✓ Lower rate activates',
       tiktokLabel: 'Your TikTok profile link *',
       tiktokError: '⚠️ A TikTok profile link is required to send the order!',
-      videoLinkLabel: 'Uploaded video link (mooontransferr.onrender.com) *',
+      videoLinkLabel: 'Uploaded video link *',
       videoLinkError: '⚠️ A link to your uploaded video is required to send the order!',
       tiktokConfirmPrompt: 'Click to confirm',
       tiktokConfirmDone: '✓ Confirmed',
@@ -5106,7 +5106,7 @@
       srTransferOpened: "The page has opened — after uploading, come back here, paste the link you received into the field below and confirm it",
       mooonAutoUploading: 'Uploading your video to mooontransferr…',
       mooonAutoFinalizing: 'Preparing your link…',
-      mooonAutoDone: "✓ Uploaded — the link was filled in automatically.",
+      mooonAutoDone: "Uploaded — the link was filled in automatically.",
       mooonAutoError: '⚠️ Automatic upload failed. ',
       mooonAutoManualLink: 'Upload manually on mooontransferr.onrender.com →',
       mooonAutoRetry: '↻ Try again',
@@ -6386,6 +6386,17 @@
   function detectFrameRate(videoEl){
     return new Promise((resolve) => {
       if (typeof videoEl.requestVideoFrameCallback !== 'function') {
+        resolve(null);
+        return;
+      }
+      // Calling .play() on a hidden video outside a direct, same-tick user
+      // gesture is unreliable on phones — some mobile browsers render a
+      // native black video surface (or briefly go fullscreen) before
+      // rejecting it. FPS detection here is best-effort — the UI already
+      // falls back to "fps unknown" cleanly — so just skip it on touch
+      // devices instead of risking that black flash.
+      const isTouchDevice = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      if (isTouchDevice) {
         resolve(null);
         return;
       }
