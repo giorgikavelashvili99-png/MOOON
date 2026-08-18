@@ -3439,9 +3439,9 @@
     min-width:0;
     max-width:100%;
     border-radius:24px;
-    border:1px solid var(--pc-border, var(--border));
+    border:1.5px dashed var(--pc-border, var(--border));
     background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
-    box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 10%, transparent);
+    box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 10%, transparent));
     padding:26px 22px 22px;
     display:flex; flex-direction:column;
     overflow:hidden;
@@ -3468,15 +3468,15 @@
     opacity:0.8;
   }
 
-  /* ---------- Individual / single order — muted slate ---------- */
+  /* ---------- Individual / single order — mint green ---------- */
   .pc-card--indiv, #orderFlowPanel{
-    --pc-accent: #94a3b8;
-    --pc-bg: linear-gradient(180deg, rgba(20,15,46,.75), rgba(10,8,26,.85));
-    --pc-border: rgba(148, 163, 184, 0.28);
-    --pc-icon-bg: linear-gradient(145deg, #334155, #1e293b);
-    --pc-price-grad: linear-gradient(180deg, #f1f5f9, #94a3b8);
-    --pc-cta-bg: rgba(148, 163, 184, 0.14);
-    --pc-cta-text: #f1f5f9;
+    --pc-accent: #22c55e;
+    --pc-bg: linear-gradient(180deg, rgba(6,46,26,.55), rgba(4,12,9,.9));
+    --pc-border: rgba(52, 217, 123, 0.4);
+    --pc-icon-bg: linear-gradient(145deg, #14532d, #166534 55%, #22c55e);
+    --pc-price-grad: linear-gradient(180deg, #dcfce7, #4ade80);
+    --pc-cta-bg: linear-gradient(135deg, #16a34a, #22c55e 55%, #4ade80);
+    --pc-cta-text: #052e16;
   }
   #orderFlowPanel{ background: var(--pc-bg); }
 
@@ -3496,12 +3496,15 @@
   /* ---------- Monthly package — gold/amber (Promoter reference) ---------- */
   .pc-card--monthly, #monthlySubPanel{
     --pc-accent: #f59e0b;
-    --pc-bg: linear-gradient(180deg, rgba(88,58,5,.26), rgba(22,15,3,.48));
+    --pc-bg: linear-gradient(180deg, rgba(88,58,5,.35), rgba(22,15,3,.85));
     --pc-border: rgba(245, 158, 11, 0.5);
+    --pc-shadow: 0 20px 50px rgba(8,5,24,.5), 0 0 40px rgba(245,158,11,.2);
     --pc-icon-bg: linear-gradient(145deg, #b45309, #f59e0b 55%, #fcd34d);
+    --pc-title-grad: linear-gradient(90deg, #fcd34d, #fbbf24 55%, #fde68a);
     --pc-price-grad: linear-gradient(180deg, #fde68a, #fbbf24);
     --pc-cta-bg: linear-gradient(135deg, #f59e0b, #fbbf24 55%, #fde68a);
-    --pc-cta-text: #2b1a02;
+    --pc-cta-text: #1c1203;
+    --pc-cta-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
     --pc-chip: #fcd34d;
   }
   #monthlySubPanel{ background: var(--pc-bg); }
@@ -3548,6 +3551,13 @@
     font-size:clamp(12px, 3.4vw, 13px); font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
     color:#fff; margin-bottom:6px;
     overflow-wrap:break-word; word-break:break-word;
+  }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .pc-card--monthly .pc-title{
+      background: var(--pc-title-grad);
+      -webkit-background-clip:text; background-clip:text;
+      -webkit-text-fill-color:transparent; color:transparent;
+    }
   }
   .pc-desc{
     font-size:clamp(11.5px, 3.2vw, 12.5px); line-height:1.55; color:var(--text-dim); margin-bottom:16px; min-height:0;
@@ -3617,7 +3627,7 @@
     white-space:nowrap;
     background: var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
     border: 1px solid color-mix(in srgb, var(--pc-accent) 40%, transparent);
-    box-shadow:0 10px 26px -8px color-mix(in srgb, var(--pc-accent) 70%, transparent);
+    box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px color-mix(in srgb, var(--pc-accent) 70%, transparent));
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
   }
   .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px color-mix(in srgb, var(--pc-accent) 80%, transparent); }
