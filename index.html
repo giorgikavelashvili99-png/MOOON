@@ -1952,6 +1952,10 @@
     background:linear-gradient(90deg, var(--purple), var(--cyan));
     transition: width 0.2s ease;
   }
+  .mooon-auto-stay{
+    font-size:11px; line-height:1.5; color:var(--text-dim);
+    margin-top:7px; text-align:center;
+  }
   .mooon-auto-done{
     display:flex; align-items:center; gap:7px;
     font-size:12.5px; font-weight:700; color:var(--wa);
@@ -4076,6 +4080,7 @@
                 <span id="srAutoStatusText" data-i18n="mooonAutoUploading">იტვირთება…</span>
               </div>
               <div class="mooon-auto-track"><div class="mooon-auto-fill" id="srAutoFill"></div></div>
+              <div class="mooon-auto-stay" data-i18n="mooonAutoStayHint">📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება</div>
               <div class="mooon-auto-error" id="srAutoError"></div>
             </div>
           </div>
@@ -4284,6 +4289,7 @@
                 <span id="mooonAutoStatusTextWp" data-i18n="mooonAutoUploading">იტვირთება…</span>
               </div>
               <div class="mooon-auto-track"><div class="mooon-auto-fill" id="mooonAutoFillWp"></div></div>
+              <div class="mooon-auto-stay" data-i18n="mooonAutoStayHint">📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება</div>
               <div class="mooon-auto-error" id="mooonAutoErrorWp"></div>
             </div>
           </div>
@@ -4428,6 +4434,7 @@
                 <span id="mooonAutoStatusTextMp" data-i18n="mooonAutoUploading">იტვირთება…</span>
               </div>
               <div class="mooon-auto-track"><div class="mooon-auto-fill" id="mooonAutoFillMp"></div></div>
+              <div class="mooon-auto-stay" data-i18n="mooonAutoStayHint">📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება</div>
               <div class="mooon-auto-error" id="mooonAutoErrorMp"></div>
             </div>
           </div>
@@ -4869,6 +4876,8 @@
       mooonAutoFinalizing: 'ბმულის მომზადება…',
       mooonAutoDone: 'ატვირთულია — ლინკი ავტომატურად ჩაისვა ველში.',
       mooonAutoError: '⚠️ ავტომატურმა ატვირთვამ ვერ იმუშავა. ',
+      mooonAutoErrorBackgrounded: '⚠️ ატვირთვა შეწყდა, რადგან გვერდი ფონში აღმოჩნდა (ეკრანი ჩაიკეტა ან სხვა აპზე გადახვედით). ',
+      mooonAutoStayHint: '📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება',
       mooonAutoManualLink: 'ატვირთეთ ხელით mooontransferr.onrender.com-ზე →',
       mooonAutoRetry: '↻ ხელახლა ცდა',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
@@ -5140,6 +5149,8 @@
       mooonAutoFinalizing: 'Preparing your link…',
       mooonAutoDone: "Uploaded — the link was filled in automatically.",
       mooonAutoError: '⚠️ Automatic upload failed. ',
+      mooonAutoErrorBackgrounded: '⚠️ The upload stopped because this page went to the background (screen locked or you switched app). ',
+      mooonAutoStayHint: '📱 Keep this page open and your screen on until the upload finishes',
       mooonAutoManualLink: 'Upload manually on mooontransferr.onrender.com →',
       mooonAutoRetry: '↻ Try again',
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
@@ -6210,6 +6221,30 @@
   // of opening a second tab and asking them to upload it again by hand.
   // ============================================================
   function uploadFileToMoontransferr(file, onProgress){
+    // Mobile browsers aggressively suspend/throttle JS and network activity
+    // for backgrounded tabs (screen lock, switching app to check WhatsApp,
+    // etc.) — by far the most common reason a large upload silently dies
+    // partway through on a phone but never on desktop. We can't prevent
+    // that OS-level suspension, but we CAN detect it happened and say so,
+    // instead of a generic "network error" that gives no clue what to do
+    // differently next time.
+    let wasBackgrounded = false;
+    const onVisChange = () => { if (document.visibilityState === 'hidden') wasBackgrounded = true; };
+    document.addEventListener('visibilitychange', onVisChange);
+
+    let xhrRef = null;
+    // Video uploads over mobile data can legitimately take a while — this
+    // is a generous ceiling so a real (if slow) upload isn't cut off, just
+    // one that has genuinely stalled.
+    const UPLOAD_TIMEOUT_MS = 120000;
+
+    const cleanupTracking = () => document.removeEventListener('visibilitychange', onVisChange);
+
+    const withBackgroundHint = (err) => {
+      if (wasBackgrounded) err.backgrounded = true;
+      return err;
+    };
+
     return fetch(VIDEO_REVIEW_TRANSFER_URL + '/api/request-upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -6224,13 +6259,16 @@
       if (!file_id || !upload_url) throw new Error('request-upload-bad-response');
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
+        xhrRef = xhr;
         xhr.open('PUT', upload_url);
+        xhr.timeout = UPLOAD_TIMEOUT_MS;
         xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
         xhr.upload.onprogress = e => {
           if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
         };
-        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('upload-failed-' + xhr.status));
-        xhr.onerror = () => reject(new Error('upload-network-error'));
+        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(withBackgroundHint(new Error('upload-failed-' + xhr.status)));
+        xhr.onerror = () => reject(withBackgroundHint(new Error('upload-network-error')));
+        xhr.ontimeout = () => reject(withBackgroundHint(new Error('upload-timeout')));
         xhr.send(file);
       }).then(() => file_id);
     })
@@ -6240,7 +6278,13 @@
       body: JSON.stringify({ file_id })
     }))
     .then(res => { if (!res.ok) throw new Error('finalize-failed'); return res.json(); })
-    .then(data => { if (!data.link) throw new Error('finalize-bad-response'); return data; });
+    .then(data => { if (!data.link) throw new Error('finalize-bad-response'); return data; })
+    .then(data => { cleanupTracking(); return data; })
+    .catch(err => {
+      cleanupTracking();
+      if (xhrRef && wasBackgrounded) { try { xhrRef.abort(); } catch(e){} }
+      throw withBackgroundHint(err);
+    });
   }
 
   function resetMooonAutoUI(ids){
@@ -6257,6 +6301,8 @@
     if (errorBox) { errorBox.classList.remove('show'); errorBox.innerHTML = ''; }
     const done = wrap.querySelector('.mooon-auto-done');
     if (done) done.remove();
+    const stayHint = wrap.querySelector('.mooon-auto-stay');
+    if (stayHint) stayHint.style.display = '';
   }
 
   // ids: { wrap, statusRow, statusText, fill, error } — one set per panel,
@@ -6271,11 +6317,14 @@
     const vg = videoLinkGroups[panelKey] || videoLinkGroups.main;
     if (!wrap) return;
 
-    function showAutoError(){
+    function showAutoError(err){
       if (statusRow) statusRow.style.display = 'none';
+      const stayHint = wrap.querySelector('.mooon-auto-stay');
+      if (stayHint) stayHint.style.display = 'none';
       if (errorBox) {
+        const msg = (err && err.backgrounded) ? t('mooonAutoErrorBackgrounded') : t('mooonAutoError');
         errorBox.innerHTML =
-          escapeHtml(t('mooonAutoError')) +
+          escapeHtml(msg) +
           '<a href="' + VIDEO_REVIEW_TRANSFER_URL + '/" target="_blank" rel="noopener">' + escapeHtml(t('mooonAutoManualLink')) + '</a>' +
           ' &nbsp; <button type="button" class="mooon-auto-retry-btn">' + escapeHtml(t('mooonAutoRetry')) + '</button>';
         errorBox.classList.add('show');
@@ -6295,6 +6344,8 @@
       if (pct >= 100 && statusText) statusText.textContent = t('mooonAutoFinalizing');
     }).then(({ link }) => {
       if (statusRow) statusRow.style.display = 'none';
+      const stayHint = wrap.querySelector('.mooon-auto-stay');
+      if (stayHint) stayHint.style.display = 'none';
       if (fill) fill.style.width = '100%';
       if (vg.link) {
         vg.link.value = link;
@@ -6307,8 +6358,8 @@
       done.className = 'mooon-auto-done';
       done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('mooonAutoDone')) + '</span>';
       wrap.appendChild(done);
-    }).catch(() => {
-      showAutoError();
+    }).catch(err => {
+      showAutoError(err);
     });
   }
 
