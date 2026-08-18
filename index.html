@@ -3435,11 +3435,8 @@
     min-width:0;
     max-width:100%;
     border-radius:24px;
-    border:1px solid color-mix(in srgb, var(--pc-accent) 32%, var(--border));
-    background:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px),
-      radial-gradient(ellipse 120% 60% at 50% -10%, color-mix(in srgb, var(--pc-accent) 16%, transparent), transparent 65%),
-      linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--pc-border, var(--border));
+    background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
     box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 10%, transparent);
     padding:26px 22px 22px;
     display:flex; flex-direction:column;
@@ -3457,7 +3454,7 @@
        card is open, it must never transform again, full stop. */
     .pc-card:not(.pc-open):hover{
       transform:translateY(-4px);
-      border-color: color-mix(in srgb, var(--pc-accent) 50%, var(--border));
+      border-color: color-mix(in srgb, var(--pc-accent) 65%, var(--pc-border, var(--border)));
       box-shadow: 0 26px 60px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 22%, transparent);
     }
   }
@@ -3466,48 +3463,61 @@
     background:linear-gradient(90deg, transparent, var(--pc-accent), transparent);
     opacity:0.8;
   }
-  .pc-card--indiv{
-    --pc-accent: #00e676;
-    background:
-      radial-gradient(ellipse 120% 60% at 50% -10%, color-mix(in srgb, var(--pc-accent) 14%, transparent), transparent 65%),
-      #12131c;
+
+  /* ---------- Individual / single order — muted slate ---------- */
+  .pc-card--indiv, #orderFlowPanel{
+    --pc-accent: #94a3b8;
+    --pc-bg: linear-gradient(180deg, rgba(20,15,46,.75), rgba(10,8,26,.85));
+    --pc-border: rgba(148, 163, 184, 0.28);
+    --pc-icon-bg: linear-gradient(145deg, #334155, #1e293b);
+    --pc-price-grad: linear-gradient(180deg, #f1f5f9, #94a3b8);
+    --pc-cta-bg: rgba(148, 163, 184, 0.14);
+    --pc-cta-text: #f1f5f9;
   }
-  .pc-card--weekly{
+  #orderFlowPanel{ background: var(--pc-bg); }
+
+  /* ---------- Weekly package — violet (VIP/Contributor reference) ---------- */
+  .pc-card--weekly, #weeklySubPanel{
     --pc-accent: #a855f7;
-    background:
-      radial-gradient(ellipse 120% 60% at 50% -10%, color-mix(in srgb, var(--pc-accent) 16%, transparent), transparent 65%),
-      #160f2c;
+    --pc-bg: linear-gradient(180deg, rgba(76,29,149,.55), rgba(23,7,49,.94));
+    --pc-border: rgba(168, 85, 247, 0.65);
+    --pc-icon-bg: linear-gradient(145deg, #6d28d9, #2e1065 70%, #7c3aed);
+    --pc-price-grad: linear-gradient(135deg, #c084fc, #e879f9);
+    --pc-cta-bg: linear-gradient(135deg, #6d28d9, #9333ea 45%, #c084fc);
+    --pc-cta-text: #fff;
+    --pc-ribbon-bg: linear-gradient(135deg, #d946ef, #a855f7 60%, #7c3aed);
   }
-  #orderFlowPanel{ --pc-accent: #00e676; background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(0,230,118,0.14), transparent 65%), #12131c; }
-  #weeklySubPanel{ --pc-accent: #a855f7; background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(168,85,247,0.16), transparent 65%), #160f2c; }
-  #monthlySubPanel{
-    --pc-accent: #ffb800;
-    background:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px),
-      radial-gradient(ellipse 130% 75% at 50% -10%, rgba(255,184,0,0.22), transparent 72%),
-      linear-gradient(180deg, #2a1d08, #1b1204);
+  #weeklySubPanel{ background: var(--pc-bg); }
+
+  /* ---------- Monthly package — gold/amber (Promoter reference) ---------- */
+  .pc-card--monthly, #monthlySubPanel{
+    --pc-accent: #f59e0b;
+    --pc-bg: linear-gradient(180deg, rgba(88,58,5,.26), rgba(22,15,3,.48));
+    --pc-border: rgba(245, 158, 11, 0.5);
+    --pc-icon-bg: linear-gradient(145deg, #b45309, #f59e0b 55%, #fcd34d);
+    --pc-price-grad: linear-gradient(180deg, #fde68a, #fbbf24);
+    --pc-cta-bg: linear-gradient(135deg, #f59e0b, #fbbf24 55%, #fde68a);
+    --pc-cta-text: #2b1a02;
+    --pc-chip: #fcd34d;
   }
-  #editOrderPanel{ --pc-accent: #ff2a85; background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(255,42,133,0.2), transparent 65%), #1a0d1e; }
-  .pc-card--monthly{
-    --pc-accent: #ffb800;
-    border-color: color-mix(in srgb, var(--pc-accent) 55%, var(--border));
-    background:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px),
-      radial-gradient(ellipse 130% 75% at 50% -10%, rgba(255,184,0,0.22), transparent 72%),
-      linear-gradient(180deg, #2a1d08, #1b1204);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 28%, transparent);
+  #monthlySubPanel{ background: var(--pc-bg); }
+
+  /* ---------- Edit order — hot pink/magenta ---------- */
+  .pc-card--edit, #editOrderPanel{
+    --pc-accent: #ec4899;
+    --pc-bg: linear-gradient(180deg, rgba(88,28,60,.5), rgba(10,8,26,.87));
+    --pc-border: rgba(236, 72, 153, 0.45);
+    --pc-icon-bg: linear-gradient(145deg, #9d174d, #4c0519);
+    --pc-price-grad: linear-gradient(180deg, #fbcfe8, #db2777);
+    --pc-cta-bg: linear-gradient(135deg, #db2777, #ec4899);
+    --pc-cta-text: #fff;
   }
-  .pc-card--edit{
-    --pc-accent: #ff2a85;
-    background:
-      radial-gradient(ellipse 120% 60% at 50% -10%, rgba(255,42,133,0.2), transparent 65%),
-      #1a0d1e;
-  }
+  #editOrderPanel{ background: var(--pc-bg); }
 
   .pc-ribbon{
     position:absolute; top:18px; right:-32px; width:140px;
     transform:rotate(40deg); text-align:center;
-    background:linear-gradient(90deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 60%, #fff));
+    background: var(--pc-ribbon-bg, linear-gradient(90deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 60%, #fff)));
     color:#0b0f1c; font-family:'JetBrains Mono', 'BPG Glaho', sans-serif;
     font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase;
     white-space:nowrap;
@@ -3519,7 +3529,7 @@
     position:relative;
     display:flex; align-items:center; justify-content:center;
     font-size:22px; line-height:1;
-    background:linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent));
+    background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
     border:1px solid color-mix(in srgb, var(--pc-accent) 60%, transparent);
     box-shadow:0 8px 20px -6px color-mix(in srgb, var(--pc-accent) 65%, transparent), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -6px 10px -6px rgba(0,0,0,0.35);
     margin-bottom:14px;
@@ -3546,8 +3556,19 @@
     margin-bottom:2px;
   }
   .pc-price-line b{
-    font-size:clamp(21px, 6vw, 26px); font-weight:800; color:#fff;
+    font-size:clamp(21px, 6vw, 26px); font-weight:800;
     text-shadow:0 0 18px color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    /* Solid, always-visible color first — same safety pattern used for
+       .dz-title/.price elsewhere on this page — so this never renders
+       invisible on a browser with partial/odd clipped-gradient support. */
+    color:#fff;
+  }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .pc-price-line b{
+      background: var(--pc-price-grad, linear-gradient(180deg, #fff, #fff));
+      -webkit-background-clip:text; background-clip:text;
+      -webkit-text-fill-color:transparent; color:transparent;
+    }
   }
   .pc-price-line .pc-price-sep{ color:var(--text-faint); font-size:clamp(13px, 3.6vw, 16px); }
   /* Two-price display (weekly/monthly: "24.99₾ / 35.99₾") — always one
@@ -3564,7 +3585,7 @@
     .pc-price-line--dual .pc-price-sep{ font-size:11px; }
   }
   .pc-price-note{
-    font-size:clamp(10px, 2.8vw, 11px); color:var(--text-faint); margin-bottom:18px; line-height:1.5;
+    font-size:clamp(10px, 2.8vw, 11px); color: var(--pc-chip, var(--text-faint)); margin-bottom:18px; line-height:1.5;
     overflow-wrap:break-word;
   }
 
@@ -3587,11 +3608,13 @@
     display:flex; align-items:center; justify-content:center;
     padding:14px 10px; border-radius:14px;
     font-family:'Space Grotesk', 'BPG Glaho', sans-serif;
-    font-size:clamp(11.5px, 3.6vw, 14.5px); font-weight:800; letter-spacing:0; color:#04101a;
+    font-size:clamp(11.5px, 3.6vw, 14.5px); font-weight:800; letter-spacing:0;
+    color: var(--pc-cta-text, #04101a);
     white-space:nowrap;
-    background:linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff));
+    background: var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
+    border: 1px solid color-mix(in srgb, var(--pc-accent) 40%, transparent);
     box-shadow:0 10px 26px -8px color-mix(in srgb, var(--pc-accent) 70%, transparent);
-    transition:transform .15s ease, box-shadow .2s ease;
+    transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
   }
   .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px color-mix(in srgb, var(--pc-accent) 80%, transparent); }
   .pc-toggle-btn:active{ transform:translateY(0); }
@@ -4205,6 +4228,7 @@
 
       <!-- Card 2 — weekly subscription package -->
       <div class="pc-card pc-card--weekly">
+        <div class="pc-ribbon" data-i18n="pcRibbon">პოპულარული</div>
         <div class="pc-icon" aria-hidden="true">📅</div>
         <div class="pc-title" data-i18n="pc2Title">კვირის პაკეტი</div>
         <div class="pc-desc" data-i18n="pc2Desc">კვირაში 5 ვიდეო<br>1080/60FPS - 4K/60FPS</div>
@@ -4349,7 +4373,6 @@
 
       <!-- Card 3 — monthly subscription package -->
       <div class="pc-card pc-card--monthly">
-        <div class="pc-ribbon" data-i18n="pcRibbon">პოპულარული</div>
         <div class="pc-icon" aria-hidden="true">👑</div>
         <div class="pc-title" data-i18n="pc3Title">თვის პაკეტი</div>
         <div class="pc-desc" data-i18n="pc3Desc">თვეში 20 ვიდეო<br>1080/60FPS - 4K/60FPS</div>
