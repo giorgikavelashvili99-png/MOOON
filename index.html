@@ -1964,6 +1964,51 @@
   }
   .stt-msg b{ color:var(--gold); }
 
+  /* Automatic mooontransferr upload — replaces the old "open a new tab and
+     paste the link back" step. Shown inside .sr-transfer and inside each
+     .mooon-prompt right after the visitor taps "yes". */
+  .mooon-auto{ display:none; margin-top:12px; }
+  .mooon-auto.show{ display:block; }
+  .mooon-auto-status{
+    display:flex; align-items:center; gap:9px;
+    font-size:12.5px; color:var(--text-dim); margin-bottom:9px;
+  }
+  .mooon-auto-spin{
+    width:15px; height:15px; border-radius:50%; flex:0 0 auto;
+    border:2px solid rgba(59,109,255,0.25); border-top-color:var(--cyan);
+    animation: moonAutoSpin 0.8s linear infinite;
+  }
+  @keyframes moonAutoSpin{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .mooon-auto-spin{ animation:none; } }
+  .mooon-auto-track{
+    height:7px; border-radius:100px; overflow:hidden;
+    background:rgba(255,255,255,0.07);
+  }
+  .mooon-auto-fill{
+    height:100%; width:0%; border-radius:100px;
+    background:linear-gradient(90deg, var(--purple), var(--cyan));
+    transition: width 0.2s ease;
+  }
+  .mooon-auto-done{
+    display:flex; align-items:center; gap:7px;
+    font-size:12.5px; font-weight:700; color:var(--wa);
+  }
+  .mooon-auto-error{
+    display:none; font-size:12px; line-height:1.5; color:#ffb3c0;
+    background:rgba(255,56,96,0.08); border:1px solid rgba(255,56,96,0.35);
+    border-radius:12px; padding:11px 13px; margin-top:4px;
+  }
+  .mooon-auto-error.show{ display:block; }
+  .mooon-auto-error a{ color:var(--cyan); font-weight:700; }
+  .mooon-auto-retry-btn{
+    display:inline-block; margin-top:8px;
+    background:rgba(255,255,255,0.06); border:1px solid var(--border);
+    color:var(--text); font-family:'Space Grotesk','BPG Glaho',sans-serif;
+    font-weight:700; font-size:11.5px; padding:7px 12px; border-radius:9px;
+    cursor:pointer;
+  }
+  .mooon-auto-retry-btn:hover{ background:rgba(255,255,255,0.12); }
+
   /* ---------- Rejected-format panel (wrong resolution / fps) ---------- */
   .sr-reject{
     display:none;
@@ -4011,6 +4056,14 @@
               <span class="stt-count" id="srTransferCountdown">3</span>
               <span class="stt-msg" data-i18n="srTransferTimerMsg">აუცილებლად იქონიეთ ატვირთული ვიდეოს ლინკი, რომ გადაუგზავნოთ მენეჯერს.</span>
             </div>
+            <div class="mooon-auto" id="srAuto">
+              <div class="mooon-auto-status" id="srAutoStatus">
+                <span class="mooon-auto-spin"></span>
+                <span id="srAutoStatusText" data-i18n="mooonAutoUploading">იტვირთება…</span>
+              </div>
+              <div class="mooon-auto-track"><div class="mooon-auto-fill" id="srAutoFill"></div></div>
+              <div class="mooon-auto-error" id="srAutoError"></div>
+            </div>
           </div>
         </div>
 
@@ -4204,10 +4257,18 @@
           <div class="mooon-prompt" id="mooonPromptWp">
             <div class="mooon-prompt-q" id="mooonPromptQWp" data-i18n="mooonPromptQ">გსურთ ატვირთული ვიდეო გაეგზავნოს mooontransferr.onrender.com-ზე, რომ ჩვენმა მენეჯერმა შეამოწმოს?</div>
             <div class="mooon-prompt-actions" id="mooonPromptActionsWp">
-              <a href="https://mooontransferr.onrender.com/" target="_blank" rel="noopener" class="mooon-prompt-yes" id="mooonPromptYesWp" data-i18n="mooonPromptYes">დიახ</a>
+              <button type="button" class="mooon-prompt-yes" id="mooonPromptYesWp" data-i18n="mooonPromptYes">დიახ</button>
               <button type="button" class="mooon-prompt-no" id="mooonPromptNoWp" data-i18n="mooonPromptNo">არა</button>
             </div>
-            <div class="mooon-prompt-dismissed" id="mooonPromptDoneWp" data-i18n="mooonPromptDone">✓ გაიხსნა mooontransferr — აუცილებლად დააკოპირეთ ატვირთული ვიდეოს ლინკი და ჩასვით ქვემოთ ველში.</div>
+            <div class="mooon-prompt-dismissed" id="mooonPromptDoneWp" data-i18n="mooonPromptDone">✓ ატვირთულია — ლინკი ავტომატურად ჩაისვა ქვემოთ.</div>
+            <div class="mooon-auto" id="mooonAutoWp">
+              <div class="mooon-auto-status" id="mooonAutoStatusWp">
+                <span class="mooon-auto-spin"></span>
+                <span id="mooonAutoStatusTextWp" data-i18n="mooonAutoUploading">იტვირთება…</span>
+              </div>
+              <div class="mooon-auto-track"><div class="mooon-auto-fill" id="mooonAutoFillWp"></div></div>
+              <div class="mooon-auto-error" id="mooonAutoErrorWp"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -4339,10 +4400,18 @@
           <div class="mooon-prompt" id="mooonPromptMp">
             <div class="mooon-prompt-q" id="mooonPromptQMp" data-i18n="mooonPromptQ">გსურთ ატვირთული ვიდეო გაეგზავნოს mooontransferr.onrender.com-ზე, რომ ჩვენმა მენეჯერმა შეამოწმოს?</div>
             <div class="mooon-prompt-actions" id="mooonPromptActionsMp">
-              <a href="https://mooontransferr.onrender.com/" target="_blank" rel="noopener" class="mooon-prompt-yes" id="mooonPromptYesMp" data-i18n="mooonPromptYes">დიახ</a>
+              <button type="button" class="mooon-prompt-yes" id="mooonPromptYesMp" data-i18n="mooonPromptYes">დიახ</button>
               <button type="button" class="mooon-prompt-no" id="mooonPromptNoMp" data-i18n="mooonPromptNo">არა</button>
             </div>
-            <div class="mooon-prompt-dismissed" id="mooonPromptDoneMp" data-i18n="mooonPromptDone">✓ გაიხსნა mooontransferr — აუცილებლად დააკოპირეთ ატვირთული ვიდეოს ლინკი და ჩასვით ქვემოთ ველში.</div>
+            <div class="mooon-prompt-dismissed" id="mooonPromptDoneMp" data-i18n="mooonPromptDone">✓ ატვირთულია — ლინკი ავტომატურად ჩაისვა ქვემოთ.</div>
+            <div class="mooon-auto" id="mooonAutoMp">
+              <div class="mooon-auto-status" id="mooonAutoStatusMp">
+                <span class="mooon-auto-spin"></span>
+                <span id="mooonAutoStatusTextMp" data-i18n="mooonAutoUploading">იტვირთება…</span>
+              </div>
+              <div class="mooon-auto-track"><div class="mooon-auto-fill" id="mooonAutoFillMp"></div></div>
+              <div class="mooon-auto-error" id="mooonAutoErrorMp"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -4765,6 +4834,12 @@
       mooonPromptNo: 'არა',
       mooonPromptDone: '✓ გაიხსნა mooontransferr — აუცილებლად დააკოპირეთ ატვირთული ვიდეოს ლინკი და ჩასვით ქვემოთ ველში.',
       srTransferOpened: 'გვერდი გაიხსნა — ატვირთვის შემდეგ დაბრუნდით აქ, ჩასვით მიღებული ლინკი ქვემოთ ველში და დაადასტურეთ',
+      mooonAutoUploading: 'ვიდეო იტვირთება mooontransferr-ზე…',
+      mooonAutoFinalizing: 'ბმულის მომზადება…',
+      mooonAutoDone: '✓ ატვირთულია — ლინკი ავტომატურად ჩაისვა ველში.',
+      mooonAutoError: '⚠️ ავტომატურმა ატვირთვამ ვერ იმუშავა. ',
+      mooonAutoManualLink: 'ატვირთეთ ხელით mooontransferr.onrender.com-ზე →',
+      mooonAutoRetry: '↻ ხელახლა ცდა',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
       sendOrder: 'გაგზავნე შეკვეთა',
@@ -5029,6 +5104,12 @@
       mooonPromptNo: 'No',
       mooonPromptDone: "✓ mooontransferr opened — be sure to copy your uploaded video's link and paste it into the field below.",
       srTransferOpened: "The page has opened — after uploading, come back here, paste the link you received into the field below and confirm it",
+      mooonAutoUploading: 'Uploading your video to mooontransferr…',
+      mooonAutoFinalizing: 'Preparing your link…',
+      mooonAutoDone: "✓ Uploaded — the link was filled in automatically.",
+      mooonAutoError: '⚠️ Automatic upload failed. ',
+      mooonAutoManualLink: 'Upload manually on mooontransferr.onrender.com →',
+      mooonAutoRetry: '↻ Try again',
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
       alertReadError: 'Could not read the video — please try another file.',
       sendOrder: 'Send order',
@@ -6070,6 +6151,116 @@
   const TRANSFER_COUNTDOWN_SECONDS = 3;
   let transferCountdownInterval = null;
 
+  // ============================================================
+  // Automatic hand-off to mooontransferr — the visitor already picked
+  // the video on THIS page (for the scanner/price calc); "yes" now
+  // uploads that same File straight to mooontransferr's API in the
+  // background and drops the resulting link into the order form, instead
+  // of opening a second tab and asking them to upload it again by hand.
+  // ============================================================
+  function uploadFileToMoontransferr(file, onProgress){
+    return fetch(VIDEO_REVIEW_TRANSFER_URL + '/api/request-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: file.name,
+        content_type: file.type || 'video/mp4',
+        size: file.size
+      })
+    })
+    .then(res => { if (!res.ok) throw new Error('request-upload-failed'); return res.json(); })
+    .then(({ file_id, upload_url }) => {
+      if (!file_id || !upload_url) throw new Error('request-upload-bad-response');
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', upload_url);
+        xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+        xhr.upload.onprogress = e => {
+          if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('upload-failed-' + xhr.status));
+        xhr.onerror = () => reject(new Error('upload-network-error'));
+        xhr.send(file);
+      }).then(() => file_id);
+    })
+    .then(file_id => fetch(VIDEO_REVIEW_TRANSFER_URL + '/api/finalize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id })
+    }))
+    .then(res => { if (!res.ok) throw new Error('finalize-failed'); return res.json(); })
+    .then(data => { if (!data.link) throw new Error('finalize-bad-response'); return data; });
+  }
+
+  function resetMooonAutoUI(ids){
+    const wrap = document.getElementById(ids.wrap);
+    const statusRow = document.getElementById(ids.statusRow);
+    const statusText = document.getElementById(ids.statusText);
+    const fill = document.getElementById(ids.fill);
+    const errorBox = document.getElementById(ids.error);
+    if (!wrap) return;
+    wrap.classList.remove('show');
+    if (statusRow) statusRow.style.display = '';
+    if (statusText) statusText.textContent = t('mooonAutoUploading');
+    if (fill) fill.style.width = '0%';
+    if (errorBox) { errorBox.classList.remove('show'); errorBox.innerHTML = ''; }
+    const done = wrap.querySelector('.mooon-auto-done');
+    if (done) done.remove();
+  }
+
+  // ids: { wrap, statusRow, statusText, fill, error } — one set per panel,
+  // matching the markup placed inside .sr-transfer / .mooon-prompt.
+  // panelKey: 'main' | 'wp' | 'mp' — which videoLinkGroups entry to fill.
+  function runMooonAutoUpload(file, ids, panelKey){
+    const wrap = document.getElementById(ids.wrap);
+    const statusRow = document.getElementById(ids.statusRow);
+    const statusText = document.getElementById(ids.statusText);
+    const fill = document.getElementById(ids.fill);
+    const errorBox = document.getElementById(ids.error);
+    const vg = videoLinkGroups[panelKey] || videoLinkGroups.main;
+    if (!wrap) return;
+
+    function showAutoError(){
+      if (statusRow) statusRow.style.display = 'none';
+      if (errorBox) {
+        errorBox.innerHTML =
+          escapeHtml(t('mooonAutoError')) +
+          '<a href="' + VIDEO_REVIEW_TRANSFER_URL + '/" target="_blank" rel="noopener">' + escapeHtml(t('mooonAutoManualLink')) + '</a>' +
+          ' &nbsp; <button type="button" class="mooon-auto-retry-btn">' + escapeHtml(t('mooonAutoRetry')) + '</button>';
+        errorBox.classList.add('show');
+        const retryBtn = errorBox.querySelector('.mooon-auto-retry-btn');
+        if (retryBtn) retryBtn.addEventListener('click', () => runMooonAutoUpload(file, ids, panelKey));
+      }
+    }
+
+    if (!file) { showAutoError(); return; }
+
+    resetMooonAutoUI(ids);
+    wrap.classList.add('show');
+    if (statusText) statusText.textContent = t('mooonAutoUploading');
+
+    uploadFileToMoontransferr(file, pct => {
+      if (fill) fill.style.width = pct + '%';
+      if (pct >= 100 && statusText) statusText.textContent = t('mooonAutoFinalizing');
+    }).then(({ link }) => {
+      if (statusRow) statusRow.style.display = 'none';
+      if (fill) fill.style.width = '100%';
+      if (vg.link) {
+        vg.link.value = link;
+        vg.link.classList.remove('error');
+      }
+      if (vg.error) vg.error.style.display = 'none';
+      videoLinkConfirmed[panelKey] = true;
+      updateVideoLinkConfirmBadge();
+      const done = document.createElement('div');
+      done.className = 'mooon-auto-done';
+      done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('mooonAutoDone')) + '</span>';
+      wrap.appendChild(done);
+    }).catch(() => {
+      showAutoError();
+    });
+  }
+
   ['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
   ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { dropZone.classList.remove('dragover'); }));
   dropZone.addEventListener('drop', e => {
@@ -6083,10 +6274,18 @@
     if (e.target.files && e.target.files[0]) handleVideoFile(e.target.files[0]);
   });
 
+  // The File the visitor scanned in the main calculator — kept in memory
+  // so the "yes" button can upload it straight to mooontransferr via the
+  // API, with no manual re-selection in a second tab.
+  let mainScannedFile = null;
+
+  const SR_AUTO_IDS = { wrap: 'srAuto', statusRow: 'srAutoStatus', statusText: 'srAutoStatusText', fill: 'srAutoFill', error: 'srAutoError' };
+
   // Fully resets the scanner back to its empty state — this is the
   // "cancel upload" action that was previously missing.
   function resetScanner(){
     videoInput.value = '';
+    mainScannedFile = null;
     scanResult.classList.remove('show');
     srReject.classList.remove('show');
     resetTransferPrompt();
@@ -6107,6 +6306,7 @@
     srTransferYes.disabled = false;
     srTransferNo.disabled = false;
     awaitingVideoLinkReturn = false;
+    resetMooonAutoUI(SR_AUTO_IDS);
   }
 
   srResetBtn.addEventListener('click', resetScanner);
@@ -6118,36 +6318,10 @@
     srTransferQ.style.display = 'none';
     srTransferActions.style.display = 'none';
 
-    // Open the review site immediately, synchronously, as the direct
-    // continuation of the click — this is what keeps the popup reliable
-    // on every platform, including iOS Safari, with no pre-opened blank
-    // tab and no platform detection needed. This page itself is never
-    // touched, so it can never redirect away on its own.
-    window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
-    awaitingVideoLinkReturn = true;
-
-    // The countdown below is now purely a friendly on-screen reminder to
-    // have the uploaded video's link ready — it no longer gates the open.
-    let remaining = TRANSFER_COUNTDOWN_SECONDS;
-    srTransferCountdown.textContent = String(remaining);
-    srTransferTimer.classList.add('show');
-
-    transferCountdownInterval = setInterval(() => {
-      remaining -= 1;
-      if (remaining > 0) {
-        srTransferCountdown.textContent = String(remaining);
-        return;
-      }
-      clearInterval(transferCountdownInterval);
-      transferCountdownInterval = null;
-      srTransferTimer.classList.remove('show');
-      if (!srTransfer.querySelector('.sr-transfer-done')) {
-        const done = document.createElement('div');
-        done.className = 'sr-transfer-done';
-        done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('srTransferOpened')) + '</span>';
-        srTransfer.appendChild(done);
-      }
-    }, 1000);
+    // Upload the already-selected file straight to mooontransferr's API
+    // in the background — no second tab, no manual re-upload, no
+    // copy/pasting the link back by hand.
+    runMooonAutoUpload(mainScannedFile, SR_AUTO_IDS, 'main');
   });
 
   srTransferNo.addEventListener('click', () => {
@@ -6159,6 +6333,7 @@
       alert(t('alertNotVideo'));
       return;
     }
+    mainScannedFile = file;
     scanResult.classList.remove('show');
     srReject.classList.remove('show');
     resetTransferPrompt();
@@ -6331,15 +6506,22 @@
     const promptDone = document.getElementById(cfg.promptDoneId);
     if (!zone || !input || !result) return;
 
+    // The File the visitor just scanned — kept in memory so "yes" can
+    // upload it straight to mooontransferr via the API, with no manual
+    // re-selection in a second tab.
+    let currentFile = null;
+
     function resetPrompt(){
       if (!prompt) return;
       prompt.classList.remove('show');
       if (promptQ) promptQ.style.display = '';
       if (promptActions) promptActions.style.display = '';
       if (promptDone) promptDone.classList.remove('show');
+      if (cfg.autoIds) resetMooonAutoUI(cfg.autoIds);
     }
 
     function showOk(file){
+      currentFile = file;
       result.classList.add('show');
       if (rejectEl) rejectEl.classList.remove('show');
       if (okEl) okEl.classList.add('show');
@@ -6348,12 +6530,14 @@
       if (prompt) prompt.classList.add('show');
     }
     function showReject(){
+      currentFile = null;
       result.classList.add('show');
       if (okEl) okEl.classList.remove('show');
       if (rejectEl) rejectEl.classList.add('show');
       resetPrompt();
     }
     function showIdle(){
+      currentFile = null;
       result.classList.remove('show');
       if (okEl) okEl.classList.remove('show');
       if (rejectEl) rejectEl.classList.remove('show');
@@ -6361,13 +6545,14 @@
     }
 
     if (promptYes) {
-      // Native <a target="_blank"> click — the browser opens the tab
-      // itself, so this is never blocked as a popup on any platform.
-      // We just switch the prompt into its "done" state alongside it.
       promptYes.addEventListener('click', () => {
         if (promptQ) promptQ.style.display = 'none';
         if (promptActions) promptActions.style.display = 'none';
-        if (promptDone) promptDone.classList.add('show');
+        if (cfg.autoIds && cfg.panelKey) {
+          runMooonAutoUpload(currentFile, cfg.autoIds, cfg.panelKey);
+        } else if (promptDone) {
+          promptDone.classList.add('show');
+        }
       });
     }
     if (promptNo) {
@@ -6402,11 +6587,15 @@
 
   initSimpleScanner({
     zoneId: 'dropZoneWp', inputId: 'videoInputWp', resultId: 'scanResultWp', okId: 'scanOkWp', okNameId: 'scanOkNameWp', rejectId: 'scanRejectWp',
-    promptId: 'mooonPromptWp', promptQId: 'mooonPromptQWp', promptActionsId: 'mooonPromptActionsWp', promptYesId: 'mooonPromptYesWp', promptNoId: 'mooonPromptNoWp', promptDoneId: 'mooonPromptDoneWp'
+    promptId: 'mooonPromptWp', promptQId: 'mooonPromptQWp', promptActionsId: 'mooonPromptActionsWp', promptYesId: 'mooonPromptYesWp', promptNoId: 'mooonPromptNoWp', promptDoneId: 'mooonPromptDoneWp',
+    panelKey: 'wp',
+    autoIds: { wrap: 'mooonAutoWp', statusRow: 'mooonAutoStatusWp', statusText: 'mooonAutoStatusTextWp', fill: 'mooonAutoFillWp', error: 'mooonAutoErrorWp' }
   });
   initSimpleScanner({
     zoneId: 'dropZoneMp', inputId: 'videoInputMp', resultId: 'scanResultMp', okId: 'scanOkMp', okNameId: 'scanOkNameMp', rejectId: 'scanRejectMp',
-    promptId: 'mooonPromptMp', promptQId: 'mooonPromptQMp', promptActionsId: 'mooonPromptActionsMp', promptYesId: 'mooonPromptYesMp', promptNoId: 'mooonPromptNoMp', promptDoneId: 'mooonPromptDoneMp'
+    promptId: 'mooonPromptMp', promptQId: 'mooonPromptQMp', promptActionsId: 'mooonPromptActionsMp', promptYesId: 'mooonPromptYesMp', promptNoId: 'mooonPromptNoMp', promptDoneId: 'mooonPromptDoneMp',
+    panelKey: 'mp',
+    autoIds: { wrap: 'mooonAutoMp', statusRow: 'mooonAutoStatusMp', statusText: 'mooonAutoStatusTextMp', fill: 'mooonAutoFillMp', error: 'mooonAutoErrorMp' }
   });
 
   function finishScan(duration, file, width, height, fps){
