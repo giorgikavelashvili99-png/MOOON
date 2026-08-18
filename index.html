@@ -10,39 +10,39 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #150c22;
-    --bg-alt: #1b0f2b;
-    --panel: #22143a;
-    --panel-2: #2c1a4a;
-    --border: #4a2f78;
-    --border-soft: #34204f;
-    --text: #fff6ef;
-    --text-dim: #c2a9e6;
-    --text-faint: #8768a8;
-    --purple: #ff4fa3;
-    --purple-soft: rgba(255,79,163,0.35);
-    --cyan: #ff9f40;
-    --cyan-soft: rgba(255,159,64,0.35);
+    --bg: #050810;
+    --bg-alt: #070c18;
+    --panel: #0b1220;
+    --panel-2: #101a30;
+    --border: #2a3c66;
+    --border-soft: #1a2440;
+    --text: #eef3ff;
+    --text-dim: #a9b8dd;
+    --text-faint: #5f6f96;
+    --purple: #3b6dff;
+    --purple-soft: rgba(59,109,255,0.35);
+    --cyan: #22c3ff;
+    --cyan-soft: rgba(34,195,255,0.35);
     --warn: #ff3860;
     --warn-soft: rgba(255,56,96,0.35);
     --gold: #ffd23f;
     --tg: #38b6ff;
     --tg-soft: rgba(56,182,255,0.35);
     --wa: #25D366;
-    --volt: #b6ff3d;
-    --volt-soft: rgba(182,255,61,0.4);
+    --volt: #3dd6ff;
+    --volt-soft: rgba(61,214,255,0.4);
 
     /* --- Moonfade palette (admin panel) --- */
-    --moon-bg: #12081f;
-    --moon-deep: #170c26;
-    --moon-silver: #fff6ef;
-    --moon-silver-dim: #c2a9e6;
-    --moon-glow: #ff9f40;
-    --moon-blue: #ff4fa3;
-    --moon-blue-soft: rgba(255,79,163,0.35);
+    --moon-bg: #050810;
+    --moon-deep: #070c18;
+    --moon-silver: #eef3ff;
+    --moon-silver-dim: #a9b8dd;
+    --moon-glow: #22c3ff;
+    --moon-blue: #3b6dff;
+    --moon-blue-soft: rgba(59,109,255,0.35);
     --moon-gold: #ffd23f;
     --moon-crater: rgba(255,255,255,0.05);
-    --moon-line: rgba(255,159,64,0.16);
+    --moon-line: rgba(34,195,255,0.16);
   }
 
   *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -320,6 +320,32 @@
   .a-save-row{ margin-top:6px; transition:transform .15s ease; }
   .a-save-row:active{ transform:scale(0.97); }
   .a-stat-note{ font-size:11px; color:var(--text-faint); margin:-4px 0 12px; }
+  .a-subheading{
+    font-size:13px; font-weight:700; color:var(--moon-silver, var(--text));
+    margin:22px 0 10px; padding-top:16px; border-top:1px solid var(--moon-line, var(--border-soft));
+    display:flex; align-items:center; gap:8px;
+  }
+  .a-subheading::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--moon-glow, var(--cyan)); box-shadow:0 0 8px var(--moon-glow, var(--cyan)); flex:0 0 auto; }
+  .a-order-row{
+    background:#0a0a16; border:1px solid var(--moon-line); border-radius:12px;
+    padding:10px 12px; margin-bottom:8px; display:flex; flex-direction:column; gap:6px;
+  }
+  .a-order-row .aor-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .a-order-row .aor-id{
+    font-family:'JetBrains Mono', monospace; font-weight:800; letter-spacing:0.02em;
+    color:var(--moon-silver, var(--text)); font-size:13px;
+    background:rgba(34,195,255,0.12); border:1px solid var(--moon-line); border-radius:8px; padding:2px 8px;
+  }
+  .a-order-row .aor-type{
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--moon-silver-dim, var(--text-dim));
+  }
+  .a-order-row .aor-meta{ font-size:11.5px; color:var(--text-faint); line-height:1.6; }
+  .a-order-row .aor-meta b{ color:var(--moon-silver-dim, var(--text-dim)); font-weight:600; }
+  .a-order-row .aor-actions{ display:flex; gap:8px; margin-top:2px; }
+  .a-order-row .aor-actions button{
+    flex:1; border:none; border-radius:8px; padding:7px 0; font-size:11.5px; font-weight:700; cursor:pointer;
+  }
   .analytics-tiktok-link{
     display:block; margin-top:2px; font-size:11.5px; color:var(--moon-blue);
     text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere;
@@ -565,12 +591,12 @@
     line-height:1.15;
     padding:19px 40px;
     border:none; border-radius:999px;
-    background:linear-gradient(135deg, #ff4fa3 0%, #ff8a3d 55%, #ffd23f 100%);
+    background:linear-gradient(135deg, #3b6dff 0%, #4d8dff 55%, #ffd23f 100%);
     color:#1b0f2b;
     text-decoration:none; text-shadow:0 1px 1px rgba(255,255,255,0.25);
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
-    box-shadow:0 0 30px rgba(255,79,163,0.5), 0 12px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    box-shadow:0 0 30px rgba(59,109,255,0.5), 0 12px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
     transition: transform .15s ease, box-shadow .2s ease;
     animation: heroCtaGlow 2.6s ease-in-out infinite;
   }
@@ -589,7 +615,7 @@
   }
   .hero-cta-btn:active{ transform:translateY(0) scale(0.98); }
   @keyframes heroCtaGlow{
-    0%,100%{ box-shadow:0 0 30px rgba(255,79,163,0.5), 0 12px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+    0%,100%{ box-shadow:0 0 30px rgba(59,109,255,0.5), 0 12px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
     50%{ box-shadow:0 0 46px rgba(255,141,66,0.85), 0 12px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.35); }
   }
   @media (prefers-reduced-motion: reduce){ .hero-cta-btn{ animation:none; } }
@@ -1215,7 +1241,15 @@
     gap:10px;
     margin-top:12px;
   }
-  .quality-btn{ --qb-accent: var(--cyan); --qb-accent-2: var(--purple); --qb-tint: rgba(255,159,64,0.1); }
+  .quality-grid-two{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .quality-grid-two .quality-btn{ flex-direction:column; align-items:stretch; gap:8px; }
+  .quality-grid-two .quality-btn .q-right{ align-self:stretch; justify-content:flex-end; }
+  @media (max-width:480px){
+    .quality-grid-two{ grid-template-columns:minmax(0, 1fr); }
+    .quality-grid-two .quality-btn{ flex-direction:row; align-items:center; }
+    .quality-grid-two .quality-btn .q-right{ align-self:auto; justify-content:flex-start; }
+  }
+  .quality-btn{ --qb-accent: var(--cyan); --qb-accent-2: var(--purple); --qb-tint: rgba(34,195,255,0.1); }
 
   .quality-btn{
     position:relative;
@@ -1393,8 +1427,8 @@
     border:1px solid var(--border-soft);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
-  @media (max-width:600px){
-    .scanner-stage{ padding:16px; border-radius:16px; }
+  @media (max-width:900px){
+    .scanner-stage{ padding: clamp(12px,3.2vw,16px); border-radius: clamp(14px,3vw,16px); }
   }
 
   .drop-zone{
@@ -1403,72 +1437,80 @@
     padding:30px 20px;
     text-align:center;
     background:
-      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(124,143,255,0.09), transparent 70%),
+      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(34,195,255,0.10), transparent 70%),
       #0a0a12;
     cursor:pointer;
-    transition: border-color .2s, background .2s, transform .2s;
+    transition: border-color .3s cubic-bezier(.4,0,.2,1), background .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1);
     position:relative;
     overflow:hidden;
-  }
-  .drop-zone::before{
-    content:'';
-    position:absolute; left:8%; right:8%; top:10%;
-    height:2px; border-radius:2px;
-    background:linear-gradient(90deg, transparent, var(--cyan), transparent);
-    opacity:0; pointer-events:none;
-    filter: drop-shadow(0 0 6px rgba(207,216,255,0.85));
-    animation: scanSweep 3.4s ease-in-out infinite;
-  }
-  @keyframes scanSweep{
-    0%{ top:10%; opacity:0; }
-    12%{ opacity:0.65; }
-    50%{ opacity:0.65; }
-    88%{ opacity:0; }
-    100%{ top:88%; opacity:0; }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .drop-zone::before{ animation:none; opacity:0; }
   }
   .drop-zone:hover, .drop-zone.dragover{
     border-color: var(--purple);
     background:
-      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(124,143,255,0.14), transparent 70%),
-      rgba(124,143,255,0.06);
+      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(34,195,255,0.16), transparent 70%),
+      rgba(59,109,255,0.06);
     transform:translateY(-1px);
+    box-shadow: 0 10px 30px rgba(59,109,255,0.14);
   }
   .drop-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
   .drop-zone .dz-icon{
     width:60px; height:60px; margin:0 auto 16px;
     display:flex; align-items:center; justify-content:center;
     border-radius:50%;
-    background: linear-gradient(160deg, rgba(124,143,255,0.2), rgba(124,143,255,0.05));
-    border:1px solid rgba(124,143,255,0.4);
-    color:#dbe2ff;
-    box-shadow: 0 0 30px rgba(124,143,255,0.22), inset 0 1px 1px rgba(255,255,255,0.1);
+    background: linear-gradient(160deg, rgba(34,195,255,0.22), rgba(59,109,255,0.08));
+    border:1px solid rgba(34,195,255,0.45);
+    color:#ffe9c7;
+    box-shadow: 0 0 30px rgba(34,195,255,0.24), inset 0 1px 1px rgba(255,255,255,0.1);
+    transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1);
+  }
+  /* Static dashed "orbit" ring behind the icon — a quiet MOON-brand
+     signature that replaces the old animated scan-line without adding
+     any motion of its own. */
+  .drop-zone .dz-icon::before{
+    content:'';
+    position:absolute;
+    width:132%; height:132%;
+    border-radius:50%;
+    border:1px dashed rgba(255,210,63,0.35);
+    pointer-events:none;
+  }
+  .drop-zone:hover .dz-icon{
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 0 38px rgba(34,195,255,0.34), inset 0 1px 1px rgba(255,255,255,0.12);
   }
   .drop-zone .dz-icon svg{
     display:block;
     width:24px; height:24px;
     fill:none;
-    stroke:#dbe2ff;
-    stroke-width:2;
+    stroke:#ffe9c7;
+    stroke-width:1.7;
     stroke-linecap:round;
     stroke-linejoin:round;
-    filter: drop-shadow(0 0 8px rgba(124,143,255,0.8));
+    filter: drop-shadow(0 0 8px rgba(34,195,255,0.8));
+    position:relative;
   }
+  .drop-zone .dz-icon svg .dz-icon-play{ fill:#ffe9c7; stroke:none; }
   .drop-zone .dz-title{ font-size:16px; font-weight:700; margin-bottom:8px; line-height:1.35; letter-spacing:0.005em; }
   .drop-zone .dz-sub{ font-size:13px; color:var(--text-dim); max-width:320px; margin:0 auto; line-height:1.5; }
 
-  @media (max-width:560px){
-    .drop-zone{ padding:22px 14px; border-radius:16px; }
-    .drop-zone .dz-icon{ width:50px; height:50px; margin-bottom:12px; }
-    .drop-zone .dz-icon svg{ width:21px; height:21px; }
-    .drop-zone .dz-title{ font-size:14.5px; }
-    .drop-zone .dz-sub{ font-size:12px; max-width:280px; }
+  @media (max-width:900px){
+    .drop-zone{
+      padding: clamp(16px,4.6vw,22px) clamp(12px,3.6vw,14px);
+      border-radius: clamp(14px,3vw,16px);
+    }
+    .drop-zone .dz-icon{
+      width: clamp(38px,9.5vw,50px);
+      height: clamp(38px,9.5vw,50px);
+      margin-bottom: clamp(8px,2.4vw,12px);
+    }
+    .drop-zone .dz-icon svg{ width: clamp(16px,4vw,21px); height: clamp(16px,4vw,21px); }
+    .drop-zone .dz-title{ font-size: clamp(12.5px,3.4vw,14.5px); margin-bottom:6px; }
+    .drop-zone .dz-sub{ font-size: clamp(10.5px,2.7vw,12px); max-width: clamp(220px,78vw,280px); line-height:1.42; }
   }
 
   .scan-result{
     display:none;
+    position:relative;
     margin-top:16px;
     padding:6px;
     border-radius:20px;
@@ -1492,10 +1534,8 @@
   }
   .scan-result .sr-row:first-child,
   .scan-result .sr-row#srQualityRow{ grid-column:1 / -1; }
-  @media (max-width:480px){
-    .scan-result .sr-specs{ grid-template-columns:1fr; gap:7px; }
-    .scan-result .sr-row{ padding:9px 11px; }
-  }
+  .scan-result .sr-row#srQualityRow{ display:none; }
+  .scan-result .sr-row#srQualityRow.show{ display:flex; }
   .scan-result .sr-ico{
     width:28px; height:28px; flex:0 0 auto; border-radius:10px;
     display:flex; align-items:center; justify-content:center;
@@ -1523,9 +1563,10 @@
     font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif; font-size:11px; font-weight:700;
     letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);
   }
+  .scan-result .sr-price-value{ flex:0 0 auto; }
   .scan-result .sr-price-value b{
     font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif; font-size:25px; font-weight:800;
-    color:var(--gold);
+    color:var(--gold); white-space:nowrap;
     text-shadow:0 0 12px rgba(207,216,255,0.6), 0 0 12px rgba(207,216,255,0.4);
   }
   .scan-result .sr-warn{
@@ -1533,6 +1574,39 @@
   }
   .scan-result .sr-info{
     margin:10px 12px 8px; font-size:12px; color:var(--cyan); padding:0 2px;
+  }
+  @media (max-width:480px){
+    .scan-result .sr-specs{ grid-template-columns:1fr; gap:7px; }
+    .scan-result .sr-row{
+      display:grid;
+      grid-template-columns:28px 1fr;
+      grid-template-areas:
+        "icon label"
+        "val  val";
+      align-items:center;
+      row-gap:6px;
+      padding:10px 12px;
+    }
+    .scan-result .sr-ico{ grid-area:icon; }
+    .scan-result .sr-label{ grid-area:label; flex:none; }
+    .scan-result .sr-row b{
+      grid-area:val;
+      text-align:right;
+      white-space:normal;
+      overflow-wrap:break-word;
+      word-break:break-word;
+      font-size:13px;
+    }
+    .scan-result .sr-price-hero{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:8px;
+      padding:14px 16px;
+      margin:10px 2px 4px;
+    }
+    .scan-result .sr-price-value{ width:100%; display:flex; justify-content:flex-end; }
+    .scan-result .sr-price-value b{ font-size:23px; }
+    .scan-result .sr-row#srQualityRow.show{ display:grid; }
   }
   .scan-progress{
     display:none; align-items:center; gap:10px; margin-top:14px;
@@ -1581,22 +1655,210 @@
     50%{ box-shadow: 0 0 0 1px rgba(124,143,255,0.12), 0 24px 70px rgba(124,143,255,0.24), inset 0 1px 0 rgba(255,255,255,0.08); }
   }
   @media (prefers-reduced-motion: reduce){ .scanner-primary .scanner-stage{ animation:none; } }
-  @media (max-width:600px){ .scanner-primary .scanner-stage{ padding:18px; border-radius:18px; } }
+  @media (max-width:900px){ .scanner-primary .scanner-stage{ padding: clamp(13px,3.6vw,18px); border-radius: clamp(15px,3.4vw,18px); } }
 
   .scanner-primary .drop-zone{ padding:38px 22px; border-radius:20px; }
   .scanner-primary .drop-zone .dz-icon{
     width:74px; height:74px; margin-bottom:18px;
-    box-shadow: 0 0 40px rgba(124,143,255,0.3), inset 0 1px 1px rgba(255,255,255,0.1);
+    box-shadow: 0 0 40px rgba(34,195,255,0.32), inset 0 1px 1px rgba(255,255,255,0.1);
   }
   .scanner-primary .drop-zone .dz-icon svg{ width:30px; height:30px; }
   .scanner-primary .drop-zone .dz-title{ font-size:18.5px; }
   .scanner-primary .drop-zone .dz-sub{ font-size:13.5px; max-width:360px; }
-  @media (max-width:560px){
-    .scanner-primary .drop-zone{ padding:26px 16px; }
-    .scanner-primary .drop-zone .dz-icon{ width:58px; height:58px; margin-bottom:14px; }
-    .scanner-primary .drop-zone .dz-icon svg{ width:24px; height:24px; }
-    .scanner-primary .drop-zone .dz-title{ font-size:16px; }
-    .scanner-primary .drop-zone .dz-sub{ font-size:12.5px; max-width:300px; }
+  @media (max-width:900px){
+    .scanner-primary .drop-zone{
+      padding: clamp(20px,5.4vw,38px) clamp(14px,4vw,22px);
+      border-radius: clamp(15px,3vw,20px);
+    }
+    .scanner-primary .drop-zone .dz-icon{
+      width: clamp(42px,10vw,74px);
+      height: clamp(42px,10vw,74px);
+      margin-bottom: clamp(9px,2.8vw,18px);
+    }
+    .scanner-primary .drop-zone .dz-icon svg{ width: clamp(17px,4.2vw,30px); height: clamp(17px,4.2vw,30px); }
+    .scanner-primary .drop-zone .dz-title{ font-size: clamp(13.5px,3.6vw,18.5px); }
+    .scanner-primary .drop-zone .dz-sub{ font-size: clamp(11px,2.9vw,13.5px); max-width: clamp(230px,80vw,360px); line-height:1.45; }
+  }
+
+  .drop-zone .dz-req{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:14px;
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-size:10.5px; font-weight:700; letter-spacing:0.05em;
+    color:var(--text-faint);
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(207,216,255,0.16);
+    padding:5px 13px; border-radius:20px;
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    white-space:nowrap;
+  }
+  .drop-zone .dz-req::before{ content:'🎯'; font-size:11px; }
+  @media (max-width:900px){
+    .drop-zone .dz-req{
+      font-size: clamp(7px,2.1vw,9.5px);
+      padding: clamp(3px,0.9vw,4px) clamp(6px,2.2vw,11px);
+      margin-top: clamp(8px,2.2vw,10px);
+      gap:3px;
+      letter-spacing:0.01em;
+      max-width:100%;
+    }
+    .drop-zone .dz-req::before{ font-size: clamp(7px,2.1vw,9.5px); }
+  }
+  @media (max-width:400px){
+    .drop-zone .dz-req{
+      font-size: clamp(6.2px,1.9vw,7.5px);
+      padding: 3px clamp(5px,1.8vw,8px);
+      letter-spacing:0;
+      gap:2px;
+    }
+    .drop-zone .dz-req::before{ font-size: clamp(6.2px,1.9vw,7.5px); }
+  }
+
+  /* ---------- Cancel / remove-upload button on the scan-result card ---------- */
+  .sr-reset-btn{
+    position:absolute; top:10px; right:10px; z-index:2;
+    width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(207,216,255,0.2);
+    color:var(--text-dim);
+    font-size:13px; line-height:1; cursor:pointer;
+    transition: background .2s, border-color .2s, color .2s, transform .15s;
+  }
+  .sr-reset-btn:hover{
+    background:rgba(255,56,96,0.14);
+    border-color:rgba(255,56,96,0.5);
+    color:#ff9db0;
+    transform:rotate(90deg);
+  }
+  .sr-reset-btn:active{ transform:rotate(90deg) scale(0.9); }
+
+  /* ---------- "Send to manager for review" prompt (Yes / No) ---------- */
+  .sr-transfer{
+    display:none;
+    margin:14px 6px 4px;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(207,216,255,0.16);
+    background:rgba(255,255,255,0.025);
+  }
+  .sr-transfer.show{ display:block; }
+  .sr-transfer-q{ font-size:12.5px; line-height:1.5; color:var(--text-dim); margin-bottom:12px; }
+  .sr-transfer-q b{ color:var(--text); }
+  .sr-transfer-actions{ display:flex; gap:10px; }
+  .st-btn{
+    flex:1; padding:11px 14px; border-radius:12px;
+    font-family:'Space Grotesk','Noto Sans Georgian',sans-serif;
+    font-weight:700; font-size:13px; cursor:pointer;
+    border:1.5px solid transparent;
+    transition: transform .15s, box-shadow .2s, opacity .2s, background .2s;
+  }
+  .st-btn:disabled{ opacity:0.55; cursor:default; transform:none !important; }
+  .st-yes{
+    background:linear-gradient(135deg, #25D366, #1aa851);
+    color:#08210f;
+    box-shadow:0 8px 20px rgba(37,211,102,0.32);
+  }
+  .st-yes:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 10px 26px rgba(37,211,102,0.4); }
+  .st-no{
+    background:rgba(255,56,96,0.06);
+    border-color:rgba(255,56,96,0.5);
+    color:#ff9db0;
+  }
+  .st-no:hover:not(:disabled){ background:rgba(255,56,96,0.14); transform:translateY(-1px); }
+  .sr-transfer-done{
+    display:flex; align-items:center; gap:7px;
+    font-size:12.5px; font-weight:700; color:var(--wa);
+  }
+  .sr-transfer-timer{
+    display:none;
+    align-items:center; gap:14px;
+    padding:13px 16px;
+    border-radius:14px;
+    border:1px solid rgba(255,210,63,0.4);
+    background:
+      radial-gradient(ellipse 100% 130% at 0% 50%, rgba(255,210,63,0.14), transparent 70%),
+      rgba(255,255,255,0.03);
+  }
+  .sr-transfer-timer.show{ display:flex; }
+  .stt-count{
+    flex:0 0 auto;
+    width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    border:2px solid var(--gold);
+    font-family:'JetBrains Mono', monospace;
+    font-weight:800; font-size:16px;
+    color:var(--gold);
+    box-shadow:0 0 16px rgba(255,210,63,0.4);
+    animation: sttPulse 1s ease-in-out infinite;
+  }
+  @keyframes sttPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.1); } }
+  @media (prefers-reduced-motion: reduce){ .stt-count{ animation:none; } }
+  .stt-msg{
+    font-family:'Space Grotesk','Noto Sans Georgian',sans-serif;
+    font-style:italic;
+    font-size:12.5px; line-height:1.5;
+    color:var(--text);
+    letter-spacing:0.01em;
+  }
+  .stt-msg b{ color:var(--gold); }
+
+  /* ---------- Rejected-format panel (wrong resolution / fps) ---------- */
+  .sr-reject{
+    display:none;
+    margin-top:16px;
+    padding:20px 18px;
+    border-radius:20px;
+    border:1.5px solid rgba(255,56,96,0.4);
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,56,96,0.14), transparent 60%),
+      linear-gradient(180deg, rgba(36,10,20,0.92), rgba(20,8,16,0.92));
+    box-shadow:0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .sr-reject.show{ display:block; }
+  .sr-reject-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .sr-reject-ico{ font-size:18px; filter:drop-shadow(0 0 8px rgba(255,56,96,0.6)); }
+  .sr-reject-title{
+    font-family:'JetBrains Mono','Noto Sans Georgian',sans-serif;
+    font-size:12.5px; font-weight:800; letter-spacing:0.04em;
+    color:#ff9db0; text-transform:uppercase;
+  }
+  .sr-reject-detected-row{
+    font-size:12px; color:var(--text-dim); margin-bottom:10px;
+    padding:9px 12px; border-radius:12px;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+  }
+  .sr-reject-detected-row b{ color:#ffb3c0; }
+  .sr-reject-text{ font-size:13px; line-height:1.6; color:var(--text); margin:0 0 14px; }
+  .sr-reject-text b{ color:#ffd23f; }
+  .sr-reject-apps-row{
+    display:flex; flex-wrap:wrap; align-items:center; gap:7px;
+    margin-bottom:8px; font-size:12px;
+  }
+  .sr-reject-apps-label{ color:var(--text-faint); margin-right:2px; }
+  .sr-chip{
+    display:inline-flex; align-items:center;
+    padding:4px 11px; border-radius:20px;
+    font-family:'JetBrains Mono','Noto Sans Georgian',sans-serif;
+    font-size:11px; font-weight:700;
+    background:rgba(207,216,255,0.08);
+    border:1px solid rgba(207,216,255,0.3);
+    color:#dbe2ff;
+  }
+  .sr-reject-etc{ color:var(--text-faint); font-size:11.5px; }
+  .sr-reject-retry{
+    margin-top:10px; width:100%;
+    padding:11px 14px; border-radius:12px;
+    background:rgba(255,255,255,0.04);
+    border:1.5px solid rgba(255,56,96,0.4);
+    color:#ff9db0; font-weight:700; font-size:13px; cursor:pointer;
+    transition: background .2s, transform .15s;
+  }
+  .sr-reject-retry:hover{ background:rgba(255,56,96,0.12); transform:translateY(-1px); }
+  @media (max-width:480px){
+    .sr-reject{ padding:16px 14px; }
+    .sr-reject-apps-row{ font-size:11px; }
   }
 
   /* ---------- Manual duration entry (collapsed accordion, stopwatch card) ---------- */
@@ -1606,34 +1868,34 @@
     padding:14px 16px;
     border-radius:16px;
     border:1.5px dashed var(--border);
-    background: rgba(255,159,64,0.03);
+    background: rgba(34,195,255,0.03);
     text-align:left;
     cursor:pointer;
     transition: border-color .2s, background .2s, transform .15s;
   }
   .manual-entry-toggle:hover, .manual-entry-toggle:focus-visible{
-    border-color: rgba(255,159,64,0.55);
-    background: rgba(255,159,64,0.07);
+    border-color: rgba(34,195,255,0.55);
+    background: rgba(34,195,255,0.07);
     outline:none;
   }
   .manual-entry-toggle:active{ transform:scale(0.99); }
   .manual-entry-toggle[aria-expanded="true"]{
     border-style:solid;
-    border-color: rgba(255,159,64,0.4);
-    background: rgba(255,159,64,0.06);
+    border-color: rgba(34,195,255,0.4);
+    background: rgba(34,195,255,0.06);
   }
   .met-badge{
     flex:0 0 auto; width:42px; height:42px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    background: linear-gradient(160deg, rgba(255,159,64,0.24), rgba(255,79,163,0.08));
-    border:1px solid rgba(255,159,64,0.4);
-    box-shadow: 0 0 18px rgba(255,159,64,0.2), inset 0 1px 1px rgba(255,255,255,0.08);
+    background: linear-gradient(160deg, rgba(34,195,255,0.24), rgba(59,109,255,0.08));
+    border:1px solid rgba(34,195,255,0.4);
+    box-shadow: 0 0 18px rgba(34,195,255,0.2), inset 0 1px 1px rgba(255,255,255,0.08);
   }
   .met-badge svg{
     width:20px; height:20px;
     fill:none; stroke:#ffd88a; stroke-width:2;
     stroke-linecap:round; stroke-linejoin:round;
-    filter: drop-shadow(0 0 6px rgba(255,159,64,0.7));
+    filter: drop-shadow(0 0 6px rgba(34,195,255,0.7));
   }
   .met-text{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:3px; }
   .met-title{ font-size:13.5px; font-weight:700; color:var(--text); line-height:1.35; }
@@ -1647,7 +1909,7 @@
   .met-chevron svg{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
   .manual-entry-toggle[aria-expanded="true"] .met-chevron{
     transform:rotate(180deg);
-    border-color: rgba(255,159,64,0.5);
+    border-color: rgba(34,195,255,0.5);
     color: var(--cyan);
   }
   @media (max-width:480px){
@@ -1668,11 +1930,11 @@
   .manual-fallback .manual-fallback-pad{ padding-top:12px; }
 
   .manual-entry-card{
-    border:1.5px dashed rgba(255,159,64,0.35);
+    border:1.5px dashed rgba(34,195,255,0.35);
     border-radius:18px;
     padding:20px 18px 18px;
     background:
-      radial-gradient(ellipse 70% 70% at 50% 0%, rgba(255,159,64,0.08), transparent 70%),
+      radial-gradient(ellipse 70% 70% at 50% 0%, rgba(34,195,255,0.08), transparent 70%),
       #0a0a12;
   }
   .mec-head{
@@ -1684,7 +1946,7 @@
     font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
     font-weight:700; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
     color:#ffd88a;
-    text-shadow:0 0 10px rgba(255,159,64,0.35);
+    text-shadow:0 0 10px rgba(34,195,255,0.35);
   }
 
   .mec-stopwatch{ display:flex; align-items:flex-start; justify-content:center; gap:12px; }
@@ -1703,7 +1965,7 @@
     cursor:pointer; user-select:none;
     transition: border-color .18s, color .18s, box-shadow .18s, transform .12s;
   }
-  .mec-step:hover{ border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 14px rgba(255,159,64,0.3); }
+  .mec-step:hover{ border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 14px rgba(34,195,255,0.3); }
   .mec-step:active{ transform:scale(0.9); }
   .mec-digit-input{
     width:74px;
@@ -1719,7 +1981,7 @@
     outline:none;
     transition: border-color .2s, box-shadow .2s;
   }
-  .mec-digit-input:focus{ border-color:var(--cyan); box-shadow:0 0 0 3px rgba(255,159,64,0.16), 0 0 20px rgba(255,159,64,0.3); }
+  .mec-digit-input:focus{ border-color:var(--cyan); box-shadow:0 0 0 3px rgba(34,195,255,0.16), 0 0 20px rgba(34,195,255,0.3); }
   .mec-digit-input.error{ border-color:var(--warn) !important; box-shadow:0 0 15px rgba(255,107,107,0.4) !important; }
   .mec-digit-input::-webkit-outer-spin-button,
   .mec-digit-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
@@ -1734,7 +1996,7 @@
     font-family:'JetBrains Mono', sans-serif;
     font-weight:800; font-size:26px;
     color:var(--cyan);
-    text-shadow:0 0 10px rgba(255,159,64,0.6);
+    text-shadow:0 0 10px rgba(34,195,255,0.6);
     animation: mecColonBlink 1.4s steps(1) infinite;
   }
   @keyframes mecColonBlink{ 50%{ opacity:0.25; } }
@@ -1872,11 +2134,12 @@
   .urgency-badge b{ color:#fff; }
   @keyframes urgencyPulse{ 0%,100%{ box-shadow:0 0 0 rgba(255,92,61,0); } 50%{ box-shadow:0 0 14px rgba(255,92,61,0.45); } }
   .wp-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:9px;
+    display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:9px;
     margin:16px 0 14px;
   }
   .wp-box{
     position:relative;
+    min-width:0;
     aspect-ratio:1 / 1;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
     background:
@@ -1960,6 +2223,13 @@
   .wp-grid-single .wp-box-fps{ margin-top:0; }
   .wp-grid-single .wp-box-price{ flex-direction:row; gap:6px; margin-top:0; }
 
+  /* Two-format package card (1080p / 4K choice) */
+  .wp-grid-two{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .wp-grid-two .wp-box{ aspect-ratio:auto !important; padding:14px 8px; min-width:0; }
+  .wp-grid-two .wp-box-q,
+  .wp-grid-two .wp-box-fps,
+  .wp-grid-two .wp-box-price{ max-width:100%; overflow-wrap:break-word; }
+
   /* ---------- Monthly subscription panel (premium) ---------- */
   .mp-panel{
     position:relative;
@@ -1988,11 +2258,12 @@
     white-space:nowrap;
   }
   .mp-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:9px;
+    display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:9px;
     margin:16px 0 14px;
   }
   .mp-box{
     position:relative;
+    min-width:0;
     aspect-ratio:1 / 1;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
     background:
@@ -2066,6 +2337,13 @@
   }
   .mp-grid-single .mp-box-fps{ margin-top:0; }
   .mp-grid-single .mp-box-price{ flex-direction:row; gap:6px; margin-top:0; }
+
+  /* Two-format package card (1080p / 4K choice) */
+  .mp-grid-two{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .mp-grid-two .mp-box{ aspect-ratio:auto !important; padding:14px 8px; min-width:0; }
+  .mp-grid-two .mp-box-q,
+  .mp-grid-two .mp-box-fps,
+  .mp-grid-two .mp-box-price{ max-width:100%; overflow-wrap:break-word; }
 
   .warn-panel{
     position:relative;
@@ -2880,6 +3158,50 @@
     .ba-slider{ max-width:165px; }
   }
 
+  /* --- Edit Order panel (fixed-price character edit) --- */
+  .eo-box{ padding:18px; }
+  .eo-video-wrap{
+    position:relative; width:100%; max-width:280px; margin:0 auto 14px;
+    aspect-ratio:3/4; border-radius:16px; overflow:hidden;
+    border:1px solid var(--border); background:#000;
+    box-shadow:0 16px 40px rgba(0,0,0,0.45);
+  }
+  .eo-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .eo-video-badge{
+    position:absolute; top:10px; right:10px; z-index:2;
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif; font-size:9.5px; font-weight:800; letter-spacing:0.08em;
+    padding:4px 9px; border-radius:7px; text-transform:uppercase;
+    background:rgba(4,4,8,0.68); backdrop-filter:blur(4px);
+    border:1px solid var(--border-soft); color:var(--text-dim);
+    pointer-events:none;
+  }
+  .eo-caption{
+    font-family:'Space Grotesk', 'Noto Sans Georgian', sans-serif; font-size:16px; font-weight:800;
+    text-align:center; color:#fff; margin:0 0 8px; line-height:1.3;
+  }
+  .eo-desc{
+    font-size:13px; line-height:1.6; text-align:center; color:#e8c9c9 !important; margin:0 0 16px;
+  }
+  .eo-price-row{
+    display:flex; align-items:baseline; justify-content:center; gap:9px;
+  }
+  .eo-price-label{
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif; font-size:11px; letter-spacing:0.08em;
+    color:var(--text-faint); text-transform:uppercase;
+  }
+  .eo-price{
+    font-family:'Space Grotesk', sans-serif; font-size:27px; font-weight:800; color:var(--gold);
+    text-shadow:0 0 14px rgba(255,210,63,0.5);
+  }
+  .eo-price sup{ font-size:0.5em; margin-left:2px; opacity:0.85; }
+  @media (max-width:480px){
+    .eo-box{ padding:14px; }
+    .eo-video-wrap{ max-width:220px; }
+    .eo-caption{ font-size:14.5px; }
+    .eo-desc{ font-size:12px; margin-bottom:13px; }
+    .eo-price{ font-size:23px; }
+  }
+
   /* --- Universal 3D tilt / depth-hover for Moonfade cards --- */
   .tilt-3d{
     position:relative;
@@ -2908,47 +3230,165 @@
     .tilt-3d{ transition:none !important; }
   }
 
+  /* ============================================================
+     PRICING CARDS — 3-tier package selector (individual / weekly / monthly)
+     ============================================================ */
+  .pc-section{ margin-bottom:8px; }
+  .pc-intro{ text-align:center; padding:6px 6px 22px; }
+  .pc-heading{
+    margin:0 0 8px; font-size:clamp(20px, 5.5vw, 30px); font-weight:800; letter-spacing:-0.01em;
+    color:#fff; text-shadow:0 0 22px rgba(59,109,255,0.35);
+    overflow-wrap:break-word;
+  }
+  .pc-subheading{
+    margin:0 auto; max-width:520px; font-size:clamp(12px, 3.4vw, 13.5px); line-height:1.6; color:var(--text-dim);
+    overflow-wrap:break-word;
+  }
+
+  .pricing-cards{
+    display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px;
+    margin-bottom:22px;
+  }
+  @media (max-width:900px){
+    .pricing-cards{ grid-template-columns:minmax(0, 1fr); }
+  }
+
+  .pc-card{
+    position:relative;
+    min-width:0;
+    max-width:100%;
+    border-radius:24px;
+    border:1px solid color-mix(in srgb, var(--pc-accent) 32%, var(--border));
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -10%, color-mix(in srgb, var(--pc-accent) 16%, transparent), transparent 65%),
+      linear-gradient(180deg, var(--panel), var(--panel-2));
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 10%, transparent);
+    padding:26px 22px 22px;
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .pc-card--indiv{ --pc-accent: #3fd9c7; }
+  .pc-card--weekly{ --pc-accent: #38b6ff; }
+  .pc-card--monthly{ --pc-accent: #ffd23f; }
+
+  .pc-ribbon{
+    position:absolute; top:16px; right:-34px; width:150px;
+    transform:rotate(40deg); text-align:center;
+    background:linear-gradient(90deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 60%, #fff));
+    color:#0b0f1c; font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    font-size:9.5px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+    padding:5px 0; box-shadow:0 6px 18px rgba(0,0,0,0.35);
+  }
+
+  .pc-icon{
+    width:46px; height:46px; border-radius:14px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:21px; line-height:1;
+    background:linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 55%, transparent), color-mix(in srgb, var(--pc-accent) 18%, transparent));
+    border:1px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    box-shadow:0 8px 20px -6px color-mix(in srgb, var(--pc-accent) 60%, transparent), inset 0 1px 0 rgba(255,255,255,0.25);
+    margin-bottom:14px;
+  }
+
+  .pc-title{
+    font-size:clamp(12px, 3.4vw, 13px); font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
+    color:#fff; margin-bottom:6px;
+    overflow-wrap:break-word; word-break:break-word;
+  }
+  .pc-desc{
+    font-size:clamp(11.5px, 3.2vw, 12.5px); line-height:1.55; color:var(--text-dim); margin-bottom:16px; min-height:0;
+    overflow-wrap:break-word; word-break:break-word;
+  }
+
+  .pc-price-line{
+    font-family:'JetBrains Mono', 'Noto Sans Georgian', sans-serif;
+    display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+    margin-bottom:2px;
+  }
+  .pc-price-line b{
+    font-size:clamp(21px, 6vw, 26px); font-weight:800; color:#fff;
+    text-shadow:0 0 18px color-mix(in srgb, var(--pc-accent) 55%, transparent);
+  }
+  .pc-price-line .pc-price-sep{ color:var(--text-faint); font-size:clamp(13px, 3.6vw, 16px); }
+  .pc-price-note{
+    font-size:clamp(10px, 2.8vw, 11px); color:var(--text-faint); margin-bottom:18px; line-height:1.5;
+    overflow-wrap:break-word;
+  }
+
+  .pc-features{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; flex:1; min-width:0; }
+  .pc-feature{
+    display:flex; align-items:flex-start; gap:10px; font-size:clamp(12px, 3.2vw, 13px); line-height:1.4; color:var(--text);
+    min-width:0;
+  }
+  .pc-feature span:last-child{ overflow-wrap:break-word; word-break:break-word; min-width:0; }
+  .pc-feature .pc-check{
+    flex:0 0 auto; width:18px; height:18px; border-radius:50%; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800;
+    background:color-mix(in srgb, var(--pc-accent) 30%, transparent);
+    color:color-mix(in srgb, var(--pc-accent) 70%, #fff);
+    border:1px solid color-mix(in srgb, var(--pc-accent) 60%, transparent);
+  }
+
+  .pc-toggle-btn{
+    appearance:none; border:none; cursor:pointer; width:100%;
+    display:flex; align-items:center; justify-content:center;
+    padding:14px 10px; border-radius:14px;
+    font-family:'Space Grotesk', 'Noto Sans Georgian', sans-serif;
+    font-size:clamp(11.5px, 3.6vw, 14.5px); font-weight:800; letter-spacing:0; color:#04101a;
+    white-space:nowrap;
+    background:linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff));
+    box-shadow:0 10px 26px -8px color-mix(in srgb, var(--pc-accent) 70%, transparent);
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px color-mix(in srgb, var(--pc-accent) 80%, transparent); }
+  .pc-toggle-btn:active{ transform:translateY(0); }
+
+  /* Opens directly on top of the page — the exact same mechanism as the
+     menu drawer (fixed overlay + scrim), not an inline reveal — so opening
+     it never pushes the rest of the page down. Instant, no animation. */
+  .pc-modal-scrim{
+    display:none;
+    position:fixed; inset:0; z-index:64;
+    background:rgba(4,4,8,0.7);
+  }
+  .pc-modal-scrim.open{ display:block; }
+
+  .pc-accordion-body.panel{
+    display:none;
+  }
+  .pc-card.pc-open .pc-accordion-body.panel{
+    display:block;
+    position:fixed; z-index:65;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    max-height:85vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    width:calc(100% - 32px); max-width:640px;
+    box-sizing:border-box;
+    border-radius:22px;
+    padding-top:56px;
+    border-color: color-mix(in srgb, var(--pc-accent) 30%, var(--border));
+  }
+  .pc-modal-close{
+    position:fixed; top:16px; right:16px; z-index:66;
+    width:34px; height:34px; border-radius:10px;
+    background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    color:var(--text-dim); font-size:14px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition: color .2s, border-color .2s, background .2s, transform .15s;
+  }
+  .pc-modal-close:hover{ color:#fff; border-color:var(--purple-soft); background:rgba(124,143,255,0.1); }
+  .pc-modal-close:active{ transform:scale(0.92); }
+
+  @media (max-width:600px){
+    .pc-card{ padding:20px 16px 16px; }
+  }
+  @media (max-width:380px){
+    .pc-card{ padding:16px 12px 14px; }
+    .pc-toggle-btn{ padding:13px 8px; }
+  }
 </style>
 </head>
 <body>
-<style>
-  #site-blur-wrap{
-    filter: blur(22px) saturate(1.1);
-    -webkit-filter: blur(22px) saturate(1.1);
-    pointer-events: none;
-    user-select: none;
-  }
-  html, body{ overflow: hidden !important; height: 100%; }
-  #maintenance-overlay{
-    position: fixed; inset: 0; z-index: 999999;
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px;
-    background: rgba(21,12,34,0.58);
-  }
-  #maintenance-overlay .mo-card{
-    max-width: 460px; width: 100%;
-    background: linear-gradient(180deg, rgba(34,20,58,0.95), rgba(23,12,38,0.96));
-    border: 1px solid var(--border, #4a2f78);
-    border-radius: 24px;
-    padding: 38px 30px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 50px rgba(255,79,163,0.18);
-    font-family: 'Space Grotesk', 'Noto Sans Georgian', sans-serif;
-  }
-  #maintenance-overlay .mo-title{
-    font-size: 23px; font-weight: 700;
-    color: #fff6ef; margin: 0 0 16px; letter-spacing: 0.01em;
-  }
-  #maintenance-overlay .mo-body{
-    font-size: 16px; line-height: 1.65;
-    color: #c2a9e6; margin: 0 0 16px;
-  }
-  #maintenance-overlay .mo-foot{
-    font-size: 17px; font-weight: 600;
-    color: #fff6ef; margin: 0;
-  }
-</style>
-<div id="site-blur-wrap">
 
 <div class="bg-layer">
   <div class="ruler"></div>
@@ -2993,6 +3433,7 @@
         <div class="quick-nav" id="quickNav">
         <button type="button" class="qn-tab scanner-jump-link" data-jump="trustPanel"><span class="qn-label" data-i18n="qnWhy">რატომ MOON<span class="qn-q">?</span></span></button>
         <button type="button" class="qn-tab scanner-jump-link" data-jump="portfolioPanel"><span class="qn-label" data-i18n="qnPortfolio">პორტფოლიო</span></button>
+        <button type="button" class="qn-tab scanner-jump-link" data-jump="editOrderPanel"><span class="qn-label" data-i18n="qnEditOrder">✨ ედითის შეკვეთა</span></button>
         <button type="button" class="qn-tab scanner-jump-link" data-jump="myOrdersPanel"><span class="qn-label" data-i18n="myOrdersLabel">ჩემი შეკვეთები</span></button>
         <button type="button" class="qn-tab scanner-jump-link" data-jump="howtoPanel"><span class="qn-label" data-i18n="qnHowto">როგორ შევუკვეთო</span></button>
         <button type="button" class="qn-tab scanner-jump-link" data-jump="promoPanel"><span class="qn-label" data-i18n="qnPromo">🎟 პრომო კოდი</span></button>
@@ -3116,6 +3557,56 @@
                   <div class="portfolio-name" id="portfolioName2">@marveluniversee26</div>
                   <div class="portfolio-cta"><span class="pc-play">▶</span> <span data-i18n="portfolioCta">ნამუშევრის ნახვა TikTok-ზე</span></div>
                 </a>
+              </div>
+            </div>
+
+            <div class="qn-drop-slot" id="qnSlotEditOrder">
+              <div class="qn-drop-head"><span class="al-icon">✨</span><span data-i18n="eoLabel">ედითის შეკვეთა</span></div>
+              <div class="eo-box moon-glow-card">
+                <div class="qn-stars" aria-hidden="true">
+                  <span style="top:10%;left:8%;animation-delay:0s;"></span>
+                  <span style="top:70%;left:14%;animation-delay:.6s;"></span>
+                  <span style="top:18%;left:88%;animation-delay:1.2s;"></span>
+                  <span style="top:82%;left:80%;animation-delay:.3s;"></span>
+                  <span style="top:46%;left:6%;animation-delay:1.6s;"></span>
+                </div>
+                <div class="eo-video-wrap">
+                  <video class="eo-video" id="eoVideo" src="edit-order-sample.mp4" poster="edit-order-poster.jpg" autoplay muted loop playsinline controls preload="metadata"></video>
+                  <span class="eo-video-badge" data-i18n="eoVideoBadge">ნიმუში</span>
+                </div>
+                <div class="eo-caption" data-i18n="eoCaption">მსგავსი ედითი — თქვენი პერსონაჟით</div>
+                <div class="eo-desc" data-i18n="eoDesc">ზუსტად ამ სტილის მონტაჟი შენი საყვარელი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი და ა.შ). შეუკვეთე და ჩატში გამომიგზავნე პერსონაჟის ფოტო/რეფერენსი — დანარჩენს ჩვენ გავაკეთებთ.</div>
+                <div class="eo-price-row">
+                  <span class="eo-price-label" data-i18n="eoPriceLabel">ფასი</span>
+                  <span class="eo-price">19.99<sup>₾</sup></span>
+                </div>
+                <div class="order-grid" style="margin-top:14px;">
+                  <button class="order-btn wa" id="eoOrderBtnWA">
+                    <div class="qn-stars" aria-hidden="true">
+                      <span style="top:15%;left:8%;animation-delay:0s;"></span>
+                      <span style="top:65%;left:20%;animation-delay:.6s;"></span>
+                      <span style="top:25%;left:45%;animation-delay:1.1s;"></span>
+                      <span style="top:70%;left:60%;animation-delay:.3s;"></span>
+                      <span style="top:20%;left:78%;animation-delay:1.5s;"></span>
+                      <span style="top:60%;left:92%;animation-delay:.9s;"></span>
+                    </div>
+                    <span class="ico"><svg viewBox="0 0 24 24"><path d="M20.52 3.449C12.831-3.984.106 5.845.061 12.68a12.94 12.94 0 001.767 6.583L0 24l5.001-1.79a12.914 12.914 0 006.482 1.658h.006c6.24 0 12.243-5.302 12.243-12.213 0-3.264-1.325-6.334-3.212-8.206zM12 22.121h-.005a10.13 10.13 0 01-5.185-1.421l-.372-.22-3.851 1.377 1.4-3.756-.242-.386a10.108 10.108 0 01-1.554-5.396c.005-5.579 4.548-10.115 10.133-10.115 2.703 0 5.243 1.057 7.148 2.978 1.905 1.921 2.952 4.464 2.951 7.153-.004 5.58-4.547 10.106-10.423 10.106zm5.556-7.596c-.303-.152-1.793-.885-2.07-.986-.278-.101-.48-.152-.682.152-.202.303-.783.986-.96 1.188-.176.202-.353.227-.655.076-.303-.152-1.279-.472-2.436-1.505-.9-.803-1.508-1.794-1.685-2.097-.176-.303-.019-.467.133-.618.136-.135.303-.353.454-.53.152-.176.202-.303.303-.505.101-.202.05-.379-.025-.53-.076-.152-.682-1.646-.934-2.253-.246-.591-.497-.511-.682-.52-.176-.008-.379-.01-.581-.01-.202 0-.53.076-.808.379-.278.303-1.06 1.036-1.06 2.528s1.085 2.933 1.236 3.135c.151.202 2.135 3.259 5.17 4.57.723.312 1.287.498 1.727.638.726.231 1.386.198 1.908.12.582-.087 1.793-.734 2.046-1.442.253-.708.253-1.315.177-1.442-.075-.126-.278-.202-.581-.353z"/></svg></span>
+                    <span data-i18n="eoSendWA" id="eoOrderBtnWAText">ედითის შეკვეთა — WhatsApp</span>
+                  </button>
+                  <button class="order-btn tg" id="eoOrderBtnTG">
+                    <div class="qn-stars" aria-hidden="true">
+                      <span style="top:15%;left:8%;animation-delay:.2s;"></span>
+                      <span style="top:65%;left:20%;animation-delay:.8s;"></span>
+                      <span style="top:25%;left:45%;animation-delay:1.3s;"></span>
+                      <span style="top:70%;left:60%;animation-delay:.5s;"></span>
+                      <span style="top:20%;left:78%;animation-delay:1.7s;"></span>
+                      <span style="top:60%;left:92%;animation-delay:1.1s;"></span>
+                    </div>
+                    <span class="ico"><svg viewBox="0 0 24 24"><path d="M23.91 3.79L20.3 20.84c-.25 1.21-.98 1.5-2 .94l-5.5-4.07-2.66 2.57c-.3.3-.55.55-1.12.55l.4-5.7 10.38-9.4c.45-.4-.1-.63-.7-.23L7.28 13.55l-5.6-1.75c-1.22-.38-1.24-1.22.26-1.8L22.4 2.35c1.02-.38 1.9.24 1.51 1.44z"/></svg></span>
+                    <span data-i18n="eoSendTG" id="eoOrderBtnTGText">ედითის შეკვეთა — Telegram</span>
+                  </button>
+                </div>
+                <div class="copy-note" id="eoCopyNote"></div>
               </div>
             </div>
 
@@ -3253,25 +3744,35 @@
     </div>
   </div>
 
-  <div class="hero">
-    <div class="hero-cta-group">
-      <h1 class="hero-cta-heading">
-        <button type="button" class="hero-cta-btn scanner-jump-link" id="heroCtaBtn" data-jump="orderFlowPanel" data-i18n="heroTitle"><span>შეუკვეთე ახლავე!</span></button>
-      </h1>
-      <div class="tutorial-link-wrap">
-        <a class="tutorial-link" href="https://www.mediafire.com/file/7csav42120ngpjg/%E1%83%A2%E1%83%A3%E1%83%A2%E1%83%9D%E1%83%A0%E1%83%98%E1%83%90%E1%83%9A%E1%83%98.mp4/file" target="_blank" rel="noopener noreferrer" data-i18n="tutorialLink">🎬 ტუტორიალი</a>
-      </div>
-    </div>
-  </div>
+  <div class="pc-modal-scrim" id="pcModalScrim"></div>
 
-  <div class="panel" id="orderFlowPanel">
-    <div class="readout">
-      <div class="tag" data-i18n="finalPrice">საბოლოო ღირებულება</div>
-      <div class="price" id="priceDisplay">1.50<sup>₾</sup></div>
-      <div class="sub-note" id="subNote" data-i18n="notSubscribed"><span class="sub-note-icon">💡</span><span class="sub-note-text"><b>გახდი გამომწერი და დაზოგე თანხა!</b></span></div>
+  <div class="pc-section">
+    <div class="pc-intro">
+      <h1 class="pc-heading" data-i18n="pcHeading">აირჩიე პაკეტი</h1>
+      <p class="pc-subheading" data-i18n="pcSubheading">დააჭირე „ფასის გამოთვლას" ნებისმიერ ბარათზე — გაიხსნება ვიდეო სკანერი და შეკვეთის გაგზავნის ველები.</p>
     </div>
 
-    <!-- Video duration checker — PRIMARY input method -->
+    <div class="pricing-cards">
+
+      <!-- Card 1 — individual / single-video package -->
+      <div class="pc-card pc-card--indiv">
+        <div class="pc-icon" aria-hidden="true">🎬</div>
+        <div class="pc-title" data-i18n="pc1Title">ცალობითი პაკეტი</div>
+        <div class="pc-desc" data-i18n="pc1Desc">ერთი ვიდეო — ფასი ავტომატურად გამოითვლება ვიდეოს ხანგრძლივობის მიხედვით.</div>
+        <div class="pc-price-line"><span class="pc-price-sep" data-i18n="pcFrom">დან</span><b>1.49₾</b></div>
+        <div class="pc-price-note" data-i18n="pc1PriceNote">ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე</div>
+        <div class="pc-features">
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080p-მდე • 60 კადრი/წმ</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature2">ბარდება არაუმეტეს 24 საათში</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature3">4K / 120 კადრი/წმ გამომავალი</span></div>
+        </div>
+        <button type="button" class="pc-toggle-btn" id="pcToggleIndiv" aria-expanded="false" aria-controls="orderFlowPanel">
+          <span data-i18n="pcCalcBtn">ფასის გამოთვლა</span>
+        </button>
+
+        <div class="panel pc-accordion-body" id="orderFlowPanel">
+    <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <!-- Video duration checker — PRIMARY input method, now the very first thing in the panel -->
     <div class="panel-section scanner-primary" id="videoScannerPanel">
       <div class="panel-head scanner-head-row">
         <div class="scanner-primary-badge"><span class="spb-dot"></span><span data-i18n="scannerPrimaryBadge">⚡ ავტომატური და ზუსტი</span></div>
@@ -3280,17 +3781,19 @@
       <div class="scanner-stage">
         <div class="drop-zone" id="dropZone">
           <input type="file" id="videoInput" accept="video/*">
-          <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M12 4L7.2 8.8M12 4l4.8 4.8"/><path d="M4.5 15.5v2.8a2.2 2.2 0 002.2 2.2h10.6a2.2 2.2 0 002.2-2.2v-2.8"/></svg></div>
-          <div class="dz-title" data-i18n="dzTitle">ატვირთე ვიდეო ავტომატური გაზომვისთვის</div>
-          <div class="dz-sub" data-i18n="dzSub">გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში</div>
+          <div class="dz-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 13.2A8 8 0 1110.6 3.4 6.3 6.3 0 0020.4 13.2z"/><path class="dz-icon-play" d="M10.1 9.7l4 2.3-4 2.3z"/></svg></div>
+          <div class="dz-title" data-i18n="dzTitle">ატვირთეთ ვიდეო ფასის გამოსათვლელად</div>
+          <div class="dz-req" data-i18n="dzReq">სავალდებულო ფორმატი: ზუსტად 1080p · 60fps</div>
         </div>
         <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
+
         <div class="scan-result" id="scanResult">
+          <button type="button" class="sr-reset-btn" id="srResetBtn" aria-label="გაუქმება" title="გაუქმება">✕</button>
           <div class="sr-specs">
             <div class="sr-row"><span class="sr-ico">📄</span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
             <div class="sr-row"><span class="sr-ico">⏱️</span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
             <div class="sr-row"><span class="sr-ico">🎯</span><span class="sr-label" data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
-            <div class="sr-row" id="srQualityRow" style="display:none;"><span class="sr-ico">🔎</span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
+            <div class="sr-row" id="srQualityRow"><span class="sr-ico">🔎</span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
           </div>
           <div class="sr-price-hero">
             <span class="sr-price-tag" data-i18n="srPrice">გამოთვლილი ფასი</span>
@@ -3299,70 +3802,66 @@
           <div class="sr-info" id="srMatchNote" style="display:none;"></div>
           <div class="sr-warn" id="srMismatchNote" style="display:none;"></div>
           <div class="sr-warn" id="srWarn" style="display:none;"></div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Manual duration entry — collapsed fallback -->
-    <button type="button" class="manual-entry-toggle" id="manualFallbackToggle" aria-expanded="false" aria-controls="manualFallback">
-      <span class="met-badge" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg>
-      </span>
-      <span class="met-text">
-        <span class="met-title" data-i18n="manualFallbackPrompt">არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით</span>
-        <span class="met-sub" data-i18n="manualFallbackSub">სწრაფი ხელით შეყვანა — წამები და მეასედები</span>
-      </span>
-      <span class="met-chevron" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-      </span>
-    </button>
-
-    <div class="manual-fallback" id="manualFallback">
-      <div class="manual-fallback-inner">
-        <div class="manual-fallback-pad">
-          <div class="manual-entry-card">
-            <div class="mec-head">
-              <span class="mec-head-ico" aria-hidden="true">⏱️</span>
-              <span class="mec-head-label" data-i18n="manualEntryBadge">ხელით შეყვანა</span>
+          <div class="sr-transfer" id="srTransfer">
+            <div class="sr-transfer-q" id="srTransferQ" data-i18n="srTransferQ">გსურთ ატვირთული ვიდეო გაეგზავნოს <b>mooontransferr.onrender.com</b>-ზე, რომ ჩვენმა მენეჯერმა შეამოწმოს?</div>
+            <div class="sr-transfer-actions" id="srTransferActions">
+              <button type="button" class="st-btn st-yes" id="srTransferYes" data-i18n="srTransferYes">დიახ</button>
+              <button type="button" class="st-btn st-no" id="srTransferNo" data-i18n="srTransferNo">არა</button>
             </div>
-            <div class="mec-stopwatch">
-              <div class="mec-group">
-                <div class="mec-group-label" data-i18n="secLabelShort">წამები</div>
-                <div class="mec-stepper">
-                  <button type="button" class="mec-step" data-target="secondsInput" data-step="-1" aria-label="−1">−</button>
-                  <input type="number" inputmode="numeric" class="mec-digit-input" id="secondsInput" min="5" max="59" value="5" placeholder="5–59" data-i18n-placeholder="secondsPlaceholder">
-                  <button type="button" class="mec-step" data-target="secondsInput" data-step="1" aria-label="+1">+</button>
-                </div>
-                <div class="mec-group-unit" data-i18n="secUnit">წამი</div>
-              </div>
-              <div class="mec-colon" aria-hidden="true">:</div>
-              <div class="mec-group">
-                <div class="mec-group-label" data-i18n="msLabelShort">მეასედები</div>
-                <div class="mec-stepper">
-                  <button type="button" class="mec-step" data-target="msRange" data-step="-1" aria-label="−1">−</button>
-                  <input type="number" inputmode="numeric" class="mec-digit-input" id="msRange" min="0" max="59" value="0" placeholder="00">
-                  <button type="button" class="mec-step" data-target="msRange" data-step="1" aria-label="+1">+</button>
-                </div>
-                <div class="mec-group-unit" data-i18n="msUnit">მეასედი</div>
-              </div>
+            <div class="sr-transfer-timer" id="srTransferTimer">
+              <span class="stt-count" id="srTransferCountdown">3</span>
+              <span class="stt-msg" data-i18n="srTransferTimerMsg">აუცილებლად იქონიეთ ატვირთული ვიდეოს ლინკი, რომ გადაუგზავნოთ მენეჯერს.</span>
             </div>
-            <div class="hint" data-i18n="msHint">მაქსიმალური სრული ხანგრძლივობაა 59.59 წამი. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.</div>
           </div>
         </div>
+
+        <div class="sr-reject" id="srReject">
+          <div class="sr-reject-head">
+            <span class="sr-reject-ico">⚠️</span>
+            <span class="sr-reject-title" data-i18n="srRejectTitle">ფაილი არ შეესაბამება მოთხოვნებს</span>
+          </div>
+          <div class="sr-reject-detected-row"><span data-i18n="srRejectDetectedLabel">ატვირთული ფაილის მონაცემები:</span> <b id="srRejectDetected">—</b></div>
+          <p class="sr-reject-text" data-i18n="srRejectText">ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.</p>
+          <div class="sr-reject-apps-row">
+            <span class="sr-reject-apps-label" data-i18n="srRejectAppsMobile">მობილურებისთვის / აიფონისთვის / აიპადებისთვის:</span>
+            <span class="sr-chip">CapCut</span><span class="sr-chip">InShot</span><span class="sr-reject-etc" data-i18n="srRejectEtc">და ა.შ.</span>
+          </div>
+          <div class="sr-reject-apps-row">
+            <span class="sr-reject-apps-label" data-i18n="srRejectAppsDesktop">კომპიუტერისთვის:</span>
+            <span class="sr-chip">After Effects</span><span class="sr-chip">Premiere Pro</span><span class="sr-reject-etc" data-i18n="srRejectEtc">და ა.შ.</span>
+          </div>
+          <button type="button" class="sr-reject-retry" id="srRejectRetry" data-i18n="srRejectRetry">↻ სცადე სხვა ვიდეოთი</button>
+        </div>
       </div>
     </div>
+
+    <!-- Manual duration inputs — kept hidden; populated automatically by the video scanner. -->
+    <input type="hidden" id="secondsInput" value="5">
+    <input type="hidden" id="msRange" value="0">
 
     <div class="field">
       <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი</label></div>
-      <div class="quality-grid" id="qualityGrid">
+      <div class="quality-grid quality-grid-two" id="qualityGrid">
         <button type="button" class="quality-btn active" data-quality="1080_60">
           <div class="q-left">
-            <span class="q-rec" data-i18n="qualityRecBadge">ერთადერთი ფორმატი</span>
+            <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
             <span class="q-res">1080p</span>
             <span class="q-fps">60 FPS</span>
           </div>
           <div class="q-right">
             <span class="q-price" data-price-for="1080_60">—</span>
+            <span class="q-check">✓</span>
+          </div>
+        </button>
+        <button type="button" class="quality-btn" data-quality="4k_120">
+          <div class="q-left">
+            <span class="q-rec" data-i18n="qualityBadgePremium">პრემიუმი</span>
+            <span class="q-res">4K</span>
+            <span class="q-fps">120 FPS</span>
+          </div>
+          <div class="q-right">
+            <span class="q-price" data-price-for="4k_120">—</span>
             <span class="q-check">✓</span>
           </div>
         </button>
@@ -3399,6 +3898,25 @@
         <span class="tt-confirm-text" id="tiktokConfirmText">დააჭირეთ დასადასტურებლად</span>
       </div>
       <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
+
+    <div class="field field-tiktok field-video-link" id="videoLinkField" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">🔗</span>
+        <input type="text" class="num-input" id="videoLink" placeholder="mooontransferr.onrender.com/...">
+      </div>
+      <div class="tt-confirm tt-red" id="videoLinkConfirm" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="videoLinkConfirmText">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="videoLinkError" data-i18n="videoLinkError">⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!</div>
     </div>
 
     <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
@@ -3449,7 +3967,7 @@
           <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
           <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
           <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
-          <p data-i18n="warnP4">საიტი მუშაობს მხოლოდ <b>1080p / 60fps</b> ფორმატში — ეს ერთადერთი ხარისხია, რომელსაც ვამონტაჟებთ და ვაწვდით.</p>
+          <p data-i18n="warnP4">ატვირთვისას მასალა ყოველთვის უნდა იყოს <b>ზუსტად 1080p / 60fps</b> — გამომავალი კი შეგიძლიათ აირჩიოთ: სტანდარტული 1080p ან პრემიუმ 4K/120fps.</p>
           <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
         </div>
       </div>
@@ -3457,20 +3975,42 @@
     </div>
   </div>
   </div>
+        </div>
 
-  <!-- Weekly subscription -->
-  <div class="panel wp-panel" id="weeklySubPanel">
+      <!-- Card 2 — weekly subscription package -->
+      <div class="pc-card pc-card--weekly">
+        <div class="pc-icon" aria-hidden="true">📅</div>
+        <div class="pc-title" data-i18n="pc2Title">კვირის პაკეტი</div>
+        <div class="pc-desc" data-i18n="pc2Desc">კვირაში 5 ვიდეო · 1080p-მდე • 60 კადრი/წმ</div>
+        <div class="pc-price-line"><b>24.99₾</b><span class="pc-price-sep">/</span><b>35.99₾</b></div>
+        <div class="pc-price-note" data-i18n="pc2PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
+        <div class="pc-features">
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080p-მდე • 60 კადრი/წმ</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc2Feature1">1 კვირის განმავლობაში სრული შეკვეთა</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc2Feature2">4K / 120 კადრი/წმ გამომავალი</span></div>
+        </div>
+        <button type="button" class="pc-toggle-btn" id="pcToggleWeekly" aria-expanded="false" aria-controls="weeklySubPanel">
+          <span data-i18n="pcCalcBtn">ფასის გამოთვლა</span>
+        </button>
+
+        <div class="panel wp-panel pc-accordion-body" id="weeklySubPanel">
+    <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
     <div class="panel-head">
       <div class="label" data-i18n="wpLabel">1-კვირიანი გამოწერა</div>
       <div class="wp-count-badge" data-i18n="wpBadge">5 ვიდეო / 7 დღე</div>
       <div class="urgency-badge" id="wpUrgencyBadge">🔥 <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">ადგილი დარჩა</span></div>
     </div>
 
-    <div class="wp-grid wp-grid-single" id="wpQualityGrid">
+    <div class="wp-grid wp-grid-two" id="wpQualityGrid">
       <button type="button" class="wp-box active" data-quality="1080_60">
         <span class="wp-box-q">1080p</span>
         <span class="wp-box-fps">60FPS</span>
         <span class="wp-box-price"><s class="wp-old-price"></s><span class="wp-new-price">24.99<sup>₾</sup></span></span>
+      </button>
+      <button type="button" class="wp-box" data-quality="4k_120">
+        <span class="wp-box-q">4K</span>
+        <span class="wp-box-fps">120FPS</span>
+        <span class="wp-box-price"><s class="wp-old-price"></s><span class="wp-new-price">35.99<sup>₾</sup></span></span>
       </button>
     </div>
 
@@ -3508,6 +4048,25 @@
       <div class="error-msg" id="tiktokErrorWp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
     </div>
 
+    <div class="field field-tiktok field-video-link" id="videoLinkFieldWp" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">🔗</span>
+        <input type="text" class="num-input" id="videoLinkWp" placeholder="mooontransferr.onrender.com/...">
+      </div>
+      <div class="tt-confirm tt-red" id="videoLinkConfirmWp" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="videoLinkConfirmTextWp">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="videoLinkErrorWp" data-i18n="videoLinkError">⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!</div>
+    </div>
+
     <div class="order-grid" style="margin-top:18px;">
       <button class="order-btn wa" id="wpOrderBtnWA">
         <div class="qn-stars" aria-hidden="true">
@@ -3536,20 +4095,43 @@
     </div>
     <div class="copy-note" id="wpCopyNote"></div>
   </div>
+        </div>
 
-  <!-- Monthly subscription -->
-  <div class="panel mp-panel" id="monthlySubPanel">
+      <!-- Card 3 — monthly subscription package -->
+      <div class="pc-card pc-card--monthly">
+        <div class="pc-ribbon" data-i18n="pcRibbon">ყველაზე პოპულარული</div>
+        <div class="pc-icon" aria-hidden="true">👑</div>
+        <div class="pc-title" data-i18n="pc3Title">თვის პაკეტი</div>
+        <div class="pc-desc" data-i18n="pc3Desc">თვეში 20 ვიდეო · 1080p-მდე • 60 კადრი/წმ</div>
+        <div class="pc-price-line"><b>49.99₾</b><span class="pc-price-sep">/</span><b>69.99₾</b></div>
+        <div class="pc-price-note" data-i18n="pc3PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
+        <div class="pc-features">
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080p-მდე • 60 კადრი/წმ</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc3Feature1">1 თვის განმავლობაში სრული შეკვეთა</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc3Feature2">4K / 120 კადრი/წმ გამომავალი</span></div>
+        </div>
+        <button type="button" class="pc-toggle-btn" id="pcToggleMonthly" aria-expanded="false" aria-controls="monthlySubPanel">
+          <span data-i18n="pcCalcBtn">ფასის გამოთვლა</span>
+        </button>
+
+        <div class="panel mp-panel pc-accordion-body" id="monthlySubPanel">
+    <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
     <div class="panel-head mp-panel-head">
       <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
       <div class="mp-count-badge" data-i18n="mpBadge">20 ვიდეო / თვე</div>
       <div class="urgency-badge" id="mpUrgencyBadge">🔥 <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">ადგილი დარჩა ამ თვეს</span></div>
     </div>
 
-    <div class="mp-grid mp-grid-single" id="mpQualityGrid">
+    <div class="mp-grid mp-grid-two" id="mpQualityGrid">
       <button type="button" class="mp-box active" data-quality="1080_60">
         <span class="mp-box-q">1080p</span>
         <span class="mp-box-fps">60FPS</span>
-        <span class="mp-box-price"><s class="mp-old-price">89.99₾</s><span class="mp-new-price">69.99<sup>₾</sup></span></span>
+        <span class="mp-box-price"><span class="mp-new-price">49.99<sup>₾</sup></span></span>
+      </button>
+      <button type="button" class="mp-box" data-quality="4k_120">
+        <span class="mp-box-q">4K</span>
+        <span class="mp-box-fps">120FPS</span>
+        <span class="mp-box-price"><span class="mp-new-price">69.99<sup>₾</sup></span></span>
       </button>
     </div>
 
@@ -3572,6 +4154,25 @@
         <span class="tt-confirm-text" id="tiktokConfirmTextMp">დააჭირეთ დასადასტურებლად</span>
       </div>
       <div class="error-msg" id="tiktokErrorMp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
+
+    <div class="field field-tiktok field-video-link" id="videoLinkFieldMp" style="margin-bottom:6px;">
+      <div class="field-top"><label data-i18n="videoLinkLabel">ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *</label></div>
+      <div class="link-input-wrap">
+        <span class="icon">🔗</span>
+        <input type="text" class="num-input" id="videoLinkMp" placeholder="mooontransferr.onrender.com/...">
+      </div>
+      <div class="tt-confirm tt-red" id="videoLinkConfirmMp" style="display:none;">
+        <div class="qn-stars" aria-hidden="true">
+          <span style="top:15%;left:8%;animation-delay:0s;"></span>
+          <span style="top:60%;left:22%;animation-delay:.5s;"></span>
+          <span style="top:25%;left:48%;animation-delay:1s;"></span>
+          <span style="top:65%;left:70%;animation-delay:1.4s;"></span>
+          <span style="top:20%;left:88%;animation-delay:.8s;"></span>
+        </div>
+        <span class="tt-confirm-text" id="videoLinkConfirmTextMp">დააჭირეთ დასადასტურებლად</span>
+      </div>
+      <div class="error-msg" id="videoLinkErrorMp" data-i18n="videoLinkError">⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!</div>
     </div>
 
     <div class="order-grid" style="margin-top:18px;">
@@ -3602,7 +4203,10 @@
     </div>
     <div class="copy-note" id="mpCopyNote"></div>
   </div>
+        </div>
+      </div>
 
+    </div>
   <!-- Comments -->
   <div class="panel comments-panel" style="padding:22px;">
     <div class="panel-head" style="margin-bottom:10px;">
@@ -3679,6 +4283,14 @@
         <div class="a-form-row"><label data-i18n="adminOrdersFail">წარუმატებელი</label><input type="number" id="ordersFailInput" min="0"></div>
         <div class="a-stat-note" data-i18n="adminOrdersNote">ეს რიცხვები ჩანს საიტზე, როგორც სოციალური მტკიცება (✅ X წარმატებული მონტაჟი).</div>
         <button class="a-go a-save-row" id="ordersSaveBtn" data-i18n="adminSave">შენახვა</button>
+
+        <div class="a-subheading" data-i18n="adminPendingOrdersTitle">დაუდასტურებელი შეკვეთები</div>
+        <div class="a-form-row"><input type="text" id="pendingOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+        <div id="pendingOrdersList"></div>
+
+        <div class="a-subheading" data-i18n="adminConfirmedOrdersTitle">დადასტურებული შეკვეთების არქივი</div>
+        <div class="a-form-row"><input type="text" id="confirmedOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+        <div id="confirmedOrdersList"></div>
       </div>
       <div class="a-panel" id="adminPanelAnalytics">
         <div class="a-chart-card" id="analyticsSummaryCard"></div>
@@ -3776,11 +4388,40 @@
       topbarTagline: 'შენ იმსახურებ საუკეთესო ხარისხს',
       heroTitle: '<span>შეუკვეთე ახლავე!</span>',
       heroSub: 'მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.',
+      pcHeading: 'აირჩიე პაკეტი',
+      pcSubheading: 'დააჭირე „ფასის გამოთვლას" ნებისმიერ ბარათზე — გაიხსნება ვიდეო სკანერი და შეკვეთის გაგზავნის ველები.',
+      pcCalcBtn: 'ფასის გამოთვლა',
+      pcRibbon: 'ყველაზე პოპულარული',
+      pcFrom: 'დან',
+      pc1Title: 'ცალობითი პაკეტი',
+      pc1Desc: 'ერთი ვიდეო — ფასი ავტომატურად გამოითვლება ვიდეოს ხანგრძლივობის მიხედვით.',
+      pc1PriceNote: 'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე',
+      pc1Feature1: '1080p-მდე • 60 კადრი/წმ',
+      pc1Feature2: 'ბარდება არაუმეტეს 24 საათში',
+      pc1Feature3: '4K / 120 კადრი/წმ გამომავალი',
+      pc2Title: 'კვირის პაკეტი',
+      pc2Desc: 'კვირაში 5 ვიდეო · 1080p-მდე • 60 კადრი/წმ',
+      pc2PriceNote: '1080p / 4K — არჩევანი ატვირთვის შემდეგ',
+      pc2Feature1: '1 კვირის განმავლობაში სრული შეკვეთა',
+      pc2Feature2: '4K / 120 კადრი/წმ გამომავალი',
+      pc3Title: 'თვის პაკეტი',
+      pc3Desc: 'თვეში 20 ვიდეო · 1080p-მდე • 60 კადრი/წმ',
+      pc3PriceNote: '1080p / 4K — არჩევანი ატვირთვის შემდეგ',
+      pc3Feature1: '1 თვის განმავლობაში სრული შეკვეთა',
+      pc3Feature2: '4K / 120 კადრი/წმ გამომავალი',
       portfolioLabel: 'ნამუშევრების პორტფოლიო',
       portfolioCta: 'ნამუშევრის ნახვა TikTok-ზე',
       myOrdersLabel: 'ჩემი შეკვეთები',
       qnWhy: 'რატომ MOON<span class="qn-q">?</span>',
       qnPortfolio: 'პორტფოლიო',
+      qnEditOrder: '✨ ედითის შეკვეთა',
+      eoLabel: 'ედითის შეკვეთა',
+      eoVideoBadge: 'ნიმუში',
+      eoCaption: 'მსგავსი ედითი — თქვენი პერსონაჟით',
+      eoDesc: 'ზუსტად ამ სტილის მონტაჟი შენი საყვარელი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი და ა.შ). შეუკვეთე და ჩატში გამომიგზავნე პერსონაჟის ფოტო/რეფერენსი — დანარჩენს ჩვენ გავაკეთებთ.',
+      eoPriceLabel: 'ფასი',
+      eoSendWA: 'ედითის შეკვეთა — WhatsApp',
+      eoSendTG: 'ედითის შეკვეთა — Telegram',
       qnHowto: 'როგორ შევუკვეთო',
       qnPromo: '🎟 პრომო კოდი',
       qnBeforeAfter: 'მონტაჟამდე / მონტაჟის შემდეგ',
@@ -3814,15 +4455,19 @@
       manualFallbackSub: 'სწრაფი ხელით შეყვანა — წამები და მეასედები',
       manualEntryBadge: 'ხელით შეყვანა',
       qualityRecBadge: 'ერთადერთი ფორმატი',
+      qualityBadgeStandard: 'სტანდარტული',
+      qualityBadgePremium: 'პრემიუმი',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
       tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
+      videoLinkLabel: 'ატვირთული ვიდეოს ლინკი (mooontransferr.onrender.com) *',
+      videoLinkError: '⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!',
       tiktokConfirmPrompt: 'დააჭირეთ დასადასტურებლად',
       tiktokConfirmDone: '✓ დადასტურებულია',
       videoScanner: 'VIDEO SCANNER',
-      dzTitle: 'ატვირთე ვიდეო ავტომატური გაზომვისთვის',
+      dzTitle: 'ატვირთეთ ვიდეო ფასის გამოსათვლელად',
       dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
       scanProcessing: 'ვიდეო მუშავდება…',
       srFile: 'ფაილი',
@@ -3835,6 +4480,19 @@
       srMatchNote: '✓ ატვირთული ვიდეო შეესაბამება მოთხოვნილ ხარისხს ({REQ})',
       srMismatchNote: '⚠️ მოთხოვნილია {REQ}, თუმცა ატვირთული ვიდეო რეალურად {DET} ხარისხისაა — ფასი მაინც გამოთვლილია თქვენ მიერ მოთხოვნილი ({REQ}) ხარისხის მიხედვით.',
       srWarnOver: '⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.',
+      dzReq: 'სავალდებულო ფორმატი: ზუსტად 1080p · 60fps',
+      srRejectTitle: 'ფაილი არ შეესაბამება მოთხოვნებს',
+      srRejectDetectedLabel: 'ატვირთული ფაილის მონაცემები:',
+      srRejectText: 'ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.',
+      srRejectAppsMobile: 'მობილურებისთვის / აიფონისთვის / აიპადებისთვის:',
+      srRejectAppsDesktop: 'კომპიუტერისთვის:',
+      srRejectEtc: 'და ა.შ.',
+      srRejectRetry: '↻ სცადე სხვა ვიდეოთი',
+      srTransferQ: 'გსურთ ატვირთული ვიდეო გაეგზავნოს <b>mooontransferr.onrender.com</b>-ზე, რომ ჩვენმა მენეჯერმა შეამოწმოს?',
+      srTransferYes: 'დიახ',
+      srTransferNo: 'არა',
+      srTransferTimerMsg: 'აუცილებლად იქონიეთ ატვირთული ვიდეოს ლინკი — mooontransferr-ზე ატვირთვის შემდეგ დააკოპირეთ ლინკი და ქვემოთ ველში ჩასვით.',
+      srTransferOpened: 'გვერდი გაიხსნა — ატვირთვის შემდეგ დაბრუნდით აქ, ჩასვით მიღებული ლინკი ქვემოთ ველში და დაადასტურეთ',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
       sendOrder: 'გაგზავნე შეკვეთა',
@@ -3847,7 +4505,7 @@
       warnP1: 'ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.',
       warnP2: 'გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.',
       warnP3: 'ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.',
-      warnP4: 'საიტი მუშაობს მხოლოდ <b>1080p / 60fps</b> ფორმატში — ეს ერთადერთი ხარისხია, რომელსაც ვამონტაჟებთ და ვაწვდით.',
+      warnP4: 'ატვირთვისას მასალა ყოველთვის უნდა იყოს <b>ზუსტად 1080p / 60fps</b> — გამომავალი კი შეგიძლიათ აირჩიოთ: სტანდარტული 1080p ან პრემიუმ 4K/120fps.',
       baLabel: 'მონტაჟამდე / მონტაჟის შემდეგ',
       baTabMovies: 'ფილმები',
       baTabGames: 'თამაშები',
@@ -3904,6 +4562,18 @@
       adminOrdersSuccess: 'წარმატებული',
       adminOrdersFail: 'წარუმატებელი',
       adminOrdersNote: 'სამივე რიცხვი (სულ / წარმატებული / წარუმატებელი) ჩანს საჯაროდ, საიტის ზედა ნაწილში, სოციალურ მტკიცებულების ზოლში.',
+      adminPendingOrdersTitle: 'დაუდასტურებელი შეკვეთები',
+      adminPendingOrdersSearchPh: 'ძებნა ID-ით...',
+      adminNoPendingOrders: 'დაუდასტურებელი შეკვეთა არ არის.',
+      adminNoPendingOrdersMatch: 'ამ ID-ით შეკვეთა ვერ მოიძებნა.',
+      adminOrderConfirm: 'დადასტურება',
+      adminOrderTypeSingle: 'ცალობითი',
+      adminOrderTypeWeekly: 'კვირის',
+      adminOrderTypeMonthly: 'თვის',
+      adminOrderTypeEditOrder: 'ედითის შეკვეთა',
+      adminConfirmedOrdersTitle: 'დადასტურებული შეკვეთების არქივი',
+      adminNoConfirmedOrders: 'დადასტურებული შეკვეთა ჯერ არ არის.',
+      adminNoConfirmedOrdersMatch: 'ამ ID-ით დადასტურებულ შეკვეთებში ვერაფერი მოიძებნა.',
       analyticsSummaryTitle: 'ანალიტიკა და მოგება',
       analyticsTotalOrders: 'სულ შეკვეთა',
       analyticsTotalRevenue: 'მოგება (₾)',
@@ -3968,11 +4638,40 @@
       topbarTagline: 'You deserve the best quality',
       heroTitle: '<span>Order now!</span>',
       heroSub: 'Enter your video\'s duration (or upload a video and it will measure it automatically) — the price is calculated in real time, for After Effects & Topaz quality editing.',
+      pcHeading: 'Choose your package',
+      pcSubheading: 'Tap "Calculate price" on any card — the video scanner and order fields will open right there.',
+      pcCalcBtn: 'Calculate price',
+      pcRibbon: 'Most popular',
+      pcFrom: 'from',
+      pc1Title: 'Single Package',
+      pc1Desc: 'One video — the price is calculated automatically from the video\'s length.',
+      pc1PriceNote: 'Price depends on the video\'s duration',
+      pc1Feature1: 'Up to 1080p • 60fps',
+      pc1Feature2: 'Delivered within 24 hours',
+      pc1Feature3: '4K / 120fps output',
+      pc2Title: 'Weekly Package',
+      pc2Desc: '5 videos / week · Up to 1080p • 60fps',
+      pc2PriceNote: '1080p / 4K — choose after upload',
+      pc2Feature1: 'Full order within 1 week',
+      pc2Feature2: '4K / 120fps output',
+      pc3Title: 'Monthly Package',
+      pc3Desc: '20 videos / month · Up to 1080p • 60fps',
+      pc3PriceNote: '1080p / 4K — choose after upload',
+      pc3Feature1: 'Full order within 1 month',
+      pc3Feature2: '4K / 120fps output',
       portfolioLabel: 'Portfolio of work',
       portfolioCta: 'View the work on TikTok',
       myOrdersLabel: 'My Orders',
       qnWhy: 'Why MOON<span class="qn-q">?</span>',
       qnPortfolio: 'Portfolio',
+      qnEditOrder: '✨ Order an Edit',
+      eoLabel: 'Order an Edit',
+      eoVideoBadge: 'Sample',
+      eoCaption: 'A similar edit — with your character',
+      eoDesc: 'The exact same style of edit, made with your favorite character (anime, game hero, movie character, etc). Order it, then send us a photo/reference of the character in chat — we handle the rest.',
+      eoPriceLabel: 'Price',
+      eoSendWA: 'Order this edit — WhatsApp',
+      eoSendTG: 'Order this edit — Telegram',
       qnHowto: 'How it works',
       qnPromo: '🎟 Promo code',
       qnBeforeAfter: 'Before / After',
@@ -4006,11 +4705,15 @@
       manualFallbackSub: 'Quick manual entry — seconds and hundredths',
       manualEntryBadge: 'Manual entry',
       qualityRecBadge: 'Only format',
+      qualityBadgeStandard: 'Standard',
+      qualityBadgePremium: 'Premium',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
       subscriberT2: '✓ Lower rate activates',
       tiktokLabel: 'Your TikTok profile link *',
       tiktokError: '⚠️ A TikTok profile link is required to send the order!',
+      videoLinkLabel: 'Uploaded video link (mooontransferr.onrender.com) *',
+      videoLinkError: '⚠️ A link to your uploaded video is required to send the order!',
       tiktokConfirmPrompt: 'Click to confirm',
       tiktokConfirmDone: '✓ Confirmed',
       videoScanner: 'VIDEO SCANNER',
@@ -4027,6 +4730,19 @@
       srMatchNote: '✓ The uploaded video matches the requested quality ({REQ})',
       srMismatchNote: '⚠️ You requested {REQ}, but the uploaded video is actually {DET} quality — the price is still calculated based on your requested quality ({REQ}).',
       srWarnOver: '⚠️ The video exceeds 59.59 seconds — it is priced individually; the calculator shows the 59.59 rate.',
+      dzReq: 'Required format: exactly 1080p · 60fps',
+      srRejectTitle: "This file doesn't meet the requirements",
+      srRejectDetectedLabel: 'Uploaded file details:',
+      srRejectText: 'Dear user, you must upload the video in <b>1080p / 60fps</b> format — exactly this format, no more and no less. Any other resolution or frame rate (e.g. 720p, 2K, 4K, 30fps, 120fps) will not be accepted.',
+      srRejectAppsMobile: 'For mobile / iPhone / iPad:',
+      srRejectAppsDesktop: 'For desktop:',
+      srRejectEtc: 'etc.',
+      srRejectRetry: '↻ Try a different video',
+      srTransferQ: 'Would you like the uploaded video sent to <b>mooontransferr.onrender.com</b> so our manager can review it?',
+      srTransferYes: 'Yes',
+      srTransferNo: 'No',
+      srTransferTimerMsg: "Make sure to copy your uploaded video's link on mooontransferr, then paste it into the field below once you're back.",
+      srTransferOpened: "The page has opened — after uploading, come back here, paste the link you received into the field below and confirm it",
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
       alertReadError: 'Could not read the video — please try another file.',
       sendOrder: 'Send order',
@@ -4039,7 +4755,7 @@
       warnP1: 'Video editing is done <b>only for TikTok</b>, with flawless quality.',
       warnP2: 'Please make sure your video duration <b>does not exceed 59.59 seconds</b> — anything longer is priced individually and isn\'t included in the calculator.',
       warnP3: 'Also make sure the footage is shot and rendered in <b>1080p / 60fps</b> quality — this affects the cleanliness of the final result.',
-      warnP4: 'The site only works in <b>1080p / 60fps</b> — that\'s the one and only format we edit and deliver in.',
+      warnP4: 'On upload, the footage must always be <b>exactly 1080p / 60fps</b> — for the output, though, you can choose either standard 1080p or premium 4K/120fps.',
       baLabel: 'Without editing vs after editing',
       baTabMovies: 'Movies',
       baTabGames: 'Games',
@@ -4096,6 +4812,18 @@
       adminOrdersSuccess: 'Successful',
       adminOrdersFail: 'Failed',
       adminOrdersNote: 'All three numbers (total / successful / failed) are shown publicly, in the social-proof bar near the top of the site.',
+      adminPendingOrdersTitle: 'Pending orders',
+      adminPendingOrdersSearchPh: 'Search by ID...',
+      adminNoPendingOrders: 'No pending orders.',
+      adminNoPendingOrdersMatch: 'No order found with that ID.',
+      adminOrderConfirm: 'Confirm',
+      adminOrderTypeSingle: 'Single',
+      adminOrderTypeWeekly: 'Weekly',
+      adminOrderTypeMonthly: 'Monthly',
+      adminOrderTypeEditOrder: 'Character Edit',
+      adminConfirmedOrdersTitle: 'Confirmed orders archive',
+      adminNoConfirmedOrders: 'No confirmed orders yet.',
+      adminNoConfirmedOrdersMatch: 'No confirmed order found with that ID.',
       analyticsSummaryTitle: 'Analytics & profit',
       analyticsTotalOrders: 'Total orders',
       analyticsTotalRevenue: 'Profit (₾)',
@@ -4209,6 +4937,15 @@
     const panel = document.getElementById(targetId);
     if (!panel) return;
 
+    // If the jump target lives inside a collapsed pricing-card accordion
+    // (e.g. the video scanner inside the individual-package card), open
+    // that card first so the target is actually visible before scrolling.
+    // The open itself is instant (display toggle, no animation), so the
+    // scroll can happen right away on the next frame once layout settles.
+    const hostCard = panel.closest('.pc-card');
+    const needsExpand = !!(hostCard && !hostCard.classList.contains('pc-open'));
+    if (hostCard && typeof openPricingCard === 'function') openPricingCard(hostCard);
+
     function fireScannerFlash(){
       panel.classList.remove('scanner-flash');
       void panel.offsetWidth;
@@ -4216,33 +4953,40 @@
       setTimeout(() => panel.classList.remove('scanner-flash'), 1600);
     }
 
-    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    function doScrollAndFlash(){
+      panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Wait for the smooth scroll to actually finish before flashing.
-    // Firing the flash immediately (old behavior) meant the glow was
-    // already fading out — or fully gone — by the time the panel
-    // scrolled into view, which looked like a broken/glitchy flicker.
-    if ('onscrollend' in window) {
-      let settled = false;
-      const onScrollEnd = () => {
-        if (settled) return;
-        settled = true;
-        window.removeEventListener('scrollend', onScrollEnd);
-        fireScannerFlash();
-      };
-      window.addEventListener('scrollend', onScrollEnd);
-      setTimeout(() => { // safety net in case scrollend never fires
-        if (settled) return;
-        settled = true;
-        window.removeEventListener('scrollend', onScrollEnd);
-        fireScannerFlash();
-      }, 900);
-    } else {
-      setTimeout(fireScannerFlash, 600);
+      // Wait for the smooth scroll to actually finish before flashing.
+      // Firing the flash immediately (old behavior) meant the glow was
+      // already fading out — or fully gone — by the time the panel
+      // scrolled into view, which looked like a broken/glitchy flicker.
+      if ('onscrollend' in window) {
+        let settled = false;
+        const onScrollEnd = () => {
+          if (settled) return;
+          settled = true;
+          window.removeEventListener('scrollend', onScrollEnd);
+          fireScannerFlash();
+        };
+        window.addEventListener('scrollend', onScrollEnd);
+        setTimeout(() => { // safety net in case scrollend never fires
+          if (settled) return;
+          settled = true;
+          window.removeEventListener('scrollend', onScrollEnd);
+          fireScannerFlash();
+        }, 900);
+      } else {
+        setTimeout(fireScannerFlash, 600);
+      }
     }
+
+    // A single extra frame is enough for the browser to lay out the
+    // now-visible accordion body before we measure where to scroll.
+    if (needsExpand) requestAnimationFrame(() => requestAnimationFrame(doScrollAndFlash));
+    else doScrollAndFlash();
   });
 
-  const QN_SLOT_MAP = { trustPanel: 'qnSlotTrust', portfolioPanel: 'qnSlotPortfolio', myOrdersPanel: 'qnSlotMyOrders', howtoPanel: 'qnSlotHowto', promoPanel: 'qnSlotPromo', baSlider: 'qnSlotBeforeAfter', contactPanel: 'qnSlotContact' };
+  const QN_SLOT_MAP = { trustPanel: 'qnSlotTrust', portfolioPanel: 'qnSlotPortfolio', editOrderPanel: 'qnSlotEditOrder', myOrdersPanel: 'qnSlotMyOrders', howtoPanel: 'qnSlotHowto', promoPanel: 'qnSlotPromo', baSlider: 'qnSlotBeforeAfter', contactPanel: 'qnSlotContact' };
   const menuToggle = document.getElementById('menuToggle');
   const siteMenu = document.getElementById('siteMenu');
   const siteMenuScrim = document.getElementById('siteMenuScrim');
@@ -4363,6 +5107,70 @@
     warnHeadRow.addEventListener('click', () => warnPanel.classList.toggle('open'));
   }
 
+  // ============================================================
+  // PRICING CARD MODALS — "ფასის გამოთვლა" opens the order flow
+  // Opens directly on top of the page (fixed overlay + scrim), exactly
+  // the same mechanism as the site menu drawer — never pushes the rest
+  // of the page down. Instant, no animation, no auto-scroll.
+  // ============================================================
+  const pcModalScrim = document.getElementById('pcModalScrim');
+  let pcBodyScrollLockCount = 0;
+
+  function lockBodyScroll(){
+    pcBodyScrollLockCount++;
+    document.body.style.overflow = 'hidden';
+  }
+  function unlockBodyScroll(){
+    pcBodyScrollLockCount = Math.max(0, pcBodyScrollLockCount - 1);
+    if (pcBodyScrollLockCount === 0) document.body.style.overflow = '';
+  }
+
+  function openPricingCard(card){
+    if (!card || card.classList.contains('pc-open')) return;
+    // Only one card open at a time.
+    document.querySelectorAll('.pc-card.pc-open').forEach(other => {
+      if (other !== card) closePricingCard(other);
+    });
+    const btn = card.querySelector('.pc-toggle-btn');
+    card.classList.add('pc-open');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    if (pcModalScrim) pcModalScrim.classList.add('open');
+    lockBodyScroll();
+  }
+
+  function closePricingCard(card){
+    if (!card || !card.classList.contains('pc-open')) return;
+    const btn = card.querySelector('.pc-toggle-btn');
+    card.classList.remove('pc-open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    if (pcModalScrim) pcModalScrim.classList.remove('open');
+    unlockBodyScroll();
+  }
+
+  function togglePricingCard(card){
+    if (card.classList.contains('pc-open')) closePricingCard(card);
+    else openPricingCard(card);
+  }
+
+  function closeAnyOpenPricingCard(){
+    const openCard = document.querySelector('.pc-card.pc-open');
+    if (openCard) closePricingCard(openCard);
+  }
+
+  document.querySelectorAll('.pc-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.pc-card');
+      togglePricingCard(card);
+    });
+  });
+  document.querySelectorAll('.pc-modal-close').forEach(btn => {
+    btn.addEventListener('click', closeAnyOpenPricingCard);
+  });
+  if (pcModalScrim) pcModalScrim.addEventListener('click', closeAnyOpenPricingCard);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAnyOpenPricingCard();
+  });
+
   const PORTFOLIO_LINKS = {
     portfolioCard1: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbW9vbmFlZTI2L3ZpZGVvLzc2NjQ2OTk2MjU3ODk1OTA4MDQ/bGFuZz1lbg==',
     portfolioCard2: 'aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9AbWFydmVsdW5pdmVyc2VlMjYvdmlkZW8vNzY2MDE0NTgxNDE0MDAzMDIzMA=='
@@ -4378,11 +5186,13 @@
   const priceDisplay = document.getElementById('priceDisplay');
   const subNote = document.getElementById('subNote');
 
-  // Only one format is offered any more, so the scale is a fixed constant.
   // Back-calculated so the minimum 5-second price (non-subscriber) lands
-  // exactly on 0.99 ₾.
+  // exactly on 1.49 ₾ for the standard 1080p/60fps output.
+  // The 4K/120fps output tier is priced at roughly double the 1080p rate.
+  const FOUR_K_MULTIPLIER = 2;
   const QUALITY_SCALES = {
-    '1080_60': 0.99 / 1.2
+    '1080_60': 1.49 / 1.2,
+    '4k_120': (1.49 / 1.2) * FOUR_K_MULTIPLIER
   };
 
   // Kept as a full lookup (not trimmed) because it's also used to label
@@ -4450,7 +5260,8 @@
   // rounded to the nearest clean .99 so every box is one simple number.
   const SUB_VIDEO_LIMIT = 5;
   const SUB_PRICES = {
-    '1080_60': 24.99
+    '1080_60': 24.99,
+    '4k_120': 35.99
   };
   const WP_CHANNEL_DISCOUNT = 3;
   let subSelectedQuality = '1080_60';
@@ -4511,7 +5322,8 @@
   // ---- Monthly subscription (20 videos / 30 days, flat discounted price per quality) ----
   const MONTH_SUB_VIDEO_LIMIT = 20;
   const MONTH_PRICES = {
-    '1080_60': 69.99
+    '1080_60': 49.99,
+    '4k_120': 69.99
   };
   let monthSelectedQuality = '1080_60';
   const mpQualityGrid = document.getElementById('mpQualityGrid');
@@ -4556,16 +5368,22 @@
     msRange.value = ms;
 
     const price = calculateExactPrice(s, ms, isSub, quality);
-    if (priceDisplay.dataset.price !== price) {
-      priceDisplay.dataset.price = price;
-      priceDisplay.innerHTML = price + '<sup>₾</sup>';
-      priceDisplay.classList.remove('bump');
-      void priceDisplay.offsetWidth;
-      priceDisplay.classList.add('bump');
+    // priceDisplay / subNote belonged to the top "final price" readout,
+    // which has been removed from the page — these guards keep refresh()
+    // safe if that markup is ever reintroduced.
+    if (priceDisplay) {
+      if (priceDisplay.dataset.price !== price) {
+        priceDisplay.dataset.price = price;
+        priceDisplay.innerHTML = price + '<sup>₾</sup>';
+        priceDisplay.classList.remove('bump');
+        void priceDisplay.offsetWidth;
+        priceDisplay.classList.add('bump');
+      }
     }
-
-    subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
-    subNote.classList.toggle('sub-note-active', !!isSub);
+    if (subNote) {
+      subNote.innerHTML = isSub ? t('subActive') : t('notSubscribed');
+      subNote.classList.toggle('sub-note-active', !!isSub);
+    }
 
     updateQualityTilePrices(s, ms, isSub);
 
@@ -4630,11 +5448,25 @@
 
   const qualityGrid = document.getElementById('qualityGrid');
 
-  // Only one format is sold now, so there's nothing to "select" — this is
-  // kept as a no-op for compatibility with the single fixed badge markup.
+  // Two output formats are sold: 1080p/60fps (standard) and 4K/120fps
+  // (premium, upscaled output) — the source upload always has to be
+  // exactly 1080p/60fps (see checkUploadAcceptable below), only the
+  // *delivered* output quality — and therefore the price — changes here.
   function selectQuality(key){
-    currentQuality = '1080_60';
-    qualityGrid.querySelectorAll('.quality-btn').forEach(b => b.classList.add('active'));
+    if (key !== '1080_60' && key !== '4k_120') return;
+    currentQuality = key;
+    if (qualityGrid) {
+      qualityGrid.querySelectorAll('.quality-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-quality') === key);
+      });
+    }
+    refresh();
+  }
+
+  if (qualityGrid) {
+    qualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
+      btn.addEventListener('click', () => selectQuality(btn.getAttribute('data-quality')));
+    });
   }
 
   // Detects the *actual* resolution/fps of an uploaded file, purely to show
@@ -4647,6 +5479,32 @@
     else if (maxDim >= 2400) resTier = '2k';
     const fpsTier = (fps && fps >= 100) ? '120' : '60';
     return `${resTier}_${fpsTier}`;
+  }
+
+  // ---- Hard upload gate: ONLY exactly-1080p footage at exactly 60fps is
+  // ever accepted — nothing lower (720p, 30fps…) and nothing higher (2K,
+  // 4K, 120fps…) gets through. This is a strict match, not a floor, on
+  // both resolution and fps. Resolution is read straight off the <video>
+  // element so it's always known; fps detection can fail on some browsers
+  // (no requestVideoFrameCallback support), so an unknown fps is treated
+  // as "can't disprove it" and is not, by itself, a rejection reason —
+  // only a *confirmed* mismatch blocks the upload. ----
+  const REQUIRED_DIM = 1080;
+  const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
+  const REQUIRED_FPS = 60;
+
+  function checkUploadAcceptable(width, height, fps){
+    const hasDims = !!(width && height);
+    let resOk = null;
+    if (hasDims) {
+      const minDim = Math.min(width, height);
+      resOk = Math.abs(minDim - REQUIRED_DIM) <= REQUIRED_DIM_TOLERANCE;
+    }
+    const fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
+    // Reject only on a *confirmed* violation — an unknown value never
+    // blocks the upload on its own.
+    const rejected = (resOk === false) || (fpsOk === false);
+    return { rejected, resOk, fpsOk };
   }
 
   // ---- Synced TikTok profile link — one field per order panel (main /
@@ -4734,6 +5592,113 @@
 
   updateTiktokConfirmBadge();
 
+  // ---- Video link — one field per order panel (main / weekly / monthly),
+  // synced the same way as the TikTok link, so it's filled everywhere no
+  // matter which panel the visitor orders from. ----
+  const videoLinkGroups = {
+    main: {
+      link: document.getElementById('videoLink'),
+      confirm: document.getElementById('videoLinkConfirm'),
+      confirmText: document.getElementById('videoLinkConfirmText'),
+      error: document.getElementById('videoLinkError'),
+      field: document.getElementById('videoLinkField')
+    },
+    wp: {
+      link: document.getElementById('videoLinkWp'),
+      confirm: document.getElementById('videoLinkConfirmWp'),
+      confirmText: document.getElementById('videoLinkConfirmTextWp'),
+      error: document.getElementById('videoLinkErrorWp'),
+      field: document.getElementById('videoLinkFieldWp')
+    },
+    mp: {
+      link: document.getElementById('videoLinkMp'),
+      confirm: document.getElementById('videoLinkConfirmMp'),
+      confirmText: document.getElementById('videoLinkConfirmTextMp'),
+      error: document.getElementById('videoLinkErrorMp'),
+      field: document.getElementById('videoLinkFieldMp')
+    }
+  };
+
+  let videoLinkConfirmed = false;
+
+  function getVideoLinkValue(){
+    for (const key in videoLinkGroups) {
+      const g = videoLinkGroups[key];
+      if (g.link) return g.link.value.trim();
+    }
+    return '';
+  }
+
+  function updateVideoLinkConfirmBadge(){
+    Object.values(videoLinkGroups).forEach(g => {
+      if (!g.link || !g.confirm) return;
+      const hasValue = g.link.value.trim() !== '';
+      if (!hasValue) {
+        g.confirm.style.display = 'none';
+        return;
+      }
+      g.confirm.style.display = 'block';
+      g.confirm.classList.toggle('tt-red', !videoLinkConfirmed);
+      g.confirm.classList.toggle('tt-green', videoLinkConfirmed);
+      if (g.confirmText) g.confirmText.textContent = videoLinkConfirmed ? t('tiktokConfirmDone') : t('tiktokConfirmPrompt');
+    });
+  }
+
+  function syncVideoLinkValue(sourceKey, value){
+    Object.keys(videoLinkGroups).forEach(key => {
+      if (key === sourceKey) return;
+      const g = videoLinkGroups[key];
+      if (g.link) g.link.value = value;
+    });
+  }
+
+  function clearVideoLinkErrors(){
+    Object.values(videoLinkGroups).forEach(g => {
+      if (g.link) g.link.classList.remove('error');
+      if (g.error) g.error.style.display = 'none';
+    });
+  }
+
+  Object.keys(videoLinkGroups).forEach(key => {
+    const g = videoLinkGroups[key];
+    if (!g.link) return;
+    g.link.addEventListener('input', () => {
+      syncVideoLinkValue(key, g.link.value);
+      videoLinkConfirmed = false;
+      clearVideoLinkErrors();
+      updateVideoLinkConfirmBadge();
+    });
+    if (g.confirm) {
+      g.confirm.addEventListener('click', () => {
+        if (videoLinkConfirmed || g.link.value.trim() === '') return;
+        videoLinkConfirmed = true;
+        updateVideoLinkConfirmBadge();
+      });
+    }
+  });
+
+  updateVideoLinkConfirmBadge();
+
+  // When the visitor clicks "Yes" on the transfer prompt, they leave for
+  // mooontransferr.onrender.com in a new tab. This flag makes us watch for
+  // them coming back to THIS tab, so we can point them straight at whichever
+  // video-link field is currently visible, to paste what they copied.
+  let awaitingVideoLinkReturn = false;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || !awaitingVideoLinkReturn) return;
+    awaitingVideoLinkReturn = false;
+    const visibleGroup = Object.values(videoLinkGroups).find(g => g.field && g.field.offsetParent !== null);
+    if (!visibleGroup) return;
+    setTimeout(() => {
+      visibleGroup.field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      visibleGroup.link.focus({ preventScroll: true });
+      visibleGroup.field.classList.remove('scanner-flash');
+      void visibleGroup.field.offsetWidth;
+      visibleGroup.field.classList.add('scanner-flash');
+    }, 350);
+  });
+
   refresh();
 
   const dropZone = document.getElementById('dropZone');
@@ -4749,6 +5714,21 @@
   const srMatchNote = document.getElementById('srMatchNote');
   const srMismatchNote = document.getElementById('srMismatchNote');
   const srWarn = document.getElementById('srWarn');
+  const srResetBtn = document.getElementById('srResetBtn');
+  const srReject = document.getElementById('srReject');
+  const srRejectDetected = document.getElementById('srRejectDetected');
+  const srRejectRetry = document.getElementById('srRejectRetry');
+  const srTransfer = document.getElementById('srTransfer');
+  const srTransferQ = document.getElementById('srTransferQ');
+  const srTransferActions = document.getElementById('srTransferActions');
+  const srTransferYes = document.getElementById('srTransferYes');
+  const srTransferNo = document.getElementById('srTransferNo');
+  const srTransferTimer = document.getElementById('srTransferTimer');
+  const srTransferCountdown = document.getElementById('srTransferCountdown');
+
+  const VIDEO_REVIEW_TRANSFER_URL = 'https://mooontransferr.onrender.com';
+  const TRANSFER_COUNTDOWN_SECONDS = 3;
+  let transferCountdownInterval = null;
 
   ['dragover','dragenter'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
   ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { dropZone.classList.remove('dragover'); }));
@@ -4763,12 +5743,85 @@
     if (e.target.files && e.target.files[0]) handleVideoFile(e.target.files[0]);
   });
 
+  // Fully resets the scanner back to its empty state — this is the
+  // "cancel upload" action that was previously missing.
+  function resetScanner(){
+    videoInput.value = '';
+    scanResult.classList.remove('show');
+    srReject.classList.remove('show');
+    resetTransferPrompt();
+    secondsInput.value = 5;
+    msRange.value = 0;
+    refresh();
+  }
+
+  function resetTransferPrompt(){
+    srTransfer.classList.remove('show');
+    srTransferQ.style.display = '';
+    srTransferActions.style.display = '';
+    if (transferCountdownInterval) { clearInterval(transferCountdownInterval); transferCountdownInterval = null; }
+    srTransferTimer.classList.remove('show');
+    srTransferCountdown.textContent = String(TRANSFER_COUNTDOWN_SECONDS);
+    const doneNote = srTransfer.querySelector('.sr-transfer-done');
+    if (doneNote) doneNote.remove();
+    srTransferYes.disabled = false;
+    srTransferNo.disabled = false;
+    awaitingVideoLinkReturn = false;
+  }
+
+  srResetBtn.addEventListener('click', resetScanner);
+  srRejectRetry.addEventListener('click', resetScanner);
+
+  srTransferYes.addEventListener('click', () => {
+    srTransferYes.disabled = true;
+    srTransferNo.disabled = true;
+    srTransferQ.style.display = 'none';
+    srTransferActions.style.display = 'none';
+
+    // Open the review site immediately, synchronously, as the direct
+    // continuation of the click — this is what keeps the popup reliable
+    // on every platform, including iOS Safari, with no pre-opened blank
+    // tab and no platform detection needed. This page itself is never
+    // touched, so it can never redirect away on its own.
+    window.open(VIDEO_REVIEW_TRANSFER_URL, '_blank', 'noopener');
+    awaitingVideoLinkReturn = true;
+
+    // The countdown below is now purely a friendly on-screen reminder to
+    // have the uploaded video's link ready — it no longer gates the open.
+    let remaining = TRANSFER_COUNTDOWN_SECONDS;
+    srTransferCountdown.textContent = String(remaining);
+    srTransferTimer.classList.add('show');
+
+    transferCountdownInterval = setInterval(() => {
+      remaining -= 1;
+      if (remaining > 0) {
+        srTransferCountdown.textContent = String(remaining);
+        return;
+      }
+      clearInterval(transferCountdownInterval);
+      transferCountdownInterval = null;
+      srTransferTimer.classList.remove('show');
+      if (!srTransfer.querySelector('.sr-transfer-done')) {
+        const done = document.createElement('div');
+        done.className = 'sr-transfer-done';
+        done.innerHTML = '<span>✓</span><span>' + escapeHtml(t('srTransferOpened')) + '</span>';
+        srTransfer.appendChild(done);
+      }
+    }, 1000);
+  });
+
+  srTransferNo.addEventListener('click', () => {
+    srTransfer.classList.remove('show');
+  });
+
   function handleVideoFile(file){
     if (!file.type.startsWith('video/')) {
       alert(t('alertNotVideo'));
       return;
     }
     scanResult.classList.remove('show');
+    srReject.classList.remove('show');
+    resetTransferPrompt();
     scanProgress.classList.add('show');
 
     const videoEl = document.createElement('video');
@@ -4872,6 +5925,21 @@
   }
 
   function finishScan(duration, file, width, height, fps){
+    const hasDimensions = !!(width && height);
+
+    // Hard gate FIRST: a video that isn't exactly 1080p/60fps is rejected
+    // outright — nothing about it (duration, price, etc.) gets used, and
+    // the styled warning panel is shown instead of the scan result.
+    const acceptability = checkUploadAcceptable(width, height, fps);
+    if (acceptability.rejected) {
+      const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
+      srRejectDetected.textContent = hasDimensions ? `${width}×${height} · ${fpsLabel}` : fpsLabel;
+      scanResult.classList.remove('show');
+      srReject.classList.add('show');
+      return;
+    }
+    srReject.classList.remove('show');
+
     let s = Math.floor(duration);
     let frac = duration - s;
     if (frac >= 0.999999) { frac = 0; s += 1; }
@@ -4885,7 +5953,6 @@
     msRange.value = msForCalc;
 
     const requestedQuality = currentQuality;
-    const hasDimensions = !!(width && height);
     const detectedQuality = hasDimensions ? detectQualityTier(width, height, fps) : null;
 
     const price = refresh();
@@ -4898,7 +5965,7 @@
     if (hasDimensions) {
       const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
       srQuality.textContent = `${width}×${height} · ${fpsLabel}`;
-      srQualityRow.style.display = 'flex';
+      srQualityRow.classList.add('show');
 
       const reqLabel = QUALITY_LABELS[requestedQuality] || QUALITY_LABELS['1080_60'];
       const detLabel = QUALITY_LABELS[detectedQuality] || QUALITY_LABELS['1080_60'];
@@ -4912,7 +5979,7 @@
         srMatchNote.style.display = 'none';
       }
     } else {
-      srQualityRow.style.display = 'none';
+      srQualityRow.classList.remove('show');
       srMatchNote.style.display = 'none';
       srMismatchNote.style.display = 'none';
     }
@@ -4925,6 +5992,11 @@
     }
 
     scanResult.classList.add('show');
+
+    // Video passed the strict 1080p/60fps gate — offer to send it to the
+    // manager for review.
+    resetTransferPrompt();
+    srTransfer.classList.add('show');
   }
 
   // ============================================================
@@ -4954,15 +6026,40 @@
     } catch(e){ /* silent — never block the UI on a failed notification */ }
   }
 
-  function buildOrderTgMessage(channel){
+  // 7-digit order ID, generated once per order — shown to the manager in
+  // the Telegram notification and stored alongside the order so it can be
+  // looked up / deleted later in the admin panel's pending-orders list.
+  // Format: MMDD + 3 random digits (e.g. 0817042 for Aug 17th), so IDs
+  // are easy to eyeball chronologically and a date search ("0817") also
+  // works as a search filter for free.
+  function generateOrderId(){
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const rand = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    return mm + dd + rand;
+  }
+
+  async function addPendingOrder(order){
+    try{
+      const data = await mdbRead('pendingOrders');
+      const list = (data && Array.isArray(data.list)) ? data.list : [];
+      list.push(order);
+      await mdbWrite('pendingOrders', { list });
+    } catch(e){ /* silent — never block the order flow on a storage failure */ }
+  }
+
+  function buildOrderTgMessage(channel, orderId){
     const { s, ms, isSub, quality } = currentValues();
     const price = calculateExactPrice(s, ms, isSub, quality);
     return `🛒 <b>ახალი შეკვეთა — MOON</b> (${channel})\n\n` +
+      `🆔 ID: <b>${orderId}</b>\n` +
       `⏱ ხანგრძლივობა: <b>${s}.${String(ms).padStart(2,'0')}</b> წმ\n` +
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `⭐ გამომწერი: <b>${isSub ? 'დიახ' : 'არა'}</b>\n` +
       `💰 ღირებულება: <b>${price} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>\n` +
+      `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
   function buildCommentTgMessage(entry){
@@ -4973,15 +6070,17 @@
       `<i>${escTg(entry.text)}</i>`;
   }
 
-  function buildOrderMessage(){
+  function buildOrderMessage(orderId){
     const { s, ms, isSub, quality } = currentValues();
     const price = calculateExactPrice(s, ms, isSub, quality);
     return `🎬 ახალი შეკვეთა — MOON
+ID: ${orderId}
 ხანგრძლივობა: ${s}.${String(ms).padStart(2,'0')} წამი
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 გამომწერი: ${isSub ? 'დიახ' : 'არა'}
 ღირებულება: ${price} ₾
-TikTok პროფილი: ${getTiktokValue()}`;
+TikTok პროფილი: ${getTiktokValue()}
+ვიდეო ლინკი: ${getVideoLinkValue()}`;
   }
 
   function validateBeforeSend(panelKey){
@@ -5003,6 +6102,27 @@ TikTok პროფილი: ${getTiktokValue()}`;
         g.confirm.classList.add('tt-shake', 'tt-error-flash');
       }
       return false;
+    }
+    // Uploaded-video link — required on every order panel, same as TikTok.
+    const vg = videoLinkGroups[panelKey] || videoLinkGroups.main;
+    if (vg.link) {
+      const vlVal = vg.link.value.trim();
+      if (!vlVal) {
+        vg.link.classList.add('error');
+        if (vg.error) vg.error.style.display = 'block';
+        vg.link.focus();
+        return false;
+      }
+      if (!videoLinkConfirmed) {
+        if (vg.error) vg.error.style.display = 'none';
+        if (vg.confirm) {
+          vg.confirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          vg.confirm.classList.remove('tt-shake', 'tt-error-flash');
+          void vg.confirm.offsetWidth;
+          vg.confirm.classList.add('tt-shake', 'tt-error-flash');
+        }
+        return false;
+      }
     }
     return true;
   }
@@ -5043,36 +6163,19 @@ TikTok პროფილი: ${getTiktokValue()}`;
     }, 1200);
   }
 
-  function isAppleMobileDevice(){
-    const ua = navigator.userAgent || '';
-    const iOSByUA = /iPad|iPhone|iPod/.test(ua);
-    // iPadOS 13+ reports itself as a Mac in the user agent, so it must be
-    // told apart from real desktop Macs using the touch-points check.
-    const iPadOSByPlatform = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-    return iOSByUA || iPadOSByPlatform;
-  }
-
-  function writePendingTabLoader(tabWin){
-    if (!tabWin) return;
-    try {
-      tabWin.document.write(
-        '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-        '<title>MOON</title></head><body style="margin:0;height:100vh;display:flex;' +
-        'align-items:center;justify-content:center;background:#08080d;' +
-        'font-family:sans-serif;color:#8b8ba3;">' +
-        '<p>' + escapeHtml(t('orderProcessing')) + '</p></body></html>'
-      );
-      tabWin.document.close();
-    } catch(e) { /* ignore — some browsers restrict document.write on foreign tabs */ }
-  }
-
   const ORDER_PROCESSING_MS = 2000;
   const ORDER_REDIRECT_DELAY_MS = 1000;
 
+  // doSend() now runs immediately, synchronously, as the direct
+  // continuation of the click handler — before any setTimeout. That is
+  // what keeps window.open() reliable as a real popup on every platform,
+  // including iOS Safari, without needing a pre-opened blank tab or any
+  // platform detection. The animation below is purely cosmetic and no
+  // longer gates anything.
   function runOrderFlow(btn, textEl, doSend){
     if (btn.disabled) return;
     const idleKey = textEl.getAttribute('data-i18n');
+    doSend();
     btn.disabled = true;
     btn.classList.add('processing');
     textEl.textContent = t('orderProcessing');
@@ -5080,11 +6183,8 @@ TikTok პროფილი: ${getTiktokValue()}`;
       btn.classList.remove('processing');
       textEl.textContent = t('orderProcessed');
       setTimeout(() => {
-        doSend();
-        setTimeout(() => {
-          textEl.textContent = t(idleKey);
-          btn.disabled = false;
-        }, 500);
+        textEl.textContent = t(idleKey);
+        btn.disabled = false;
       }, ORDER_REDIRECT_DELAY_MS);
     }, ORDER_PROCESSING_MS);
   }
@@ -5093,20 +6193,19 @@ TikTok პროფილი: ${getTiktokValue()}`;
     if (!validateBeforeSend('main')) return;
     const btn = document.getElementById('orderBtnWA');
     const textEl = document.getElementById('orderBtnWAText');
-    // Open the tab synchronously, inside the click gesture — iOS/iPadOS Safari
-    // blocks window.open() calls that happen later inside a setTimeout, which is
-    // why orders stopped opening on iPad once the "processing" delay was added.
-    // The pre-opened-tab workaround is only needed on iOS/iPadOS Safari,
-    // which blocks window.open() calls made after a setTimeout delay.
-    // Other devices keep the original flow (nicer, no blank tab flash).
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildOrderMessage();
-      sendTelegramNotification(buildOrderTgMessage('WhatsApp'));
+      const orderId = generateOrderId();
+      const message = buildOrderMessage(orderId);
+      sendTelegramNotification(buildOrderTgMessage('WhatsApp', orderId));
+      const { s, ms, isSub, quality } = currentValues();
+      const price = calculateExactPrice(s, ms, isSub, quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'single', channel: 'WhatsApp',
+        duration: `${s}.${String(ms).padStart(2,'0')}`, quality, isSub, price,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
     });
   });
 
@@ -5114,15 +6213,20 @@ TikTok პროფილი: ${getTiktokValue()}`;
     if (!validateBeforeSend('main')) return;
     const btn = document.getElementById('orderBtnTG');
     const textEl = document.getElementById('orderBtnTGText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildOrderMessage();
-      sendTelegramNotification(buildOrderTgMessage('Telegram'));
+      const orderId = generateOrderId();
+      const message = buildOrderMessage(orderId);
+      sendTelegramNotification(buildOrderTgMessage('Telegram', orderId));
+      const { s, ms, isSub, quality } = currentValues();
+      const price = calculateExactPrice(s, ms, isSub, quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'single', channel: 'Telegram',
+        duration: `${s}.${String(ms).padStart(2,'0')}`, quality, isSub, price,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
       flashCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
     });
   });
@@ -5137,34 +6241,38 @@ TikTok პროფილი: ${getTiktokValue()}`;
     setTimeout(() => wpCopyNote.classList.remove('active'), 4000);
   }
 
-  function buildWeeklySubOrderTgMessage(channel){
+  function buildWeeklySubOrderTgMessage(channel, orderId){
     const quality = subSelectedQuality;
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
     const total = getWeeklyTotal(quality);
     const perVideo = total / SUB_VIDEO_LIMIT;
     return `🗓 <b>ახალი შეკვეთა — MOON 1-კვირიანი გამოწერა</b> (${channel})\n\n` +
+      `🆔 ID: <b>${orderId}</b>\n` +
       `🎬 ლიმიტი: <b>${SUB_VIDEO_LIMIT} ვიდეო / 7 დღე</b>\n` +
       `⏱ თითო ვიდეო მაქს: <b>59.59</b> წმ\n` +
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `📢 არხის გამომწერი: <b>${isChannelSub ? 'კი (−3₾)' : 'არა'}</b>\n` +
       `💳 1 ვიდეო (საშუალოდ): <b>${perVideo.toFixed(2)} ₾</b>\n` +
       `💰 სულ ${SUB_VIDEO_LIMIT} ვიდეოზე (1 კვირა): <b>${total.toFixed(2)} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>\n` +
+      `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
-  function buildWeeklySubOrderMessage(){
+  function buildWeeklySubOrderMessage(orderId){
     const quality = subSelectedQuality;
     const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
     const total = getWeeklyTotal(quality);
     const perVideo = total / SUB_VIDEO_LIMIT;
     return `🗓 ახალი შეკვეთა — MOON 1-კვირიანი გამოწერა
+ID: ${orderId}
 ლიმიტი: ${SUB_VIDEO_LIMIT} ვიდეო / 7 დღე
 თითო ვიდეო მაქს: 59.59 წამი
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 არხის გამომწერი: ${isChannelSub ? 'კი (−3₾)' : 'არა'}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${SUB_VIDEO_LIMIT} ვიდეოზე (1 კვირა): ${total.toFixed(2)} ₾
-TikTok პროფილი: ${getTiktokValue()}`;
+TikTok პროფილი: ${getTiktokValue()}
+ვიდეო ლინკი: ${getVideoLinkValue()}`;
   }
 
   const wpOrderBtnWA = document.getElementById('wpOrderBtnWA');
@@ -5174,14 +6282,20 @@ TikTok პროფილი: ${getTiktokValue()}`;
     if (!validateBeforeSend('wp')) return;
     const btn = wpOrderBtnWA;
     const textEl = document.getElementById('wpOrderBtnWAText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildWeeklySubOrderMessage();
-      sendTelegramNotification(buildWeeklySubOrderTgMessage('WhatsApp'));
+      const orderId = generateOrderId();
+      const message = buildWeeklySubOrderMessage(orderId);
+      sendTelegramNotification(buildWeeklySubOrderTgMessage('WhatsApp', orderId));
+      const quality = subSelectedQuality;
+      const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
+      const total = getWeeklyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'weekly', channel: 'WhatsApp',
+        quality, isSub: isChannelSub, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
     });
   });
 
@@ -5189,15 +6303,21 @@ TikTok პროფილი: ${getTiktokValue()}`;
     if (!validateBeforeSend('wp')) return;
     const btn = wpOrderBtnTG;
     const textEl = document.getElementById('wpOrderBtnTGText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildWeeklySubOrderMessage();
-      sendTelegramNotification(buildWeeklySubOrderTgMessage('Telegram'));
+      const orderId = generateOrderId();
+      const message = buildWeeklySubOrderMessage(orderId);
+      sendTelegramNotification(buildWeeklySubOrderTgMessage('Telegram', orderId));
+      const quality = subSelectedQuality;
+      const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
+      const total = getWeeklyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'weekly', channel: 'Telegram',
+        quality, isSub: isChannelSub, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
       flashWpCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
     });
   });
@@ -5212,30 +6332,34 @@ TikTok პროფილი: ${getTiktokValue()}`;
     setTimeout(() => mpCopyNote.classList.remove('active'), 4000);
   }
 
-  function buildMonthlySubOrderTgMessage(channel){
+  function buildMonthlySubOrderTgMessage(channel, orderId){
     const quality = monthSelectedQuality;
     const total = getMonthlyTotal(quality);
     const perVideo = total / MONTH_SUB_VIDEO_LIMIT;
     return `🗓 <b>ახალი შეკვეთა — MOON 1-თვიანი გამოწერა</b> (${channel})\n\n` +
+      `🆔 ID: <b>${orderId}</b>\n` +
       `🎬 ლიმიტი: <b>${MONTH_SUB_VIDEO_LIMIT} ვიდეო / 30 დღე</b>\n` +
       `⏱ თითო ვიდეო მაქს: <b>59.59</b> წმ\n` +
       `🎞 ხარისხი: <b>${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}</b>\n` +
       `💳 1 ვიდეო (საშუალოდ): <b>${perVideo.toFixed(2)} ₾</b>\n` +
       `💰 სულ ${MONTH_SUB_VIDEO_LIMIT} ვიდეოზე (1 თვე): <b>${total.toFixed(2)} ₾</b>\n` +
-      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>`;
+      `🔗 TikTok: <code>${escTg(getTiktokValue())}</code>\n` +
+      `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue())}</code>`;
   }
 
-  function buildMonthlySubOrderMessage(){
+  function buildMonthlySubOrderMessage(orderId){
     const quality = monthSelectedQuality;
     const total = getMonthlyTotal(quality);
     const perVideo = total / MONTH_SUB_VIDEO_LIMIT;
     return `🗓 ახალი შეკვეთა — MOON 1-თვიანი გამოწერა
+ID: ${orderId}
 ლიმიტი: ${MONTH_SUB_VIDEO_LIMIT} ვიდეო / 30 დღე
 თითო ვიდეო მაქს: 59.59 წამი
 ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${MONTH_SUB_VIDEO_LIMIT} ვიდეოზე (1 თვე): ${total.toFixed(2)} ₾
-TikTok პროფილი: ${getTiktokValue()}`;
+TikTok პროფილი: ${getTiktokValue()}
+ვიდეო ლინკი: ${getVideoLinkValue()}`;
   }
 
   const mpOrderBtnWA = document.getElementById('mpOrderBtnWA');
@@ -5245,14 +6369,19 @@ TikTok პროფილი: ${getTiktokValue()}`;
     if (!validateBeforeSend('mp')) return;
     const btn = mpOrderBtnWA;
     const textEl = document.getElementById('mpOrderBtnWAText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildMonthlySubOrderMessage();
-      sendTelegramNotification(buildMonthlySubOrderTgMessage('WhatsApp'));
+      const orderId = generateOrderId();
+      const message = buildMonthlySubOrderMessage(orderId);
+      sendTelegramNotification(buildMonthlySubOrderTgMessage('WhatsApp', orderId));
+      const quality = monthSelectedQuality;
+      const total = getMonthlyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'monthly', channel: 'WhatsApp',
+        quality, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
     });
   });
 
@@ -5260,16 +6389,86 @@ TikTok პროფილი: ${getTiktokValue()}`;
     if (!validateBeforeSend('mp')) return;
     const btn = mpOrderBtnTG;
     const textEl = document.getElementById('mpOrderBtnTGText');
-    const needsIOSWorkaround = isAppleMobileDevice();
-    const pendingTab = needsIOSWorkaround ? window.open('', '_blank') : null;
-    if (needsIOSWorkaround) writePendingTabLoader(pendingTab);
     runOrderFlow(btn, textEl, () => {
-      const message = buildMonthlySubOrderMessage();
-      sendTelegramNotification(buildMonthlySubOrderTgMessage('Telegram'));
+      const orderId = generateOrderId();
+      const message = buildMonthlySubOrderMessage(orderId);
+      sendTelegramNotification(buildMonthlySubOrderTgMessage('Telegram', orderId));
+      const quality = monthSelectedQuality;
+      const total = getMonthlyTotal(quality);
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'monthly', channel: 'Telegram',
+        quality, price: total,
+        tiktok: getTiktokValue(), videoLink: getVideoLinkValue()
+      });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
-      if (pendingTab) { pendingTab.location.href = url; } else { window.open(url, '_blank'); }
+      window.open(url, '_blank', 'noopener');
       flashMpCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
+    });
+  });
+
+  // ---- Fixed-price "Edit Order" (same-style edit, customer's own character) ----
+  const EO_PRICE = 19.99;
+  const eoCopyNote = document.getElementById('eoCopyNote');
+
+  function flashEoCopyNote(text){
+    if (!eoCopyNote) return;
+    eoCopyNote.textContent = text;
+    eoCopyNote.classList.add('active');
+    setTimeout(() => eoCopyNote.classList.remove('active'), 4000);
+  }
+
+  function buildEditOrderTgMessage(channel, orderId){
+    return `✨ <b>ახალი შეკვეთა — MOON (ედითის შეკვეთა)</b> (${channel})\n\n` +
+      `🆔 ID: <b>${orderId}</b>\n` +
+      `🎬 პაკეტი: <b>მსგავსი ედითი თქვენი პერსონაჟით</b>\n` +
+      `💰 ღირებულება: <b>${EO_PRICE} ₾</b>\n` +
+      `ℹ️ კლიენტი გამოგზავნის პერსონაჟის ფოტო/რეფერენსს ჩატში.`;
+  }
+
+  function buildEditOrderMessage(orderId){
+    return `✨ ახალი შეკვეთა — MOON (ედითის შეკვეთა)
+ID: ${orderId}
+პაკეტი: მსგავსი ედითი თქვენი პერსონაჟით
+ღირებულება: ${EO_PRICE} ₾
+
+გამოგიგზავნით პერსონაჟის ფოტოს/რეფერენსს ჩატში.`;
+  }
+
+  const eoOrderBtnWA = document.getElementById('eoOrderBtnWA');
+  const eoOrderBtnTG = document.getElementById('eoOrderBtnTG');
+
+  if (eoOrderBtnWA) eoOrderBtnWA.addEventListener('click', () => {
+    const btn = eoOrderBtnWA;
+    const textEl = document.getElementById('eoOrderBtnWAText');
+    runOrderFlow(btn, textEl, () => {
+      const orderId = generateOrderId();
+      const message = buildEditOrderMessage(orderId);
+      sendTelegramNotification(buildEditOrderTgMessage('WhatsApp', orderId));
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'editOrder', channel: 'WhatsApp',
+        price: EO_PRICE
+      });
+      const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank', 'noopener');
+    });
+  });
+
+  if (eoOrderBtnTG) eoOrderBtnTG.addEventListener('click', () => {
+    const btn = eoOrderBtnTG;
+    const textEl = document.getElementById('eoOrderBtnTGText');
+    runOrderFlow(btn, textEl, () => {
+      const orderId = generateOrderId();
+      const message = buildEditOrderMessage(orderId);
+      sendTelegramNotification(buildEditOrderTgMessage('Telegram', orderId));
+      addPendingOrder({
+        id: orderId, ts: Date.now(), type: 'editOrder', channel: 'Telegram',
+        price: EO_PRICE
+      });
+      copyToClipboard(message);
+      const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank', 'noopener');
+      flashEoCopyNote(t('tgSentNote').replace('@MOON_TG', '@' + TELEGRAM_USERNAME));
     });
   });
 
@@ -5560,8 +6759,12 @@ TikTok პროფილი: ${getTiktokValue()}`;
       a: 'მონტაჟი კეთდება მხოლოდ TikTok-ის ფორმატისთვის. შეკვეთის გასაგზავნად აუცილებელია მიუთითო შენი TikTok პროფილის ლინკი ველში.',
     },
     {
-      kw: ['პაბჯ','pubg'],
+      kw: ['პაბჯ','pubg','ნანამ სენსეტივ','სენსეტივები გაასწოროს','ნანას სენსეტივ'],
       a: '1) EXIT GAME<br>2) DELETE GAME<br>3) YOU ARE DONE<br>4) მოიცა, არ დაგვიმთავრებია.<br>5) DELETE ANUKA FROM THE PLANET<br>6) NOW YOU ARE DONE',
+    },
+    {
+      kw: ['ანუკა ბოტია','ანუკა ბოტი'],
+      a: 'კი, ბოტია.',
     },
     {
       kw: ['ატვირთვის გვერდ','ატვირთვის საიტ','two313','ატვირთვა'],
@@ -5701,6 +6904,10 @@ TikTok პროფილი: ${getTiktokValue()}`;
       a: 'A manager will confirm payment details directly in chat after your order is confirmed.',
     },
     {
+      kw: ['is anuka a bot','anuka a bot','anuka bot'],
+      a: 'Yes, it\'s a bot.',
+    },
+    {
       kw: ['hi','hello','hey'],
       a: 'Hello! How can I help? You can ask me about pricing, deadlines, requirements, or the order process.',
     },
@@ -5773,13 +6980,23 @@ TikTok პროფილი: ${getTiktokValue()}`;
     return 'დაასახელე კონკრეტული ქვეყანა და გეტყვი დედაქალაქს 🌍 (მაგ: „საქართველოს დედაქალაქი").';
   }
 
+  // Score-based matcher: instead of returning the first rule whose keyword
+  // appears anywhere in the text, we score every rule by how many distinct
+  // keywords match plus a small bonus for longer (more specific) keywords,
+  // then return the best match. This avoids short/generic keywords in an
+  // earlier rule accidentally winning over a more specific, later rule.
   function findAnswer(text){
     const lowerText = text.toLowerCase();
     const kb = currentLang === 'en' ? KB_EN : KB_KA;
+    let best = null, bestScore = 0;
     for (const rule of kb) {
-      if (rule.kw.some(k => lowerText.includes(k))) return rule;
+      let score = 0;
+      for (const k of rule.kw) {
+        if (lowerText.includes(k.toLowerCase())) score += 1 + Math.min(2, k.length / 10);
+      }
+      if (score > bestScore) { bestScore = score; best = rule; }
     }
-    return null;
+    return best;
   }
 
   function sendChat(){
@@ -6424,13 +7641,20 @@ TikTok პროფილი: ${getTiktokValue()}`;
   // ============================================================
   // 10) ADMIN PANEL
   // ============================================================
-  const ADMIN_PASSWORD = '37HcM)4bv1fZ7\'LR~9YE&epXj|HUE2|Xg`upUg1(T£XX\\r\\miG';
+  // ---- ნამდვილი admin პაროლი ამ ფაილში აღარსად ინახება. ----
+  // შემოწმება ხდება სერვერზე (Cloudflare Worker), იხ. tryAdminLogin().
+  // ADMIN_AUTH_URL შეცვალე შენი დეპლოირებული Worker-ის URL-ით.
+  const ADMIN_AUTH_URL = 'https://moon-admin-auth-workerjs.giorgikavelashvili99.workers.dev';
+
+  // ეს ფრაზა მხოლოდ gear ხატულის გამოსაჩენად გამოიყენება (UX-ტრიგერია,
+  // არა რეალური secret) — შეგიძლია თავისუფლად შეცვალო ნებისმიერ სტრიქონზე.
+  const GEAR_REVEAL_PHRASE = 'moonadmin';
   const adminGear = document.getElementById('adminGear');
 
   (function initAdminGearReveal(){
     function checkReveal(str){
       if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (typeof str === 'string' && str.slice(-ADMIN_PASSWORD.length) === ADMIN_PASSWORD) {
+      if (typeof str === 'string' && str.slice(-GEAR_REVEAL_PHRASE.length) === GEAR_REVEAL_PHRASE) {
         adminGear.classList.add('revealed');
       }
     }
@@ -6438,7 +7662,7 @@ TikTok პროფილი: ${getTiktokValue()}`;
     document.addEventListener('keydown', (e) => {
       if (!adminGear || adminGear.classList.contains('revealed')) return;
       if (e.key.length !== 1) return;
-      typed = (typed + e.key).slice(-ADMIN_PASSWORD.length);
+      typed = (typed + e.key).slice(-GEAR_REVEAL_PHRASE.length);
       checkReveal(typed);
     });
     document.addEventListener('input', (e) => {
@@ -6688,6 +7912,7 @@ TikTok პროფილი: ${getTiktokValue()}`;
   }
 
   async function renderAdminOrders(){
+    renderAdminPendingOrders();
     const data = await mdbRead('stats');
     const s = Object.assign({}, DEFAULT_STATS, data || {});
     document.getElementById('ordersTotalInput').value = s.total;
@@ -6725,6 +7950,153 @@ TikTok პროფილი: ${getTiktokValue()}`;
     loadStats();
     renderAdminOrders();
   });
+
+  // ============================================================
+  // PENDING ORDERS: every WhatsApp/Telegram order gets a 7-digit ID
+  // (generated at send time). They land here until the admin either
+  // confirms them (order fulfilled — moved into the confirmed archive
+  // below so the history isn't lost) or deletes them (never confirmed —
+  // e.g. spam, duplicate, or a video that didn't actually check out).
+  // ============================================================
+  let pendingOrdersCache = [];
+  let confirmedOrdersCache = [];
+
+  function pendingOrderTypeLabel(type){
+    if (type === 'weekly') return t('adminOrderTypeWeekly');
+    if (type === 'monthly') return t('adminOrderTypeMonthly');
+    if (type === 'editOrder') return t('adminOrderTypeEditOrder');
+    return t('adminOrderTypeSingle');
+  }
+
+  function orderRowMetaBits(o){
+    const metaBits = [];
+    if (o.duration) metaBits.push('⏱ ' + escapeHtml(o.duration) + ' წმ');
+    if (o.quality) metaBits.push('🎞 ' + escapeHtml(QUALITY_LABELS[o.quality] || o.quality));
+    if (o.price !== undefined && o.price !== null) metaBits.push('💰 <b>' + escapeHtml(String(o.price)) + ' ₾</b>');
+    if (o.tiktok) metaBits.push('🔗 ' + escapeHtml(o.tiktok));
+    return metaBits;
+  }
+
+  function renderPendingOrdersList(){
+    const listEl = document.getElementById('pendingOrdersList');
+    if (!listEl) return;
+    const query = (document.getElementById('pendingOrdersSearch').value || '').trim();
+    const sorted = pendingOrdersCache.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    const filtered = query ? sorted.filter(o => String(o.id).includes(query)) : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoPendingOrders') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoPendingOrdersMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(o =>
+      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="aor-top">' +
+          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
+        '</div>' +
+        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.ts ? '<br>' + formatCommentDate(o.ts) : '') + '</div>' +
+        '<div class="aor-actions">' +
+          '<button class="a-save-btn" data-action="confirm-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminOrderConfirm') + '</button>' +
+          '<button class="a-del-btn" data-action="delete-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDelete') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  function renderConfirmedOrdersList(){
+    const listEl = document.getElementById('confirmedOrdersList');
+    if (!listEl) return;
+    const query = (document.getElementById('confirmedOrdersSearch').value || '').trim();
+    const sorted = confirmedOrdersCache.slice().sort((a, b) => (b.confirmedAt || b.ts || 0) - (a.confirmedAt || a.ts || 0));
+    const filtered = query ? sorted.filter(o => String(o.id).includes(query)) : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoConfirmedOrders') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoConfirmedOrdersMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(o =>
+      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="aor-top">' +
+          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
+        '</div>' +
+        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
+        '<div class="aor-actions">' +
+          '<button class="a-del-btn" data-action="delete-confirmed-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDeleteForever') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  async function renderAdminPendingOrders(){
+    const listEl = document.getElementById('pendingOrdersList');
+    const confirmedEl = document.getElementById('confirmedOrdersList');
+    if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
+    if (confirmedEl) confirmedEl.innerHTML = '<div class="c-empty">…</div>';
+    const [pendingData, confirmedData] = await Promise.all([
+      mdbRead('pendingOrders'),
+      mdbRead('confirmedOrders')
+    ]);
+    pendingOrdersCache = (pendingData && Array.isArray(pendingData.list)) ? pendingData.list : [];
+    confirmedOrdersCache = (confirmedData && Array.isArray(confirmedData.list)) ? confirmedData.list : [];
+    renderPendingOrdersList();
+    renderConfirmedOrdersList();
+  }
+
+  const pendingOrdersSearchInput = document.getElementById('pendingOrdersSearch');
+  if (pendingOrdersSearchInput) {
+    pendingOrdersSearchInput.addEventListener('input', renderPendingOrdersList);
+  }
+  const confirmedOrdersSearchInput = document.getElementById('confirmedOrdersSearch');
+  if (confirmedOrdersSearchInput) {
+    confirmedOrdersSearchInput.addEventListener('input', renderConfirmedOrdersList);
+  }
+
+  const pendingOrdersListEl = document.getElementById('pendingOrdersList');
+  if (pendingOrdersListEl) {
+    pendingOrdersListEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+      const id = btn.getAttribute('data-id');
+      if (action !== 'delete-order' && action !== 'confirm-order') return;
+
+      const order = pendingOrdersCache.find(o => String(o.id) === String(id));
+      pendingOrdersCache = pendingOrdersCache.filter(o => String(o.id) !== String(id));
+      await mdbWrite('pendingOrders', { list: pendingOrdersCache });
+
+      if (action === 'confirm-order' && order) {
+        confirmedOrdersCache = confirmedOrdersCache.concat([
+          Object.assign({}, order, { confirmedAt: Date.now() })
+        ]);
+        await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+        renderConfirmedOrdersList();
+      }
+      renderPendingOrdersList();
+    });
+  }
+
+  const confirmedOrdersListEl = document.getElementById('confirmedOrdersList');
+  if (confirmedOrdersListEl) {
+    confirmedOrdersListEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn || btn.getAttribute('data-action') !== 'delete-confirmed-order') return;
+      const id = btn.getAttribute('data-id');
+      confirmedOrdersCache = confirmedOrdersCache.filter(o => String(o.id) !== String(id));
+      await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+      renderConfirmedOrdersList();
+    });
+  }
 
   // ============================================================
   // ORDER ANALYTICS: manually-logged real orders (TikTok link,
@@ -6946,16 +8318,46 @@ TikTok პროფილი: ${getTiktokValue()}`;
   adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
   adminTabPromo.addEventListener('click', () => switchAdminTab('promo'));
 
-  function tryAdminLogin(){
-    if (adminPass.value === ADMIN_PASSWORD) {
-      adminAuthenticated = true;
-      initAdminModeCheckbox();
-      applyAdminNameLock();
-      adminLogin.style.display = 'none';
-      adminDashboard.style.display = 'block';
-      switchAdminTab('visits');
-    } else {
+  let adminCheckInFlight = false;
+  async function tryAdminLogin(){
+    if (adminCheckInFlight) return;
+    const entered = adminPass.value;
+    adminErr.classList.remove('show');
+    adminCheckInFlight = true;
+    const prevLabel = adminGo.textContent;
+    adminGo.disabled = true;
+    adminGo.textContent = '...';
+    try {
+      const res = await fetch(ADMIN_AUTH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: entered }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch {}
+      console.log('[admin-auth] status:', res.status, 'body:', data);
+      if (res.ok && data && data.ok === true) {
+        adminAuthenticated = true;
+        initAdminModeCheckbox();
+        applyAdminNameLock();
+        adminLogin.style.display = 'none';
+        adminDashboard.style.display = 'block';
+        switchAdminTab('visits');
+      } else if (data && data.error === 'locked') {
+        adminErr.textContent = 'დროებით დაბლოკილია — სცადე 15 წუთში';
+        adminErr.classList.add('show');
+      } else {
+        adminErr.textContent = 'არასწორი პაროლი';
+        adminErr.classList.add('show');
+      }
+    } catch (err) {
+      console.error('[admin-auth] network/CORS error:', err);
+      adminErr.textContent = 'Worker-თან კავშირი ვერ დამყარდა (იხ. Console)';
       adminErr.classList.add('show');
+    } finally {
+      adminCheckInFlight = false;
+      adminGo.disabled = false;
+      adminGo.textContent = prevLabel;
     }
   }
   adminGo.addEventListener('click', tryAdminLogin);
@@ -7134,16 +8536,6 @@ TikTok პროფილი: ${getTiktokValue()}`;
   initBeforeAfterSliders();
   initTilt3D();
 </script>
-
-</div>
-
-<div id="maintenance-overlay">
-  <div class="mo-card">
-    <p class="mo-title">მოგესალმებით ❤️</p>
-    <p class="mo-body">დროებით შეზღუდულია შეკვეთების მიღება, რადგან ვებრძვით ტიკტოკის კომპრესიას 😄</p>
-    <p class="mo-foot">მალე დავბრუნდებით ❤️</p>
-  </div>
-</div>
 
 </body>
 </html>
