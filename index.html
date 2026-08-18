@@ -1654,9 +1654,9 @@
     margin-top:16px;
     padding:6px;
     border-radius:20px;
-    border:1px solid rgba(207,216,255,0.25);
+    border:1px solid color-mix(in srgb, var(--pc-accent) 28%, transparent);
     background:
-      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(207,216,255,0.10), transparent 60%),
+      radial-gradient(ellipse 90% 60% at 50% 0%, color-mix(in srgb, var(--pc-accent) 10%, transparent), transparent 60%),
       linear-gradient(180deg, rgba(23,23,36,0.92), rgba(13,13,21,0.92));
     box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
   }
@@ -1669,7 +1669,7 @@
     display:flex; align-items:center; gap:9px;
     font-size:12px; padding:11px 12px;
     border-radius:13px;
-    border:1px solid rgba(207,216,255,0.14);
+    border:1px solid var(--border-soft);
     background:rgba(255,255,255,0.025);
   }
   .scan-result .sr-row:first-child,
@@ -1679,15 +1679,18 @@
   .scan-result .sr-ico{
     width:28px; height:28px; flex:0 0 auto; border-radius:10px;
     display:flex; align-items:center; justify-content:center;
-    font-size:12.5px; line-height:1;
-    background:linear-gradient(160deg, rgba(124,143,255,0.22), rgba(124,143,255,0.05));
-    border:1px solid rgba(124,143,255,0.35);
-    box-shadow:0 0 14px rgba(124,143,255,0.16);
+    background:linear-gradient(160deg, color-mix(in srgb, var(--pc-accent) 24%, transparent), color-mix(in srgb, var(--pc-accent) 6%, transparent));
+    border:1px solid color-mix(in srgb, var(--pc-accent) 38%, transparent);
+    box-shadow:0 0 14px color-mix(in srgb, var(--pc-accent) 18%, transparent);
+  }
+  .scan-result .sr-ico svg{
+    width:14px; height:14px; fill:none; stroke:var(--pc-accent);
+    stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
   }
   .scan-result .sr-label{ color:var(--text-dim); flex:1; }
   .scan-result .sr-row b{
-    font-family:'JetBrains Mono', 'BPG Glaho', sans-serif; color:var(--cyan);
-    text-shadow:0 0 10px rgba(207,216,255,0.5);
+    font-family:'JetBrains Mono', 'BPG Glaho', sans-serif; color:var(--pc-accent);
+    text-shadow:0 0 10px color-mix(in srgb, var(--pc-accent) 45%, transparent);
     font-size:12.5px; text-align:right; white-space:nowrap;
   }
   .scan-result .sr-price-hero{
@@ -1695,9 +1698,9 @@
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     padding:16px 18px;
     border-radius:16px;
-    background: linear-gradient(135deg, rgba(207,216,255,0.2), rgba(207,216,255,0.04));
-    border:1px solid rgba(207,216,255,0.45);
-    box-shadow: 0 0 30px rgba(207,216,255,0.14), inset 0 1px 0 rgba(255,255,255,0.06);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--pc-accent) 20%, transparent), color-mix(in srgb, var(--pc-accent) 4%, transparent));
+    border:1px solid color-mix(in srgb, var(--pc-accent) 45%, transparent);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--pc-accent) 16%, transparent), inset 0 1px 0 rgba(255,255,255,0.06);
   }
   .scan-result .sr-price-tag{
     font-family:'JetBrains Mono', 'BPG Glaho', sans-serif; font-size:11px; font-weight:700;
@@ -1706,9 +1709,10 @@
   .scan-result .sr-price-value{ flex:0 0 auto; }
   .scan-result .sr-price-value b{
     font-family:'JetBrains Mono', 'BPG Glaho', sans-serif; font-size:25px; font-weight:800;
-    color:var(--gold); white-space:nowrap;
-    text-shadow:0 0 12px rgba(207,216,255,0.6), 0 0 12px rgba(207,216,255,0.4);
+    color:#fff; white-space:nowrap;
+    text-shadow:0 0 14px color-mix(in srgb, var(--pc-accent) 75%, transparent), 0 0 26px color-mix(in srgb, var(--pc-accent) 45%, transparent);
   }
+  .scan-result .sr-price-value sup{ color: var(--pc-accent); }
   .scan-result .sr-warn{
     margin:10px 12px 8px; font-size:12px; color:var(--gold); padding:0 2px;
   }
@@ -1755,10 +1759,19 @@
   .scan-progress.show{ display:flex; }
   .scan-progress .spin{
     width:14px; height:14px; border-radius:50%;
-    border:2px solid var(--border); border-top-color:var(--purple);
+    border:2px solid var(--border); border-top-color:var(--pc-accent, var(--purple));
     animation: spin 0.7s linear infinite;
+    flex:0 0 auto;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+  .scan-progress-cancel{
+    margin-left:auto; flex:0 0 auto;
+    background:none; border:1px solid var(--border-soft); border-radius:20px;
+    color:var(--text-dim); font-family:'Space Grotesk', 'BPG Glaho', sans-serif;
+    font-size:11px; font-weight:600; padding:5px 12px; cursor:pointer;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .scan-progress-cancel:hover{ color:#ff9db0; border-color:rgba(255,56,96,0.5); background:rgba(255,56,96,0.1); }
 
   /* ---------- Scanner as the PRIMARY input method ---------- */
   .panel-section.scanner-primary{ margin-top:2px; }
@@ -1831,9 +1844,10 @@
     background:rgba(255,255,255,0.05);
     border:1px solid rgba(207,216,255,0.2);
     color:var(--text-dim);
-    font-size:13px; line-height:1; cursor:pointer;
+    cursor:pointer;
     transition: background .2s, border-color .2s, color .2s, transform .15s;
   }
+  .sr-reset-btn svg{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; }
   .sr-reset-btn:hover{
     background:rgba(255,56,96,0.14);
     border-color:rgba(255,56,96,0.5);
@@ -4000,15 +4014,20 @@
           <div class="dz-title" data-i18n="dzTitle">ატვირთეთ ვიდეო ფასის გამოსათვლელად</div>
           <div class="dz-req" data-i18n="dzReq">სავალდებულო ფორმატი: ზუსტად 1080p · 60fps</div>
         </div>
-        <div class="scan-progress" id="scanProgress"><span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span></div>
+        <div class="scan-progress" id="scanProgress">
+          <span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span>
+          <button type="button" class="scan-progress-cancel" id="scanProgressCancel" data-i18n="scanCancelBtn">გაუქმება</button>
+        </div>
 
         <div class="scan-result" id="scanResult">
-          <button type="button" class="sr-reset-btn" id="srResetBtn" aria-label="გაუქმება" title="გაუქმება">✕</button>
+          <button type="button" class="sr-reset-btn" id="srResetBtn" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
           <div class="sr-specs">
-            <div class="sr-row"><span class="sr-ico">📄</span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
-            <div class="sr-row"><span class="sr-ico">⏱️</span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
-            <div class="sr-row"><span class="sr-ico">🎯</span><span class="sr-label" data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
-            <div class="sr-row" id="srQualityRow"><span class="sr-ico">🔎</span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
+            <div class="sr-row"><span class="sr-ico"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/></svg></span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
+            <div class="sr-row"><span class="sr-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg></span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
+            <div class="sr-row"><span class="sr-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor" stroke="none"/></svg></span><span class="sr-label" data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
+            <div class="sr-row" id="srQualityRow"><span class="sr-ico"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.85-4.85"/></svg></span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
           </div>
           <div class="sr-price-hero">
             <span class="sr-price-tag" data-i18n="srPrice">გამოთვლილი ფასი</span>
@@ -4795,6 +4814,7 @@
       dzTitle: 'ატვირთეთ ვიდეო ფასის გამოსათვლელად',
       dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
       scanProcessing: 'ვიდეო მუშავდება…',
+      scanCancelBtn: 'გაუქმება',
       srFile: 'ფაილი',
       srDuration: 'ხანგრძლივობა',
       srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
@@ -5065,6 +5085,7 @@
       dzTitle: 'Upload a video for automatic measurement',
       dzSub: 'Drag it here or click — duration will be filled in automatically',
       scanProcessing: 'Processing video…',
+      scanCancelBtn: 'Cancel',
       srFile: 'File',
       srDuration: 'Duration',
       srDetectedFormat: 'Uploaded video format',
@@ -6142,6 +6163,7 @@
   const srMismatchNote = document.getElementById('srMismatchNote');
   const srWarn = document.getElementById('srWarn');
   const srResetBtn = document.getElementById('srResetBtn');
+  const scanProgressCancel = document.getElementById('scanProgressCancel');
   const srReject = document.getElementById('srReject');
   const srRejectDetected = document.getElementById('srRejectDetected');
   const srRejectRetry = document.getElementById('srRejectRetry');
@@ -6285,11 +6307,19 @@
   // API, with no manual re-selection in a second tab.
   let mainScannedFile = null;
 
+  // Bumped on every new scan and on manual cancel — async video-metadata
+  // callbacks check their own token before touching the UI, so a result
+  // that arrives after the visitor already cancelled (or started a new
+  // scan) is simply dropped instead of overwriting what's on screen.
+  let scanToken = 0;
+
   const SR_AUTO_IDS = { wrap: 'srAuto', statusRow: 'srAutoStatus', statusText: 'srAutoStatusText', fill: 'srAutoFill', error: 'srAutoError' };
 
   // Fully resets the scanner back to its empty state — this is the
   // "cancel upload" action that was previously missing.
   function resetScanner(){
+    scanToken++; // invalidate any scan still in flight
+    scanProgress.classList.remove('show');
     videoInput.value = '';
     mainScannedFile = null;
     scanResult.classList.remove('show');
@@ -6316,6 +6346,7 @@
   }
 
   srResetBtn.addEventListener('click', resetScanner);
+  if (scanProgressCancel) scanProgressCancel.addEventListener('click', resetScanner);
   srRejectRetry.addEventListener('click', resetScanner);
 
   srTransferYes.addEventListener('click', () => {
@@ -6339,6 +6370,7 @@
       alert(t('alertNotVideo'));
       return;
     }
+    const myToken = ++scanToken;
     mainScannedFile = file;
     scanResult.classList.remove('show');
     srReject.classList.remove('show');
@@ -6353,7 +6385,7 @@
     document.body.appendChild(videoEl);
 
     const cleanup = () => {
-      scanProgress.classList.remove('show');
+      if (myToken === scanToken) scanProgress.classList.remove('show');
       if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
       URL.revokeObjectURL(videoEl.src);
       videoEl.remove();
@@ -6365,14 +6397,14 @@
     // and let the visitor try again.
     let watchdogTimer = setTimeout(() => {
       cleanup();
-      alert(t('alertReadError'));
+      if (myToken === scanToken) alert(t('alertReadError'));
     }, 9000);
 
     const proceed = (duration) => {
       const width = videoEl.videoWidth;
       const height = videoEl.videoHeight;
       detectFrameRate(videoEl).then(fps => {
-        finishScan(duration, file, width, height, fps);
+        if (myToken === scanToken) finishScan(duration, file, width, height, fps);
         cleanup();
       });
     };
@@ -6400,7 +6432,7 @@
 
     videoEl.onerror = function(){
       cleanup();
-      alert(t('alertReadError'));
+      if (myToken === scanToken) alert(t('alertReadError'));
     };
 
     videoEl.src = URL.createObjectURL(file);
