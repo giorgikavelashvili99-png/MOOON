@@ -1554,32 +1554,21 @@
     position:relative;
     width:52px; height:52px; margin:0 auto 14px;
     display:flex; align-items:center; justify-content:center;
+    border-radius:16px;
+    background: linear-gradient(150deg, #6fe0ff, var(--cyan) 55%, #0f8fc9);
+    box-shadow: 0 0 26px rgba(34,195,255,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: box-shadow .25s ease, transform .25s ease;
+  }
+  .drop-zone:hover .dz-icon, .drop-zone.dragover .dz-icon{
+    box-shadow: 0 0 38px rgba(34,195,255,0.75), inset 0 1px 0 rgba(255,255,255,0.45);
+    transform: scale(1.05);
   }
   .drop-zone .dz-icon svg{
     display:block;
-    width:100%; height:100%;
+    width:22px; height:22px;
     overflow:visible;
   }
-  .dz-bracket{
-    fill:none; stroke:var(--cyan); stroke-width:2.4; stroke-linecap:round;
-    filter:drop-shadow(0 0 4px rgba(34,195,255,0.65));
-    transition: stroke .25s ease;
-  }
-  .drop-zone:hover .dz-bracket, .drop-zone.dragover .dz-bracket{ stroke:#ffd23f; filter:drop-shadow(0 0 5px rgba(255,210,63,0.7)); }
-  .dz-icon-play{ fill:var(--text); opacity:0.92; }
-  .dz-scanline{
-    stroke:var(--cyan); stroke-width:1.2; opacity:0;
-    filter:drop-shadow(0 0 4px rgba(34,195,255,0.9));
-    animation: dzScan 2.4s ease-in-out infinite;
-  }
-  @keyframes dzScan{
-    0%{ transform:translateY(-11px); opacity:0; }
-    15%{ opacity:.9; }
-    50%{ transform:translateY(11px); opacity:.9; }
-    85%{ opacity:0; }
-    100%{ transform:translateY(-11px); opacity:0; }
-  }
-  @media (prefers-reduced-motion: reduce){ .dz-scanline{ animation:none; opacity:.55; transform:none; } }
+  .dz-plus{ stroke:#04101a; stroke-width:2.6; stroke-linecap:round; }
   .drop-zone .dz-title{
     font-size:14px; font-weight:800; margin-bottom:6px; line-height:1.35; letter-spacing:0.005em;
     /* Solid, always-visible color first, so the label never disappears —
@@ -1827,24 +1816,6 @@
   }
   @media (prefers-reduced-motion: reduce){ .scanner-primary .scanner-stage{ animation:none; } }
   @media (max-width:900px){ .scanner-primary .scanner-stage{ padding: clamp(13px,3.6vw,18px); border-radius: clamp(15px,3.4vw,18px); } }
-
-  .scanner-primary .drop-zone{ padding:24px 18px; border-radius:18px; }
-  .scanner-primary .drop-zone .dz-icon{ width:56px; height:56px; margin-bottom:12px; }
-  .scanner-primary .drop-zone .dz-title{ font-size:15.5px; }
-  .scanner-primary .drop-zone .dz-sub{ font-size:12px; max-width:360px; }
-  @media (max-width:900px){
-    .scanner-primary .drop-zone{
-      padding: clamp(14px,3.8vw,24px) clamp(12px,3.4vw,18px);
-      border-radius: clamp(14px,3vw,18px);
-    }
-    .scanner-primary .drop-zone .dz-icon{
-      width: clamp(38px,9vw,56px);
-      height: clamp(38px,9vw,56px);
-      margin-bottom: clamp(7px,2.2vw,12px);
-    }
-    .scanner-primary .drop-zone .dz-title{ font-size: clamp(12.5px,3.2vw,15.5px); }
-    .scanner-primary .drop-zone .dz-sub{ font-size: clamp(11px,2.9vw,13.5px); max-width: clamp(230px,80vw,360px); line-height:1.45; }
-  }
 
   .drop-zone .dz-req{
     display:inline-flex; align-items:center; gap:6px;
@@ -3509,10 +3480,10 @@
     background:linear-gradient(90deg, transparent, var(--pc-accent), transparent);
     opacity:0.8;
   }
-  .pc-card--indiv{ --pc-accent: #3fd9c7; }
-  .pc-card--weekly{ --pc-accent: #a78bfa; }
+  .pc-card--indiv{ --pc-accent: #22c3ff; }
+  .pc-card--weekly{ --pc-accent: #b855f7; }
   .pc-card--monthly{
-    --pc-accent: #ffd23f;
+    --pc-accent: #ff9d1f;
     border-color: color-mix(in srgb, var(--pc-accent) 55%, var(--border));
     background:
       repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px),
@@ -3520,7 +3491,7 @@
       linear-gradient(180deg, color-mix(in srgb, var(--pc-accent) 12%, var(--panel)), color-mix(in srgb, var(--pc-accent) 5%, var(--panel-2)));
     box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 28%, transparent);
   }
-  .pc-card--edit{ --pc-accent: #ff3b5c; }
+  .pc-card--edit{ --pc-accent: #ec4899; }
 
   .pc-ribbon{
     position:absolute; top:18px; right:-32px; width:140px;
@@ -3635,7 +3606,6 @@
     position:fixed; inset:0; z-index:64;
     background:rgba(3,3,7,0.88);
     padding:16px; box-sizing:border-box;
-    overflow-y:auto; -webkit-overflow-scrolling:touch;
   }
   .pc-modal-scrim.open{ display:flex; }
 
@@ -4026,13 +3996,8 @@
         <div class="drop-zone" id="dropZone">
           <input type="file" id="videoInput" accept="video/*">
           <div class="dz-icon" aria-hidden="true">
-            <svg viewBox="0 0 52 52">
-              <path class="dz-bracket" d="M2 16V8a6 6 0 016-6h8"/>
-              <path class="dz-bracket" d="M50 16V8a6 6 0 00-6-6h-8"/>
-              <path class="dz-bracket" d="M2 36v8a6 6 0 006 6h8"/>
-              <path class="dz-bracket" d="M50 36v8a6 6 0 01-6 6h-8"/>
-              <path class="dz-icon-play" d="M21 18l13 8-13 8z"/>
-              <line class="dz-scanline" x1="8" y1="26" x2="44" y2="26"/>
+            <svg viewBox="0 0 24 24">
+              <path class="dz-plus" d="M12 5v14M5 12h14"/>
             </svg>
           </div>
           <div class="dz-title" data-i18n="dzTitle">ატვირთეთ ვიდეო ფასის გამოსათვლელად</div>
@@ -4252,13 +4217,8 @@
         <div class="drop-zone simple-drop-zone" id="dropZoneWp">
           <input type="file" id="videoInputWp" accept="video/*">
           <div class="dz-icon" aria-hidden="true">
-            <svg viewBox="0 0 52 52">
-              <path class="dz-bracket" d="M2 16V8a6 6 0 016-6h8"/>
-              <path class="dz-bracket" d="M50 16V8a6 6 0 00-6-6h-8"/>
-              <path class="dz-bracket" d="M2 36v8a6 6 0 006 6h8"/>
-              <path class="dz-bracket" d="M50 36v8a6 6 0 01-6 6h-8"/>
-              <path class="dz-icon-play" d="M21 18l13 8-13 8z"/>
-              <line class="dz-scanline" x1="8" y1="26" x2="44" y2="26"/>
+            <svg viewBox="0 0 24 24">
+              <path class="dz-plus" d="M12 5v14M5 12h14"/>
             </svg>
           </div>
           <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
@@ -4402,13 +4362,8 @@
         <div class="drop-zone simple-drop-zone" id="dropZoneMp">
           <input type="file" id="videoInputMp" accept="video/*">
           <div class="dz-icon" aria-hidden="true">
-            <svg viewBox="0 0 52 52">
-              <path class="dz-bracket" d="M2 16V8a6 6 0 016-6h8"/>
-              <path class="dz-bracket" d="M50 16V8a6 6 0 00-6-6h-8"/>
-              <path class="dz-bracket" d="M2 36v8a6 6 0 006 6h8"/>
-              <path class="dz-bracket" d="M50 36v8a6 6 0 01-6 6h-8"/>
-              <path class="dz-icon-play" d="M21 18l13 8-13 8z"/>
-              <line class="dz-scanline" x1="8" y1="26" x2="44" y2="26"/>
+            <svg viewBox="0 0 24 24">
+              <path class="dz-plus" d="M12 5v14M5 12h14"/>
             </svg>
           </div>
           <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
