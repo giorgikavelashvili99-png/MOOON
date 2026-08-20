@@ -1912,11 +1912,12 @@
     position:fixed; inset:0; z-index:999999;
     display:flex; align-items:center; justify-content:center;
     padding:24px;
+    overflow-y:auto;
     background:
       radial-gradient(ellipse 620px 420px at 50% 38%, rgba(255,176,32,0.10), transparent 70%),
-      rgba(6,6,10,0.74);
-    -webkit-backdrop-filter: blur(22px) saturate(110%);
-    backdrop-filter: blur(22px) saturate(110%);
+      rgba(6,6,10,0.88);
+    -webkit-backdrop-filter: blur(46px) saturate(110%);
+    backdrop-filter: blur(46px) saturate(110%);
   }
   .vacation-overlay[hidden]{ display:none !important; }
 
@@ -2006,10 +2007,72 @@
     50%{ transform:scale(1.2); }
   }
 
+  /* ---- Vacation offer: still-available flat-price order block ---- */
+  .vacation-offer{
+    position:relative;
+    width:100%;
+    margin-top:22px;
+    padding:20px 20px 22px;
+    border-radius:20px;
+    border:1px solid rgba(77,95,255,0.28);
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(77,95,255,0.12), transparent 65%),
+      linear-gradient(180deg, rgba(23,23,36,0.94), rgba(13,13,21,0.94));
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+    text-align:center;
+  }
+  .vo-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700;
+    letter-spacing:0.12em; text-transform:uppercase; color:#b3c6ff;
+    border:1px solid rgba(77,95,255,0.35); border-radius:20px;
+    padding:6px 13px; margin-bottom:14px;
+    background:rgba(77,95,255,0.08);
+    text-shadow:0 0 10px rgba(77,95,255,0.5);
+  }
+  .vacation-offer-text{
+    margin:0 0 16px; font-size:14px; line-height:1.55; color:var(--text-dim);
+  }
+  .vacation-offer-text b{ color:var(--text); font-weight:600; }
+
+  .vacation-price-pill{
+    display:inline-flex; align-items:center; gap:10px; justify-content:center;
+    margin:0 auto 18px;
+    padding:10px 20px; border-radius:14px;
+    border:1px solid rgba(255,176,32,0.45);
+    background: linear-gradient(135deg, rgba(255,176,32,0.2), rgba(255,176,32,0.04));
+    box-shadow: 0 0 30px rgba(255,176,32,0.14), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .vp-label{
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim);
+  }
+  .vp-value{
+    font-family:'JetBrains Mono', monospace; font-size:19px; font-weight:800;
+    color:var(--gold); text-shadow:0 0 14px rgba(255,210,122,0.6), 0 0 32px rgba(255,176,32,0.4);
+  }
+
+  .vacation-offer .drop-zone{ text-align:center; }
+
+  .vac-file-result{ display:none; margin-top:16px; }
+  .vac-file-result.show{ display:block; animation: vacResultIn .35s ease; }
+  @keyframes vacResultIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+  .vac-file-row{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-size:12px; color:var(--text-dim);
+    border:1px solid var(--border-soft); border-radius:12px;
+    padding:10px 14px; background:rgba(255,255,255,0.02);
+  }
+  .vac-file-row .vac-file-name{ color:var(--text); font-weight:600; word-break:break-all; }
+  .vacation-offer .order-grid{ margin-top:14px; }
+  .vacation-offer .copy-note{ margin-top:2px; }
+
   @media (max-width:480px){
     .vacation-moon-wrap{ width:150px; height:150px; margin-bottom:18px; }
     .vacation-heading{ font-size:25px; }
     .vacation-text{ font-size:15px; }
+    .vacation-offer{ padding:16px 14px 18px; margin-top:18px; }
+    .vacation-offer-text{ font-size:13px; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -2094,6 +2157,53 @@
       <span class="vacation-date-label">საიტი გაიხსნება</span>
       <span>25 აგვისტოს</span>
       <span class="vacation-heart">❤️</span>
+    </div>
+
+    <div class="vacation-offer" id="vacationOffer">
+      <div class="vo-badge">🎬 მიუხედავად შვებულებისა</div>
+      <p class="vacation-offer-text">შემიძლია <b>ვიდეო დაგიმონტაჟო</b> ისე, რომ ხარისხი არ დაიკარგოს — უბრალოდ ატვირთე ფაილი ქვემოთ.</p>
+      <div class="vacation-price-pill">
+        <span class="vp-label">ყველა ვიდეოს ფასი</span>
+        <span class="vp-value">4.99 ₾</span>
+      </div>
+
+      <div class="drop-zone" id="vacDropZone">
+        <input type="file" id="vacVideoInput" accept="video/*">
+        <div class="dz-icon"><svg viewBox="8 5 11 14" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="dz-title">ატვირთე ვიდეო შეკვეთისთვის</div>
+        <div class="dz-sub">გადმოიტანე ან დააკლიკე — ფასი ფიქსირებულია, 4.99 ₾, შვებულების განმავლობაშიც</div>
+      </div>
+
+      <div class="vac-file-result" id="vacFileResult">
+        <div class="vac-file-row"><span>📄</span><span class="vac-file-name" id="vacFileName">—</span></div>
+        <div class="order-grid">
+          <button class="order-btn wa" id="vacOrderBtnWA">
+            <div class="qn-stars" aria-hidden="true">
+              <span style="top:15%;left:8%;animation-delay:0s;"></span>
+              <span style="top:65%;left:20%;animation-delay:.6s;"></span>
+              <span style="top:25%;left:45%;animation-delay:1.1s;"></span>
+              <span style="top:70%;left:60%;animation-delay:.3s;"></span>
+              <span style="top:20%;left:78%;animation-delay:1.5s;"></span>
+              <span style="top:60%;left:92%;animation-delay:.9s;"></span>
+            </div>
+            <span class="ico"><svg viewBox="0 0 24 24"><path d="M20.52 3.449C12.831-3.984.106 5.845.061 12.68a12.94 12.94 0 001.767 6.583L0 24l5.001-1.79a12.914 12.914 0 006.482 1.658h.006c6.24 0 12.243-5.302 12.243-12.213 0-3.264-1.325-6.334-3.212-8.206zM12 22.121h-.005a10.13 10.13 0 01-5.185-1.421l-.372-.22-3.851 1.377 1.4-3.756-.242-.386a10.108 10.108 0 01-1.554-5.396c.005-5.579 4.548-10.115 10.133-10.115 2.703 0 5.243 1.057 7.148 2.978 1.905 1.921 2.952 4.464 2.951 7.153-.004 5.58-4.547 10.106-10.423 10.106zm5.556-7.596c-.303-.152-1.793-.885-2.07-.986-.278-.101-.48-.152-.682.152-.202.303-.783.986-.96 1.188-.176.202-.353.227-.655.076-.303-.152-1.279-.472-2.436-1.505-.9-.803-1.508-1.794-1.685-2.097-.176-.303-.019-.467.133-.618.136-.135.303-.353.454-.53.152-.176.202-.303.303-.505.101-.202.05-.379-.025-.53-.076-.152-.682-1.646-.934-2.253-.246-.591-.497-.511-.682-.52-.176-.008-.379-.01-.581-.01-.202 0-.53.076-.808.379-.278.303-1.06 1.036-1.06 2.528s1.085 2.933 1.236 3.135c.151.202 2.135 3.259 5.17 4.57.723.312 1.287.498 1.727.638.726.231 1.386.198 1.908.12.582-.087 1.793-.734 2.046-1.442.253-.708.253-1.315.177-1.442-.075-.126-.278-.202-.581-.353z"/></svg></span>
+            <span id="vacOrderBtnWAText">WhatsApp-ზე გაგზავნა</span>
+          </button>
+          <button class="order-btn tg" id="vacOrderBtnTG">
+            <div class="qn-stars" aria-hidden="true">
+              <span style="top:15%;left:8%;animation-delay:.2s;"></span>
+              <span style="top:65%;left:20%;animation-delay:.8s;"></span>
+              <span style="top:25%;left:45%;animation-delay:1.3s;"></span>
+              <span style="top:70%;left:60%;animation-delay:.5s;"></span>
+              <span style="top:20%;left:78%;animation-delay:1.7s;"></span>
+              <span style="top:60%;left:92%;animation-delay:1.1s;"></span>
+            </div>
+            <span class="ico"><svg viewBox="0 0 24 24"><path d="M23.91 3.79L20.3 20.84c-.25 1.21-.98 1.5-2 .94l-5.5-4.07-2.66 2.57c-.3.3-.55.55-1.12.55l.4-5.7 10.38-9.4c.45-.4-.1-.63-.7-.23L7.28 13.55l-5.6-1.75c-1.22-.38-1.24-1.22.26-1.8L22.4 2.35c1.02-.38 1.9.24 1.51 1.44z"/></svg></span>
+            <span id="vacOrderBtnTGText">Telegram-ზე გაგზავნა</span>
+          </button>
+        </div>
+        <div class="copy-note" id="vacCopyNote"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -5229,6 +5339,77 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
       if (checkDate()) clearInterval(vacationTimer);
     }, 60000);
   }
+})();
+</script>
+
+<script>
+(function(){
+  // ---- VACATION OFFER: flat-price scanner + order buttons ----
+  var dropZone = document.getElementById('vacDropZone');
+  var videoInput = document.getElementById('vacVideoInput');
+  var fileResult = document.getElementById('vacFileResult');
+  var fileNameEl = document.getElementById('vacFileName');
+  var copyNote = document.getElementById('vacCopyNote');
+  var btnWA = document.getElementById('vacOrderBtnWA');
+  var btnTG = document.getElementById('vacOrderBtnTG');
+  if (!dropZone) return;
+
+  var PHONE_INTL = "995592630630";
+  var TELEGRAM_USERNAME = "Moonknight0012";
+  var VAC_PRICE = "4.99 ₾";
+  var selectedFileName = '';
+
+  ['dragover','dragenter'].forEach(function(evt){
+    dropZone.addEventListener(evt, function(e){ e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(function(evt){
+    dropZone.addEventListener(evt, function(){ dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', function(e){
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  videoInput.addEventListener('change', function(e){
+    if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+  });
+
+  function handleFile(file){
+    if (!file.type.startsWith('video/')) {
+      alert('გთხოვთ აირჩიოთ ვიდეო ფაილი');
+      return;
+    }
+    selectedFileName = file.name;
+    fileNameEl.textContent = selectedFileName;
+    fileResult.classList.add('show');
+    setTimeout(function(){
+      fileResult.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }, 80);
+  }
+
+  function buildVacMessage(){
+    return '🌴 შვებულების შეკვეთა — MOON\n' +
+      'ფაილი: ' + (selectedFileName || '—') + '\n' +
+      'ფასი: ' + VAC_PRICE + ' (ფიქსირებული ფასი შვებულების პერიოდში)\n' +
+      'ვიდეოს ჩატში ცალკე გამოგიგზავნით.';
+  }
+
+  function flashNote(text){
+    if (!copyNote) return;
+    copyNote.textContent = text;
+    copyNote.classList.add('active');
+    setTimeout(function(){ copyNote.classList.remove('active'); }, 4000);
+  }
+
+  if (btnWA) btnWA.addEventListener('click', function(){
+    var url = 'https://wa.me/' + PHONE_INTL + '?text=' + encodeURIComponent(buildVacMessage());
+    window.open(url, '_blank');
+  });
+
+  if (btnTG) btnTG.addEventListener('click', function(){
+    var url = 'https://t.me/' + TELEGRAM_USERNAME + '?text=' + encodeURIComponent(buildVacMessage());
+    window.open(url, '_blank');
+    flashNote('იხსნება Telegram — @' + TELEGRAM_USERNAME);
+  });
 })();
 </script>
 
