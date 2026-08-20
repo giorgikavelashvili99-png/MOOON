@@ -2007,72 +2007,175 @@
     50%{ transform:scale(1.2); }
   }
 
-  /* ---- Vacation offer: still-available flat-price order block ---- */
+  /* ---- Vacation offer: real-upload package card (bright blue) ---- */
   .vacation-offer{
+    --vpk-accent: #2fc6ff;
     position:relative;
     width:100%;
     margin-top:22px;
-    padding:20px 20px 22px;
-    border-radius:20px;
-    border:1px solid rgba(77,95,255,0.28);
+    padding:24px 20px 22px;
+    border-radius:22px;
+    border:1.5px solid rgba(47,198,255,0.4);
     background:
-      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(77,95,255,0.12), transparent 65%),
-      linear-gradient(180deg, rgba(23,23,36,0.94), rgba(13,13,21,0.94));
-    box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(47,198,255,0.16), transparent 62%),
+      linear-gradient(180deg, rgba(9,38,58,0.7), rgba(9,14,26,0.94));
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 40px rgba(47,198,255,0.08);
     text-align:center;
   }
-  .vo-badge{
-    display:inline-flex; align-items:center; gap:6px;
-    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700;
-    letter-spacing:0.12em; text-transform:uppercase; color:#b3c6ff;
-    border:1px solid rgba(77,95,255,0.35); border-radius:20px;
-    padding:6px 13px; margin-bottom:14px;
-    background:rgba(77,95,255,0.08);
-    text-shadow:0 0 10px rgba(77,95,255,0.5);
+  .vacation-offer::before{
+    content:''; position:absolute; top:0; left:16%; right:16%; height:2px;
+    background:linear-gradient(90deg, transparent, var(--vpk-accent), transparent);
+    opacity:0.9;
   }
-  .vacation-offer-text{
-    margin:0 0 16px; font-size:14px; line-height:1.55; color:var(--text-dim);
+  .vpk-icon{
+    width:48px; height:48px; margin:0 auto 12px;
+    border-radius:15px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; line-height:1;
+    background: linear-gradient(150deg, #0d3e5c, #0f79ad 55%, var(--vpk-accent));
+    border:1px solid rgba(47,198,255,0.55);
+    box-shadow:0 8px 20px -6px rgba(47,198,255,0.5), inset 0 1px 0 rgba(255,255,255,0.25);
   }
-  .vacation-offer-text b{ color:var(--text); font-weight:600; }
-
-  .vacation-price-pill{
-    display:inline-flex; align-items:center; gap:10px; justify-content:center;
-    margin:0 auto 18px;
-    padding:10px 20px; border-radius:14px;
-    border:1px solid rgba(255,176,32,0.45);
-    background: linear-gradient(135deg, rgba(255,176,32,0.2), rgba(255,176,32,0.04));
-    box-shadow: 0 0 30px rgba(255,176,32,0.14), inset 0 1px 0 rgba(255,255,255,0.06);
+  .vpk-title{
+    font-size:17px; font-weight:800; letter-spacing:0.01em;
+    color:#eef9ff; margin-bottom:8px;
+    text-shadow:0 0 20px rgba(47,198,255,0.35);
   }
-  .vp-label{
-    font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700;
-    letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim);
+  .vpk-desc{
+    font-size:13px; line-height:1.55; color:var(--text-dim);
+    margin:0 0 16px;
   }
-  .vp-value{
-    font-family:'JetBrains Mono', monospace; font-size:19px; font-weight:800;
-    color:var(--gold); text-shadow:0 0 14px rgba(255,210,122,0.6), 0 0 32px rgba(255,176,32,0.4);
+  .vpk-desc b{ color:var(--text); font-weight:600; }
+  .vpk-price-line{
+    display:flex; align-items:baseline; justify-content:center; gap:6px;
+    font-family:'JetBrains Mono', monospace; margin-bottom:4px;
   }
+  .vpk-price-line b{
+    font-size:30px; font-weight:800; color:#eaffff;
+    text-shadow:0 0 18px rgba(47,198,255,0.6);
+  }
+  .vpk-price-note{
+    font-size:11px; color:#7fd8f7; margin-bottom:18px;
+  }
+  .vpk-features{
+    display:flex; flex-direction:column; gap:9px;
+    text-align:left; margin:0 0 18px;
+    padding:14px 16px;
+    border-radius:14px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .vpk-feature{
+    display:flex; align-items:flex-start; gap:9px;
+    font-size:12.5px; line-height:1.4; color:var(--text);
+  }
+  .vpk-feature .vpk-check{
+    flex:0 0 auto; width:17px; height:17px; border-radius:50%; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:800;
+    background:rgba(47,198,255,0.22); color:#c7f3ff;
+    border:1px solid rgba(47,198,255,0.5);
+  }
+  .vpk-feature.off{ color:var(--text-faint); }
+  .vpk-feature .vpk-x{
+    flex:0 0 auto; width:17px; height:17px; border-radius:50%; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:800;
+    background:rgba(255,56,96,0.18); color:#ff9db0;
+    border:1px solid rgba(255,56,96,0.4);
+  }
+  .vpk-feature .vpk-strike{ text-decoration:line-through; color:#ff8fa3; }
 
   .vacation-offer .drop-zone{ text-align:center; }
+  .vacation-offer .drop-zone .dz-req{
+    display:inline-flex; align-items:center; gap:6px; margin-top:12px;
+    font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700;
+    color:var(--text-faint);
+    background:rgba(255,255,255,0.03); border:1px solid rgba(47,198,255,0.25);
+    padding:5px 12px; border-radius:20px;
+  }
+  .vacation-offer .drop-zone .dz-req::before{ content:'🎯'; font-size:11px; }
+  .vacation-offer .scan-result{ border-color: rgba(47,198,255,0.3); }
+  .vacation-offer .scan-result .sr-row b{ color: var(--vpk-accent); text-shadow:0 0 10px rgba(47,198,255,0.5); }
+  .vacation-offer .scan-progress .spin{ border-top-color: var(--vpk-accent); }
+
+  .vpk-reject{
+    display:none; margin-top:16px; padding:18px 16px; border-radius:18px;
+    border:1.5px solid rgba(255,56,96,0.4);
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,56,96,0.14), transparent 60%),
+      linear-gradient(180deg, rgba(36,10,20,0.92), rgba(20,8,16,0.92));
+    text-align:left;
+  }
+  .vpk-reject.show{ display:block; }
+  .vpk-reject-head{ display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+  .vpk-reject-ico{ font-size:17px; filter:drop-shadow(0 0 8px rgba(255,56,96,0.6)); }
+  .vpk-reject-title{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; font-weight:800;
+    letter-spacing:0.04em; color:#ff9db0; text-transform:uppercase;
+  }
+  .vpk-reject-detected{
+    font-size:11.5px; color:var(--text-dim); margin-bottom:9px;
+    padding:8px 11px; border-radius:11px;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+  }
+  .vpk-reject-detected b{ color:#ffb3c0; }
+  .vpk-reject-text{ font-size:12.5px; line-height:1.6; color:var(--text); margin:0 0 12px; }
+  .vpk-reject-text b{ color:#ffd23f; }
+  .vpk-reject-retry{
+    width:100%; padding:11px 14px; border-radius:12px;
+    background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,56,96,0.4);
+    color:#ff9db0; font-weight:700; font-size:12.5px; cursor:pointer;
+    font-family:'Space Grotesk', sans-serif;
+    transition: background .2s, transform .15s;
+  }
+  .vpk-reject-retry:hover{ background:rgba(255,56,96,0.12); transform:translateY(-1px); }
+
+  .vpk-auto{ display:none; margin-top:14px; text-align:left; }
+  .vpk-auto.show{ display:block; }
+  .vpk-auto-status{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+  .vpk-auto-spin{
+    width:14px; height:14px; border-radius:50%; flex:0 0 auto;
+    border:2px solid rgba(47,198,255,0.25); border-top-color: var(--vpk-accent);
+    animation: vpkSpin 0.8s linear infinite;
+  }
+  @keyframes vpkSpin{ to{ transform:rotate(360deg); } }
+  .vpk-auto-track{ height:6px; border-radius:100px; overflow:hidden; background:rgba(255,255,255,0.07); }
+  .vpk-auto-fill{ height:100%; width:0%; border-radius:100px; background:linear-gradient(90deg, #146a99, var(--vpk-accent)); transition:width .2s ease; }
+  .vpk-auto-stay{ font-size:10.5px; line-height:1.5; color:var(--text-dim); margin-top:6px; text-align:center; }
+  .vpk-auto-error{
+    display:none; font-size:11.5px; line-height:1.5; color:#ffb3c0;
+    background:rgba(255,56,96,0.08); border:1px solid rgba(255,56,96,0.35);
+    border-radius:12px; padding:10px 12px; margin-top:6px;
+  }
+  .vpk-auto-error.show{ display:block; }
+  .vpk-auto-error a{ color:var(--vpk-accent); font-weight:700; }
+  .vpk-retry-btn{
+    display:inline-block; margin-top:8px;
+    background:rgba(255,255,255,0.06); border:1px solid var(--border);
+    color:var(--text); font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:11px; padding:6px 11px; border-radius:9px;
+    cursor:pointer;
+  }
+  .vpk-retry-btn:hover{ background:rgba(255,255,255,0.12); }
 
   .vac-file-result{ display:none; margin-top:16px; }
   .vac-file-result.show{ display:block; animation: vacResultIn .35s ease; }
   @keyframes vacResultIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
-  .vac-file-row{
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    font-size:12px; color:var(--text-dim);
+  .vpk-link-row{
+    display:flex; align-items:center; gap:8px;
+    font-size:11.5px; color:var(--text-dim);
     border:1px solid var(--border-soft); border-radius:12px;
-    padding:10px 14px; background:rgba(255,255,255,0.02);
+    padding:9px 12px; background:rgba(255,255,255,0.02);
+    margin-bottom:12px; text-align:left; overflow-wrap:anywhere;
   }
-  .vac-file-row .vac-file-name{ color:var(--text); font-weight:600; word-break:break-all; }
-  .vacation-offer .order-grid{ margin-top:14px; }
+  .vpk-link-row b{ color: var(--vpk-accent); font-weight:600; }
+  .vacation-offer .order-grid{ margin-top:4px; }
   .vacation-offer .copy-note{ margin-top:2px; }
 
   @media (max-width:480px){
     .vacation-moon-wrap{ width:150px; height:150px; margin-bottom:18px; }
     .vacation-heading{ font-size:25px; }
     .vacation-text{ font-size:15px; }
-    .vacation-offer{ padding:16px 14px 18px; margin-top:18px; }
-    .vacation-offer-text{ font-size:13px; }
+    .vacation-offer{ padding:18px 14px 18px; margin-top:18px; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -2160,22 +2263,58 @@
     </div>
 
     <div class="vacation-offer" id="vacationOffer">
-      <div class="vo-badge">🎬 მიუხედავად შვებულებისა</div>
-      <p class="vacation-offer-text">შემიძლია <b>ვიდეო დაგიმონტაჟო</b> ისე, რომ ხარისხი არ დაიკარგოს — უბრალოდ ატვირთე ფაილი ქვემოთ.</p>
-      <div class="vacation-price-pill">
-        <span class="vp-label">ყველა ვიდეოს ფასი</span>
-        <span class="vp-value">4.99 ₾</span>
+      <div class="vpk-icon">🌴</div>
+      <div class="vpk-title">მიუხედავად შვებულებისა</div>
+      <p class="vpk-desc">შემიძლია <b>ვიდეო დაგიმონტაჟო</b> ისე, რომ ხარისხი არ დაიკარგოს.</p>
+      <div class="vpk-price-line"><b>4.99₾</b></div>
+      <div class="vpk-price-note">ფიქსირებული ფასი — ყველა ვიდეო, შვებულების პერიოდში</div>
+
+      <div class="vpk-features">
+        <div class="vpk-feature"><span class="vpk-check">✓</span><span>1080P • 60FPS</span></div>
+        <div class="vpk-feature"><span class="vpk-check">✓</span><span>ავტომატური ატვირთვა — ლინკი თავად ჩაისმება</span></div>
+        <div class="vpk-feature off"><span class="vpk-x">✕</span><span class="vpk-strike">ხარისხის ამაღლება (4K)</span></div>
+        <div class="vpk-feature off"><span class="vpk-x">✕</span><span class="vpk-strike">დამატებითი ეფექტები</span></div>
       </div>
 
       <div class="drop-zone" id="vacDropZone">
         <input type="file" id="vacVideoInput" accept="video/*">
         <div class="dz-icon"><svg viewBox="8 5 11 14" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>
-        <div class="dz-title">ატვირთე ვიდეო შეკვეთისთვის</div>
-        <div class="dz-sub">გადმოიტანე ან დააკლიკე — ფასი ფიქსირებულია, 4.99 ₾, შვებულების განმავლობაშიც</div>
+        <div class="dz-title">ატვირთე ვიდეო</div>
+        <div class="dz-sub">გადმოიტანე ან დააკლიკე — ავტომატურად შემოწმდება და აიტვირთება</div>
+        <div class="dz-req">ზუსტად 1080p · 60fps</div>
+      </div>
+
+      <div class="scan-progress" id="vacScanProgress"><span class="spin"></span> <span>ვიდეო მოწმდება…</span></div>
+
+      <div class="scan-result" id="vacScanResult">
+        <div class="sr-specs">
+          <div class="sr-row"><span class="sr-ico">📄</span><span class="sr-label">ფაილი</span><b id="vacSrName">—</b></div>
+          <div class="sr-row"><span class="sr-ico">🔎</span><span class="sr-label">ფორმატი</span><b id="vacSrQuality">—</b></div>
+        </div>
+
+        <div class="vpk-auto" id="vacAuto">
+          <div class="vpk-auto-status">
+            <span class="vpk-auto-spin"></span>
+            <span id="vacAutoStatusText">იტვირთება…</span>
+          </div>
+          <div class="vpk-auto-track"><div class="vpk-auto-fill" id="vacAutoFill"></div></div>
+          <div class="vpk-auto-stay">📱 დატოვეთ ეს გვერდი ღია, სანამ ატვირთვა დასრულდება</div>
+          <div class="vpk-auto-error" id="vacAutoError"></div>
+        </div>
+      </div>
+
+      <div class="vpk-reject" id="vacReject">
+        <div class="vpk-reject-head">
+          <span class="vpk-reject-ico">⚠️</span>
+          <span class="vpk-reject-title">ფაილი არ შეესაბამება მოთხოვნებს</span>
+        </div>
+        <div class="vpk-reject-detected">ატვირთული ფაილის მონაცემები: <b id="vacRejectDetected">—</b></div>
+        <p class="vpk-reject-text">ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. სხვა გარჩევადობა ან კადრების სიხშირე (720p, 2K, 4K, 30fps, 120fps და ა.შ.) არ მიიღება.</p>
+        <button type="button" class="vpk-reject-retry" id="vacRejectRetry">↻ სცადე სხვა ვიდეოთი</button>
       </div>
 
       <div class="vac-file-result" id="vacFileResult">
-        <div class="vac-file-row"><span>📄</span><span class="vac-file-name" id="vacFileName">—</span></div>
+        <div class="vpk-link-row">🔗 <b id="vacLinkDisplay">—</b></div>
         <div class="order-grid">
           <button class="order-btn wa" id="vacOrderBtnWA">
             <div class="qn-stars" aria-hidden="true">
@@ -5344,20 +5483,116 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
 <script>
 (function(){
-  // ---- VACATION OFFER: flat-price scanner + order buttons ----
+  // ---- VACATION PACKAGE: real upload to mooontransferr + hard 1080p/60fps gate ----
   var dropZone = document.getElementById('vacDropZone');
   var videoInput = document.getElementById('vacVideoInput');
+  var scanProgress = document.getElementById('vacScanProgress');
+  var scanResult = document.getElementById('vacScanResult');
+  var srName = document.getElementById('vacSrName');
+  var srQuality = document.getElementById('vacSrQuality');
+  var rejectPanel = document.getElementById('vacReject');
+  var rejectDetected = document.getElementById('vacRejectDetected');
+  var rejectRetry = document.getElementById('vacRejectRetry');
+  var autoWrap = document.getElementById('vacAuto');
+  var autoStatusText = document.getElementById('vacAutoStatusText');
+  var autoFill = document.getElementById('vacAutoFill');
+  var autoError = document.getElementById('vacAutoError');
   var fileResult = document.getElementById('vacFileResult');
-  var fileNameEl = document.getElementById('vacFileName');
-  var copyNote = document.getElementById('vacCopyNote');
+  var linkDisplay = document.getElementById('vacLinkDisplay');
   var btnWA = document.getElementById('vacOrderBtnWA');
   var btnTG = document.getElementById('vacOrderBtnTG');
+  var copyNote = document.getElementById('vacCopyNote');
   if (!dropZone) return;
 
   var PHONE_INTL = "995592630630";
   var TELEGRAM_USERNAME = "Moonknight0012";
   var VAC_PRICE = "4.99 ₾";
+  var VIDEO_REVIEW_TRANSFER_URL = 'https://mooontransferr.onrender.com';
+  var REQUIRED_DIM = 1080;
+  var REQUIRED_DIM_TOLERANCE = 24;
+  var REQUIRED_FPS = 60;
+  var UPLOAD_TIMEOUT_MS = 120000;
+
+  var scanToken = 0;
   var selectedFileName = '';
+  var obtainedLink = '';
+
+  // Strict match on both resolution and fps — the same hard gate used by
+  // the main VIDEO SCANNER: only exactly-1080p footage at exactly 60fps is
+  // accepted. An unknown fps (detection unsupported) never blocks on its
+  // own — only a confirmed mismatch does.
+  function checkUploadAcceptable(width, height, fps){
+    var hasDims = !!(width && height);
+    var resOk = null;
+    if (hasDims){
+      var minDim = Math.min(width, height);
+      resOk = Math.abs(minDim - REQUIRED_DIM) <= REQUIRED_DIM_TOLERANCE;
+    }
+    var fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
+    var rejected = (resOk === false) || (fpsOk === false);
+    return { rejected: rejected, resOk: resOk, fpsOk: fpsOk };
+  }
+
+  function detectFrameRate(videoEl){
+    return new Promise(function(resolve){
+      if (typeof videoEl.requestVideoFrameCallback !== 'function'){ resolve(null); return; }
+      var samples = [];
+      var settled = false;
+      var safetyTimer = null;
+
+      function finish(fps){
+        if (settled) return;
+        settled = true;
+        if (safetyTimer) clearTimeout(safetyTimer);
+        videoEl.pause();
+        resolve(fps);
+      }
+
+      function computeAndFinish(){
+        if (samples.length < 3){ finish(null); return; }
+        var deltas = [];
+        for (var i = 1; i < samples.length; i++){
+          var d = samples[i] - samples[i - 1];
+          if (d > 0) deltas.push(d);
+        }
+        if (!deltas.length){ finish(null); return; }
+        deltas.sort(function(a, b){ return a - b; });
+        var mid = deltas[Math.floor(deltas.length / 2)];
+        var rawFps = 1 / mid;
+        var commonRates = [24, 25, 30, 50, 60, 120];
+        var closest = Math.round(rawFps);
+        var bestDiff = Infinity;
+        commonRates.forEach(function(r){
+          var diff = Math.abs(r - rawFps);
+          if (diff < bestDiff){ bestDiff = diff; closest = r; }
+        });
+        finish(closest);
+      }
+
+      function onFrame(now, metadata){
+        samples.push(metadata.mediaTime);
+        if (samples.length < 10 && !settled){
+          videoEl.requestVideoFrameCallback(onFrame);
+        } else {
+          computeAndFinish();
+        }
+      }
+
+      safetyTimer = setTimeout(function(){ computeAndFinish(); }, 1200);
+      videoEl.play().then(function(){
+        videoEl.requestVideoFrameCallback(onFrame);
+      }).catch(function(){ finish(null); });
+    });
+  }
+
+  function detectQualityLabel(width, height, fps){
+    var maxDim = Math.max(width || 0, height || 0);
+    var resTier = '1080p';
+    if (maxDim >= 3600) resTier = '4K';
+    else if (maxDim >= 2400) resTier = '2K';
+    var fpsTier = fps ? (fps + 'fps') : 'უცნობი fps';
+    return resTier + ' · ' + fpsTier;
+  }
 
   ['dragover','dragenter'].forEach(function(evt){
     dropZone.addEventListener(evt, function(e){ e.preventDefault(); dropZone.classList.add('dragover'); });
@@ -5373,24 +5608,170 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
     if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
   });
 
+  function resetAll(){
+    scanToken++;
+    videoInput.value = '';
+    scanProgress.classList.remove('show');
+    scanResult.classList.remove('show');
+    rejectPanel.classList.remove('show');
+    fileResult.classList.remove('show');
+    autoWrap.classList.remove('show');
+    autoError.classList.remove('show');
+    autoFill.style.width = '0%';
+    obtainedLink = '';
+  }
+  if (rejectRetry) rejectRetry.addEventListener('click', resetAll);
+
   function handleFile(file){
-    if (!file.type.startsWith('video/')) {
+    if (!file.type.startsWith('video/')){
       alert('გთხოვთ აირჩიოთ ვიდეო ფაილი');
       return;
     }
+    var myToken = ++scanToken;
     selectedFileName = file.name;
-    fileNameEl.textContent = selectedFileName;
-    fileResult.classList.add('show');
-    setTimeout(function(){
-      fileResult.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    }, 80);
+    scanResult.classList.remove('show');
+    rejectPanel.classList.remove('show');
+    fileResult.classList.remove('show');
+    scanProgress.classList.add('show');
+
+    var videoEl = document.createElement('video');
+    videoEl.preload = 'metadata';
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+    videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
+    document.body.appendChild(videoEl);
+
+    function cleanup(){
+      if (myToken === scanToken) scanProgress.classList.remove('show');
+      URL.revokeObjectURL(videoEl.src);
+      videoEl.remove();
+    }
+
+    function proceed(){
+      var width = videoEl.videoWidth;
+      var height = videoEl.videoHeight;
+      detectFrameRate(videoEl).then(function(fps){
+        if (myToken !== scanToken){ cleanup(); return; }
+        cleanup();
+        var acceptability = checkUploadAcceptable(width, height, fps);
+        if (acceptability.rejected){
+          rejectDetected.textContent = (width && height ? (width + '×' + height) : 'უცნობი გარჩევადობა') + ', ' + (fps ? fps + 'fps' : 'უცნობი fps');
+          rejectPanel.classList.add('show');
+          return;
+        }
+        srName.textContent = file.name.length > 30 ? file.name.slice(0, 27) + '…' : file.name;
+        srQuality.textContent = detectQualityLabel(width, height, fps);
+        scanResult.classList.add('show');
+        startAutoUpload(file);
+      });
+    }
+
+    videoEl.onloadedmetadata = function(){
+      if (videoEl.duration === Infinity || isNaN(videoEl.duration)){
+        videoEl.currentTime = 1e101;
+        videoEl.ontimeupdate = function(){
+          videoEl.ontimeupdate = null;
+          videoEl.currentTime = 0;
+          proceed();
+        };
+      } else {
+        proceed();
+      }
+    };
+
+    videoEl.onerror = function(){
+      cleanup();
+      alert('ვიდეოს წაკითხვისას შეცდომა მოხდა');
+    };
+
+    videoEl.src = URL.createObjectURL(file);
+  }
+
+  // ---- Real upload: request-upload -> PUT straight to storage -> finalize,
+  // exactly the same three-step handshake mooontransferr's API expects on
+  // the main site's scanner — the link comes back and drops straight into
+  // the order message, no manual copy/paste, no second tab. ----
+  function uploadFileToMoontransferr(file, onProgress){
+    return fetch(VIDEO_REVIEW_TRANSFER_URL + '/api/request-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: file.name, content_type: file.type || 'video/mp4', size: file.size })
+    })
+    .then(function(res){ if (!res.ok) throw new Error('request-upload-failed'); return res.json(); })
+    .then(function(data){
+      var file_id = data.file_id, upload_url = data.upload_url;
+      if (!file_id || !upload_url) throw new Error('request-upload-bad-response');
+      return new Promise(function(resolve, reject){
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', upload_url);
+        xhr.timeout = UPLOAD_TIMEOUT_MS;
+        xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+        xhr.upload.onprogress = function(e){
+          if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = function(){ (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('upload-failed-' + xhr.status)); };
+        xhr.onerror = function(){ reject(new Error('upload-network-error')); };
+        xhr.ontimeout = function(){ reject(new Error('upload-timeout')); };
+        xhr.send(file);
+      }).then(function(){ return file_id; });
+    })
+    .then(function(file_id){
+      return fetch(VIDEO_REVIEW_TRANSFER_URL + '/api/finalize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file_id: file_id })
+      });
+    })
+    .then(function(res){ if (!res.ok) throw new Error('finalize-failed'); return res.json(); })
+    .then(function(data){ if (!data.link) throw new Error('finalize-bad-response'); return data; });
+  }
+
+  function startAutoUpload(file){
+    autoWrap.classList.add('show');
+    autoError.classList.remove('show');
+    autoStatusText.textContent = 'იტვირთება…';
+    autoFill.style.width = '0%';
+
+    uploadFileToMoontransferr(file, function(pct){
+      autoFill.style.width = pct + '%';
+      if (pct >= 100) autoStatusText.textContent = 'მუშავდება…';
+    }).then(function(data){
+      obtainedLink = data.link;
+      autoWrap.classList.remove('show');
+      linkDisplay.textContent = obtainedLink;
+      fileResult.classList.add('show');
+      setTimeout(function(){ fileResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 80);
+    }).catch(function(){
+      autoStatusText.textContent = 'შეცდომა';
+      autoError.innerHTML =
+        '⚠️ ავტომატურმა ატვირთვამ ვერ იმუშავა — ატვირთეთ ხელით: ' +
+        '<a href="' + VIDEO_REVIEW_TRANSFER_URL + '/" target="_blank" rel="noopener">' + VIDEO_REVIEW_TRANSFER_URL.replace('https://','') + '</a>' +
+        ' &nbsp; <button type="button" class="vpk-retry-btn" id="vacRetryUploadBtn">↻ ხელახლა ცდა</button>';
+      autoError.classList.add('show');
+      var retryBtn = document.getElementById('vacRetryUploadBtn');
+      if (retryBtn) retryBtn.addEventListener('click', function(){ startAutoUpload(file); });
+    });
+  }
+
+  function escVacTg(str){
+    if (typeof escTg === 'function') return escTg(str);
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   function buildVacMessage(){
     return '🌴 შვებულების შეკვეთა — MOON\n' +
       'ფაილი: ' + (selectedFileName || '—') + '\n' +
-      'ფასი: ' + VAC_PRICE + ' (ფიქსირებული ფასი შვებულების პერიოდში)\n' +
-      'ვიდეოს ჩატში ცალკე გამოგიგზავნით.';
+      'ვიდეოს ლინკი: ' + (obtainedLink || '—') + '\n' +
+      'ხარისხი: 1080p / 60fps\n' +
+      'ფასი: ' + VAC_PRICE + ' (ფიქსირებული ფასი შვებულების პერიოდში)';
+  }
+
+  function buildVacTgMessage(channel){
+    return '🌴 <b>შვებულების შეკვეთა — MOON</b> (' + channel + ')\n\n' +
+      'ფაილი: <code>' + escVacTg(selectedFileName || '—') + '</code>\n' +
+      'ლინკი: ' + escVacTg(obtainedLink || '—') + '\n' +
+      'ხარისხი: 1080p / 60fps\n' +
+      'ფასი: <b>' + VAC_PRICE + '</b> (ფიქსირებული)';
   }
 
   function flashNote(text){
@@ -5402,11 +5783,13 @@ TikTok პროფილი: ${tiktokLink.value.trim()}`;
 
   if (btnWA) btnWA.addEventListener('click', function(){
     var url = 'https://wa.me/' + PHONE_INTL + '?text=' + encodeURIComponent(buildVacMessage());
+    if (typeof sendTelegramNotification === 'function') sendTelegramNotification(buildVacTgMessage('WhatsApp'));
     window.open(url, '_blank');
   });
 
   if (btnTG) btnTG.addEventListener('click', function(){
     var url = 'https://t.me/' + TELEGRAM_USERNAME + '?text=' + encodeURIComponent(buildVacMessage());
+    if (typeof sendTelegramNotification === 'function') sendTelegramNotification(buildVacTgMessage('Telegram'));
     window.open(url, '_blank');
     flashNote('იხსნება Telegram — @' + TELEGRAM_USERNAME);
   });
