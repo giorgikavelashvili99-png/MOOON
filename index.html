@@ -2919,10 +2919,10 @@
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif;
   }
 
-  .howto-steps{ display:flex; flex-direction:column; gap:14px; }
+  .howto-steps{ display:flex; flex-direction:column; gap:8px; }
   .howto-step{
-    display:flex; gap:14px; align-items:center;
-    border-radius:16px; padding:15px 16px;
+    display:flex; gap:9px; align-items:center;
+    border-radius:12px; padding:9px 10px;
     background:
       repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 8px),
       radial-gradient(ellipse 90% 70% at 12% 50%, color-mix(in srgb, var(--hs-accent, var(--purple)) 15%, transparent), transparent 65%),
@@ -2948,14 +2948,14 @@
   .moon-glow-card.howto-step .hs-title{ color:#fff !important; text-shadow:0 0 10px color-mix(in srgb, var(--hs-accent, var(--purple)) 55%, transparent) !important; }
   .moon-glow-card.howto-step .hs-text{ color:var(--text-dim) !important; }
   .howto-step .hs-num{
-    flex:0 0 auto; width:28px; height:28px; border-radius:9px;
+    flex:0 0 auto; width:21px; height:21px; border-radius:7px;
     background:linear-gradient(135deg, var(--purple), var(--cyan));
     color:#04101a; font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-weight:800;
-    font-size:13px; display:flex; align-items:center; justify-content:center;
+    font-size:10.5px; display:flex; align-items:center; justify-content:center;
   }
   .howto-step .hs-body{ flex:1 1 auto; min-width:0; }
-  .howto-step .hs-body .hs-title{ font-size:14px; font-weight:700; margin-bottom:4px; }
-  .howto-step .hs-body .hs-text{ font-size:13px; color:var(--text-dim); line-height:1.55; }
+  .howto-step .hs-body .hs-title{ font-size:10.5px; font-weight:700; margin-bottom:1px; }
+  .howto-step .hs-body .hs-text{ font-size:9px; color:var(--text-dim); line-height:1.32; }
   .howto-step .hs-body a.hs-link{
     color:var(--cyan); text-decoration:none; font-weight:700;
     text-shadow:0 0 10px rgba(207,216,255,0.4);
@@ -3444,11 +3444,6 @@
     .portfolio-icon svg{ width:19px; height:19px; }
     .portfolio-name{ font-size:11.5px; }
     .portfolio-cta{ font-size:9px; }
-    .howto-steps{ gap:9px; }
-    .howto-step{ padding:10px 11px; gap:9px; }
-    .howto-step .hs-num{ width:22px; height:22px; font-size:11px; border-radius:7px; }
-    .howto-step .hs-body .hs-title{ font-size:11.5px; margin-bottom:2px; }
-    .howto-step .hs-body .hs-text{ font-size:10.5px; line-height:1.45; }
     .warn-panel{ padding:16px 14px; }
     .warn-panel .w-head span.title{ font-size:12.5px; }
     .warn-panel .w-head .ico{ width:22px; height:22px; font-size:12px; }
@@ -3865,25 +3860,25 @@
   #cheapOrderPanel{ background: var(--pc-bg); }
 
   .pc-ribbon{
-    position:absolute; top:12px; right:-40px; width:105px;
+    position:absolute; top:16px; right:-38px; width:120px;
     transform:rotate(40deg); text-align:center;
     background: var(--pc-ribbon-bg, linear-gradient(90deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 60%, #fff)));
     color:#0b0f1c; font-family:'BPG Glaho', 'JetBrains Mono', sans-serif;
-    font-size:9px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase;
+    font-size:10.5px; font-weight:800; letter-spacing:0.05em; text-transform:uppercase;
     white-space:nowrap;
-    padding:4px 0; box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    padding:5px 0; box-shadow:0 6px 18px rgba(0,0,0,0.35);
     z-index:2;
   }
+  /* Cards with a corner ribbon get extra top clearance so the ribbon has
+     its own space above the icon+title row — this keeps the title/desc
+     text at full natural width (so it stays on one line) instead of
+     squeezing it sideways, which is what caused it to wrap before. */
+  .pc-card--weekly, .pc-card--indiv, .pc-card--cheap{ padding-top:40px; }
 
   .pc-head{
     display:flex; align-items:center; gap:12px; margin-bottom:16px;
   }
   .pc-head-text{ min-width:0; flex:1 1 auto; }
-  /* The weekly card has a diagonal "POPULAR" ribbon pinned to its top-right
-     corner — now that the title sits beside the icon (same row as the
-     ribbon) instead of below it, it needs its own reserved clearance on
-     the right so the ribbon never crosses over the title text. */
-  .pc-card--weekly .pc-head-text{ padding-right:36px; }
   .pc-icon{
     width:48px; height:48px; border-radius:15px; flex:0 0 auto;
     position:relative;
@@ -4054,9 +4049,11 @@
 
   @media (max-width:600px){
     .pc-card{ padding:20px 16px 16px; }
+    .pc-card--weekly, .pc-card--indiv, .pc-card--cheap{ padding-top:34px; }
   }
   @media (max-width:380px){
     .pc-card{ padding:16px 12px 14px; }
+    .pc-card--weekly, .pc-card--indiv, .pc-card--cheap{ padding-top:30px; }
     .pc-toggle-btn{ padding:13px 8px; }
   }
 </style>
@@ -4520,6 +4517,7 @@
 
       <!-- Card 1 — individual / single-video package -->
       <div class="pc-card pc-card--indiv">
+        <div class="pc-ribbon" data-i18n="pcRibbon">პოპულარული</div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">🎬</div>
           <div class="pc-head-text">
@@ -5054,6 +5052,7 @@
 
       <!-- Card 5 — cheap package (fixed price, no Topaz/effects) -->
       <div class="pc-card pc-card--cheap">
+        <div class="pc-ribbon" data-i18n="pcRibbon">პოპულარული</div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">⚡</div>
           <div class="pc-head-text">
