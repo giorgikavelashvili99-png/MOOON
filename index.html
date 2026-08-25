@@ -3865,15 +3865,25 @@
   #cheapOrderPanel{ background: var(--pc-bg); }
 
   .pc-ribbon{
-    position:absolute; top:18px; right:-32px; width:140px;
+    position:absolute; top:12px; right:-40px; width:105px;
     transform:rotate(40deg); text-align:center;
     background: var(--pc-ribbon-bg, linear-gradient(90deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 60%, #fff)));
     color:#0b0f1c; font-family:'BPG Glaho', 'JetBrains Mono', sans-serif;
-    font-size:11px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase;
+    font-size:9px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase;
     white-space:nowrap;
-    padding:5px 0; box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    padding:4px 0; box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    z-index:2;
   }
 
+  .pc-head{
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+  }
+  .pc-head-text{ min-width:0; flex:1 1 auto; }
+  /* The weekly card has a diagonal "POPULAR" ribbon pinned to its top-right
+     corner — now that the title sits beside the icon (same row as the
+     ribbon) instead of below it, it needs its own reserved clearance on
+     the right so the ribbon never crosses over the title text. */
+  .pc-card--weekly .pc-head-text{ padding-right:36px; }
   .pc-icon{
     width:48px; height:48px; border-radius:15px; flex:0 0 auto;
     position:relative;
@@ -3882,7 +3892,6 @@
     background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
     border:1px solid color-mix(in srgb, var(--pc-accent) 60%, transparent);
     box-shadow:0 8px 20px -6px color-mix(in srgb, var(--pc-accent) 65%, transparent), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -6px 10px -6px rgba(0,0,0,0.35);
-    margin-bottom:14px;
   }
   .pc-icon::after{
     content:''; position:absolute; inset:-5px; border-radius:19px;
@@ -3892,19 +3901,18 @@
 
   .pc-title{
     font-size:clamp(12px, 3.4vw, 13px); font-weight:800; letter-spacing:0.08em; text-transform:uppercase;
-    color:#fff; margin-bottom:6px;
+    color:#fff; margin-bottom:3px;
+    text-shadow: 0 0 2px rgba(0,0,0,0.9), 0 0 12px color-mix(in srgb, var(--pc-accent) 75%, transparent), 0 2px 5px rgba(0,0,0,0.6);
     overflow-wrap:break-word; word-break:break-word;
-  }
-  @supports ((background-clip:text) or (-webkit-background-clip:text)){
-    .pc-card--monthly .pc-title{
-      background: var(--pc-title-grad);
-      -webkit-background-clip:text; background-clip:text;
-      -webkit-text-fill-color:transparent; color:transparent;
-    }
   }
   .pc-desc{
-    font-size:clamp(11.5px, 3.2vw, 12.5px); line-height:1.55; color:var(--text-dim); margin-bottom:16px; min-height:0;
+    font-size:clamp(11.5px, 3.2vw, 12.5px); line-height:1.5; color:#fff; min-height:0;
+    text-shadow: 0 0 2px rgba(0,0,0,0.85), 0 0 9px color-mix(in srgb, var(--pc-accent) 60%, transparent), 0 1px 4px rgba(0,0,0,0.55);
     overflow-wrap:break-word; word-break:break-word;
+  }
+  .pc-desc-spec{
+    display:inline-block; font-size:clamp(9px, 2.5vw, 10.5px); white-space:nowrap;
+    letter-spacing:-0.01em;
   }
 
   .pc-price-line{
@@ -3942,13 +3950,15 @@
     .pc-price-line--dual .pc-price-sep{ font-size:11px; }
   }
   .pc-price-note{
-    font-size:clamp(10px, 2.8vw, 11px); color: var(--pc-chip, var(--text-faint)); margin-bottom:18px; line-height:1.5;
+    font-size:clamp(10px, 2.8vw, 11px); color:#fff; margin-bottom:18px; line-height:1.5;
+    text-shadow: 0 0 2px rgba(0,0,0,0.85), 0 0 8px color-mix(in srgb, var(--pc-accent) 55%, transparent), 0 1px 3px rgba(0,0,0,0.5);
     overflow-wrap:break-word;
   }
 
   .pc-features{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; flex:1; min-width:0; }
   .pc-feature{
     display:flex; align-items:flex-start; gap:10px; font-size:clamp(12px, 3.2vw, 13px); line-height:1.4; color:var(--text);
+    text-shadow: 0 0 2px rgba(0,0,0,0.8), 0 0 8px color-mix(in srgb, var(--pc-accent) 45%, transparent), 0 1px 3px rgba(0,0,0,0.45);
     min-width:0;
   }
   .pc-feature span:last-child{ overflow-wrap:break-word; word-break:break-word; min-width:0; }
@@ -4510,9 +4520,13 @@
 
       <!-- Card 1 — individual / single-video package -->
       <div class="pc-card pc-card--indiv">
+        <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">🎬</div>
-        <div class="pc-title" data-i18n="pc1Title">ცალობითი პაკეტი</div>
-        <div class="pc-desc" data-i18n="pc1Desc">პაკეტში შედის 1 ვიდეოს დამუშავება</div>
+          <div class="pc-head-text">
+          <div class="pc-title" data-i18n="pc1Title">ცალობითი პაკეტი</div>
+          <div class="pc-desc" data-i18n="pc1Desc">პაკეტში შედის 1 ვიდეოს დამუშავება</div>
+          </div>
+        </div>
         <div class="pc-price-line"><b>1.49₾</b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
         <div class="pc-price-note" data-i18n="pc1PriceNote">ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე</div>
         <div class="pc-features">
@@ -4718,9 +4732,13 @@
       <!-- Card 2 — weekly subscription package -->
       <div class="pc-card pc-card--weekly">
         <div class="pc-ribbon" data-i18n="pcRibbon">პოპულარული</div>
+        <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">📅</div>
-        <div class="pc-title" data-i18n="pc2Title">კვირის პაკეტი</div>
-        <div class="pc-desc" data-i18n="pc2Desc">კვირაში 5 ვიდეო<br>1080/60FPS - 4K/60FPS</div>
+          <div class="pc-head-text">
+          <div class="pc-title" data-i18n="pc2Title">კვირის პაკეტი</div>
+          <div class="pc-desc" data-i18n="pc2Desc">კვირაში 5 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span></div>
+          </div>
+        </div>
         <div class="pc-price-line pc-price-line--dual"><b>24.99₾</b><span class="pc-price-sep">/</span><b>35.99₾</b></div>
         <div class="pc-price-note" data-i18n="pc2PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
         <div class="pc-features">
@@ -4848,9 +4866,13 @@
 
       <!-- Card 3 — monthly subscription package -->
       <div class="pc-card pc-card--monthly">
+        <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">👑</div>
-        <div class="pc-title" data-i18n="pc3Title">თვის პაკეტი</div>
-        <div class="pc-desc" data-i18n="pc3Desc">თვეში 20 ვიდეო<br>1080/60FPS - 4K/60FPS</div>
+          <div class="pc-head-text">
+          <div class="pc-title" data-i18n="pc3Title">თვის პაკეტი</div>
+          <div class="pc-desc" data-i18n="pc3Desc">თვეში 20 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span></div>
+          </div>
+        </div>
         <div class="pc-price-line pc-price-line--dual"><b>49.99₾</b><span class="pc-price-sep">/</span><b>69.99₾</b></div>
         <div class="pc-price-note" data-i18n="pc3PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
         <div class="pc-features">
@@ -4965,9 +4987,13 @@
 
       <!-- Card 4 — edit order (character edit) -->
       <div class="pc-card pc-card--edit">
+        <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">✨</div>
-        <div class="pc-title" data-i18n="eoLabel">ედითის შეკვეთა</div>
-        <div class="pc-desc" data-i18n="pc4Desc">მსგავსი ედითი — თქვენი პერსონაჟით</div>
+          <div class="pc-head-text">
+          <div class="pc-title" data-i18n="eoLabel">ედითის შეკვეთა</div>
+          <div class="pc-desc" data-i18n="pc4Desc">მსგავსი ედითი — თქვენი პერსონაჟით</div>
+          </div>
+        </div>
         <div class="pc-price-line pc-price-line--dual"><b>9.99₾</b><span class="pc-price-sep">/</span><b>14.99₾</b></div>
         <div class="pc-price-note" data-i18n="pc4PriceNote">1080p / 4K — არჩევანი შეკვეთისას</div>
         <div class="pc-features">
@@ -5028,9 +5054,13 @@
 
       <!-- Card 5 — cheap package (fixed price, no Topaz/effects) -->
       <div class="pc-card pc-card--cheap">
+        <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">⚡</div>
-        <div class="pc-title" data-i18n="cpLabel">იაფი პაკეტი</div>
-        <div class="pc-desc" data-i18n="cpDesc">ბიუჯეტური ვარიანტი — მარტივი დამუშავება</div>
+          <div class="pc-head-text">
+          <div class="pc-title" data-i18n="cpLabel">იაფი პაკეტი</div>
+          <div class="pc-desc" data-i18n="cpDesc">ბიუჯეტური ვარიანტი — მარტივი დამუშავება</div>
+          </div>
+        </div>
         <div class="pc-price-line pc-price-line--dual"><b>1.99₾</b><span class="pc-price-sep">/</span><b>3.99₾</b></div>
         <div class="pc-price-note" data-i18n="cpPriceNote">1080p / 4K — ფასი ფიქსირებულია</div>
         <div class="pc-features">
@@ -5363,12 +5393,12 @@
       pc1Feature2: 'ჩაბარდება არაუმეტეს 24 საათში',
       pc1Feature3: '4K • 60FPS',
       pc2Title: 'კვირის პაკეტი',
-      pc2Desc: 'კვირაში 5 ვიდეო<br>1080/60FPS - 4K/60FPS',
+      pc2Desc: 'კვირაში 5 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span>',
       pc2PriceNote: '1080p / 4K — არჩევანი ატვირთვის შემდეგ',
       pc2Feature1: '1 კვირის განმავლობაში<br>სრული შეკვეთა',
       pc2Feature2: '4K • 60FPS',
       pc3Title: 'თვის პაკეტი',
-      pc3Desc: 'თვეში 20 ვიდეო<br>1080/60FPS - 4K/60FPS',
+      pc3Desc: 'თვეში 20 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span>',
       pc3PriceNote: '1080p / 4K — არჩევანი ატვირთვის შემდეგ',
       pc3Feature1: '1 თვის განმავლობაში<br>სრული შეკვეთა',
       pc3Feature2: '4K • 60FPS',
@@ -5703,12 +5733,12 @@
       pc1Feature2: 'Delivered within 24 hours',
       pc1Feature3: '4K • 60FPS',
       pc2Title: 'Weekly Package',
-      pc2Desc: '5 videos / week<br>1080/60FPS - 4K/60FPS',
+      pc2Desc: '5 videos / week<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span>',
       pc2PriceNote: '1080p / 4K — choose after upload',
       pc2Feature1: 'Within 1 week<br>full order',
       pc2Feature2: '4K • 60FPS',
       pc3Title: 'Monthly Package',
-      pc3Desc: '20 videos / month<br>1080/60FPS - 4K/60FPS',
+      pc3Desc: '20 videos / month<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span>',
       pc3PriceNote: '1080p / 4K — choose after upload',
       pc3Feature1: 'Within 1 month<br>full order',
       pc3Feature2: '4K • 60FPS',
