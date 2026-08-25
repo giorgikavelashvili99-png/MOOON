@@ -1113,6 +1113,46 @@
     cursor:pointer; transition:.15s; min-height:44px;
   }
   .comments-panel .c-submit:hover{ filter:brightness(1.1); }
+
+  .c-discord-gate{
+    display:flex; flex-direction:column; gap:10px; align-items:center; text-align:center;
+    background:rgba(88,101,242,0.06); border:1px solid rgba(88,101,242,0.3);
+    border-radius:14px; padding:16px 14px;
+  }
+  .c-discord-gate-text{ font-size:12.5px; line-height:1.5; color:var(--text-dim); }
+  .c-discord-login-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#5865F2; color:#fff; border:none; border-radius:11px;
+    padding:10px 18px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+    font-weight:700; font-size:13px; cursor:pointer;
+    transition: filter .15s ease, transform .15s ease;
+  }
+  .c-discord-login-btn svg{ width:17px; height:17px; fill:#fff; }
+  .c-discord-login-btn:hover{ filter:brightness(1.12); }
+  .c-discord-login-btn:active{ transform:scale(0.96); }
+
+  .c-discord-identity{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(88,101,242,0.08); border:1px solid rgba(88,101,242,0.3);
+    border-radius:12px; padding:8px 12px;
+  }
+  .c-discord-identity-avatar{
+    width:26px; height:26px; border-radius:50%; flex:0 0 auto;
+    object-fit:cover; border:1px solid rgba(88,101,242,0.5);
+  }
+  .c-discord-identity-label{ font-size:11.5px; color:var(--text-faint); }
+  .c-discord-identity-name{ font-size:12.5px; font-weight:700; color:var(--text); word-break:break-word; }
+
+  .c-reply-identity{
+    display:flex; align-items:center; gap:7px;
+    font-size:11px; color:var(--text-faint); margin-bottom:2px;
+  }
+  .c-reply-identity-avatar{
+    width:18px; height:18px; border-radius:50%; flex:0 0 auto;
+    object-fit:cover; border:1px solid rgba(88,101,242,0.5);
+  }
+  .c-reply-identity b{ color:var(--text-dim); font-weight:700; }
+
   .comments-panel .c-error{
     display:none; color:var(--warn); font-size:12.5px; background:var(--warn-soft);
     padding:9px 12px; border-radius:10px;
@@ -3738,15 +3778,15 @@
     opacity:0.8;
   }
 
-  /* ---------- Individual / single order — mint green ---------- */
+  /* ---------- Individual / single order — lime green ---------- */
   .pc-card--indiv, #orderFlowPanel{
-    --pc-accent: #22c55e;
-    --pc-bg: linear-gradient(180deg, rgba(6,46,26,.55), rgba(4,12,9,.9));
-    --pc-border: rgba(52, 217, 123, 0.4);
-    --pc-icon-bg: linear-gradient(145deg, #14532d, #166534 55%, #22c55e);
-    --pc-price-grad: linear-gradient(180deg, #dcfce7, #4ade80);
-    --pc-cta-bg: linear-gradient(135deg, #16a34a, #22c55e 55%, #4ade80);
-    --pc-cta-text: #052e16;
+    --pc-accent: #32CD32;
+    --pc-bg: linear-gradient(180deg, rgba(15,69,15,.55), rgba(5,14,5,.9));
+    --pc-border: rgba(50, 205, 50, 0.45);
+    --pc-icon-bg: linear-gradient(145deg, #1c6b1c, #228B22 55%, #32CD32);
+    --pc-price-grad: linear-gradient(180deg, #d9f8d9, #32CD32);
+    --pc-cta-bg: linear-gradient(135deg, #1f9e1f, #32CD32 55%, #90EE90);
+    --pc-cta-text: #042b04;
   }
   #orderFlowPanel{ background: var(--pc-bg); }
 
@@ -3763,43 +3803,43 @@
   }
   #weeklySubPanel{ background: var(--pc-bg); }
 
-  /* ---------- Monthly package — gold/amber (Promoter reference) ---------- */
+  /* ---------- Monthly package — metallic gold shine (Promoter reference) ---------- */
   .pc-card--monthly, #monthlySubPanel{
-    --pc-accent: #f59e0b;
-    --pc-bg: linear-gradient(180deg, rgba(88,58,5,.35), rgba(22,15,3,.85));
-    --pc-border: rgba(245, 158, 11, 0.5);
-    --pc-shadow: 0 20px 50px rgba(8,5,24,.5), 0 0 40px rgba(245,158,11,.2);
-    --pc-icon-bg: linear-gradient(145deg, #b45309, #f59e0b 55%, #fcd34d);
-    --pc-title-grad: linear-gradient(90deg, #fcd34d, #fbbf24 55%, #fde68a);
-    --pc-price-grad: linear-gradient(180deg, #fde68a, #fbbf24);
-    --pc-cta-bg: linear-gradient(135deg, #f59e0b, #fbbf24 55%, #fde68a);
-    --pc-cta-text: #1c1203;
-    --pc-cta-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
-    --pc-chip: #fcd34d;
+    --pc-accent: #FFC814;
+    --pc-bg: linear-gradient(180deg, rgba(90,60,4,.4), rgba(20,14,2,.88));
+    --pc-border: rgba(255, 200, 20, 0.5);
+    --pc-shadow: 0 20px 50px rgba(8,5,24,.5), 0 0 40px rgba(255,200,20,.2);
+    --pc-icon-bg: linear-gradient(135deg, #C67C03, #FBCB11 45%, #FCF08A 70%, #DAA404);
+    --pc-title-grad: linear-gradient(90deg, #FCF08A, #FBCB11 55%, #FCD34D);
+    --pc-price-grad: linear-gradient(180deg, #FCF08A, #DAA404);
+    --pc-cta-bg: linear-gradient(90deg, #C67C03, #FBCB11 25%, #FCF08A 47%, #EAC43F 65%, #DAA404 75%, #E5D172);
+    --pc-cta-text: #241800;
+    --pc-cta-shadow: 0 12px 30px rgba(255, 200, 20, 0.4);
+    --pc-chip: #FCF08A;
   }
   #monthlySubPanel{ background: var(--pc-bg); }
 
-  /* ---------- Edit order — hot pink/magenta ---------- */
+  /* ---------- Edit order — crimson ---------- */
   .pc-card--edit, #editOrderPanel{
-    --pc-accent: #ec4899;
-    --pc-bg: linear-gradient(180deg, rgba(88,28,60,.5), rgba(10,8,26,.87));
-    --pc-border: rgba(236, 72, 153, 0.45);
-    --pc-icon-bg: linear-gradient(145deg, #9d174d, #4c0519);
-    --pc-price-grad: linear-gradient(180deg, #fbcfe8, #db2777);
-    --pc-cta-bg: linear-gradient(135deg, #db2777, #ec4899);
+    --pc-accent: #B80F0A;
+    --pc-bg: linear-gradient(180deg, rgba(90,8,5,.5), rgba(18,4,3,.9));
+    --pc-border: rgba(184, 15, 10, 0.5);
+    --pc-icon-bg: linear-gradient(145deg, #7a0a07, #B80F0A 60%, #E8362F);
+    --pc-price-grad: linear-gradient(180deg, #ffd0cc, #B80F0A);
+    --pc-cta-bg: linear-gradient(135deg, #8f0c08, #B80F0A 55%, #E8362F);
     --pc-cta-text: #fff;
   }
   #editOrderPanel{ background: var(--pc-bg); }
 
-  /* ---------- Cheap package — dark orange (311 Dark Orange swatch) ---------- */
+  /* ---------- Cheap package — amber ---------- */
   .pc-card--cheap, #cheapOrderPanel{
-    --pc-accent: #e0654a;
-    --pc-bg: linear-gradient(180deg, rgba(120,46,20,.5), rgba(24,10,6,.9));
-    --pc-border: rgba(224, 101, 74, 0.5);
-    --pc-icon-bg: linear-gradient(145deg, #8a3416, #e0654a 60%, #ff9a6e);
-    --pc-price-grad: linear-gradient(180deg, #ffd9c7, #e0654a);
-    --pc-cta-bg: linear-gradient(135deg, #c8492c, #e0654a 55%, #ff8a5c);
-    --pc-cta-text: #2a0d04;
+    --pc-accent: #FC7F03;
+    --pc-bg: linear-gradient(180deg, rgba(120,58,4,.5), rgba(24,11,2,.9));
+    --pc-border: rgba(252, 127, 3, 0.5);
+    --pc-icon-bg: linear-gradient(145deg, #9a4e02, #FC7F03 60%, #FFA94D);
+    --pc-price-grad: linear-gradient(180deg, #FFE0BD, #FC7F03);
+    --pc-cta-bg: linear-gradient(135deg, #C96502, #FC7F03 55%, #FFA94D);
+    --pc-cta-text: #2a1400;
   }
   #cheapOrderPanel{ background: var(--pc-bg); }
 
@@ -5104,7 +5144,19 @@
           <span class="rp-star" data-val="1">★</span><span class="rp-star" data-val="2">★</span><span class="rp-star" data-val="3">★</span><span class="rp-star" data-val="4">★</span><span class="rp-star" data-val="5">★</span>
         </span>
       </div>
-      <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი">
+      <div class="c-discord-gate" id="cDiscordLoggedOut">
+        <div class="c-discord-gate-text" data-i18n="commentDiscordRequired">კომენტარის დასატოვებლად საჭიროა Discord ანგარიშით შესვლა.</div>
+        <button type="button" class="c-discord-login-btn" id="cDiscordLoginBtn">
+          <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
+          <span data-i18n="authLoginBtn">შესვლა Discord-ით</span>
+        </button>
+      </div>
+      <div class="c-discord-identity" id="cDiscordLoggedIn" style="display:none;">
+        <img class="c-discord-identity-avatar" id="cDiscordIdentityAvatar" alt="">
+        <span class="c-discord-identity-label" data-i18n="commentPostingAs">იწერები, როგორც:</span>
+        <span class="c-discord-identity-name" id="cDiscordIdentityName">—</span>
+      </div>
+      <input type="text" class="c-name" id="commentName" maxlength="40" data-i18n-placeholder="commentNamePh" placeholder="სახელი" style="display:none;" readonly>
       <div class="c-text-wrap">
         <textarea class="c-text" id="commentText" maxlength="500" data-i18n-placeholder="commentTextPh" placeholder="დაწერე კომენტარი…"></textarea>
         <button type="button" class="c-emoji-btn" id="commentEmojiBtn" aria-label="emoji">🙂</button>
@@ -5484,6 +5536,9 @@
       commentErrRating: 'გთხოვთ მონიშნოთ შეფასება ვარსკვლავებით.',
       commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
       commentErrBlocked: 'თქვენთვის შეზღუდულია კომენტარების დატოვება.',
+      commentErrNeedDiscord: 'კომენტარის დასატოვებლად საჭიროა Discord ანგარიშით შესვლა.',
+      commentDiscordRequired: 'კომენტარის დასატოვებლად საჭიროა Discord ანგარიშით შესვლა.',
+      commentPostingAs: 'იწერები, როგორც:',
       ipBlockedTitle: 'წვდომა შეზღუდულია',
       ipBlockedSub: 'თქვენი მოწყობილობიდან საიტზე წვდომა შეზღუდულია ადმინისტრაციის მიერ.',
       commentErrGeneric: 'კომენტარის გამოქვეყნება ვერ მოხერხდა — სცადეთ ხელახლა.',
@@ -5821,6 +5876,9 @@
       commentErrRating: 'Please select a star rating.',
       commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
       commentErrBlocked: 'You are not allowed to post comments.',
+      commentErrNeedDiscord: 'You need to sign in with Discord to post a comment.',
+      commentDiscordRequired: 'You need to sign in with Discord to post a comment.',
+      commentPostingAs: 'Posting as:',
       ipBlockedTitle: 'Access restricted',
       ipBlockedSub: 'Access to this site from your device has been restricted by the site administrator.',
       commentErrGeneric: 'Could not post the comment — please try again.',
@@ -8970,23 +9028,33 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   function normalizeCommenterName(name){
     return String(name || '').trim().toLowerCase();
   }
-  function isCommenterBlocked(name){
+  function isCommenterBlocked(name, discordId){
+    if (discordId) {
+      if (blockedCommentersCache.some(b => b.discordId && String(b.discordId) === String(discordId))) return true;
+    }
     const n = normalizeCommenterName(name);
     if (!n) return false;
     return blockedCommentersCache.some(b => normalizeCommenterName(b.name) === n);
   }
-  async function blockCommenter(name){
+  async function blockCommenter(name, discordId){
     const n = String(name || '').trim();
-    if (!n) return;
+    if (!n && !discordId) return;
     const fresh = await loadBlockedCommenters();
-    if (fresh.some(b => normalizeCommenterName(b.name) === normalizeCommenterName(n))) return;
-    const updated = fresh.concat([{ name: n, blockedAt: Date.now() }]);
+    const already = fresh.some(b =>
+      (discordId && b.discordId && String(b.discordId) === String(discordId)) ||
+      normalizeCommenterName(b.name) === normalizeCommenterName(n)
+    );
+    if (already) return;
+    const updated = fresh.concat([{ name: n, discordId: discordId || null, blockedAt: Date.now() }]);
     await mdbWrite('blockedCommenters', { list: updated });
     blockedCommentersCache = updated;
   }
-  async function unblockCommenter(name){
+  async function unblockCommenter(name, discordId){
     const fresh = await loadBlockedCommenters();
-    const updated = fresh.filter(b => normalizeCommenterName(b.name) !== normalizeCommenterName(name));
+    const updated = fresh.filter(b =>
+      !((discordId && b.discordId && String(b.discordId) === String(discordId)) ||
+        normalizeCommenterName(b.name) === normalizeCommenterName(name))
+    );
     await mdbWrite('blockedCommenters', { list: updated });
     blockedCommentersCache = updated;
   }
@@ -9258,7 +9326,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           '<button type="button" class="c-vote-btn c-dislike' + (getCommentVote(c.id) === 'dislike' ? ' voted' : '') + '" data-id="' + c.id + '">👎 <span class="c-vote-count">' + (c.dislikes || 0) + '</span></button>' +
         '</div><button type="button" class="c-reply-btn" data-id="' + c.id + '">' + (currentLang === 'en' ? 'Reply' : 'პასუხი') + '</button></div>' +
         '<div class="c-reply-form" id="replyForm_' + c.id + '">' +
-          '<input type="text" class="c-reply-name" maxlength="40" placeholder="' + t('commentNamePh') + '">' +
+          '<div class="c-reply-identity">' + (currentDiscordUser
+            ? '<img class="c-reply-identity-avatar" src="' + escapeHtml(currentDiscordUser.avatarUrl || '') + '" alt=""><span>' + escapeHtml(t('commentPostingAs')) + ' <b>' + escapeHtml(currentDiscordUser.username || '') + '</b></span>'
+            : '<span>' + escapeHtml(t('commentDiscordRequired')) + '</span>') + '</div>' +
           '<div class="c-text-wrap">' +
             '<textarea class="c-reply-text" maxlength="300" placeholder="' + t('commentTextPh') + '"></textarea>' +
             '<button type="button" class="c-emoji-btn" aria-label="emoji">🙂</button>' +
@@ -9389,9 +9459,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const id = btn.getAttribute('data-id');
         const form = document.getElementById('replyForm_' + id);
         if (!form) return;
-        const nameEl = form.querySelector('.c-reply-name');
         const textEl = form.querySelector('.c-reply-text');
-        const name = (nameEl.value || '').trim();
+        const asAdmin = getAdminPostMode();
+        if (!asAdmin && !currentDiscordUser) {
+          alert(t('commentErrNeedDiscord'));
+          return;
+        }
+        const name = asAdmin ? adminDisplayName() : (currentDiscordUser.username || '').trim();
+        const discordId = (!asAdmin && currentDiscordUser) ? (currentDiscordUser.id || null) : null;
         const text = (textEl.value || '').trim();
         if (!name || !text) return;
         if (containsProfanity(name) || containsProfanity(text)) {
@@ -9399,12 +9474,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           return;
         }
         await loadBlockedCommenters();
-        if (!getAdminPostMode() && isCommenterBlocked(name)) {
+        if (!asAdmin && isCommenterBlocked(name, discordId)) {
           alert(t('commentErrBlocked'));
           return;
         }
         btn.disabled = true;
-        const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: getAdminPostMode() };
+        const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: asAdmin, discordId: discordId };
         const fresh = await mdbRead('comments');
         let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
         list = list.map(c => {
@@ -9446,7 +9521,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     commentSubmit.addEventListener('click', async () => {
       hideCommentError();
       const asAdmin = getAdminPostMode();
-      const name = asAdmin ? adminDisplayName() : (commentName.value || '').trim();
+      if (!asAdmin && !currentDiscordUser) {
+        showCommentError(t('commentErrNeedDiscord'));
+        return;
+      }
+      const name = asAdmin ? adminDisplayName() : (currentDiscordUser.username || '').trim();
+      const discordId = (!asAdmin && currentDiscordUser) ? (currentDiscordUser.id || null) : null;
       const text = (commentText.value || '').trim();
       if (!name || !text) {
         showCommentError(t('commentErrEmpty'));
@@ -9457,13 +9537,13 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         return;
       }
       await loadBlockedCommenters();
-      if (!asAdmin && isCommenterBlocked(name)) {
+      if (!asAdmin && isCommenterBlocked(name, discordId)) {
         showCommentError(t('commentErrBlocked'));
         return;
       }
       commentSubmit.disabled = true;
       const submitterIp = await fetchMyIp();
-      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [], ip: submitterIp || null };
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [], ip: submitterIp || null, discordId: discordId };
       const fresh = await mdbRead('comments');
       const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
       const updated = [entry, ...list].slice(0, 200);
@@ -9477,7 +9557,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       sendTelegramNotification(buildCommentTgMessage(entry));
       commentsPage = 1;
       renderComments();
-      if (!asAdmin) commentName.value = '';
       commentText.value = '';
       selectedRating = 0;
       if (rpStars) rpStars.querySelectorAll('.rp-star').forEach(el => el.classList.remove('filled'));
@@ -9732,8 +9811,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
     return blockedCommentersCache.map(b =>
       '<div class="a-blocklist-item">' +
-        '<span class="a-blocklist-name">' + escapeHtml(b.name) + '</span>' +
-        '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(b.name) + '">' + t('adminUnblock') + '</button>' +
+        '<span class="a-blocklist-name">' + escapeHtml(b.name) + (b.discordId ? ' · Discord ID: ' + escapeHtml(String(b.discordId)) : '') + '</span>' +
+        '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(b.name) + '" data-discord-id="' + escapeHtml(b.discordId || '') + '">' + t('adminUnblock') + '</button>' +
       '</div>'
     ).join('');
   }
@@ -9776,17 +9855,17 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       return;
     }
     adminPanelComments.innerHTML = blockedHtml + list.map(c => {
-      const blocked = isCommenterBlocked(c.name);
+      const blocked = isCommenterBlocked(c.name, c.discordId);
       const ipBlocked = c.ip && isIpBlocked(c.ip);
       return '<div class="a-cmt' + (c.pinned ? ' a-cmt-pinned' : '') + '" data-id="' + c.id + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.pinned ? ' · 📌' : '') + (blocked ? ' · 🚫' : '') + (c.ip ? ' · ' + escapeHtml(c.ip) : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.pinned ? ' · 📌' : '') + (blocked ? ' · 🚫' : '') + (c.discordId ? ' · Discord ✓' : '') + (c.ip ? ' · ' + escapeHtml(c.ip) : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
         '<textarea>' + escapeHtml(c.text) + '</textarea>' +
         '<div class="a-cmt-actions">' +
           '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
           '<button class="a-pin-btn' + (c.pinned ? ' is-pinned' : '') + '" data-action="pin" data-id="' + c.id + '">' + (c.pinned ? t('adminUnpin') : t('adminPin')) + '</button>' +
           (c.isAdmin ? '' : (blocked
-            ? '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(c.name) + '">' + t('adminUnblock') + '</button>'
-            : '<button class="a-block-btn" data-action="block" data-name="' + escapeHtml(c.name) + '">' + t('adminBlock') + '</button>')) +
+            ? '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(c.name) + '" data-discord-id="' + escapeHtml(c.discordId || '') + '">' + t('adminUnblock') + '</button>'
+            : '<button class="a-block-btn" data-action="block" data-name="' + escapeHtml(c.name) + '" data-discord-id="' + escapeHtml(c.discordId || '') + '">' + t('adminBlock') + '</button>')) +
           (c.ip && !c.isAdmin ? (ipBlocked
             ? '<button class="a-unblock-btn" data-action="unblock-ip" data-ip="' + escapeHtml(c.ip) + '">' + t('adminUnblockIp') + '</button>'
             : '<button class="a-block-btn" data-action="block-ip" data-ip="' + escapeHtml(c.ip) + '">' + t('adminBlockIp') + '</button>') : '') +
@@ -9863,16 +9942,20 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   function renderAdminReplies(c){
     const replies = Array.isArray(c.replies) ? c.replies : [];
     if (!replies.length) return '';
-    return '<div class="a-cmt-replies">' + replies.map((r, i) =>
-      '<div class="a-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(r.name) + (r.isAdmin ? ' · ADMIN' : '') + ' · ' + formatCommentDate(r.ts) + '</div>' +
+    return '<div class="a-cmt-replies">' + replies.map((r, i) => {
+      const blocked = !r.isAdmin && isCommenterBlocked(r.name, r.discordId);
+      return '<div class="a-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(r.name) + (r.isAdmin ? ' · ADMIN' : '') + (blocked ? ' · 🚫' : '') + (r.discordId ? ' · Discord ✓' : '') + ' · ' + formatCommentDate(r.ts) + '</div>' +
         '<textarea>' + escapeHtml(r.text) + '</textarea>' +
         '<div class="a-cmt-actions">' +
           '<button class="a-save-btn" data-action="save-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminSave') + '</button>' +
+          (r.isAdmin ? '' : (blocked
+            ? '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(r.name) + '" data-discord-id="' + escapeHtml(r.discordId || '') + '">' + t('adminUnblock') + '</button>'
+            : '<button class="a-block-btn" data-action="block" data-name="' + escapeHtml(r.name) + '" data-discord-id="' + escapeHtml(r.discordId || '') + '">' + t('adminBlock') + '</button>')) +
           '<button class="a-del-btn" data-action="delete-reply" data-parent="' + c.id + '" data-ridx="' + i + '">' + t('adminDelete') + '</button>' +
         '</div>' +
-      '</div>'
-    ).join('') + '</div>';
+      '</div>';
+    }).join('') + '</div>';
   }
 
   async function renderAdminOrders(){
@@ -10252,15 +10335,17 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const action = btn.getAttribute('data-action');
     if (action === 'block') {
       const name = btn.getAttribute('data-name');
+      const discordId = btn.getAttribute('data-discord-id') || null;
       btn.disabled = true;
-      await blockCommenter(name);
+      await blockCommenter(name, discordId);
       renderAdminComments();
       return;
     }
     if (action === 'unblock') {
       const name = btn.getAttribute('data-name');
+      const discordId = btn.getAttribute('data-discord-id') || null;
       btn.disabled = true;
-      await unblockCommenter(name);
+      await unblockCommenter(name, discordId);
       renderAdminComments();
       return;
     }
@@ -10600,6 +10685,39 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
   let currentDiscordUser = null;
 
+  function updateCommentAuthUI(){
+    const user = currentDiscordUser;
+    const loggedOutBox = document.getElementById('cDiscordLoggedOut');
+    const loggedInBox = document.getElementById('cDiscordLoggedIn');
+    const idAvatar = document.getElementById('cDiscordIdentityAvatar');
+    const idName = document.getElementById('cDiscordIdentityName');
+    const nameInput = document.getElementById('commentName');
+    const ratingPicker = document.getElementById('ratingPicker');
+    const textWrap = document.querySelector('.comments-panel .c-text-wrap');
+    const submitBtn = document.getElementById('commentSubmit');
+    if (!loggedOutBox || !loggedInBox) return;
+    if (user){
+      loggedOutBox.style.display = 'none';
+      loggedInBox.style.display = 'flex';
+      if (idAvatar){ idAvatar.src = user.avatarUrl || ''; idAvatar.alt = user.username || ''; }
+      if (idName) idName.textContent = user.username || '';
+      if (nameInput) nameInput.value = user.username || '';
+      if (ratingPicker) ratingPicker.style.display = '';
+      if (textWrap) textWrap.style.display = '';
+      if (submitBtn) submitBtn.style.display = '';
+    } else {
+      loggedOutBox.style.display = 'flex';
+      loggedInBox.style.display = 'none';
+      if (nameInput) nameInput.value = '';
+      if (ratingPicker) ratingPicker.style.display = 'none';
+      if (textWrap) textWrap.style.display = 'none';
+      if (submitBtn) submitBtn.style.display = 'none';
+    }
+    if (typeof renderComments === 'function' && typeof commentList !== 'undefined' && commentList && commentsCache.length) {
+      renderComments();
+    }
+  }
+
   function setDiscordUI(user){
     currentDiscordUser = user;
     const chip = document.getElementById('discordChip');
@@ -10618,6 +10736,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       chip.classList.remove('is-authed');
       if (gate) gate.classList.add('open');
     }
+    updateCommentAuthUI();
   }
 
   async function checkDiscordSession(){
