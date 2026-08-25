@@ -1182,6 +1182,23 @@
     background: radial-gradient(circle at 32% 28%, rgba(207,216,255,0.22), transparent 60%),
                 linear-gradient(150deg, rgba(207,216,255,0.1), #0a0a12 75%);
   }
+  .comments-panel .c-item .c-avatar-img{
+    width:100%; height:100%; border-radius:50%; object-fit:cover;
+  }
+  .comments-panel .c-reply-item{ display:flex; align-items:flex-start; gap:9px; }
+  .comments-panel .c-reply-item .c-reply-avatar{
+    flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:13px;
+    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), transparent 60%),
+                linear-gradient(150deg, var(--panel-2), #0a0a12 75%);
+    border:1px solid var(--border-soft);
+  }
+  .comments-panel .c-reply-item .c-reply-avatar.c-avatar-admin{
+    border-color: rgba(207,216,255,0.55);
+    background: radial-gradient(circle at 32% 28%, rgba(207,216,255,0.22), transparent 60%),
+                linear-gradient(150deg, rgba(207,216,255,0.1), #0a0a12 75%);
+  }
+  .comments-panel .c-reply-item .c-reply-body-wrap{ flex:1 1 auto; min-width:0; }
   .comments-panel .c-item .c-top .c-head{ flex:1 1 auto; min-width:0; }
   .comments-panel .c-item .c-head{
     display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;
@@ -3781,7 +3798,7 @@
   /* ---------- Individual / single order — lime green ---------- */
   .pc-card--indiv, #orderFlowPanel{
     --pc-accent: #32CD32;
-    --pc-bg: linear-gradient(180deg, rgba(15,69,15,.55), rgba(5,14,5,.9));
+    --pc-bg: linear-gradient(180deg, rgba(50,205,50,.4), rgba(8,36,8,.93));
     --pc-border: rgba(50, 205, 50, 0.45);
     --pc-icon-bg: linear-gradient(145deg, #228B22, #32CD32 70%, #3ee83e);
     --pc-price-grad: linear-gradient(180deg, #d9f8d9, #32CD32);
@@ -3806,7 +3823,7 @@
   /* ---------- Monthly package — metallic gold shine (Promoter reference) ---------- */
   .pc-card--monthly, #monthlySubPanel{
     --pc-accent: #FFC814;
-    --pc-bg: linear-gradient(180deg, rgba(90,60,4,.4), rgba(20,14,2,.88));
+    --pc-bg: linear-gradient(180deg, rgba(255,200,20,.35), rgba(35,24,3,.92));
     --pc-border: rgba(255, 200, 20, 0.5);
     --pc-shadow: 0 20px 50px rgba(8,5,24,.5), 0 0 40px rgba(255,200,20,.2);
     --pc-icon-bg: linear-gradient(135deg, #C67C03, #FBCB11 45%, #FFD700 70%, #DAA404);
@@ -3822,7 +3839,7 @@
   /* ---------- Edit order — crimson ---------- */
   .pc-card--edit, #editOrderPanel{
     --pc-accent: #B80F0A;
-    --pc-bg: linear-gradient(180deg, rgba(90,8,5,.5), rgba(18,4,3,.9));
+    --pc-bg: linear-gradient(180deg, rgba(184,15,10,.45), rgba(30,6,4,.93));
     --pc-border: rgba(184, 15, 10, 0.5);
     --pc-icon-bg: linear-gradient(145deg, #8f0c08, #B80F0A 70%, #d5140d);
     --pc-price-grad: linear-gradient(180deg, #ffd0cc, #B80F0A);
@@ -3834,7 +3851,7 @@
   /* ---------- Cheap package — amber ---------- */
   .pc-card--cheap, #cheapOrderPanel{
     --pc-accent: #FC7F03;
-    --pc-bg: linear-gradient(180deg, rgba(120,58,4,.5), rgba(24,11,2,.9));
+    --pc-bg: linear-gradient(180deg, rgba(252,127,3,.4), rgba(35,17,3,.93));
     --pc-border: rgba(252, 127, 3, 0.5);
     --pc-icon-bg: linear-gradient(145deg, #c96502, #FC7F03 70%, #ff9421);
     --pc-price-grad: linear-gradient(180deg, #FFE0BD, #FC7F03);
@@ -9287,13 +9304,16 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   function renderReplies(comment){
     const replies = Array.isArray(comment.replies) ? comment.replies : [];
     if (!replies.length) return '';
-    return '<div class="c-replies">' + replies.map(r =>
-      '<div class="c-reply-item"><div class="c-head"><span class="c-author">' + (r.isAdmin ? '' : escapeHtml(r.name)) +
+    const AVATAR_ICONS = ['🌕', '🌗', '☀️', '✨'];
+    return '<div class="c-replies">' + replies.map((r, i) => {
+      const avatarIcon = r.isAdmin ? '🌙' : AVATAR_ICONS[i % AVATAR_ICONS.length];
+      const avatarInner = (!r.isAdmin && r.avatarUrl) ? '<img class="c-avatar-img" src="' + escapeHtml(r.avatarUrl) + '" alt="">' : avatarIcon;
+      return '<div class="c-reply-item"><div class="c-reply-avatar' + (r.isAdmin ? ' c-avatar-admin' : '') + '">' + avatarInner + '</div><div class="c-reply-body-wrap"><div class="c-head"><span class="c-author">' + (r.isAdmin ? '' : escapeHtml(r.name)) +
       (r.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
       '</span><span class="c-date">' + formatCommentDate(r.ts) + '</span></div>' +
       '<div class="c-body c-clamped">' + escapeHtml(r.text) + '</div>' +
-      '<button type="button" class="c-more-btn">' + t('commentReadMore') + '</button></div>'
-    ).join('') + '</div>';
+      '<button type="button" class="c-more-btn">' + t('commentReadMore') + '</button></div></div>';
+    }).join('') + '</div>';
   }
 
   function renderComments(){
@@ -9313,7 +9333,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       commentList.innerHTML = pageItems.map((c, i) => {
         const avatarIcon = c.isAdmin ? '🌙' : AVATAR_ICONS[(start + i) % AVATAR_ICONS.length];
         const avatarClass = 'c-avatar' + (c.isAdmin ? ' c-avatar-admin' : '');
-        return '<div class="c-item' + (c.pinned ? ' c-pinned' : '') + '" data-id="' + c.id + '"><div class="c-top"><div class="' + avatarClass + '">' + avatarIcon + '</div><div class="c-head"><span class="c-author">' + (c.isAdmin ? '' : escapeHtml(c.name)) +
+        const avatarInner = (!c.isAdmin && c.avatarUrl) ? '<img class="c-avatar-img" src="' + escapeHtml(c.avatarUrl) + '" alt="">' : avatarIcon;
+        return '<div class="c-item' + (c.pinned ? ' c-pinned' : '') + '" data-id="' + c.id + '"><div class="c-top"><div class="' + avatarClass + '">' + avatarInner + '</div><div class="c-head"><span class="c-author">' + (c.isAdmin ? '' : escapeHtml(c.name)) +
         (c.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
         (c.pinned ? '<span class="pin-badge">📌</span>' : '') +
         (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
@@ -9479,7 +9500,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           return;
         }
         btn.disabled = true;
-        const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: asAdmin, discordId: discordId };
+        const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: asAdmin, discordId: discordId, avatarUrl: (!asAdmin && currentDiscordUser) ? (currentDiscordUser.avatarUrl || null) : null };
         const fresh = await mdbRead('comments');
         let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
         list = list.map(c => {
@@ -9543,7 +9564,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
       commentSubmit.disabled = true;
       const submitterIp = await fetchMyIp();
-      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [], ip: submitterIp || null, discordId: discordId };
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [], ip: submitterIp || null, discordId: discordId, avatarUrl: (!asAdmin && currentDiscordUser) ? (currentDiscordUser.avatarUrl || null) : null };
       const fresh = await mdbRead('comments');
       const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
       const updated = [entry, ...list].slice(0, 200);
