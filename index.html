@@ -1318,6 +1318,40 @@
   .admin-box .a-reply{ background:#0e0e19; border:1px solid var(--moon-line); border-radius:10px; padding:8px; }
   .admin-box .a-reply textarea{ min-height:38px; }
 
+  .admin-box .a-block-btn{ background:#ffb020; color:#2a1400; }
+  .admin-box .a-unblock-btn{ background:var(--moon-glow); color:#06231f; }
+
+  .admin-box .a-blocklist{
+    background:#0a0a16; border:1px solid var(--moon-line); border-radius:12px;
+    padding:12px; margin-bottom:14px;
+  }
+  .admin-box .a-blocklist-title{ font-size:12.5px; font-weight:700; color:var(--moon-silver); margin-bottom:6px; }
+  .admin-box .a-blocklist-note{ font-size:10.5px; line-height:1.5; color:var(--text-faint); margin-bottom:10px; }
+  .admin-box .a-blocklist-add{ display:flex; gap:8px; margin-bottom:10px; }
+  .admin-box .a-blocklist-add input{
+    flex:1; min-width:0; background:#12121e; border:1px solid var(--border); border-radius:8px;
+    color:var(--moon-silver); padding:8px 10px; font-size:12px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+  }
+  .admin-box .a-blocklist-add button{
+    flex:0 0 auto; border:none; border-radius:8px; padding:8px 14px; font-size:11.5px; font-weight:700;
+    cursor:pointer; background:#ffb020; color:#2a1400; transition:filter .15s ease, transform .15s ease;
+  }
+  .admin-box .a-blocklist-add button:hover{ filter:brightness(1.12); }
+  .admin-box .a-blocklist-add button:active{ transform:scale(0.95); }
+  .admin-box .a-blocklist-body{ display:flex; flex-direction:column; gap:6px; }
+  .admin-box .a-blocklist-empty{ font-size:11.5px; color:var(--text-faint); }
+  .admin-box .a-blocklist-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#12121e; border:1px solid var(--moon-line); border-radius:8px; padding:6px 8px;
+  }
+  .admin-box .a-blocklist-name{ font-size:11.5px; color:var(--moon-silver); word-break:break-all; }
+  .admin-box .a-blocklist-item .a-unblock-btn{
+    flex:0 0 auto; border:none; border-radius:7px; padding:5px 10px; font-size:10.5px; font-weight:700;
+    cursor:pointer; transition:filter .15s ease, transform .15s ease;
+  }
+  .admin-box .a-blocklist-item .a-unblock-btn:hover{ filter:brightness(1.12); }
+  .admin-box .a-blocklist-item .a-unblock-btn:active{ transform:scale(0.95); }
+
   /* --- Moonfade stat cards & animated charts (admin dashboard) --- */
   .a-stat-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
   .a-stat-card{
@@ -2369,8 +2403,8 @@
 
   .discord-popover{
     position:absolute; top:calc(100% + 10px); right:0; z-index:40;
-    width:216px; padding:14px;
-    background:#0b0b13; border:1px solid var(--border); border-radius:14px;
+    width:250px; padding:14px;
+    background:#0b0b13; border:1px solid var(--border); border-radius:16px;
     box-shadow:0 20px 50px rgba(0,0,0,0.5);
     opacity:0; visibility:hidden; transform:translateY(-6px);
     transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
@@ -2379,15 +2413,35 @@
     opacity:1; visibility:visible; transform:translateY(0);
     transition: opacity .18s ease, transform .18s ease, visibility 0s;
   }
-  .discord-popover .dp-name{ font-family:'BPG Glaho', 'Space Grotesk', sans-serif; font-weight:700; font-size:13.5px; color:var(--text); margin-bottom:2px; word-break:break-word; }
-  .discord-popover .dp-sub{ font-size:11px; color:var(--text-faint); margin-bottom:12px; }
-  .discord-popover button{
-    width:100%; padding:9px 0; border-radius:9px; border:1px solid var(--border);
-    background:rgba(255,255,255,0.04); color:var(--text-dim);
-    font-family:'BPG Glaho', 'Space Grotesk', sans-serif; font-weight:600; font-size:12px; cursor:pointer;
-    transition: border-color .15s ease, color .15s ease, background .15s ease;
+  .dp-pill-top{
+    display:flex; align-items:center; gap:10px; margin-bottom:12px;
   }
-  .discord-popover button:hover{ border-color:rgba(255,56,96,0.5); color:#ff8a9d; background:rgba(255,56,96,0.08); }
+  .dp-pill-avatar{
+    width:42px; height:42px; border-radius:50%; flex:0 0 auto;
+    object-fit:cover; border:1.5px solid rgba(88,101,242,0.55);
+    background:rgba(88,101,242,0.15);
+  }
+  .dp-pill-info{ min-width:0; flex:1 1 auto; }
+  .discord-popover .dp-name{ font-family:'BPG Glaho', 'Space Grotesk', sans-serif; font-weight:700; font-size:14px; color:var(--text); margin-bottom:4px; word-break:break-word; line-height:1.2; }
+  .dp-member-badge{
+    display:inline-block; padding:2px 10px; border-radius:100px;
+    border:1.3px solid rgba(255,255,255,0.5); color:var(--text);
+    font-family:'BPG Glaho', 'Space Grotesk', sans-serif; font-weight:700; font-size:9.5px; letter-spacing:0.04em;
+  }
+  .dp-pill-actions{ display:flex; gap:8px; }
+  .dp-icon-btn{
+    flex:1 1 0; padding:9px 0; border-radius:11px; border:1px solid var(--border);
+    background:rgba(255,255,255,0.04); color:var(--text-dim);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition: border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .dp-icon-btn svg{ width:16px; height:16px; fill:currentColor; }
+  .dp-icon-btn:hover{ border-color:rgba(88,101,242,0.55); color:#98a4ff; background:rgba(88,101,242,0.1); }
+  .dp-icon-btn:active{ transform:scale(0.92); }
+  .dp-icon-btn.dp-icon-logout:hover{ border-color:rgba(255,56,96,0.5); color:#ff8a9d; background:rgba(255,56,96,0.08); }
+  .dp-icon-btn.is-spinning svg{ animation: dpSpin .6s linear; }
+  @keyframes dpSpin{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .dp-icon-btn.is-spinning svg{ animation:none; } }
 
   .discord-gate{
     position:fixed; inset:0; z-index:99999;
@@ -3976,9 +4030,21 @@
         <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
         <img class="dc-avatar" id="discordAvatarImg" alt="">
         <div class="discord-popover" id="discordPopover">
-          <div class="dp-name" id="dpName">—</div>
-          <div class="dp-sub" data-i18n="authLoggedInSub">Discord-ით შესული</div>
-          <button type="button" id="discordLogoutBtn" data-i18n="authLogout">გამოსვლა</button>
+          <div class="dp-pill-top">
+            <img class="dp-pill-avatar" id="dpAvatarImg" alt="">
+            <div class="dp-pill-info">
+              <div class="dp-name" id="dpName">—</div>
+              <span class="dp-member-badge" data-i18n="authMemberBadge">MEMBER</span>
+            </div>
+          </div>
+          <div class="dp-pill-actions">
+            <button type="button" class="dp-icon-btn" id="discordRefreshBtn" aria-label="Refresh" title="განახლება">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08a5.99 5.99 0 01-5.65 4c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L14 11h7V4l-3.35 3.35z"/></svg>
+            </button>
+            <button type="button" class="dp-icon-btn dp-icon-logout" id="discordLogoutBtn" aria-label="Logout" title="გამოსვლა">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17v-2H4V9h6V7l5 5-5 5zM4 3h9c1.1 0 2 .9 2 2v3h-2V5H4v14h9v-3h2v3c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2z"/></svg>
+            </button>
+          </div>
         </div>
       </div>
       <div class="lang-switch" id="langSwitch">
@@ -5207,6 +5273,7 @@
       authJoinBtn: 'შემოუერთდი ჩვენს Discord სერვერს',
       authGateSkip: 'გაგრძელება სტუმრად',
       authLoggedInSub: 'Discord-ით შესული ხარ',
+      authMemberBadge: 'MEMBER',
       authLogout: 'გამოსვლა',
       authError: 'Discord-ით შესვლა ვერ მოხერხდა — სცადე ხელახლა.',
       heroTitle: '<span>შეუკვეთე ახლავე!</span>',
@@ -5416,6 +5483,9 @@
       commentErrEmpty: 'გთხოვთ შეავსოთ სახელისა და კომენტარის ველები.',
       commentErrRating: 'გთხოვთ მონიშნოთ შეფასება ვარსკვლავებით.',
       commentErrProfanity: 'კომენტარში გამოვლენილია უცენზურო სიტყვა — გთხოვთ გადაწეროთ თავაზიანად.',
+      commentErrBlocked: 'თქვენთვის შეზღუდულია კომენტარების დატოვება.',
+      ipBlockedTitle: 'წვდომა შეზღუდულია',
+      ipBlockedSub: 'თქვენი მოწყობილობიდან საიტზე წვდომა შეზღუდულია ადმინისტრაციის მიერ.',
       commentErrGeneric: 'კომენტარის გამოქვეყნება ვერ მოხერხდა — სცადეთ ხელახლა.',
       commentsAvgText: 'საშუალო შეფასება <b>{AVG}</b> ({COUNT} შეფასება)',
       adminTitle: 'ადმინის პანელი',
@@ -5436,6 +5506,16 @@
       adminDeleteForever: 'სამუდამო წაშლა',
       adminPin: 'დაპინვა',
       adminUnpin: 'პინის მოხსნა',
+      adminBlockedTitle: '🚫 დაბლოკილი მომხმარებლები',
+      adminNoBlocked: 'დაბლოკილი მომხმარებელი არ არის.',
+      adminBlock: 'დაბლოკვა',
+      adminUnblock: 'განბლოკვა',
+      adminBlockedIpsTitle: '🚫 დაბლოკილი IP მისამართები',
+      adminBlockedIpsNote: 'ეს არის დამატებითი, ბრაუზერზე დაფუძნებული დაცვა — ნამდვილი, გვერდის ავლის გარეშე დაბლოკვისთვის გამოიყენეთ Cloudflare-ის IP Access Rules თქვენი დომენის მართვის პანელში.',
+      adminIpPlaceholder: 'IP მისამართი',
+      adminNoBlockedIps: 'დაბლოკილი IP არ არის.',
+      adminBlockIp: 'IP-ის დაბლოკვა',
+      adminUnblockIp: 'IP-ის განბლოკვა',
       adminTabOrders: 'შეკვეთები',
       adminTabAnalytics: 'ანალიტიკა',
       adminTabUrgency: 'ადგილები',
@@ -5530,6 +5610,7 @@
       authJoinBtn: 'Join our Discord server',
       authGateSkip: 'Continue as guest',
       authLoggedInSub: 'Signed in with Discord',
+      authMemberBadge: 'MEMBER',
       authLogout: 'Log out',
       authError: 'Discord sign-in failed — please try again.',
       heroTitle: '<span>Order now!</span>',
@@ -5739,6 +5820,9 @@
       commentErrEmpty: 'Please fill in both the name and comment fields.',
       commentErrRating: 'Please select a star rating.',
       commentErrProfanity: 'Your comment contains inappropriate language — please rephrase it politely.',
+      commentErrBlocked: 'You are not allowed to post comments.',
+      ipBlockedTitle: 'Access restricted',
+      ipBlockedSub: 'Access to this site from your device has been restricted by the site administrator.',
       commentErrGeneric: 'Could not post the comment — please try again.',
       commentsAvgText: 'Average rating <b>{AVG}</b> ({COUNT} reviews)',
       adminTitle: 'Admin panel',
@@ -5759,6 +5843,16 @@
       adminDeleteForever: 'Delete forever',
       adminPin: 'Pin',
       adminUnpin: 'Unpin',
+      adminBlockedTitle: '🚫 Blocked commenters',
+      adminNoBlocked: 'No blocked commenters.',
+      adminBlock: 'Block',
+      adminUnblock: 'Unblock',
+      adminBlockedIpsTitle: '🚫 Blocked IP addresses',
+      adminBlockedIpsNote: "This is a supplementary, browser-based protection — for a real, unbypassable block, use Cloudflare's IP Access Rules in your domain's dashboard.",
+      adminIpPlaceholder: 'IP address',
+      adminNoBlockedIps: 'No blocked IPs.',
+      adminBlockIp: 'Block IP',
+      adminUnblockIp: 'Unblock IP',
       adminTabOrders: 'Orders',
       adminTabAnalytics: 'Analytics',
       adminTabUrgency: 'Spots',
@@ -8861,6 +8955,100 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const lower = str.toLowerCase();
     return PROFANITY_LIST.some(w => lower.includes(w));
   }
+
+  // ---- Blocked commenters — admin can block/unblock a name from the
+  // admin panel; matched case-insensitively and trimmed against the name
+  // typed on the comment form. This is enforced client-side only (the
+  // shared backend here has no server-side auth check), so it stops
+  // casual repeat offenders but isn't a hard security boundary. ----
+  let blockedCommentersCache = [];
+  async function loadBlockedCommenters(){
+    const data = await mdbRead('blockedCommenters');
+    blockedCommentersCache = (data && Array.isArray(data.list)) ? data.list : [];
+    return blockedCommentersCache;
+  }
+  function normalizeCommenterName(name){
+    return String(name || '').trim().toLowerCase();
+  }
+  function isCommenterBlocked(name){
+    const n = normalizeCommenterName(name);
+    if (!n) return false;
+    return blockedCommentersCache.some(b => normalizeCommenterName(b.name) === n);
+  }
+  async function blockCommenter(name){
+    const n = String(name || '').trim();
+    if (!n) return;
+    const fresh = await loadBlockedCommenters();
+    if (fresh.some(b => normalizeCommenterName(b.name) === normalizeCommenterName(n))) return;
+    const updated = fresh.concat([{ name: n, blockedAt: Date.now() }]);
+    await mdbWrite('blockedCommenters', { list: updated });
+    blockedCommentersCache = updated;
+  }
+  async function unblockCommenter(name){
+    const fresh = await loadBlockedCommenters();
+    const updated = fresh.filter(b => normalizeCommenterName(b.name) !== normalizeCommenterName(name));
+    await mdbWrite('blockedCommenters', { list: updated });
+    blockedCommentersCache = updated;
+  }
+
+  // ---- Blocked IPs — a second, IP-based layer of blocking. IMPORTANT
+  // HONEST LIMITATION: a browser page cannot enforce a real ban on its
+  // own — this only checks the visitor's IP (fetched from a public
+  // lookup service, since JS can't read it directly) against a list and
+  // shows a block screen if it matches. A VPN, mobile data, or a router
+  // restart (new IP from the ISP) bypasses this instantly, and the check
+  // itself is visible to anyone who views the page source. The only
+  // real, unbypassable block is a Cloudflare IP Access Rule on the
+  // domain itself — this is a supplementary deterrent, not a substitute.
+  let blockedIPsCache = [];
+  let myVisitorIp = null;
+  async function loadBlockedIPs(){
+    const data = await mdbRead('blockedIPs');
+    blockedIPsCache = (data && Array.isArray(data.list)) ? data.list : [];
+    return blockedIPsCache;
+  }
+  async function fetchMyIp(){
+    if (myVisitorIp) return myVisitorIp;
+    try{
+      const res = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      myVisitorIp = data.ip || null;
+      return myVisitorIp;
+    }catch(e){ return null; }
+  }
+  function isIpBlocked(ip){
+    if (!ip) return false;
+    return blockedIPsCache.some(b => b.ip === ip);
+  }
+  async function blockIp(ip){
+    const cleaned = String(ip || '').trim();
+    if (!cleaned) return;
+    const fresh = await loadBlockedIPs();
+    if (fresh.some(b => b.ip === cleaned)) return;
+    const updated = fresh.concat([{ ip: cleaned, blockedAt: Date.now() }]);
+    await mdbWrite('blockedIPs', { list: updated });
+    blockedIPsCache = updated;
+  }
+  async function unblockIp(ip){
+    const fresh = await loadBlockedIPs();
+    const updated = fresh.filter(b => b.ip !== ip);
+    await mdbWrite('blockedIPs', { list: updated });
+    blockedIPsCache = updated;
+  }
+  function showIpBlockGate(){
+    const gate = document.createElement('div');
+    gate.id = 'ipBlockGate';
+    gate.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#05050a;color:#eef1ff;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;font-family:sans-serif;';
+    gate.innerHTML = '<div><div style="font-size:40px;margin-bottom:14px;">🚫</div><div style="font-size:18px;font-weight:700;margin-bottom:8px;">' + t('ipBlockedTitle') + '</div><div style="font-size:13px;color:#a9b8dd;max-width:340px;margin:0 auto;">' + t('ipBlockedSub') + '</div></div>';
+    document.documentElement.appendChild(gate);
+    document.body.style.overflow = 'hidden';
+  }
+  async function checkIpBlockGate(){
+    const [ip] = await Promise.all([fetchMyIp(), loadBlockedIPs()]);
+    if (isIpBlocked(ip)) showIpBlockGate();
+  }
+
   function escapeHtml(str){
     return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   }
@@ -9210,6 +9398,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           alert(t('commentErrProfanity'));
           return;
         }
+        await loadBlockedCommenters();
+        if (!getAdminPostMode() && isCommenterBlocked(name)) {
+          alert(t('commentErrBlocked'));
+          return;
+        }
         btn.disabled = true;
         const replyEntry = { name: name.slice(0,40), text: text.slice(0,300), ts: Date.now(), isAdmin: getAdminPostMode() };
         const fresh = await mdbRead('comments');
@@ -9263,8 +9456,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         showCommentError(t('commentErrProfanity'));
         return;
       }
+      await loadBlockedCommenters();
+      if (!asAdmin && isCommenterBlocked(name)) {
+        showCommentError(t('commentErrBlocked'));
+        return;
+      }
       commentSubmit.disabled = true;
-      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [] };
+      const submitterIp = await fetchMyIp();
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [], ip: submitterIp || null };
       const fresh = await mdbRead('comments');
       const list = (fresh && Array.isArray(fresh.list)) ? fresh.list : commentsCache;
       const updated = [entry, ...list].slice(0, 200);
@@ -9287,6 +9486,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
   wireEmojiPickers(document);
   loadComments();
+  loadBlockedCommenters();
+  checkIpBlockGate();
 
   // ============================================================
   // 9) VISITOR LOG
@@ -9525,26 +9726,92 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     animateCountUp(document.getElementById('vsLoc'), uniqueLocations);
   }
 
+  function renderBlockedCommentersList(){
+    if (!blockedCommentersCache.length) {
+      return '<div class="a-blocklist-empty">' + t('adminNoBlocked') + '</div>';
+    }
+    return blockedCommentersCache.map(b =>
+      '<div class="a-blocklist-item">' +
+        '<span class="a-blocklist-name">' + escapeHtml(b.name) + '</span>' +
+        '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(b.name) + '">' + t('adminUnblock') + '</button>' +
+      '</div>'
+    ).join('');
+  }
+
+  function renderBlockedIPsList(){
+    if (!blockedIPsCache.length) {
+      return '<div class="a-blocklist-empty">' + t('adminNoBlockedIps') + '</div>';
+    }
+    return blockedIPsCache.map(b =>
+      '<div class="a-blocklist-item">' +
+        '<span class="a-blocklist-name">' + escapeHtml(b.ip) + '</span>' +
+        '<button class="a-unblock-btn" data-action="unblock-ip" data-ip="' + escapeHtml(b.ip) + '">' + t('adminUnblock') + '</button>' +
+      '</div>'
+    ).join('');
+  }
+
   async function renderAdminComments(){
     adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
     const data = await mdbRead('comments');
     const list = sortCommentsForDisplay((data && Array.isArray(data.list)) ? data.list : []);
+    await loadBlockedCommenters();
+    await loadBlockedIPs();
+    const blockedHtml =
+      '<div class="a-blocklist">' +
+        '<div class="a-blocklist-title">' + t('adminBlockedTitle') + '</div>' +
+        '<div class="a-blocklist-body" id="adminBlockedBody">' + renderBlockedCommentersList() + '</div>' +
+      '</div>' +
+      '<div class="a-blocklist">' +
+        '<div class="a-blocklist-title">' + t('adminBlockedIpsTitle') + '</div>' +
+        '<div class="a-blocklist-note">' + t('adminBlockedIpsNote') + '</div>' +
+        '<div class="a-blocklist-add">' +
+          '<input type="text" id="adminAddIpInput" placeholder="' + t('adminIpPlaceholder') + '">' +
+          '<button type="button" id="adminAddIpBtn">' + t('adminBlock') + '</button>' +
+        '</div>' +
+        '<div class="a-blocklist-body" id="adminBlockedIpsBody">' + renderBlockedIPsList() + '</div>' +
+      '</div>';
     if (!list.length) {
-      adminPanelComments.innerHTML = '<div class="c-empty">' + t('adminNoComments') + '</div>';
+      adminPanelComments.innerHTML = blockedHtml + '<div class="c-empty">' + t('adminNoComments') + '</div>';
+      wireAdminIpAdd();
       return;
     }
-    adminPanelComments.innerHTML = list.map(c =>
-      '<div class="a-cmt' + (c.pinned ? ' a-cmt-pinned' : '') + '" data-id="' + c.id + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.pinned ? ' · 📌' : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
+    adminPanelComments.innerHTML = blockedHtml + list.map(c => {
+      const blocked = isCommenterBlocked(c.name);
+      const ipBlocked = c.ip && isIpBlocked(c.ip);
+      return '<div class="a-cmt' + (c.pinned ? ' a-cmt-pinned' : '') + '" data-id="' + c.id + '">' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.pinned ? ' · 📌' : '') + (blocked ? ' · 🚫' : '') + (c.ip ? ' · ' + escapeHtml(c.ip) : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
         '<textarea>' + escapeHtml(c.text) + '</textarea>' +
         '<div class="a-cmt-actions">' +
           '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
           '<button class="a-pin-btn' + (c.pinned ? ' is-pinned' : '') + '" data-action="pin" data-id="' + c.id + '">' + (c.pinned ? t('adminUnpin') : t('adminPin')) + '</button>' +
+          (c.isAdmin ? '' : (blocked
+            ? '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(c.name) + '">' + t('adminUnblock') + '</button>'
+            : '<button class="a-block-btn" data-action="block" data-name="' + escapeHtml(c.name) + '">' + t('adminBlock') + '</button>')) +
+          (c.ip && !c.isAdmin ? (ipBlocked
+            ? '<button class="a-unblock-btn" data-action="unblock-ip" data-ip="' + escapeHtml(c.ip) + '">' + t('adminUnblockIp') + '</button>'
+            : '<button class="a-block-btn" data-action="block-ip" data-ip="' + escapeHtml(c.ip) + '">' + t('adminBlockIp') + '</button>') : '') +
           '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
         '</div>' +
         renderAdminReplies(c) +
-      '</div>'
-    ).join('');
+      '</div>';
+    }).join('');
+    wireAdminIpAdd();
+  }
+
+  function wireAdminIpAdd(){
+    const btn = document.getElementById('adminAddIpBtn');
+    const input = document.getElementById('adminAddIpInput');
+    if (!btn || !input) return;
+    btn.addEventListener('click', async () => {
+      const ip = input.value.trim();
+      if (!ip) return;
+      btn.disabled = true;
+      await blockIp(ip);
+      renderAdminComments();
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btn.click();
+    });
   }
 
   async function renderAdminArchive(){
@@ -9983,6 +10250,34 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const btn = e.target.closest('button[data-action]');
     if (!btn) return;
     const action = btn.getAttribute('data-action');
+    if (action === 'block') {
+      const name = btn.getAttribute('data-name');
+      btn.disabled = true;
+      await blockCommenter(name);
+      renderAdminComments();
+      return;
+    }
+    if (action === 'unblock') {
+      const name = btn.getAttribute('data-name');
+      btn.disabled = true;
+      await unblockCommenter(name);
+      renderAdminComments();
+      return;
+    }
+    if (action === 'block-ip') {
+      const ip = btn.getAttribute('data-ip');
+      btn.disabled = true;
+      await blockIp(ip);
+      renderAdminComments();
+      return;
+    }
+    if (action === 'unblock-ip') {
+      const ip = btn.getAttribute('data-ip');
+      btn.disabled = true;
+      await unblockIp(ip);
+      renderAdminComments();
+      return;
+    }
     const fresh = await mdbRead('comments');
     let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
     if (action === 'delete') {
@@ -10309,12 +10604,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     currentDiscordUser = user;
     const chip = document.getElementById('discordChip');
     const avatarImg = document.getElementById('discordAvatarImg');
+    const dpAvatarImg = document.getElementById('dpAvatarImg');
     const dpName = document.getElementById('dpName');
     const gate = document.getElementById('discordGate');
     if (!chip) return;
     if (user){
       chip.classList.add('is-authed');
       if (avatarImg){ avatarImg.src = user.avatarUrl || ''; avatarImg.alt = user.username || ''; }
+      if (dpAvatarImg){ dpAvatarImg.src = user.avatarUrl || ''; dpAvatarImg.alt = user.username || ''; }
       if (dpName) dpName.textContent = user.username || '';
       if (gate) gate.classList.remove('open');
     } else {
@@ -10375,6 +10672,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const popover = document.getElementById('discordPopover');
     const loginBtn = document.getElementById('discordLoginBtn');
     const logoutBtn = document.getElementById('discordLogoutBtn');
+    const refreshBtn = document.getElementById('discordRefreshBtn');
     const gate = document.getElementById('discordGate');
     const gateClose = document.getElementById('discordGateClose');
     const gateSkip = document.getElementById('discordGateSkip');
@@ -10393,6 +10691,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     });
     if (loginBtn) loginBtn.addEventListener('click', startDiscordLogin);
     if (logoutBtn) logoutBtn.addEventListener('click', discordLogout);
+    if (refreshBtn) refreshBtn.addEventListener('click', async () => {
+      refreshBtn.classList.remove('is-spinning');
+      void refreshBtn.offsetWidth;
+      refreshBtn.classList.add('is-spinning');
+      refreshBtn.disabled = true;
+      await checkDiscordSession();
+      refreshBtn.disabled = false;
+    });
     if (gateClose) gateClose.addEventListener('click', () => gate && gate.classList.remove('open'));
     if (gateSkip) gateSkip.addEventListener('click', () => gate && gate.classList.remove('open'));
 
