@@ -3668,6 +3668,25 @@
     display:flex; flex-direction:column; align-items:center;
     margin-bottom:14px; text-align:center;
   }
+  .eo-style-tabs{
+    display:flex; gap:8px; margin-bottom:12px;
+  }
+  .eo-style-tab{
+    appearance:none; -webkit-appearance:none; cursor:pointer;
+    font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+    font-size:11.5px; font-weight:700;
+    padding:7px 16px; border-radius:100px;
+    background:rgba(255,255,255,0.05); color:var(--text-dim);
+    border:1.5px solid var(--border-soft);
+    transition: background .18s ease, border-color .18s ease, color .18s ease, transform .15s ease;
+  }
+  .eo-style-tab:hover{ border-color:color-mix(in srgb, var(--gold) 55%, transparent); color:var(--text); }
+  .eo-style-tab:active{ transform:scale(0.96); }
+  .eo-style-tab.active{
+    background:linear-gradient(135deg, var(--gold), #fff3d1 60%, var(--gold));
+    color:#241a00; border-color:transparent;
+    box-shadow:0 6px 16px -4px color-mix(in srgb, var(--gold) 55%, transparent);
+  }
   .eo-video-wrap{
     position:relative; width:170px; margin:0 0 14px;
     aspect-ratio:3/4; border-radius:14px; overflow:hidden;
@@ -5016,6 +5035,10 @@
         <span style="top:46%;left:6%;animation-delay:1.6s;"></span>
       </div>
       <div class="eo-content">
+        <div class="eo-style-tabs" id="eoStyleTabs">
+          <button type="button" class="eo-style-tab active" data-style="1" data-i18n="eoStyle1">სტილი 1</button>
+          <button type="button" class="eo-style-tab" data-style="2" data-i18n="eoStyle2">სტილი 2</button>
+        </div>
         <div class="eo-video-wrap">
           <video class="eo-video" id="eoVideo" src="edit-order-sample.mp4" poster="edit-order-poster.jpg" loop playsinline controls preload="metadata"></video>
           <span class="eo-video-badge" data-i18n="eoVideoBadge">ნიმუში</span>
@@ -5026,12 +5049,12 @@
         <button type="button" class="mp-box active" data-quality="1080_60">
           <span class="mp-box-q">1080p</span>
           <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">9.99<sup>₾</sup></span></span>
+          <span class="mp-box-price"><span class="mp-new-price" id="eoPrice1080">9.99<sup>₾</sup></span></span>
         </button>
         <button type="button" class="mp-box" data-quality="4k_120">
           <span class="mp-box-q">4K</span>
           <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">14.99<sup>₾</sup></span></span>
+          <span class="mp-box-price"><span class="mp-new-price" id="eoPrice4k">14.99<sup>₾</sup></span></span>
         </button>
       </div>
       <div class="order-grid" style="margin-top:14px;">
@@ -5416,6 +5439,8 @@
       qnEditOrder: 'ედითის შეკვეთა',
       eoLabel: 'ედითის შეკვეთა',
       eoVideoBadge: 'ნიმუში',
+      eoStyle1: 'სტილი 1',
+      eoStyle2: 'სტილი 2',
       eoCaption: 'მსგავსი ედითი — თქვენი პერსონაჟით',
       eoDesc: 'ზუსტად ამ სტილის მონტაჟი შენი საყვარელი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი და ა.შ). შეუკვეთე და ჩატში გამომიგზავნე პერსონაჟის ფოტო/რეფერენსი — დანარჩენს ჩვენ გავაკეთებთ.',
       eoPriceLabel: 'ფასი',
@@ -5756,6 +5781,8 @@
       qnEditOrder: 'Order an Edit',
       eoLabel: 'Order an Edit',
       eoVideoBadge: 'Sample',
+      eoStyle1: 'Style 1',
+      eoStyle2: 'Style 2',
       eoCaption: 'A similar edit — with your character',
       eoDesc: 'The exact same style of edit, made with your favorite character (anime, game hero, movie character, etc). Order it, then send us a photo/reference of the character in chat — we handle the rest.',
       eoPriceLabel: 'Price',
@@ -6594,12 +6621,56 @@
   }
   updateMpBoxPrices();
 
-  // ---- Edit Order (fixed price per quality tier, single video) ----
-  const EO_PRICES = {
-    '1080_60': 9.99,
-    '4k_120': 14.99
+  // ---- Edit Order (multiple selectable styles, each its own sample
+  // video and its own price per quality tier — selecting a style swaps
+  // the preview video and the displayed price automatically) ----
+  const EO_STYLES = {
+    '1': {
+      video: 'edit-order-sample.mp4',
+      poster: 'edit-order-poster.jpg',
+      prices: { '1080_60': 9.99, '4k_120': 14.99 }
+    },
+    '2': {
+      video: 'edit-order-sample-2.mp4',
+      poster: 'edit-order-poster-2.jpg',
+      prices: { '1080_60': 12.99, '4k_120': 17.99 }
+    }
   };
+  let eoSelectedStyle = '1';
   let eoSelectedQuality = '1080_60';
+  const eoStyleTabs = document.getElementById('eoStyleTabs');
+  const eoVideoEl = document.getElementById('eoVideo');
+  const eoPrice1080El = document.getElementById('eoPrice1080');
+  const eoPrice4kEl = document.getElementById('eoPrice4k');
+
+  function currentEoStyle(){
+    return EO_STYLES[eoSelectedStyle] || EO_STYLES['1'];
+  }
+
+  function updateEoStyleUI(){
+    const style = currentEoStyle();
+    if (eoVideoEl) {
+      const wasPlaying = !eoVideoEl.paused;
+      eoVideoEl.pause();
+      eoVideoEl.setAttribute('src', style.video);
+      eoVideoEl.setAttribute('poster', style.poster);
+      eoVideoEl.load();
+      if (wasPlaying) eoVideoEl.play().catch(() => {});
+    }
+    if (eoPrice1080El) eoPrice1080El.innerHTML = style.prices['1080_60'].toFixed(2) + '<sup>₾</sup>';
+    if (eoPrice4kEl) eoPrice4kEl.innerHTML = style.prices['4k_120'].toFixed(2) + '<sup>₾</sup>';
+  }
+
+  if (eoStyleTabs) {
+    eoStyleTabs.querySelectorAll('.eo-style-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        eoSelectedStyle = tab.getAttribute('data-style');
+        eoStyleTabs.querySelectorAll('.eo-style-tab').forEach(t => t.classList.toggle('active', t === tab));
+        updateEoStyleUI();
+      });
+    });
+  }
+
   const eoQualityGrid = document.getElementById('eoQualityGrid');
   if (eoQualityGrid) {
     eoQualityGrid.querySelectorAll('.mp-box').forEach(box => {
@@ -8166,22 +8237,26 @@ TikTok პროფილი: ${getTiktokValue('mp')}
   }
 
   function buildEditOrderTgMessage(channel, orderId){
-    const price = EO_PRICES[eoSelectedQuality] || EO_PRICES['1080_60'];
+    const style = currentEoStyle();
+    const price = style.prices[eoSelectedQuality] || style.prices['1080_60'];
     const qualityLabel = QUALITY_LABELS[eoSelectedQuality] || QUALITY_LABELS['1080_60'];
     return `✨ <b>ახალი შეკვეთა — MOON (ედითის შეკვეთა)</b> (${channel})\n\n` +
       `🆔 ID: <b>${orderId}</b>\n` +
       `🎬 პაკეტი: <b>მსგავსი ედითი თქვენი პერსონაჟით</b>\n` +
+      `🎨 სტილი: <b>სტილი ${escapeHtml(eoSelectedStyle)}</b>\n` +
       `🎞 ხარისხი: <b>${qualityLabel}</b>\n` +
       `💰 ღირებულება: <b>${price} ₾</b>\n` +
       `ℹ️ კლიენტი გამოგზავნის ვიდეოს ჩატში, პერსონაჟის ფოტო/რეფერენსთან ერთად.`;
   }
 
   function buildEditOrderMessage(orderId){
-    const price = EO_PRICES[eoSelectedQuality] || EO_PRICES['1080_60'];
+    const style = currentEoStyle();
+    const price = style.prices[eoSelectedQuality] || style.prices['1080_60'];
     const qualityLabel = QUALITY_LABELS[eoSelectedQuality] || QUALITY_LABELS['1080_60'];
     return `✨ ახალი შეკვეთა — MOON (ედითის შეკვეთა)
 ID: ${orderId}
 პაკეტი: მსგავსი ედითი თქვენი პერსონაჟით
+სტილი: სტილი ${eoSelectedStyle}
 ხარისხი: ${qualityLabel}
 ღირებულება: ${price} ₾
 
@@ -8200,7 +8275,7 @@ ID: ${orderId}
       sendTelegramNotification(buildEditOrderTgMessage('WhatsApp', orderId));
       addPendingOrder({
         id: orderId, ts: Date.now(), type: 'editOrder', channel: 'WhatsApp',
-        price: EO_PRICES[eoSelectedQuality] || EO_PRICES['1080_60']
+        price: currentEoStyle().prices[eoSelectedQuality] || currentEoStyle().prices['1080_60']
       });
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
@@ -8216,7 +8291,7 @@ ID: ${orderId}
       sendTelegramNotification(buildEditOrderTgMessage('Telegram', orderId));
       addPendingOrder({
         id: orderId, ts: Date.now(), type: 'editOrder', channel: 'Telegram',
-        price: EO_PRICES[eoSelectedQuality] || EO_PRICES['1080_60']
+        price: currentEoStyle().prices[eoSelectedQuality] || currentEoStyle().prices['1080_60']
       });
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
