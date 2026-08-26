@@ -435,25 +435,33 @@
 
   .topbar-moon{
     display:inline-flex;
+    position:relative;
     flex:0 0 auto;
     width:26px; height:26px;
     max-width:26px; max-height:26px;
-    overflow:hidden;
     align-items:center; justify-content:center;
     border-radius:50%;
     font-size:13px; line-height:1;
     -webkit-text-size-adjust:100%; text-size-adjust:100%;
     background:radial-gradient(circle at 35% 30%, #f5f8ff 0%, #cfd8ff 45%, #7c8fff 100%);
     box-shadow:0 0 10px rgba(207,216,255,0.5), 0 0 16px rgba(124,143,255,0.3);
-    animation: moonSpin 7s linear infinite, moonGlow 2.6s ease-in-out infinite;
+    animation: moonSpin 7s linear infinite;
+  }
+  .topbar-moon::after{
+    content:''; position:absolute; inset:0; border-radius:50%;
+    box-shadow:0 0 16px rgba(207,216,255,0.85), 0 0 26px rgba(124,143,255,0.55);
+    opacity:0;
+    animation: moonGlowFade 2.6s ease-in-out infinite;
+    pointer-events:none;
   }
   @keyframes moonSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
-  @keyframes moonGlow{
-    0%,100%{ box-shadow:0 0 10px rgba(207,216,255,0.5), 0 0 16px rgba(124,143,255,0.3); }
-    50%{ box-shadow:0 0 16px rgba(207,216,255,0.85), 0 0 26px rgba(124,143,255,0.55); }
+  @keyframes moonGlowFade{
+    0%,100%{ opacity:0; }
+    50%{ opacity:1; }
   }
   @media (prefers-reduced-motion: reduce){
     .topbar-moon{ animation:none; }
+    .topbar-moon::after{ animation:none; opacity:0; }
   }
 
   .lang-switch{
@@ -3785,15 +3793,21 @@
   /* The 4th (edit-order) card is deliberately featured on its own row
      below the three main packages, centered rather than stretched
      edge-to-edge — this is what looked right, not an accident this time. */
-  .pc-card--edit, .pc-card--cheap{
+  .pc-card--edit, .pc-card-wrap--cheap{
     grid-column: 1 / -1;
     width:100%;
     max-width:420px;
     margin:0 auto;
   }
   @media (max-width:900px){
-    .pc-card--edit, .pc-card--cheap{ max-width:none; }
+    .pc-card--edit, .pc-card-wrap--cheap{ max-width:none; }
   }
+  /* Wraps any card that carries a floating .pc-badge. The badge needs to
+     sit OUTSIDE the card's own clipped box (poking above its top edge),
+     while the card itself needs overflow:hidden to correctly contain its
+     ambient animation. Two different elements needing two different
+     overflow behaviors is exactly why this wrapper exists. */
+  .pc-card-wrap{ position:relative; min-width:0; }
 
   .pc-card{
     position:relative;
@@ -3829,28 +3843,120 @@
     opacity:0.8;
   }
 
-  /* ---------- Individual / single order — lime green ---------- */
+  /* ---------- Desktop-only ambient animations — one distinct style per
+     card, not the same effect repeated. All five share the exact same
+     6s duration with zero delay offset, so they stay in lockstep with
+     each other even though they look different — none runs ahead of or
+     behind the rest. Every one of them animates only `transform` and/or
+     `opacity`, which the browser composites on the GPU thread
+     independently of layout/paint/scroll — so unlike animating
+     box-shadow, width or background-position, these physically cannot
+     drop frames or stall input during a scroll, on any refresh rate.
+     Gated to hover:hover+pointer:fine (mouse-driven desktop only, never
+     a phone or tablet) and paused via :not(.pc-open), matching the
+     existing hover-lift rule above for the same fixed-modal reason. ---------- */
+  @media (hover:hover) and (pointer:fine){
+    /* Individual (green) — diagonal shine sweep */
+    .pc-card--indiv:not(.pc-open)::after{
+      content:'';
+      position:absolute; top:-20%; left:-30%; width:55%; height:140%;
+      background:linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--pc-accent) 32%, transparent) 50%, transparent 60%);
+      transform:translateX(-120%) rotate(8deg);
+      animation: pcSweepDiag 6s ease-in-out infinite;
+      pointer-events:none; will-change:transform;
+    }
+    /* Weekly (purple) — soft pulsing glow */
+    .pc-card--weekly:not(.pc-open)::after{
+      content:'';
+      position:absolute; inset:0;
+      background:radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--pc-accent) 40%, transparent), transparent 62%);
+      opacity:0;
+      animation: pcPulseGlow 6s ease-in-out infinite;
+      pointer-events:none;
+    }
+    /* Monthly (gold) — small highlight orbiting the card */
+    .pc-card--monthly:not(.pc-open)::after{
+      content:'';
+      position:absolute; top:50%; left:50%; width:34%; height:34%;
+      border-radius:50%; filter:blur(6px);
+      background:radial-gradient(circle, rgba(255,255,255,0.55), transparent 70%);
+      transform:translate(-50%,-50%) translate(32px,-22px);
+      animation: pcOrbit 6s ease-in-out infinite;
+      pointer-events:none; will-change:transform;
+    }
+    /* Edith (red) — breathing inner border glow */
+    .pc-card--edit:not(.pc-open)::after{
+      content:'';
+      position:absolute; inset:6px; border-radius:19px;
+      border:1.5px solid var(--pc-accent);
+      opacity:0.25;
+      transform:scale(1);
+      animation: pcBreathe 6s ease-in-out infinite;
+      pointer-events:none; will-change:transform, opacity;
+    }
+    /* Cheap (blue) — vertical shimmer sweep */
+    .pc-card-wrap--cheap .pc-card--cheap:not(.pc-open)::after{
+      content:'';
+      position:absolute; top:-30%; left:-20%; width:140%; height:55%;
+      background:linear-gradient(190deg, transparent 40%, color-mix(in srgb, var(--pc-accent) 32%, transparent) 50%, transparent 60%);
+      transform:translateY(-120%) rotate(6deg);
+      animation: pcSweepVert 6s ease-in-out infinite;
+      pointer-events:none; will-change:transform;
+    }
+  }
+  @keyframes pcSweepDiag{
+    0%, 15%{ transform:translateX(-120%) rotate(8deg); }
+    45%, 100%{ transform:translateX(280%) rotate(8deg); }
+  }
+  @keyframes pcSweepVert{
+    0%, 15%{ transform:translateY(-120%) rotate(6deg); }
+    45%, 100%{ transform:translateY(280%) rotate(6deg); }
+  }
+  @keyframes pcPulseGlow{
+    0%, 100%{ opacity:0; }
+    50%{ opacity:1; }
+  }
+  @keyframes pcOrbit{
+    0%{ transform:translate(-50%,-50%) translate(32px,-22px); }
+    25%{ transform:translate(-50%,-50%) translate(-26px,-26px); }
+    50%{ transform:translate(-50%,-50%) translate(-32px,22px); }
+    75%{ transform:translate(-50%,-50%) translate(26px,26px); }
+    100%{ transform:translate(-50%,-50%) translate(32px,-22px); }
+  }
+  @keyframes pcBreathe{
+    0%, 100%{ opacity:0.2; transform:scale(1); }
+    50%{ opacity:0.65; transform:scale(1.015); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pc-card::after{ animation:none !important; }
+  }
+
+  /* ---------- Individual / single order — green, sampled directly from
+     the reference photo, same treatment as monthly's gold. ---------- */
   .pc-card--indiv, #orderFlowPanel{
-    --pc-accent: #32CD32;
-    --pc-bg: linear-gradient(180deg, rgba(50,205,50,.4), rgba(8,36,8,.93));
-    --pc-border: rgba(50, 205, 50, 0.45);
-    --pc-icon-bg: linear-gradient(145deg, #228B22, #32CD32 70%, #3ee83e);
-    --pc-price-grad: linear-gradient(180deg, #d9f8d9, #32CD32);
-    --pc-cta-bg: linear-gradient(135deg, #2eb82e, #32CD32 60%, #3ee83e);
+    --pc-accent: #14D011;
+    --pc-green-shine: linear-gradient(90deg, #01AD01 0%, #08C906 10%, #12D50E 20%, #14D011 30%, #12C30C 40%, #13C40D 50%, #14C70D 60%, #15CE10 70%, #15CA0F 80%, #0DAA07 90%, #048403 100%);
+    --pc-bg: linear-gradient(180deg, transparent 0%, rgba(3,10,3,0.94) 78%), var(--pc-green-shine);
+    --pc-border: rgba(20, 208, 17, 0.5);
+    --pc-icon-bg: var(--pc-green-shine);
+    --pc-price-grad: linear-gradient(180deg, #15CE10, #048403);
+    --pc-cta-bg: var(--pc-green-shine);
     --pc-cta-text: #042b04;
   }
   #orderFlowPanel{ background: var(--pc-bg); }
 
-  /* ---------- Weekly package — violet (VIP/Contributor reference) ---------- */
+  /* ---------- Weekly package — violet, sampled directly from the
+     reference photo, same treatment as monthly's gold. ---------- */
   .pc-card--weekly, #weeklySubPanel{
-    --pc-accent: #a855f7;
-    --pc-bg: linear-gradient(180deg, rgba(76,29,149,.55), rgba(23,7,49,.94));
-    --pc-border: rgba(168, 85, 247, 0.65);
-    --pc-icon-bg: linear-gradient(145deg, #6d28d9, #2e1065 70%, #7c3aed);
-    --pc-price-grad: linear-gradient(135deg, #c084fc, #e879f9);
-    --pc-cta-bg: linear-gradient(135deg, #6d28d9, #9333ea 45%, #c084fc);
+    --pc-accent: #B501E7;
+    --pc-purple-shine: linear-gradient(90deg, #2A0160 0%, #3B007C 10%, #4C0091 20%, #57019E 30%, #420086 40%, #420084 50%, #4D0094 60%, #5F00A5 70%, #7300BA 80%, #B501E7 90%, #D400F5 100%);
+    --pc-bg: linear-gradient(180deg, transparent 0%, rgba(9,2,18,0.94) 78%), var(--pc-purple-shine);
+    --pc-border: rgba(181, 1, 231, 0.55);
+    --pc-icon-bg: var(--pc-purple-shine);
+    --pc-price-grad: linear-gradient(180deg, #D400F5, #420084);
+    --pc-cta-bg: var(--pc-purple-shine);
     --pc-cta-text: #fff;
-    --pc-ribbon-bg: linear-gradient(135deg, #d946ef, #a855f7 60%, #7c3aed);
+    --pc-ribbon-bg: var(--pc-purple-shine);
   }
   #weeklySubPanel{ background: var(--pc-bg); }
 
@@ -3874,27 +3980,31 @@
   }
   #monthlySubPanel{ background: var(--pc-bg); }
 
-  /* ---------- Edit order — crimson ---------- */
+  /* ---------- Edit order — red foil, sampled directly from the
+     reference photo, same treatment as monthly's gold. ---------- */
   .pc-card--edit, #editOrderPanel{
-    --pc-accent: #B80F0A;
-    --pc-bg: linear-gradient(180deg, rgba(184,15,10,.45), rgba(30,6,4,.93));
-    --pc-border: rgba(184, 15, 10, 0.5);
-    --pc-icon-bg: linear-gradient(145deg, #8f0c08, #B80F0A 70%, #d5140d);
-    --pc-price-grad: linear-gradient(180deg, #ffd0cc, #B80F0A);
-    --pc-cta-bg: linear-gradient(135deg, #960c08, #B80F0A 60%, #d5140d);
+    --pc-accent: #F70000;
+    --pc-red-shine: linear-gradient(90deg, #AD0000 0%, #D20000 10%, #D90200 20%, #E50000 30%, #F40000 40%, #F70000 50%, #F50000 60%, #ED0200 70%, #E20000 80%, #D00000 90%, #C40000 100%);
+    --pc-bg: linear-gradient(180deg, transparent 0%, rgba(18,2,2,0.94) 78%), var(--pc-red-shine);
+    --pc-border: rgba(247, 0, 0, 0.5);
+    --pc-icon-bg: var(--pc-red-shine);
+    --pc-price-grad: linear-gradient(180deg, #F70000, #AD0000);
+    --pc-cta-bg: var(--pc-red-shine);
     --pc-cta-text: #fff;
   }
   #editOrderPanel{ background: var(--pc-bg); }
 
-  /* ---------- Cheap package — amber ---------- */
+  /* ---------- Cheap package — blue, sampled directly from the
+     reference photo, same treatment as monthly's gold. ---------- */
   .pc-card--cheap, #cheapOrderPanel{
-    --pc-accent: #FC7F03;
-    --pc-bg: linear-gradient(180deg, rgba(252,127,3,.4), rgba(35,17,3,.93));
-    --pc-border: rgba(252, 127, 3, 0.5);
-    --pc-icon-bg: linear-gradient(145deg, #c96502, #FC7F03 70%, #ff9421);
-    --pc-price-grad: linear-gradient(180deg, #FFE0BD, #FC7F03);
-    --pc-cta-bg: linear-gradient(135deg, #e57302, #FC7F03 60%, #ff9421);
-    --pc-cta-text: #2a1400;
+    --pc-accent: #0048E5;
+    --pc-blue-shine: linear-gradient(90deg, #0242D6 0%, #0048E5 10%, #0047E6 20%, #0041DE 30%, #0037CD 40%, #002CBA 50%, #0123A9 60%, #011A97 70%, #00127E 80%, #020A5F 90%, #010535 100%);
+    --pc-bg: linear-gradient(180deg, transparent 0%, rgba(1,3,15,0.94) 78%), var(--pc-blue-shine);
+    --pc-border: rgba(0, 72, 229, 0.55);
+    --pc-icon-bg: var(--pc-blue-shine);
+    --pc-price-grad: linear-gradient(180deg, #0048E5, #010535);
+    --pc-cta-bg: var(--pc-blue-shine);
+    --pc-cta-text: #fff;
   }
   #cheapOrderPanel{ background: var(--pc-bg); }
 
@@ -3911,10 +4021,6 @@
   .pc-badge::before{
     content:'★'; font-size:9px; color:#f5a623; line-height:1;
   }
-  /* This badge is meant to float above the card's top edge rather than
-     sit clipped inside it — the card's overflow:hidden (needed elsewhere
-     for other effects) would otherwise cut it off. */
-  .pc-card--indiv, .pc-card--cheap{ overflow:visible; }
 
   .pc-head{
     display:flex; align-items:center; gap:12px; margin-bottom:16px;
@@ -4555,8 +4661,9 @@
     <div class="pricing-cards">
 
       <!-- Card 1 — individual / single-video package -->
+      <div class="pc-card-wrap">
+      <div class="pc-badge" data-i18n="pcRibbon">პოპულარული</div>
       <div class="pc-card pc-card--indiv">
-        <div class="pc-badge" data-i18n="pcRibbon">პოპულარული</div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">🎬</div>
           <div class="pc-head-text">
@@ -4765,6 +4872,7 @@
   </div>
   </div>
         </div>
+      </div>
 
       <!-- Card 2 — weekly subscription package -->
       <div class="pc-card pc-card--weekly">
@@ -5093,8 +5201,9 @@
       </div>
 
       <!-- Card 5 — cheap package (fixed price, no Topaz/effects) -->
+      <div class="pc-card-wrap pc-card-wrap--cheap">
+      <div class="pc-badge" data-i18n="pcRibbon">პოპულარული</div>
       <div class="pc-card pc-card--cheap">
-        <div class="pc-badge" data-i18n="pcRibbon">პოპულარული</div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">⚡</div>
           <div class="pc-head-text">
@@ -5216,6 +5325,7 @@
       <div class="copy-note" id="cpCopyNote"></div>
     </div>
         </div>
+      </div>
       </div>
     </div>
   </div>
