@@ -3764,7 +3764,7 @@
     margin-bottom:14px; text-align:center;
   }
   .eo-style-tabs{
-    display:flex; gap:8px; margin-bottom:12px;
+    display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:12px;
   }
   .eo-style-tab{
     appearance:none; -webkit-appearance:none; cursor:pointer;
@@ -5142,8 +5142,8 @@
           <div class="pc-desc" data-i18n="pc4Desc">მსგავსი ედითი — თქვენი პერსონაჟით</div>
           </div>
         </div>
-        <div class="pc-price-line pc-price-line--dual"><b>9.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>14.99<sup>₾</sup></b></div>
-        <div class="pc-price-note" data-i18n="pc4PriceNote">1080p / 4K — არჩევანი შეკვეთისას</div>
+        <div class="pc-price-line"><b>9.99<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
+        <div class="pc-price-note" data-i18n="pc4PriceNote">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე (1080p / 4K)</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc4Feature1">1080P • 60FPS</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc4Feature2">4K • 60FPS</span></div>
@@ -5170,6 +5170,8 @@
         <div class="eo-style-tabs" id="eoStyleTabs">
           <button type="button" class="eo-style-tab active" data-style="1" data-i18n="eoStyle1">სტილი 1</button>
           <button type="button" class="eo-style-tab" data-style="2" data-i18n="eoStyle2">სტილი 2</button>
+          <button type="button" class="eo-style-tab" data-style="3" data-i18n="eoStyle3">სტილი 3</button>
+          <button type="button" class="eo-style-tab" data-style="4" data-i18n="eoStyle4">სტილი 4</button>
         </div>
         <div class="eo-video-wrap">
           <video class="eo-video" id="eoVideo" src="edit-order-sample.mp4" poster="edit-order-poster.jpg" loop playsinline controls preload="metadata"></video>
@@ -5565,7 +5567,7 @@
       pc3Feature1: '1 თვის განმავლობაში<br>სრული შეკვეთა',
       pc3Feature2: '4K • 60FPS',
       pc4Desc: 'მსგავსი ედითი — თქვენი პერსონაჟით',
-      pc4PriceNote: '1080p / 4K — არჩევანი შეკვეთისას',
+      pc4PriceNote: 'ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე (1080p / 4K)',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
       pc4Feature3: 'ჩაბარდება არაუმეტეს 24 საათის განმავლობაში',
@@ -5582,6 +5584,8 @@
       eoVideoBadge: 'ნიმუში',
       eoStyle1: 'სტილი 1',
       eoStyle2: 'სტილი 2',
+      eoStyle3: 'სტილი 3',
+      eoStyle4: 'სტილი 4',
       eoCaption: 'მსგავსი ედითი — თქვენი პერსონაჟით',
       eoDesc: 'ზუსტად ამ სტილის მონტაჟი შენი საყვარელი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი და ა.შ). შეუკვეთე და ჩატში გამომიგზავნე პერსონაჟის ფოტო/რეფერენსი — დანარჩენს ჩვენ გავაკეთებთ.',
       eoPriceLabel: 'ფასი',
@@ -5922,7 +5926,7 @@
       pc3Feature1: 'Within 1 month<br>full order',
       pc3Feature2: '4K • 60FPS',
       pc4Desc: 'A similar edit — with your character',
-      pc4PriceNote: '1080p / 4K — choose when ordering',
+      pc4PriceNote: 'Price depends on the chosen style and quality (1080p / 4K)',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
       pc4Feature3: 'Delivered within 24 hours',
@@ -5939,6 +5943,8 @@
       eoVideoBadge: 'Sample',
       eoStyle1: 'Style 1',
       eoStyle2: 'Style 2',
+      eoStyle3: 'Style 3',
+      eoStyle4: 'Style 4',
       eoCaption: 'A similar edit — with your character',
       eoDesc: 'The exact same style of edit, made with your favorite character (anime, game hero, movie character, etc). Order it, then send us a photo/reference of the character in chat — we handle the rest.',
       eoPriceLabel: 'Price',
@@ -6805,6 +6811,16 @@
       video: 'edit-order-sample-2.mp4',
       poster: 'edit-order-poster-2.jpg',
       prices: { '1080_60': 12.99, '4k_120': 17.99 }
+    },
+    '3': {
+      video: 'edit-order-sample-3.mp4',
+      poster: 'edit-order-poster-3.jpg',
+      prices: { '1080_60': 9.99, '4k_120': 14.99 }
+    },
+    '4': {
+      video: 'edit-order-sample-4.mp4',
+      poster: 'edit-order-poster-4.jpg',
+      prices: { '1080_60': 9.99, '4k_120': 14.99 }
     }
   };
   let eoSelectedStyle = '1';
@@ -8928,7 +8944,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     },
     {
       kw: ['ედით','edith','მსგავსი ედით','პერსონაჟით','ჩემი პერსონაჟ','ედითის შეკვეთა'],
-      a: '„ედითის შეკვეთა" — მსგავსი სტილის მონტაჟია, მაგრამ შენი საკუთარი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი და ა.შ). ფასი ფიქსირებულია: 9.99₾ 1080p/60fps-ზე და 14.99₾ 4K/60fps-ზე. შეკვეთის შემდეგ პერსონაჟის ფოტო/რეფერენსი პირდაპირ ჩატში გამოგვიგზავნი — ცალკე ვიდეოს ატვირთვა ან TikTok ლინკი ამ პაკეტისთვის საჭირო არ არის.',
+      a: '„ედითის შეკვეთა" — მსგავსი სტილის მონტაჟია, მაგრამ შენი საკუთარი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი და ა.შ). ფასი იწყება 9.99₾-დან 1080p/60fps-ზე და 14.99₾-დან 4K/60fps-ზე — კონკრეტული ფასი დამოკიდებულია არჩეულ სტილზე. შეკვეთის შემდეგ პერსონაჟის ფოტო/რეფერენსი პირდაპირ ჩატში გამოგვიგზავნი — ცალკე ვიდეოს ატვირთვა ან TikTok ლინკი ამ პაკეტისთვის საჭირო არ არის.',
     },
     {
       kw: ['პრომო კოდ','promo კოდ','რეფერალ','referral','ფასდაკლების კოდ','მაქვს კოდი'],
@@ -9073,7 +9089,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     },
     {
       kw: ['edith','similar to edith','with my character','your own character'],
-      a: 'The "Edith Order" is the same style of edit, made with your own character (anime, game hero, movie character, etc). Fixed price: 9.99₾ for 1080p/60fps and 14.99₾ for 4K/60fps. After ordering, just send us a photo/reference of the character directly in chat — no separate video upload or TikTok link is needed for this package.',
+      a: 'The "Edith Order" is the same style of edit, made with your own character (anime, game hero, movie character, etc). Prices start from 9.99₾ for 1080p/60fps and 14.99₾ for 4K/60fps — the exact price depends on the style you choose. After ordering, just send us a photo/reference of the character directly in chat — no separate video upload or TikTok link is needed for this package.',
     },
     {
       kw: ['promo code','referral','discount code','have a code'],
