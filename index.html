@@ -510,11 +510,16 @@
   .site-menu{
     position:fixed; z-index:60;
     top:0; left:0; right:0;
-    max-height:100vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    max-height:100vh; overflow-y:scroll; -webkit-overflow-scrolling:touch;
     transform:translateY(-12px);
     opacity:0; visibility:hidden; pointer-events:none;
     transition: opacity .26s ease, transform .26s ease, visibility 0s linear .26s;
+    scrollbar-color: rgba(124,143,255,0.5) transparent;
+    scrollbar-width: thin;
   }
+  .site-menu::-webkit-scrollbar{ width:8px; }
+  .site-menu::-webkit-scrollbar-thumb{ background:rgba(124,143,255,0.45); border-radius:20px; }
+  .site-menu::-webkit-scrollbar-track{ background:transparent; }
   .site-menu.open{
     opacity:1; transform:translateY(0);
     visibility:visible; pointer-events:auto;
@@ -4017,17 +4022,25 @@
     letter-spacing:-0.01em;
   }
 
+  /* Custom Lari (₾) icon replacing the plain Unicode glyph everywhere —
+     white to match the surrounding price text, sized and raised like a
+     proper superscript mark rather than a near-full-height character. */
+  sup{
+    color:transparent; text-shadow:none; position:relative;
+    display:inline-block; width:0.58em; height:0.58em; vertical-align:0.16em;
+  }
+  sup::after{
+    content:'';
+    position:absolute; inset:0;
+    background-image:url('data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAuODAgMTAwLjAwVjg2LjIyTDIzLjEyIDg0LjkyVjg0LjQ1UTE3LjA2IDgwLjY3IDEzLjI1IDc1LjQwUTkuNDQgNzAuMTQgNy42MyA2My43MVE1LjgzIDU3LjI4IDUuODMgNTAuMjZRNS44MyAzOC4wMyAxMC45MCAyOC41M1ExNS45NyAxOS4wMyAyNS44NiAxMy41NVEzNS43NSA4LjA3IDUwLjEzIDguMDdRNjUuMDcgOC4wNyA3NC44MiAxMy44OVE4NC41NiAxOS43MSA4OS4zNiAzMC4xNlE5NC4xNyA0MC42MCA5NC4xNyA1NC41N0g3NC4wOVE3NC4wOSA0My45OCA3MS43OSAzNi44NlE2OS40OSAyOS43MyA2NC4yNCAyNi4xNFE1OC45OSAyMi41NSA1MC4xMyAyMi41NVE0MS4zOCAyMi41NSAzNi4wNiAyNS45OFEzMC43NCAyOS40MiAyOC4zMyAzNS45N1EyNS45MSA0Mi41MiAyNS45MSA1MS45NlEyNS45MSA2MS44NCAyOS4zNyA2OS4wMlEzMi44MyA3Ni4yMSAzOS4wMiA4MC4wOFE0NS4yMSA4My45NSA1My4zOSA4My45NUg4OC42NFYxMDAuMDBaTTM2LjczIDU0LjUyVjAuMDBINDYuNDdWNTQuNTJaTTUzLjYzIDU0LjUyVjAuMDBINjMuMzdWNTQuNTJaIiBmaWxsPSIjZmZmZmZmIi8+PC9zdmc+');
+    background-size:contain; background-repeat:no-repeat; background-position:center;
+  }
+
   .pc-price-line{
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif;
     display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
     margin-bottom:2px;
   }
-  /* The ₾ (Lari) glyph in the custom 'BPG Glaho' font is badly drawn —
-     small stray marks on top that read as "mouse teeth" rather than a
-     clean currency symbol. It only ever appears inside <sup>, so give
-     just that element a normal font stack instead of chasing this one
-     glyph through every price display individually. */
-  sup{ font-family:'JetBrains Mono', 'Space Grotesk', sans-serif; }
   .pc-price-line b{
     font-size:clamp(21px, 6vw, 26px); font-weight:800;
     text-shadow:0 0 4px rgba(0,0,0,0.9), 0 0 18px color-mix(in srgb, var(--pc-accent) 65%, transparent), 0 2px 6px rgba(0,0,0,0.65);
@@ -4628,7 +4641,7 @@
           <div class="pc-desc" data-i18n="pc1Desc">პაკეტში შედის 1 ვიდეოს დამუშავება</div>
           </div>
         </div>
-        <div class="pc-price-line"><b>1.49₾</b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
+        <div class="pc-price-line"><b>1.49<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
         <div class="pc-price-note" data-i18n="pc1PriceNote">ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080P • 60FPS</span></div>
@@ -4840,7 +4853,7 @@
           <div class="pc-desc" data-i18n="pc2Desc">კვირაში 5 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span></div>
           </div>
         </div>
-        <div class="pc-price-line pc-price-line--dual"><b>24.99₾</b><span class="pc-price-sep">/</span><b>35.99₾</b></div>
+        <div class="pc-price-line pc-price-line--dual"><b>24.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>35.99<sup>₾</sup></b></div>
         <div class="pc-price-note" data-i18n="pc2PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080P • 60FPS</span></div>
@@ -4974,7 +4987,7 @@
           <div class="pc-desc" data-i18n="pc3Desc">თვეში 20 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span></div>
           </div>
         </div>
-        <div class="pc-price-line pc-price-line--dual"><b>49.99₾</b><span class="pc-price-sep">/</span><b>69.99₾</b></div>
+        <div class="pc-price-line pc-price-line--dual"><b>49.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>69.99<sup>₾</sup></b></div>
         <div class="pc-price-note" data-i18n="pc3PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080P • 60FPS</span></div>
@@ -5096,7 +5109,7 @@
           <div class="pc-desc" data-i18n="pc4Desc">მსგავსი ედითი — თქვენი პერსონაჟით</div>
           </div>
         </div>
-        <div class="pc-price-line pc-price-line--dual"><b>9.99₾</b><span class="pc-price-sep">/</span><b>14.99₾</b></div>
+        <div class="pc-price-line pc-price-line--dual"><b>9.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>14.99<sup>₾</sup></b></div>
         <div class="pc-price-note" data-i18n="pc4PriceNote">1080p / 4K — არჩევანი შეკვეთისას</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc4Feature1">1080P • 60FPS</span></div>
@@ -5169,7 +5182,7 @@
           <div class="pc-desc" data-i18n="cpDesc">ბიუჯეტური ვარიანტი — მარტივი დამუშავება</div>
           </div>
         </div>
-        <div class="pc-price-line pc-price-line--dual"><b>1.99₾</b><span class="pc-price-sep">/</span><b>3.99₾</b></div>
+        <div class="pc-price-line pc-price-line--dual"><b>1.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>3.99<sup>₾</sup></b></div>
         <div class="pc-price-note" data-i18n="cpPriceNote">1080p / 4K — ფასი ფიქსირებულია</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeatureFast">ჩაბარდება მაქსიმუმ 30 წუთში</span></div>
