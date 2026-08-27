@@ -5720,6 +5720,7 @@
       orderProcessing: 'მუშავდება თქვენი შეკვეთა…',
       orderProcessed: 'თქვენი შეკვეთა დამუშავებულია ✓',
       tgSentNote: '✓ იხსნება MOON-ის Telegram ჩატი (@MOON_TG) — ტექსტი ასევე დაკოპირებულია სარეზერვოდ',
+      orderSaveWarning: '⚠️ შეკვეთა გაიგზავნა, მაგრამ ვერ შევინახეთ ჩვენს სისტემაში — არაუშავს, უბრალოდ დარწმუნდით, რომ ჩატი მიხვდა ჩვენამდე, თუარა დაგვიკავშირდით პირდაპირ.',
       warnTitle: 'გაფრთხილება შეკვეთამდე',
       warnP1: 'ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.',
       warnP2: 'გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.',
@@ -6075,6 +6076,7 @@
       orderProcessing: 'Processing your order…',
       orderProcessed: 'Your order has been processed ✓',
       tgSentNote: "✓ Opening MOON's Telegram chat (@MOON_TG) — the text has also been copied as a backup",
+      orderSaveWarning: "⚠️ Order sent, but we couldn't save it in our system — that's alright, just make sure the chat message reached us, or contact us directly if not.",
       warnTitle: 'Notice before ordering',
       warnP1: 'Video editing is done <b>only for TikTok</b>, with flawless quality.',
       warnP2: 'Please make sure your video duration <b>does not exceed 59.59 seconds</b> — anything longer is priced individually and isn\'t included in the calculator.',
@@ -8085,6 +8087,13 @@
   }
 
   async function addPendingOrder(order){
+    // Returns true/false so callers can warn the customer if the order
+    // didn't actually make it into the admin panel's pending list — it
+    // used to fail 100% silently here, which is exactly how a real order
+    // can "go through" (WhatsApp/Telegram opens fine) while never showing
+    // up for the admin. The real reason (network error, CORS, a bad
+    // response, etc.) is now also logged to the console so it's visible
+    // via DevTools → Console the next time this happens.
     try{
       if (currentDiscordUser){
         order = Object.assign({}, order, {
@@ -8095,8 +8104,25 @@
       const data = await mdbRead('pendingOrders');
       const list = (data && Array.isArray(data.list)) ? data.list : [];
       list.push(order);
-      await mdbWrite('pendingOrders', { list });
-    } catch(e){ /* silent — never block the order flow on a storage failure */ }
+      const ok = await mdbWrite('pendingOrders', { list });
+      if (!ok) console.error('[MOON] addPendingOrder: mdbWrite("pendingOrders") failed — this order will NOT show up in the admin panel.', order);
+      return ok;
+    } catch(e){
+      console.error('[MOON] addPendingOrder threw — this order will NOT show up in the admin panel.', e, order);
+      return false;
+    }
+  }
+
+  // Fire-and-forget helper for the order buttons below: addPendingOrder()
+  // is intentionally never awaited before window.open() (awaiting first
+  // would delay the popup past the click's "user gesture" window and get
+  // it blocked on Safari/strict browsers). Instead we let it resolve in
+  // the background and only flash a note if it comes back false — the
+  // WhatsApp/Telegram message itself is unaffected either way.
+  function warnIfOrderNotSaved(savedPromise, flashFn){
+    savedPromise.then(ok => {
+      if (!ok && typeof flashFn === 'function') flashFn(t('orderSaveWarning'));
+    });
   }
 
   function buildOrderTgMessage(channel, orderId){
@@ -8267,11 +8293,11 @@ TikTok პროფილი: ${getTiktokValue('main')}
       sendTelegramNotification(buildOrderTgMessage('WhatsApp', orderId));
       const { s, ms, isSub, quality } = currentValues();
       const price = calculateExactPrice(s, ms, isSub, quality);
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'single', channel: 'WhatsApp',
         duration: `${s}.${String(ms).padStart(2,'0')}`, quality, isSub, price,
         tiktok: getTiktokValue('main'), videoLink: getVideoLinkValue('main')
-      });
+      }), flashCopyNote);
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
     });
@@ -8287,11 +8313,11 @@ TikTok პროფილი: ${getTiktokValue('main')}
       sendTelegramNotification(buildOrderTgMessage('Telegram', orderId));
       const { s, ms, isSub, quality } = currentValues();
       const price = calculateExactPrice(s, ms, isSub, quality);
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'single', channel: 'Telegram',
         duration: `${s}.${String(ms).padStart(2,'0')}`, quality, isSub, price,
         tiktok: getTiktokValue('main'), videoLink: getVideoLinkValue('main')
-      });
+      }), flashCopyNote);
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
@@ -8361,11 +8387,11 @@ TikTok პროფილი: ${getTiktokValue('wp')}
       const quality = subSelectedQuality;
       const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
       const total = getWeeklyTotal(quality);
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'weekly', channel: 'WhatsApp',
         quality, isSub: isChannelSub, price: total,
         tiktok: getTiktokValue('wp'), videoLink: getVideoLinkValue('wp')
-      });
+      }), flashWpCopyNote);
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
     });
@@ -8382,11 +8408,11 @@ TikTok პროფილი: ${getTiktokValue('wp')}
       const quality = subSelectedQuality;
       const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
       const total = getWeeklyTotal(quality);
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'weekly', channel: 'Telegram',
         quality, isSub: isChannelSub, price: total,
         tiktok: getTiktokValue('wp'), videoLink: getVideoLinkValue('wp')
-      });
+      }), flashWpCopyNote);
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
@@ -8451,11 +8477,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       sendTelegramNotification(buildMonthlySubOrderTgMessage('WhatsApp', orderId));
       const quality = monthSelectedQuality;
       const total = getMonthlyTotal(quality);
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'monthly', channel: 'WhatsApp',
         quality, price: total,
         tiktok: getTiktokValue('mp'), videoLink: getVideoLinkValue('mp')
-      });
+      }), flashMpCopyNote);
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
     });
@@ -8471,11 +8497,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       sendTelegramNotification(buildMonthlySubOrderTgMessage('Telegram', orderId));
       const quality = monthSelectedQuality;
       const total = getMonthlyTotal(quality);
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'monthly', channel: 'Telegram',
         quality, price: total,
         tiktok: getTiktokValue('mp'), videoLink: getVideoLinkValue('mp')
-      });
+      }), flashMpCopyNote);
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
@@ -8530,10 +8556,10 @@ ID: ${orderId}
       const orderId = generateOrderId();
       const message = buildEditOrderMessage(orderId);
       sendTelegramNotification(buildEditOrderTgMessage('WhatsApp', orderId));
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'editOrder', channel: 'WhatsApp',
         price: currentEoStyle().prices[eoSelectedQuality] || currentEoStyle().prices['1080_60']
-      });
+      }), flashEoCopyNote);
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
     });
@@ -8546,10 +8572,10 @@ ID: ${orderId}
       const orderId = generateOrderId();
       const message = buildEditOrderMessage(orderId);
       sendTelegramNotification(buildEditOrderTgMessage('Telegram', orderId));
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'editOrder', channel: 'Telegram',
         price: currentEoStyle().prices[eoSelectedQuality] || currentEoStyle().prices['1080_60']
-      });
+      }), flashEoCopyNote);
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
@@ -8623,11 +8649,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const orderId = generateOrderId();
       const message = buildCheapOrderMessage(orderId);
       sendTelegramNotification(buildCheapOrderTgMessage('WhatsApp', orderId));
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'cheapOrder', channel: 'WhatsApp',
         price: CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60'],
         tiktok: getTiktokValue('cp'), videoLink: getVideoLinkValue('cp')
-      });
+      }), flashCpCopyNote);
       const url = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
     });
@@ -8641,11 +8667,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const orderId = generateOrderId();
       const message = buildCheapOrderMessage(orderId);
       sendTelegramNotification(buildCheapOrderTgMessage('Telegram', orderId));
-      addPendingOrder({
+      warnIfOrderNotSaved(addPendingOrder({
         id: orderId, ts: Date.now(), type: 'cheapOrder', channel: 'Telegram',
         price: CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60'],
         tiktok: getTiktokValue('cp'), videoLink: getVideoLinkValue('cp')
-      });
+      }), flashCpCopyNote);
       copyToClipboard(message);
       const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener');
@@ -9270,9 +9296,18 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   async function mdbRead(path){
     try{
       const r = await fetch(MDB_BASE + '/' + MDB_NS + '/' + path, { cache: 'no-store' });
-      if (!r.ok) return null;
+      if (!r.ok) {
+        // A 404 just means "nothing saved at this path yet" (totally
+        // normal for a fresh path like a first-ever order) — anything
+        // else (0/CORS, 403, 429, 500…) is worth knowing about.
+        if (r.status !== 404) console.warn('[MOON] mdbRead("' + path + '") returned ' + r.status);
+        return null;
+      }
       return await r.json();
-    } catch(e){ return null; }
+    } catch(e){
+      console.warn('[MOON] mdbRead("' + path + '") network error — request likely never reached the server (offline, CORS, or an ad/privacy blocker).', e);
+      return null;
+    }
   }
   async function mdbWrite(path, data){
     try{
@@ -9281,8 +9316,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+      if (!r.ok) console.warn('[MOON] mdbWrite("' + path + '") returned ' + r.status);
       return r.ok;
-    } catch(e){ return false; }
+    } catch(e){
+      console.warn('[MOON] mdbWrite("' + path + '") network error — request likely never reached the server (offline, CORS, or an ad/privacy blocker).', e);
+      return false;
+    }
   }
 
   // ============================================================
