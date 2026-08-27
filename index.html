@@ -1290,14 +1290,18 @@
     position:relative; z-index:1;
     width:100%; max-width:min(94vw, 860px); max-height:88vh; overflow-y:auto; overflow-x:hidden;
     background:
-      radial-gradient(circle at 85% -10%, rgba(207,216,255,0.10), transparent 55%),
-      linear-gradient(165deg, #10101f 0%, var(--moon-deep) 55%, #080814 100%);
-    border:1px solid rgba(207,216,255,0.16); border-radius:22px; padding:22px;
+      radial-gradient(circle at 85% -10%, rgba(207,216,255,0.12), transparent 55%),
+      radial-gradient(circle at 10% 105%, rgba(124,143,255,0.10), transparent 50%),
+      linear-gradient(165deg, #14142a 0%, var(--moon-deep) 55%, #06060d 100%);
+    border:1px solid transparent;
+    background-clip:padding-box;
+    border-radius:24px; padding:24px;
     box-shadow:
-      0 0 0 1px rgba(255,255,255,0.02) inset,
-      0 -1px 0 rgba(255,255,255,0.06) inset,
-      0 30px 70px rgba(0,0,0,0.55),
-      0 0 60px rgba(124,143,255,0.08);
+      0 0 0 1px rgba(207,216,255,0.14),
+      0 0 0 1px rgba(255,255,255,0.03) inset,
+      0 -1px 0 rgba(255,255,255,0.07) inset,
+      0 34px 80px rgba(0,0,0,0.6),
+      0 0 70px rgba(124,143,255,0.1);
     animation: moonRise .5s cubic-bezier(.2,.8,.2,1);
   }
   @media (max-width:640px){
@@ -1307,8 +1311,9 @@
   .admin-box::-webkit-scrollbar{ width:6px; }
   .admin-box::-webkit-scrollbar-thumb{ background:rgba(207,216,255,0.18); border-radius:6px; }
   .admin-box h3{
-    margin:0 0 14px; font-size:16px; display:flex; align-items:center; gap:8px;
-    color:var(--moon-silver);
+    margin:0 0 16px; font-size:17px; font-weight:800; letter-spacing:0.01em; display:flex; align-items:center; gap:9px;
+    color:#fff; text-shadow:0 0 16px rgba(207,216,255,0.35);
+    padding-bottom:12px; border-bottom:1px solid rgba(207,216,255,0.12);
   }
   .admin-box h3::before{
     content:''; display:inline-block; width:15px; height:15px; border-radius:50%; flex:0 0 auto;
@@ -1322,16 +1327,16 @@
   }
   .admin-box .a-pass-row{ display:flex; gap:8px; }
   .admin-box input.a-pass{
-    flex:1; background:#0a0a16; border:1px solid var(--border); border-radius:12px;
-    color:var(--moon-silver); padding:11px 14px; font-size:14px; outline:none; letter-spacing:2px;
+    flex:1; background:rgba(0,0,0,0.35); border:1px solid rgba(207,216,255,0.15); border-radius:100px;
+    color:#fff; padding:12px 18px; font-size:14px; outline:none; letter-spacing:2px;
     transition:border-color .2s, box-shadow .2s;
   }
-  .admin-box input.a-pass:focus{ border-color:var(--moon-blue-soft); box-shadow:0 0 0 3px rgba(124,143,255,0.15); }
+  .admin-box input.a-pass:focus{ border-color:var(--moon-blue-soft); box-shadow:0 0 0 3px rgba(124,143,255,0.18); }
   .admin-box .a-go{
-    background:linear-gradient(135deg, var(--moon-glow), var(--moon-blue));
-    color:#0a0a1a; border:none; border-radius:12px; padding:0 18px;
+    background:linear-gradient(135deg, #fff, var(--moon-glow) 55%, var(--moon-blue));
+    color:#04060f; border:none; border-radius:100px; padding:0 22px;
     font-weight:800; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
-    box-shadow:0 4px 16px rgba(124,143,255,0.3);
+    box-shadow:0 6px 20px -4px rgba(124,143,255,0.5);
   }
   .admin-box .a-go:hover{ transform:translateY(-1px); box-shadow:0 6px 22px rgba(124,143,255,0.45); }
   .admin-box .a-go:active{ transform:translateY(0) scale(0.97); }
@@ -1339,23 +1344,24 @@
   .admin-box .a-err.show{ display:block; animation: shakeErr .35s; }
   @keyframes shakeErr{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-4px); } 75%{ transform:translateX(4px); } }
   .admin-box .a-tabs{
-    display:flex; flex-wrap:wrap; gap:4px; margin-bottom:16px; padding:4px;
-    background:rgba(255,255,255,0.03); border:1px solid var(--moon-line); border-radius:14px;
+    display:flex; flex-wrap:wrap; gap:5px; margin-bottom:18px; padding:5px;
+    background:rgba(0,0,0,0.35); border:1px solid rgba(207,216,255,0.1); border-radius:16px;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.3);
   }
   .admin-box .a-tab{
     flex:1 1 92px; min-width:0; background:transparent; border:1px solid transparent; color:var(--moon-silver-dim);
-    border-radius:10px; padding:9px 4px; font-size:12px; font-weight:700; cursor:pointer;
+    border-radius:11px; padding:10px 4px; font-size:12px; font-weight:700; cursor:pointer;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     transition:background .25s ease, color .25s ease, box-shadow .25s ease, transform .15s ease;
   }
   @media (max-width:480px){
-    .admin-box .a-tab{ flex-basis:30%; font-size:11px; padding:8px 3px; }
+    .admin-box .a-tab{ flex-basis:30%; font-size:11px; padding:9px 3px; }
   }
-  .admin-box .a-tab:hover{ color:var(--moon-silver); }
+  .admin-box .a-tab:hover{ color:#fff; background:rgba(255,255,255,0.05); }
   .admin-box .a-tab.active{
-    background:linear-gradient(135deg, rgba(207,216,255,0.95), rgba(124,143,255,0.9));
-    color:#0a0a1a; border-color:transparent;
-    box-shadow:0 4px 16px rgba(124,143,255,0.35);
+    background:linear-gradient(135deg, #fff, var(--moon-glow) 55%, var(--moon-blue));
+    color:#04060f; border-color:transparent;
+    box-shadow:0 6px 20px -4px rgba(124,143,255,0.55), inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .admin-box .a-tab:active{ transform:scale(0.96); }
   .admin-box .a-panel{ display:none; }
@@ -1381,30 +1387,40 @@
     transition:border-color .2s, color .2s;
   }
   .admin-box .a-close:hover{ border-color:var(--moon-blue-soft); color:var(--moon-silver); }
-  .admin-box .a-cmt{ background:#0a0a16; border:1px solid var(--moon-line); border-radius:12px; padding:10px; margin-bottom:10px; }
-  .admin-box .a-cmt.a-cmt-pinned{ border-color: rgba(255,210,122,0.5); }
+  .admin-box .a-cmt{
+    position:relative;
+    background:linear-gradient(135deg, rgba(255,255,255,0.03), transparent 40%), #0d0d1c;
+    border:1px solid rgba(207,216,255,0.1); border-left:3px solid rgba(124,143,255,0.5);
+    border-radius:12px; padding:12px 12px 12px 14px; margin-bottom:10px;
+    box-shadow:0 6px 16px -8px rgba(0,0,0,0.5);
+    transition:border-color .2s ease, transform .15s ease;
+  }
+  .admin-box .a-cmt:hover{ border-left-color:var(--moon-glow); }
+  .admin-box .a-cmt.a-cmt-pinned{ border-left-color: rgba(255,210,122,0.9); }
   .admin-box .a-cmt .a-cmt-meta{ font-size:11px; color:var(--text-faint); margin-bottom:6px; }
   .admin-box .a-cmt textarea{
     width:100%; background:#12121e; border:1px solid var(--border); border-radius:8px;
     color:var(--moon-silver); padding:8px; font-size:12.5px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif; resize:vertical; min-height:50px;
   }
-  .admin-box .a-cmt-actions{ display:flex; gap:8px; margin-top:8px; }
+  .admin-box .a-cmt-actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .admin-box .a-cmt-actions--solo{ justify-content:flex-end; }
+  .admin-box .a-cmt-actions--solo button{ flex:none; padding:8px 24px; }
   .admin-box .a-cmt-actions button{
-    flex:1; border:none; border-radius:8px; padding:7px; font-size:11.5px; font-weight:700; cursor:pointer;
-    transition:transform .15s ease, filter .15s ease;
+    flex:1; min-width:64px; border:none; border-radius:100px; padding:8px 10px; font-size:11.5px; font-weight:800; cursor:pointer;
+    transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
   }
-  .admin-box .a-cmt-actions button:hover{ filter:brightness(1.12); }
+  .admin-box .a-cmt-actions button:hover{ filter:brightness(1.14); transform:translateY(-1px); }
   .admin-box .a-cmt-actions button:active{ transform:scale(0.95); }
-  .admin-box .a-save-btn{ background:var(--moon-glow); color:#06231f; }
-  .admin-box .a-del-btn{ background:var(--warn); color:#2a0a0a; }
-  .admin-box .a-pin-btn{ background:#ffd27a; color:#2a1c00; }
+  .admin-box .a-save-btn{ background:linear-gradient(135deg, #4ade80, #16a34a); color:#04150a; box-shadow:0 4px 14px -4px rgba(74,222,128,0.55); }
+  .admin-box .a-del-btn{ background:linear-gradient(135deg, #fb7185, #dc2626); color:#2a0a0a; box-shadow:0 4px 14px -4px rgba(239,68,68,0.55); }
+  .admin-box .a-pin-btn{ background:linear-gradient(135deg, #ffe19a, #ffb020); color:#2a1c00; box-shadow:0 4px 14px -4px rgba(255,176,32,0.5); }
   .admin-box .a-pin-btn.is-pinned{ background:linear-gradient(90deg, var(--moon-blue), var(--moon-glow)); color:#0a0a1a; }
   .admin-box .a-cmt-replies{ margin-top:10px; padding-left:14px; border-left:2px solid var(--moon-line); display:flex; flex-direction:column; gap:8px; }
   .admin-box .a-reply{ background:#0e0e19; border:1px solid var(--moon-line); border-radius:10px; padding:8px; }
   .admin-box .a-reply textarea{ min-height:38px; }
 
-  .admin-box .a-block-btn{ background:#ffb020; color:#2a1400; }
-  .admin-box .a-unblock-btn{ background:var(--moon-glow); color:#06231f; }
+  .admin-box .a-block-btn{ background:linear-gradient(135deg, #fdba74, #ea580c); color:#2a1400; box-shadow:0 4px 14px -4px rgba(234,88,12,0.5); }
+  .admin-box .a-unblock-btn{ background:linear-gradient(135deg, #4ade80, #16a34a); color:#04150a; box-shadow:0 4px 14px -4px rgba(74,222,128,0.55); }
 
   .admin-box .a-blocklist{
     background:#0a0a16; border:1px solid var(--moon-line); border-radius:12px;
@@ -3807,14 +3823,25 @@
   /* The 4th (edit-order) card is deliberately featured on its own row
      below the three main packages, centered rather than stretched
      edge-to-edge — this is what looked right, not an accident this time. */
-  .pc-card--edit.pc-card--edit, .pc-card-wrap--cheap{
+  /* Edith's order and the cheap package now sit side by side as a
+     matched pair (equal width, equal height via default grid stretch)
+     instead of each getting its own full-width row. */
+  .pc-duo-row{
     grid-column: 1 / -1;
-    width:100%;
-    max-width:420px;
-    margin:0 auto;
+    display:grid; grid-template-columns:1fr 1fr; gap:16px;
+    width:100%; max-width:640px; margin:0 auto;
+  }
+  .pc-duo-row .pc-card--edit,
+  .pc-duo-row .pc-card-wrap--cheap{
+    min-width:0; height:100%;
+  }
+  .pc-duo-row .pc-card-wrap--cheap .pc-card--cheap{ height:100%; }
+  .pc-duo-row .pc-card--edit.pc-card--edit,
+  .pc-duo-row .pc-card-wrap--cheap{
+    grid-column:auto; width:auto; max-width:none; margin:0;
   }
   @media (max-width:900px){
-    .pc-card--edit.pc-card--edit, .pc-card-wrap--cheap{ max-width:none; }
+    .pc-duo-row{ grid-template-columns:1fr; max-width:none; }
   }
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
      sit OUTSIDE the card's own clipped box (poking above its top edge),
@@ -5047,6 +5074,7 @@
         </div>
 
       <!-- Card 4 — edit order (character edit) -->
+      <div class="pc-duo-row">
       <div class="pc-card pc-card--edit">
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">✨</div>
@@ -5131,6 +5159,7 @@
         <div class="pc-price-line pc-price-line--dual"><b>1.99₾</b><span class="pc-price-sep">/</span><b>3.99₾</b></div>
         <div class="pc-price-note" data-i18n="cpPriceNote">1080p / 4K — ფასი ფიქსირებულია</div>
         <div class="pc-features">
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeatureFast">ჩაბარდება მაქსიმუმ 30 წუთში</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeature1">1080P • 60FPS</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeature2">4K • 60FPS</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="featTiktokLossless">ტიკტოკზე ხარისხის დანაკარგის გარეშე ატვირთვა</span></div>
@@ -5242,6 +5271,7 @@
       <div class="copy-note" id="cpCopyNote"></div>
     </div>
         </div>
+      </div>
       </div>
       </div>
     </div>
@@ -5496,6 +5526,7 @@
       cpLabel: 'იაფი პაკეტი',
       cpDesc: 'ბიუჯეტური ვარიანტი — მარტივი დამუშავება',
       cpPriceNote: '1080p / 4K — ფასი ფიქსირებულია',
+      cpFeatureFast: 'ჩაბარდება მაქსიმუმ 30 წუთში',
       cpFeature1: '1080P • 60FPS',
       cpFeature2: '4K • 60FPS',
       cpCaption: 'იაფი პაკეტი — სწრაფი და ეკონომიური დამუშავება, TOPAZ-ისა და ეფექტების გარეშე',
@@ -5838,6 +5869,7 @@
       cpLabel: 'Cheap Package',
       cpDesc: 'Budget option — simple processing',
       cpPriceNote: '1080p / 4K — fixed price',
+      cpFeatureFast: 'Delivered within 30 minutes max',
       cpFeature1: '1080P • 60FPS',
       cpFeature2: '4K • 60FPS',
       cpCaption: 'Cheap Package — fast and affordable processing, without TOPAZ or effects',
@@ -8382,6 +8414,7 @@ ID: ${orderId}
       `🎬 პაკეტი: <b>იაფი პაკეტი (TOPAZ და ეფექტების გარეშე)</b>\n` +
       `🎞 ხარისხი: <b>${qualityLabel}</b>\n` +
       `💰 ღირებულება: <b>${price} ₾</b>\n` +
+      `⏱ <b>ჩაბარება: მაქსიმუმ 30 წუთში</b>\n` +
       `🔗 TikTok: <code>${escTg(getTiktokValue('cp'))}</code>\n` +
       `🎬 ვიდეო ლინკი: <code>${escTg(getVideoLinkValue('cp'))}</code>`;
   }
@@ -8398,7 +8431,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 ვიდეო ლინკი: ${getVideoLinkValue('cp')}
 
 ვადასტურებ რომ ვეთანხმები წესებს✅
-ვიდეო ჩამბარდეს არაუმეტეს 24 საათში`;
+ვიდეო ჩამბარდეს არაუმეტეს 30 წუთში`;
   }
 
   const cpOrderBtnWA = document.getElementById('cpOrderBtnWA');
@@ -10433,7 +10466,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           '<div class="a-cmt" data-id="' + o.id + '">' +
             '<div class="a-cmt-meta">' + escapeHtml(orderTypeLabel(o.type)) + ' · ' + (Number(o.price) || 0).toFixed(2) + '₾ · ' + formatCommentDate(o.ts) + '</div>' +
             (o.tiktokLink ? '<a class="analytics-tiktok-link" href="' + escapeHtml(o.tiktokLink) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(o.tiktokLink) + '</a>' : '') +
-            '<div class="a-cmt-actions">' +
+            '<div class="a-cmt-actions a-cmt-actions--solo">' +
               '<button class="a-del-btn" data-action="delete-order" data-id="' + o.id + '">' + t('adminDelete') + '</button>' +
             '</div>' +
           '</div>'
