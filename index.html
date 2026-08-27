@@ -5814,6 +5814,7 @@
       adminEtaPlaceholder: 'რაოდენობა',
       adminEtaUnitHours: 'საათი',
       adminEtaUnitDays: 'დღე',
+      adminEtaUnitMinutes: 'წუთი',
       adminSendDiscordEta: 'Discord შეტყობინება',
       adminSendingDiscord: 'იგზავნება…',
       adminDiscordEtaSent: 'Discord შეტყობინება გაიგზავნა',
@@ -6170,6 +6171,7 @@
       adminEtaPlaceholder: 'amount',
       adminEtaUnitHours: 'hours',
       adminEtaUnitDays: 'days',
+      adminEtaUnitMinutes: 'minutes',
       adminSendDiscordEta: 'Discord notify',
       adminSendingDiscord: 'Sending…',
       adminDiscordEtaSent: 'Discord notification sent',
@@ -10521,7 +10523,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           '<div class="aor-discord-notify">' +
             '<input type="number" min="0" step="0.5" class="aor-eta-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminEtaPlaceholder') + '">' +
             '<select class="aor-eta-unit" data-id="' + escapeHtml(String(o.id)) + '">' +
-              '<option value="hours">' + t('adminEtaUnitHours') + '</option>' +
+              '<option value="minutes">' + t('adminEtaUnitMinutes') + '</option>' +
+              '<option value="hours" selected>' + t('adminEtaUnitHours') + '</option>' +
               '<option value="days">' + t('adminEtaUnitDays') + '</option>' +
             '</select>' +
             '<button class="a-discord-btn" data-action="send-discord-eta" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendDiscordEta') + '</button>' +
@@ -10697,31 +10700,43 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     });
   }
 
-  // Formats a total-hours duration as an exact "HH:MM:SS" countdown, one
-  // second short of the round number — e.g. 25 hours → "24:59:59", 2 days
-  // (48 hours) → "47:59:59". HH is a plain total-hours count, never wrapped
-  // at 24, so multi-day windows stay readable as one number (e.g. 47, not
-  // "1 day 23"). This only produces a one-time snapshot string for the
-  // message text below — Discord messages can't tick down live on their
-  // own, so this is what "დროის ათვლა დაიწყო" is announcing.
-  function formatHmsFromHours(totalHours){
+  // Formats an exact countdown one tick short of the round number the
+  // admin typed — the same "one second (or minute) less than the full
+  // amount" logic across all three units:
+  //   - minutes → "MM:SS"    (30 წუთი  → "29:59")
+  //   - hours   → "HH:MM:SS" (25 საათი → "24:59:59")
+  //   - days    → "HH:MM:SS", HH = TOTAL hours, never wrapped at 24, so a
+  //               31-day window still reads as one number, not "1d 23h"
+  //               (2 დღე  → "47:59:59", 31 დღე → "743:59:59")
+  // This only produces a one-time snapshot string for the message text
+  // below — Discord messages can't tick down live on their own, so this
+  // is what "დროის ათვლა დაიწყო" is announcing.
+  function formatCountdown(rawValue, unit){
+    const pad = n => String(n).padStart(2, '0');
+    if (unit === 'minutes'){
+      const totalSeconds = Math.max(0, Math.round(rawValue * 60) - 1);
+      const mm = Math.floor(totalSeconds / 60);
+      const ss = totalSeconds % 60;
+      return pad(mm) + ':' + pad(ss);
+    }
+    const totalHours = unit === 'days' ? rawValue * 24 : rawValue;
     const totalSeconds = Math.max(0, Math.round(totalHours * 3600) - 1);
     const hh = Math.floor(totalSeconds / 3600);
     const mm = Math.floor((totalSeconds % 3600) / 60);
     const ss = totalSeconds % 60;
-    const pad = n => String(n).padStart(2, '0');
     return pad(hh) + ':' + pad(mm) + ':' + pad(ss);
   }
 
   // Builds the exact Discord ETA message from whatever the admin typed
-  // (a plain number) plus the chosen unit (hours or days). "rawValue" is
-  // kept in the sentence as-is (e.g. "25 საათში" / "2 დღეში"), while the
-  // countdown line always uses the converted total-hours HH:MM:SS.
+  // (a plain number) plus the chosen unit (hours / days / minutes).
+  // "rawValue" is kept in the sentence as-is (e.g. "25 საათში" /
+  // "2 დღეში" / "30 წუთში"), while the countdown line always uses the
+  // format from formatCountdown() above.
   function buildDiscordEtaMessage(rawValue, unit){
-    const totalHours = unit === 'days' ? rawValue * 24 : rawValue;
-    const countdown = formatHmsFromHours(totalHours);
-    const cleanValue = (rawValue % 1 === 0) ? String(rawValue) : String(rawValue);
-    const unitWord = unit === 'days' ? 'დღეში' : 'საათში';
+    const totalHours = unit === 'days' ? rawValue * 24 : (unit === 'minutes' ? rawValue / 60 : rawValue);
+    const countdown = formatCountdown(rawValue, unit);
+    const cleanValue = String(rawValue);
+    const unitWord = unit === 'days' ? 'დღეში' : (unit === 'minutes' ? 'წუთში' : 'საათში');
     const text =
       'ძვირფასო მომხმარებელო! 💌\n' +
       'თქვენი შეკვეთის დამუშავება მიმდინარეობს!\n' +
