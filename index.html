@@ -400,7 +400,7 @@
     flex:1; border:none; border-radius:8px; padding:7px 0; font-size:11.5px; font-weight:700; cursor:pointer;
   }
   .aor-discord-notify{
-    display:flex; gap:8px; align-items:center; margin-top:2px;
+    display:flex; gap:8px; align-items:center; margin-top:2px; flex-wrap:wrap;
   }
   .aor-eta-input{
     width:74px; flex:0 0 auto; background:#0e0e1c; border:1px solid var(--moon-line); border-radius:8px;
@@ -408,6 +408,14 @@
   }
   .aor-eta-input.error{ border-color:var(--warn); }
   .aor-eta-input::placeholder{ color:var(--text-faint); font-family:'BPG Glaho', 'Space Grotesk', sans-serif; }
+  .aor-eta-unit{
+    flex:0 0 auto; background:#0e0e1c; border:1px solid var(--moon-line); border-radius:8px;
+    color:var(--text); font-size:11.5px; padding:6px 6px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+  }
+  .aor-eta-preview{
+    flex:1 1 100%; font-size:11px; color:var(--text-faint);
+    font-family:'BPG Glaho', 'JetBrains Mono', monospace;
+  }
   .a-discord-btn{
     flex:1; border:none; border-radius:8px; padding:7px 10px; font-size:11.5px; font-weight:700; cursor:pointer;
     background:#5865F2; color:#fff;
@@ -2222,6 +2230,23 @@
   .tt-auto-note.tt-auto-ok{ color:#8ff0b0; }
   .tt-auto-note.tt-auto-miss{ color:var(--text-faint); }
   .tt-auto-note.tt-auto-wait{ color:#ffd23f; }
+
+  /* ---------- "Package already active" badge — replaces the TikTok link
+     field on the weekly/monthly panels once the admin has confirmed that
+     Discord-logged-in customer's subscription order, and stays until it
+     expires (7 / 30 days later), at which point the link field comes
+     back automatically. ---------- */
+  .sub-active-badge{
+    display:none; align-items:center; gap:10px;
+    padding:12px 14px; border-radius:12px; margin-bottom:6px;
+    background:rgba(37,211,102,0.10);
+    border:1.5px solid rgba(37,211,102,0.45);
+    color:#8ff0b0;
+    font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-weight:700; font-size:12.5px; line-height:1.5;
+  }
+  .sub-active-badge.show{ display:flex; }
+  .sub-active-badge .sub-active-check{ font-size:16px; flex:0 0 auto; }
 
   /* ---------- Rejected-format panel (wrong resolution / fps) ---------- */
   .sr-reject{
@@ -4947,7 +4972,7 @@
 
     <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
 
-    <div class="field field-tiktok" style="margin-bottom:6px;">
+    <div class="field field-tiktok" id="tiktokFieldWp" style="margin-bottom:6px;">
       <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
       <div class="link-input-wrap">
         <span class="icon">@</span>
@@ -4959,6 +4984,10 @@
       </button>
       <div class="tt-auto-note" id="tiktokAutoNoteWp"></div>
       <div class="error-msg" id="tiktokErrorWp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
+    <div class="sub-active-badge" id="subActiveBadgeWp">
+      <span class="sub-active-check">✅</span>
+      <span class="sub-active-text" data-i18n="subActivatedWeekly">თქვენ გააქტიურებული გაქვთ 1-კვირიანი პაკეტი</span>
     </div>
 
     <input type="hidden" id="videoLinkWp">
@@ -5068,7 +5097,7 @@
 
     <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
 
-    <div class="field field-tiktok" style="margin-bottom:6px;">
+    <div class="field field-tiktok" id="tiktokFieldMp" style="margin-bottom:6px;">
       <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
       <div class="link-input-wrap">
         <span class="icon">@</span>
@@ -5080,6 +5109,10 @@
       </button>
       <div class="tt-auto-note" id="tiktokAutoNoteMp"></div>
       <div class="error-msg" id="tiktokErrorMp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+    </div>
+    <div class="sub-active-badge" id="subActiveBadgeMp">
+      <span class="sub-active-check">✅</span>
+      <span class="sub-active-text" data-i18n="subActivatedMonthly">თქვენ გააქტიურებული გაქვთ 1-თვიანი პაკეტი</span>
     </div>
 
     <input type="hidden" id="videoLinkMp">
@@ -5399,6 +5432,11 @@
         <div class="a-subheading" data-i18n="adminConfirmedOrdersTitle">დადასტურებული შეკვეთების არქივი</div>
         <div class="a-form-row"><input type="text" id="confirmedOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
         <div id="confirmedOrdersList"></div>
+
+        <div class="a-subheading" data-i18n="adminActiveSubsTitle">აქტიური პაკეტები (Discord)</div>
+        <div class="a-stat-note" data-i18n="adminActiveSubsNote">როცა ზემოთ დაუდასტურებელი 1-კვირიანი/1-თვიანი შეკვეთა დაადასტურებ, დისქორდით შესული მომხმარებლისთვის აქ ავტომატურად გააქტიურდება პაკეტი — მანამ, სანამ არ ამოიწურება, საიტზე მას აღარ მოეთხოვება TikTok ლინკის ხელახლა შეყვანა.</div>
+        <div class="a-form-row"><input type="text" id="activeSubsSearch" data-i18n-placeholder="adminActiveSubsSearchPh" placeholder="ძებნა Discord სახელით..."></div>
+        <div id="activeSubsList"></div>
       </div>
       <div class="a-panel" id="adminPanelAnalytics">
         <div class="a-chart-card" id="analyticsSummaryCard"></div>
@@ -5672,6 +5710,8 @@
       tiktokAutoNotFound: 'ბუფერში TikTok ლინკი ვერ მოიძებნა — დარწმუნდით, რომ დააკოპირეთ პროფილის ლინკი, და დააჭირეთ ღილაკს ისევ, ან ჩასვით ხელით ქვემოთ',
       tiktokAutoDenied: 'ბუფერზე წვდომა არ მოხერხდა — ჩასვით ლინკი ხელით ქვემოთ',
       tiktokAutoUnsupported: 'ეს ბრაუზერი ავტომატურ ამოცნობას ვერ უჭერს მხარს — ჩასვით ლინკი ხელით',
+      subActivatedWeekly: 'თქვენ გააქტიურებული გაქვთ 1-კვირიანი პაკეტი',
+      subActivatedMonthly: 'თქვენ გააქტიურებული გაქვთ 1-თვიანი პაკეტი',
       alertNotVideo: 'გთხოვთ ატვირთოთ ვიდეო ფაილი (mp4, mov, webm და სხვ.)',
       alertReadError: 'ვერ მოხერხდა ვიდეოს წაკითხვა — სცადეთ სხვა ფაილი.',
       sendOrder: 'გაგზავნე შეკვეთა',
@@ -5770,11 +5810,21 @@
       adminConfirmedOrdersTitle: 'დადასტურებული შეკვეთების არქივი',
       adminNoConfirmedOrders: 'დადასტურებული შეკვეთა ჯერ არ არის.',
       adminNoConfirmedOrdersMatch: 'ამ ID-ით დადასტურებულ შეკვეთებში ვერაფერი მოიძებნა.',
-      adminEtaPlaceholder: 'საათი',
+      adminEtaPlaceholder: 'რაოდენობა',
+      adminEtaUnitHours: 'საათი',
+      adminEtaUnitDays: 'დღე',
       adminSendDiscordEta: 'Discord შეტყობინება',
       adminSendingDiscord: 'იგზავნება…',
       adminDiscordEtaSent: 'Discord შეტყობინება გაიგზავნა',
       adminDiscordSendFailed: 'ვერ გაიგზავნა — გადაამოწმე Worker-ის მისამართი და სცადე თავიდან.',
+      adminActiveSubsTitle: 'აქტიური პაკეტები (Discord)',
+      adminActiveSubsNote: 'როცა ზემოთ დაუდასტურებელი 1-კვირიანი/1-თვიანი შეკვეთა დაადასტურებ, დისქორდით შესული მომხმარებლისთვის აქ ავტომატურად გააქტიურდება პაკეტი — მანამ, სანამ არ ამოიწურება, საიტზე მას აღარ მოეთხოვება TikTok ლინკის ხელახლა შეყვანა.',
+      adminActiveSubsSearchPh: 'ძებნა Discord სახელით...',
+      adminNoActiveSubs: 'აქტიური პაკეტი ჯერ არავის აქვს.',
+      adminNoActiveSubsMatch: 'ამ სახელით აქტიური პაკეტი ვერ მოიძებნა.',
+      adminSubExpiresIn: 'იწურება',
+      adminSubExpired: 'ვადა გასულია',
+      adminRevokeSubscription: 'გაუქმება',
       analyticsSummaryTitle: 'ანალიტიკა და მოგება',
       analyticsTotalOrders: 'სულ შეკვეთა',
       analyticsTotalRevenue: 'მოგება (₾)',
@@ -6015,6 +6065,8 @@
       tiktokAutoNotFound: "No TikTok link found in your clipboard — make sure you copied your profile link, then tap the button again, or paste it manually below",
       tiktokAutoDenied: 'Could not access your clipboard — paste the link manually below',
       tiktokAutoUnsupported: 'This browser doesn\'t support auto-detect — paste the link manually',
+      subActivatedWeekly: 'You have an active 1-week package',
+      subActivatedMonthly: 'You have an active 1-month package',
       alertNotVideo: 'Please upload a video file (mp4, mov, webm, etc.)',
       alertReadError: 'Could not read the video — please try another file.',
       sendOrder: 'Send order',
@@ -6113,11 +6165,21 @@
       adminConfirmedOrdersTitle: 'Confirmed orders archive',
       adminNoConfirmedOrders: 'No confirmed orders yet.',
       adminNoConfirmedOrdersMatch: 'No confirmed order found with that ID.',
-      adminEtaPlaceholder: 'hours',
+      adminEtaPlaceholder: 'amount',
+      adminEtaUnitHours: 'hours',
+      adminEtaUnitDays: 'days',
       adminSendDiscordEta: 'Discord notify',
       adminSendingDiscord: 'Sending…',
       adminDiscordEtaSent: 'Discord notification sent',
       adminDiscordSendFailed: 'Failed to send — check the worker URL and try again.',
+      adminActiveSubsTitle: 'Active packages (Discord)',
+      adminActiveSubsNote: 'When you confirm a pending 1-week/1-month order above, the Discord-logged-in customer\'s package is activated here automatically — until it expires, the site no longer asks them to re-enter their TikTok link.',
+      adminActiveSubsSearchPh: 'Search by Discord name...',
+      adminNoActiveSubs: 'No one has an active package yet.',
+      adminNoActiveSubsMatch: 'No active package found with that name.',
+      adminSubExpiresIn: 'expires',
+      adminSubExpired: 'expired',
+      adminRevokeSubscription: 'Revoke',
       analyticsSummaryTitle: 'Analytics & profit',
       analyticsTotalOrders: 'Total orders',
       analyticsTotalRevenue: 'Profit (₾)',
@@ -6978,9 +7040,80 @@
   // value, and its own "confirmed" state, not shared with the others.
   const tiktokLinkConfirmed = { main: false, wp: false, mp: false, cp: false };
 
+  // ============================================================
+  // DISCORD SUBSCRIPTION STATE (1-week / 1-month package already active) —
+  // once the admin confirms a weekly/monthly order placed while logged in
+  // via Discord, that Discord account gets an entry in the shared
+  // 'activeSubscriptions' store (see admin section further down). While it
+  // hasn't expired yet, the matching order panel (wp/mp) hides its TikTok
+  // link field entirely and shows a "package activated" badge instead —
+  // the link on file from the original order is reused automatically.
+  // Only 'wp' and 'mp' can ever have an active subscription; 'main'/'cp'
+  // are one-off orders and are unaffected.
+  // ============================================================
+  const SUB_PANEL_TYPE = { wp: 'weekly', mp: 'monthly' };
+  let mySubscriptions = { weekly: null, monthly: null };
+
+  function getActiveSubFor(panelKey){
+    const type = SUB_PANEL_TYPE[panelKey];
+    return type ? mySubscriptions[type] : null;
+  }
+
   function getTiktokValue(panelKey){
+    const activeSub = getActiveSubFor(panelKey);
+    if (activeSub && activeSub.tiktok) return activeSub.tiktok;
     const g = tiktokGroups[panelKey] || tiktokGroups.main;
     return g.link ? g.link.value.trim() : '';
+  }
+
+  // Swaps the TikTok field for the "package activated" badge (or back) on
+  // one panel, based on the current mySubscriptions state.
+  function applySubscriptionUIFor(panelKey){
+    const type = SUB_PANEL_TYPE[panelKey];
+    if (!type) return;
+    const sub = mySubscriptions[type];
+    const fieldEl = document.getElementById(panelKey === 'wp' ? 'tiktokFieldWp' : 'tiktokFieldMp');
+    const badgeEl = document.getElementById(panelKey === 'wp' ? 'subActiveBadgeWp' : 'subActiveBadgeMp');
+    if (!fieldEl || !badgeEl) return;
+    if (sub){
+      fieldEl.style.display = 'none';
+      badgeEl.classList.add('show');
+      // The link is already on file from the original order — treat the
+      // field as satisfied so validateBeforeSend() never blocks on it.
+      tiktokLinkConfirmed[panelKey] = true;
+    } else {
+      fieldEl.style.display = '';
+      badgeEl.classList.remove('show');
+      const g = tiktokGroups[panelKey];
+      tiktokLinkConfirmed[panelKey] = !!(g && g.link && g.link.value.trim());
+    }
+  }
+
+  function applySubscriptionUI(){
+    applySubscriptionUIFor('wp');
+    applySubscriptionUIFor('mp');
+  }
+
+  // Re-reads the shared 'activeSubscriptions' store and refreshes which
+  // (if any) package badges show for the currently logged-in Discord user.
+  // Called whenever the Discord login state changes (see setDiscordUI()).
+  // Expired entries are simply ignored here (not deleted) — the very next
+  // read after expiry naturally puts the TikTok field back for everyone.
+  async function refreshMySubscriptions(){
+    mySubscriptions = { weekly: null, monthly: null };
+    if (currentDiscordUser && currentDiscordUser.id){
+      try{
+        const data = await mdbRead('activeSubscriptions');
+        const list = (data && Array.isArray(data.list)) ? data.list : [];
+        const now = Date.now();
+        list.forEach(s => {
+          if (String(s.discordId) === String(currentDiscordUser.id) && s.expiresAt > now){
+            mySubscriptions[s.type] = s;
+          }
+        });
+      } catch(e){ /* silent — falls back to showing the normal TikTok fields */ }
+    }
+    applySubscriptionUI();
   }
 
   function clearTiktokErrors(){
@@ -8027,22 +8160,27 @@ TikTok პროფილი: ${getTiktokValue('main')}
   }
 
   function validateBeforeSend(panelKey){
+    const activeSub = getActiveSubFor(panelKey);
     const g = tiktokGroups[panelKey] || tiktokGroups.main;
-    if (!g.link) return true;
-    const linkVal = g.link.value.trim();
-    if (!linkVal) {
-      g.link.classList.add('error');
-      if (g.error) g.error.style.display = 'block';
-      g.link.focus();
-      return false;
-    }
-    if (!tiktokLinkConfirmed[panelKey]) {
-      if (g.error) g.error.style.display = 'none';
-      g.link.classList.remove('tt-shake', 'tt-error-flash');
-      void g.link.offsetWidth;
-      g.link.classList.add('tt-shake', 'tt-error-flash');
-      g.link.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return false;
+    // Discord package already active for this panel — the TikTok link is
+    // already on file from the original order, so skip the field entirely
+    // (it's hidden in the UI too, see applySubscriptionUIFor()).
+    if (!activeSub && g.link) {
+      const linkVal = g.link.value.trim();
+      if (!linkVal) {
+        g.link.classList.add('error');
+        if (g.error) g.error.style.display = 'block';
+        g.link.focus();
+        return false;
+      }
+      if (!tiktokLinkConfirmed[panelKey]) {
+        if (g.error) g.error.style.display = 'none';
+        g.link.classList.remove('tt-shake', 'tt-error-flash');
+        void g.link.offsetWidth;
+        g.link.classList.add('tt-shake', 'tt-error-flash');
+        g.link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+      }
     }
     // Uploaded-video link — required on every order panel, same as TikTok.
     // There's no manual field anymore: this is populated automatically in
@@ -10264,6 +10402,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // ============================================================
   let pendingOrdersCache = [];
   let confirmedOrdersCache = [];
+  let activeSubsCache = [];
+
+  const SUB_DURATION_MS = { weekly: 7 * 24 * 60 * 60 * 1000, monthly: 30 * 24 * 60 * 60 * 1000 };
 
   function pendingOrderTypeLabel(type){
     if (type === 'weekly') return t('adminOrderTypeWeekly');
@@ -10340,6 +10481,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         (o.discordId ?
           '<div class="aor-discord-notify">' +
             '<input type="number" min="0" step="0.5" class="aor-eta-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminEtaPlaceholder') + '">' +
+            '<select class="aor-eta-unit" data-id="' + escapeHtml(String(o.id)) + '">' +
+              '<option value="hours">' + t('adminEtaUnitHours') + '</option>' +
+              '<option value="days">' + t('adminEtaUnitDays') + '</option>' +
+            '</select>' +
             '<button class="a-discord-btn" data-action="send-discord-eta" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendDiscordEta') + '</button>' +
           '</div>' +
           (o.discordEtaSentAt ? '<div class="aor-discord-sent">✅ ' + t('adminDiscordEtaSent') + ' — ' + formatCommentDate(o.discordEtaSentAt) + '</div>' : '')
@@ -10351,19 +10496,126 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     ).join('');
   }
 
+  // ============================================================
+  // ACTIVE PACKAGES (DISCORD): once a pending weekly/monthly order placed
+  // by a Discord-logged-in customer gets confirmed below, this store
+  // records that their package is active for 7 (weekly) or 30 (monthly)
+  // days. While active, that Discord account's order panel on the public
+  // site hides the TikTok field and shows a "package activated" badge
+  // instead (see refreshMySubscriptions()/applySubscriptionUI() near the
+  // order forms). Expiry is just a timestamp check on read — nothing
+  // needs to run automatically to "turn it off"; the very next page load
+  // after expiresAt simply stops matching, and the TikTok field is back.
+  // ============================================================
+  function formatSubExpiry(expiresAt){
+    const now = Date.now();
+    if (expiresAt <= now) return t('adminSubExpired');
+    const ms = expiresAt - now;
+    const days = Math.floor(ms / 86400000);
+    const hours = Math.floor((ms % 86400000) / 3600000);
+    const parts = [];
+    if (days > 0) parts.push(days + (currentLang === 'en' ? 'd' : 'დ'));
+    parts.push(hours + (currentLang === 'en' ? 'h' : 'სთ'));
+    return t('adminSubExpiresIn') + ': ' + parts.join(' ') + ' — ' + formatCommentDate(expiresAt);
+  }
+
+  async function activateDiscordSubscription(order){
+    if (!order || !order.discordId || !SUB_DURATION_MS[order.type]) return;
+    try{
+      const data = await mdbRead('activeSubscriptions');
+      let list = (data && Array.isArray(data.list)) ? data.list : [];
+      // Replace any existing entry for this same Discord account + package
+      // type (re-confirming a later order simply resets the 7/30-day clock).
+      list = list.filter(s => !(String(s.discordId) === String(order.discordId) && s.type === order.type));
+      const now = Date.now();
+      list.push({
+        discordId: order.discordId,
+        discordUsername: order.discordUsername || '',
+        type: order.type,
+        tiktok: order.tiktok || '',
+        orderId: order.id,
+        activatedAt: now,
+        expiresAt: now + SUB_DURATION_MS[order.type]
+      });
+      await mdbWrite('activeSubscriptions', { list });
+      activeSubsCache = list;
+      renderActiveSubsList();
+    } catch(e){ /* silent — the order itself is still confirmed either way */ }
+  }
+
+  function renderActiveSubsList(){
+    const listEl = document.getElementById('activeSubsList');
+    if (!listEl) return;
+    const searchEl = document.getElementById('activeSubsSearch');
+    const query = (searchEl && searchEl.value || '').trim().toLowerCase();
+    const now = Date.now();
+    const live = activeSubsCache.filter(s => s.expiresAt > now);
+    const sorted = live.slice().sort((a, b) => (b.activatedAt || 0) - (a.activatedAt || 0));
+    const filtered = query ? sorted.filter(s => (s.discordUsername || '').toLowerCase().includes(query)) : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoActiveSubs') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoActiveSubsMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(s =>
+      '<div class="a-order-row" data-discord-id="' + escapeHtml(String(s.discordId)) + '" data-type="' + escapeHtml(s.type) + '">' +
+        '<div class="aor-top">' +
+          '<span class="aor-id">🎮 ' + escapeHtml(s.discordUsername || s.discordId) + '</span>' +
+          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(s.type)) + '</span>' +
+        '</div>' +
+        '<div class="aor-meta">' +
+          (s.tiktok ? '🔗 ' + escapeHtml(s.tiktok) + ' · ' : '') +
+          '🆔 ' + escapeHtml(String(s.orderId || '')) +
+          '<br>' + formatSubExpiry(s.expiresAt) +
+        '</div>' +
+        '<div class="aor-actions">' +
+          '<button class="a-del-btn" data-action="revoke-subscription" data-discord-id="' + escapeHtml(String(s.discordId)) + '" data-type="' + escapeHtml(s.type) + '">' + t('adminRevokeSubscription') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
   async function renderAdminPendingOrders(){
     const listEl = document.getElementById('pendingOrdersList');
     const confirmedEl = document.getElementById('confirmedOrdersList');
+    const activeSubsEl = document.getElementById('activeSubsList');
     if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
     if (confirmedEl) confirmedEl.innerHTML = '<div class="c-empty">…</div>';
-    const [pendingData, confirmedData] = await Promise.all([
+    if (activeSubsEl) activeSubsEl.innerHTML = '<div class="c-empty">…</div>';
+    const [pendingData, confirmedData, activeSubsData] = await Promise.all([
       mdbRead('pendingOrders'),
-      mdbRead('confirmedOrders')
+      mdbRead('confirmedOrders'),
+      mdbRead('activeSubscriptions')
     ]);
     pendingOrdersCache = (pendingData && Array.isArray(pendingData.list)) ? pendingData.list : [];
     confirmedOrdersCache = (confirmedData && Array.isArray(confirmedData.list)) ? confirmedData.list : [];
+    activeSubsCache = (activeSubsData && Array.isArray(activeSubsData.list)) ? activeSubsData.list : [];
     renderPendingOrdersList();
     renderConfirmedOrdersList();
+    renderActiveSubsList();
+  }
+
+  const activeSubsSearchInput = document.getElementById('activeSubsSearch');
+  if (activeSubsSearchInput) {
+    activeSubsSearchInput.addEventListener('input', renderActiveSubsList);
+  }
+
+  const activeSubsListEl = document.getElementById('activeSubsList');
+  if (activeSubsListEl) {
+    activeSubsListEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action="revoke-subscription"]');
+      if (!btn) return;
+      const discordId = btn.getAttribute('data-discord-id');
+      const type = btn.getAttribute('data-type');
+      activeSubsCache = activeSubsCache.filter(s => !(String(s.discordId) === String(discordId) && s.type === type));
+      await mdbWrite('activeSubscriptions', { list: activeSubsCache });
+      renderActiveSubsList();
+    });
   }
 
   const pendingOrdersSearchInput = document.getElementById('pendingOrdersSearch');
@@ -10394,17 +10646,69 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         ]);
         await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
         renderConfirmedOrdersList();
+        // Weekly/monthly order placed via Discord login — activate (or
+        // reset) that customer's 7/30-day package now, so their next visit
+        // to the wp/mp panel shows the "activated" badge instead of asking
+        // for the TikTok link again.
+        if ((order.type === 'weekly' || order.type === 'monthly') && order.discordId) {
+          await activateDiscordSubscription(order);
+        }
       }
       renderPendingOrdersList();
     });
   }
 
-  async function sendDiscordOrderUpdate(orderId, hours){
+  // Formats a total-hours duration as an exact "HH:MM:SS" countdown, one
+  // second short of the round number — e.g. 25 hours → "24:59:59", 2 days
+  // (48 hours) → "47:59:59". HH is a plain total-hours count, never wrapped
+  // at 24, so multi-day windows stay readable as one number (e.g. 47, not
+  // "1 day 23"). This only produces a one-time snapshot string for the
+  // message text below — Discord messages can't tick down live on their
+  // own, so this is what "დროის ათვლა დაიწყო" is announcing.
+  function formatHmsFromHours(totalHours){
+    const totalSeconds = Math.max(0, Math.round(totalHours * 3600) - 1);
+    const hh = Math.floor(totalSeconds / 3600);
+    const mm = Math.floor((totalSeconds % 3600) / 60);
+    const ss = totalSeconds % 60;
+    const pad = n => String(n).padStart(2, '0');
+    return pad(hh) + ':' + pad(mm) + ':' + pad(ss);
+  }
+
+  // Builds the exact Discord ETA message from whatever the admin typed
+  // (a plain number) plus the chosen unit (hours or days). "rawValue" is
+  // kept in the sentence as-is (e.g. "25 საათში" / "2 დღეში"), while the
+  // countdown line always uses the converted total-hours HH:MM:SS.
+  function buildDiscordEtaMessage(rawValue, unit){
+    const totalHours = unit === 'days' ? rawValue * 24 : rawValue;
+    const countdown = formatHmsFromHours(totalHours);
+    const cleanValue = (rawValue % 1 === 0) ? String(rawValue) : String(rawValue);
+    const unitWord = unit === 'days' ? 'დღეში' : 'საათში';
+    const text =
+      'ძვირფასო მომხმარებელო! 💌\n' +
+      'თქვენი შეკვეთის დამუშავება მიმდინარეობს!\n' +
+      'შეკვეთა ჩაგებარდებათ არაუმეტეს ' + cleanValue + ' ' + unitWord + ' ❤️\n' +
+      countdown + ' — დროის ათვლა დაიწყო!';
+    return { totalHours, countdown, unit, unitValue: rawValue, text };
+  }
+
+  async function sendDiscordOrderUpdate(orderId, built){
     try{
       const res = await fetch(DISCORD_NOTIFY_WORKER_URL + '/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId: orderId, hours: hours })
+        // "hours" is kept for backward compatibility with the current
+        // worker; "countdown" and "message" are the new exact-text fields
+        // — once the worker sends body.message verbatim (instead of
+        // building its own Discord relative timestamp), the "in a day"
+        // wording goes away and the exact HH:MM:SS countdown shows instead.
+        body: JSON.stringify({
+          orderId: orderId,
+          hours: built.totalHours,
+          unit: built.unit,
+          unitValue: built.unitValue,
+          countdown: built.countdown,
+          message: built.text
+        })
       });
       return res.ok;
     } catch(e){ return false; }
@@ -10425,15 +10729,18 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (discordBtn) {
         const id = discordBtn.getAttribute('data-id');
         const input = confirmedOrdersListEl.querySelector('.aor-eta-input[data-id="' + CSS.escape(id) + '"]');
-        const hours = input ? parseFloat(input.value) : NaN;
-        if (!hours || hours <= 0) {
+        const unitSel = confirmedOrdersListEl.querySelector('.aor-eta-unit[data-id="' + CSS.escape(id) + '"]');
+        const rawValue = input ? parseFloat(input.value) : NaN;
+        const unit = unitSel ? unitSel.value : 'hours';
+        if (!rawValue || rawValue <= 0) {
           if (input) { input.classList.add('error'); input.focus(); }
           return;
         }
+        const built = buildDiscordEtaMessage(rawValue, unit);
         discordBtn.disabled = true;
         const originalText = discordBtn.textContent;
         discordBtn.textContent = t('adminSendingDiscord');
-        const ok = await sendDiscordOrderUpdate(id, hours);
+        const ok = await sendDiscordOrderUpdate(id, built);
         discordBtn.disabled = false;
         discordBtn.textContent = originalText;
         if (ok) {
@@ -10977,6 +11284,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
   function setDiscordUI(user){
     currentDiscordUser = user;
+    // Re-check the logged-in Discord account's weekly/monthly package
+    // status every time the login state changes (login, logout, or a
+    // cache-then-network refresh) — this is what shows/hides the "package
+    // activated" badge on the wp/mp order panels.
+    refreshMySubscriptions();
     const chip = document.getElementById('discordChip');
     const avatarImg = document.getElementById('discordAvatarImg');
     const dpAvatarImg = document.getElementById('dpAvatarImg');
