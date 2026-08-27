@@ -4090,6 +4090,42 @@
     text-shadow: 0 0 2px rgba(0,0,0,0.85), 0 0 8px color-mix(in srgb, var(--pc-accent) 55%, transparent), 0 1px 3px rgba(0,0,0,0.5);
     overflow-wrap:break-word;
   }
+  /* Forces a price-note onto a single line. Deliberately a FIXED size
+     (not the vw-based clamp above) — the edit-order/cheap cards sit in a
+     narrow paired column (see .pc-duo-row) that's much tighter than the
+     viewport itself on wide desktop screens, so a vw unit reports "plenty
+     of room" right as this column is actually the narrowest thing on the
+     page. This is just the resting/starting size: right after the
+     .pricing-cards grid switches from 1 column to 3 (900px breakpoint),
+     those 3 columns are briefly narrower than the text needs — roughly
+     901–950px viewport width, an ordinary desktop window size — and 10px
+     doesn't fit there. Rather than hand-picking a smaller pixel value for
+     that band (which broke last time: exact text metrics for this
+     embedded font shift slightly by browser/OS, and the two languages on
+     this site aren't even the same length), the JS fitPriceNotes()
+     function measures each element's actual rendered overflow at
+     runtime and shrinks it in 0.25px steps only until it truly fits —
+     see the definition near applyTranslations(). The ellipsis here is
+     just the final fallback if that JS ever can't run. */
+  .pc-price-note--nowrap{
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    font-size:10px;
+  }
+  @media (max-width:360px){
+    .pc-price-note--nowrap{ font-size:9px; }
+  }
+  /* Edit-order note: the sentence and the "(1080p / 4K)" qualifier are
+     deliberately split onto their own lines (rather than left to wrap
+     wherever the text happens to run out of room), so it's always a
+     clean, predictable two lines instead of an uneven 2-3 line wrap. */
+  .pc-price-note-line{
+    display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    font-size:10px;
+  }
+  .pc-price-note-line + .pc-price-note-line{ margin-top:2px; }
+  @media (max-width:360px){
+    .pc-price-note-line{ font-size:9px; }
+  }
 
   .pc-features{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; flex:1; min-width:0; }
   .pc-feature{
@@ -4122,7 +4158,13 @@
     font-size:clamp(11.5px, 3.6vw, 14.5px); font-weight:800; letter-spacing:0;
     color: var(--pc-cta-text, #04101a);
     white-space:nowrap;
-    background: linear-gradient(135deg, rgba(255,255,255,0.55), transparent 45%), var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
+    /* A small top-left gloss highlight, not a wash over the whole button —
+       it used to fade out only at 45%, which covered nearly half the
+       button in a pale white tint and hid the card's real accent color
+       underneath it. Now it's a much smaller, subtler highlight (fades
+       out by 22%) so the true --pc-cta-bg color shows fully everywhere
+       else on the button. */
+    background: linear-gradient(135deg, rgba(255,255,255,0.35), transparent 22%), var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
     border: 1.5px solid rgba(255,255,255,0.55);
     box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px color-mix(in srgb, var(--pc-accent) 70%, transparent)), inset 0 1px 0 rgba(255,255,255,0.4);
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
@@ -4667,7 +4709,7 @@
           </div>
         </div>
         <div class="pc-price-line"><b>1.49<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
-        <div class="pc-price-note" data-i18n="pc1PriceNote">ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე</div>
+        <div class="pc-price-note pc-price-note--nowrap" data-i18n="pc1PriceNote">ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080P • 60FPS</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature3">4K • 60FPS</span></div>
@@ -4879,7 +4921,7 @@
           </div>
         </div>
         <div class="pc-price-line pc-price-line--dual"><b>24.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>35.99<sup>₾</sup></b></div>
-        <div class="pc-price-note" data-i18n="pc2PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
+        <div class="pc-price-note pc-price-note--nowrap" data-i18n="pc2PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080P • 60FPS</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc2Feature2">4K • 60FPS</span></div>
@@ -5017,7 +5059,7 @@
           </div>
         </div>
         <div class="pc-price-line pc-price-line--dual"><b>49.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>69.99<sup>₾</sup></b></div>
-        <div class="pc-price-note" data-i18n="pc3PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
+        <div class="pc-price-note pc-price-note--nowrap" data-i18n="pc3PriceNote">1080p / 4K — არჩევანი ატვირთვის შემდეგ</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080P • 60FPS</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc3Feature2">4K • 60FPS</span></div>
@@ -5143,7 +5185,7 @@
           </div>
         </div>
         <div class="pc-price-line"><b>9.99<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
-        <div class="pc-price-note" data-i18n="pc4PriceNote">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე (1080p / 4K)</div>
+        <div class="pc-price-note" data-i18n="pc4PriceNote"><span class="pc-price-note-line">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე</span><span class="pc-price-note-line">(1080p / 4K)</span></div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc4Feature1">1080P • 60FPS</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc4Feature2">4K • 60FPS</span></div>
@@ -5218,7 +5260,7 @@
           </div>
         </div>
         <div class="pc-price-line pc-price-line--dual"><b>1.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>3.99<sup>₾</sup></b></div>
-        <div class="pc-price-note" data-i18n="cpPriceNote">1080p / 4K — ფასი ფიქსირებულია</div>
+        <div class="pc-price-note pc-price-note--nowrap" data-i18n="cpPriceNote">1080p / 4K — ფასი ფიქსირებულია</div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeatureFast">ჩაბარდება მაქსიმუმ 30 წუთში</span></div>
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeature1">1080P • 60FPS</span></div>
@@ -5567,7 +5609,7 @@
       pc3Feature1: '1 თვის განმავლობაში<br>სრული შეკვეთა',
       pc3Feature2: '4K • 60FPS',
       pc4Desc: 'მსგავსი ედითი — თქვენი პერსონაჟით',
-      pc4PriceNote: 'ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე (1080p / 4K)',
+      pc4PriceNote: '<span class="pc-price-note-line">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე</span><span class="pc-price-note-line">(1080p / 4K)</span>',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
       pc4Feature3: 'ჩაბარდება არაუმეტეს 24 საათის განმავლობაში',
@@ -5926,7 +5968,7 @@
       pc3Feature1: 'Within 1 month<br>full order',
       pc3Feature2: '4K • 60FPS',
       pc4Desc: 'A similar edit — with your character',
-      pc4PriceNote: 'Price depends on the chosen style and quality (1080p / 4K)',
+      pc4PriceNote: '<span class="pc-price-note-line">Price depends on the chosen style and quality</span><span class="pc-price-note-line">(1080p / 4K)</span>',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
       pc4Feature3: 'Delivered within 24 hours',
@@ -6257,6 +6299,42 @@
     return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.ka[key] || '');
   }
 
+  /* Keeps every .pc-price-note--nowrap on exactly one line, on any real
+     device, without relying on hand-picked pixel breakpoints.
+     Earlier this was "fixed" with a media query tuned to one specific
+     headless-browser measurement — that was fragile by construction:
+     different browsers/OSes hint and kern this embedded Georgian font
+     slightly differently, so a pixel value measured in one environment
+     is not guaranteed correct in another, and it silently breaks again
+     for any future translation of different length (English text here
+     is shorter, but the next language might not be).
+     This instead measures the ACTUAL rendered overflow of each element
+     in the user's own browser and shrinks font-size in small steps
+     only until it truly fits — then stops. If there's room, it stays
+     at full size; nothing is pre-guessed. */
+  function fitPriceNotes(){
+    document.querySelectorAll('.pc-price-note--nowrap').forEach(el => {
+      el.style.fontSize = ''; // reset to CSS baseline before measuring
+      let size = parseFloat(getComputedStyle(el).fontSize);
+      const minSize = 7; // floor so it never shrinks into illegibility
+      let guard = 0;
+      while (el.scrollWidth > el.clientWidth + 0.5 && size > minSize && guard < 40) {
+        size -= 0.25;
+        el.style.fontSize = size + 'px';
+        guard++;
+      }
+    });
+  }
+  let priceNoteFitTimer;
+  function scheduleFitPriceNotes(){
+    clearTimeout(priceNoteFitTimer);
+    priceNoteFitTimer = setTimeout(fitPriceNotes, 120);
+  }
+  window.addEventListener('resize', scheduleFitPriceNotes);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(fitPriceNotes);
+  }
+
   function applyTranslations(){
     document.documentElement.lang = currentLang;
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -6281,6 +6359,7 @@
       const slot = document.getElementById('qnSlotHowto');
       if (slot && slot.classList.contains('active')) requestAnimationFrame(equalizeHowtoStepHeights);
     }
+    requestAnimationFrame(fitPriceNotes);
   }
 
   function setLanguage(lang){
