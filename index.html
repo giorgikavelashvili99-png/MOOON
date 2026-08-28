@@ -5319,7 +5319,7 @@
               <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
               <span class="simple-scan-ok-name" id="scanOkNameCp"></span>
             </div>
-            <div class="simple-scan-reject" id="scanRejectCp" data-i18n="srRejectTextShort">ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps</div>
+            <div class="simple-scan-reject" id="scanRejectCp" data-i18n="srRejectTextCp">ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps ან 4K / 60fps</div>
             <div class="mooon-prompt" id="mooonPromptCp">
               <div class="mooon-prompt-q" id="mooonPromptQCp" data-i18n="mooonPromptQ">გსურთ, ატვირთული ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს შესამოწმებლად?</div>
               <div class="mooon-prompt-actions" id="mooonPromptActionsCp">
@@ -5712,6 +5712,7 @@
       dzSubSimple: 'გადმოაგდეთ ან დააჭირეთ ასარჩევად',
       simpleScanOk: 'ვიდეო მიღებულია',
       srRejectTextShort: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps',
+      srRejectTextCp: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps ან 4K / 60fps',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
@@ -6073,6 +6074,7 @@
       dzSubSimple: 'Drop it here or click to choose',
       simpleScanOk: 'Video accepted',
       srRejectTextShort: 'Format doesn\'t match — must be exactly 1080p / 60fps',
+      srRejectTextCp: 'Format doesn\'t match — must be exactly 1080p / 60fps or 4K / 60fps',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
       subscriberT2: '✓ Lower rate activates',
@@ -7860,15 +7862,23 @@
       const samples = [];
       let settled = false;
       let safetyTimer = null;
-      // The first few frames right after .play() starts often have
-      // irregular timing while the decoder is still warming up (buffering,
-      // codec init) — measuring from frame 1 was producing wrong FPS
-      // values on a freshly-created video element, which is exactly why
-      // the SAME video would wrongly get rejected on a first upload but
-      // pass fine on a second one (some warm-up had already happened by
-      // then). Discarding a few warm-up frames before recording samples
-      // fixes this regardless of which upload attempt it is.
-      let warmupRemaining = 3;
+      // Warm-up is skipped by ELAPSED MEDIA TIME, not a fixed frame count.
+      // A fixed count (the previous approach) assumes decode start-up
+      // takes roughly the same few frames everywhere, but that cost
+      // varies a lot by browser — a constrained in-app WebView (Messenger,
+      // Instagram, TikTok's own in-app browser, etc.) can take noticeably
+      // longer to spin up than a normal mobile/desktop browser, and even
+      // varies run-to-run on the SAME browser depending on device load.
+      // That's exactly what was producing the "1st upload works, 2nd
+      // upload of the identical file fails, 3rd works again" pattern —
+      // on a slow run, the fixed-count warm-up + a short safety timeout
+      // let a couple of irregular startup frames leak into the sample
+      // set, which skewed the computed fps just enough to miss the
+      // strict 60fps check. Time-based warm-up plus a longer timeout and
+      // a higher minimum sample count make the read consistent run to run.
+      const WARMUP_SECONDS = 0.15;
+      const MIN_SAMPLES = 8; // below this, the reading isn't trustworthy
+      const TARGET_SAMPLES = 14;
 
       function finish(fps){
         if (settled) return;
@@ -7879,13 +7889,16 @@
       }
 
       function computeAndFinish(){
-        if (samples.length < 3) { finish(null); return; }
+        // Too few post-warm-up samples to trust — report "unknown" rather
+        // than risk a noisy number. Per checkUploadAcceptable, an unknown
+        // fps never blocks the upload on its own, so this fails safe.
+        if (samples.length < MIN_SAMPLES) { finish(null); return; }
         const deltas = [];
         for (let i = 1; i < samples.length; i++) {
           const d = samples[i] - samples[i - 1];
           if (d > 0) deltas.push(d);
         }
-        if (!deltas.length) { finish(null); return; }
+        if (deltas.length < MIN_SAMPLES - 1) { finish(null); return; }
         deltas.sort((a, b) => a - b);
         const mid = deltas[Math.floor(deltas.length / 2)];
         const rawFps = 1 / mid;
@@ -7896,24 +7909,32 @@
           const diff = Math.abs(r - rawFps);
           if (diff < bestDiff) { bestDiff = diff; closest = r; }
         });
+        // If the measured rate isn't reasonably close to any common rate,
+        // the sample set was probably still noisy (dropped/irregular
+        // frames) — better to report "unknown" than a confident-looking
+        // wrong number that then fails the strict 60fps check.
+        if (bestDiff > 4) { finish(null); return; }
         finish(closest);
       }
 
       function onFrame(now, metadata){
-        if (warmupRemaining > 0) {
-          warmupRemaining--;
+        if (metadata.mediaTime < WARMUP_SECONDS) {
           if (!settled) videoEl.requestVideoFrameCallback(onFrame);
           return;
         }
         samples.push(metadata.mediaTime);
-        if (samples.length < 10 && !settled) {
+        if (samples.length < TARGET_SAMPLES && !settled) {
           videoEl.requestVideoFrameCallback(onFrame);
         } else {
           computeAndFinish();
         }
       }
 
-      safetyTimer = setTimeout(() => computeAndFinish(), 1200);
+      // Generous on purpose: a slow in-app WebView needs real room to
+      // both spin up the decoder and deliver ~14 post-warm-up frames.
+      // This is invisible to a normal browser (it resolves in well under
+      // a second there) but stops slow runs from being cut off mid-read.
+      safetyTimer = setTimeout(() => computeAndFinish(), 3000);
 
       videoEl.play().then(() => {
         videoEl.requestVideoFrameCallback(onFrame);
