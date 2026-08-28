@@ -4157,24 +4157,27 @@
     border-radius:16px;
     padding:14px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.09), 0 10px 28px rgba(0,0,0,0.35);
+    min-width:0;
   }
 
-  .ttdl-input-wrap{ position:relative; margin-bottom:10px; }
+  .ttdl-input-wrap{ position:relative; margin-bottom:10px; min-width:0; }
   .ttdl-input-icon{
     position:absolute; left:12px; top:50%; transform:translateY(-50%);
     color:var(--pc-accent); display:flex; opacity:0.85; pointer-events:none;
   }
   .ttdl-input{
-    width:100%; padding:11px 12px 11px 34px; border-radius:10px;
+    width:100%; min-width:0; padding:11px 12px 11px 34px; border-radius:10px;
     background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.12);
     color:#fff; font-size:12.5px; outline:none;
     transition:border-color .2s ease, box-shadow .2s ease;
+    box-sizing:border-box;
   }
   .ttdl-input::placeholder{ color:var(--text-faint); }
   .ttdl-input:focus{ border-color:var(--pc-accent); box-shadow:0 0 0 3px rgba(37,244,238,0.18); }
 
+  .ttdl-action-row{ display:flex; gap:8px; margin-bottom:12px; min-width:0; }
   .ttdl-analyze-btn{
-    width:100%; padding:11px; margin-bottom:12px;
+    flex:1 1 auto; width:auto; min-width:0; padding:11px; margin-bottom:0;
     border:none; border-radius:10px; cursor:pointer;
     font-family:'BPG Glaho','Space Grotesk',sans-serif; font-weight:800; font-size:13px; letter-spacing:0.02em;
     background:linear-gradient(90deg, #25F4EE, #FE2C55); color:#04141a;
@@ -4183,6 +4186,16 @@
   }
   .ttdl-analyze-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 32px rgba(254,44,85,0.35); }
   .ttdl-analyze-btn:disabled{ opacity:0.55; cursor:default; transform:none; }
+
+  .ttdl-clear-btn{
+    flex:0 0 auto; width:42px; padding:0;
+    border:1px solid rgba(255,255,255,0.16); border-radius:10px; cursor:pointer;
+    background:rgba(255,255,255,0.05); color:var(--text-dim); font-size:14px;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .2s ease;
+  }
+  .ttdl-clear-btn:hover{ border-color:var(--pc-accent-2); color:var(--pc-accent-2); box-shadow:0 0 14px rgba(254,44,85,0.3); }
+  .ttdl-clear-btn:active{ transform:translateY(1px); }
 
   .ttdl-result{
     display:flex; align-items:center; gap:10px;
@@ -4217,24 +4230,37 @@
   .ttdl-log div{ white-space:normal; word-break:break-word; }
 
   /* Own full-width row below the packages — no longer squeezed into a
-     1/3 or 1/2 column, so the tool actually has room to breathe. */
+     1/3 or 1/2 column, so the tool actually has room to breathe.
+     Mobile-first: single stacked column is the DEFAULT (safest — it can
+     never overflow), and the side-by-side layout only switches on for
+     wider screens. minmax(0, …) on the tracks is a second safety net so
+     that even the wide layout can never force the card past the
+     viewport edge. */
   .pc-ttdl-row{
     grid-column: 1 / -1;
     width:100%;
+    min-width:0;
   }
-  .pc-card--ttdl-wide{ padding:28px 26px; }
+  .pc-card--ttdl-wide{ padding:24px 22px; min-width:0; }
   .ttdl-body{
     display:grid;
-    grid-template-columns: 1fr 1.3fr;
-    gap:30px;
-    align-items:center;
+    grid-template-columns: minmax(0, 1fr);
+    gap:16px;
+    min-width:0;
   }
+  .ttdl-body > *{ min-width:0; }
   .pc-card--ttdl-wide .pc-head{ margin-bottom:0; }
-  .pc-icon--lg{ width:58px; height:58px; border-radius:18px; }
-  .pc-card--ttdl-wide .pc-title{ font-size:clamp(13px, 2.6vw, 15px); }
-  .pc-card--ttdl-wide .pc-desc{ font-size:clamp(11.5px, 2.4vw, 12.5px); }
-  @media (max-width:720px){
-    .ttdl-body{ grid-template-columns:1fr; gap:16px; }
+  .pc-icon--lg{ width:50px; height:50px; border-radius:16px; flex-shrink:0; }
+  .pc-card--ttdl-wide .pc-title{ font-size:clamp(13px, 4vw, 15px); }
+  .pc-card--ttdl-wide .pc-desc{ font-size:clamp(11px, 3.2vw, 12.5px); }
+  @media (min-width:640px){
+    .ttdl-body{
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+      gap:30px;
+      align-items:center;
+    }
+    .pc-card--ttdl-wide{ padding:28px 26px; }
+    .pc-icon--lg{ width:58px; height:58px; border-radius:18px; }
   }
 
   .pc-badge{
@@ -5656,7 +5682,10 @@
               </span>
               <input type="text" class="ttdl-input" id="ttdlUrlInput" data-i18n-placeholder="ttdlInputPh" placeholder="ჩასვი TikTok ვიდეოს ლინკი...">
             </div>
-            <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
+            <div class="ttdl-action-row">
+              <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
+              <button type="button" class="ttdl-clear-btn" id="ttdlClearBtn" title="გასუფთავება" aria-label="გასუფთავება" style="display:none;">✕</button>
+            </div>
 
             <div class="ttdl-result" id="ttdlResult" style="display:none;">
               <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
@@ -12455,6 +12484,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const dlRow = document.getElementById('ttdlDlRow');
     const sdBtn = document.getElementById('ttdlDlSd');
     const hdBtn = document.getElementById('ttdlDlHd');
+    const clearBtn = document.getElementById('ttdlClearBtn');
     const logEl = document.getElementById('ttdlLog');
     if (!analyzeBtn || !urlInput) return;
 
@@ -12494,6 +12524,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       setBtnBusy(analyzeBtn, true, ttdlDict('analyzing'));
       resultBox.style.display = 'none';
       dlRow.style.display = 'none';
+      if (clearBtn) clearBtn.style.display = 'none';
       sdBtn.disabled = true; hdBtn.disabled = true;
       ttdlLog(ttdlDict('logAnalyzing'));
       try{
@@ -12515,6 +12546,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           metaEl.textContent = (lastData.author ? '@' + lastData.author + ' · ' : '') + ttdlFormatCount(lastData.views) + ' ' + ttdlDict('views');
           resultBox.style.display = 'flex';
           dlRow.style.display = 'flex';
+          if (clearBtn) clearBtn.style.display = 'flex';
           sdBtn.disabled = !lastData.sd;
           hdBtn.disabled = !lastData.hd;
           ttdlLog(ttdlDict('logFound'));
@@ -12559,10 +12591,27 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
 
+    function ttdlClear(){
+      urlInput.value = '';
+      lastData = null;
+      thumbEl.src = '';
+      titleEl.textContent = '';
+      metaEl.textContent = '';
+      resultBox.style.display = 'none';
+      dlRow.style.display = 'none';
+      if (clearBtn) clearBtn.style.display = 'none';
+      sdBtn.disabled = true;
+      hdBtn.disabled = true;
+      if (logEl) logEl.innerHTML = '';
+      ttdlLog(ttdlDict('logReady'));
+      urlInput.focus();
+    }
+
     analyzeBtn.addEventListener('click', ttdlAnalyze);
     urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ttdlAnalyze(); });
     sdBtn.addEventListener('click', () => ttdlDownload('sd'));
     hdBtn.addEventListener('click', () => ttdlDownload('hd'));
+    if (clearBtn) clearBtn.addEventListener('click', ttdlClear);
 
     ttdlLog(ttdlDict('logReady'));
   }
