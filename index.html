@@ -3972,29 +3972,6 @@
   @media (max-width:900px){
     .pc-duo-row{ grid-template-columns:1fr; max-width:none; }
   }
-  /* Same idea as .pc-duo-row, one column wider — edit order / cheap
-     package / free TikTok downloader now sit level in a single row on
-     desktop and stack on narrow screens. */
-  .pc-trio-row{
-    grid-column: 1 / -1;
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;
-    width:100%; max-width:960px; margin:0 auto;
-  }
-  .pc-trio-row .pc-card--edit,
-  .pc-trio-row .pc-card-wrap--cheap,
-  .pc-trio-row .pc-card-wrap--ttdl{
-    min-width:0; height:100%;
-  }
-  .pc-trio-row .pc-card-wrap--cheap .pc-card--cheap,
-  .pc-trio-row .pc-card-wrap--ttdl .pc-card--ttdl{ height:100%; }
-  .pc-trio-row .pc-card--edit.pc-card--edit,
-  .pc-trio-row .pc-card-wrap--cheap,
-  .pc-trio-row .pc-card-wrap--ttdl{
-    grid-column:auto; width:auto; max-width:none; margin:0;
-  }
-  @media (max-width:900px){
-    .pc-trio-row{ grid-template-columns:1fr; max-width:none; }
-  }
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
      sit OUTSIDE the card's own clipped box (poking above its top edge),
      while the card itself needs overflow:hidden to correctly contain its
@@ -4085,6 +4062,21 @@
   }
   #monthlySubPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
+  /* Slow diagonal light sweep — the "catches the light" glint real gold
+     foil gets. Passes over everything on the card face; pointer-events
+     stays off so it never blocks a click underneath it. */
+  .pc-card--monthly::after{
+    content:'';
+    position:absolute; inset:0; z-index:5; pointer-events:none;
+    background:linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.35) 49%, rgba(255,255,255,0.06) 58%, transparent 70%);
+    transform:translateX(-130%);
+    animation: pcShineSweep 6s ease-in-out infinite;
+  }
+  @keyframes pcShineSweep{
+    0%, 35%{ transform:translateX(-130%); }
+    65%, 100%{ transform:translateX(130%); }
+  }
+
   /* ---------- Edit order — red foil, sampled directly from the
      reference photo, same treatment as monthly's gold. ---------- */
   .pc-card--edit, #editOrderPanel{
@@ -4136,22 +4128,6 @@
   .pc-card--ttdl::before{
     background:linear-gradient(90deg, transparent, var(--pc-accent), var(--pc-accent-2), transparent);
   }
-  /* Slow diagonal light sweep — the "catches the light" glint real foil
-     gets. Passes over everything (including the glass panel below),
-     which is exactly what a light reflection would do; pointer-events
-     stays off so it never blocks a click underneath it. */
-  .pc-card--ttdl::after{
-    content:'';
-    position:absolute; inset:0; z-index:5; pointer-events:none;
-    background:linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.32) 49%, rgba(255,255,255,0.05) 58%, transparent 70%);
-    transform:translateX(-130%);
-    animation: ttdlShine 6s ease-in-out infinite;
-  }
-  @keyframes ttdlShine{
-    0%, 35%{ transform:translateX(-130%); }
-    65%, 100%{ transform:translateX(130%); }
-  }
-  .pc-card--ttdl > *{ position:relative; z-index:2; }
 
   /* Free-tool ribbon — cyan/pink gradient pill with a small pulsing dot,
      replacing the gold-star "პოპულარული" ribbon used on priced packages. */
@@ -4239,7 +4215,27 @@
     color:#9fb0c8; height:60px; overflow-y:auto;
   }
   .ttdl-log div{ white-space:normal; word-break:break-word; }
-  .ttdl-note{ font-size:9.5px; color:var(--text-faint); line-height:1.45; text-align:center; margin-top:8px; }
+
+  /* Own full-width row below the packages — no longer squeezed into a
+     1/3 or 1/2 column, so the tool actually has room to breathe. */
+  .pc-ttdl-row{
+    grid-column: 1 / -1;
+    width:100%;
+  }
+  .pc-card--ttdl-wide{ padding:28px 26px; }
+  .ttdl-body{
+    display:grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap:30px;
+    align-items:center;
+  }
+  .pc-card--ttdl-wide .pc-head{ margin-bottom:0; }
+  .pc-icon--lg{ width:58px; height:58px; border-radius:18px; }
+  .pc-card--ttdl-wide .pc-title{ font-size:clamp(13px, 2.6vw, 15px); }
+  .pc-card--ttdl-wide .pc-desc{ font-size:clamp(11.5px, 2.4vw, 12.5px); }
+  @media (max-width:720px){
+    .ttdl-body{ grid-template-columns:1fr; gap:16px; }
+  }
 
   .pc-badge{
     position:absolute; top:-11px; right:16px; z-index:6;
@@ -5425,7 +5421,7 @@
         </div>
 
       <!-- Card 4 — edit order (character edit) -->
-      <div class="pc-trio-row">
+      <div class="pc-duo-row">
       <div class="pc-card pc-card--edit">
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">✨</div>
@@ -5627,58 +5623,61 @@
         </div>
       </div>
       </div>
+      </div>
 
-      <!-- Card 6 — free TikTok video downloader tool (no order flow, works instantly) -->
+      <!-- Card 6 — free TikTok video downloader, full-width banner below the packages -->
+      <div class="pc-ttdl-row">
       <div class="pc-card-wrap pc-card-wrap--ttdl">
       <div class="pc-badge pc-badge--ttdl" data-i18n="ttdlBadge">უფასო</div>
-      <div class="pc-card pc-card--ttdl">
-        <div class="pc-head">
-        <div class="pc-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="ttdlIconGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stop-color="#25F4EE"/>
-                <stop offset="1" stop-color="#FE2C55"/>
-              </linearGradient>
-            </defs>
-            <path d="M12 3v11.5m0 0l-4-4m4 4l4-4M4.5 19h15" stroke="url(#ttdlIconGrad)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-          <div class="pc-head-text">
-          <div class="pc-title" data-i18n="ttdlTitle">TikTok Video Downloader</div>
-          <div class="pc-desc" data-i18n="ttdlDesc">ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში</div>
+      <div class="pc-card pc-card--ttdl pc-card--ttdl-wide">
+        <div class="ttdl-body">
+          <div class="pc-head">
+          <div class="pc-icon pc-icon--lg" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="ttdlIconGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#25F4EE"/>
+                  <stop offset="1" stop-color="#FE2C55"/>
+                </linearGradient>
+              </defs>
+              <path d="M12 3v11.5m0 0l-4-4m4 4l4-4M4.5 19h15" stroke="url(#ttdlIconGrad)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </div>
-        </div>
-
-        <div class="ttdl-glass">
-          <div class="ttdl-input-wrap">
-            <span class="ttdl-input-icon" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 15l6-6M10 6l1.5-1.5a3.54 3.54 0 015 5L15 11M14 18l-1.5 1.5a3.54 3.54 0 01-5-5L9 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <input type="text" class="ttdl-input" id="ttdlUrlInput" data-i18n-placeholder="ttdlInputPh" placeholder="ჩასვი TikTok ვიდეოს ლინკი...">
-          </div>
-          <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
-
-          <div class="ttdl-result" id="ttdlResult" style="display:none;">
-            <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
-            <div class="ttdl-result-info">
-              <div class="ttdl-result-title" id="ttdlResultTitle"></div>
-              <div class="ttdl-result-meta" id="ttdlResultMeta"></div>
+            <div class="pc-head-text">
+            <div class="pc-title" data-i18n="ttdlTitle">TikTok Video Downloader</div>
+            <div class="pc-desc" data-i18n="ttdlDesc">ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში</div>
             </div>
           </div>
 
-          <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
-            <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled><span class="ttdl-dl-ico">⬇</span>SD</button>
-            <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled><span class="ttdl-dl-ico">⬇</span>HD</button>
+          <div class="ttdl-glass">
+            <div class="ttdl-input-wrap">
+              <span class="ttdl-input-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 15l6-6M10 6l1.5-1.5a3.54 3.54 0 015 5L15 11M14 18l-1.5 1.5a3.54 3.54 0 01-5-5L9 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <input type="text" class="ttdl-input" id="ttdlUrlInput" data-i18n-placeholder="ttdlInputPh" placeholder="ჩასვი TikTok ვიდეოს ლინკი...">
+            </div>
+            <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
+
+            <div class="ttdl-result" id="ttdlResult" style="display:none;">
+              <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
+              <div class="ttdl-result-info">
+                <div class="ttdl-result-title" id="ttdlResultTitle"></div>
+                <div class="ttdl-result-meta" id="ttdlResultMeta"></div>
+              </div>
+            </div>
+
+            <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
+              <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled><span class="ttdl-dl-ico">⬇</span>SD</button>
+              <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled><span class="ttdl-dl-ico">⬇</span>HD</button>
+            </div>
+
+            <div class="ttdl-log" id="ttdlLog"></div>
           </div>
-
-          <div class="ttdl-log" id="ttdlLog"></div>
         </div>
-        <div class="ttdl-note" data-i18n="ttdlNote">მხოლოდ საკუთარი ან თანხმობის მქონე ვიდეოსთვის გამოიყენეთ</div>
+      </div>
       </div>
       </div>
 
-      </div>
     </div>
   </div>
 
@@ -5984,7 +5983,6 @@
       ttdlDesc: 'ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში',
       ttdlInputPh: 'ჩასვი TikTok ვიდეოს ლინკი...',
       ttdlAnalyzeBtn: 'გაანალიზება',
-      ttdlNote: 'მხოლოდ საკუთარი ან თანხმობის მქონე ვიდეოსთვის გამოიყენეთ',
       cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
       cpUpscaleModalText4k: 'ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.',
       cpUpscaleModalTextDowngrade: 'ძვირფასო მომხმარებელო, თქვენი ატვირთული ვიდეო 1080p-ზე მაღალი ხარისხისაა, ამიტომ ფასი ავტომატურად <b>4K</b> ტარიფზეა დაფიქსირებული — <b>1080p</b>-ის ფასზე გადასვლა შეუძლებელია. თუ გსურთ 1080p ფასით სარგებლობა, ატვირთეთ ზუსტად 1080p ფორმატის ვიდეო.',
@@ -6374,7 +6372,6 @@
       ttdlDesc: 'Download videos without the watermark, in the best quality available',
       ttdlInputPh: 'Paste a TikTok video link...',
       ttdlAnalyzeBtn: 'Analyze Video',
-      ttdlNote: 'Only use this for your own content or content you have permission to download',
       cpUpscaleModalTitle: "You can't switch to this quality",
       cpUpscaleModalText4k: "Dear customer, your video was uploaded in <b>1080p</b> — whatever its FPS, it can't be converted to <b>4K</b>. To use the 4K option, please upload a video that is actually filmed/exported in 4K.",
       cpUpscaleModalTextDowngrade: "Dear customer, your uploaded video is higher quality than 1080p, so the price is automatically locked to the <b>4K</b> rate — switching to the <b>1080p</b> price isn't possible. If you want the 1080p price, upload a video that is exactly 1080p.",
