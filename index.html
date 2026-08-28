@@ -5779,6 +5779,7 @@
       cpQualityHint: 'აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება',
       cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
       cpUpscaleModalText4k: 'ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.',
+      cpUpscaleModalTextDowngrade: 'ძვირფასო მომხმარებელო, თქვენი ატვირთული ვიდეო 1080p-ზე მაღალი ხარისხისაა, ამიტომ ფასი ავტომატურად <b>4K</b> ტარიფზეა დაფიქსირებული — <b>1080p</b>-ის ფასზე გადასვლა შეუძლებელია. თუ გსურთ 1080p ფასით სარგებლობა, ატვირთეთ ზუსტად 1080p ფორმატის ვიდეო.',
       qnHowto: 'როგორ შევუკვეთო',
       qnPromo: 'პრომო კოდი',
       qnBeforeAfter: 'მონტაჟამდე / მონტაჟის შემდეგ',
@@ -5865,7 +5866,7 @@
       srRejectTitle: 'ფაილი არ შეესაბამება მოთხოვნებს',
       srRejectDetectedLabel: 'ატვირთული ფაილის მონაცემები:',
       srRejectText: 'ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.',
-      srReject4kNote: 'ℹ️ 2K/4K ფორმატის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას (2K ფასდება 1080p-ის ტარიფით, 4K — 4K ტარიფით) — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
+      srReject4kNote: 'ℹ️ 1080p-ზე მაღალი ხარისხის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას (ფასდება 4K ტარიფით) — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
       srReject4kNoteShort: 'ℹ️ 2K/4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“',
       srRejectAppsMobile: 'მობილურებისთვის / აიფონისთვის / აიპადებისთვის:',
       srRejectAppsDesktop: 'კომპიუტერისთვის:',
@@ -6162,6 +6163,7 @@
       cpQualityHint: 'Pick a quality or upload your video — the matching price will be selected automatically',
       cpUpscaleModalTitle: "You can't switch to this quality",
       cpUpscaleModalText4k: "Dear customer, your video was uploaded in <b>1080p</b> — whatever its FPS, it can't be converted to <b>4K</b>. To use the 4K option, please upload a video that is actually filmed/exported in 4K.",
+      cpUpscaleModalTextDowngrade: "Dear customer, your uploaded video is higher quality than 1080p, so the price is automatically locked to the <b>4K</b> rate — switching to the <b>1080p</b> price isn't possible. If you want the 1080p price, upload a video that is exactly 1080p.",
       qnHowto: 'How it works',
       qnPromo: 'Promo code',
       qnBeforeAfter: 'Before / After',
@@ -6248,7 +6250,7 @@
       srRejectTitle: "This file doesn't meet the requirements",
       srRejectDetectedLabel: 'Uploaded file details:',
       srRejectText: 'Dear user, you must upload the video in <b>1080p / 60fps</b> format — exactly this format, no more and no less. Any other resolution or frame rate (e.g. 720p, 2K, 4K, 30fps, 120fps) will not be accepted.',
-      srReject4kNote: 'ℹ️ Uploading a 2K or 4K video is only possible when ordering the "Cheap Package" (2K is priced at the 1080p rate, 4K at the 4K rate) — for every other package, the uploaded video must be exactly 1080p / 60fps.',
+      srReject4kNote: 'ℹ️ Uploading a video above 1080p quality is only possible when ordering the "Cheap Package" (priced at the 4K rate) — for every other package, the uploaded video must be exactly 1080p / 60fps.',
       srReject4kNoteShort: 'ℹ️ 2K/4K upload is only possible in the "Cheap Package"',
       srRejectAppsMobile: 'For mobile / iPhone / iPad:',
       srRejectAppsDesktop: 'For desktop:',
@@ -7259,42 +7261,38 @@
   // as "can't disprove it" and is not, by itself, a rejection reason —
   // only a *confirmed* mismatch blocks the upload.
   //
-  // The Cheap Package is the one exception: it sells both a 1080p and a 4K
-  // output tier, so its scanner passes allowFourK=true. In that package:
-  //   - FPS never matters, for EITHER tier. The visitor may upload footage
+  // The Cheap Package is the one exception: it sells a 1080p tier and a 4K
+  // tier, so its scanner passes allowFourK=true. In that package:
+  //   - 1080p is a FLOOR, not a band: any resolution at or above ~1080p is
+  //     accepted (2K, 4K, 5K, 8K, whatever the phone/camera produced) —
+  //     only something clearly BELOW 1080p (720p, 480p…) is rejected.
+  //   - FPS never matters, for either tier. The visitor may upload footage
   //     at any frame rate — fps only ever affected the price/format match
   //     elsewhere on the site, and the Cheap Package deliberately drops
   //     that requirement entirely (resolution is the only thing judged).
-  //   - A 2K/1440p upload is treated the SAME as 1080p (the cheaper tier),
-  //     not folded into the 4K tier — footage that isn't genuinely 4K
-  //     can't be sold/priced as 4K, so 2K only ever qualifies the visitor
-  //     for the 1080p price, exactly like true 1080p footage does.
-  //   - Only a true 4K upload matches the 4K tier.
+  //   - Pricing: exactly-1080p footage matches the 1080p tier; literally
+  //     anything higher than that (2K included) matches the 4K tier — i.e.
+  //     "above 1080p" always prices at the 4K rate, never in between.
   // Every other package still calls this with no 3rd argument, so their
   // gate (strict 1080p/60fps, nothing else) is unchanged.
   const REQUIRED_DIM = 1080;
   const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
-  const REQUIRED_DIM_2K = 1440;
-  const REQUIRED_DIM_2K_TOLERANCE = 48; // covers common QHD/1440p variants
-  const REQUIRED_DIM_4K = 2160;
-  const REQUIRED_DIM_4K_TOLERANCE = 60; // 4K encodes vary a bit more than 1080p ones
   const REQUIRED_FPS = 60;
 
   function checkUploadAcceptable(width, height, fps, allowFourK){
     const hasDims = !!(width && height);
     let resOk = null;
     let is1080 = false;
-    let is2k = false;
-    let is4k = false;
+    let aboveHD = false; // strictly higher than the 1080p band — 2K, 4K, 5K, 8K, all of it
     if (hasDims) {
       const minDim = Math.min(width, height);
       is1080 = Math.abs(minDim - REQUIRED_DIM) <= REQUIRED_DIM_TOLERANCE;
-      is2k = Math.abs(minDim - REQUIRED_DIM_2K) <= REQUIRED_DIM_2K_TOLERANCE;
-      is4k = Math.abs(minDim - REQUIRED_DIM_4K) <= REQUIRED_DIM_4K_TOLERANCE;
-      resOk = is1080 || (!!allowFourK && (is2k || is4k));
+      aboveHD = minDim > (REQUIRED_DIM + REQUIRED_DIM_TOLERANCE);
+      resOk = allowFourK
+        ? (minDim >= (REQUIRED_DIM - REQUIRED_DIM_TOLERANCE)) // cheap package: 1080p is a floor
+        : is1080; // every other package: still an exact 1080p match only
     }
     const fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
-    const isHighRes = is2k || is4k; // "belongs to the 4K price tier" (reporting only — see matchedTier below)
     // Reject only on a *confirmed* violation — an unknown value never blocks
     // the upload on its own. In the Cheap Package (allowFourK) fps is never
     // checked at all, for any resolution; every other package still
@@ -7302,14 +7300,15 @@
     const rejected = allowFourK
       ? (resOk === false)
       : ((resOk === false) || (fpsOk === false));
-    // matchedTier is only meaningful when the upload was accepted. A 2K
-    // source is deliberately bucketed with 1080p here (NOT the 4K tier) —
-    // only genuinely 4K footage can match the 4K price. isHighRes is still
-    // reported as-is (regardless of allowFourK) so callers that DON'T sell
-    // 4K can tell a rejected 2K/4K upload apart from a rejected 720p one,
-    // to point the visitor at the Cheap Package instead of just saying "no".
-    const matchedTier = is4k ? '4k_120' : ((is1080 || is2k) ? '1080_60' : null);
-    return { rejected, resOk, fpsOk, is4k: isHighRes, matchedTier };
+    // matchedTier is only meaningful when the upload was accepted: exactly
+    // 1080p → the 1080p tier; anything clearly above it → the 4K tier.
+    // aboveHD is also reported as `is4k` regardless of allowFourK, so
+    // callers that DON'T sell above-1080p footage (wp/mp) can tell a
+    // rejected higher-resolution upload apart from a rejected sub-1080p
+    // one, to point the visitor at the Cheap Package instead of just
+    // saying "no".
+    const matchedTier = is1080 ? '1080_60' : (aboveHD ? '4k_120' : null);
+    return { rejected, resOk, fpsOk, is4k: aboveHD, matchedTier };
   }
 
   // ---- Synced TikTok profile link — one field per order panel (main /
@@ -8974,8 +8973,15 @@ ID: ${orderId}
   const cpUpscaleModalOverlay = document.getElementById('cpUpscaleModalOverlay');
   const cpUpscaleModalClose = document.getElementById('cpUpscaleModalClose');
 
-  function showCpUpscaleBlockedPopup(){
-    if (cpUpscaleModalOverlay) cpUpscaleModalOverlay.classList.add('show');
+  function showCpUpscaleBlockedPopup(direction){
+    if (!cpUpscaleModalOverlay) return;
+    const textEl = document.getElementById('cpUpscaleModalText');
+    if (textEl) {
+      const key = direction === 'downgrade' ? 'cpUpscaleModalTextDowngrade' : 'cpUpscaleModalText4k';
+      textEl.setAttribute('data-i18n', key);
+      textEl.innerHTML = t(key);
+    }
+    cpUpscaleModalOverlay.classList.add('show');
   }
   function hideCpUpscaleBlockedPopup(){
     if (cpUpscaleModalOverlay) cpUpscaleModalOverlay.classList.remove('show');
@@ -9004,16 +9010,16 @@ ID: ${orderId}
   }
 
   // A visitor clicking a tile by hand — unlike selectCpQuality(), this is
-  // only allowed to move UP to a tier their uploaded footage can actually
-  // deliver. If they've already uploaded 1080p/2K footage (cpUploadedTier
-  // === '1080_60') and then try to tap the 4K tile, that's an attempted
-  // upscale past their real source — block it and explain why instead of
-  // silently letting them "order" a resolution their file can't produce.
-  // Picking a tile before any upload, or picking DOWN to the cheaper tile
-  // after uploading true 4K footage, is always allowed.
+  // fully LOCKED to whatever tier the uploaded footage actually matched,
+  // in both directions: a 1080p source can't hand-pick the 4K tile
+  // (upscaling isn't possible), and — just as strictly — footage above
+  // 1080p can't hand-pick the cheaper 1080p tile either (the price always
+  // has to match the real uploaded quality). The only way to change tier
+  // is to upload a different video; before any upload at all
+  // (cpUploadedTier is null) both tiles are still freely clickable.
   function tryManualSelectCpQuality(key){
-    if (cpUploadedTier === '1080_60' && key === '4k_120') {
-      showCpUpscaleBlockedPopup();
+    if (cpUploadedTier && key !== cpUploadedTier) {
+      showCpUpscaleBlockedPopup(cpUploadedTier === '1080_60' ? 'upgrade' : 'downgrade');
       return;
     }
     selectCpQuality(key);
