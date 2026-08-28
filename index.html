@@ -5712,7 +5712,7 @@
       dzSubSimple: 'გადმოაგდეთ ან დააჭირეთ ასარჩევად',
       simpleScanOk: 'ვიდეო მიღებულია',
       srRejectTextShort: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps',
-      srRejectTextCp: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps, ან ნებისმიერი 4K ვიდეო',
+      srRejectTextCp: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps, ან ნებისმიერი 2K/4K ვიდეო',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
@@ -5741,8 +5741,8 @@
       srRejectTitle: 'ფაილი არ შეესაბამება მოთხოვნებს',
       srRejectDetectedLabel: 'ატვირთული ფაილის მონაცემები:',
       srRejectText: 'ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.',
-      srReject4kNote: 'ℹ️ 4K ფორმატის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
-      srReject4kNoteShort: 'ℹ️ 4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“',
+      srReject4kNote: 'ℹ️ 2K/4K ფორმატის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას (4K-ის ფასად) — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
+      srReject4kNoteShort: 'ℹ️ 2K/4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“',
       srRejectAppsMobile: 'მობილურებისთვის / აიფონისთვის / აიპადებისთვის:',
       srRejectAppsDesktop: 'კომპიუტერისთვის:',
       srRejectEtc: 'და ა.შ.',
@@ -6074,7 +6074,7 @@
       dzSubSimple: 'Drop it here or click to choose',
       simpleScanOk: 'Video accepted',
       srRejectTextShort: 'Format doesn\'t match — must be exactly 1080p / 60fps',
-      srRejectTextCp: 'Format doesn\'t match — must be exactly 1080p / 60fps, or any 4K video',
+      srRejectTextCp: 'Format doesn\'t match — must be exactly 1080p / 60fps, or any 2K/4K video',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
       subscriberT2: '✓ Lower rate activates',
@@ -6103,8 +6103,8 @@
       srRejectTitle: "This file doesn't meet the requirements",
       srRejectDetectedLabel: 'Uploaded file details:',
       srRejectText: 'Dear user, you must upload the video in <b>1080p / 60fps</b> format — exactly this format, no more and no less. Any other resolution or frame rate (e.g. 720p, 2K, 4K, 30fps, 120fps) will not be accepted.',
-      srReject4kNote: 'ℹ️ Uploading a 4K video is only possible when ordering the "Cheap Package" — for every other package, the uploaded video must be exactly 1080p / 60fps.',
-      srReject4kNoteShort: 'ℹ️ 4K upload is only possible in the "Cheap Package"',
+      srReject4kNote: 'ℹ️ Uploading a 2K or 4K video is only possible when ordering the "Cheap Package" (at the 4K price) — for every other package, the uploaded video must be exactly 1080p / 60fps.',
+      srReject4kNoteShort: 'ℹ️ 2K/4K upload is only possible in the "Cheap Package"',
       srRejectAppsMobile: 'For mobile / iPhone / iPad:',
       srRejectAppsDesktop: 'For desktop:',
       srRejectEtc: 'etc.',
@@ -7100,17 +7100,23 @@
   //
   // The Cheap Package is the one exception: it sells both a 1080p and a 4K
   // output tier, so its scanner passes allowFourK=true, which also accepts
-  // 4K footage. Every other package still calls this with no 3rd argument,
-  // so their gate is unchanged.
+  // 4K footage — AND 2K/1440p footage, which is folded into the 4K tier
+  // (same acceptance rule, same price) rather than needing its own price
+  // tile. Every other package still calls this with no 3rd argument, so
+  // their gate is unchanged.
   //
-  // The 4K tier is judged on RESOLUTION ONLY, not fps. Real-world "4K"
+  // The 4K/2K tier is judged on RESOLUTION ONLY, not fps. Real-world "4K"
   // footage is almost always natively 24/25/30fps — 4K/60fps specifically
   // requires a deliberate camera setting most phones don't default to —
-  // so enforcing an exact 60fps match on top of the resolution match was
-  // rejecting completely standard 4K video. The 1080p tier keeps the
-  // strict 60fps requirement, since that pairing has always worked fine. ----
+  // and 2K sources are frequently something like a screen recording at an
+  // odd native fps (e.g. 80fps) — so enforcing an exact 60fps match on top
+  // of the resolution match was rejecting completely standard footage.
+  // The 1080p tier keeps the strict 60fps requirement, since that pairing
+  // has always worked fine. ----
   const REQUIRED_DIM = 1080;
   const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
+  const REQUIRED_DIM_2K = 1440;
+  const REQUIRED_DIM_2K_TOLERANCE = 48; // covers common QHD/1440p variants
   const REQUIRED_DIM_4K = 2160;
   const REQUIRED_DIM_4K_TOLERANCE = 60; // 4K encodes vary a bit more than 1080p ones
   const REQUIRED_FPS = 60;
@@ -7119,28 +7125,31 @@
     const hasDims = !!(width && height);
     let resOk = null;
     let is1080 = false;
+    let is2k = false;
     let is4k = false;
     if (hasDims) {
       const minDim = Math.min(width, height);
       is1080 = Math.abs(minDim - REQUIRED_DIM) <= REQUIRED_DIM_TOLERANCE;
+      is2k = Math.abs(minDim - REQUIRED_DIM_2K) <= REQUIRED_DIM_2K_TOLERANCE;
       is4k = Math.abs(minDim - REQUIRED_DIM_4K) <= REQUIRED_DIM_4K_TOLERANCE;
-      resOk = is1080 || (!!allowFourK && is4k);
+      resOk = is1080 || (!!allowFourK && (is2k || is4k));
     }
     const fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
-    const isFourKMatch = !!allowFourK && is4k;
+    const isHighRes = is2k || is4k; // "belongs to the 4K price tier"
+    const isHighResMatch = !!allowFourK && isHighRes;
     // Reject only on a *confirmed* violation — an unknown value never
-    // blocks the upload on its own. A resolution match on the 4K tier
+    // blocks the upload on its own. A resolution match on the 2K/4K tier
     // skips the fps check entirely (see note above); every other case
     // still requires a confirmed 60fps match.
-    const rejected = isFourKMatch
+    const rejected = isHighResMatch
       ? (resOk === false)
       : ((resOk === false) || (fpsOk === false));
-    // matchedTier is only meaningful when the upload was accepted; is4k is
-    // reported regardless of allowFourK so callers that DON'T sell 4K can
-    // still tell a rejected 4K upload apart from a rejected 720p one (to
+    // matchedTier is only meaningful when the upload was accepted; isHighRes
+    // is reported regardless of allowFourK so callers that DON'T sell 4K can
+    // still tell a rejected 2K/4K upload apart from a rejected 720p one (to
     // point the visitor at the Cheap Package instead of just saying "no").
-    const matchedTier = is1080 ? '1080_60' : (is4k ? '4k_120' : null);
-    return { rejected, resOk, fpsOk, is4k, matchedTier };
+    const matchedTier = is1080 ? '1080_60' : (isHighRes ? '4k_120' : null);
+    return { rejected, resOk, fpsOk, is4k: isHighRes, matchedTier };
   }
 
   // ---- Synced TikTok profile link — one field per order panel (main /
