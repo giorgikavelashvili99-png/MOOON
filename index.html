@@ -4113,68 +4113,104 @@
   }
   #cheapOrderPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
-  /* ---------- Free TikTok Downloader tool — deliberately NOT another
-     single-hue foil colorway like the packages above. It's a free tool,
-     not a priced package, so it gets its own visual language: TikTok's
-     own cyan + pink duotone on a near-black glass panel, plus a small
-     animated particle net behind the content — reads instantly as
-     "different" from the priced cards sitting right next to it. ---------- */
+  /* ---------- Free TikTok Downloader tool — a genuine "foil shine" card
+     like the priced packages above, just blended from TikTok's own two
+     brand colors (cyan + pink) instead of a single hue, plus a slow
+     light sweep and a frosted-glass inner panel for the actual tool —
+     reads as premium AND unmistakably "different" from the packages
+     sitting right next to it. ---------- */
   .pc-card--ttdl{
     --pc-accent:#25F4EE;
     --pc-accent-2:#FE2C55;
-    --pc-bg: radial-gradient(ellipse 90% 60% at 15% 0%, rgba(37,244,238,0.18), transparent 55%),
-             radial-gradient(ellipse 90% 65% at 100% 100%, rgba(254,44,85,0.16), transparent 55%),
-             linear-gradient(180deg, #07070a, #0c0c12);
-    --pc-border: rgba(37,244,238,0.4);
-    --pc-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 40px rgba(37,244,238,0.14);
-    --pc-icon-bg: linear-gradient(135deg, #25F4EE, #FE2C55);
+    --pc-ttdl-shine: linear-gradient(100deg,
+      #011619 0%, #013238 8%, #04565f 16%, #0a8b95 24%,
+      #25F4EE 32%, #8be9e2 40%, #d9c3ec 48%, #f08fce 56%,
+      #FE2C55 66%, #e0234c 76%, #8f1236 86%, #430a1c 94%, #1c0510 100%);
+    --pc-bg: radial-gradient(ellipse 120% 60% at 12% 0%, rgba(255,255,255,0.28), transparent 55%),
+             linear-gradient(180deg, rgba(3,10,12,0.32), rgba(3,10,12,0.5)),
+             var(--pc-ttdl-shine);
+    --pc-border: rgba(37,244,238,0.55);
+    --pc-shadow: 0 20px 50px rgba(4,2,14,0.55), 0 0 40px rgba(37,244,238,0.22), 0 0 34px rgba(254,44,85,0.16);
+    --pc-icon-bg: linear-gradient(135deg, rgba(37,244,238,0.25), rgba(254,44,85,0.25));
   }
   .pc-card--ttdl::before{
     background:linear-gradient(90deg, transparent, var(--pc-accent), var(--pc-accent-2), transparent);
   }
+  /* Slow diagonal light sweep — the "catches the light" glint real foil
+     gets. Passes over everything (including the glass panel below),
+     which is exactly what a light reflection would do; pointer-events
+     stays off so it never blocks a click underneath it. */
+  .pc-card--ttdl::after{
+    content:'';
+    position:absolute; inset:0; z-index:5; pointer-events:none;
+    background:linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.32) 49%, rgba(255,255,255,0.05) 58%, transparent 70%);
+    transform:translateX(-130%);
+    animation: ttdlShine 6s ease-in-out infinite;
+  }
+  @keyframes ttdlShine{
+    0%, 35%{ transform:translateX(-130%); }
+    65%, 100%{ transform:translateX(130%); }
+  }
+  .pc-card--ttdl > *{ position:relative; z-index:2; }
 
-  /* Free-tool ribbon — cyan/pink, replaces the gold-star "პოპულარული"
-     ribbon used on the priced packages. This one flags the card as free. */
+  /* Free-tool ribbon — cyan/pink gradient pill with a small pulsing dot,
+     replacing the gold-star "პოპულარული" ribbon used on priced packages. */
   .pc-badge--ttdl{
     background:linear-gradient(120deg, #25F4EE, #FE2C55);
     color:#04141a;
+    box-shadow:0 6px 16px rgba(37,244,238,0.4), inset 0 0 0 1px rgba(255,255,255,0.7);
   }
-  .pc-badge--ttdl::before{ content:'⚡'; color:#04141a; }
-
-  /* Tiny particle canvas confined to this one card only. Absolutely
-     positioned behind every other child; pointer-events:none so it never
-     steals clicks from the input/buttons sitting on top of it. */
-  .ttdl-particles{
-    position:absolute; inset:0; width:100%; height:100%;
-    pointer-events:none; z-index:0; opacity:0.55;
+  .pc-badge--ttdl::before{
+    content:''; width:6px; height:6px; border-radius:50%; background:#04141a;
+    animation: ttdlPulse 1.6s ease-in-out infinite;
   }
-  .pc-card--ttdl > *:not(.ttdl-particles){ position:relative; z-index:1; }
+  @keyframes ttdlPulse{
+    0%{ box-shadow:0 0 0 0 rgba(4,20,26,0.5); }
+    70%{ box-shadow:0 0 0 6px rgba(4,20,26,0); }
+    100%{ box-shadow:0 0 0 0 rgba(4,20,26,0); }
+  }
 
-  .ttdl-input-row{ display:flex; gap:8px; margin-bottom:10px; }
+  /* Frosted-glass inner panel holding the actual tool — floats as its
+     own layer on top of the vivid foil background so the input, buttons
+     and log stay perfectly legible no matter how bright the gradient
+     underneath gets. */
+  .ttdl-glass{
+    background:rgba(5,10,14,0.58);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.09), 0 10px 28px rgba(0,0,0,0.35);
+  }
+
+  .ttdl-input-wrap{ position:relative; margin-bottom:10px; }
+  .ttdl-input-icon{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--pc-accent); display:flex; opacity:0.85; pointer-events:none;
+  }
   .ttdl-input{
-    flex:1 1 auto; min-width:0;
-    padding:11px 12px; border-radius:10px;
-    background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1);
+    width:100%; padding:11px 12px 11px 34px; border-radius:10px;
+    background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.12);
     color:#fff; font-size:12.5px; outline:none;
     transition:border-color .2s ease, box-shadow .2s ease;
   }
   .ttdl-input::placeholder{ color:var(--text-faint); }
-  .ttdl-input:focus{ border-color:var(--pc-accent); box-shadow:0 0 12px rgba(37,244,238,0.25); }
+  .ttdl-input:focus{ border-color:var(--pc-accent); box-shadow:0 0 0 3px rgba(37,244,238,0.18); }
 
   .ttdl-analyze-btn{
     width:100%; padding:11px; margin-bottom:12px;
     border:none; border-radius:10px; cursor:pointer;
     font-family:'BPG Glaho','Space Grotesk',sans-serif; font-weight:800; font-size:13px; letter-spacing:0.02em;
     background:linear-gradient(90deg, #25F4EE, #FE2C55); color:#04141a;
-    box-shadow:0 10px 24px rgba(37,244,238,0.25);
+    box-shadow:0 10px 24px rgba(37,244,238,0.3);
     transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
   }
-  .ttdl-analyze-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 32px rgba(37,244,238,0.4); }
+  .ttdl-analyze-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 32px rgba(254,44,85,0.35); }
   .ttdl-analyze-btn:disabled{ opacity:0.55; cursor:default; transform:none; }
 
   .ttdl-result{
     display:flex; align-items:center; gap:10px;
-    background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
     border-radius:10px; padding:8px 10px; margin-bottom:10px;
   }
   .ttdl-thumb{ width:44px; height:44px; border-radius:6px; object-fit:cover; flex-shrink:0; background:#000; }
@@ -4184,22 +4220,26 @@
 
   .ttdl-dl-row{ display:flex; gap:8px; margin-bottom:10px; }
   .ttdl-dl-btn{
-    flex:1; padding:10px; border-radius:9px; cursor:pointer; border:1px solid rgba(255,255,255,0.14);
-    background:rgba(255,255,255,0.05); color:#fff; font-family:'BPG Glaho','Space Grotesk',sans-serif;
-    font-weight:700; font-size:12px; transition:all .2s ease;
+    flex:1; padding:10px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.16);
+    background:linear-gradient(135deg, rgba(37,244,238,0.18), rgba(37,244,238,0.04));
+    color:#fff; font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-weight:700; font-size:12px;
+    display:flex; align-items:center; justify-content:center; gap:5px;
+    transition:all .2s ease;
   }
-  .ttdl-dl-btn:hover{ border-color:var(--pc-accent); box-shadow:0 0 14px rgba(37,244,238,0.3); }
-  .ttdl-dl-btn--hd{ border-color:rgba(254,44,85,0.4); }
-  .ttdl-dl-btn--hd:hover{ border-color:var(--pc-accent-2); box-shadow:0 0 14px rgba(254,44,85,0.3); }
-  .ttdl-dl-btn:disabled{ opacity:0.5; cursor:default; box-shadow:none; }
+  .ttdl-dl-ico{ font-size:10px; opacity:0.85; }
+  .ttdl-dl-btn:hover{ border-color:var(--pc-accent); box-shadow:0 8px 20px rgba(37,244,238,0.3); transform:translateY(-1px); }
+  .ttdl-dl-btn--hd{ background:linear-gradient(135deg, rgba(254,44,85,0.18), rgba(254,44,85,0.04)); border-color:rgba(254,44,85,0.35); }
+  .ttdl-dl-btn--hd:hover{ border-color:var(--pc-accent-2); box-shadow:0 8px 20px rgba(254,44,85,0.3); }
+  .ttdl-dl-btn:disabled{ opacity:0.45; cursor:default; box-shadow:none; transform:none; }
 
   .ttdl-log{
-    background:#000; border:1px solid rgba(37,244,238,0.3); border-radius:8px;
+    background:rgba(0,0,0,0.55); border:1px solid rgba(37,244,238,0.25); border-radius:9px;
     padding:8px 9px; font-family:'JetBrains Mono',monospace; font-size:10px; line-height:1.5;
-    color:#9fb0c8; height:64px; overflow-y:auto; margin-bottom:8px;
+    color:#9fb0c8; height:60px; overflow-y:auto;
   }
   .ttdl-log div{ white-space:normal; word-break:break-word; }
-  .ttdl-note{ font-size:9.5px; color:var(--text-faint); line-height:1.45; text-align:center; }
+  .ttdl-note{ font-size:9.5px; color:var(--text-faint); line-height:1.45; text-align:center; margin-top:8px; }
 
   .pc-badge{
     position:absolute; top:-11px; right:16px; z-index:6;
@@ -5592,34 +5632,48 @@
       <div class="pc-card-wrap pc-card-wrap--ttdl">
       <div class="pc-badge pc-badge--ttdl" data-i18n="ttdlBadge">უფასო</div>
       <div class="pc-card pc-card--ttdl">
-        <canvas class="ttdl-particles" id="ttdlParticles" aria-hidden="true"></canvas>
         <div class="pc-head">
-        <div class="pc-icon" aria-hidden="true">⬇️</div>
+        <div class="pc-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ttdlIconGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#25F4EE"/>
+                <stop offset="1" stop-color="#FE2C55"/>
+              </linearGradient>
+            </defs>
+            <path d="M12 3v11.5m0 0l-4-4m4 4l4-4M4.5 19h15" stroke="url(#ttdlIconGrad)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
           <div class="pc-head-text">
           <div class="pc-title" data-i18n="ttdlTitle">TikTok Video Downloader</div>
           <div class="pc-desc" data-i18n="ttdlDesc">ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში</div>
           </div>
         </div>
 
-        <div class="ttdl-input-row">
-          <input type="text" class="ttdl-input" id="ttdlUrlInput" data-i18n-placeholder="ttdlInputPh" placeholder="ჩასვი TikTok ვიდეოს ლინკი...">
-        </div>
-        <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
-
-        <div class="ttdl-result" id="ttdlResult" style="display:none;">
-          <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
-          <div class="ttdl-result-info">
-            <div class="ttdl-result-title" id="ttdlResultTitle"></div>
-            <div class="ttdl-result-meta" id="ttdlResultMeta"></div>
+        <div class="ttdl-glass">
+          <div class="ttdl-input-wrap">
+            <span class="ttdl-input-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 15l6-6M10 6l1.5-1.5a3.54 3.54 0 015 5L15 11M14 18l-1.5 1.5a3.54 3.54 0 01-5-5L9 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <input type="text" class="ttdl-input" id="ttdlUrlInput" data-i18n-placeholder="ttdlInputPh" placeholder="ჩასვი TikTok ვიდეოს ლინკი...">
           </div>
-        </div>
+          <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
 
-        <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
-          <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled>SD</button>
-          <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled>HD</button>
-        </div>
+          <div class="ttdl-result" id="ttdlResult" style="display:none;">
+            <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
+            <div class="ttdl-result-info">
+              <div class="ttdl-result-title" id="ttdlResultTitle"></div>
+              <div class="ttdl-result-meta" id="ttdlResultMeta"></div>
+            </div>
+          </div>
 
-        <div class="ttdl-log" id="ttdlLog"></div>
+          <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
+            <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled><span class="ttdl-dl-ico">⬇</span>SD</button>
+            <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled><span class="ttdl-dl-ico">⬇</span>HD</button>
+          </div>
+
+          <div class="ttdl-log" id="ttdlLog"></div>
+        </div>
         <div class="ttdl-note" data-i18n="ttdlNote">მხოლოდ საკუთარი ან თანხმობის მქონე ვიდეოსთვის გამოიყენეთ</div>
       </div>
       </div>
@@ -12514,70 +12568,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     hdBtn.addEventListener('click', () => ttdlDownload('hd'));
 
     ttdlLog(ttdlDict('logReady'));
-    initTtdlParticles();
-  }
-
-  function initTtdlParticles(){
-    const canvas = document.getElementById('ttdlParticles');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const card = canvas.closest('.pc-card--ttdl');
-    if (!card) return;
-
-    function resize(){
-      canvas.width = card.clientWidth;
-      canvas.height = card.clientHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    const colors = ['rgba(37,244,238,0.75)', 'rgba(254,44,85,0.75)'];
-    let particles = [];
-    function build(){
-      particles = [];
-      const count = Math.max(10, Math.min(28, Math.floor((canvas.width * canvas.height) / 9000)));
-      for (let i = 0; i < count; i++){
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          dx: (Math.random() - 0.5) * 0.4,
-          dy: (Math.random() - 0.5) * 0.4,
-          size: Math.random() * 1.6 + 0.8,
-          color: colors[Math.random() > 0.5 ? 1 : 0]
-        });
-      }
-    }
-    build();
-
-    function step(){
-      requestAnimationFrame(step);
-      if (!canvas.width || !canvas.height) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const p of particles){
-        if (p.x > canvas.width || p.x < 0) p.dx *= -1;
-        if (p.y > canvas.height || p.y < 0) p.dy *= -1;
-        p.x += p.dx; p.y += p.dy;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      }
-      for (let i = 0; i < particles.length; i++){
-        for (let j = i + 1; j < particles.length; j++){
-          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
-          const dist = dx * dx + dy * dy;
-          if (dist < 6000){
-            ctx.strokeStyle = `rgba(255,255,255,${(1 - dist / 6000) * 0.12})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
-      }
-    }
-    step();
   }
 
   applyTranslations();
