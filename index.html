@@ -2344,11 +2344,18 @@
      Shown when a visitor has already uploaded a video (so we know its real
      resolution) and then tries to manually pick a higher-priced tile than
      that footage actually supports (e.g. source is 1080p/2K, tile is 4K).
-     Styled as a centered card over a dimmed backdrop, matching the rest of
-     the site's dark/purple/gold palette rather than any external UI. ---------- */
+     Styled as a plain white card with a bold purple heading — deliberately
+     breaking from the site's own dark theme so it reads as an urgent system
+     notice, the same way the referenced address-change notice does. The HTML
+     for this lives at the top level of <body> (see near the closing </body>),
+     NOT inside any .moon-glow-card — those cards set `contain: layout paint
+     style`, which turns them into the containing block for any
+     position:fixed descendant inside them, silently breaking full-screen
+     overlays. The !important below is a second safety net in case a future
+     edit ever nests this somewhere unexpected again. ---------- */
   .cp-upscale-modal-overlay{
-    position:fixed; inset:0; z-index:9999;
-    background:rgba(3,6,14,0.72);
+    position:fixed !important; inset:0 !important; z-index:99999;
+    background:rgba(8,8,16,0.75);
     display:flex; align-items:center; justify-content:center;
     padding:18px;
     opacity:0; visibility:hidden;
@@ -2359,35 +2366,35 @@
     transition: opacity .2s ease, visibility 0s linear 0s;
   }
   .cp-upscale-modal{
-    position:relative; width:100%; max-width:400px;
-    background:linear-gradient(180deg, var(--panel-2), var(--panel));
-    border:1.5px solid var(--border);
-    border-radius:18px;
-    padding:26px 22px 22px;
-    box-shadow:0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,143,255,0.08) inset;
+    position:relative; width:100%; max-width:380px;
+    background:#ffffff;
+    border-radius:20px;
+    padding:32px 24px 26px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.5);
+    text-align:center;
     transform:translateY(10px) scale(0.98);
     transition: transform .22s ease;
   }
   .cp-upscale-modal-overlay.show .cp-upscale-modal{ transform:translateY(0) scale(1); }
   .cp-upscale-modal-close{
-    position:absolute; top:12px; right:12px;
+    position:absolute; top:14px; right:14px;
     width:30px; height:30px; border-radius:50%;
-    border:1.5px solid var(--border); background:rgba(255,255,255,0.03);
-    color:var(--text-dim); font-size:15px; line-height:1; cursor:pointer;
+    border:none; background:transparent;
+    color:#9a9aa8; font-size:18px; line-height:1; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    transition: background .15s, color .15s, border-color .15s;
+    transition: color .15s, transform .15s;
   }
-  .cp-upscale-modal-close:hover{ background:rgba(124,143,255,0.12); color:#fff; border-color:var(--purple-soft); }
-  .cp-upscale-modal-ico{ font-size:26px; margin-bottom:10px; filter:drop-shadow(0 0 10px rgba(255,210,63,0.5)); }
+  .cp-upscale-modal-close:hover{ color:#333340; transform:scale(1.12); }
+  .cp-upscale-modal-ico{ font-size:30px; margin-bottom:12px; }
   .cp-upscale-modal-title{
     font-family:'BPG Glaho','Space Grotesk',sans-serif;
-    font-size:16.5px; font-weight:700; color:#cdd6ff;
-    margin:0 0 12px; padding-right:26px; line-height:1.35;
+    font-size:19px; font-weight:800; color:#6a3fd6;
+    margin:0 0 16px; padding:0 8px; line-height:1.35;
   }
-  .cp-upscale-modal-text{ font-size:13.5px; line-height:1.65; color:var(--text); margin:0; }
-  .cp-upscale-modal-text b{ color:var(--gold); }
+  .cp-upscale-modal-text{ font-size:14px; line-height:1.7; color:#2b2b38; margin:0; }
+  .cp-upscale-modal-text b{ color:#b8720b; }
   @media (max-width:480px){
-    .cp-upscale-modal{ padding:22px 16px 18px; }
+    .cp-upscale-modal{ padding:26px 18px 20px; }
   }
 
   /* ---------- Manual duration entry (collapsed accordion, stopwatch card) ---------- */
@@ -5436,15 +5443,6 @@
       </div>
       <div class="cp-upscale-hint" id="cpQualityHint" data-i18n="cpQualityHint">აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება</div>
 
-      <div class="cp-upscale-modal-overlay" id="cpUpscaleModalOverlay">
-        <div class="cp-upscale-modal">
-          <button type="button" class="cp-upscale-modal-close" id="cpUpscaleModalClose" aria-label="დახურვა">✕</button>
-          <div class="cp-upscale-modal-ico" aria-hidden="true">⚠️</div>
-          <div class="cp-upscale-modal-title" id="cpUpscaleModalTitle" data-i18n="cpUpscaleModalTitle">ამ ხარისხში გადაყვანა შეუძლებელია</div>
-          <p class="cp-upscale-modal-text" id="cpUpscaleModalText" data-i18n="cpUpscaleModalText4k">ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.</p>
-        </div>
-      </div>
-
       <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
 
       <div class="field field-tiktok" style="margin-bottom:6px;">
@@ -5652,6 +5650,24 @@
   <div class="chat-input-row">
     <input type="text" id="chatInput" placeholder="დასვი კითხვა…" data-i18n-placeholder="chatInputPlaceholder">
     <button class="chat-send" id="chatSend">➤</button>
+  </div>
+</div>
+
+<!-- Cheap Package: "can't upscale past your uploaded source" notice. Deliberately
+     placed at the top level of <body> (like discord-gate / admin-overlay below),
+     NOT nested inside any .moon-glow-card container — those cards use
+     `contain: layout paint style` plus a `> *{ position:relative }` rule for their
+     own glow/star effects, and either one alone is enough to hijack a
+     position:fixed descendant into being positioned relative to the CARD instead
+     of the viewport. Nesting this modal inside one earlier caused it to render as
+     a tall, un-hideable block stretching down the whole accordion panel instead of
+     a proper full-screen popup. -->
+<div class="cp-upscale-modal-overlay" id="cpUpscaleModalOverlay">
+  <div class="cp-upscale-modal">
+    <button type="button" class="cp-upscale-modal-close" id="cpUpscaleModalClose" aria-label="დახურვა">✕</button>
+    <div class="cp-upscale-modal-ico" aria-hidden="true">⚠️</div>
+    <div class="cp-upscale-modal-title" id="cpUpscaleModalTitle" data-i18n="cpUpscaleModalTitle">ამ ხარისხში გადაყვანა შეუძლებელია</div>
+    <p class="cp-upscale-modal-text" id="cpUpscaleModalText" data-i18n="cpUpscaleModalText4k">ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.</p>
   </div>
 </div>
 
