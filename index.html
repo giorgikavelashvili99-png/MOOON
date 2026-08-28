@@ -3972,6 +3972,29 @@
   @media (max-width:900px){
     .pc-duo-row{ grid-template-columns:1fr; max-width:none; }
   }
+  /* Same idea as .pc-duo-row, one column wider — edit order / cheap
+     package / free TikTok downloader now sit level in a single row on
+     desktop and stack on narrow screens. */
+  .pc-trio-row{
+    grid-column: 1 / -1;
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;
+    width:100%; max-width:960px; margin:0 auto;
+  }
+  .pc-trio-row .pc-card--edit,
+  .pc-trio-row .pc-card-wrap--cheap,
+  .pc-trio-row .pc-card-wrap--ttdl{
+    min-width:0; height:100%;
+  }
+  .pc-trio-row .pc-card-wrap--cheap .pc-card--cheap,
+  .pc-trio-row .pc-card-wrap--ttdl .pc-card--ttdl{ height:100%; }
+  .pc-trio-row .pc-card--edit.pc-card--edit,
+  .pc-trio-row .pc-card-wrap--cheap,
+  .pc-trio-row .pc-card-wrap--ttdl{
+    grid-column:auto; width:auto; max-width:none; margin:0;
+  }
+  @media (max-width:900px){
+    .pc-trio-row{ grid-template-columns:1fr; max-width:none; }
+  }
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
      sit OUTSIDE the card's own clipped box (poking above its top edge),
      while the card itself needs overflow:hidden to correctly contain its
@@ -4089,6 +4112,94 @@
     --pc-cta-text: #fff;
   }
   #cheapOrderPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+
+  /* ---------- Free TikTok Downloader tool — deliberately NOT another
+     single-hue foil colorway like the packages above. It's a free tool,
+     not a priced package, so it gets its own visual language: TikTok's
+     own cyan + pink duotone on a near-black glass panel, plus a small
+     animated particle net behind the content — reads instantly as
+     "different" from the priced cards sitting right next to it. ---------- */
+  .pc-card--ttdl{
+    --pc-accent:#25F4EE;
+    --pc-accent-2:#FE2C55;
+    --pc-bg: radial-gradient(ellipse 90% 60% at 15% 0%, rgba(37,244,238,0.18), transparent 55%),
+             radial-gradient(ellipse 90% 65% at 100% 100%, rgba(254,44,85,0.16), transparent 55%),
+             linear-gradient(180deg, #07070a, #0c0c12);
+    --pc-border: rgba(37,244,238,0.4);
+    --pc-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 40px rgba(37,244,238,0.14);
+    --pc-icon-bg: linear-gradient(135deg, #25F4EE, #FE2C55);
+  }
+  .pc-card--ttdl::before{
+    background:linear-gradient(90deg, transparent, var(--pc-accent), var(--pc-accent-2), transparent);
+  }
+
+  /* Free-tool ribbon — cyan/pink, replaces the gold-star "პოპულარული"
+     ribbon used on the priced packages. This one flags the card as free. */
+  .pc-badge--ttdl{
+    background:linear-gradient(120deg, #25F4EE, #FE2C55);
+    color:#04141a;
+  }
+  .pc-badge--ttdl::before{ content:'⚡'; color:#04141a; }
+
+  /* Tiny particle canvas confined to this one card only. Absolutely
+     positioned behind every other child; pointer-events:none so it never
+     steals clicks from the input/buttons sitting on top of it. */
+  .ttdl-particles{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:0; opacity:0.55;
+  }
+  .pc-card--ttdl > *:not(.ttdl-particles){ position:relative; z-index:1; }
+
+  .ttdl-input-row{ display:flex; gap:8px; margin-bottom:10px; }
+  .ttdl-input{
+    flex:1 1 auto; min-width:0;
+    padding:11px 12px; border-radius:10px;
+    background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1);
+    color:#fff; font-size:12.5px; outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .ttdl-input::placeholder{ color:var(--text-faint); }
+  .ttdl-input:focus{ border-color:var(--pc-accent); box-shadow:0 0 12px rgba(37,244,238,0.25); }
+
+  .ttdl-analyze-btn{
+    width:100%; padding:11px; margin-bottom:12px;
+    border:none; border-radius:10px; cursor:pointer;
+    font-family:'BPG Glaho','Space Grotesk',sans-serif; font-weight:800; font-size:13px; letter-spacing:0.02em;
+    background:linear-gradient(90deg, #25F4EE, #FE2C55); color:#04141a;
+    box-shadow:0 10px 24px rgba(37,244,238,0.25);
+    transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+  }
+  .ttdl-analyze-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 32px rgba(37,244,238,0.4); }
+  .ttdl-analyze-btn:disabled{ opacity:0.55; cursor:default; transform:none; }
+
+  .ttdl-result{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px; padding:8px 10px; margin-bottom:10px;
+  }
+  .ttdl-thumb{ width:44px; height:44px; border-radius:6px; object-fit:cover; flex-shrink:0; background:#000; }
+  .ttdl-result-info{ flex:1 1 auto; min-width:0; }
+  .ttdl-result-title{ font-size:11.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ttdl-result-meta{ font-size:10px; color:var(--text-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .ttdl-dl-row{ display:flex; gap:8px; margin-bottom:10px; }
+  .ttdl-dl-btn{
+    flex:1; padding:10px; border-radius:9px; cursor:pointer; border:1px solid rgba(255,255,255,0.14);
+    background:rgba(255,255,255,0.05); color:#fff; font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-weight:700; font-size:12px; transition:all .2s ease;
+  }
+  .ttdl-dl-btn:hover{ border-color:var(--pc-accent); box-shadow:0 0 14px rgba(37,244,238,0.3); }
+  .ttdl-dl-btn--hd{ border-color:rgba(254,44,85,0.4); }
+  .ttdl-dl-btn--hd:hover{ border-color:var(--pc-accent-2); box-shadow:0 0 14px rgba(254,44,85,0.3); }
+  .ttdl-dl-btn:disabled{ opacity:0.5; cursor:default; box-shadow:none; }
+
+  .ttdl-log{
+    background:#000; border:1px solid rgba(37,244,238,0.3); border-radius:8px;
+    padding:8px 9px; font-family:'JetBrains Mono',monospace; font-size:10px; line-height:1.5;
+    color:#9fb0c8; height:64px; overflow-y:auto; margin-bottom:8px;
+  }
+  .ttdl-log div{ white-space:normal; word-break:break-word; }
+  .ttdl-note{ font-size:9.5px; color:var(--text-faint); line-height:1.45; text-align:center; }
 
   .pc-badge{
     position:absolute; top:-11px; right:16px; z-index:6;
@@ -5274,7 +5385,7 @@
         </div>
 
       <!-- Card 4 — edit order (character edit) -->
-      <div class="pc-duo-row">
+      <div class="pc-trio-row">
       <div class="pc-card pc-card--edit">
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">✨</div>
@@ -5476,6 +5587,43 @@
         </div>
       </div>
       </div>
+
+      <!-- Card 6 — free TikTok video downloader tool (no order flow, works instantly) -->
+      <div class="pc-card-wrap pc-card-wrap--ttdl">
+      <div class="pc-badge pc-badge--ttdl" data-i18n="ttdlBadge">უფასო</div>
+      <div class="pc-card pc-card--ttdl">
+        <canvas class="ttdl-particles" id="ttdlParticles" aria-hidden="true"></canvas>
+        <div class="pc-head">
+        <div class="pc-icon" aria-hidden="true">⬇️</div>
+          <div class="pc-head-text">
+          <div class="pc-title" data-i18n="ttdlTitle">TikTok დაუნლოუდერი</div>
+          <div class="pc-desc" data-i18n="ttdlDesc">ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში</div>
+          </div>
+        </div>
+
+        <div class="ttdl-input-row">
+          <input type="text" class="ttdl-input" id="ttdlUrlInput" data-i18n-placeholder="ttdlInputPh" placeholder="ჩასვი TikTok ვიდეოს ლინკი...">
+        </div>
+        <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
+
+        <div class="ttdl-result" id="ttdlResult" style="display:none;">
+          <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
+          <div class="ttdl-result-info">
+            <div class="ttdl-result-title" id="ttdlResultTitle"></div>
+            <div class="ttdl-result-meta" id="ttdlResultMeta"></div>
+          </div>
+        </div>
+
+        <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
+          <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled>SD</button>
+          <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled>HD</button>
+        </div>
+
+        <div class="ttdl-log" id="ttdlLog"></div>
+        <div class="ttdl-note" data-i18n="ttdlNote">მხოლოდ საკუთარი ან თანხმობის მქონე ვიდეოსთვის გამოიყენეთ</div>
+      </div>
+      </div>
+
       </div>
     </div>
   </div>
@@ -5777,6 +5925,12 @@
       cpSendWA: 'იაფი შეკვეთა — WhatsApp',
       cpSendTG: 'იაფი შეკვეთა — Telegram',
       cpQualityHint: 'აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება',
+      ttdlBadge: 'უფასო',
+      ttdlTitle: 'TikTok დაუნლოუდერი',
+      ttdlDesc: 'ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში',
+      ttdlInputPh: 'ჩასვი TikTok ვიდეოს ლინკი...',
+      ttdlAnalyzeBtn: 'გაანალიზება',
+      ttdlNote: 'მხოლოდ საკუთარი ან თანხმობის მქონე ვიდეოსთვის გამოიყენეთ',
       cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
       cpUpscaleModalText4k: 'ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.',
       cpUpscaleModalTextDowngrade: 'ძვირფასო მომხმარებელო, თქვენი ატვირთული ვიდეო 1080p-ზე მაღალი ხარისხისაა, ამიტომ ფასი ავტომატურად <b>4K</b> ტარიფზეა დაფიქსირებული — <b>1080p</b>-ის ფასზე გადასვლა შეუძლებელია. თუ გსურთ 1080p ფასით სარგებლობა, ატვირთეთ ზუსტად 1080p ფორმატის ვიდეო.',
@@ -6161,6 +6315,12 @@
       cpSendWA: 'Cheap order — WhatsApp',
       cpSendTG: 'Cheap order — Telegram',
       cpQualityHint: 'Pick a quality or upload your video — the matching price will be selected automatically',
+      ttdlBadge: 'FREE',
+      ttdlTitle: 'TikTok Downloader',
+      ttdlDesc: 'Download videos without the watermark, in the best quality available',
+      ttdlInputPh: 'Paste a TikTok video link...',
+      ttdlAnalyzeBtn: 'Analyze Video',
+      ttdlNote: 'Only use this for your own content or content you have permission to download',
       cpUpscaleModalTitle: "You can't switch to this quality",
       cpUpscaleModalText4k: "Dear customer, your video was uploaded in <b>1080p</b> — whatever its FPS, it can't be converted to <b>4K</b>. To use the 4K option, please upload a video that is actually filmed/exported in 4K.",
       cpUpscaleModalTextDowngrade: "Dear customer, your uploaded video is higher quality than 1080p, so the price is automatically locked to the <b>4K</b> rate — switching to the <b>1080p</b> price isn't possible. If you want the 1080p price, upload a video that is exactly 1080p.",
@@ -12206,12 +12366,227 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
   }
 
+  /* ---------- Free TikTok Downloader tool (Card 6) ----------
+     Same TikTok-link / quality logic as the standalone "TikTok Video
+     Downloader" Chrome extension, ported for a plain webpage: no
+     chrome.* APIs here, just fetch() and a real file download. Runs on
+     the public tikwm.com API, the same service most watermark-free
+     TikTok downloader tools run on — it's built to be called straight
+     from browser JS, which is exactly what happens below. */
+  function ttdlDict(key){
+    const isEn = (document.documentElement.lang === 'en') || (localStorage.getItem('moon_lang') === 'en');
+    const map = {
+      needLink: ['ჩასვით TikTok ვიდეოს ლინკი.', 'Paste a TikTok video link first.'],
+      analyzing: ['მუშავდება...', 'Analyzing...'],
+      logAnalyzing: ['ვიდეოს ანალიზი მიმდინარეობს...', 'Analyzing video...'],
+      logFound: ['ვიდეო მოიძებნა — აირჩიეთ ხარისხი.', 'Video found — choose a quality.'],
+      logFail: ['ვერ მოხერხდა ვიდეოს ანალიზი. შეამოწმეთ ლინკი.', 'Could not analyze this link. Check the URL.'],
+      logNoLink: ['ამ ხარისხში ბმული ვერ მოიძებნა.', 'No download link available for this quality.'],
+      preparing: ['მზადდება...', 'Preparing...'],
+      logDownloading: ['ვიდეო იტვირთება...', 'Downloading video...'],
+      logDone: ['ჩამოტვირთვა დაწყებულია.', 'Download started.'],
+      logFallback: ['პირდაპირი გადმოწერა ვერ მოხერხდა — ვიდეო გაიხსნა ახალ ჩანართში, შეინახეთ „შენახვა როგორც"-ით.', 'Direct download was blocked — opened the video in a new tab, use "Save video as" to keep it.'],
+      logReady: ['მზადაა.', 'Ready.'],
+      untitled: ['უსათაურო ვიდეო', 'Untitled video'],
+      views: ['ნახვა', 'views']
+    };
+    const pair = map[key] || ['', ''];
+    return isEn ? pair[1] : pair[0];
+  }
+
+  function initTiktokDownloader(){
+    const urlInput = document.getElementById('ttdlUrlInput');
+    const analyzeBtn = document.getElementById('ttdlAnalyzeBtn');
+    const resultBox = document.getElementById('ttdlResult');
+    const thumbEl = document.getElementById('ttdlThumb');
+    const titleEl = document.getElementById('ttdlResultTitle');
+    const metaEl = document.getElementById('ttdlResultMeta');
+    const dlRow = document.getElementById('ttdlDlRow');
+    const sdBtn = document.getElementById('ttdlDlSd');
+    const hdBtn = document.getElementById('ttdlDlHd');
+    const logEl = document.getElementById('ttdlLog');
+    if (!analyzeBtn || !urlInput) return;
+
+    let lastData = null;
+
+    function ttdlLog(msg){
+      if (!logEl || !msg) return;
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement('div');
+      line.textContent = `[${time}] ${msg}`;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function ttdlFormatCount(n){
+      n = Number(n) || 0;
+      if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+      if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+      return String(n);
+    }
+
+    function setBtnBusy(btn, busy, busyText){
+      if (!btn) return;
+      if (busy){
+        btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
+        btn.textContent = busyText || '...';
+        btn.disabled = true;
+      } else {
+        btn.textContent = btn.dataset.originalText || btn.textContent;
+        btn.disabled = false;
+      }
+    }
+
+    async function ttdlAnalyze(){
+      const url = (urlInput.value || '').trim();
+      if (!url){ ttdlLog(ttdlDict('needLink')); return; }
+      setBtnBusy(analyzeBtn, true, ttdlDict('analyzing'));
+      resultBox.style.display = 'none';
+      dlRow.style.display = 'none';
+      sdBtn.disabled = true; hdBtn.disabled = true;
+      ttdlLog(ttdlDict('logAnalyzing'));
+      try{
+        const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url);
+        const res = await fetch(api);
+        const json = await res.json();
+        if (json && json.code === 0 && json.data){
+          const d = json.data;
+          lastData = {
+            sd: d.play,
+            hd: d.hdplay || d.play,
+            cover: d.cover || d.origin_cover,
+            title: d.title,
+            author: d.author && d.author.nickname,
+            views: d.play_count
+          };
+          thumbEl.src = lastData.cover || '';
+          titleEl.textContent = lastData.title || ttdlDict('untitled');
+          metaEl.textContent = (lastData.author ? '@' + lastData.author + ' · ' : '') + ttdlFormatCount(lastData.views) + ' ' + ttdlDict('views');
+          resultBox.style.display = 'flex';
+          dlRow.style.display = 'flex';
+          sdBtn.disabled = !lastData.sd;
+          hdBtn.disabled = !lastData.hd;
+          ttdlLog(ttdlDict('logFound'));
+        } else {
+          ttdlLog(ttdlDict('logFail'));
+        }
+      } catch(e){
+        ttdlLog(ttdlDict('logFail'));
+      } finally {
+        setBtnBusy(analyzeBtn, false);
+      }
+    }
+
+    async function ttdlDownload(quality){
+      if (!lastData) return;
+      const link = quality === 'hd' ? lastData.hd : lastData.sd;
+      if (!link){ ttdlLog(ttdlDict('logNoLink')); return; }
+      const btn = quality === 'hd' ? hdBtn : sdBtn;
+      setBtnBusy(btn, true, ttdlDict('preparing'));
+      ttdlLog(ttdlDict('logDownloading'));
+      try{
+        const res = await fetch(link);
+        if (!res.ok) throw new Error('bad response');
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `tiktok_${Date.now()}_${quality}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 8000);
+        ttdlLog(ttdlDict('logDone'));
+      } catch(e){
+        // Cross-origin fetch was blocked by the video CDN — fall back to
+        // just opening the direct link; the browser's own video player
+        // still lets the visitor save it from there ("Save video as...").
+        window.open(link, '_blank', 'noopener');
+        ttdlLog(ttdlDict('logFallback'));
+      } finally {
+        setBtnBusy(btn, false);
+      }
+    }
+
+    analyzeBtn.addEventListener('click', ttdlAnalyze);
+    urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ttdlAnalyze(); });
+    sdBtn.addEventListener('click', () => ttdlDownload('sd'));
+    hdBtn.addEventListener('click', () => ttdlDownload('hd'));
+
+    ttdlLog(ttdlDict('logReady'));
+    initTtdlParticles();
+  }
+
+  function initTtdlParticles(){
+    const canvas = document.getElementById('ttdlParticles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const card = canvas.closest('.pc-card--ttdl');
+    if (!card) return;
+
+    function resize(){
+      canvas.width = card.clientWidth;
+      canvas.height = card.clientHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const colors = ['rgba(37,244,238,0.75)', 'rgba(254,44,85,0.75)'];
+    let particles = [];
+    function build(){
+      particles = [];
+      const count = Math.max(10, Math.min(28, Math.floor((canvas.width * canvas.height) / 9000)));
+      for (let i = 0; i < count; i++){
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          dx: (Math.random() - 0.5) * 0.4,
+          dy: (Math.random() - 0.5) * 0.4,
+          size: Math.random() * 1.6 + 0.8,
+          color: colors[Math.random() > 0.5 ? 1 : 0]
+        });
+      }
+    }
+    build();
+
+    function step(){
+      requestAnimationFrame(step);
+      if (!canvas.width || !canvas.height) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles){
+        if (p.x > canvas.width || p.x < 0) p.dx *= -1;
+        if (p.y > canvas.height || p.y < 0) p.dy *= -1;
+        p.x += p.dx; p.y += p.dy;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      }
+      for (let i = 0; i < particles.length; i++){
+        for (let j = i + 1; j < particles.length; j++){
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = dx * dx + dy * dy;
+          if (dist < 6000){
+            ctx.strokeStyle = `rgba(255,255,255,${(1 - dist / 6000) * 0.12})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+    step();
+  }
+
   applyTranslations();
   initAdminModeCheckbox();
   applyAdminNameLock();
   initBeforeAfterSliders();
   initTilt3D();
   initDiscordAuth();
+  initTiktokDownloader();
 </script>
 
 </body>
