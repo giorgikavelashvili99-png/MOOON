@@ -1441,6 +1441,30 @@
 
   .admin-box .a-block-btn{ background:linear-gradient(135deg, #fdba74, #ea580c); color:#2a1400; box-shadow:0 4px 14px -4px rgba(234,88,12,0.5); }
   .admin-box .a-unblock-btn{ background:linear-gradient(135deg, #4ade80, #16a34a); color:#04150a; box-shadow:0 4px 14px -4px rgba(74,222,128,0.55); }
+  .admin-box .a-logout-btn{ background:linear-gradient(135deg, #8ea1ff, #5865F2); color:#0a0f2e; box-shadow:0 4px 14px -4px rgba(88,101,242,0.55); }
+  .admin-box .a-order-row.a-du-row{ flex-direction:row; align-items:center; flex-wrap:wrap; }
+  .admin-box .a-du-avatar{
+    width:38px; height:38px; border-radius:10px; flex:0 0 auto;
+    background:#12121e; border:1px solid var(--moon-line); object-fit:cover;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .admin-box .a-du-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .admin-box .a-du-info{ flex:1 1 160px; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .admin-box .a-du-name{ font-size:13px; font-weight:700; color:var(--moon-silver); word-break:break-word; }
+  .admin-box .a-du-name .a-du-blocked-tag{ color:var(--warn); font-size:10.5px; font-weight:700; margin-left:6px; }
+  .admin-box .a-du-meta{ font-size:11px; color:var(--text-faint); line-height:1.5; }
+  .admin-box .a-du-actions{ display:flex; gap:8px; flex:0 0 auto; }
+  .admin-box .a-du-actions button{
+    border:none; border-radius:8px; padding:7px 12px; font-size:11px; font-weight:700; cursor:pointer;
+    transition:transform .15s ease, filter .15s ease;
+  }
+  .admin-box .a-du-actions button:hover{ filter:brightness(1.12); transform:translateY(-1px); }
+  .admin-box .a-du-actions button:active{ transform:scale(0.95); }
+  @media (max-width:480px){
+    .admin-box .a-order-row.a-du-row{ flex-direction:column; align-items:stretch; }
+    .admin-box .a-du-actions{ width:100%; }
+    .admin-box .a-du-actions button{ flex:1; }
+  }
 
   .admin-box .a-blocklist{
     background:#0a0a16; border:1px solid var(--moon-line); border-radius:12px;
@@ -2309,6 +2333,61 @@
   @media (max-width:480px){
     .sr-reject{ padding:16px 14px; }
     .sr-reject-apps-row{ font-size:11px; }
+  }
+
+  /* ---------- Cheap Package: no quality pre-selected, small helper note ---------- */
+  .cp-upscale-hint{
+    margin-top:8px; font-size:11.5px; line-height:1.5; color:var(--text-faint); text-align:center;
+  }
+
+  /* ---------- Cheap Package: "can't upscale past your source" popup modal.
+     Shown when a visitor has already uploaded a video (so we know its real
+     resolution) and then tries to manually pick a higher-priced tile than
+     that footage actually supports (e.g. source is 1080p/2K, tile is 4K).
+     Styled as a centered card over a dimmed backdrop, matching the rest of
+     the site's dark/purple/gold palette rather than any external UI. ---------- */
+  .cp-upscale-modal-overlay{
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(3,6,14,0.72);
+    display:flex; align-items:center; justify-content:center;
+    padding:18px;
+    opacity:0; visibility:hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+  }
+  .cp-upscale-modal-overlay.show{
+    opacity:1; visibility:visible;
+    transition: opacity .2s ease, visibility 0s linear 0s;
+  }
+  .cp-upscale-modal{
+    position:relative; width:100%; max-width:400px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1.5px solid var(--border);
+    border-radius:18px;
+    padding:26px 22px 22px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,143,255,0.08) inset;
+    transform:translateY(10px) scale(0.98);
+    transition: transform .22s ease;
+  }
+  .cp-upscale-modal-overlay.show .cp-upscale-modal{ transform:translateY(0) scale(1); }
+  .cp-upscale-modal-close{
+    position:absolute; top:12px; right:12px;
+    width:30px; height:30px; border-radius:50%;
+    border:1.5px solid var(--border); background:rgba(255,255,255,0.03);
+    color:var(--text-dim); font-size:15px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .cp-upscale-modal-close:hover{ background:rgba(124,143,255,0.12); color:#fff; border-color:var(--purple-soft); }
+  .cp-upscale-modal-ico{ font-size:26px; margin-bottom:10px; filter:drop-shadow(0 0 10px rgba(255,210,63,0.5)); }
+  .cp-upscale-modal-title{
+    font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-size:16.5px; font-weight:700; color:#cdd6ff;
+    margin:0 0 12px; padding-right:26px; line-height:1.35;
+  }
+  .cp-upscale-modal-text{ font-size:13.5px; line-height:1.65; color:var(--text); margin:0; }
+  .cp-upscale-modal-text b{ color:var(--gold); }
+  @media (max-width:480px){
+    .cp-upscale-modal{ padding:22px 16px 18px; }
   }
 
   /* ---------- Manual duration entry (collapsed accordion, stopwatch card) ---------- */
@@ -5344,7 +5423,7 @@
         </div>
       </div>
       <div class="mp-grid mp-grid-two" id="cpQualityGrid" style="margin-top:14px;">
-        <button type="button" class="mp-box active" data-quality="1080_60">
+        <button type="button" class="mp-box" data-quality="1080_60">
           <span class="mp-box-q">1080p</span>
           <span class="mp-box-fps">60FPS</span>
           <span class="mp-box-price"><span class="mp-new-price">0.99<sup>₾</sup></span></span>
@@ -5354,6 +5433,16 @@
           <span class="mp-box-fps">60FPS</span>
           <span class="mp-box-price"><span class="mp-new-price">1.99<sup>₾</sup></span></span>
         </button>
+      </div>
+      <div class="cp-upscale-hint" id="cpQualityHint" data-i18n="cpQualityHint">აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება</div>
+
+      <div class="cp-upscale-modal-overlay" id="cpUpscaleModalOverlay">
+        <div class="cp-upscale-modal">
+          <button type="button" class="cp-upscale-modal-close" id="cpUpscaleModalClose" aria-label="დახურვა">✕</button>
+          <div class="cp-upscale-modal-ico" aria-hidden="true">⚠️</div>
+          <div class="cp-upscale-modal-title" id="cpUpscaleModalTitle" data-i18n="cpUpscaleModalTitle">ამ ხარისხში გადაყვანა შეუძლებელია</div>
+          <p class="cp-upscale-modal-text" id="cpUpscaleModalText" data-i18n="cpUpscaleModalText4k">ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.</p>
+        </div>
       </div>
 
       <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
@@ -5467,6 +5556,8 @@
         <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
         <button class="a-tab" id="adminTabArchive" data-i18n="adminTabArchive">არქივი</button>
         <button class="a-tab" id="adminTabOrders" data-i18n="adminTabOrders">შეკვეთები</button>
+        <button class="a-tab" id="adminTabDiscordUsers" data-i18n="adminTabDiscordUsers">Discord მომხმარებლები</button>
+        <button class="a-tab" id="adminTabDiscordNotify" data-i18n="adminTabDiscordNotify">Discord შეტყობინებები</button>
         <button class="a-tab" id="adminTabAnalytics" data-i18n="adminTabAnalytics">ანალიტიკა</button>
         <button class="a-tab" id="adminTabUrgency" data-i18n="adminTabUrgency">ადგილები</button>
         <button class="a-tab" id="adminTabPromo" data-i18n="adminTabPromo">Promo</button>
@@ -5489,11 +5580,23 @@
         <div class="a-subheading" data-i18n="adminConfirmedOrdersTitle">დადასტურებული შეკვეთების არქივი</div>
         <div class="a-form-row"><input type="text" id="confirmedOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
         <div id="confirmedOrdersList"></div>
+      </div>
+      <div class="a-panel" id="adminPanelDiscordUsers">
+        <div class="a-subheading" data-i18n="adminDiscordUsersTitle">Discord მომხმარებლები</div>
+        <div class="a-stat-note" data-i18n="adminDiscordUsersNote">აქ ჩანს ყველა მომხმარებელი, ვინც ოდესმე შემოვიდა საიტზე Discord ანგარიშით — შეგიძლია გამოაგდო მიმდინარე სესიიდან („გამოსვლა") ან სამუდამოდ დაბლოკო საიტზე Discord-ით შესვლა („დაბლოკვა").</div>
+        <div class="a-form-row"><input type="text" id="discordUsersSearch" data-i18n-placeholder="adminDiscordUsersSearchPh" placeholder="ძებნა სახელით ან ID-ით..."></div>
+        <div id="discordUsersList"></div>
 
         <div class="a-subheading" data-i18n="adminActiveSubsTitle">აქტიური პაკეტები (Discord)</div>
         <div class="a-stat-note" data-i18n="adminActiveSubsNote">როცა ზემოთ დაუდასტურებელი 1-კვირიანი/1-თვიანი შეკვეთა დაადასტურებ, დისქორდით შესული მომხმარებლისთვის აქ ავტომატურად გააქტიურდება პაკეტი — მანამ, სანამ არ ამოიწურება, საიტზე მას აღარ მოეთხოვება TikTok ლინკის ხელახლა შეყვანა.</div>
         <div class="a-form-row"><input type="text" id="activeSubsSearch" data-i18n-placeholder="adminActiveSubsSearchPh" placeholder="ძებნა Discord სახელით..."></div>
         <div id="activeSubsList"></div>
+      </div>
+      <div class="a-panel" id="adminPanelDiscordNotify">
+        <div class="a-subheading" data-i18n="adminDiscordNotifyTitle">Discord შეტყობინებები (ჩაბარების ვადა)</div>
+        <div class="a-stat-note" data-i18n="adminDiscordNotifyNote">დადასტურებული შეკვეთები, რომლებიც Discord ანგარიშითაა შეკვეთილი — უგზავნი მომხმარებელს პირად შეტყობინებას სავარაუდო ჩაბარების ვადით.</div>
+        <div class="a-form-row"><input type="text" id="discordNotifySearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+        <div id="discordNotifyList"></div>
       </div>
       <div class="a-panel" id="adminPanelAnalytics">
         <div class="a-chart-card" id="analyticsSummaryCard"></div>
@@ -5598,6 +5701,8 @@
       authMemberBadge: 'MEMBER',
       authLogout: 'გამოსვლა',
       authError: 'Discord-ით შესვლა ვერ მოხერხდა — სცადე ხელახლა.',
+      authBlockedError: 'თქვენი Discord ანგარიში დაბლოკილია ადმინისტრაციის მიერ — ვერ შეძლებთ ამ საიტზე Discord-ით შესვლას.',
+      authKickedNotice: 'თქვენ გამოხვედით სისტემიდან ადმინისტრაციის მიერ.',
       heroTitle: '<span>შეუკვეთე ახლავე!</span>',
       heroSub: 'მიუთითე ვიდეოს ხანგრძლივობა (ან ატვირთე ვიდეო და ავტომატურად გაზომავს) — ფასი გამოითვლება რეალურ დროში, After Effects & Topaz ხარისხის მონტაჟისთვის.',
       pcHeading: 'აირჩიეთ პაკეტი',
@@ -5655,6 +5760,9 @@
       cpCaption: 'იაფი პაკეტი — სწრაფი და ეკონომიური დამუშავება, TOPAZ-ისა და ეფექტების გარეშე',
       cpSendWA: 'იაფი შეკვეთა — WhatsApp',
       cpSendTG: 'იაფი შეკვეთა — Telegram',
+      cpQualityHint: 'აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება',
+      cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
+      cpUpscaleModalText4k: 'ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.',
       qnHowto: 'როგორ შევუკვეთო',
       qnPromo: 'პრომო კოდი',
       qnBeforeAfter: 'მონტაჟამდე / მონტაჟის შემდეგ',
@@ -5741,7 +5849,7 @@
       srRejectTitle: 'ფაილი არ შეესაბამება მოთხოვნებს',
       srRejectDetectedLabel: 'ატვირთული ფაილის მონაცემები:',
       srRejectText: 'ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.',
-      srReject4kNote: 'ℹ️ 2K/4K ფორმატის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას (4K-ის ფასად) — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
+      srReject4kNote: 'ℹ️ 2K/4K ფორმატის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას (2K ფასდება 1080p-ის ტარიფით, 4K — 4K ტარიფით) — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
       srReject4kNoteShort: 'ℹ️ 2K/4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“',
       srRejectAppsMobile: 'მობილურებისთვის / აიფონისთვის / აიპადებისთვის:',
       srRejectAppsDesktop: 'კომპიუტერისთვის:',
@@ -5853,6 +5961,8 @@
       adminBlockIp: 'IP-ის დაბლოკვა',
       adminUnblockIp: 'IP-ის განბლოკვა',
       adminTabOrders: 'შეკვეთები',
+      adminTabDiscordUsers: 'Discord მომხმარებლები',
+      adminTabDiscordNotify: 'Discord შეტყობინებები',
       adminTabAnalytics: 'ანალიტიკა',
       adminTabUrgency: 'ადგილები',
       adminTabPromo: 'Promo',
@@ -5884,6 +5994,20 @@
       adminActiveSubsTitle: 'აქტიური პაკეტები (Discord)',
       adminActiveSubsNote: 'როცა ზემოთ დაუდასტურებელი 1-კვირიანი/1-თვიანი შეკვეთა დაადასტურებ, დისქორდით შესული მომხმარებლისთვის აქ ავტომატურად გააქტიურდება პაკეტი — მანამ, სანამ არ ამოიწურება, საიტზე მას აღარ მოეთხოვება TikTok ლინკის ხელახლა შეყვანა.',
       adminActiveSubsSearchPh: 'ძებნა Discord სახელით...',
+      adminDiscordUsersTitle: 'Discord მომხმარებლები',
+      adminDiscordUsersNote: 'აქ ჩანს ყველა მომხმარებელი, ვინც ოდესმე შემოვიდა საიტზე Discord ანგარიშით — შეგიძლია გამოაგდო მიმდინარე სესიიდან („გამოსვლა") ან სამუდამოდ დაბლოკო საიტზე Discord-ით შესვლა („დაბლოკვა").',
+      adminDiscordUsersSearchPh: 'ძებნა სახელით ან ID-ით...',
+      adminNoDiscordUsers: 'ჯერ არავინ შესულა Discord ანგარიშით.',
+      adminNoDiscordUsersMatch: 'ვერაფერი მოიძებნა.',
+      adminDuFirstSeen: 'პირველი ვიზიტი',
+      adminDuLastSeen: 'ბოლო ვიზიტი',
+      adminDuLogout: 'გამოსვლა',
+      adminDuBlocked: 'დაბლოკილია',
+      adminDuBlockConfirm: 'დარწმუნებული ხარ, რომ გინდა ამ Discord მომხმარებლის დაბლოკვა? მას აღარ შეეძლება საიტზე Discord-ით შესვლა და დაუყოვნებლივ გამოვა სისტემიდან.',
+      adminDiscordNotifyTitle: 'Discord შეტყობინებები (ჩაბარების ვადა)',
+      adminDiscordNotifyNote: 'დადასტურებული შეკვეთები, რომლებიც Discord ანგარიშითაა შეკვეთილი — უგზავნი მომხმარებელს პირად შეტყობინებას სავარაუდო ჩაბარების ვადით.',
+      adminNoDiscordNotify: 'დისქორდით შეკვეთილი დადასტურებული შეკვეთა ჯერ არ არის.',
+      adminNoDiscordNotifyMatch: 'ვერაფერი მოიძებნა.',
       adminNoActiveSubs: 'აქტიური პაკეტი ჯერ არავის აქვს.',
       adminNoActiveSubsMatch: 'ამ სახელით აქტიური პაკეტი ვერ მოიძებნა.',
       adminSubExpiresIn: 'იწურება',
@@ -5960,6 +6084,8 @@
       authMemberBadge: 'MEMBER',
       authLogout: 'Log out',
       authError: 'Discord sign-in failed — please try again.',
+      authBlockedError: 'Your Discord account has been blocked by an admin — you can no longer sign in with Discord on this site.',
+      authKickedNotice: 'You were signed out by an admin.',
       heroTitle: '<span>Order now!</span>',
       heroSub: 'Enter your video\'s duration (or upload a video and it will measure it automatically) — the price is calculated in real time, for After Effects & Topaz quality editing.',
       pcHeading: 'Choose your package',
@@ -6017,6 +6143,9 @@
       cpCaption: 'Cheap Package — fast and affordable processing, without TOPAZ or effects',
       cpSendWA: 'Cheap order — WhatsApp',
       cpSendTG: 'Cheap order — Telegram',
+      cpQualityHint: 'Pick a quality or upload your video — the matching price will be selected automatically',
+      cpUpscaleModalTitle: "You can't switch to this quality",
+      cpUpscaleModalText4k: "Dear customer, your video was uploaded in <b>1080p</b> — whatever its FPS, it can't be converted to <b>4K</b>. To use the 4K option, please upload a video that is actually filmed/exported in 4K.",
       qnHowto: 'How it works',
       qnPromo: 'Promo code',
       qnBeforeAfter: 'Before / After',
@@ -6103,7 +6232,7 @@
       srRejectTitle: "This file doesn't meet the requirements",
       srRejectDetectedLabel: 'Uploaded file details:',
       srRejectText: 'Dear user, you must upload the video in <b>1080p / 60fps</b> format — exactly this format, no more and no less. Any other resolution or frame rate (e.g. 720p, 2K, 4K, 30fps, 120fps) will not be accepted.',
-      srReject4kNote: 'ℹ️ Uploading a 2K or 4K video is only possible when ordering the "Cheap Package" (at the 4K price) — for every other package, the uploaded video must be exactly 1080p / 60fps.',
+      srReject4kNote: 'ℹ️ Uploading a 2K or 4K video is only possible when ordering the "Cheap Package" (2K is priced at the 1080p rate, 4K at the 4K rate) — for every other package, the uploaded video must be exactly 1080p / 60fps.',
       srReject4kNoteShort: 'ℹ️ 2K/4K upload is only possible in the "Cheap Package"',
       srRejectAppsMobile: 'For mobile / iPhone / iPad:',
       srRejectAppsDesktop: 'For desktop:',
@@ -6215,6 +6344,8 @@
       adminBlockIp: 'Block IP',
       adminUnblockIp: 'Unblock IP',
       adminTabOrders: 'Orders',
+      adminTabDiscordUsers: 'Discord Users',
+      adminTabDiscordNotify: 'Discord Notifications',
       adminTabAnalytics: 'Analytics',
       adminTabUrgency: 'Spots',
       adminTabPromo: 'Promo',
@@ -6246,6 +6377,20 @@
       adminActiveSubsTitle: 'Active packages (Discord)',
       adminActiveSubsNote: 'When you confirm a pending 1-week/1-month order above, the Discord-logged-in customer\'s package is activated here automatically — until it expires, the site no longer asks them to re-enter their TikTok link.',
       adminActiveSubsSearchPh: 'Search by Discord name...',
+      adminDiscordUsersTitle: 'Discord Users',
+      adminDiscordUsersNote: 'Every visitor who has ever signed in with Discord shows up here — you can end their current session ("Log out") or permanently stop them from signing in with Discord on this site ("Block").',
+      adminDiscordUsersSearchPh: 'Search by name or ID...',
+      adminNoDiscordUsers: 'No one has signed in with Discord yet.',
+      adminNoDiscordUsersMatch: 'No matches found.',
+      adminDuFirstSeen: 'First seen',
+      adminDuLastSeen: 'Last seen',
+      adminDuLogout: 'Log out',
+      adminDuBlocked: 'Blocked',
+      adminDuBlockConfirm: 'Are you sure you want to block this Discord user? They will no longer be able to sign in with Discord on this site, and will be signed out immediately.',
+      adminDiscordNotifyTitle: 'Discord Notifications (delivery ETA)',
+      adminDiscordNotifyNote: 'Confirmed orders placed with a Discord account — send the customer a direct message with an estimated delivery time.',
+      adminNoDiscordNotify: 'No confirmed Discord orders yet.',
+      adminNoDiscordNotifyMatch: 'No matches found.',
       adminNoActiveSubs: 'No one has an active package yet.',
       adminNoActiveSubsMatch: 'No active package found with that name.',
       adminSubExpiresIn: 'expires',
@@ -7099,20 +7244,18 @@
   // only a *confirmed* mismatch blocks the upload.
   //
   // The Cheap Package is the one exception: it sells both a 1080p and a 4K
-  // output tier, so its scanner passes allowFourK=true, which also accepts
-  // 4K footage — AND 2K/1440p footage, which is folded into the 4K tier
-  // (same acceptance rule, same price) rather than needing its own price
-  // tile. Every other package still calls this with no 3rd argument, so
-  // their gate is unchanged.
-  //
-  // The 4K/2K tier is judged on RESOLUTION ONLY, not fps. Real-world "4K"
-  // footage is almost always natively 24/25/30fps — 4K/60fps specifically
-  // requires a deliberate camera setting most phones don't default to —
-  // and 2K sources are frequently something like a screen recording at an
-  // odd native fps (e.g. 80fps) — so enforcing an exact 60fps match on top
-  // of the resolution match was rejecting completely standard footage.
-  // The 1080p tier keeps the strict 60fps requirement, since that pairing
-  // has always worked fine. ----
+  // output tier, so its scanner passes allowFourK=true. In that package:
+  //   - FPS never matters, for EITHER tier. The visitor may upload footage
+  //     at any frame rate — fps only ever affected the price/format match
+  //     elsewhere on the site, and the Cheap Package deliberately drops
+  //     that requirement entirely (resolution is the only thing judged).
+  //   - A 2K/1440p upload is treated the SAME as 1080p (the cheaper tier),
+  //     not folded into the 4K tier — footage that isn't genuinely 4K
+  //     can't be sold/priced as 4K, so 2K only ever qualifies the visitor
+  //     for the 1080p price, exactly like true 1080p footage does.
+  //   - Only a true 4K upload matches the 4K tier.
+  // Every other package still calls this with no 3rd argument, so their
+  // gate (strict 1080p/60fps, nothing else) is unchanged.
   const REQUIRED_DIM = 1080;
   const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
   const REQUIRED_DIM_2K = 1440;
@@ -7135,20 +7278,21 @@
       resOk = is1080 || (!!allowFourK && (is2k || is4k));
     }
     const fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
-    const isHighRes = is2k || is4k; // "belongs to the 4K price tier"
-    const isHighResMatch = !!allowFourK && isHighRes;
-    // Reject only on a *confirmed* violation — an unknown value never
-    // blocks the upload on its own. A resolution match on the 2K/4K tier
-    // skips the fps check entirely (see note above); every other case
-    // still requires a confirmed 60fps match.
-    const rejected = isHighResMatch
+    const isHighRes = is2k || is4k; // "belongs to the 4K price tier" (reporting only — see matchedTier below)
+    // Reject only on a *confirmed* violation — an unknown value never blocks
+    // the upload on its own. In the Cheap Package (allowFourK) fps is never
+    // checked at all, for any resolution; every other package still
+    // requires a confirmed 60fps match on top of the resolution match.
+    const rejected = allowFourK
       ? (resOk === false)
       : ((resOk === false) || (fpsOk === false));
-    // matchedTier is only meaningful when the upload was accepted; isHighRes
-    // is reported regardless of allowFourK so callers that DON'T sell 4K can
-    // still tell a rejected 2K/4K upload apart from a rejected 720p one (to
-    // point the visitor at the Cheap Package instead of just saying "no").
-    const matchedTier = is1080 ? '1080_60' : (isHighRes ? '4k_120' : null);
+    // matchedTier is only meaningful when the upload was accepted. A 2K
+    // source is deliberately bucketed with 1080p here (NOT the 4K tier) —
+    // only genuinely 4K footage can match the 4K price. isHighRes is still
+    // reported as-is (regardless of allowFourK) so callers that DON'T sell
+    // 4K can tell a rejected 2K/4K upload apart from a rejected 720p one,
+    // to point the visitor at the Cheap Package instead of just saying "no".
+    const matchedTier = is4k ? '4k_120' : ((is1080 || is2k) ? '1080_60' : null);
     return { rejected, resOk, fpsOk, is4k: isHighRes, matchedTier };
   }
 
@@ -8077,6 +8221,10 @@
       if (fourKNoteEl) {
         fourKNoteEl.style.display = (!cfg.allowFourK && acceptability && acceptability.is4k) ? 'block' : 'none';
       }
+      // Cheap Package only: without a currently-accepted file there's
+      // nothing to hold the visitor's quality pick to, so lift the
+      // upscale restriction until a valid video is scanned again.
+      if (cfg.allowFourK && typeof cpUploadedTier !== 'undefined') cpUploadedTier = null;
       resetPrompt();
     }
     function showIdle(){
@@ -8114,9 +8262,14 @@
           showReject(acceptability);
         } else {
           // Cheap Package only: auto-mark the 1080p or 4K price tile to
-          // match whichever format was actually detected on upload.
+          // match whichever format was actually detected on upload, and
+          // remember that as the ceiling for the manual click handler —
+          // e.g. 1080p/2K footage only ever unlocks the 1080p tile; trying
+          // to hand-pick 4K afterwards gets blocked (see
+          // tryManualSelectCpQuality) instead of silently allowed.
           if (cfg.allowFourK && acceptability.matchedTier && typeof selectCpQuality === 'function') {
             selectCpQuality(acceptability.matchedTier);
+            if (typeof cpUploadedTier !== 'undefined') cpUploadedTier = acceptability.matchedTier;
           }
           showOk(file);
         }
@@ -8791,13 +8944,39 @@ ID: ${orderId}
     '1080_60': 0.99,
     '4k_120': 1.99
   };
-  let cpSelectedQuality = '1080_60';
+  // Nothing is pre-selected on load — the visitor picks a tile themselves,
+  // or it gets set automatically once their upload is scanned.
+  let cpSelectedQuality = null;
+  // The resolution ceiling their ACTUAL uploaded footage supports, set by
+  // the scanner (see initSimpleScanner's cp config, allowFourK:true) once a
+  // video has been accepted. null = nothing uploaded yet (manual picks are
+  // free in that case — we don't know their footage yet, so there's
+  // nothing to contradict). This is what stops a visitor from uploading
+  // 1080p/2K footage and then manually clicking the 4K tile afterwards.
+  let cpUploadedTier = null;
   const cpQualityGrid = document.getElementById('cpQualityGrid');
+  const cpUpscaleModalOverlay = document.getElementById('cpUpscaleModalOverlay');
+  const cpUpscaleModalClose = document.getElementById('cpUpscaleModalClose');
+
+  function showCpUpscaleBlockedPopup(){
+    if (cpUpscaleModalOverlay) cpUpscaleModalOverlay.classList.add('show');
+  }
+  function hideCpUpscaleBlockedPopup(){
+    if (cpUpscaleModalOverlay) cpUpscaleModalOverlay.classList.remove('show');
+  }
+  if (cpUpscaleModalClose) cpUpscaleModalClose.addEventListener('click', hideCpUpscaleBlockedPopup);
+  if (cpUpscaleModalOverlay) {
+    cpUpscaleModalOverlay.addEventListener('click', (e) => {
+      if (e.target === cpUpscaleModalOverlay) hideCpUpscaleBlockedPopup();
+    });
+  }
 
   // Shared by the manual click handler below AND by the upload scanner
   // (see initSimpleScanner's cp config, allowFourK:true): once a video is
   // scanned and turns out to be 1080p or 4K, this marks the matching price
   // tile active automatically, exactly as if the visitor had clicked it.
+  // Unlike the manual handler, this is never blocked — it always reflects
+  // whatever the scanner actually detected.
   function selectCpQuality(key){
     if (key !== '1080_60' && key !== '4k_120') return;
     cpSelectedQuality = key;
@@ -8808,9 +8987,25 @@ ID: ${orderId}
     }
   }
 
+  // A visitor clicking a tile by hand — unlike selectCpQuality(), this is
+  // only allowed to move UP to a tier their uploaded footage can actually
+  // deliver. If they've already uploaded 1080p/2K footage (cpUploadedTier
+  // === '1080_60') and then try to tap the 4K tile, that's an attempted
+  // upscale past their real source — block it and explain why instead of
+  // silently letting them "order" a resolution their file can't produce.
+  // Picking a tile before any upload, or picking DOWN to the cheaper tile
+  // after uploading true 4K footage, is always allowed.
+  function tryManualSelectCpQuality(key){
+    if (cpUploadedTier === '1080_60' && key === '4k_120') {
+      showCpUpscaleBlockedPopup();
+      return;
+    }
+    selectCpQuality(key);
+  }
+
   if (cpQualityGrid) {
     cpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
-      box.addEventListener('click', () => selectCpQuality(box.getAttribute('data-quality')));
+      box.addEventListener('click', () => tryManualSelectCpQuality(box.getAttribute('data-quality')));
     });
   }
 
@@ -10307,6 +10502,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminTabComments = document.getElementById('adminTabComments');
   const adminTabArchive = document.getElementById('adminTabArchive');
   const adminTabOrders = document.getElementById('adminTabOrders');
+  const adminTabDiscordUsers = document.getElementById('adminTabDiscordUsers');
+  const adminTabDiscordNotify = document.getElementById('adminTabDiscordNotify');
   const adminTabAnalytics = document.getElementById('adminTabAnalytics');
   const adminTabUrgency = document.getElementById('adminTabUrgency');
   const adminTabPromo = document.getElementById('adminTabPromo');
@@ -10314,6 +10511,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminPanelComments = document.getElementById('adminPanelComments');
   const adminPanelArchive = document.getElementById('adminPanelArchive');
   const adminPanelOrders = document.getElementById('adminPanelOrders');
+  const adminPanelDiscordUsers = document.getElementById('adminPanelDiscordUsers');
+  const adminPanelDiscordNotify = document.getElementById('adminPanelDiscordNotify');
   const adminPanelAnalytics = document.getElementById('adminPanelAnalytics');
   const adminPanelUrgency = document.getElementById('adminPanelUrgency');
   const adminPanelPromo = document.getElementById('adminPanelPromo');
@@ -10655,6 +10854,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   let pendingOrdersCache = [];
   let confirmedOrdersCache = [];
   let activeSubsCache = [];
+  // Roster of every Discord account that has ever signed in on the site
+  // (see syncDiscordUserWithBackend()), and the subset of those accounts an
+  // admin has blocked — both read/written from the shared store, powering
+  // the "Discord Users" admin tab further below.
+  let discordDirectoryCache = [];
+  let blockedDiscordUsersCache = [];
 
   const SUB_DURATION_MS = { weekly: 7 * 24 * 60 * 60 * 1000, monthly: 30 * 24 * 60 * 60 * 1000 };
 
@@ -10730,24 +10935,68 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
         '</div>' +
         '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
-        (o.discordId ?
-          '<div class="aor-discord-notify">' +
-            '<input type="number" min="0" step="0.5" class="aor-eta-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminEtaPlaceholder') + '">' +
-            '<select class="aor-eta-unit" data-id="' + escapeHtml(String(o.id)) + '">' +
-              '<option value="minutes">' + t('adminEtaUnitMinutes') + '</option>' +
-              '<option value="hours" selected>' + t('adminEtaUnitHours') + '</option>' +
-              '<option value="days">' + t('adminEtaUnitDays') + '</option>' +
-            '</select>' +
-            '<button class="a-discord-btn" data-action="send-discord-eta" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendDiscordEta') + '</button>' +
-          '</div>' +
-          (o.discordEtaSentAt ? '<div class="aor-discord-sent">✅ ' + t('adminDiscordEtaSent') + ' — ' + formatCommentDate(o.discordEtaSentAt) + '</div>' : '')
-        : '') +
         '<div class="aor-actions">' +
           '<button class="a-del-btn" data-action="delete-confirmed-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDeleteForever') + '</button>' +
         '</div>' +
       '</div>'
     ).join('');
   }
+
+  // ============================================================
+  // DISCORD NOTIFICATIONS (delivery ETA): confirmed orders placed with a
+  // Discord account, listed in their own admin tab (see adminPanelDiscordNotify)
+  // instead of inline inside the confirmed-orders archive above — reuses
+  // the same confirmedOrdersCache, just filtered down to o.discordId rows.
+  // ============================================================
+  function renderDiscordNotifyList(){
+    const listEl = document.getElementById('discordNotifyList');
+    if (!listEl) return;
+    const searchEl = document.getElementById('discordNotifySearch');
+    const query = (searchEl && searchEl.value || '').trim();
+    const withDiscord = confirmedOrdersCache.filter(o => o.discordId);
+    const sorted = withDiscord.slice().sort((a, b) => (b.confirmedAt || b.ts || 0) - (a.confirmedAt || a.ts || 0));
+    const filtered = query ? sorted.filter(o => String(o.id).includes(query)) : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoDiscordNotify') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoDiscordNotifyMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(o =>
+      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="aor-top">' +
+          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · 🎮 ' + escapeHtml(o.discordUsername || String(o.discordId)) + '</span>' +
+        '</div>' +
+        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
+        '<div class="aor-discord-notify">' +
+          '<input type="number" min="0" step="0.5" class="aor-eta-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminEtaPlaceholder') + '">' +
+          '<select class="aor-eta-unit" data-id="' + escapeHtml(String(o.id)) + '">' +
+            '<option value="minutes">' + t('adminEtaUnitMinutes') + '</option>' +
+            '<option value="hours" selected>' + t('adminEtaUnitHours') + '</option>' +
+            '<option value="days">' + t('adminEtaUnitDays') + '</option>' +
+          '</select>' +
+          '<button class="a-discord-btn" data-action="send-discord-eta" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendDiscordEta') + '</button>' +
+        '</div>' +
+        (o.discordEtaSentAt ? '<div class="aor-discord-sent">✅ ' + t('adminDiscordEtaSent') + ' — ' + formatCommentDate(o.discordEtaSentAt) + '</div>' : '') +
+      '</div>'
+    ).join('');
+  }
+
+  async function renderAdminDiscordNotify(){
+    const listEl = document.getElementById('discordNotifyList');
+    if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('confirmedOrders');
+    confirmedOrdersCache = (data && Array.isArray(data.list)) ? data.list : [];
+    renderDiscordNotifyList();
+  }
+
+  const discordNotifySearchInput = document.getElementById('discordNotifySearch');
+  if (discordNotifySearchInput) discordNotifySearchInput.addEventListener('input', renderDiscordNotifyList);
 
   // ============================================================
   // ACTIVE PACKAGES (DISCORD): once a pending weekly/monthly order placed
@@ -10836,21 +11085,16 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   async function renderAdminPendingOrders(){
     const listEl = document.getElementById('pendingOrdersList');
     const confirmedEl = document.getElementById('confirmedOrdersList');
-    const activeSubsEl = document.getElementById('activeSubsList');
     if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
     if (confirmedEl) confirmedEl.innerHTML = '<div class="c-empty">…</div>';
-    if (activeSubsEl) activeSubsEl.innerHTML = '<div class="c-empty">…</div>';
-    const [pendingData, confirmedData, activeSubsData] = await Promise.all([
+    const [pendingData, confirmedData] = await Promise.all([
       mdbRead('pendingOrders'),
-      mdbRead('confirmedOrders'),
-      mdbRead('activeSubscriptions')
+      mdbRead('confirmedOrders')
     ]);
     pendingOrdersCache = (pendingData && Array.isArray(pendingData.list)) ? pendingData.list : [];
     confirmedOrdersCache = (confirmedData && Array.isArray(confirmedData.list)) ? confirmedData.list : [];
-    activeSubsCache = (activeSubsData && Array.isArray(activeSubsData.list)) ? activeSubsData.list : [];
     renderPendingOrdersList();
     renderConfirmedOrdersList();
-    renderActiveSubsList();
   }
 
   const activeSubsSearchInput = document.getElementById('activeSubsSearch');
@@ -10868,6 +11112,134 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       activeSubsCache = activeSubsCache.filter(s => !(String(s.discordId) === String(discordId) && s.type === type));
       await mdbWrite('activeSubscriptions', { list: activeSubsCache });
       renderActiveSubsList();
+    });
+  }
+
+  // ============================================================
+  // DISCORD USERS: a roster of every Discord account that has ever signed
+  // in on the site (written to by syncDiscordUserWithBackend(), further
+  // below, every time someone logs in), plus the block-list an admin can
+  // add accounts to from here. Two actions per row:
+  //   - "Log out" queues that account's ID in the shared 'discordForceLogout'
+  //     list; the very next time their browser confirms its session (see
+  //     syncDiscordUserWithBackend()), it finds itself in that queue, signs
+  //     itself out locally, and clears its own entry — a one-shot kick.
+  //     There's no way for a static frontend like this one to reach into
+  //     another person's browser directly, so this "on next check" queue is
+  //     the closest equivalent to a remote force-logout.
+  //   - "Block" adds the account to 'blockedDiscordUsers' (permanent, until
+  //     unblocked) AND queues the same one-shot logout, so a blocked visitor
+  //     is kicked out immediately rather than staying signed in until they
+  //     happen to reload. While blocked, syncDiscordUserWithBackend() also
+  //     refuses to log a future login attempt back into the roster.
+  // ============================================================
+  function isDiscordUserBlocked(id){
+    return blockedDiscordUsersCache.some(b => String(b.id) === String(id));
+  }
+
+  async function queueDiscordForceLogout(id){
+    try{
+      const fresh = await mdbRead('discordForceLogout');
+      let list = (fresh && Array.isArray(fresh.list)) ? fresh.list : [];
+      if (!list.some(x => String(x) === String(id))) list = list.concat([id]);
+      await mdbWrite('discordForceLogout', { list });
+    } catch(e){ /* best-effort — worst case they stay in until their next natural check */ }
+  }
+
+  function renderDiscordUsersList(){
+    const listEl = document.getElementById('discordUsersList');
+    if (!listEl) return;
+    const searchEl = document.getElementById('discordUsersSearch');
+    const query = (searchEl && searchEl.value || '').trim().toLowerCase();
+    const sorted = discordDirectoryCache.slice().sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+    const filtered = query
+      ? sorted.filter(u => (u.username || '').toLowerCase().includes(query) || String(u.id).includes(query))
+      : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoDiscordUsers') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoDiscordUsersMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(u => {
+      const blocked = isDiscordUserBlocked(u.id);
+      return (
+        '<div class="a-order-row a-du-row" data-discord-id="' + escapeHtml(String(u.id)) + '">' +
+          '<div class="a-du-avatar">' + (u.avatarUrl ? '<img src="' + escapeHtml(u.avatarUrl) + '" alt="">' : '🎮') + '</div>' +
+          '<div class="a-du-info">' +
+            '<div class="a-du-name">' + escapeHtml(u.username || String(u.id)) +
+              (blocked ? '<span class="a-du-blocked-tag">🚫 ' + t('adminDuBlocked') + '</span>' : '') +
+            '</div>' +
+            '<div class="a-du-meta">ID: ' + escapeHtml(String(u.id)) + '</div>' +
+            '<div class="a-du-meta">' + t('adminDuFirstSeen') + ': ' + formatCommentDate(u.firstSeen) + ' · ' + t('adminDuLastSeen') + ': ' + formatCommentDate(u.lastSeen) + '</div>' +
+          '</div>' +
+          '<div class="a-du-actions">' +
+            '<button class="a-logout-btn" data-action="logout-discord-user" data-discord-id="' + escapeHtml(String(u.id)) + '">' + t('adminDuLogout') + '</button>' +
+            (blocked
+              ? '<button class="a-unblock-btn" data-action="unblock-discord-user" data-discord-id="' + escapeHtml(String(u.id)) + '">' + t('adminUnblock') + '</button>'
+              : '<button class="a-block-btn" data-action="block-discord-user" data-discord-id="' + escapeHtml(String(u.id)) + '">' + t('adminBlock') + '</button>') +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+  }
+
+  async function renderAdminDiscordUsers(){
+    const rosterEl = document.getElementById('discordUsersList');
+    const subsEl = document.getElementById('activeSubsList');
+    if (rosterEl) rosterEl.innerHTML = '<div class="c-empty">…</div>';
+    if (subsEl) subsEl.innerHTML = '<div class="c-empty">…</div>';
+    const [dirData, blockedData, activeSubsData] = await Promise.all([
+      mdbRead('discordDirectory'),
+      mdbRead('blockedDiscordUsers'),
+      mdbRead('activeSubscriptions')
+    ]);
+    discordDirectoryCache = (dirData && Array.isArray(dirData.list)) ? dirData.list : [];
+    blockedDiscordUsersCache = (blockedData && Array.isArray(blockedData.list)) ? blockedData.list : [];
+    activeSubsCache = (activeSubsData && Array.isArray(activeSubsData.list)) ? activeSubsData.list : [];
+    renderDiscordUsersList();
+    renderActiveSubsList();
+  }
+
+  const discordUsersSearchInput = document.getElementById('discordUsersSearch');
+  if (discordUsersSearchInput) discordUsersSearchInput.addEventListener('input', renderDiscordUsersList);
+
+  const discordUsersListEl = document.getElementById('discordUsersList');
+  if (discordUsersListEl) {
+    discordUsersListEl.addEventListener('click', async (e) => {
+      const logoutBtn = e.target.closest('button[data-action="logout-discord-user"]');
+      if (logoutBtn) {
+        logoutBtn.disabled = true;
+        await queueDiscordForceLogout(logoutBtn.getAttribute('data-discord-id'));
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = '✓';
+        setTimeout(() => { logoutBtn.textContent = t('adminDuLogout'); }, 1500);
+        return;
+      }
+      const blockBtn = e.target.closest('button[data-action="block-discord-user"]');
+      if (blockBtn) {
+        const id = blockBtn.getAttribute('data-discord-id');
+        if (!confirm(t('adminDuBlockConfirm'))) return;
+        const user = discordDirectoryCache.find(u => String(u.id) === String(id));
+        blockedDiscordUsersCache = blockedDiscordUsersCache
+          .filter(b => String(b.id) !== String(id))
+          .concat([{ id: id, username: (user && user.username) || '', blockedAt: Date.now() }]);
+        await mdbWrite('blockedDiscordUsers', { list: blockedDiscordUsersCache });
+        await queueDiscordForceLogout(id); // a block also kicks them out right away
+        renderDiscordUsersList();
+        return;
+      }
+      const unblockBtn = e.target.closest('button[data-action="unblock-discord-user"]');
+      if (unblockBtn) {
+        const id = unblockBtn.getAttribute('data-discord-id');
+        blockedDiscordUsersCache = blockedDiscordUsersCache.filter(b => String(b.id) !== String(id));
+        await mdbWrite('blockedDiscordUsers', { list: blockedDiscordUsersCache });
+        renderDiscordUsersList();
+      }
     });
   }
 
@@ -10983,42 +11355,46 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   if (confirmedOrdersListEl) {
     confirmedOrdersListEl.addEventListener('click', async (e) => {
       const delBtn = e.target.closest('button[data-action="delete-confirmed-order"]');
-      if (delBtn) {
-        const id = delBtn.getAttribute('data-id');
-        confirmedOrdersCache = confirmedOrdersCache.filter(o => String(o.id) !== String(id));
-        await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
-        renderConfirmedOrdersList();
+      if (!delBtn) return;
+      const id = delBtn.getAttribute('data-id');
+      confirmedOrdersCache = confirmedOrdersCache.filter(o => String(o.id) !== String(id));
+      await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+      renderConfirmedOrdersList();
+    });
+  }
+
+  const discordNotifyListEl = document.getElementById('discordNotifyList');
+  if (discordNotifyListEl) {
+    discordNotifyListEl.addEventListener('click', async (e) => {
+      const discordBtn = e.target.closest('button[data-action="send-discord-eta"]');
+      if (!discordBtn) return;
+      const id = discordBtn.getAttribute('data-id');
+      const input = discordNotifyListEl.querySelector('.aor-eta-input[data-id="' + CSS.escape(id) + '"]');
+      const unitSel = discordNotifyListEl.querySelector('.aor-eta-unit[data-id="' + CSS.escape(id) + '"]');
+      const rawValue = input ? parseFloat(input.value) : NaN;
+      const unit = unitSel ? unitSel.value : 'hours';
+      if (!rawValue || rawValue <= 0) {
+        if (input) { input.classList.add('error'); input.focus(); }
         return;
       }
-      const discordBtn = e.target.closest('button[data-action="send-discord-eta"]');
-      if (discordBtn) {
-        const id = discordBtn.getAttribute('data-id');
-        const input = confirmedOrdersListEl.querySelector('.aor-eta-input[data-id="' + CSS.escape(id) + '"]');
-        const unitSel = confirmedOrdersListEl.querySelector('.aor-eta-unit[data-id="' + CSS.escape(id) + '"]');
-        const rawValue = input ? parseFloat(input.value) : NaN;
-        const unit = unitSel ? unitSel.value : 'hours';
-        if (!rawValue || rawValue <= 0) {
-          if (input) { input.classList.add('error'); input.focus(); }
-          return;
-        }
-        const built = buildDiscordEtaMessage(rawValue, unit);
-        discordBtn.disabled = true;
-        const originalText = discordBtn.textContent;
-        discordBtn.textContent = t('adminSendingDiscord');
-        const ok = await sendDiscordOrderUpdate(id, built);
-        discordBtn.disabled = false;
-        discordBtn.textContent = originalText;
-        if (ok) {
-          const order = confirmedOrdersCache.find(o => String(o.id) === String(id));
-          if (order) order.discordEtaSentAt = Date.now();
-          await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
-          renderConfirmedOrdersList();
-        } else {
-          alert(t('adminDiscordSendFailed'));
-        }
+      const built = buildDiscordEtaMessage(rawValue, unit);
+      discordBtn.disabled = true;
+      const originalText = discordBtn.textContent;
+      discordBtn.textContent = t('adminSendingDiscord');
+      const ok = await sendDiscordOrderUpdate(id, built);
+      discordBtn.disabled = false;
+      discordBtn.textContent = originalText;
+      if (ok) {
+        const order = confirmedOrdersCache.find(o => String(o.id) === String(id));
+        if (order) order.discordEtaSentAt = Date.now();
+        await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+        renderDiscordNotifyList();
+      } else {
+        alert(t('adminDiscordSendFailed'));
       }
     });
   }
+
 
   // ============================================================
   // ORDER ANALYTICS: manually-logged real orders (TikTok link,
@@ -11244,6 +11620,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminTabComments.classList.toggle('active', tab === 'comments');
     adminTabArchive.classList.toggle('active', tab === 'archive');
     adminTabOrders.classList.toggle('active', tab === 'orders');
+    adminTabDiscordUsers.classList.toggle('active', tab === 'discordUsers');
+    adminTabDiscordNotify.classList.toggle('active', tab === 'discordNotify');
     adminTabAnalytics.classList.toggle('active', tab === 'analytics');
     adminTabUrgency.classList.toggle('active', tab === 'urgency');
     adminTabPromo.classList.toggle('active', tab === 'promo');
@@ -11251,6 +11629,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminPanelComments.classList.toggle('active', tab === 'comments');
     adminPanelArchive.classList.toggle('active', tab === 'archive');
     adminPanelOrders.classList.toggle('active', tab === 'orders');
+    adminPanelDiscordUsers.classList.toggle('active', tab === 'discordUsers');
+    adminPanelDiscordNotify.classList.toggle('active', tab === 'discordNotify');
     adminPanelAnalytics.classList.toggle('active', tab === 'analytics');
     adminPanelUrgency.classList.toggle('active', tab === 'urgency');
     adminPanelPromo.classList.toggle('active', tab === 'promo');
@@ -11258,6 +11638,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     else if (tab === 'comments') renderAdminComments();
     else if (tab === 'archive') renderAdminArchive();
     else if (tab === 'orders') renderAdminOrders();
+    else if (tab === 'discordUsers') renderAdminDiscordUsers();
+    else if (tab === 'discordNotify') renderAdminDiscordNotify();
     else if (tab === 'analytics') renderAdminAnalytics();
     else if (tab === 'urgency') renderAdminUrgency();
     else if (tab === 'promo') renderAdminPromo();
@@ -11266,6 +11648,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
   adminTabArchive.addEventListener('click', () => switchAdminTab('archive'));
   adminTabOrders.addEventListener('click', () => switchAdminTab('orders'));
+  adminTabDiscordUsers.addEventListener('click', () => switchAdminTab('discordUsers'));
+  adminTabDiscordNotify.addEventListener('click', () => switchAdminTab('discordNotify'));
   adminTabAnalytics.addEventListener('click', () => switchAdminTab('analytics'));
   adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
   adminTabPromo.addEventListener('click', () => switchAdminTab('promo'));
@@ -11547,6 +11931,59 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
   }
 
+  // ============================================================
+  // DISCORD DIRECTORY + MODERATION SYNC: runs every time setDiscordUI(user)
+  // fires with a real user (login, or a cache/network re-confirmation).
+  // Two jobs, in order:
+  //   1) Check whether an admin has blocked this account, or queued it for
+  //      a one-shot forced logout (see the "Discord Users" admin tab further
+  //      up) — if either is true, sign this browser out right away and, for
+  //      the one-shot queue, clear this account's own entry so a later,
+  //      legitimate login isn't kicked again.
+  //   2) Otherwise, upsert this account into the shared 'discordDirectory'
+  //      list the admin panel reads from, so every Discord account that
+  //      has ever visited shows up there with a first-seen/last-seen stamp.
+  // Fire-and-forget from setDiscordUI() — never blocks the visitor's own
+  // session on a slow/failed network call, and any error here is swallowed
+  // (worst case, the directory entry is just a little stale).
+  // ============================================================
+  async function syncDiscordUserWithBackend(user){
+    if (!user || !user.id) return;
+    try{
+      const [blockedData, kickData] = await Promise.all([
+        mdbRead('blockedDiscordUsers'),
+        mdbRead('discordForceLogout')
+      ]);
+      const blockedList = (blockedData && Array.isArray(blockedData.list)) ? blockedData.list : [];
+      const isBlocked = blockedList.some(b => String(b.id) === String(user.id));
+      const kickList = (kickData && Array.isArray(kickData.list)) ? kickData.list : [];
+      const isKicked = kickList.some(k => String(k) === String(user.id));
+      if (isBlocked || isKicked){
+        if (isKicked){
+          const remaining = kickList.filter(k => String(k) !== String(user.id));
+          mdbWrite('discordForceLogout', { list: remaining }).catch(() => {});
+        }
+        if (currentDiscordUser && String(currentDiscordUser.id) === String(user.id)){
+          alert(isBlocked ? t('authBlockedError') : t('authKickedNotice'));
+          discordLogout();
+        }
+        return;
+      }
+      const dirData = await mdbRead('discordDirectory');
+      let list = (dirData && Array.isArray(dirData.list)) ? dirData.list : [];
+      const now = Date.now();
+      const existing = list.find(u => String(u.id) === String(user.id));
+      if (existing){
+        existing.username = user.username || existing.username;
+        existing.avatarUrl = user.avatarUrl || existing.avatarUrl;
+        existing.lastSeen = now;
+      } else {
+        list = list.concat([{ id: user.id, username: user.username || '', avatarUrl: user.avatarUrl || '', firstSeen: now, lastSeen: now }]);
+      }
+      await mdbWrite('discordDirectory', { list });
+    }catch(e){ /* best-effort */ }
+  }
+
   function setDiscordUI(user){
     currentDiscordUser = user;
     // Re-check the logged-in Discord account's weekly/monthly package
@@ -11566,6 +12003,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (dpAvatarImg){ dpAvatarImg.src = user.avatarUrl || ''; dpAvatarImg.alt = user.username || ''; }
       if (dpName) dpName.textContent = user.username || '';
       if (gate) gate.classList.remove('open');
+      syncDiscordUserWithBackend(user);
     } else {
       chip.classList.remove('is-authed');
       if (gate) gate.classList.add('open');
