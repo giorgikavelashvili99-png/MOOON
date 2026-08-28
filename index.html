@@ -5712,7 +5712,7 @@
       dzSubSimple: 'გადმოაგდეთ ან დააჭირეთ ასარჩევად',
       simpleScanOk: 'ვიდეო მიღებულია',
       srRejectTextShort: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps',
-      srRejectTextCp: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps ან 4K / 60fps',
+      srRejectTextCp: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps, ან ნებისმიერი 4K ვიდეო',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
@@ -6074,7 +6074,7 @@
       dzSubSimple: 'Drop it here or click to choose',
       simpleScanOk: 'Video accepted',
       srRejectTextShort: 'Format doesn\'t match — must be exactly 1080p / 60fps',
-      srRejectTextCp: 'Format doesn\'t match — must be exactly 1080p / 60fps or 4K / 60fps',
+      srRejectTextCp: 'Format doesn\'t match — must be exactly 1080p / 60fps, or any 4K video',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
       subscriberT2: '✓ Lower rate activates',
@@ -7100,8 +7100,15 @@
   //
   // The Cheap Package is the one exception: it sells both a 1080p and a 4K
   // output tier, so its scanner passes allowFourK=true, which also accepts
-  // exactly-4K/60fps footage. Every other package still calls this with no
-  // 3rd argument, so their gate is unchanged. ----
+  // 4K footage. Every other package still calls this with no 3rd argument,
+  // so their gate is unchanged.
+  //
+  // The 4K tier is judged on RESOLUTION ONLY, not fps. Real-world "4K"
+  // footage is almost always natively 24/25/30fps — 4K/60fps specifically
+  // requires a deliberate camera setting most phones don't default to —
+  // so enforcing an exact 60fps match on top of the resolution match was
+  // rejecting completely standard 4K video. The 1080p tier keeps the
+  // strict 60fps requirement, since that pairing has always worked fine. ----
   const REQUIRED_DIM = 1080;
   const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
   const REQUIRED_DIM_4K = 2160;
@@ -7120,9 +7127,14 @@
       resOk = is1080 || (!!allowFourK && is4k);
     }
     const fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
+    const isFourKMatch = !!allowFourK && is4k;
     // Reject only on a *confirmed* violation — an unknown value never
-    // blocks the upload on its own.
-    const rejected = (resOk === false) || (fpsOk === false);
+    // blocks the upload on its own. A resolution match on the 4K tier
+    // skips the fps check entirely (see note above); every other case
+    // still requires a confirmed 60fps match.
+    const rejected = isFourKMatch
+      ? (resOk === false)
+      : ((resOk === false) || (fpsOk === false));
     // matchedTier is only meaningful when the upload was accepted; is4k is
     // reported regardless of allowFourK so callers that DON'T sell 4K can
     // still tell a rejected 4K upload apart from a rejected 720p one (to
@@ -8134,8 +8146,8 @@
   initSimpleScanner({
     zoneId: 'dropZoneCp', inputId: 'videoInputCp', resultId: 'scanResultCp', okId: 'scanOkCp', okNameId: 'scanOkNameCp', rejectId: 'scanRejectCp',
     // Only the Cheap Package sells both a 1080p AND a 4K output tier, so
-    // its scanner is the one that also accepts exactly-4K/60fps uploads
-    // (see checkUploadAcceptable / selectCpQuality below).
+    // its scanner is the one that also accepts 4K uploads (any fps — see
+    // checkUploadAcceptable / selectCpQuality below).
     allowFourK: true,
     promptId: 'mooonPromptCp', promptQId: 'mooonPromptQCp', promptActionsId: 'mooonPromptActionsCp', promptYesId: 'mooonPromptYesCp', promptNoId: 'mooonPromptNoCp',
     panelKey: 'cp',
