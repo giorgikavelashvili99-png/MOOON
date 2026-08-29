@@ -12954,5 +12954,39 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   initTiktokDownloader();
 </script>
 
+<script>
+  // --- უბრალო კლიენტის მხრიდან დაცვა: მარჯვენა ღილაკი + წყაროს/DevTools მალსახმობები ---
+  // შენიშვნა: ეს მხოლოდ საშუალო მომხმარებელს აფერხებს (ბრაუზერის მენიუდან
+  // "View Page Source"-ს და F12-ს), მაგრამ ვერავითარი JS ვერ დაბლოკავს ვინმეს,
+  // ვინც JS-ს გამორთავს ან ბრაუზერის URL-ში view-source: პირდაპირ ჩაწერს.
+  (function () {
+    document.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      const k = (e.key || '').toLowerCase();
+
+      // F12 — DevTools
+      if (e.keyCode === 123) { e.preventDefault(); return; }
+
+      // Ctrl/Cmd + Shift + I / J / C  — Inspect / Console / Element picker
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'j', 'c'].includes(k)) {
+        e.preventDefault(); return;
+      }
+
+      // Ctrl/Cmd + U — View Source
+      if ((e.ctrlKey || e.metaKey) && k === 'u') {
+        e.preventDefault(); return;
+      }
+
+      // Ctrl/Cmd + S — Save Page
+      if ((e.ctrlKey || e.metaKey) && k === 's') {
+        e.preventDefault(); return;
+      }
+    });
+  })();
+</script>
+
 </body>
 </html>
