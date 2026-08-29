@@ -4259,8 +4259,10 @@
     border-radius:10px; padding:10px 12px; margin-bottom:8px;
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
   }
-  .ttdl-quality-tier{ display:flex; justify-content:space-between; gap:8px; padding:3px 0; border-bottom:1px dashed rgba(255,255,255,0.08); }
+  .ttdl-quality-tier{ padding:4px 0; border-bottom:1px dashed rgba(255,255,255,0.08); }
   .ttdl-quality-tier:last-of-type{ border-bottom:none; }
+  .tqt-top{ display:flex; justify-content:space-between; gap:8px; }
+  .tqt-sub{ color:var(--text-faint); padding-left:4px; margin-top:1px; }
   .ttdl-quality-original{ margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.14); color:#fff; font-weight:600; }
 
   .ttdl-log{
@@ -12633,6 +12635,104 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       });
     }
 
+    // ---- FPS: browsers have no direct API for this (unlike width/height
+    // via <video>), so we read just the first few MB of the actual file
+    // and parse the MP4 container ourselves to find the real frame rate
+    // in moov > trak > mdia > minf > stbl > stts (time-to-sample table).
+    // Works on any faststart MP4 (moov near the front of the file), which
+    // is what TikTok/tikwm serve. If moov isn't found in the fetched
+    // range, this cleanly gives up and reports fps as unknown rather than
+    // guessing. ----
+    function readFourCC(buf, pos){
+      return String.fromCharCode(buf[pos], buf[pos+1], buf[pos+2], buf[pos+3]);
+    }
+    function readUint32(buf, pos){
+      return (buf[pos] * 16777216) + (buf[pos+1] << 16) + (buf[pos+2] << 8) + buf[pos+3];
+    }
+    function readMp4Boxes(buf, start, end){
+      const boxes = [];
+      let pos = start;
+      while (pos + 8 <= end && pos + 8 <= buf.length) {
+        const size32 = readUint32(buf, pos);
+        const type = readFourCC(buf, pos + 4);
+        let headerSize = 8, size = size32;
+        if (size32 === 1) {
+          if (pos + 16 > buf.length) break;
+          size = readUint32(buf, pos + 8) * 4294967296 + readUint32(buf, pos + 12);
+          headerSize = 16;
+        } else if (size32 === 0) {
+          size = end - pos;
+        }
+        if (size < headerSize) break; // malformed -- bail out instead of looping forever
+        boxes.push({ type: type, start: pos + headerSize, end: Math.min(pos + size, end) });
+        pos += size;
+      }
+      return boxes;
+    }
+    function parseFpsFromMp4Buffer(buf){
+      try {
+        if (!buf || buf.length < 8) return null;
+        const moov = readMp4Boxes(buf, 0, buf.length).find(b => b.type === 'moov');
+        if (!moov) return null;
+        const traks = readMp4Boxes(buf, moov.start, moov.end).filter(b => b.type === 'trak');
+        for (const trak of traks) {
+          const mdia = readMp4Boxes(buf, trak.start, trak.end).find(b => b.type === 'mdia');
+          if (!mdia) continue;
+          const mdiaBoxes = readMp4Boxes(buf, mdia.start, mdia.end);
+          const hdlr = mdiaBoxes.find(b => b.type === 'hdlr');
+          if (!hdlr || hdlr.start + 12 > buf.length || readFourCC(buf, hdlr.start + 8) !== 'vide') continue;
+          const mdhd = mdiaBoxes.find(b => b.type === 'mdhd');
+          const minf = mdiaBoxes.find(b => b.type === 'minf');
+          if (!mdhd || !minf) continue;
+          const mdhdVersion = buf[mdhd.start];
+          const timescaleOff = mdhd.start + (mdhdVersion === 1 ? 20 : 12);
+          if (timescaleOff + 4 > buf.length) continue;
+          const timescale = readUint32(buf, timescaleOff);
+          const stbl = readMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
+          if (!stbl) continue;
+          const stts = readMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts');
+          if (!stts || stts.start + 16 > buf.length) continue;
+          const sampleDelta = readUint32(buf, stts.start + 12);
+          if (!sampleDelta || !timescale) continue;
+          const fps = timescale / sampleDelta;
+          if (!isFinite(fps) || fps <= 0 || fps > 300) continue;
+          return Math.round(fps * 100) / 100;
+        }
+        return null;
+      } catch (e) {
+        return null;
+      }
+    }
+    async function probeFps(url, maxBytes){
+      if (!url) return null;
+      maxBytes = maxBytes || 3 * 1024 * 1024;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok || !res.body) { clearTimeout(timer); return null; }
+        const reader = res.body.getReader();
+        let received = 0;
+        const chunks = [];
+        while (received < maxBytes) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+        }
+        clearTimeout(timer);
+        try { reader.cancel(); } catch (e) {}
+        try { controller.abort(); } catch (e) {} // stop downloading the rest of the file in the background
+        const buf = new Uint8Array(received);
+        let offset = 0;
+        for (const c of chunks) { buf.set(c, offset); offset += c.length; }
+        return parseFpsFromMp4Buffer(buf);
+      } catch (e) {
+        clearTimeout(timer);
+        return null;
+      }
+    }
+
     function ttdlStatRow(icon, label, value){
       return '<div class="ttdl-stat-item">' + icon + ' ' + escapeHtml(label) + ': <b>' + escapeHtml(String(value)) + '</b></div>';
     }
@@ -12681,7 +12781,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             }
           });
           const urls = Object.keys(labelsByUrl);
-          const metas = await Promise.all(urls.map(probeVideoMeta));
+          const metas = await Promise.all(urls.map(u => Promise.all([probeVideoMeta(u), probeFps(u)])));
           const duration = Number(d.duration) || 0;
 
           const tiers = urls.map((tierUrl, i) => {
@@ -12695,7 +12795,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               sizeMb = Math.round((sizeBytes / (1024*1024)) * 10) / 10;
               bitrateMbps = Math.round(((sizeBytes * 8 / duration) / 1000000) * 10) / 10;
             }
-            return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: metas[i].width, height: metas[i].height, sizeMb, bitrateMbps };
+            const [dims, fps] = metas[i];
+            return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: dims.width, height: dims.height, fps: fps, sizeMb, bitrateMbps };
           });
 
           // "Original" = whichever tier has the tallest short side, same
@@ -12743,9 +12844,13 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           if (qualityBlock) {
             const tierLines = tiers.map(tItem => {
               const resLabel = ttdlResLabel(tItem.width, tItem.height) || ttdlDict('unknownRes');
+              const fpsTxt = tItem.fps != null ? (tItem.fps + 'fps') : '?fps';
               const bitrateTxt = tItem.bitrateMbps != null ? tItem.bitrateMbps + 'Mbps' : '?';
               const sizeTxt = tItem.sizeMb != null ? tItem.sizeMb + 'MB' : '?';
-              return '<div class="ttdl-quality-tier"><span>' + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + bitrateTxt + ' · ' + sizeTxt + '</span></div>';
+              return '<div class="ttdl-quality-tier">' +
+                       '<div class="tqt-top"><span>' + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + fpsTxt + '</span></div>' +
+                       '<div class="tqt-sub">↳ ' + bitrateTxt + ' · ' + sizeTxt + '</div>' +
+                     '</div>';
             }).join('');
             const origRes = original ? ((original.width || '?') + 'x' + (original.height || '?')) : '?';
             qualityBlock.innerHTML = tierLines +
