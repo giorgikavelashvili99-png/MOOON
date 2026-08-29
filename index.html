@@ -13092,48 +13092,87 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
       return boxes;
     }
-    function parseFpsFromMp4Buffer(buf){
+    // Reads BOTH the real pixel width/height AND the frame rate straight
+    // from the MP4 container's own structure (moov > trak > tkhd for
+    // dimensions, ...stbl > stts for frame rate) -- pure box-parsing, no
+    // decoding involved. This replaces the old approach of reading
+    // width/height via a hidden <video> element: that depends on the
+    // device's actual decoder being able to open the file, which turned
+    // out to be unreliable across devices/codecs -- it was the real cause
+    // of "unknown" resolution appearing even on videos whose fps came
+    // through correctly via this exact same box-parsing technique.
+    function parseTrackInfoFromMp4Buffer(buf){
+      const empty = { width: null, height: null, fps: null };
       try {
-        if (!buf || buf.length < 8) return null;
+        if (!buf || buf.length < 8) return empty;
         const moov = readMp4Boxes(buf, 0, buf.length).find(b => b.type === 'moov');
-        if (!moov) return null;
+        if (!moov) return empty;
         const traks = readMp4Boxes(buf, moov.start, moov.end).filter(b => b.type === 'trak');
         for (const trak of traks) {
-          const mdia = readMp4Boxes(buf, trak.start, trak.end).find(b => b.type === 'mdia');
+          const trakBoxes = readMp4Boxes(buf, trak.start, trak.end);
+          const mdia = trakBoxes.find(b => b.type === 'mdia');
           if (!mdia) continue;
           const mdiaBoxes = readMp4Boxes(buf, mdia.start, mdia.end);
           const hdlr = mdiaBoxes.find(b => b.type === 'hdlr');
           if (!hdlr || hdlr.start + 12 > buf.length || readFourCC(buf, hdlr.start + 8) !== 'vide') continue;
+
+          // ---- width/height from tkhd (a sibling of mdia, same trak).
+          // Layout after version(1)+flags(3): creation_time,
+          // modification_time, track_ID, reserved, duration (4 bytes each
+          // for version 0, 8 bytes each -- except track_ID/reserved stay
+          // 4 -- for version 1), then reserved(8), layer+alt_group(4),
+          // volume+reserved(4), matrix(36), then width(4)+height(4) as
+          // 16.16 fixed-point. ----
+          let width = null, height = null;
+          const tkhd = trakBoxes.find(b => b.type === 'tkhd');
+          if (tkhd && tkhd.start < buf.length) {
+            const tkhdVersion = buf[tkhd.start];
+            const timesSize = tkhdVersion === 1 ? 32 : 20;
+            const dimsOffset = tkhd.start + 4 + timesSize + 8 + 4 + 4 + 36;
+            if (dimsOffset + 8 <= buf.length) {
+              const w = Math.round(readUint32(buf, dimsOffset) / 65536);
+              const h = Math.round(readUint32(buf, dimsOffset + 4) / 65536);
+              if (w > 0 && h > 0) { width = w; height = h; }
+            }
+          }
+
+          // ---- fps from stbl > stts (unchanged from before) ----
+          let fps = null;
           const mdhd = mdiaBoxes.find(b => b.type === 'mdhd');
           const minf = mdiaBoxes.find(b => b.type === 'minf');
-          if (!mdhd || !minf) continue;
-          const mdhdVersion = buf[mdhd.start];
-          const timescaleOff = mdhd.start + (mdhdVersion === 1 ? 20 : 12);
-          if (timescaleOff + 4 > buf.length) continue;
-          const timescale = readUint32(buf, timescaleOff);
-          const stbl = readMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
-          if (!stbl) continue;
-          const stts = readMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts');
-          if (!stts || stts.start + 16 > buf.length) continue;
-          const sampleDelta = readUint32(buf, stts.start + 12);
-          if (!sampleDelta || !timescale) continue;
-          const fps = timescale / sampleDelta;
-          if (!isFinite(fps) || fps <= 0 || fps > 300) continue;
-          return Math.round(fps * 100) / 100;
+          if (mdhd && minf) {
+            const mdhdVersion = buf[mdhd.start];
+            const timescaleOff = mdhd.start + (mdhdVersion === 1 ? 20 : 12);
+            if (timescaleOff + 4 <= buf.length) {
+              const timescale = readUint32(buf, timescaleOff);
+              const stbl = readMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
+              const stts = stbl ? readMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts') : null;
+              if (stts && stts.start + 16 <= buf.length) {
+                const sampleDelta = readUint32(buf, stts.start + 12);
+                if (sampleDelta && timescale) {
+                  const rawFps = timescale / sampleDelta;
+                  if (isFinite(rawFps) && rawFps > 0 && rawFps <= 300) fps = Math.round(rawFps * 100) / 100;
+                }
+              }
+            }
+          }
+
+          if (width || height || fps != null) return { width, height, fps };
         }
-        return null;
+        return empty;
       } catch (e) {
-        return null;
+        return empty;
       }
     }
-    async function probeFps(url, maxBytes){
-      if (!url) return null;
+    async function probeMp4Info(url, maxBytes){
+      const empty = { width: null, height: null, fps: null };
+      if (!url) return empty;
       maxBytes = maxBytes || 3 * 1024 * 1024;
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 10000);
       try {
         const res = await fetch(url, { signal: controller.signal });
-        if (!res.ok || !res.body) { clearTimeout(timer); return null; }
+        if (!res.ok || !res.body) { clearTimeout(timer); return empty; }
         const reader = res.body.getReader();
         let received = 0;
         const chunks = [];
@@ -13149,10 +13188,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const buf = new Uint8Array(received);
         let offset = 0;
         for (const c of chunks) { buf.set(c, offset); offset += c.length; }
-        return parseFpsFromMp4Buffer(buf);
+        return parseTrackInfoFromMp4Buffer(buf);
       } catch (e) {
         clearTimeout(timer);
-        return null;
+        return empty;
       }
     }
 
@@ -13269,7 +13308,19 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           // ttdlAnalysisToken so a second Analyze click (new URL) can't
           // have this stale probe overwrite the newer result. ----
           const myToken = ++ttdlAnalysisToken;
-          Promise.all(urls.map(u => Promise.all([probeVideoMeta(u), probeFps(u)]))).then((metas) => {
+          Promise.all(urls.map(async (u) => {
+            const info = await probeMp4Info(u);
+            // Rare fallback: if the box-parser above didn't find tkhd
+            // dimensions (some non-standard MP4 structure), try the
+            // browser's own <video> element as a second attempt before
+            // giving up and showing "unknown".
+            if (!info.width || !info.height) {
+              const dims = await probeVideoMeta(u);
+              info.width = info.width || dims.width;
+              info.height = info.height || dims.height;
+            }
+            return info;
+          })).then((metas) => {
             if (myToken !== ttdlAnalysisToken || !qualityBlock) return; // a newer analyze() superseded this one
 
             const tiers = urls.map((tierUrl, i) => {
@@ -13283,8 +13334,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
                 sizeMb = Math.round((sizeBytes / (1024*1024)) * 10) / 10;
                 bitrateMbps = Math.round(((sizeBytes * 8 / duration) / 1000000) * 10) / 10;
               }
-              const [dims, fps] = metas[i];
-              return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: dims.width, height: dims.height, fps: fps, sizeMb, bitrateMbps };
+              const info = metas[i];
+              return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: info.width, height: info.height, fps: info.fps, sizeMb, bitrateMbps };
             });
 
             // "Original" = whichever tier has the tallest short side, same
