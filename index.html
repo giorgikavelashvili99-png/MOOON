@@ -4152,27 +4152,33 @@
     content:''; position:absolute; top:0; left:0; right:0; height:2px; z-index:1;
     /* Default (touch devices / phones / tablets): a complete, symmetric
        line that fades transparent -> cyan -> red -> cyan -> transparent
-       across the FULL width, at rest. Deliberately NOT a frozen frame of
-       the scrolling version below -- that version is drawn at 220% width
-       specifically so it can scroll seamlessly, which means any single
-       static position of it is unavoidably cut off mid-color on one edge.
-       A dedicated 100%-wide gradient is the only way to get a clean,
-       finished-looking line with no motion. */
+       across the FULL width, at rest. */
     background: linear-gradient(90deg, transparent, #25F4EE 20%, #FE2C55 50%, #25F4EE 80%, transparent);
   }
   /* Continuous motion only on devices with a real mouse (fine pointer +
-     hover) — i.e. "computers". Touch devices keep the static line above. */
+     hover) — i.e. "computers". Touch devices keep the static line above.
+     This uses a different technique from the static rule on purpose: a
+     small, self-contained "comet" tile that already starts and ends in
+     transparent, repeated end-to-end with background-repeat, then
+     animated by exactly ONE tile-width per loop. Because every tile is a
+     pixel-identical copy of the same shape, the frame right before the
+     loop and the frame right after it are IDENTICAL -- there's no seam to
+     see, so it can never visibly snap or "restart". (Sliding a single
+     220%-wide gradient back and forth, the previous approach, doesn't
+     have that guarantee and is what caused the visible cut.) */
   @media (hover:hover) and (pointer:fine){
     .ttdl-shell::before{
-      background: linear-gradient(90deg, transparent, #25F4EE 25%, #FE2C55 55%, #25F4EE 85%, transparent);
-      background-size:220% 100%;
-      animation: ttdlTrace 6s linear infinite;
+      background-image: linear-gradient(90deg, transparent 0%, #25F4EE 35%, #FE2C55 50%, #25F4EE 65%, transparent 100%);
+      background-repeat: repeat-x;
+      background-size: 220px 100%;
+      animation: ttdlTrace 3.5s linear infinite;
     }
   }
   @keyframes ttdlTrace{
-    0%{ background-position:0% 0; }
-    100%{ background-position:-220% 0; }
+    from{ background-position: 0 0; }
+    to{ background-position: -220px 0; }
   }
+
 
   /* Title bar — reads as an app/terminal window, not a product card. The
      "free" indicator now lives here as an ordinary flex child (a real
@@ -12647,6 +12653,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       logFallback: ['პირდაპირი გადმოწერა ვერ მოხერხდა — ვიდეო გაიხსნა ახალ ჩანართში, შეინახეთ „შენახვა როგორც"-ით.', 'Direct download was blocked — opened the video in a new tab, use "Save video as" to keep it.'],
       logIosShared: ['გაიხსნა iOS-ის „გაზიარების" მენიუ — დააჭირეთ „ვიდეოს შენახვა", რომ პირდაპირ ფოტოებში შეინახოთ.', 'The iOS Share Sheet opened — tap "Save Video" to save it straight to Photos.'],
       logIosCancelled: ['გაუქმებულია.', 'Cancelled.'],
+      logIosUnclear: ['გაზიარების მენიუ გაიხსნა — თუ იქიდან უკვე შეინახეთ, მზადაა. თუ არა, ქვემოთ არის პირდაპირი ლინკიც.', 'The Share Sheet opened — if you already saved it from there, you\'re done. If not, there\'s a direct link below too.'],
       logIosOpen: ['ვიდეო გაიხსნა ახალ ჩანართში (iOS-ზე ასე ჩამოიტვირთება ხმის გარეშე თამაშის თავიდან ასაცილებლად) — შეინახეთ Share ღილაკით ან თითის გრძლად დაჭერით.', 'Video opened in a new tab (this avoids an iOS bug where the audio cuts out) — save it via the Share button or by long-pressing it.'],
       logReady: ['მზადაა.', 'Ready.'],
       untitled: ['უსათაურო ვიდეო', 'Untitled video'],
@@ -13029,22 +13036,41 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // streaming blob: URL being played back), the audio-cutout bug does
     // NOT apply here — that bug is specific to *playing* video from a
     // blob: URL, not to saving its bytes.
+    //
+    // Return values matter here:
+    //  'shared'      — completed normally.
+    //  'cancelled'   — the visitor closed the sheet themselves.
+    //  'shareFailed' — the sheet DID open (canShare said yes and share()
+    //                  was actually called), but the promise rejected for
+    //                  some other reason. Some iOS versions do this even
+    //                  after the visitor has already picked "Save Video"
+    //                  and it worked — a known WebKit quirk with file
+    //                  shares. The caller must NOT treat this the same as
+    //                  'unsupported': auto-opening a tab on top of a sheet
+    //                  the visitor may have already used is exactly the
+    //                  unwanted "why am I on another page now" behaviour.
+    //  'unsupported' — the Share Sheet was never reachable at all (no API,
+    //                  the video's bytes couldn't be fetched, or the file
+    //                  isn't shareable) — a tab is the only remaining way
+    //                  to reach the video, so opening one here is justified.
     async function ttdlIosSaveViaShare(url, quality){
       if (!(navigator.share && navigator.canShare)) return 'unsupported';
+      let file;
       try{
         const res = await fetch(url);
         if (!res.ok) return 'unsupported';
         const blob = await res.blob();
-        const file = new File([blob], `tiktok_${Date.now()}_${quality}.mp4`, { type: blob.type || 'video/mp4' });
-        if (!navigator.canShare({ files: [file] })) return 'unsupported';
+        file = new File([blob], `tiktok_${Date.now()}_${quality}.mp4`, { type: blob.type || 'video/mp4' });
+      }catch(e){
+        return 'unsupported'; // couldn't even get the video's bytes
+      }
+      if (!navigator.canShare({ files: [file] })) return 'unsupported';
+      try{
         await navigator.share({ files: [file] });
         return 'shared';
       }catch(e){
-        // The visitor closing the Share Sheet themselves also lands here
-        // (AbortError) — that's an intentional cancel, not a failure, so
-        // it must NOT fall through to opening a tab behind their back.
         if (e && e.name === 'AbortError') return 'cancelled';
-        return 'unsupported';
+        return 'shareFailed';
       }
     }
 
@@ -13108,15 +13134,25 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             ttdlLog(ttdlDict('logIosShared'));
           } else if (outcome === 'cancelled'){
             ttdlLog(ttdlDict('logIosCancelled'));
+          } else if (outcome === 'shareFailed'){
+            // The Share Sheet genuinely opened -- do NOT also force-open a
+            // tab here. Some iOS versions reject this promise even after
+            // the visitor already tapped "Save Video" and it worked, so
+            // auto-opening anything at this point risks yanking someone
+            // who already finished saving onto an unwanted extra page.
+            // Just surface the manual link as an option, nothing more.
+            ttdlShowIosLink(link);
+            ttdlLog(ttdlDict('logIosUnclear'));
           } else {
-            // Share Sheet unavailable or the fetch failed — fall back to
-            // opening the direct link, plus the guaranteed manual link.
+            // 'unsupported': the Share Sheet was never reachable at all
+            // (no Web Share API, or the video's bytes couldn't be
+            // fetched) -- opening the link is the only remaining way to
+            // reach the video, so it's justified here specifically.
             ttdlOpenLinkViaAnchor(link);
             ttdlShowIosLink(link);
             ttdlLog(ttdlDict('logIosOpen'));
           }
         }catch(e){
-          ttdlOpenLinkViaAnchor(link);
           ttdlShowIosLink(link);
           ttdlLog(ttdlDict('logFallback'));
         }finally{
