@@ -422,6 +422,93 @@
   }
   .aor-tiktok-input.error{ border-color:var(--warn); }
   .aor-tiktok-input::placeholder{ color:var(--text-faint); font-family:'BPG Glaho', 'Space Grotesk', sans-serif; }
+
+  /* ---------- "TikTok ანალიტიკის გაგზავნა" tab -- its own distinct look,
+     borrowing the TikTok-brand cyan/red gradient language from the public
+     downloader card, instead of the plain grey admin-list treatment used
+     by the other tabs. Everything here is additive (new .tnf- classes
+     layered on top of the existing .a-order-row/.aor-* elements), so the
+     shared JS (which only looks for .aor-tiktok-input / data-action /
+     data-id) keeps working untouched. ---------- */
+  .tnf-header{ display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; }
+  .tnf-header-icon{
+    flex:0 0 auto; width:40px; height:40px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg, rgba(37,244,238,0.18), rgba(254,44,85,0.18));
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .tnf-note{
+    margin-top:4px; font-size:12px; line-height:1.6; color:var(--text-dim);
+    background:rgba(37,244,238,0.06); border:1px solid rgba(37,244,238,0.18);
+    border-radius:10px; padding:8px 11px;
+  }
+
+  .tnf-row{
+    position:relative; overflow:hidden;
+    background:linear-gradient(165deg, #0d1220, #080b14);
+    border:1px solid rgba(255,255,255,0.08); border-radius:14px;
+    padding:12px 14px 12px 18px; margin-bottom:10px;
+    display:flex; flex-direction:column; gap:8px;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  }
+  .tnf-row-accent{
+    position:absolute; top:0; left:0; bottom:0; width:4px;
+    background:linear-gradient(180deg, #25F4EE, #FE2C55);
+  }
+  @media (hover:hover) and (pointer:fine){
+    .tnf-row:hover{
+      border-color:rgba(37,244,238,0.35);
+      transform:translateY(-1px);
+      box-shadow:0 10px 26px rgba(0,0,0,0.35);
+    }
+  }
+  .tnf-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .tnf-id{
+    font-family:'JetBrains Mono', monospace; font-weight:700; font-size:12px;
+    color:#eafffe; background:rgba(37,244,238,0.12); border:1px solid rgba(37,244,238,0.3);
+    border-radius:100px; padding:3px 10px;
+  }
+  .tnf-user{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:700; color:var(--text-dim);
+    background:rgba(255,255,255,0.05); border-radius:100px; padding:3px 10px 3px 8px;
+  }
+  .tnf-user-dot{ width:6px; height:6px; border-radius:50%; background:#5865F2; flex:0 0 auto; box-shadow:0 0 6px #5865F2; }
+  .tnf-meta{ font-size:11.5px; color:var(--text-faint); line-height:1.6; }
+
+  .tnf-input-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tnf-input-wrap{ position:relative; flex:1 1 200px; min-width:0; }
+  .tnf-input-icon{
+    position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    font-size:12px; opacity:0.7; pointer-events:none;
+  }
+  .tnf-input-wrap .aor-tiktok-input{
+    width:100%; padding-left:28px; border-radius:10px;
+    background:#0a0e1a; border-color:rgba(255,255,255,0.12);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .tnf-input-wrap .aor-tiktok-input:focus{
+    outline:none; border-color:#25F4EE; box-shadow:0 0 0 3px rgba(37,244,238,0.16);
+  }
+  .tnf-send-btn{
+    flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
+    border:none; border-radius:10px; padding:8px 14px;
+    font-size:11.5px; font-weight:800; letter-spacing:0.01em; cursor:pointer;
+    color:#fff; background:linear-gradient(120deg, #25F4EE, #3b6dff 55%, #FE2C55);
+    background-size:180% 100%; background-position:0% 0;
+    transition: background-position .3s ease, transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 6px 16px rgba(37,244,238,0.18);
+  }
+  @media (hover:hover) and (pointer:fine){
+    .tnf-send-btn:hover:not(:disabled){ background-position:100% 0; transform:translateY(-1px); box-shadow:0 10px 22px rgba(254,44,85,0.22); }
+  }
+  .tnf-send-btn:disabled{ opacity:0.55; cursor:default; box-shadow:none; }
+  .tnf-sent{
+    display:inline-flex; align-items:center; gap:6px; width:fit-content;
+    font-size:11px; font-weight:700; color:#3ddc84;
+    background:rgba(61,220,132,0.1); border:1px solid rgba(61,220,132,0.3);
+    border-radius:100px; padding:3px 10px;
+  }
   .a-discord-btn{
     flex:1; border:none; border-radius:8px; padding:7px 10px; font-size:11.5px; font-weight:700; cursor:pointer;
     background:#5865F2; color:#fff;
@@ -6022,8 +6109,15 @@
            worker vs. DISCORD_TIKTOK_NOTIFY_WORKER_URL below), so the two
            can never both fire for the same click. -->
       <div class="a-panel" id="adminPanelTiktokNotify">
-        <div class="a-subheading" data-i18n="adminTiktokNotifyTitle">TikTok ანალიტიკის გაგზავნა (მეორე ბოტი)</div>
-        <div class="a-stat-note" data-i18n="adminTiktokNotifyNote">დადასტურებული შეკვეთები Discord ანგარიშით — ჩაასვი მზა ვიდეოს TikTok ლინკი და გაუგზავნე მომხმარებელს სრული ანალიტიკის ჩანაწერი (ნახვები, მოწონებები, ხარისხი, შადოუბანი). ეს იგზავნება ცალკე ბოტიდან, ზემოთა Discord შეტყობინებისგან დამოუკიდებლად.</div>
+        <div class="tnf-header">
+          <div class="tnf-header-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M16.5 3c.3 2.4 1.7 3.8 4 4v3.1c-1.5.1-2.9-.3-4-1.1v6.4a6.4 6.4 0 1 1-6.4-6.4c.3 0 .6 0 .9.1v3.2a3.2 3.2 0 1 0 2.3 3.1V3h3.2z" fill="url(#tnfIconGrad)"/><defs><linearGradient id="tnfIconGrad" x1="6" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#25F4EE"/><stop offset="1" stop-color="#FE2C55"/></linearGradient></defs></svg>
+          </div>
+          <div>
+            <div class="a-subheading" style="margin:0; padding:0; border:none;" data-i18n="adminTiktokNotifyTitle">TikTok ანალიტიკის გაგზავნა (მეორე ბოტი)</div>
+            <div class="tnf-note" data-i18n="adminTiktokNotifyNote">დადასტურებული შეკვეთები Discord ანგარიშით — ჩაასვი მზა ვიდეოს TikTok ლინკი და გაუგზავნე მომხმარებელს სრული ანალიტიკის ჩანაწერი (ნახვები, მოწონებები, ხარისხი, შადოუბანი). ეს იგზავნება ცალკე ბოტიდან, ზემოთა Discord შეტყობინებისგან დამოუკიდებლად.</div>
+          </div>
+        </div>
         <div class="a-form-row"><input type="text" id="tiktokNotifySearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
         <div id="tiktokNotifyList"></div>
       </div>
@@ -11517,17 +11611,21 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     listEl.innerHTML = filtered.map(o =>
-      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
-        '<div class="aor-top">' +
-          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
-          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · 🎮 ' + escapeHtml(o.discordUsername || String(o.discordId)) + '</span>' +
+      '<div class="a-order-row tnf-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="tnf-row-accent" aria-hidden="true"></div>' +
+        '<div class="tnf-top">' +
+          '<span class="tnf-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="tnf-user"><span class="tnf-user-dot" aria-hidden="true"></span>' + escapeHtml(o.discordUsername || String(o.discordId)) + '</span>' +
         '</div>' +
-        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
-        '<div class="aor-discord-notify">' +
-          '<input type="text" class="aor-tiktok-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminTiktokLinkPh') + '">' +
-          '<button class="a-discord-btn" data-action="send-tiktok-analytics" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendTiktokAnalytics') + '</button>' +
+        '<div class="tnf-meta">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? ' · ✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
+        '<div class="tnf-input-row">' +
+          '<span class="tnf-input-wrap">' +
+            '<span class="tnf-input-icon" aria-hidden="true">🎬</span>' +
+            '<input type="text" class="aor-tiktok-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminTiktokLinkPh') + '">' +
+          '</span>' +
+          '<button class="tnf-send-btn" data-action="send-tiktok-analytics" data-id="' + escapeHtml(String(o.id)) + '"><span aria-hidden="true">✦</span>' + t('adminSendTiktokAnalytics') + '</button>' +
         '</div>' +
-        (o.tiktokAnalyticsSentAt ? '<div class="aor-discord-sent">✅ ' + t('adminTiktokAnalyticsSent') + ' — ' + formatCommentDate(o.tiktokAnalyticsSentAt) + '</div>' : '') +
+        (o.tiktokAnalyticsSentAt ? '<span class="tnf-sent">✅ ' + t('adminTiktokAnalyticsSent') + ' — ' + formatCommentDate(o.tiktokAnalyticsSentAt) + '</span>' : '') +
       '</div>'
     ).join('');
   }
@@ -11973,11 +12071,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (!order || !order.discordId) return;
 
       sendBtn.disabled = true;
-      const originalText = sendBtn.textContent;
+      const originalHtml = sendBtn.innerHTML;
       sendBtn.textContent = t('adminSendingTiktokAnalytics');
       const ok = await sendTiktokAnalytics(order.discordId, link);
       sendBtn.disabled = false;
-      sendBtn.textContent = originalText;
+      sendBtn.innerHTML = originalHtml;
       if (ok) {
         order.tiktokAnalyticsSentAt = Date.now();
         await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
@@ -12803,6 +12901,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       analyzing: ['მუშავდება...', 'Analyzing...'],
       logAnalyzing: ['ვიდეოს ანალიზი მიმდინარეობს...', 'Analyzing video...'],
       logFound: ['ვიდეო მოიძებნა — აირჩიეთ ხარისხი.', 'Video found — choose a quality.'],
+      checkingQuality: ['მოწმდება...', 'Checking...'],
       logFail: ['ვერ მოხერხდა ვიდეოს ანალიზი. შეამოწმეთ ლინკი.', 'Could not analyze this link. Check the URL.'],
       logNoLink: ['ამ ხარისხში ბმული ვერ მოიძებნა.', 'No download link available for this quality.'],
       preparing: ['მზადდება...', 'Preparing...'],
@@ -12853,6 +12952,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     if (!analyzeBtn || !urlInput) return;
 
     let lastData = null;
+    // Bumped on every ttdlAnalyze() call; the background quality-probe in
+    // phase 2 checks this before writing to the DOM so a stale probe from
+    // a previous URL can never overwrite a newer analysis's results.
+    let ttdlAnalysisToken = 0;
 
     function ttdlLog(msg){
       if (!logEl || !msg) return;
@@ -12908,72 +13011,51 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // pixel data) across origins without needing CORS headers, so this
     // works on tikwm's CDN even though a raw fetch() of the same URL
     // sometimes gets blocked (see the SD/HD download fallback below).
-    // Public CORS proxies, tried in order as a fallback when a tikwm CDN
-    // edge rejects the direct cross-origin request outright (missing CORS
-    // headers, or a Referer/hotlink check that a request from our own
-    // domain fails). These are third-party services with their own
-    // uptime/rate-limit quirks -- a best-effort second attempt, not a real
-    // fix. The reliable fix is probing through your own backend (reuse
-    // bot.py's probe_all_sources so the browser never needs cross-origin
-    // access to tikwm's CDN at all).
-    const TTDL_CORS_PROXIES = [
-      (u) => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
-      (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u)
-    ];
-
-    function probeVideoMetaOnce(url, timeoutMs){
+    //
+    // iOS fix: 2K/4K originals were showing as "unknown" resolution on
+    // iPhones specifically. Root cause is almost certainly Safari's
+    // AVFoundation-based media pipeline simply needing longer than 8s to
+    // expose metadata for these much larger files over a mobile
+    // connection (a 4K clip can be several times the bytes of the SD/HD
+    // tiers, which loaded fine) -- the old fixed 8000ms timeout was firing
+    // and reporting "unknown" before Safari had actually finished, even
+    // though the real data would have arrived given a bit more time. Two
+    // changes: a longer timeout specifically on iOS, and a couple of
+    // extra, redundant event listeners as a safety net in case
+    // `loadedmetadata` itself is ever the event that's slow/unreliable
+    // while width/height are already populated by then regardless.
+    function probeVideoMeta(url){
       return new Promise((resolve) => {
         if (!url) { resolve({ width:null, height:null }); return; }
         const v = document.createElement('video');
         v.preload = 'metadata';
         v.muted = true;
         v.playsInline = true;
-        v.setAttribute('webkit-playsinline', ''); // old-style equivalent some iOS versions still check
-        // WebKit (iOS Safari and every other iOS browser, since Apple
-        // requires them all to use WebKit) is known to be unreliable about
-        // firing loadedmetadata on a <video> that's never attached to the
-        // document -- Chrome/Firefox load a detached element fine, WebKit
-        // often just never loads it, which is why "unknown" showed up far
-        // more on iPhone than on Android in testing. Attaching it
-        // off-screen (not display:none -- some WebKit versions skip
-        // loading elements with that too) fixes this without it ever being
-        // visible to the visitor.
-        v.style.position = 'fixed';
-        v.style.left = '-9999px';
-        v.style.top = '0';
-        v.style.width = '1px';
-        v.style.height = '1px';
-        v.style.opacity = '0';
-        v.style.pointerEvents = 'none';
-        document.body.appendChild(v);
         let settled = false;
         const finish = (result) => {
           if (settled) return;
           settled = true;
           v.removeAttribute('src');
-          v.remove();
           resolve(result);
         };
-        const timer = setTimeout(() => finish({ width:null, height:null }), timeoutMs);
-        v.onloadedmetadata = () => { clearTimeout(timer); finish({ width: v.videoWidth || null, height: v.videoHeight || null }); };
+        const tryReport = () => {
+          if (v.videoWidth && v.videoHeight) {
+            clearTimeout(timer);
+            finish({ width: v.videoWidth, height: v.videoHeight });
+          }
+        };
+        // Large 4K originals need real headroom on a mobile connection --
+        // 8s was tuned for the much smaller SD/HD tiers and was cutting
+        // off 4K probes on iOS before Safari had actually finished.
+        const timeoutMs = ttdlIsIOS() ? 20000 : 8000;
+        const timer = setTimeout(() => finish({ width: v.videoWidth || null, height: v.videoHeight || null }), timeoutMs);
+        v.onloadedmetadata = tryReport;
+        v.onloadeddata = tryReport;
+        v.ondurationchange = tryReport;
         v.onerror = () => { clearTimeout(timer); finish({ width:null, height:null }); };
         v.src = url;
+        v.load();
       });
-    }
-
-    // Direct URL first (fast path -- works for most tikwm edges). If that
-    // comes back with no dimensions at all (blocked/expired/hotlink-
-    // protected link), retries once per CORS proxy before giving up. This
-    // is what turns a hard "unknown" into a real width/height for the
-    // edges that reject the direct request.
-    async function probeVideoMeta(url){
-      const direct = await probeVideoMetaOnce(url, 8000);
-      if (direct.width && direct.height) return direct;
-      for (const buildProxyUrl of TTDL_CORS_PROXIES){
-        const viaProxy = await probeVideoMetaOnce(buildProxyUrl(url), 8000);
-        if (viaProxy.width && viaProxy.height) return viaProxy;
-      }
-      return { width:null, height:null };
     }
 
     // ---- FPS: browsers have no direct API for this (unlike width/height
@@ -13044,9 +13126,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         return null;
       }
     }
-    async function fetchBytes(url, maxBytes, timeoutMs){
+    async function probeFps(url, maxBytes){
+      if (!url) return null;
+      maxBytes = maxBytes || 3 * 1024 * 1024;
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const timer = setTimeout(() => controller.abort(), 10000);
       try {
         const res = await fetch(url, { signal: controller.signal });
         if (!res.ok || !res.body) { clearTimeout(timer); return null; }
@@ -13065,33 +13149,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const buf = new Uint8Array(received);
         let offset = 0;
         for (const c of chunks) { buf.set(c, offset); offset += c.length; }
-        return buf;
+        return parseFpsFromMp4Buffer(buf);
       } catch (e) {
         clearTimeout(timer);
         return null;
       }
-    }
-
-    // Direct fetch first; if the CDN edge withholds CORS headers (or
-    // rejects the request outright) this comes back null, so we retry once
-    // per proxy before reporting fps as unknown. Same trade-off as
-    // probeVideoMeta above -- best-effort, not a guarantee.
-    async function probeFps(url, maxBytes){
-      if (!url) return null;
-      maxBytes = maxBytes || 3 * 1024 * 1024;
-      const direct = await fetchBytes(url, maxBytes, 10000);
-      if (direct) {
-        const fps = parseFpsFromMp4Buffer(direct);
-        if (fps) return fps;
-      }
-      for (const buildProxyUrl of TTDL_CORS_PROXIES){
-        const buf = await fetchBytes(buildProxyUrl(url), maxBytes, 10000);
-        if (buf) {
-          const fps = parseFpsFromMp4Buffer(buf);
-          if (fps) return fps;
-        }
-      }
-      return null;
     }
 
     function ttdlStatRow(icon, label, value){
@@ -13110,103 +13172,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
 
-    // Fill this in once bot.py's companion web server (see /api/analyze in
-    // the updated bot.py) is deployed and reachable over HTTPS from this
-    // page, e.g. 'https://api.moonfull4k.xyz/api/analyze'. Leave it empty
-    // ('') to always use the client-side tikwm+probe fallback below --
-    // the tool works either way, this just switches which path runs first.
-    const TTDL_BACKEND_URL = '';
-
-    // Server-side probing (ffprobe over HTTP, no CORS, no hotlink issues)
-    // is strictly more reliable than the browser-side video-tag/fetch
-    // probing further down, so this is tried first whenever configured.
-    // Any failure here (not configured, network error, backend down,
-    // bad/partial JSON) just returns null and ttdlAnalyze falls through
-    // to the client-side path -- the tool never breaks because of this.
-    async function ttdlAnalyzeViaBackend(url){
-      if (!TTDL_BACKEND_URL) return null;
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 20000);
-      try {
-        const res = await fetch(TTDL_BACKEND_URL + '?url=' + encodeURIComponent(url), { signal: controller.signal });
-        clearTimeout(timer);
-        if (!res.ok) return null;
-        const json = await res.json();
-        if (!json || !json.ok) return null;
-        return json;
-      } catch (e) {
-        clearTimeout(timer);
-        return null;
-      }
-    }
-
-    // Shared by both the backend path and the client-probe fallback path so
-    // the two never drift out of sync -- same rendering either way, only
-    // where width/height/fps/etc. came from differs.
-    //   d        -- tikwm-shaped meta: play, hdplay, cover, title,
-    //               author.nickname, play_count, digg_count, comment_count,
-    //               collect_count, share_count, download_count, id, region
-    //   tiers    -- [{ label, width, height, fps, bitrateMbps, sizeMb }]
-    //   original -- the tallest-short-side tier ({ width, height, ... }) or null
-    //   shadow   -- 'YES' | 'NO' | null
-    //   vq       -- number | null
-    function renderTtdlResult(d, tiers, original, shadow, vq){
-      lastData = {
-        sd: d.play,
-        hd: d.hdplay || d.play,
-        cover: d.cover || d.origin_cover,
-        title: d.title,
-        author: d.author && d.author.nickname,
-        views: d.play_count
-      };
-
-      thumbEl.src = lastData.cover || '';
-      titleEl.textContent = lastData.title || ttdlDict('untitled');
-      metaEl.textContent = (lastData.author ? '@' + lastData.author + ' · ' : '') + ttdlFormatCount(lastData.views) + ' ' + ttdlDict('views');
-      resultBox.style.display = 'flex';
-
-      if (statsGrid) {
-        const shadowClass = shadow === 'YES' ? 'ttdl-shadow-yes' : (shadow === 'NO' ? 'ttdl-shadow-no' : 'ttdl-shadow-unknown');
-        const shadowText = shadow || ttdlDict('unknownRes');
-        statsGrid.innerHTML =
-          ttdlStatRow('👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
-          ttdlStatRow('♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
-          ttdlStatRow('💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
-          ttdlStatRow('🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
-          ttdlStatRow('↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
-          ttdlStatRow('⬇', ttdlDict('statDownloads'), ttdlFormatCount(d.download_count)) +
-          ttdlStatRow('🆔', ttdlDict('statId'), d.id || '?') +
-          ttdlStatRow('📍', ttdlDict('statRegion'), d.region || '?') +
-          '<div class="ttdl-stat-item">👻 ' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
-      }
-
-      if (qualityBlock) {
-        const tierLines = tiers.map(tItem => {
-          const resLabel = ttdlResLabel(tItem.width, tItem.height) || ttdlDict('unknownRes');
-          const fpsTxt = tItem.fps != null ? (tItem.fps + 'fps') : '?fps';
-          const bitrateTxt = tItem.bitrateMbps != null ? tItem.bitrateMbps + 'Mbps' : '?';
-          const sizeTxt = tItem.sizeMb != null ? tItem.sizeMb + 'MB' : '?';
-          return '<div class="ttdl-quality-tier">' +
-                   '<div class="tqt-top"><span>' + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + fpsTxt + '</span></div>' +
-                   '<div class="tqt-sub">↳ ' + bitrateTxt + ' · ' + sizeTxt + '</div>' +
-                 '</div>';
-        }).join('');
-        const origRes = original ? ((original.width || '?') + 'x' + (original.height || '?')) : '?';
-        qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' + tierLines + '</div>' +
-          '<div class="ttdl-quality-original">' + escapeHtml(ttdlDict('statOriginal')) + ': ' + origRes + ' · VQ ' + (vq != null ? vq : '?') + '</div>';
-      }
-
-      if (bodyEl) bodyEl.classList.add('ttdl-expanded');
-      if (detailsBox) detailsBox.style.display = 'block';
-      dlRow.style.display = 'flex';
-      if (clearBtn) clearBtn.style.display = 'flex';
-      sdBtn.disabled = !lastData.sd;
-      hdBtn.disabled = !lastData.hd;
-      ttdlLog(ttdlDict('logFound'));
-    }
-
     async function ttdlAnalyze(){
-
       const url = (urlInput.value || '').trim();
       if (!url){ ttdlLog(ttdlDict('needLink')); return; }
       setBtnBusy(analyzeBtn, true, ttdlDict('analyzing'));
@@ -13217,34 +13183,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (iosLinkWrap) iosLinkWrap.style.display = 'none';
       sdBtn.disabled = true; hdBtn.disabled = true;
       ttdlLog(ttdlDict('logAnalyzing'));
-
-      // ---- Preferred path: our own backend (bot.py's probe_all_sources,
-      // via ffprobe, run server-side) -- no CORS, no hotlink blocks, the
-      // numbers are just always right. Only takes effect once
-      // TTDL_BACKEND_URL above is filled in with a deployed HTTPS URL. ----
-      const backend = await ttdlAnalyzeViaBackend(url);
-      if (backend) {
-        const d = {
-          play: backend.sd, hdplay: backend.hd,
-          cover: backend.cover, title: backend.title,
-          author: { nickname: backend.author },
-          play_count: backend.views, digg_count: backend.likes,
-          comment_count: backend.comments, collect_count: backend.favorites,
-          share_count: backend.shares, download_count: backend.downloads,
-          id: backend.id, region: backend.region
-        };
-        const tiers = backend.tiers || [];
-        const original = backend.original || null;
-        renderTtdlResult(d, tiers, original, backend.shadow, original ? original.vq : null);
-        setBtnBusy(analyzeBtn, false);
-        return;
-      }
-
-      // ---- Fallback path: fetch tikwm directly and probe resolution/fps
-      // from the browser itself (see probeVideoMeta/probeFps above for the
-      // CORS-proxy retry logic). Runs automatically whenever the backend
-      // isn't configured or didn't answer, so the tool keeps working
-      // either way while you roll the backend out. ----
       try{
         const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
         const res = await fetch(api);
@@ -13254,8 +13192,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
           // ---- Per-tier quality (mirrors bot.py's probe_all_sources):
           // dedupe identical URLs across play/hdplay/wmplay into one
-          // merged label, probe real width/height per distinct URL, and
-          // take size/bitrate straight from tikwm's own size fields. ----
+          // merged label per distinct URL. ----
           const labelsByUrl = {};
           const keysByUrl = {};
           TTDL_QUALITY_SOURCES.forEach(([label, key]) => {
@@ -13266,37 +13203,114 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             }
           });
           const urls = Object.keys(labelsByUrl);
-          const metas = await Promise.all(urls.map(u => Promise.all([probeVideoMeta(u), probeFps(u)])));
           const duration = Number(d.duration) || 0;
 
-          const tiers = urls.map((tierUrl, i) => {
-            let sizeBytes = null;
-            for (const key of keysByUrl[tierUrl]) {
-              const candidate = d[TTDL_SIZE_KEYS[key]];
-              if (candidate) { sizeBytes = candidate; break; }
-            }
-            let sizeMb = null, bitrateMbps = null;
-            if (sizeBytes && duration) {
-              sizeMb = Math.round((sizeBytes / (1024*1024)) * 10) / 10;
-              bitrateMbps = Math.round(((sizeBytes * 8 / duration) / 1000000) * 10) / 10;
-            }
-            const [dims, fps] = metas[i];
-            return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: dims.width, height: dims.height, fps: fps, sizeMb, bitrateMbps };
-          });
-
-          // "Original" = whichever tier has the tallest short side, same
-          // rule the bot uses to decide which tier represents the video.
-          let original = tiers.length ? tiers[0] : null;
-          tiers.forEach(tItem => {
-            const a = Math.min(tItem.width || 0, tItem.height || 0);
-            const b = original ? Math.min(original.width || 0, original.height || 0) : -1;
-            if (a > b) original = tItem;
-          });
-
+          // Shadow-ban estimate only needs like/view counts -- already in
+          // hand from the API response, no need to wait on anything else.
           const shadow = ttdlShadowBan(d.digg_count, d.play_count);
-          const vq = original ? ttdlVqScore(original.bitrateMbps, original.height) : null;
 
-          renderTtdlResult(d, tiers, original, shadow, vq);
+          // ---- Phase 1 (immediate): everything the visitor actually
+          // needs to start downloading -- thumbnail, title, engagement
+          // stats, and working SD/HD buttons -- comes straight from the
+          // tikwm response with no extra network round-trips. None of
+          // this should sit behind the slow per-tier resolution/fps probe
+          // below, which used to block the ENTIRE result from appearing
+          // for up to 8-20 seconds even though it only affects the small
+          // "quality" detail box, not whether downloading works at all. ----
+          lastData = {
+            sd: d.play,
+            hd: d.hdplay || d.play,
+            cover: d.cover || d.origin_cover,
+            title: d.title,
+            author: d.author && d.author.nickname,
+            views: d.play_count
+          };
+
+          thumbEl.src = lastData.cover || '';
+          titleEl.textContent = lastData.title || ttdlDict('untitled');
+          metaEl.textContent = (lastData.author ? '@' + lastData.author + ' · ' : '') + ttdlFormatCount(lastData.views) + ' ' + ttdlDict('views');
+          resultBox.style.display = 'flex';
+
+          if (statsGrid) {
+            const shadowClass = shadow === 'YES' ? 'ttdl-shadow-yes' : (shadow === 'NO' ? 'ttdl-shadow-no' : 'ttdl-shadow-unknown');
+            const shadowText = shadow || ttdlDict('unknownRes');
+            statsGrid.innerHTML =
+              ttdlStatRow('👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
+              ttdlStatRow('♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
+              ttdlStatRow('💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
+              ttdlStatRow('🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
+              ttdlStatRow('↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
+              ttdlStatRow('⬇', ttdlDict('statDownloads'), ttdlFormatCount(d.download_count)) +
+              ttdlStatRow('🆔', ttdlDict('statId'), d.id || '?') +
+              ttdlStatRow('📍', ttdlDict('statRegion'), d.region || '?') +
+              '<div class="ttdl-stat-item">👻 ' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
+          }
+
+          // Placeholder quality box -- swapped for the real numbers once
+          // the background probe (phase 2, below) finishes.
+          if (qualityBlock) {
+            qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' +
+              urls.map(u => '<div class="ttdl-quality-tier"><div class="tqt-top"><span>' + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div></div>').join('') +
+              '</div>';
+          }
+
+          if (bodyEl) bodyEl.classList.add('ttdl-expanded');
+          if (detailsBox) detailsBox.style.display = 'block';
+          dlRow.style.display = 'flex';
+          if (clearBtn) clearBtn.style.display = 'flex';
+          sdBtn.disabled = !lastData.sd;
+          hdBtn.disabled = !lastData.hd;
+          ttdlLog(ttdlDict('logFound'));
+
+          // ---- Phase 2 (background): the slow per-tier resolution/fps
+          // probe. Deliberately NOT awaited before the code above runs --
+          // this fills in the quality box a moment later without making
+          // the visitor wait for it to do anything else. Guarded by
+          // ttdlAnalysisToken so a second Analyze click (new URL) can't
+          // have this stale probe overwrite the newer result. ----
+          const myToken = ++ttdlAnalysisToken;
+          Promise.all(urls.map(u => Promise.all([probeVideoMeta(u), probeFps(u)]))).then((metas) => {
+            if (myToken !== ttdlAnalysisToken || !qualityBlock) return; // a newer analyze() superseded this one
+
+            const tiers = urls.map((tierUrl, i) => {
+              let sizeBytes = null;
+              for (const key of keysByUrl[tierUrl]) {
+                const candidate = d[TTDL_SIZE_KEYS[key]];
+                if (candidate) { sizeBytes = candidate; break; }
+              }
+              let sizeMb = null, bitrateMbps = null;
+              if (sizeBytes && duration) {
+                sizeMb = Math.round((sizeBytes / (1024*1024)) * 10) / 10;
+                bitrateMbps = Math.round(((sizeBytes * 8 / duration) / 1000000) * 10) / 10;
+              }
+              const [dims, fps] = metas[i];
+              return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: dims.width, height: dims.height, fps: fps, sizeMb, bitrateMbps };
+            });
+
+            // "Original" = whichever tier has the tallest short side, same
+            // rule the bot uses to decide which tier represents the video.
+            let original = tiers.length ? tiers[0] : null;
+            tiers.forEach(tItem => {
+              const a = Math.min(tItem.width || 0, tItem.height || 0);
+              const b = original ? Math.min(original.width || 0, original.height || 0) : -1;
+              if (a > b) original = tItem;
+            });
+            const vq = original ? ttdlVqScore(original.bitrateMbps, original.height) : null;
+
+            const tierLines = tiers.map(tItem => {
+              const resLabel = ttdlResLabel(tItem.width, tItem.height) || ttdlDict('unknownRes');
+              const fpsTxt = tItem.fps != null ? (tItem.fps + 'fps') : '?fps';
+              const bitrateTxt = tItem.bitrateMbps != null ? tItem.bitrateMbps + 'Mbps' : '?';
+              const sizeTxt = tItem.sizeMb != null ? tItem.sizeMb + 'MB' : '?';
+              return '<div class="ttdl-quality-tier">' +
+                       '<div class="tqt-top"><span>' + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + fpsTxt + '</span></div>' +
+                       '<div class="tqt-sub">↳ ' + bitrateTxt + ' · ' + sizeTxt + '</div>' +
+                     '</div>';
+            }).join('');
+            const origRes = original ? ((original.width || '?') + 'x' + (original.height || '?')) : '?';
+            qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' + tierLines + '</div>' +
+              '<div class="ttdl-quality-original">' + escapeHtml(ttdlDict('statOriginal')) + ': ' + origRes + ' · VQ ' + (vq != null ? vq : '?') + '</div>';
+          });
         } else {
           ttdlLog(ttdlDict('logFail'));
         }
@@ -13491,6 +13505,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     function ttdlClear(){
       urlInput.value = '';
       lastData = null;
+      ttdlAnalysisToken++; // invalidate any in-flight background quality probe
       thumbEl.src = '';
       titleEl.textContent = '';
       metaEl.textContent = '';
