@@ -4172,6 +4172,8 @@
     padding:14px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.09), 0 10px 28px rgba(0,0,0,0.35);
     min-width:0;
+    contain:layout paint;
+    transform:translateZ(0);
   }
 
   .ttdl-input-wrap{ position:relative; margin-bottom:10px; min-width:0; }
@@ -4244,7 +4246,7 @@
      widget doubles as the "checker" without needing a server. ---------- */
   .ttdl-details{ margin-bottom:10px; }
   .ttdl-stats-grid{
-    display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:5px 10px;
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:5px 14px;
     background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
     border-radius:10px; padding:10px 12px; margin-bottom:8px;
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
@@ -4259,6 +4261,7 @@
     border-radius:10px; padding:10px 12px; margin-bottom:8px;
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
   }
+  .ttdl-quality-tiers{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:4px 16px; }
   .ttdl-quality-tier{ padding:4px 0; border-bottom:1px dashed rgba(255,255,255,0.08); }
   .ttdl-quality-tier:last-of-type{ border-bottom:none; }
   .tqt-top{ display:flex; justify-content:space-between; gap:8px; }
@@ -4305,6 +4308,15 @@
     .pc-card--ttdl-wide{ padding:28px 26px; }
     .pc-icon--lg{ width:58px; height:58px; border-radius:18px; }
   }
+
+  /* Once a video is analyzed, the left title column is just dead weight
+     next to a now-tall results panel (that's what was making the card
+     look oddly stretched with a short title floating in a sea of empty
+     space) -- drop it and let the tool use the card's full width. Two
+     classes beats the single-class media-query rule above regardless of
+     viewport, so this applies at every screen size. */
+  .ttdl-body.ttdl-expanded{ grid-template-columns: minmax(0,1fr); }
+  .ttdl-body.ttdl-expanded .pc-head{ display:none; }
 
   .pc-badge{
     position:absolute; top:-11px; right:16px; z-index:6;
@@ -12556,6 +12568,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const wmBtn = document.getElementById('ttdlDlWm');
     const clearBtn = document.getElementById('ttdlClearBtn');
     const logEl = document.getElementById('ttdlLog');
+    const bodyEl = analyzeBtn.closest('.ttdl-body');
     if (!analyzeBtn || !urlInput) return;
 
     let lastData = null;
@@ -12853,10 +12866,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
                      '</div>';
             }).join('');
             const origRes = original ? ((original.width || '?') + 'x' + (original.height || '?')) : '?';
-            qualityBlock.innerHTML = tierLines +
+            qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' + tierLines + '</div>' +
               '<div class="ttdl-quality-original">' + escapeHtml(ttdlDict('statOriginal')) + ': ' + origRes + ' · VQ ' + (vq != null ? vq : '?') + '</div>';
           }
 
+          if (bodyEl) bodyEl.classList.add('ttdl-expanded');
           if (detailsBox) detailsBox.style.display = 'block';
           dlRow.style.display = 'flex';
           if (clearBtn) clearBtn.style.display = 'flex';
@@ -12918,6 +12932,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (detailsBox) detailsBox.style.display = 'none';
       if (statsGrid) statsGrid.innerHTML = '';
       if (qualityBlock) qualityBlock.innerHTML = '';
+      if (bodyEl) bodyEl.classList.remove('ttdl-expanded');
       dlRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       sdBtn.disabled = true;
