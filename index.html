@@ -4152,7 +4152,17 @@
     content:''; position:absolute; top:0; left:0; right:0; height:2px; z-index:1;
     background:linear-gradient(90deg, transparent, #25F4EE 25%, #FE2C55 55%, #25F4EE 85%, transparent);
     background-size:220% 100%;
-    animation: ttdlTrace 6s linear infinite;
+    /* Static resting frame for touch devices (phones/tablets) — same
+       coordinate the animation itself starts from, so it's a clean, fully
+       "designed" frame rather than an arbitrary freeze mid-gradient. */
+    background-position:0% 0;
+  }
+  /* Continuous motion only on devices with a real mouse (fine pointer +
+     hover) — i.e. "computers". Touch devices keep the static frame above. */
+  @media (hover:hover) and (pointer:fine){
+    .ttdl-shell::before{
+      animation: ttdlTrace 6s linear infinite;
+    }
   }
   @keyframes ttdlTrace{
     0%{ background-position:0% 0; }
@@ -4363,6 +4373,16 @@
     color:#9fb0c8; height:60px; overflow-y:auto;
   }
   .ttdl-log div{ white-space:normal; word-break:break-word; }
+
+  .ttdl-ios-link-wrap{ margin-bottom:10px; }
+  .ttdl-ios-link{
+    display:block; text-align:center; text-decoration:none;
+    padding:10px 12px; border-radius:9px;
+    background:rgba(37,244,238,0.12); border:1px solid rgba(37,244,238,0.35);
+    color:#eafffe; font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-size:12px; font-weight:600;
+  }
+  .ttdl-ios-link:active{ background:rgba(37,244,238,0.2); }
 
   /* Own full-width row below the packages, unchanged. */
   .pc-ttdl-row{
@@ -5838,6 +5858,17 @@
               <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled><span class="ttdl-dl-ico">⬇</span>HD</button>
             </div>
 
+            <!-- iOS Safari sometimes silently blocks the auto-opened tab
+                 (its "Block Pop-ups" setting is on by default), so this is
+                 a guaranteed, real, user-tappable link the visitor can use
+                 as a manual fallback -- a genuine anchor click is never
+                 caught by a popup blocker the way a script-triggered open
+                 can be. Hidden by default; shown only on iOS after a
+                 download attempt. -->
+            <div class="ttdl-ios-link-wrap" id="ttdlIosLinkWrap" style="display:none;">
+              <a class="ttdl-ios-link" id="ttdlIosLink" target="_blank" rel="noopener noreferrer" data-i18n="ttdlIosLinkText">ვიდეო არ გაიხსნა? დააჭირეთ აქ პირდაპირ</a>
+            </div>
+
             <div class="ttdl-log" id="ttdlLog"></div>
           </div>
         </div>
@@ -6152,6 +6183,7 @@
       ttdlDesc: 'ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში',
       ttdlInputPh: 'ჩასვი TikTok ვიდეოს ლინკი...',
       ttdlAnalyzeBtn: 'გაანალიზება',
+      ttdlIosLinkText: 'ვიდეო არ გაიხსნა? დააჭირეთ აქ პირდაპირ',
       cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
       cpUpscaleModalText4k: 'ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.',
       cpUpscaleModalTextDowngrade: 'ძვირფასო მომხმარებელო, თქვენი ატვირთული ვიდეო 1080p-ზე მაღალი ხარისხისაა, ამიტომ ფასი ავტომატურად <b>4K</b> ტარიფზეა დაფიქსირებული — <b>1080p</b>-ის ფასზე გადასვლა შეუძლებელია. თუ გსურთ 1080p ფასით სარგებლობა, ატვირთეთ ზუსტად 1080p ფორმატის ვიდეო.',
@@ -6542,6 +6574,7 @@
       ttdlDesc: 'Download videos without the watermark, in the best quality available',
       ttdlInputPh: 'Paste a TikTok video link...',
       ttdlAnalyzeBtn: 'Analyze Video',
+      ttdlIosLinkText: "Video didn't open? Tap here directly",
       cpUpscaleModalTitle: "You can't switch to this quality",
       cpUpscaleModalText4k: "Dear customer, your video was uploaded in <b>1080p</b> — whatever its FPS, it can't be converted to <b>4K</b>. To use the 4K option, please upload a video that is actually filmed/exported in 4K.",
       cpUpscaleModalTextDowngrade: "Dear customer, your uploaded video is higher quality than 1080p, so the price is automatically locked to the <b>4K</b> rate — switching to the <b>1080p</b> price isn't possible. If you want the 1080p price, upload a video that is exactly 1080p.",
@@ -12642,6 +12675,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const hdBtn = document.getElementById('ttdlDlHd');
     const clearBtn = document.getElementById('ttdlClearBtn');
     const logEl = document.getElementById('ttdlLog');
+    const iosLinkWrap = document.getElementById('ttdlIosLinkWrap');
+    const iosLink = document.getElementById('ttdlIosLink');
     const bodyEl = analyzeBtn.closest('.ttdl-body');
     if (!analyzeBtn || !urlInput) return;
 
@@ -12844,6 +12879,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (detailsBox) detailsBox.style.display = 'none';
       dlRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
+      if (iosLinkWrap) iosLinkWrap.style.display = 'none';
       sdBtn.disabled = true; hdBtn.disabled = true;
       ttdlLog(ttdlDict('logAnalyzing'));
       try{
@@ -12974,6 +13010,47 @@ TikTok პროფილი: ${getTiktokValue('cp')}
              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
 
+    // ---- Reliable "open in new tab" helper for iOS ----
+    // window.open() alone has two real problems on iOS Safari:
+    //   1) "Block Pop-ups" is ON by default in Safari settings, and
+    //      window.open() can be silently blocked by it -- it returns null,
+    //      nothing visibly happens, yet the old code logged "opened in a
+    //      new tab" regardless, so the visitor saw a false success message
+    //      while no tab ever opened. That mismatch is almost certainly
+    //      what "can't download on iOS" actually was.
+    //   2) A real <a target="_blank"> click is treated as a genuine,
+    //      user-driven navigation and is NOT subject to the same
+    //      popup-blocker heuristics as a script-triggered window.open() --
+    //      this is the same trick file-download libraries use. So we open
+    //      via a synthetic anchor click instead of window.open().
+    // Even so, there's no reliable way for JS to confirm the tab actually
+    // opened (an anchor click never throws or returns a "blocked" signal
+    // the way window.open() can return null), so on top of this we also
+    // reveal a real, permanent <a> link in the page itself (see
+    // ttdlShowIosLink below) -- a link the visitor taps themselves can
+    // never be blocked by any popup blocker, guaranteeing a way through
+    // even in the worst case (e.g. a restrictive in-app browser).
+    function ttdlOpenLinkViaAnchor(url){
+      try{
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
+
+    function ttdlShowIosLink(url){
+      if (!iosLinkWrap || !iosLink) return;
+      iosLink.href = url;
+      iosLinkWrap.style.display = 'block';
+    }
+
     async function ttdlDownload(quality){
       if (!lastData) return;
       const link = quality === 'hd' ? lastData.hd : lastData.sd;
@@ -12986,10 +13063,21 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         // Hand Safari the direct CDN link instead of a Blob -- it then
         // streams/plays it the normal networked way (audio stays intact),
         // and the visitor saves it themselves via the Share sheet or a
-        // long-press "Save Video" from the native player.
-        window.open(link, '_blank', 'noopener');
-        ttdlLog(ttdlDict('logIosOpen'));
-        setBtnBusy(btn, false);
+        // long-press "Save Video" from the native player. Wrapped in its
+        // own try/catch/finally so a thrown error here can never leave the
+        // button stuck on "Preparing..." forever (the old code had no
+        // safety net on this branch at all).
+        try{
+          ttdlOpenLinkViaAnchor(link);
+          ttdlLog(ttdlDict('logIosOpen'));
+        }catch(e){
+          ttdlLog(ttdlDict('logFallback'));
+        }finally{
+          // Always show the manual link too -- guarantees a way through
+          // even if the automatic open above was silently blocked.
+          ttdlShowIosLink(link);
+          setBtnBusy(btn, false);
+        }
         return;
       }
 
@@ -13010,7 +13098,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         // Cross-origin fetch was blocked by the video CDN — fall back to
         // just opening the direct link; the browser's own video player
         // still lets the visitor save it from there ("Save video as...").
-        window.open(link, '_blank', 'noopener');
+        ttdlOpenLinkViaAnchor(link);
+        ttdlShowIosLink(link);
         ttdlLog(ttdlDict('logFallback'));
       } finally {
         setBtnBusy(btn, false);
@@ -13030,6 +13119,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (bodyEl) bodyEl.classList.remove('ttdl-expanded');
       dlRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
+      if (iosLinkWrap) iosLinkWrap.style.display = 'none';
       sdBtn.disabled = true;
       hdBtn.disabled = true;
       if (logEl) logEl.innerHTML = '';
@@ -13046,13 +13136,25 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     ttdlLog(ttdlDict('logReady'));
   }
 
-  applyTranslations();
-  initAdminModeCheckbox();
-  applyAdminNameLock();
-  initBeforeAfterSliders();
-  initTilt3D();
-  initDiscordAuth();
-  initTiktokDownloader();
+  // Each feature init runs in its own try/catch so that a bug in any ONE
+  // of them (translations, admin panel, sliders, tilt effect, Discord
+  // auth...) can never throw and silently stop the rest of this script
+  // from running. Before this, they were called back-to-back with no
+  // isolation at all -- an uncaught error partway through this list would
+  // abort every call after it, including initTiktokDownloader() at the
+  // very end, which would make the downloader look completely broken on
+  // whatever browser/device happened to trip that earlier error, with no
+  // console noise pointing at the downloader itself as the "cause".
+  function ttdlSafeInit(fn){
+    try{ fn(); }catch(e){ if (window.console && console.error) console.error(e); }
+  }
+  ttdlSafeInit(applyTranslations);
+  ttdlSafeInit(initAdminModeCheckbox);
+  ttdlSafeInit(applyAdminNameLock);
+  ttdlSafeInit(initBeforeAfterSliders);
+  ttdlSafeInit(initTilt3D);
+  ttdlSafeInit(initDiscordAuth);
+  ttdlSafeInit(initTiktokDownloader);
 </script>
 
 <script>
