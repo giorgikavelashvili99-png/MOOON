@@ -4234,7 +4234,34 @@
   .ttdl-dl-btn:hover{ border-color:var(--pc-accent); box-shadow:0 8px 20px rgba(37,244,238,0.3); transform:translateY(-1px); }
   .ttdl-dl-btn--hd{ background:linear-gradient(135deg, rgba(254,44,85,0.18), rgba(254,44,85,0.04)); border-color:rgba(254,44,85,0.35); }
   .ttdl-dl-btn--hd:hover{ border-color:var(--pc-accent-2); box-shadow:0 8px 20px rgba(254,44,85,0.3); }
+  .ttdl-dl-btn--wm{ background:linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03)); border-color:rgba(255,255,255,0.22); }
+  .ttdl-dl-btn--wm:hover{ border-color:#fff; box-shadow:0 8px 20px rgba(255,255,255,0.16); }
   .ttdl-dl-btn:disabled{ opacity:0.45; cursor:default; box-shadow:none; transform:none; }
+
+  /* ---------- Merged analytics details (stats + quality) — same numbers
+     the Discord bot reports, computed client-side straight from tikwm's
+     JSON plus a hidden <video> element for real width/height, so this
+     widget doubles as the "checker" without needing a server. ---------- */
+  .ttdl-details{ margin-bottom:10px; }
+  .ttdl-stats-grid{
+    display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:5px 10px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px; padding:10px 12px; margin-bottom:8px;
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
+  }
+  .ttdl-stat-item{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ttdl-stat-item b{ color:#fff; font-weight:700; }
+  .ttdl-shadow-yes{ color:var(--warn); font-weight:700; }
+  .ttdl-shadow-no{ color:#3ddc84; font-weight:700; }
+  .ttdl-shadow-unknown{ color:var(--text-faint); font-weight:700; }
+  .ttdl-quality-block{
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px; padding:10px 12px; margin-bottom:8px;
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
+  }
+  .ttdl-quality-tier{ display:flex; justify-content:space-between; gap:8px; padding:3px 0; border-bottom:1px dashed rgba(255,255,255,0.08); }
+  .ttdl-quality-tier:last-of-type{ border-bottom:none; }
+  .ttdl-quality-original{ margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.14); color:#fff; font-weight:600; }
 
   .ttdl-log{
     background:rgba(0,0,0,0.55); border:1px solid rgba(37,244,238,0.25); border-radius:9px;
@@ -5713,9 +5740,15 @@
               </div>
             </div>
 
+            <div class="ttdl-details" id="ttdlDetails" style="display:none;">
+              <div class="ttdl-stats-grid" id="ttdlStatsGrid"></div>
+              <div class="ttdl-quality-block" id="ttdlQualityBlock"></div>
+            </div>
+
             <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
               <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled><span class="ttdl-dl-ico">⬇</span>SD</button>
               <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled><span class="ttdl-dl-ico">⬇</span>HD</button>
+              <button type="button" class="ttdl-dl-btn ttdl-dl-btn--wm" id="ttdlDlWm" disabled style="display:none;"><span class="ttdl-dl-ico">⬇</span>WM</button>
             </div>
 
             <div class="ttdl-log" id="ttdlLog"></div>
@@ -12488,7 +12521,18 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       logFallback: ['პირდაპირი გადმოწერა ვერ მოხერხდა — ვიდეო გაიხსნა ახალ ჩანართში, შეინახეთ „შენახვა როგორც"-ით.', 'Direct download was blocked — opened the video in a new tab, use "Save video as" to keep it.'],
       logReady: ['მზადაა.', 'Ready.'],
       untitled: ['უსათაურო ვიდეო', 'Untitled video'],
-      views: ['ნახვა', 'views']
+      views: ['ნახვა', 'views'],
+      statViews: ['ნახვა', 'Views'],
+      statLikes: ['მოწონება', 'Likes'],
+      statComments: ['კომენტარი', 'Comments'],
+      statFavorites: ['ფავორიტი', 'Favorites'],
+      statShares: ['გაზიარება', 'Shares'],
+      statDownloads: ['ჩამოტვირთვა', 'Downloads'],
+      statId: ['ID', 'ID'],
+      statRegion: ['რეგიონი', 'Region'],
+      statShadow: ['შადოუბანი', 'Shadow ban'],
+      statOriginal: ['ორიგინალი', 'Original'],
+      unknownRes: ['უცნობი', 'unknown']
     };
     const pair = map[key] || ['', ''];
     return isEn ? pair[1] : pair[0];
@@ -12498,12 +12542,16 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const urlInput = document.getElementById('ttdlUrlInput');
     const analyzeBtn = document.getElementById('ttdlAnalyzeBtn');
     const resultBox = document.getElementById('ttdlResult');
+    const detailsBox = document.getElementById('ttdlDetails');
+    const statsGrid = document.getElementById('ttdlStatsGrid');
+    const qualityBlock = document.getElementById('ttdlQualityBlock');
     const thumbEl = document.getElementById('ttdlThumb');
     const titleEl = document.getElementById('ttdlResultTitle');
     const metaEl = document.getElementById('ttdlResultMeta');
     const dlRow = document.getElementById('ttdlDlRow');
     const sdBtn = document.getElementById('ttdlDlSd');
     const hdBtn = document.getElementById('ttdlDlHd');
+    const wmBtn = document.getElementById('ttdlDlWm');
     const clearBtn = document.getElementById('ttdlClearBtn');
     const logEl = document.getElementById('ttdlLog');
     if (!analyzeBtn || !urlInput) return;
@@ -12526,6 +12574,69 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       return String(n);
     }
 
+    // ---- Analytics helpers below mirror the Discord bot's own logic
+    // 1:1 (same thresholds/formulas) so the site and the bot always
+    // report the same numbers for the same video. ----
+    const TTDL_SIZE_KEYS = { play: 'size', hdplay: 'hd_size', wmplay: 'wm_size' };
+    const TTDL_QUALITY_SOURCES = [['SD', 'play'], ['HD', 'hdplay'], ['WM', 'wmplay']];
+    const TTDL_SHADOW_HIGH_LIKES = 50;
+    const TTDL_SHADOW_LOW_LIKES = 5;
+    const TTDL_SHADOW_MIN_VIEWS = 1000;
+
+    function ttdlShadowBan(likes, views){
+      likes = Number(likes) || 0;
+      views = Number(views) || 0;
+      if (likes >= TTDL_SHADOW_HIGH_LIKES) return 'NO';
+      if (likes <= TTDL_SHADOW_LOW_LIKES && views >= TTDL_SHADOW_MIN_VIEWS) return 'YES';
+      return null; // ambiguous -- reported as "unknown" rather than guessed
+    }
+
+    function ttdlVqScore(bitrateMbps, height){
+      if (bitrateMbps == null || height == null) return null;
+      const score = Math.round((bitrateMbps / 15) * 60 + (height / 2880) * 40);
+      return Math.max(0, Math.min(100, score));
+    }
+
+    function ttdlResLabel(width, height){
+      if (!width || !height) return null;
+      const shortSide = Math.min(width, height);
+      if (shortSide >= 2160) return '4K';
+      if (shortSide >= 1440) return '2K';
+      if (shortSide >= 1080) return '1080p';
+      if (shortSide >= 720) return '720p';
+      return shortSide + 'p';
+    }
+
+    // Reads real width/height straight from the video file itself via a
+    // hidden <video> element -- browsers allow reading metadata (unlike
+    // pixel data) across origins without needing CORS headers, so this
+    // works on tikwm's CDN even though a raw fetch() of the same URL
+    // sometimes gets blocked (see the SD/HD download fallback below).
+    function probeVideoMeta(url){
+      return new Promise((resolve) => {
+        if (!url) { resolve({ width:null, height:null }); return; }
+        const v = document.createElement('video');
+        v.preload = 'metadata';
+        v.muted = true;
+        v.playsInline = true;
+        let settled = false;
+        const finish = (result) => {
+          if (settled) return;
+          settled = true;
+          v.removeAttribute('src');
+          resolve(result);
+        };
+        const timer = setTimeout(() => finish({ width:null, height:null }), 8000);
+        v.onloadedmetadata = () => { clearTimeout(timer); finish({ width: v.videoWidth || null, height: v.videoHeight || null }); };
+        v.onerror = () => { clearTimeout(timer); finish({ width:null, height:null }); };
+        v.src = url;
+      });
+    }
+
+    function ttdlStatRow(icon, label, value){
+      return '<div class="ttdl-stat-item">' + icon + ' ' + escapeHtml(label) + ': <b>' + escapeHtml(String(value)) + '</b></div>';
+    }
+
     function setBtnBusy(btn, busy, busyText){
       if (!btn) return;
       if (busy){
@@ -12543,32 +12654,113 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (!url){ ttdlLog(ttdlDict('needLink')); return; }
       setBtnBusy(analyzeBtn, true, ttdlDict('analyzing'));
       resultBox.style.display = 'none';
+      if (detailsBox) detailsBox.style.display = 'none';
       dlRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       sdBtn.disabled = true; hdBtn.disabled = true;
+      if (wmBtn) { wmBtn.disabled = true; wmBtn.style.display = 'none'; }
       ttdlLog(ttdlDict('logAnalyzing'));
       try{
-        const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url);
+        const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
         const res = await fetch(api);
         const json = await res.json();
         if (json && json.code === 0 && json.data){
           const d = json.data;
+
+          // ---- Per-tier quality (mirrors bot.py's probe_all_sources):
+          // dedupe identical URLs across play/hdplay/wmplay into one
+          // merged label, probe real width/height per distinct URL, and
+          // take size/bitrate straight from tikwm's own size fields. ----
+          const labelsByUrl = {};
+          const keysByUrl = {};
+          TTDL_QUALITY_SOURCES.forEach(([label, key]) => {
+            const tierUrl = d[key];
+            if (tierUrl) {
+              (labelsByUrl[tierUrl] = labelsByUrl[tierUrl] || []).push(label);
+              (keysByUrl[tierUrl] = keysByUrl[tierUrl] || []).push(key);
+            }
+          });
+          const urls = Object.keys(labelsByUrl);
+          const metas = await Promise.all(urls.map(probeVideoMeta));
+          const duration = Number(d.duration) || 0;
+
+          const tiers = urls.map((tierUrl, i) => {
+            let sizeBytes = null;
+            for (const key of keysByUrl[tierUrl]) {
+              const candidate = d[TTDL_SIZE_KEYS[key]];
+              if (candidate) { sizeBytes = candidate; break; }
+            }
+            let sizeMb = null, bitrateMbps = null;
+            if (sizeBytes && duration) {
+              sizeMb = Math.round((sizeBytes / (1024*1024)) * 10) / 10;
+              bitrateMbps = Math.round(((sizeBytes * 8 / duration) / 1000000) * 10) / 10;
+            }
+            return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: metas[i].width, height: metas[i].height, sizeMb, bitrateMbps };
+          });
+
+          // "Original" = whichever tier has the tallest short side, same
+          // rule the bot uses to decide which tier represents the video.
+          let original = tiers.length ? tiers[0] : null;
+          tiers.forEach(tItem => {
+            const a = Math.min(tItem.width || 0, tItem.height || 0);
+            const b = original ? Math.min(original.width || 0, original.height || 0) : -1;
+            if (a > b) original = tItem;
+          });
+
+          const shadow = ttdlShadowBan(d.digg_count, d.play_count);
+          const vq = original ? ttdlVqScore(original.bitrateMbps, original.height) : null;
+
           lastData = {
             sd: d.play,
             hd: d.hdplay || d.play,
+            wm: (d.wmplay && d.wmplay !== d.play && d.wmplay !== d.hdplay) ? d.wmplay : null,
             cover: d.cover || d.origin_cover,
             title: d.title,
             author: d.author && d.author.nickname,
             views: d.play_count
           };
+
           thumbEl.src = lastData.cover || '';
           titleEl.textContent = lastData.title || ttdlDict('untitled');
           metaEl.textContent = (lastData.author ? '@' + lastData.author + ' · ' : '') + ttdlFormatCount(lastData.views) + ' ' + ttdlDict('views');
           resultBox.style.display = 'flex';
+
+          if (statsGrid) {
+            const shadowClass = shadow === 'YES' ? 'ttdl-shadow-yes' : (shadow === 'NO' ? 'ttdl-shadow-no' : 'ttdl-shadow-unknown');
+            const shadowText = shadow || ttdlDict('unknownRes');
+            statsGrid.innerHTML =
+              ttdlStatRow('👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
+              ttdlStatRow('♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
+              ttdlStatRow('💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
+              ttdlStatRow('🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
+              ttdlStatRow('↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
+              ttdlStatRow('⬇', ttdlDict('statDownloads'), ttdlFormatCount(d.download_count)) +
+              ttdlStatRow('🆔', ttdlDict('statId'), d.id || '?') +
+              ttdlStatRow('📍', ttdlDict('statRegion'), d.region || '?') +
+              '<div class="ttdl-stat-item">👻 ' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
+          }
+
+          if (qualityBlock) {
+            const tierLines = tiers.map(tItem => {
+              const resLabel = ttdlResLabel(tItem.width, tItem.height) || ttdlDict('unknownRes');
+              const bitrateTxt = tItem.bitrateMbps != null ? tItem.bitrateMbps + 'Mbps' : '?';
+              const sizeTxt = tItem.sizeMb != null ? tItem.sizeMb + 'MB' : '?';
+              return '<div class="ttdl-quality-tier"><span>' + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + bitrateTxt + ' · ' + sizeTxt + '</span></div>';
+            }).join('');
+            const origRes = original ? ((original.width || '?') + 'x' + (original.height || '?')) : '?';
+            qualityBlock.innerHTML = tierLines +
+              '<div class="ttdl-quality-original">' + escapeHtml(ttdlDict('statOriginal')) + ': ' + origRes + ' · VQ ' + (vq != null ? vq : '?') + '</div>';
+          }
+
+          if (detailsBox) detailsBox.style.display = 'block';
           dlRow.style.display = 'flex';
           if (clearBtn) clearBtn.style.display = 'flex';
           sdBtn.disabled = !lastData.sd;
           hdBtn.disabled = !lastData.hd;
+          if (wmBtn) {
+            if (lastData.wm) { wmBtn.style.display = 'flex'; wmBtn.disabled = false; }
+            else { wmBtn.style.display = 'none'; wmBtn.disabled = true; }
+          }
           ttdlLog(ttdlDict('logFound'));
         } else {
           ttdlLog(ttdlDict('logFail'));
@@ -12582,9 +12774,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
     async function ttdlDownload(quality){
       if (!lastData) return;
-      const link = quality === 'hd' ? lastData.hd : lastData.sd;
+      const link = quality === 'hd' ? lastData.hd : (quality === 'wm' ? lastData.wm : lastData.sd);
       if (!link){ ttdlLog(ttdlDict('logNoLink')); return; }
-      const btn = quality === 'hd' ? hdBtn : sdBtn;
+      const btn = quality === 'hd' ? hdBtn : (quality === 'wm' ? wmBtn : sdBtn);
       setBtnBusy(btn, true, ttdlDict('preparing'));
       ttdlLog(ttdlDict('logDownloading'));
       try{
@@ -12618,10 +12810,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       titleEl.textContent = '';
       metaEl.textContent = '';
       resultBox.style.display = 'none';
+      if (detailsBox) detailsBox.style.display = 'none';
+      if (statsGrid) statsGrid.innerHTML = '';
+      if (qualityBlock) qualityBlock.innerHTML = '';
       dlRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       sdBtn.disabled = true;
       hdBtn.disabled = true;
+      if (wmBtn) { wmBtn.disabled = true; wmBtn.style.display = 'none'; }
       if (logEl) logEl.innerHTML = '';
       ttdlLog(ttdlDict('logReady'));
       urlInput.focus();
@@ -12631,6 +12827,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ttdlAnalyze(); });
     sdBtn.addEventListener('click', () => ttdlDownload('sd'));
     hdBtn.addEventListener('click', () => ttdlDownload('hd'));
+    if (wmBtn) wmBtn.addEventListener('click', () => ttdlDownload('wm'));
     if (clearBtn) clearBtn.addEventListener('click', ttdlClear);
 
     ttdlLog(ttdlDict('logReady'));
