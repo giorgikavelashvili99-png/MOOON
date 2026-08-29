@@ -422,6 +422,93 @@
   }
   .aor-tiktok-input.error{ border-color:var(--warn); }
   .aor-tiktok-input::placeholder{ color:var(--text-faint); font-family:'BPG Glaho', 'Space Grotesk', sans-serif; }
+
+  /* ---------- "TikTok ანალიტიკის გაგზავნა" tab -- its own distinct look,
+     borrowing the TikTok-brand cyan/red gradient language from the public
+     downloader card, instead of the plain grey admin-list treatment used
+     by the other tabs. Everything here is additive (new .tnf- classes
+     layered on top of the existing .a-order-row/.aor-* elements), so the
+     shared JS (which only looks for .aor-tiktok-input / data-action /
+     data-id) keeps working untouched. ---------- */
+  .tnf-header{ display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; }
+  .tnf-header-icon{
+    flex:0 0 auto; width:40px; height:40px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg, rgba(37,244,238,0.18), rgba(254,44,85,0.18));
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .tnf-note{
+    margin-top:4px; font-size:12px; line-height:1.6; color:var(--text-dim);
+    background:rgba(37,244,238,0.06); border:1px solid rgba(37,244,238,0.18);
+    border-radius:10px; padding:8px 11px;
+  }
+
+  .tnf-row{
+    position:relative; overflow:hidden;
+    background:linear-gradient(165deg, #0d1220, #080b14);
+    border:1px solid rgba(255,255,255,0.08); border-radius:14px;
+    padding:12px 14px 12px 18px; margin-bottom:10px;
+    display:flex; flex-direction:column; gap:8px;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  }
+  .tnf-row-accent{
+    position:absolute; top:0; left:0; bottom:0; width:4px;
+    background:linear-gradient(180deg, #25F4EE, #FE2C55);
+  }
+  @media (hover:hover) and (pointer:fine){
+    .tnf-row:hover{
+      border-color:rgba(37,244,238,0.35);
+      transform:translateY(-1px);
+      box-shadow:0 10px 26px rgba(0,0,0,0.35);
+    }
+  }
+  .tnf-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .tnf-id{
+    font-family:'JetBrains Mono', monospace; font-weight:700; font-size:12px;
+    color:#eafffe; background:rgba(37,244,238,0.12); border:1px solid rgba(37,244,238,0.3);
+    border-radius:100px; padding:3px 10px;
+  }
+  .tnf-user{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:700; color:var(--text-dim);
+    background:rgba(255,255,255,0.05); border-radius:100px; padding:3px 10px 3px 8px;
+  }
+  .tnf-user-dot{ width:6px; height:6px; border-radius:50%; background:#5865F2; flex:0 0 auto; box-shadow:0 0 6px #5865F2; }
+  .tnf-meta{ font-size:11.5px; color:var(--text-faint); line-height:1.6; }
+
+  .tnf-input-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tnf-input-wrap{ position:relative; flex:1 1 200px; min-width:0; }
+  .tnf-input-icon{
+    position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    font-size:12px; opacity:0.7; pointer-events:none;
+  }
+  .tnf-input-wrap .aor-tiktok-input{
+    width:100%; padding-left:28px; border-radius:10px;
+    background:#0a0e1a; border-color:rgba(255,255,255,0.12);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .tnf-input-wrap .aor-tiktok-input:focus{
+    outline:none; border-color:#25F4EE; box-shadow:0 0 0 3px rgba(37,244,238,0.16);
+  }
+  .tnf-send-btn{
+    flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
+    border:none; border-radius:10px; padding:8px 14px;
+    font-size:11.5px; font-weight:800; letter-spacing:0.01em; cursor:pointer;
+    color:#fff; background:linear-gradient(120deg, #25F4EE, #3b6dff 55%, #FE2C55);
+    background-size:180% 100%; background-position:0% 0;
+    transition: background-position .3s ease, transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 6px 16px rgba(37,244,238,0.18);
+  }
+  @media (hover:hover) and (pointer:fine){
+    .tnf-send-btn:hover:not(:disabled){ background-position:100% 0; transform:translateY(-1px); box-shadow:0 10px 22px rgba(254,44,85,0.22); }
+  }
+  .tnf-send-btn:disabled{ opacity:0.55; cursor:default; box-shadow:none; }
+  .tnf-sent{
+    display:inline-flex; align-items:center; gap:6px; width:fit-content;
+    font-size:11px; font-weight:700; color:#3ddc84;
+    background:rgba(61,220,132,0.1); border:1px solid rgba(61,220,132,0.3);
+    border-radius:100px; padding:3px 10px;
+  }
   .a-discord-btn{
     flex:1; border:none; border-radius:8px; padding:7px 10px; font-size:11.5px; font-weight:700; cursor:pointer;
     background:#5865F2; color:#fff;
@@ -6022,8 +6109,15 @@
            worker vs. DISCORD_TIKTOK_NOTIFY_WORKER_URL below), so the two
            can never both fire for the same click. -->
       <div class="a-panel" id="adminPanelTiktokNotify">
-        <div class="a-subheading" data-i18n="adminTiktokNotifyTitle">TikTok ანალიტიკის გაგზავნა (მეორე ბოტი)</div>
-        <div class="a-stat-note" data-i18n="adminTiktokNotifyNote">დადასტურებული შეკვეთები Discord ანგარიშით — ჩაასვი მზა ვიდეოს TikTok ლინკი და გაუგზავნე მომხმარებელს სრული ანალიტიკის ჩანაწერი (ნახვები, მოწონებები, ხარისხი, შადოუბანი). ეს იგზავნება ცალკე ბოტიდან, ზემოთა Discord შეტყობინებისგან დამოუკიდებლად.</div>
+        <div class="tnf-header">
+          <div class="tnf-header-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M16.5 3c.3 2.4 1.7 3.8 4 4v3.1c-1.5.1-2.9-.3-4-1.1v6.4a6.4 6.4 0 1 1-6.4-6.4c.3 0 .6 0 .9.1v3.2a3.2 3.2 0 1 0 2.3 3.1V3h3.2z" fill="url(#tnfIconGrad)"/><defs><linearGradient id="tnfIconGrad" x1="6" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#25F4EE"/><stop offset="1" stop-color="#FE2C55"/></linearGradient></defs></svg>
+          </div>
+          <div>
+            <div class="a-subheading" style="margin:0; padding:0; border:none;" data-i18n="adminTiktokNotifyTitle">TikTok ანალიტიკის გაგზავნა (მეორე ბოტი)</div>
+            <div class="tnf-note" data-i18n="adminTiktokNotifyNote">დადასტურებული შეკვეთები Discord ანგარიშით — ჩაასვი მზა ვიდეოს TikTok ლინკი და გაუგზავნე მომხმარებელს სრული ანალიტიკის ჩანაწერი (ნახვები, მოწონებები, ხარისხი, შადოუბანი). ეს იგზავნება ცალკე ბოტიდან, ზემოთა Discord შეტყობინებისგან დამოუკიდებლად.</div>
+          </div>
+        </div>
         <div class="a-form-row"><input type="text" id="tiktokNotifySearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
         <div id="tiktokNotifyList"></div>
       </div>
@@ -11517,17 +11611,21 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     listEl.innerHTML = filtered.map(o =>
-      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
-        '<div class="aor-top">' +
-          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
-          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · 🎮 ' + escapeHtml(o.discordUsername || String(o.discordId)) + '</span>' +
+      '<div class="a-order-row tnf-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="tnf-row-accent" aria-hidden="true"></div>' +
+        '<div class="tnf-top">' +
+          '<span class="tnf-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="tnf-user"><span class="tnf-user-dot" aria-hidden="true"></span>' + escapeHtml(o.discordUsername || String(o.discordId)) + '</span>' +
         '</div>' +
-        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
-        '<div class="aor-discord-notify">' +
-          '<input type="text" class="aor-tiktok-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminTiktokLinkPh') + '">' +
-          '<button class="a-discord-btn" data-action="send-tiktok-analytics" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendTiktokAnalytics') + '</button>' +
+        '<div class="tnf-meta">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? ' · ✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
+        '<div class="tnf-input-row">' +
+          '<span class="tnf-input-wrap">' +
+            '<span class="tnf-input-icon" aria-hidden="true">🎬</span>' +
+            '<input type="text" class="aor-tiktok-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminTiktokLinkPh') + '">' +
+          '</span>' +
+          '<button class="tnf-send-btn" data-action="send-tiktok-analytics" data-id="' + escapeHtml(String(o.id)) + '"><span aria-hidden="true">✦</span>' + t('adminSendTiktokAnalytics') + '</button>' +
         '</div>' +
-        (o.tiktokAnalyticsSentAt ? '<div class="aor-discord-sent">✅ ' + t('adminTiktokAnalyticsSent') + ' — ' + formatCommentDate(o.tiktokAnalyticsSentAt) + '</div>' : '') +
+        (o.tiktokAnalyticsSentAt ? '<span class="tnf-sent">✅ ' + t('adminTiktokAnalyticsSent') + ' — ' + formatCommentDate(o.tiktokAnalyticsSentAt) + '</span>' : '') +
       '</div>'
     ).join('');
   }
@@ -11973,11 +12071,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (!order || !order.discordId) return;
 
       sendBtn.disabled = true;
-      const originalText = sendBtn.textContent;
+      const originalHtml = sendBtn.innerHTML;
       sendBtn.textContent = t('adminSendingTiktokAnalytics');
       const ok = await sendTiktokAnalytics(order.discordId, link);
       sendBtn.disabled = false;
-      sendBtn.textContent = originalText;
+      sendBtn.innerHTML = originalHtml;
       if (ok) {
         order.tiktokAnalyticsSentAt = Date.now();
         await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
