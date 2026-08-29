@@ -4236,8 +4236,6 @@
   .ttdl-dl-btn:hover{ border-color:var(--pc-accent); box-shadow:0 8px 20px rgba(37,244,238,0.3); transform:translateY(-1px); }
   .ttdl-dl-btn--hd{ background:linear-gradient(135deg, rgba(254,44,85,0.18), rgba(254,44,85,0.04)); border-color:rgba(254,44,85,0.35); }
   .ttdl-dl-btn--hd:hover{ border-color:var(--pc-accent-2); box-shadow:0 8px 20px rgba(254,44,85,0.3); }
-  .ttdl-dl-btn--wm{ background:linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03)); border-color:rgba(255,255,255,0.22); }
-  .ttdl-dl-btn--wm:hover{ border-color:#fff; box-shadow:0 8px 20px rgba(255,255,255,0.16); }
   .ttdl-dl-btn:disabled{ opacity:0.45; cursor:default; box-shadow:none; transform:none; }
 
   /* ---------- Merged analytics details (stats + quality) — same numbers
@@ -4262,10 +4260,14 @@
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
   }
   .ttdl-quality-tiers{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:4px 16px; }
-  .ttdl-quality-tier{ padding:4px 0; border-bottom:1px dashed rgba(255,255,255,0.08); }
-  .ttdl-quality-tier:last-of-type{ border-bottom:none; }
-  .tqt-top{ display:flex; justify-content:space-between; gap:8px; }
-  .tqt-sub{ color:var(--text-faint); padding-left:4px; margin-top:1px; }
+  .ttdl-quality-tier{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:8px;
+    padding:6px 10px;
+  }
+  .tqt-top{ display:flex; justify-content:space-between; gap:8px; font-weight:700; color:#fff; }
+  .tqt-sub{ color:var(--text-faint); margin-top:2px; }
   .ttdl-quality-original{ margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.14); color:#fff; font-weight:600; }
 
   .ttdl-log{
@@ -5762,7 +5764,6 @@
             <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
               <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled><span class="ttdl-dl-ico">⬇</span>SD</button>
               <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled><span class="ttdl-dl-ico">⬇</span>HD</button>
-              <button type="button" class="ttdl-dl-btn ttdl-dl-btn--wm" id="ttdlDlWm" disabled style="display:none;"><span class="ttdl-dl-ico">⬇</span>WM</button>
             </div>
 
             <div class="ttdl-log" id="ttdlLog"></div>
@@ -12565,7 +12566,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const dlRow = document.getElementById('ttdlDlRow');
     const sdBtn = document.getElementById('ttdlDlSd');
     const hdBtn = document.getElementById('ttdlDlHd');
-    const wmBtn = document.getElementById('ttdlDlWm');
     const clearBtn = document.getElementById('ttdlClearBtn');
     const logEl = document.getElementById('ttdlLog');
     const bodyEl = analyzeBtn.closest('.ttdl-body');
@@ -12592,8 +12592,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // ---- Analytics helpers below mirror the Discord bot's own logic
     // 1:1 (same thresholds/formulas) so the site and the bot always
     // report the same numbers for the same video. ----
-    const TTDL_SIZE_KEYS = { play: 'size', hdplay: 'hd_size', wmplay: 'wm_size' };
-    const TTDL_QUALITY_SOURCES = [['SD', 'play'], ['HD', 'hdplay'], ['WM', 'wmplay']];
+    const TTDL_SIZE_KEYS = { play: 'size', hdplay: 'hd_size' };
+    const TTDL_QUALITY_SOURCES = [['SD', 'play'], ['HD', 'hdplay']];
     const TTDL_SHADOW_HIGH_LIKES = 50;
     const TTDL_SHADOW_LOW_LIKES = 5;
     const TTDL_SHADOW_MIN_VIEWS = 1000;
@@ -12771,7 +12771,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       dlRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       sdBtn.disabled = true; hdBtn.disabled = true;
-      if (wmBtn) { wmBtn.disabled = true; wmBtn.style.display = 'none'; }
       ttdlLog(ttdlDict('logAnalyzing'));
       try{
         const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
@@ -12827,7 +12826,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           lastData = {
             sd: d.play,
             hd: d.hdplay || d.play,
-            wm: (d.wmplay && d.wmplay !== d.play && d.wmplay !== d.hdplay) ? d.wmplay : null,
             cover: d.cover || d.origin_cover,
             title: d.title,
             author: d.author && d.author.nickname,
@@ -12876,10 +12874,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           if (clearBtn) clearBtn.style.display = 'flex';
           sdBtn.disabled = !lastData.sd;
           hdBtn.disabled = !lastData.hd;
-          if (wmBtn) {
-            if (lastData.wm) { wmBtn.style.display = 'flex'; wmBtn.disabled = false; }
-            else { wmBtn.style.display = 'none'; wmBtn.disabled = true; }
-          }
           ttdlLog(ttdlDict('logFound'));
         } else {
           ttdlLog(ttdlDict('logFail'));
@@ -12893,9 +12887,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
     async function ttdlDownload(quality){
       if (!lastData) return;
-      const link = quality === 'hd' ? lastData.hd : (quality === 'wm' ? lastData.wm : lastData.sd);
+      const link = quality === 'hd' ? lastData.hd : lastData.sd;
       if (!link){ ttdlLog(ttdlDict('logNoLink')); return; }
-      const btn = quality === 'hd' ? hdBtn : (quality === 'wm' ? wmBtn : sdBtn);
+      const btn = quality === 'hd' ? hdBtn : sdBtn;
       setBtnBusy(btn, true, ttdlDict('preparing'));
       ttdlLog(ttdlDict('logDownloading'));
       try{
@@ -12937,7 +12931,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (clearBtn) clearBtn.style.display = 'none';
       sdBtn.disabled = true;
       hdBtn.disabled = true;
-      if (wmBtn) { wmBtn.disabled = true; wmBtn.style.display = 'none'; }
       if (logEl) logEl.innerHTML = '';
       ttdlLog(ttdlDict('logReady'));
       urlInput.focus();
@@ -12947,7 +12940,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ttdlAnalyze(); });
     sdBtn.addEventListener('click', () => ttdlDownload('sd'));
     hdBtn.addEventListener('click', () => ttdlDownload('hd'));
-    if (wmBtn) wmBtn.addEventListener('click', () => ttdlDownload('wm'));
     if (clearBtn) clearBtn.addEventListener('click', ttdlClear);
 
     ttdlLog(ttdlDict('logReady'));
