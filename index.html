@@ -416,6 +416,12 @@
     flex:1 1 100%; font-size:11px; color:var(--text-faint);
     font-family:'BPG Glaho', 'JetBrains Mono', monospace;
   }
+  .aor-tiktok-input{
+    flex:1 1 180px; min-width:0; background:#0e0e1c; border:1px solid var(--moon-line); border-radius:8px;
+    color:var(--text); font-size:12px; padding:6px 8px; font-family:'BPG Glaho', 'JetBrains Mono', monospace;
+  }
+  .aor-tiktok-input.error{ border-color:var(--warn); }
+  .aor-tiktok-input::placeholder{ color:var(--text-faint); font-family:'BPG Glaho', 'Space Grotesk', sans-serif; }
   .a-discord-btn{
     flex:1; border:none; border-radius:8px; padding:7px 10px; font-size:11.5px; font-weight:700; cursor:pointer;
     background:#5865F2; color:#fff;
@@ -5965,6 +5971,7 @@
         <button class="a-tab" id="adminTabOrders" data-i18n="adminTabOrders">შეკვეთები</button>
         <button class="a-tab" id="adminTabDiscordUsers" data-i18n="adminTabDiscordUsers">Discord მომხმარებლები</button>
         <button class="a-tab" id="adminTabDiscordNotify" data-i18n="adminTabDiscordNotify">Discord შეტყობინებები</button>
+        <button class="a-tab" id="adminTabTiktokNotify" data-i18n="adminTabTiktokNotify">TikTok ანალიტიკის გაგზავნა</button>
         <button class="a-tab" id="adminTabAnalytics" data-i18n="adminTabAnalytics">ანალიტიკა</button>
         <button class="a-tab" id="adminTabUrgency" data-i18n="adminTabUrgency">ადგილები</button>
         <button class="a-tab" id="adminTabPromo" data-i18n="adminTabPromo">Promo</button>
@@ -6004,6 +6011,21 @@
         <div class="a-stat-note" data-i18n="adminDiscordNotifyNote">დადასტურებული შეკვეთები, რომლებიც Discord ანგარიშითაა შეკვეთილი — უგზავნი მომხმარებელს პირად შეტყობინებას სავარაუდო ჩაბარების ვადით.</div>
         <div class="a-form-row"><input type="text" id="discordNotifySearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
         <div id="discordNotifyList"></div>
+      </div>
+      <!-- Separate "second bot" tab: sends the customer their FINISHED
+           video's full analytics embed (views/likes/quality/shadow-ban —
+           the same pipeline bot.py runs) once the admin pastes that
+           video's own link, once it's live on the customer's profile.
+           Deliberately its own tab, own list render, own send function —
+           never mixed with the plain ETA text above, and always sent via
+           a completely separate bot process (see adminTabDiscordNotify's
+           worker vs. DISCORD_TIKTOK_NOTIFY_WORKER_URL below), so the two
+           can never both fire for the same click. -->
+      <div class="a-panel" id="adminPanelTiktokNotify">
+        <div class="a-subheading" data-i18n="adminTiktokNotifyTitle">TikTok ანალიტიკის გაგზავნა (მეორე ბოტი)</div>
+        <div class="a-stat-note" data-i18n="adminTiktokNotifyNote">დადასტურებული შეკვეთები Discord ანგარიშით — ჩაასვი მზა ვიდეოს TikTok ლინკი და გაუგზავნე მომხმარებელს სრული ანალიტიკის ჩანაწერი (ნახვები, მოწონებები, ხარისხი, შადოუბანი). ეს იგზავნება ცალკე ბოტიდან, ზემოთა Discord შეტყობინებისგან დამოუკიდებლად.</div>
+        <div class="a-form-row"><input type="text" id="tiktokNotifySearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+        <div id="tiktokNotifyList"></div>
       </div>
       <div class="a-panel" id="adminPanelAnalytics">
         <div class="a-chart-card" id="analyticsSummaryCard"></div>
@@ -6396,6 +6418,7 @@
       adminTabOrders: 'შეკვეთები',
       adminTabDiscordUsers: 'Discord მომხმარებლები',
       adminTabDiscordNotify: 'Discord შეტყობინებები',
+      adminTabTiktokNotify: 'TikTok ანალიტიკის გაგზავნა',
       adminTabAnalytics: 'ანალიტიკა',
       adminTabUrgency: 'ადგილები',
       adminTabPromo: 'Promo',
@@ -6441,6 +6464,16 @@
       adminDiscordNotifyNote: 'დადასტურებული შეკვეთები, რომლებიც Discord ანგარიშითაა შეკვეთილი — უგზავნი მომხმარებელს პირად შეტყობინებას სავარაუდო ჩაბარების ვადით.',
       adminNoDiscordNotify: 'დისქორდით შეკვეთილი დადასტურებული შეკვეთა ჯერ არ არის.',
       adminNoDiscordNotifyMatch: 'ვერაფერი მოიძებნა.',
+      adminTiktokNotifyTitle: 'TikTok ანალიტიკის გაგზავნა (მეორე ბოტი)',
+      adminTiktokNotifyNote: 'დადასტურებული შეკვეთები Discord ანგარიშით — ჩაასვი მზა ვიდეოს TikTok ლინკი და გაუგზავნე მომხმარებელს სრული ანალიტიკის ჩანაწერი. ეს იგზავნება ცალკე ბოტიდან, ზემოთა Discord შეტყობინებისგან დამოუკიდებლად.',
+      adminNoTiktokNotify: 'დისქორდით შეკვეთილი დადასტურებული შეკვეთა ჯერ არ არის.',
+      adminNoTiktokNotifyMatch: 'ვერაფერი მოიძებნა.',
+      adminTiktokLinkPh: 'ჩასვი მზა ვიდეოს TikTok ლინკი',
+      adminSendTiktokAnalytics: 'ანალიტიკის გაგზავნა',
+      adminSendingTiktokAnalytics: 'გაანალიზება და გაგზავნა…',
+      adminTiktokAnalyticsSent: 'ანალიტიკა გაიგზავნა',
+      adminTiktokSendFailed: 'ვერ გაიგზავნა — გადაამოწმე TikTok ლინკი და Worker-ის მისამართი, და სცადე თავიდან.',
+      adminTiktokLinkRequired: 'ჩაწერე TikTok ვიდეოს ლინკი.',
       adminNoActiveSubs: 'აქტიური პაკეტი ჯერ არავის აქვს.',
       adminNoActiveSubsMatch: 'ამ სახელით აქტიური პაკეტი ვერ მოიძებნა.',
       adminSubExpiresIn: 'იწურება',
@@ -6787,6 +6820,7 @@
       adminTabOrders: 'Orders',
       adminTabDiscordUsers: 'Discord Users',
       adminTabDiscordNotify: 'Discord Notifications',
+      adminTabTiktokNotify: 'Send TikTok Analytics',
       adminTabAnalytics: 'Analytics',
       adminTabUrgency: 'Spots',
       adminTabPromo: 'Promo',
@@ -6832,6 +6866,16 @@
       adminDiscordNotifyNote: 'Confirmed orders placed with a Discord account — send the customer a direct message with an estimated delivery time.',
       adminNoDiscordNotify: 'No confirmed Discord orders yet.',
       adminNoDiscordNotifyMatch: 'No matches found.',
+      adminTiktokNotifyTitle: 'Send TikTok Analytics (second bot)',
+      adminTiktokNotifyNote: "Confirmed orders placed with a Discord account — paste the finished video's TikTok link and send the customer its full analytics report. This is sent from a completely separate bot, independent of the Discord notification above.",
+      adminNoTiktokNotify: 'No confirmed Discord orders yet.',
+      adminNoTiktokNotifyMatch: 'No matches found.',
+      adminTiktokLinkPh: "Paste the finished video's TikTok link",
+      adminSendTiktokAnalytics: 'Send analytics',
+      adminSendingTiktokAnalytics: 'Analyzing and sending…',
+      adminTiktokAnalyticsSent: 'Analytics sent',
+      adminTiktokSendFailed: 'Failed to send — check the TikTok link and the worker URL, and try again.',
+      adminTiktokLinkRequired: 'Enter a TikTok video link.',
       adminNoActiveSubs: 'No one has an active package yet.',
       adminNoActiveSubsMatch: 'No active package found with that name.',
       adminSubExpiresIn: 'expires',
@@ -10949,6 +10993,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminTabOrders = document.getElementById('adminTabOrders');
   const adminTabDiscordUsers = document.getElementById('adminTabDiscordUsers');
   const adminTabDiscordNotify = document.getElementById('adminTabDiscordNotify');
+  const adminTabTiktokNotify = document.getElementById('adminTabTiktokNotify');
   const adminTabAnalytics = document.getElementById('adminTabAnalytics');
   const adminTabUrgency = document.getElementById('adminTabUrgency');
   const adminTabPromo = document.getElementById('adminTabPromo');
@@ -10958,6 +11003,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminPanelOrders = document.getElementById('adminPanelOrders');
   const adminPanelDiscordUsers = document.getElementById('adminPanelDiscordUsers');
   const adminPanelDiscordNotify = document.getElementById('adminPanelDiscordNotify');
+  const adminPanelTiktokNotify = document.getElementById('adminPanelTiktokNotify');
   const adminPanelAnalytics = document.getElementById('adminPanelAnalytics');
   const adminPanelUrgency = document.getElementById('adminPanelUrgency');
   const adminPanelPromo = document.getElementById('adminPanelPromo');
@@ -11444,6 +11490,60 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   if (discordNotifySearchInput) discordNotifySearchInput.addEventListener('input', renderDiscordNotifyList);
 
   // ============================================================
+  // TIKTOK ANALYTICS SEND ("second bot"): same confirmed-Discord-order
+  // list as above, but each row lets the admin paste the customer's
+  // now-finished video's own TikTok link and send them a full analytics
+  // report (views/likes/quality/shadow-ban) as a DM from a completely
+  // separate bot process — see DISCORD_TIKTOK_NOTIFY_WORKER_URL. Kept as
+  // its own tab/render/send path end-to-end so it can never fire together
+  // with the plain ETA notification above.
+  // ============================================================
+  function renderTiktokNotifyList(){
+    const listEl = document.getElementById('tiktokNotifyList');
+    if (!listEl) return;
+    const searchEl = document.getElementById('tiktokNotifySearch');
+    const query = (searchEl && searchEl.value || '').trim();
+    const withDiscord = confirmedOrdersCache.filter(o => o.discordId);
+    const sorted = withDiscord.slice().sort((a, b) => (b.confirmedAt || b.ts || 0) - (a.confirmedAt || a.ts || 0));
+    const filtered = query ? sorted.filter(o => String(o.id).includes(query)) : sorted;
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoTiktokNotify') + '</div>';
+      return;
+    }
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="c-empty">' + t('adminNoTiktokNotifyMatch') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(o =>
+      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
+        '<div class="aor-top">' +
+          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
+          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · 🎮 ' + escapeHtml(o.discordUsername || String(o.discordId)) + '</span>' +
+        '</div>' +
+        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
+        '<div class="aor-discord-notify">' +
+          '<input type="text" class="aor-tiktok-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminTiktokLinkPh') + '">' +
+          '<button class="a-discord-btn" data-action="send-tiktok-analytics" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendTiktokAnalytics') + '</button>' +
+        '</div>' +
+        (o.tiktokAnalyticsSentAt ? '<div class="aor-discord-sent">✅ ' + t('adminTiktokAnalyticsSent') + ' — ' + formatCommentDate(o.tiktokAnalyticsSentAt) + '</div>' : '') +
+      '</div>'
+    ).join('');
+  }
+
+  async function renderAdminTiktokNotify(){
+    const listEl = document.getElementById('tiktokNotifyList');
+    if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
+    const data = await mdbRead('confirmedOrders');
+    confirmedOrdersCache = (data && Array.isArray(data.list)) ? data.list : [];
+    renderTiktokNotifyList();
+  }
+
+  const tiktokNotifySearchInput = document.getElementById('tiktokNotifySearch');
+  if (tiktokNotifySearchInput) tiktokNotifySearchInput.addEventListener('input', renderTiktokNotifyList);
+
+  // ============================================================
   // ACTIVE PACKAGES (DISCORD): once a pending weekly/monthly order placed
   // by a Discord-logged-in customer gets confirmed below, this store
   // records that their package is active for 7 (weekly) or 30 (monthly)
@@ -11840,6 +11940,54 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     });
   }
 
+  // Sends {discordId, tiktokLink} to the "second bot"'s Worker proxy,
+  // which forwards it (with the shared secret attached server-side) to
+  // that bot's own /send-analytics endpoint. The bot itself runs the full
+  // tikwm + ffprobe pipeline and DMs the finished embed to the customer —
+  // this call just kicks that off and waits for ok/fail.
+  async function sendTiktokAnalytics(discordId, tiktokLink){
+    try{
+      const res = await fetch(DISCORD_TIKTOK_NOTIFY_WORKER_URL + '/notify-tiktok', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ discordId: discordId, tiktokLink: tiktokLink })
+      });
+      return res.ok;
+    } catch(e){ return false; }
+  }
+
+  const tiktokNotifyListEl = document.getElementById('tiktokNotifyList');
+  if (tiktokNotifyListEl) {
+    tiktokNotifyListEl.addEventListener('click', async (e) => {
+      const sendBtn = e.target.closest('button[data-action="send-tiktok-analytics"]');
+      if (!sendBtn) return;
+      const id = sendBtn.getAttribute('data-id');
+      const input = tiktokNotifyListEl.querySelector('.aor-tiktok-input[data-id="' + CSS.escape(id) + '"]');
+      const link = input ? input.value.trim() : '';
+      if (!link) {
+        if (input) { input.classList.add('error'); input.focus(); }
+        alert(t('adminTiktokLinkRequired'));
+        return;
+      }
+      const order = confirmedOrdersCache.find(o => String(o.id) === String(id));
+      if (!order || !order.discordId) return;
+
+      sendBtn.disabled = true;
+      const originalText = sendBtn.textContent;
+      sendBtn.textContent = t('adminSendingTiktokAnalytics');
+      const ok = await sendTiktokAnalytics(order.discordId, link);
+      sendBtn.disabled = false;
+      sendBtn.textContent = originalText;
+      if (ok) {
+        order.tiktokAnalyticsSentAt = Date.now();
+        await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+        renderTiktokNotifyList();
+      } else {
+        alert(t('adminTiktokSendFailed'));
+      }
+    });
+  }
+
 
   // ============================================================
   // ORDER ANALYTICS: manually-logged real orders (TikTok link,
@@ -12067,6 +12215,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminTabOrders.classList.toggle('active', tab === 'orders');
     adminTabDiscordUsers.classList.toggle('active', tab === 'discordUsers');
     adminTabDiscordNotify.classList.toggle('active', tab === 'discordNotify');
+    adminTabTiktokNotify.classList.toggle('active', tab === 'tiktokNotify');
     adminTabAnalytics.classList.toggle('active', tab === 'analytics');
     adminTabUrgency.classList.toggle('active', tab === 'urgency');
     adminTabPromo.classList.toggle('active', tab === 'promo');
@@ -12076,6 +12225,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminPanelOrders.classList.toggle('active', tab === 'orders');
     adminPanelDiscordUsers.classList.toggle('active', tab === 'discordUsers');
     adminPanelDiscordNotify.classList.toggle('active', tab === 'discordNotify');
+    adminPanelTiktokNotify.classList.toggle('active', tab === 'tiktokNotify');
     adminPanelAnalytics.classList.toggle('active', tab === 'analytics');
     adminPanelUrgency.classList.toggle('active', tab === 'urgency');
     adminPanelPromo.classList.toggle('active', tab === 'promo');
@@ -12085,6 +12235,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     else if (tab === 'orders') renderAdminOrders();
     else if (tab === 'discordUsers') renderAdminDiscordUsers();
     else if (tab === 'discordNotify') renderAdminDiscordNotify();
+    else if (tab === 'tiktokNotify') renderAdminTiktokNotify();
     else if (tab === 'analytics') renderAdminAnalytics();
     else if (tab === 'urgency') renderAdminUrgency();
     else if (tab === 'promo') renderAdminPromo();
@@ -12095,6 +12246,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   adminTabOrders.addEventListener('click', () => switchAdminTab('orders'));
   adminTabDiscordUsers.addEventListener('click', () => switchAdminTab('discordUsers'));
   adminTabDiscordNotify.addEventListener('click', () => switchAdminTab('discordNotify'));
+  adminTabTiktokNotify.addEventListener('click', () => switchAdminTab('tiktokNotify'));
   adminTabAnalytics.addEventListener('click', () => switchAdminTab('analytics'));
   adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
   adminTabPromo.addEventListener('click', () => switchAdminTab('promo'));
@@ -12323,6 +12475,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
   const DISCORD_AUTH_WORKER_URL = 'https://moon-discord-auth.giorgikavelashvili99.workers.dev';
   const DISCORD_NOTIFY_WORKER_URL = 'https://discordbottoken.giorgikavelashvili99.workers.dev';
+  // "Second bot" — a completely separate Discord bot process (its own
+  // token, own deployment) whose only job is to DM a customer their
+  // finished video's full TikTok analytics embed. This site never talks
+  // to that bot directly (that would mean shipping its shared secret to
+  // every visitor's browser) — it goes through its own small Worker proxy
+  // instead, exactly like DISCORD_NOTIFY_WORKER_URL above. Deploy
+  // discord-tiktok-notify-worker.js, then paste its URL here.
+  const DISCORD_TIKTOK_NOTIFY_WORKER_URL = 'https://PASTE-YOUR-TIKTOK-NOTIFY-WORKER-URL-HERE.workers.dev';
   const DISCORD_INVITE_URL = 'https://discord.gg/7bbmeHKq4';
   const DISCORD_STATE_KEY = 'moon_discord_oauth_state';
 
