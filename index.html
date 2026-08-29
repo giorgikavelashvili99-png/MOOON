@@ -12908,7 +12908,20 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // pixel data) across origins without needing CORS headers, so this
     // works on tikwm's CDN even though a raw fetch() of the same URL
     // sometimes gets blocked (see the SD/HD download fallback below).
-    function probeVideoMeta(url){
+    // Public CORS proxies, tried in order as a fallback when a tikwm CDN
+    // edge rejects the direct cross-origin request outright (missing CORS
+    // headers, or a Referer/hotlink check that a request from our own
+    // domain fails). These are third-party services with their own
+    // uptime/rate-limit quirks -- a best-effort second attempt, not a real
+    // fix. The reliable fix is probing through your own backend (reuse
+    // bot.py's probe_all_sources so the browser never needs cross-origin
+    // access to tikwm's CDN at all).
+    const TTDL_CORS_PROXIES = [
+      (u) => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
+      (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u)
+    ];
+
+    function probeVideoMetaOnce(url, timeoutMs){
       return new Promise((resolve) => {
         if (!url) { resolve({ width:null, height:null }); return; }
         const v = document.createElement('video');
@@ -12922,11 +12935,26 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           v.removeAttribute('src');
           resolve(result);
         };
-        const timer = setTimeout(() => finish({ width:null, height:null }), 8000);
+        const timer = setTimeout(() => finish({ width:null, height:null }), timeoutMs);
         v.onloadedmetadata = () => { clearTimeout(timer); finish({ width: v.videoWidth || null, height: v.videoHeight || null }); };
         v.onerror = () => { clearTimeout(timer); finish({ width:null, height:null }); };
         v.src = url;
       });
+    }
+
+    // Direct URL first (fast path -- works for most tikwm edges). If that
+    // comes back with no dimensions at all (blocked/expired/hotlink-
+    // protected link), retries once per CORS proxy before giving up. This
+    // is what turns a hard "unknown" into a real width/height for the
+    // edges that reject the direct request.
+    async function probeVideoMeta(url){
+      const direct = await probeVideoMetaOnce(url, 8000);
+      if (direct.width && direct.height) return direct;
+      for (const buildProxyUrl of TTDL_CORS_PROXIES){
+        const viaProxy = await probeVideoMetaOnce(buildProxyUrl(url), 8000);
+        if (viaProxy.width && viaProxy.height) return viaProxy;
+      }
+      return { width:null, height:null };
     }
 
     // ---- FPS: browsers have no direct API for this (unlike width/height
@@ -12997,11 +13025,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         return null;
       }
     }
-    async function probeFps(url, maxBytes){
-      if (!url) return null;
-      maxBytes = maxBytes || 3 * 1024 * 1024;
+    async function fetchBytes(url, maxBytes, timeoutMs){
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 10000);
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const res = await fetch(url, { signal: controller.signal });
         if (!res.ok || !res.body) { clearTimeout(timer); return null; }
@@ -13020,11 +13046,33 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const buf = new Uint8Array(received);
         let offset = 0;
         for (const c of chunks) { buf.set(c, offset); offset += c.length; }
-        return parseFpsFromMp4Buffer(buf);
+        return buf;
       } catch (e) {
         clearTimeout(timer);
         return null;
       }
+    }
+
+    // Direct fetch first; if the CDN edge withholds CORS headers (or
+    // rejects the request outright) this comes back null, so we retry once
+    // per proxy before reporting fps as unknown. Same trade-off as
+    // probeVideoMeta above -- best-effort, not a guarantee.
+    async function probeFps(url, maxBytes){
+      if (!url) return null;
+      maxBytes = maxBytes || 3 * 1024 * 1024;
+      const direct = await fetchBytes(url, maxBytes, 10000);
+      if (direct) {
+        const fps = parseFpsFromMp4Buffer(direct);
+        if (fps) return fps;
+      }
+      for (const buildProxyUrl of TTDL_CORS_PROXIES){
+        const buf = await fetchBytes(buildProxyUrl(url), maxBytes, 10000);
+        if (buf) {
+          const fps = parseFpsFromMp4Buffer(buf);
+          if (fps) return fps;
+        }
+      }
+      return null;
     }
 
     function ttdlStatRow(icon, label, value){
