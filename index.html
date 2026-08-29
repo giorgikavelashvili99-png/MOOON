@@ -4150,17 +4150,22 @@
   }
   .ttdl-shell::before{
     content:''; position:absolute; top:0; left:0; right:0; height:2px; z-index:1;
-    background:linear-gradient(90deg, transparent, #25F4EE 25%, #FE2C55 55%, #25F4EE 85%, transparent);
-    background-size:220% 100%;
-    /* Static resting frame for touch devices (phones/tablets) — same
-       coordinate the animation itself starts from, so it's a clean, fully
-       "designed" frame rather than an arbitrary freeze mid-gradient. */
-    background-position:0% 0;
+    /* Default (touch devices / phones / tablets): a complete, symmetric
+       line that fades transparent -> cyan -> red -> cyan -> transparent
+       across the FULL width, at rest. Deliberately NOT a frozen frame of
+       the scrolling version below -- that version is drawn at 220% width
+       specifically so it can scroll seamlessly, which means any single
+       static position of it is unavoidably cut off mid-color on one edge.
+       A dedicated 100%-wide gradient is the only way to get a clean,
+       finished-looking line with no motion. */
+    background: linear-gradient(90deg, transparent, #25F4EE 20%, #FE2C55 50%, #25F4EE 80%, transparent);
   }
   /* Continuous motion only on devices with a real mouse (fine pointer +
-     hover) — i.e. "computers". Touch devices keep the static frame above. */
+     hover) — i.e. "computers". Touch devices keep the static line above. */
   @media (hover:hover) and (pointer:fine){
     .ttdl-shell::before{
+      background: linear-gradient(90deg, transparent, #25F4EE 25%, #FE2C55 55%, #25F4EE 85%, transparent);
+      background-size:220% 100%;
       animation: ttdlTrace 6s linear infinite;
     }
   }
@@ -12640,6 +12645,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       logDownloading: ['ვიდეო იტვირთება...', 'Downloading video...'],
       logDone: ['ჩამოტვირთვა დაწყებულია.', 'Download started.'],
       logFallback: ['პირდაპირი გადმოწერა ვერ მოხერხდა — ვიდეო გაიხსნა ახალ ჩანართში, შეინახეთ „შენახვა როგორც"-ით.', 'Direct download was blocked — opened the video in a new tab, use "Save video as" to keep it.'],
+      logIosShared: ['გაიხსნა iOS-ის „გაზიარების" მენიუ — დააჭირეთ „ვიდეოს შენახვა", რომ პირდაპირ ფოტოებში შეინახოთ.', 'The iOS Share Sheet opened — tap "Save Video" to save it straight to Photos.'],
+      logIosCancelled: ['გაუქმებულია.', 'Cancelled.'],
       logIosOpen: ['ვიდეო გაიხსნა ახალ ჩანართში (iOS-ზე ასე ჩამოიტვირთება ხმის გარეშე თამაშის თავიდან ასაცილებლად) — შეინახეთ Share ღილაკით ან თითის გრძლად დაჭერით.', 'Video opened in a new tab (this avoids an iOS bug where the audio cuts out) — save it via the Share button or by long-pressing it.'],
       logReady: ['მზადაა.', 'Ready.'],
       untitled: ['უსათაურო ვიდეო', 'Untitled video'],
@@ -13004,32 +13011,67 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // Safari's decoder relies on normal HTTP range requests to stream the
     // file and a Blob URL doesn't support those the same way a real
     // network URL does. So on iOS we skip the fetch()/Blob step entirely.
+    // ---- Real "download" on iOS: the native Share Sheet ----
+    // Opening the video's direct link in a new tab (the old approach) just
+    // shows the video playing — it is not what people mean by "download",
+    // and there's no built-in "Save" action on that screen unless the
+    // visitor already knows to use Share/long-press. iOS Safari also
+    // ignores the <a download> attribute entirely, and Blob-URL playback
+    // has a known WebKit bug where the audio cuts out (see note below), so
+    // neither of the two tricks that work on desktop/Android is usable
+    // here as-is.
+    // The real fix is the Web Share API with an actual file attached:
+    // fetch the video's bytes, hand them to navigator.share() as a File,
+    // and iOS opens its native Share Sheet with "Save Video" right there —
+    // one tap saves it straight to Photos, no separate tab, no manual
+    // steps. This has been supported for file attachments since iOS 15.
+    // Because we're handing over the complete downloaded file (not a
+    // streaming blob: URL being played back), the audio-cutout bug does
+    // NOT apply here — that bug is specific to *playing* video from a
+    // blob: URL, not to saving its bytes.
+    async function ttdlIosSaveViaShare(url, quality){
+      if (!(navigator.share && navigator.canShare)) return 'unsupported';
+      try{
+        const res = await fetch(url);
+        if (!res.ok) return 'unsupported';
+        const blob = await res.blob();
+        const file = new File([blob], `tiktok_${Date.now()}_${quality}.mp4`, { type: blob.type || 'video/mp4' });
+        if (!navigator.canShare({ files: [file] })) return 'unsupported';
+        await navigator.share({ files: [file] });
+        return 'shared';
+      }catch(e){
+        // The visitor closing the Share Sheet themselves also lands here
+        // (AbortError) — that's an intentional cancel, not a failure, so
+        // it must NOT fall through to opening a tab behind their back.
+        if (e && e.name === 'AbortError') return 'cancelled';
+        return 'unsupported';
+      }
+    }
+
     function ttdlIsIOS(){
       const ua = navigator.userAgent || '';
       return /iPhone|iPad|iPod/i.test(ua) ||
              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
 
-    // ---- Reliable "open in new tab" helper for iOS ----
-    // window.open() alone has two real problems on iOS Safari:
+    // ---- Fallback path: reliable "open in new tab" ----
+    // Used only when the Share Sheet above isn't available (old iOS
+    // versions, or the CDN fetch failing) — the same last-resort behaviour
+    // the downloader always had, just made more reliable:
     //   1) "Block Pop-ups" is ON by default in Safari settings, and
     //      window.open() can be silently blocked by it -- it returns null,
     //      nothing visibly happens, yet the old code logged "opened in a
     //      new tab" regardless, so the visitor saw a false success message
-    //      while no tab ever opened. That mismatch is almost certainly
-    //      what "can't download on iOS" actually was.
+    //      while no tab ever opened.
     //   2) A real <a target="_blank"> click is treated as a genuine,
     //      user-driven navigation and is NOT subject to the same
     //      popup-blocker heuristics as a script-triggered window.open() --
     //      this is the same trick file-download libraries use. So we open
     //      via a synthetic anchor click instead of window.open().
     // Even so, there's no reliable way for JS to confirm the tab actually
-    // opened (an anchor click never throws or returns a "blocked" signal
-    // the way window.open() can return null), so on top of this we also
-    // reveal a real, permanent <a> link in the page itself (see
-    // ttdlShowIosLink below) -- a link the visitor taps themselves can
-    // never be blocked by any popup blocker, guaranteeing a way through
-    // even in the worst case (e.g. a restrictive in-app browser).
+    // opened, so on top of this we also reveal a real, permanent <a> link
+    // in the page itself (see ttdlShowIosLink below) -- a link the visitor
+    // taps themselves can never be blocked by any popup blocker.
     function ttdlOpenLinkViaAnchor(url){
       try{
         const a = document.createElement('a');
@@ -13060,22 +13102,27 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       ttdlLog(ttdlDict('logDownloading'));
 
       if (ttdlIsIOS()){
-        // Hand Safari the direct CDN link instead of a Blob -- it then
-        // streams/plays it the normal networked way (audio stays intact),
-        // and the visitor saves it themselves via the Share sheet or a
-        // long-press "Save Video" from the native player. Wrapped in its
-        // own try/catch/finally so a thrown error here can never leave the
-        // button stuck on "Preparing..." forever (the old code had no
-        // safety net on this branch at all).
         try{
-          ttdlOpenLinkViaAnchor(link);
-          ttdlLog(ttdlDict('logIosOpen'));
+          const outcome = await ttdlIosSaveViaShare(link, quality);
+          if (outcome === 'shared'){
+            ttdlLog(ttdlDict('logIosShared'));
+          } else if (outcome === 'cancelled'){
+            ttdlLog(ttdlDict('logIosCancelled'));
+          } else {
+            // Share Sheet unavailable or the fetch failed — fall back to
+            // opening the direct link, plus the guaranteed manual link.
+            ttdlOpenLinkViaAnchor(link);
+            ttdlShowIosLink(link);
+            ttdlLog(ttdlDict('logIosOpen'));
+          }
         }catch(e){
+          ttdlOpenLinkViaAnchor(link);
+          ttdlShowIosLink(link);
           ttdlLog(ttdlDict('logFallback'));
         }finally{
-          // Always show the manual link too -- guarantees a way through
-          // even if the automatic open above was silently blocked.
-          ttdlShowIosLink(link);
+          // Wrapped in try/catch/finally end-to-end so a thrown error can
+          // never leave the button stuck on "Preparing..." forever (the
+          // old code had no safety net on this branch at all).
           setBtnBusy(btn, false);
         }
         return;
@@ -13105,6 +13152,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         setBtnBusy(btn, false);
       }
     }
+
 
     function ttdlClear(){
       urlInput.value = '';
