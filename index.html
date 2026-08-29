@@ -4119,206 +4119,261 @@
   }
   #cheapOrderPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
-  /* ---------- Free TikTok Downloader tool — a genuine "foil shine" card
-     like the priced packages above, just blended from TikTok's own two
-     brand colors (cyan + pink) instead of a single hue, plus a slow
-     light sweep and a frosted-glass inner panel for the actual tool —
-     reads as premium AND unmistakably "different" from the packages
-     sitting right next to it. ---------- */
-  .pc-card--ttdl{
-    --pc-accent:#25F4EE;
-    --pc-accent-2:#FE2C55;
-    --pc-ttdl-shine: linear-gradient(100deg,
-      #011619 0%, #013238 8%, #04565f 16%, #0a8b95 24%,
-      #25F4EE 32%, #8be9e2 40%, #d9c3ec 48%, #f08fce 56%,
-      #FE2C55 66%, #e0234c 76%, #8f1236 86%, #430a1c 94%, #1c0510 100%);
-    --pc-bg: radial-gradient(ellipse 120% 60% at 12% 0%, rgba(255,255,255,0.28), transparent 55%),
-             linear-gradient(180deg, rgba(3,10,12,0.32), rgba(3,10,12,0.5)),
-             var(--pc-ttdl-shine);
-    --pc-border: rgba(37,244,238,0.55);
-    --pc-shadow: 0 20px 50px rgba(4,2,14,0.55), 0 0 40px rgba(37,244,238,0.22), 0 0 34px rgba(254,44,85,0.16);
-    --pc-icon-bg: linear-gradient(135deg, rgba(37,244,238,0.25), rgba(254,44,85,0.25));
+  /* ---------- Free TikTok Downloader — deliberately NOT another foil
+     pricing card. It's a free utility sitting among paid packages, so it
+     gets its own identity: a dark "console window" with a title bar
+     (traffic-light dots + file-path label + a live status chip), and a
+     JetBrains Mono voice throughout that echoes the log readout below —
+     already the most distinctive part of the old design, now extended
+     to the whole card instead of being the one mono corner of a glossy
+     marketing card.
+     Everything here is scoped to .ttdl-*/.pc-ttdl-row classes that exist
+     ONLY on this card, so none of it touches .pc-card/.pc-badge/.pc-head/
+     .pc-icon/.pc-title/.pc-desc — those stay exactly as they were for
+     the priced packages above. ---------- */
+
+  .ttdl-shell{
+    position:relative;
+    min-width:0;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,0.10);
+    background:linear-gradient(180deg, #0a1018, #05080f);
+    box-shadow:0 22px 54px rgba(0,0,0,0.55), 0 0 0 1px rgba(37,244,238,0.05);
+    overflow:hidden;
+    transition:border-color .25s ease, box-shadow .25s ease;
   }
-  .pc-card--ttdl::before{
-    background:linear-gradient(90deg, transparent, var(--pc-accent), var(--pc-accent-2), transparent);
+  @media (hover:hover) and (pointer:fine){
+    .ttdl-shell:hover{
+      border-color:rgba(37,244,238,0.32);
+      box-shadow:0 26px 64px rgba(0,0,0,0.6), 0 0 36px rgba(37,244,238,0.14);
+    }
+  }
+  .ttdl-shell::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:2px; z-index:1;
+    background:linear-gradient(90deg, transparent, #25F4EE 25%, #FE2C55 55%, #25F4EE 85%, transparent);
+    background-size:220% 100%;
+    animation: ttdlTrace 6s linear infinite;
+  }
+  @keyframes ttdlTrace{
+    0%{ background-position:0% 0; }
+    100%{ background-position:-220% 0; }
   }
 
-  /* Free-tool ribbon — cyan/pink gradient pill with a small pulsing dot,
-     replacing the gold-star "პოპულარული" ribbon used on priced packages. */
-  .pc-badge--ttdl{
-    background:linear-gradient(120deg, #25F4EE, #FE2C55);
-    color:#04141a;
-    box-shadow:0 6px 16px rgba(37,244,238,0.4), inset 0 0 0 1px rgba(255,255,255,0.7);
+  /* Title bar — reads as an app/terminal window, not a product card. The
+     "free" indicator now lives here as an ordinary flex child (a real
+     circle element, centered by flexbox) instead of a badge floating
+     outside the card's edge with its icon painted on by ::before — that
+     old setup was exactly what let a leftover star glyph from the
+     shared .pc-badge rule silently win the cascade and sit mis-aligned. */
+  .ttdl-titlebar{
+    position:relative; z-index:2;
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px;
+    background:rgba(255,255,255,0.03);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    min-width:0;
   }
-  .pc-badge--ttdl::before{
-    content:''; width:6px; height:6px; border-radius:50%; background:#04141a;
-    animation: ttdlPulse 1.6s ease-in-out infinite;
+  .ttdl-titlebar-dots{ display:flex; gap:6px; flex:0 0 auto; }
+  .ttdl-dot{ width:8px; height:8px; border-radius:50%; display:block; }
+  .ttdl-dot--a{ background:#FE2C55; }
+  .ttdl-dot--b{ background:#ffd23f; }
+  .ttdl-dot--c{ background:#25F4EE; }
+  .ttdl-titlebar-path{
+    flex:1 1 auto; min-width:0;
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.01em;
+    color:var(--text-faint);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
-  @keyframes ttdlPulse{
-    0%{ box-shadow:0 0 0 0 rgba(4,20,26,0.5); }
-    70%{ box-shadow:0 0 0 6px rgba(4,20,26,0); }
-    100%{ box-shadow:0 0 0 0 rgba(4,20,26,0); }
+  .ttdl-status-chip{
+    flex:0 0 auto;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 11px; border-radius:100px;
+    background:linear-gradient(120deg, rgba(37,244,238,0.16), rgba(254,44,85,0.16));
+    border:1px solid rgba(37,244,238,0.35);
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:10px;
+    letter-spacing:0.06em; text-transform:uppercase; color:#eafffe;
+    white-space:nowrap;
+  }
+  .ttdl-status-dot{
+    flex:0 0 auto; width:6px; height:6px; border-radius:50%;
+    background:#3ddc84;
+    box-shadow:0 0 0 0 rgba(61,220,132,0.55);
+    animation: ttdlStatusPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes ttdlStatusPulse{
+    0%{ box-shadow:0 0 0 0 rgba(61,220,132,0.55); }
+    70%{ box-shadow:0 0 0 6px rgba(61,220,132,0); }
+    100%{ box-shadow:0 0 0 0 rgba(61,220,132,0); }
   }
 
-  /* Frosted-glass inner panel holding the actual tool — floats as its
-     own layer on top of the vivid foil background so the input, buttons
-     and log stay perfectly legible no matter how bright the gradient
-     underneath gets. */
-  .ttdl-glass{
-    background:rgba(5,10,14,0.58);
-    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  .ttdl-content{ position:relative; z-index:2; padding:16px 14px 14px; min-width:0; }
+  @media (min-width:640px){ .ttdl-content{ padding:22px 20px 18px; } }
+
+  /* Single stacked flow at every width — a console reads top-to-bottom,
+     not side-by-side, so the old two-column breakpoint is gone. */
+  .ttdl-body{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .ttdl-body > *{ min-width:0; }
+  .ttdl-body.ttdl-expanded .ttdl-header{ display:none; }
+
+  .ttdl-header{ display:flex; align-items:flex-start; gap:12px; }
+  .ttdl-icon{
+    width:42px; height:42px; border-radius:12px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg, rgba(37,244,238,0.22), rgba(254,44,85,0.22));
     border:1px solid rgba(255,255,255,0.14);
-    border-radius:16px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  @media (min-width:640px){ .ttdl-icon{ width:48px; height:48px; border-radius:14px; } }
+  .ttdl-header-text{ min-width:0; flex:1 1 auto; }
+  .ttdl-heading{
+    font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-size:clamp(13.5px, 3.6vw, 15px); font-weight:800; color:#fff;
+    margin-bottom:4px; overflow-wrap:break-word; word-break:break-word;
+  }
+  .ttdl-subtext{
+    font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-size:clamp(11.5px, 3.1vw, 12.5px); line-height:1.55; color:var(--text-dim);
+    overflow-wrap:break-word; word-break:break-word;
+  }
+
+  .ttdl-glass{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.09);
+    border-radius:14px;
     padding:14px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.09), 0 10px 28px rgba(0,0,0,0.35);
     min-width:0;
     contain:layout paint;
-    transform:translateZ(0);
   }
 
   .ttdl-input-wrap{ position:relative; margin-bottom:10px; min-width:0; }
   .ttdl-input-icon{
     position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    color:var(--pc-accent); display:flex; opacity:0.85; pointer-events:none;
+    color:#25F4EE; display:flex; opacity:0.85; pointer-events:none;
   }
   .ttdl-input{
-    width:100%; min-width:0; padding:11px 12px 11px 34px; border-radius:10px;
-    background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.12);
-    color:#fff; font-size:12.5px; outline:none;
+    width:100%; min-width:0; box-sizing:border-box;
+    padding:12px 12px 12px 34px; border-radius:10px;
+    background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.12);
+    color:#fff; font-family:'JetBrains Mono',monospace; font-size:12.5px; outline:none;
     transition:border-color .2s ease, box-shadow .2s ease;
-    box-sizing:border-box;
   }
-  .ttdl-input::placeholder{ color:var(--text-faint); }
-  .ttdl-input:focus{ border-color:var(--pc-accent); box-shadow:0 0 0 3px rgba(37,244,238,0.18); }
+  .ttdl-input::placeholder{ color:var(--text-faint); font-family:'BPG Glaho','Space Grotesk',sans-serif; }
+  .ttdl-input:focus{ border-color:#25F4EE; box-shadow:0 0 0 3px rgba(37,244,238,0.18); }
 
   .ttdl-action-row{ display:flex; gap:8px; margin-bottom:12px; min-width:0; }
   .ttdl-analyze-btn{
-    flex:1 1 auto; width:auto; min-width:0; padding:11px; margin-bottom:0;
+    flex:1 1 auto; width:auto; min-width:0; padding:12px; margin-bottom:0;
     border:none; border-radius:10px; cursor:pointer;
     font-family:'BPG Glaho','Space Grotesk',sans-serif; font-weight:800; font-size:13px; letter-spacing:0.02em;
     background:linear-gradient(90deg, #25F4EE, #FE2C55); color:#04141a;
-    box-shadow:0 10px 24px rgba(37,244,238,0.3);
+    box-shadow:0 10px 24px rgba(37,244,238,0.28);
     transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
   }
-  .ttdl-analyze-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 32px rgba(254,44,85,0.35); }
+  .ttdl-analyze-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(254,44,85,0.32); }
   .ttdl-analyze-btn:disabled{ opacity:0.55; cursor:default; transform:none; }
+  .ttdl-analyze-btn:focus-visible, .ttdl-dl-btn:focus-visible, .ttdl-clear-btn:focus-visible{
+    outline:2px solid #25F4EE; outline-offset:2px;
+  }
 
   .ttdl-clear-btn{
-    flex:0 0 auto; width:42px; padding:0;
-    border:1px solid rgba(255,255,255,0.16); border-radius:10px; cursor:pointer;
-    background:rgba(255,255,255,0.05); color:var(--text-dim); font-size:14px;
+    flex:0 0 auto; width:44px; padding:0;
+    border:1px solid rgba(255,255,255,0.14); border-radius:10px; cursor:pointer;
+    background:rgba(255,255,255,0.04); color:var(--text-dim); font-size:14px;
     display:flex; align-items:center; justify-content:center;
     transition:all .2s ease;
   }
-  .ttdl-clear-btn:hover{ border-color:var(--pc-accent-2); color:var(--pc-accent-2); box-shadow:0 0 14px rgba(254,44,85,0.3); }
+  .ttdl-clear-btn:hover{ border-color:#FE2C55; color:#FE2C55; box-shadow:0 0 14px rgba(254,44,85,0.25); }
   .ttdl-clear-btn:active{ transform:translateY(1px); }
 
   .ttdl-result{
-    display:flex; align-items:center; gap:10px;
-    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
-    border-radius:10px; padding:8px 10px; margin-bottom:10px;
+    display:flex; align-items:center; gap:11px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+    border-radius:12px; padding:9px 11px; margin-bottom:10px;
   }
-  .ttdl-thumb{ width:44px; height:44px; border-radius:6px; object-fit:cover; flex-shrink:0; background:#000; }
+  .ttdl-thumb-wrap{
+    position:relative; flex:0 0 auto; width:44px; height:58px;
+    border-radius:8px; overflow:hidden; background:#000;
+    box-shadow:0 0 0 1.5px rgba(37,244,238,0.4);
+  }
+  .ttdl-thumb{ width:100%; height:100%; object-fit:cover; display:block; }
+  .ttdl-thumb-play{
+    position:absolute; right:3px; bottom:3px; width:15px; height:15px; border-radius:50%;
+    background:rgba(0,0,0,0.6); color:#fff; font-size:7px; line-height:15px; text-align:center;
+    border:1px solid rgba(255,255,255,0.4);
+  }
   .ttdl-result-info{ flex:1 1 auto; min-width:0; }
-  .ttdl-result-title{ font-size:11.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .ttdl-result-meta{ font-size:10px; color:var(--text-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ttdl-result-title{ font-size:11.5px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ttdl-result-meta{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;
+  }
 
   .ttdl-dl-row{ display:flex; gap:8px; margin-bottom:10px; }
   .ttdl-dl-btn{
-    flex:1; padding:10px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.16);
-    background:linear-gradient(135deg, rgba(37,244,238,0.18), rgba(37,244,238,0.04));
-    color:#fff; font-family:'BPG Glaho','Space Grotesk',sans-serif;
-    font-weight:700; font-size:12px;
-    display:flex; align-items:center; justify-content:center; gap:5px;
+    flex:1; padding:11px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.14);
+    background:linear-gradient(135deg, rgba(37,244,238,0.16), rgba(37,244,238,0.03));
+    color:#fff; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12px; letter-spacing:0.02em;
+    display:flex; align-items:center; justify-content:center; gap:6px;
     transition:all .2s ease;
   }
   .ttdl-dl-ico{ font-size:10px; opacity:0.85; }
-  .ttdl-dl-btn:hover{ border-color:var(--pc-accent); box-shadow:0 8px 20px rgba(37,244,238,0.3); transform:translateY(-1px); }
-  .ttdl-dl-btn--hd{ background:linear-gradient(135deg, rgba(254,44,85,0.18), rgba(254,44,85,0.04)); border-color:rgba(254,44,85,0.35); }
-  .ttdl-dl-btn--hd:hover{ border-color:var(--pc-accent-2); box-shadow:0 8px 20px rgba(254,44,85,0.3); }
-  .ttdl-dl-btn:disabled{ opacity:0.45; cursor:default; box-shadow:none; transform:none; }
+  .ttdl-dl-btn:hover{ border-color:#25F4EE; box-shadow:0 8px 20px rgba(37,244,238,0.28); transform:translateY(-1px); }
+  .ttdl-dl-btn--hd{ background:linear-gradient(135deg, rgba(254,44,85,0.16), rgba(254,44,85,0.03)); border-color:rgba(254,44,85,0.3); }
+  .ttdl-dl-btn--hd:hover{ border-color:#FE2C55; box-shadow:0 8px 20px rgba(254,44,85,0.28); }
+  .ttdl-dl-btn:disabled{ opacity:0.4; cursor:default; box-shadow:none; transform:none; }
 
   /* ---------- Merged analytics details (stats + quality) — same numbers
      the Discord bot reports, computed client-side straight from tikwm's
      JSON plus a hidden <video> element for real width/height, so this
-     widget doubles as the "checker" without needing a server. ---------- */
+     widget doubles as the "checker" without needing a server. Stats are
+     now individual wrapping chips instead of a fixed grid, so a long
+     value on a narrow phone wraps to its own line instead of clipping. ---------- */
   .ttdl-details{ margin-bottom:10px; }
-  .ttdl-stats-grid{
-    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:5px 14px;
-    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
-    border-radius:10px; padding:10px 12px; margin-bottom:8px;
+  .ttdl-stats-grid{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .ttdl-stat-item{
+    display:inline-flex; align-items:center; gap:4px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+    border-radius:8px; padding:5px 9px;
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
+    white-space:nowrap;
   }
-  .ttdl-stat-item{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .ttdl-stat-item b{ color:#fff; font-weight:700; }
   .ttdl-shadow-yes{ color:var(--warn); font-weight:700; }
   .ttdl-shadow-no{ color:#3ddc84; font-weight:700; }
   .ttdl-shadow-unknown{ color:var(--text-faint); font-weight:700; }
   .ttdl-quality-block{
-    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
     border-radius:10px; padding:10px 12px; margin-bottom:8px;
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
   }
-  .ttdl-quality-tiers{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:4px 16px; }
+  .ttdl-quality-tiers{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:4px 14px; }
   .ttdl-quality-tier{
     background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.09);
     border-radius:8px;
     padding:6px 10px;
   }
   .tqt-top{ display:flex; justify-content:space-between; gap:8px; font-weight:700; color:#fff; }
   .tqt-sub{ color:var(--text-faint); margin-top:2px; }
-  .ttdl-quality-original{ margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.14); color:#fff; font-weight:600; }
+  .ttdl-quality-original{ margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.12); color:#fff; font-weight:600; }
 
   .ttdl-log{
-    background:rgba(0,0,0,0.55); border:1px solid rgba(37,244,238,0.25); border-radius:9px;
+    background:rgba(0,0,0,0.5); border:1px solid rgba(37,244,238,0.22); border-radius:9px;
     padding:8px 9px; font-family:'JetBrains Mono',monospace; font-size:10px; line-height:1.5;
     color:#9fb0c8; height:60px; overflow-y:auto;
   }
   .ttdl-log div{ white-space:normal; word-break:break-word; }
 
-  /* Own full-width row below the packages — no longer squeezed into a
-     1/3 or 1/2 column, so the tool actually has room to breathe.
-     Mobile-first: single stacked column is the DEFAULT (safest — it can
-     never overflow), and the side-by-side layout only switches on for
-     wider screens. minmax(0, …) on the tracks is a second safety net so
-     that even the wide layout can never force the card past the
-     viewport edge. */
+  /* Own full-width row below the packages, unchanged. */
   .pc-ttdl-row{
     grid-column: 1 / -1;
     width:100%;
     min-width:0;
   }
-  .pc-card--ttdl-wide{ padding:24px 22px; min-width:0; }
-  .ttdl-body{
-    display:grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap:16px;
-    min-width:0;
-  }
-  .ttdl-body > *{ min-width:0; }
-  .pc-card--ttdl-wide .pc-head{ margin-bottom:0; }
-  .pc-icon--lg{ width:50px; height:50px; border-radius:16px; flex-shrink:0; }
-  .pc-card--ttdl-wide .pc-title{ font-size:clamp(13px, 4vw, 15px); }
-  .pc-card--ttdl-wide .pc-desc{ font-size:clamp(11px, 3.2vw, 12.5px); }
-  @media (min-width:640px){
-    .ttdl-body{
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
-      gap:30px;
-      align-items:center;
-    }
-    .pc-card--ttdl-wide{ padding:28px 26px; }
-    .pc-icon--lg{ width:58px; height:58px; border-radius:18px; }
-  }
 
-  /* Once a video is analyzed, the left title column is just dead weight
-     next to a now-tall results panel (that's what was making the card
-     look oddly stretched with a short title floating in a sea of empty
-     space) -- drop it and let the tool use the card's full width. Two
-     classes beats the single-class media-query rule above regardless of
-     viewport, so this applies at every screen size. */
-  .ttdl-body.ttdl-expanded{ grid-template-columns: minmax(0,1fr); }
-  .ttdl-body.ttdl-expanded .pc-head{ display:none; }
+  @media (prefers-reduced-motion: reduce){
+    .ttdl-shell::before, .ttdl-status-dot{ animation:none; }
+  }
 
   .pc-badge{
     position:absolute; top:-11px; right:16px; z-index:6;
@@ -5712,15 +5767,29 @@
       </div>
       </div>
 
-      <!-- Card 6 — free TikTok video downloader, full-width banner below the packages -->
+      <!-- Card 6 — free TikTok video downloader, styled as its own console
+           window rather than another pricing card. -->
       <div class="pc-ttdl-row">
-      <div class="pc-card-wrap pc-card-wrap--ttdl">
-      <div class="pc-badge pc-badge--ttdl" data-i18n="ttdlBadge">უფასო</div>
-      <div class="pc-card pc-card--ttdl pc-card--ttdl-wide">
+      <div class="ttdl-shell">
+
+        <div class="ttdl-titlebar">
+          <span class="ttdl-titlebar-dots" aria-hidden="true">
+            <span class="ttdl-dot ttdl-dot--a"></span>
+            <span class="ttdl-dot ttdl-dot--b"></span>
+            <span class="ttdl-dot ttdl-dot--c"></span>
+          </span>
+          <span class="ttdl-titlebar-path">~/tiktok/downloader</span>
+          <span class="ttdl-status-chip">
+            <span class="ttdl-status-dot" aria-hidden="true"></span>
+            <span data-i18n="ttdlBadge">უფასო</span>
+          </span>
+        </div>
+
+        <div class="ttdl-content">
         <div class="ttdl-body">
-          <div class="pc-head">
-          <div class="pc-icon pc-icon--lg" aria-hidden="true">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div class="ttdl-header">
+          <div class="ttdl-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="ttdlIconGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
                   <stop offset="0" stop-color="#25F4EE"/>
@@ -5730,9 +5799,9 @@
               <path d="M12 3v11.5m0 0l-4-4m4 4l4-4M4.5 19h15" stroke="url(#ttdlIconGrad)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-            <div class="pc-head-text">
-            <div class="pc-title" data-i18n="ttdlTitle">TikTok Video Downloader</div>
-            <div class="pc-desc" data-i18n="ttdlDesc">ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში</div>
+            <div class="ttdl-header-text">
+            <div class="ttdl-heading" data-i18n="ttdlTitle">TikTok Video Downloader</div>
+            <div class="ttdl-subtext" data-i18n="ttdlDesc">ჩამოტვირთე ვიდეო ლოგოს (watermark) გარეშე, საუკეთესო ხელმისაწვდომ ხარისხში</div>
             </div>
           </div>
 
@@ -5749,7 +5818,10 @@
             </div>
 
             <div class="ttdl-result" id="ttdlResult" style="display:none;">
-              <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
+              <span class="ttdl-thumb-wrap">
+                <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
+                <span class="ttdl-thumb-play" aria-hidden="true">▶</span>
+              </span>
               <div class="ttdl-result-info">
                 <div class="ttdl-result-title" id="ttdlResultTitle"></div>
                 <div class="ttdl-result-meta" id="ttdlResultMeta"></div>
@@ -5769,7 +5841,8 @@
             <div class="ttdl-log" id="ttdlLog"></div>
           </div>
         </div>
-      </div>
+        </div>
+
       </div>
       </div>
 
