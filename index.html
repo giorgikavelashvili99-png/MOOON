@@ -12607,6 +12607,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       logDownloading: ['ვიდეო იტვირთება...', 'Downloading video...'],
       logDone: ['ჩამოტვირთვა დაწყებულია.', 'Download started.'],
       logFallback: ['პირდაპირი გადმოწერა ვერ მოხერხდა — ვიდეო გაიხსნა ახალ ჩანართში, შეინახეთ „შენახვა როგორც"-ით.', 'Direct download was blocked — opened the video in a new tab, use "Save video as" to keep it.'],
+      logIosOpen: ['ვიდეო გაიხსნა ახალ ჩანართში (iOS-ზე ასე ჩამოიტვირთება ხმის გარეშე თამაშის თავიდან ასაცილებლად) — შეინახეთ Share ღილაკით ან თითის გრძლად დაჭერით.', 'Video opened in a new tab (this avoids an iOS bug where the audio cuts out) — save it via the Share button or by long-pressing it.'],
       logReady: ['მზადაა.', 'Ready.'],
       untitled: ['უსათაურო ვიდეო', 'Untitled video'],
       views: ['ნახვა', 'views'],
@@ -12958,6 +12959,21 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
 
+    // iOS Safari (iPhone/iPad, incl. iPadOS 13+ which reports as a Mac but
+    // is touch-only) doesn't support the <a download> attribute on blob:
+    // URLs the way desktop/Android browsers do -- instead of saving the
+    // file, it opens the blob straight in its own inline video player.
+    // Playing a video from a Blob URL on iOS Safari has a well-known
+    // WebKit bug where the audio track cuts out a few seconds in, because
+    // Safari's decoder relies on normal HTTP range requests to stream the
+    // file and a Blob URL doesn't support those the same way a real
+    // network URL does. So on iOS we skip the fetch()/Blob step entirely.
+    function ttdlIsIOS(){
+      const ua = navigator.userAgent || '';
+      return /iPhone|iPad|iPod/i.test(ua) ||
+             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
     async function ttdlDownload(quality){
       if (!lastData) return;
       const link = quality === 'hd' ? lastData.hd : lastData.sd;
@@ -12965,6 +12981,18 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const btn = quality === 'hd' ? hdBtn : sdBtn;
       setBtnBusy(btn, true, ttdlDict('preparing'));
       ttdlLog(ttdlDict('logDownloading'));
+
+      if (ttdlIsIOS()){
+        // Hand Safari the direct CDN link instead of a Blob -- it then
+        // streams/plays it the normal networked way (audio stays intact),
+        // and the visitor saves it themselves via the Share sheet or a
+        // long-press "Save Video" from the native player.
+        window.open(link, '_blank', 'noopener');
+        ttdlLog(ttdlDict('logIosOpen'));
+        setBtnBusy(btn, false);
+        return;
+      }
+
       try{
         const res = await fetch(link);
         if (!res.ok) throw new Error('bad response');
@@ -13034,6 +13062,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // ვინც JS-ს გამორთავს ან ბრაუზერის URL-ში view-source: პირდაპირ ჩაწერს.
   (function () {
     document.addEventListener('contextmenu', function (e) {
+      // Let the native right-click menu (Cut/Copy/Paste) through on text
+      // fields — e.g. pasting a TikTok link — and keep it blocked
+      // everywhere else on the page.
+      const editable = e.target && e.target.closest &&
+        e.target.closest('input, textarea, [contenteditable="true"]');
+      if (editable) return;
       e.preventDefault();
     });
 
