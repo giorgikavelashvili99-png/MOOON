@@ -4150,25 +4150,23 @@
   }
   .ttdl-shell::before{
     content:''; position:absolute; top:0; left:0; right:0; height:2px; z-index:1;
-    /* Default (touch devices / phones / tablets): a complete, symmetric
-       line that fades transparent -> cyan -> red -> cyan -> transparent
-       across the FULL width, at rest. */
-    background: linear-gradient(90deg, transparent, #25F4EE 20%, #FE2C55 50%, #25F4EE 80%, transparent);
+    /* Default (touch devices / phones / tablets): fully colored end to
+       end — no transparent stops at all, so there's no point along the
+       line where the dark card background shows through. */
+    background: linear-gradient(90deg, #25F4EE, #FE2C55, #25F4EE);
   }
   /* Continuous motion only on devices with a real mouse (fine pointer +
      hover) — i.e. "computers". Touch devices keep the static line above.
-     This uses a different technique from the static rule on purpose: a
-     small, self-contained "comet" tile that already starts and ends in
-     transparent, repeated end-to-end with background-repeat, then
-     animated by exactly ONE tile-width per loop. Because every tile is a
-     pixel-identical copy of the same shape, the frame right before the
-     loop and the frame right after it are IDENTICAL -- there's no seam to
-     see, so it can never visibly snap or "restart". (Sliding a single
-     220%-wide gradient back and forth, the previous approach, doesn't
-     have that guarantee and is what caused the visible cut.) */
+     Same principle as the static rule: the tile has NO transparent stops,
+     so repeating it end-to-end never shows a dark gap between copies.
+     It's also seamless by construction — the tile starts and ends on the
+     exact same color (#25F4EE), so one copy flows straight into the next
+     with no visible seam, and animating by exactly one tile-width per
+     loop means the frame right before the loop and right after it are
+     pixel-identical. */
   @media (hover:hover) and (pointer:fine){
     .ttdl-shell::before{
-      background-image: linear-gradient(90deg, transparent 0%, #25F4EE 35%, #FE2C55 50%, #25F4EE 65%, transparent 100%);
+      background-image: linear-gradient(90deg, #25F4EE 0%, #FE2C55 50%, #25F4EE 100%);
       background-repeat: repeat-x;
       background-size: 220px 100%;
       animation: ttdlTrace 3.5s linear infinite;
