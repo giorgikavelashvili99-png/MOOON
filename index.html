@@ -12928,11 +12928,30 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         v.preload = 'metadata';
         v.muted = true;
         v.playsInline = true;
+        v.setAttribute('webkit-playsinline', ''); // old-style equivalent some iOS versions still check
+        // WebKit (iOS Safari and every other iOS browser, since Apple
+        // requires them all to use WebKit) is known to be unreliable about
+        // firing loadedmetadata on a <video> that's never attached to the
+        // document -- Chrome/Firefox load a detached element fine, WebKit
+        // often just never loads it, which is why "unknown" showed up far
+        // more on iPhone than on Android in testing. Attaching it
+        // off-screen (not display:none -- some WebKit versions skip
+        // loading elements with that too) fixes this without it ever being
+        // visible to the visitor.
+        v.style.position = 'fixed';
+        v.style.left = '-9999px';
+        v.style.top = '0';
+        v.style.width = '1px';
+        v.style.height = '1px';
+        v.style.opacity = '0';
+        v.style.pointerEvents = 'none';
+        document.body.appendChild(v);
         let settled = false;
         const finish = (result) => {
           if (settled) return;
           settled = true;
           v.removeAttribute('src');
+          v.remove();
           resolve(result);
         };
         const timer = setTimeout(() => finish({ width:null, height:null }), timeoutMs);
