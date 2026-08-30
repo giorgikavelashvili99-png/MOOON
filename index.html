@@ -13531,8 +13531,19 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // Content-Length, or a running MB count when it doesn't (some
       // tikwm responses omit it), so there's always visible feedback
       // either way instead of silently showing nothing.
+      // A generous overall ceiling on the whole fetch+stream -- if the
+      // connection genuinely stalls partway through (not the tab-
+      // visibility issue above, just a dead connection), this aborts the
+      // fetch and its in-progress body read, which lands in the catch
+      // block below and falls back to opening the link directly instead
+      // of leaving the button stuck on "Preparing..." forever. Declared
+      // outside the try block so the finally block can still clear it
+      // (a const/let declared inside try{} isn't visible in finally{}).
+      const dlTimeoutController = new AbortController();
+      let dlTimeoutTimer = null;
       try{
-        const res = await fetch(link);
+        dlTimeoutTimer = setTimeout(() => dlTimeoutController.abort(), 90000);
+        const res = await fetch(link, { signal: dlTimeoutController.signal });
         if (!res.ok) throw new Error('bad response');
         const totalBytes = Number(res.headers.get('Content-Length')) || 0;
         const contentType = res.headers.get('Content-Type') || 'video/mp4';
@@ -13561,10 +13572,21 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             // ever shown. On desktop, slightly slower/more granular chunk
             // delivery happens to leave enough gaps for repaints to sneak
             // in anyway, which is why this was only ever noticed on
-            // Android. Explicitly waiting for the next paint frame here
-            // guarantees every intermediate percentage actually renders,
-            // regardless of how bursty the underlying network delivery is.
-            await new Promise(resolve => requestAnimationFrame(resolve));
+            // Android.
+            //
+            // IMPORTANT: this must NOT use requestAnimationFrame -- rAF
+            // only ever fires while the tab is actually visible, and
+            // stops firing entirely the moment the visitor switches away
+            // (checking their Downloads folder, the screen locking,
+            // etc.). An earlier version of this fix used rAF here, which
+            // meant the whole download could get stuck forever waiting
+            // on a callback that would never come back once the tab was
+            // backgrounded -- exactly the "site completely freezes"
+            // symptom this replaces. setTimeout still yields long enough
+            // for a repaint, but keeps firing (just less often, clamped
+            // by the browser) even while backgrounded, so the download
+            // can only ever slow down in that case, never hang forever.
+            await new Promise(resolve => setTimeout(resolve, 0));
           }
           buf = new Uint8Array(received);
           let offset = 0;
@@ -13592,6 +13614,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         ttdlShowIosLink(link);
         ttdlLog(ttdlDict('logFallback'));
       } finally {
+        clearTimeout(dlTimeoutTimer);
         setDlBtnBusy(btn, labelSpan, false);
       }
     }
