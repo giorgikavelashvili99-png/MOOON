@@ -13641,8 +13641,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // read as the download "silently happening in the background"
       // rather than a normal, reassuring in-progress download. Reading
       // the stream manually (same technique already used for the MP4
-      // box-parsing probe) lets the button show a real, live percentage
-      // while the bytes come in, whenever the CDN sends a Content-Length.
+      // box-parsing probe) lets the button show live progress while the
+      // bytes come in -- a real percentage when the CDN sends a
+      // Content-Length, or a running MB count when it doesn't (some
+      // tikwm responses omit it), so there's always visible feedback
+      // either way instead of silently showing nothing.
       try{
         const res = await fetch(link);
         if (!res.ok) throw new Error('bad response');
@@ -13661,6 +13664,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             if (totalBytes) {
               const pct = Math.min(99, Math.round((received / totalBytes) * 100));
               setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + pct + '%');
+            } else {
+              const mb = (received / (1024*1024)).toFixed(1);
+              setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + mb + 'MB');
             }
           }
           buf = new Uint8Array(received);
