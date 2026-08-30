@@ -8317,6 +8317,18 @@
   // background and drops the resulting link into the order form, instead
   // of opening a second tab and asking them to upload it again by hand.
   // ============================================================
+  // A plain fetch() has no built-in timeout -- if the network stalls (very
+  // common on mobile: screen lock, switching apps, a flaky connection),
+  // it can hang forever with no error and no way out. This wraps any
+  // fetch with an AbortController so a stalled request always eventually
+  // fails instead of hanging the calling code (and whatever button/UI
+  // state is waiting on it) indefinitely.
+  function fetchWithTimeout(url, options, ms){
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    return fetch(url, { ...(options || {}), signal: controller.signal }).finally(() => clearTimeout(timer));
+  }
+
   function uploadFileToMoontransferr(file, onProgress){
     // Mobile browsers aggressively suspend/throttle JS and network activity
     // for backgrounded tabs (screen lock, switching app to check WhatsApp,
@@ -8334,6 +8346,11 @@
     // is a generous ceiling so a real (if slow) upload isn't cut off, just
     // one that has genuinely stalled.
     const UPLOAD_TIMEOUT_MS = 120000;
+    // The two plain JSON API calls below (request-upload / finalize) are
+    // small and should normally resolve almost instantly -- 20s is a
+    // generous ceiling that only kicks in if one of them has genuinely
+    // stalled (see fetchWithTimeout above for why this matters).
+    const API_TIMEOUT_MS = 20000;
 
     const cleanupTracking = () => document.removeEventListener('visibilitychange', onVisChange);
 
@@ -8342,7 +8359,7 @@
       return err;
     };
 
-    return fetch(VIDEO_REVIEW_TRANSFER_URL + '/api/request-upload', {
+    return fetchWithTimeout(VIDEO_REVIEW_TRANSFER_URL + '/api/request-upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -8350,7 +8367,7 @@
         content_type: file.type || 'video/mp4',
         size: file.size
       })
-    })
+    }, API_TIMEOUT_MS)
     .then(res => { if (!res.ok) throw new Error('request-upload-failed'); return res.json(); })
     .then(({ file_id, upload_url }) => {
       if (!file_id || !upload_url) throw new Error('request-upload-bad-response');
@@ -8369,11 +8386,11 @@
         xhr.send(file);
       }).then(() => file_id);
     })
-    .then(file_id => fetch(VIDEO_REVIEW_TRANSFER_URL + '/api/finalize', {
+    .then(file_id => fetchWithTimeout(VIDEO_REVIEW_TRANSFER_URL + '/api/finalize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ file_id })
-    }))
+    }, API_TIMEOUT_MS))
     .then(res => { if (!res.ok) throw new Error('finalize-failed'); return res.json(); })
     .then(data => { if (!data.link) throw new Error('finalize-bad-response'); return data; })
     .then(data => { cleanupTracking(); return data; })
@@ -13477,12 +13494,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (!(navigator.share && navigator.canShare)) return 'unsupported';
       let file;
       try{
-        const res = await fetch(url);
+        const res = await fetchWithTimeout(url, {}, 30000);
         if (!res.ok) return 'unsupported';
         const blob = await res.blob();
         file = new File([blob], `tiktok_${Date.now()}_${quality}.mp4`, { type: blob.type || 'video/mp4' });
       }catch(e){
-        return 'unsupported'; // couldn't even get the video's bytes
+        return 'unsupported'; // couldn't even get the video's bytes (or it stalled and timed out)
       }
       if (!navigator.canShare({ files: [file] })) return 'unsupported';
       const shareStartedAt = Date.now();
@@ -13573,12 +13590,32 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // themselves -- no popup-blocker questions, no Share Sheet timing
     // quirks, works the same way every single time.
     async function ttdlUploadToMoontransferr(url, quality, onProgress){
-      const res = await fetch(url);
+      // fetchWithTimeout (defined above, alongside uploadFileToMoontransferr)
+      // guards against this specific fetch stalling forever on a flaky
+      // mobile connection -- getting the video's own bytes shouldn't
+      // normally take more than a few seconds, but large 4K files over
+      // slow cellular need real headroom.
+      const res = await fetchWithTimeout(url, {}, 30000);
       if (!res.ok) throw new Error('fetch-failed');
       const blob = await res.blob();
       const file = new File([blob], `tiktok_${Date.now()}_${quality}.mp4`, { type: blob.type || 'video/mp4' });
       const data = await uploadFileToMoontransferr(file, onProgress);
       return data.link;
+    }
+
+    // Belt-and-suspenders on top of the per-step timeouts above: even if
+    // some future change reintroduces an untimed network call somewhere
+    // in this chain, this guarantees the iOS download button can never
+    // get stuck waiting forever -- after this many seconds we give up
+    // and fall back to the Share Sheet path no matter what the Moon-
+    // transferr upload is doing. (Promise.race doesn't cancel the
+    // original request, so a very late success just resolves quietly in
+    // the background with no visible effect once we've moved on.)
+    function ttdlWithTimeout(promise, ms){
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('ttdl-overall-timeout')), ms))
+      ]);
     }
 
     async function ttdlDownload(quality){
@@ -13592,15 +13629,18 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
       if (ttdlIsIOS()){
         try{
-          const mtLink = await ttdlUploadToMoontransferr(link, quality, pct => {
-            setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + pct + '%');
-          });
+          const mtLink = await ttdlWithTimeout(
+            ttdlUploadToMoontransferr(link, quality, pct => {
+              setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + pct + '%');
+            }),
+            60000
+          );
           ttdlShowIosLink(mtLink);
           ttdlLog(ttdlDict('logMtReady'));
         }catch(e){
-          // Moontransferr unreachable/failed -- fall back to the Share
-          // Sheet approach, which still works most of the time even if
-          // less consistently than a plain link.
+          // Moontransferr unreachable/failed/too slow -- fall back to the
+          // Share Sheet approach, which still works most of the time even
+          // if less consistently than a plain link.
           try{
             const outcome = await ttdlIosSaveViaShare(link, quality);
             if (outcome === 'shared'){
