@@ -12929,6 +12929,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       logDone: ['ჩამოტვირთვა დაწყებულია.', 'Download started.'],
       logFallback: ['პირდაპირი გადმოწერა ვერ მოხერხდა — ვიდეო გაიხსნა ახალ ჩანართში, შეინახეთ „შენახვა როგორც"-ით.', 'Direct download was blocked — opened the video in a new tab, use "Save video as" to keep it.'],
       logIosShared: ['გაიხსნა iOS-ის „გაზიარების" მენიუ — დააჭირეთ „ვიდეოს შენახვა", რომ პირდაპირ ფოტოებში შეინახოთ.', 'The iOS Share Sheet opened — tap "Save Video" to save it straight to Photos.'],
+      logMtReady: ['ვიდეო მზადაა — დააჭირეთ ქვემოთა ღილაკს ჩამოსატვირთად.', 'Video is ready — tap the button below to download it.'],
       logIosCancelled: ['გაუქმებულია.', 'Cancelled.'],
       logIosUnclear: ['გაზიარების მენიუ გაიხსნა — თუ იქიდან უკვე შეინახეთ, მზადაა. თუ არა, ქვემოთ არის პირდაპირი ლინკიც.', 'The Share Sheet opened — if you already saved it from there, you\'re done. If not, there\'s a direct link below too.'],
       logIosOpen: ['ვიდეო გაიხსნა ახალ ჩანართში (iOS-ზე ასე ჩამოიტვირთება ხმის გარეშე თამაშის თავიდან ასაცილებლად) — შეინახეთ Share ღილაკით ან თითის გრძლად დაჭერით.', 'Video opened in a new tab (this avoids an iOS bug where the audio cuts out) — save it via the Share button or by long-pressing it.'],
@@ -13558,6 +13559,28 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
 
+    // ---- iOS primary path: upload to Moontransferr, then hand the
+    // visitor a real, working download link ----
+    // The Share Sheet approach below is a reasonable fallback, but it's
+    // fundamentally fighting WebKit quirks (transient-activation timing,
+    // inconsistent rejections on repeat use). Moontransferr is a service
+    // this same site already relies on elsewhere (the video-upload-for-
+    // editing flow) and reliably serves files with a real, working
+    // download experience across browsers. Routing through it here
+    // sidesteps the Share API entirely: fetch the video's bytes, upload
+    // them via the same uploadFileToMoontransferr() the editing-upload
+    // flow already uses, and hand back a normal link the visitor taps
+    // themselves -- no popup-blocker questions, no Share Sheet timing
+    // quirks, works the same way every single time.
+    async function ttdlUploadToMoontransferr(url, quality, onProgress){
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('fetch-failed');
+      const blob = await res.blob();
+      const file = new File([blob], `tiktok_${Date.now()}_${quality}.mp4`, { type: blob.type || 'video/mp4' });
+      const data = await uploadFileToMoontransferr(file, onProgress);
+      return data.link;
+    }
+
     async function ttdlDownload(quality){
       if (!lastData) return;
       const link = quality === 'hd' ? lastData.hd : lastData.sd;
@@ -13569,36 +13592,44 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
       if (ttdlIsIOS()){
         try{
-          const outcome = await ttdlIosSaveViaShare(link, quality);
-          if (outcome === 'shared'){
-            ttdlLog(ttdlDict('logIosShared'));
-          } else if (outcome === 'cancelled'){
-            ttdlLog(ttdlDict('logIosCancelled'));
-          } else if (outcome === 'shareFailed'){
-            // The Share Sheet genuinely opened -- do NOT also force-open a
-            // tab here. Some iOS versions reject this promise even after
-            // the visitor already tapped "Save Video" and it worked, so
-            // auto-opening anything at this point risks yanking someone
-            // who already finished saving onto an unwanted extra page.
-            // Just surface the manual link as an option, nothing more.
-            ttdlShowIosLink(link);
-            ttdlLog(ttdlDict('logIosUnclear'));
-          } else {
-            // 'unsupported': the Share Sheet was never reachable at all
-            // (no Web Share API, or the video's bytes couldn't be
-            // fetched) -- opening the link is the only remaining way to
-            // reach the video, so it's justified here specifically.
-            ttdlOpenLinkViaAnchor(link);
-            ttdlShowIosLink(link);
-            ttdlLog(ttdlDict('logIosOpen'));
-          }
+          const mtLink = await ttdlUploadToMoontransferr(link, quality, pct => {
+            setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + pct + '%');
+          });
+          ttdlShowIosLink(mtLink);
+          ttdlLog(ttdlDict('logMtReady'));
         }catch(e){
-          ttdlShowIosLink(link);
-          ttdlLog(ttdlDict('logFallback'));
+          // Moontransferr unreachable/failed -- fall back to the Share
+          // Sheet approach, which still works most of the time even if
+          // less consistently than a plain link.
+          try{
+            const outcome = await ttdlIosSaveViaShare(link, quality);
+            if (outcome === 'shared'){
+              ttdlLog(ttdlDict('logIosShared'));
+            } else if (outcome === 'cancelled'){
+              ttdlLog(ttdlDict('logIosCancelled'));
+            } else if (outcome === 'shareFailed'){
+              // The Share Sheet genuinely opened -- do NOT also force-open
+              // a tab here. Some iOS versions reject this promise even
+              // after the visitor already tapped "Save Video" and it
+              // worked, so auto-opening anything at this point risks
+              // yanking someone who already finished saving onto an
+              // unwanted extra page. Just surface the manual link.
+              ttdlShowIosLink(link);
+              ttdlLog(ttdlDict('logIosUnclear'));
+            } else {
+              // 'unsupported': the Share Sheet was never reachable at all
+              // -- opening the link directly is the last remaining option.
+              ttdlOpenLinkViaAnchor(link);
+              ttdlShowIosLink(link);
+              ttdlLog(ttdlDict('logIosOpen'));
+            }
+          }catch(e2){
+            ttdlShowIosLink(link);
+            ttdlLog(ttdlDict('logFallback'));
+          }
         }finally{
           // Wrapped in try/catch/finally end-to-end so a thrown error can
-          // never leave the button stuck on "Preparing..." forever (the
-          // old code had no safety net on this branch at all).
+          // never leave the button stuck on "Preparing..." forever.
           setDlBtnBusy(btn, labelSpan, false);
         }
         return;
