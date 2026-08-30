@@ -13553,6 +13553,18 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const mb = (received / (1024*1024)).toFixed(1);
               setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + mb + 'MB');
             }
+            // On some mobile connections the whole response arrives as a
+            // handful of very large, very fast chunks -- if this loop
+            // never yields long enough for the browser to actually paint,
+            // it can update the button's text many times between two
+            // repaints, and only the LAST state before the next paint is
+            // ever shown. On desktop, slightly slower/more granular chunk
+            // delivery happens to leave enough gaps for repaints to sneak
+            // in anyway, which is why this was only ever noticed on
+            // Android. Explicitly waiting for the next paint frame here
+            // guarantees every intermediate percentage actually renders,
+            // regardless of how bursty the underlying network delivery is.
+            await new Promise(resolve => requestAnimationFrame(resolve));
           }
           buf = new Uint8Array(received);
           let offset = 0;
