@@ -13431,6 +13431,58 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
 
+    function ttdlIsIOS(){
+      const ua = navigator.userAgent || '';
+      return /iPhone|iPad|iPod/i.test(ua) ||
+             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    // Opens a link via a synthetic anchor click rather than window.open() --
+    // browsers generally don't subject a real anchor click to the same
+    // popup-blocker heuristics as a script-triggered window.open(), so
+    // this is meaningfully more reliable, especially on iOS Safari.
+    function ttdlOpenLinkViaAnchor(url){
+      try{
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
+
+    // Reveals the always-available manual link (see ttdlIosLinkWrap in the
+    // markup) pointed at whatever URL actually works right now -- a real
+    // link the visitor taps themselves can never be blocked by anything.
+    function ttdlShowIosLink(url){
+      if (!iosLinkWrap || !iosLink) return;
+      iosLink.href = url;
+      iosLinkWrap.style.display = 'block';
+    }
+
+    // The SD/HD buttons have an icon + label structure (see markup), so
+    // the generic setBtnBusy() (which does btn.textContent = ...) would
+    // wipe out the icon SVG every time it's used here. This variant only
+    // ever touches the label span, leaving the icon alone.
+    function setDlBtnBusy(btn, labelSpan, busy, busyText){
+      if (!btn) return;
+      if (busy){
+        if (labelSpan){
+          labelSpan.dataset.originalText = labelSpan.dataset.originalText || labelSpan.textContent;
+          labelSpan.textContent = busyText || '...';
+        }
+        btn.disabled = true;
+      } else {
+        if (labelSpan) labelSpan.textContent = labelSpan.dataset.originalText || labelSpan.textContent;
+        btn.disabled = false;
+      }
+    }
+
     // A tap-to-download link that actually triggers a real download,
     // even on iOS Safari. The raw tikwm CDN link (and Moontransferr's own
     // links) never set a Content-Disposition header, so Safari just plays
