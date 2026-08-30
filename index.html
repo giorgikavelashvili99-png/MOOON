@@ -1369,11 +1369,10 @@
     padding:0 2px; user-select:none;
   }
 
-  .admin-gear{
-    background:none; border:none; color:var(--text-faint); opacity:0.35; font-size:14px;
-    cursor:pointer; padding:6px; transition:opacity .15s; vertical-align:middle;
-  }
-  .admin-gear:hover{ opacity:0.9; }
+  /* Deliberately near-invisible as a "button" -- looks like ordinary
+     footer text (matching the old hidden-gear's stealth intent), just
+     with a pointer cursor as the only hint it's tappable. */
+  .admin-trigger-word{ cursor:pointer; }
   .admin-overlay{
     display:none; position:fixed; inset:0; z-index:100;
     background:
@@ -6046,7 +6045,7 @@
   </div>
 
 
-  <footer><span data-i18n="footer">MOON ENHANCER — ზუსტი კალკულაცია, კადრამდე სიზუსტით</span> <button class="admin-gear" id="adminGear" aria-label="admin" title="admin">⚙</button></footer>
+  <footer><span data-i18n="footer">MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">ზუსტი</span> კალკულაცია, კადრამდე სიზუსტით</span></footer>
 
 </div>
 
@@ -6476,7 +6475,7 @@
       contactPanelTitle: 'კითხვა გაქვს? მომწერე პირდაპირ',
       contactPanelOnline: 'ჩვეულებრივ სწრაფად ვპასუხობთ',
       contactPanelSub: 'უბრალოდ მომწერე ნებისმიერი კითხვა WhatsApp-ზე ან Telegram-ზე და პირადად გიპასუხებ.',
-      footer: 'MOON ENHANCER — ზუსტი კალკულაცია, კადრამდე სიზუსტით',
+      footer: 'MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">ზუსტი</span> კალკულაცია, კადრამდე სიზუსტით',
       chatAssistant: 'ასისტენტი',
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
@@ -6878,7 +6877,7 @@
       contactPanelTitle: 'Have a question? Message me directly',
       contactPanelOnline: 'Usually replies fast',
       contactPanelSub: "Just send me any question on WhatsApp or Telegram and I'll answer you personally.",
-      footer: 'MOON ENHANCER — precise calculation, down to the frame',
+      footer: 'MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">precise</span> calculation, down to the frame',
       chatAssistant: 'Assistant',
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
@@ -11085,32 +11084,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // ADMIN_AUTH_URL შეცვალე შენი დეპლოირებული Worker-ის URL-ით.
   const ADMIN_AUTH_URL = 'https://moon-admin-auth-workerjs.giorgikavelashvili99.workers.dev';
 
-  // ეს ფრაზა მხოლოდ gear ხატულის გამოსაჩენად გამოიყენება (UX-ტრიგერია,
-  // არა რეალური secret) — შეგიძლია თავისუფლად შეცვალო ნებისმიერ სტრიქონზე.
-  const GEAR_REVEAL_PHRASE = 'moonadmin';
-  const adminGear = document.getElementById('adminGear');
-
-  (function initAdminGearReveal(){
-    function checkReveal(str){
-      if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (typeof str === 'string' && str.slice(-GEAR_REVEAL_PHRASE.length) === GEAR_REVEAL_PHRASE) {
-        adminGear.classList.add('revealed');
-      }
-    }
-    let typed = '';
-    document.addEventListener('keydown', (e) => {
-      if (!adminGear || adminGear.classList.contains('revealed')) return;
-      if (e.key.length !== 1) return;
-      typed = (typed + e.key).slice(-GEAR_REVEAL_PHRASE.length);
-      checkReveal(typed);
-    });
-    document.addEventListener('input', (e) => {
-      const el = e.target;
-      if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
-      if (el.type === 'password') return;
-      checkReveal(String(el.value || ''));
-    });
-  })();
+  // Admin panel trigger: direct, single-action now instead of the old
+  // "type a secret phrase, then click a revealed gear icon" two-step --
+  // pressing "+" on a physical keyboard (desktop) or tapping the word
+  // "ზუსტი"/"precise" inside the footer (works everywhere, but this is
+  // the one meant for iOS/touch, where there's no keyboard to press "+"
+  // on) both open the panel immediately.
 
   const adminOverlay = document.getElementById('adminOverlay');
   const adminLogin = document.getElementById('adminLogin');
@@ -11150,7 +11129,28 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminOverlay.classList.remove('open');
   }
 
-  if (adminGear) adminGear.addEventListener('click', openAdmin);
+  // "+" key opens it directly -- but only when the visitor isn't
+  // currently typing into a real field (a comment box, the TikTok link
+  // input, etc. can all legitimately contain a "+" character), so a
+  // genuine "+" keystroke there doesn't accidentally pop the panel open.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== '+') return;
+    const el = document.activeElement;
+    const typing = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+    if (typing) return;
+    openAdmin();
+  });
+
+  // Tapping the trigger word in the footer -- the iOS/touch equivalent,
+  // since there's no keyboard there to press "+" on. This element gets
+  // recreated by applyTranslations() on every language switch (its
+  // innerHTML is regenerated from the `footer` string), so the listener
+  // is attached via delegation on a stable ancestor instead of directly
+  // on the span itself, which wouldn't survive that.
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'adminTriggerWord') openAdmin();
+  });
+
   document.getElementById('adminCloseLogin').addEventListener('click', closeAdmin);
   document.getElementById('adminCloseDash').addEventListener('click', closeAdmin);
   adminOverlay.addEventListener('click', (e) => { if (e.target === adminOverlay) closeAdmin(); });
