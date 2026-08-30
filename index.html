@@ -13517,7 +13517,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         return;
       }
 
-      setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing'));
+      // Just "0%" to start -- no "preparing"/"loading" word at all, only
+      // ever the number itself, updating live all the way to 100%.
+      setDlBtnBusy(btn, labelSpan, true, '0%');
       ttdlLog(ttdlDict('logDownloading'));
 
       // ---- Android/desktop: stream with visible progress ----
@@ -13558,11 +13560,17 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             chunks.push(value);
             received += value.length;
             if (totalBytes) {
-              const pct = Math.min(99, Math.round((received / totalBytes) * 100));
-              setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + pct + '%');
+              // Let this reach the real 100% (no artificial 99% cap) --
+              // capping it made the very end of a download look
+              // permanently stuck once the last few bytes/the final
+              // buffer assembly took even a moment, instead of ever
+              // showing the completion the visitor was actually waiting
+              // for. Just the number now, no "preparing"/"loading" word.
+              const pct = Math.min(100, Math.round((received / totalBytes) * 100));
+              setDlBtnBusy(btn, labelSpan, true, pct + '%');
             } else {
               const mb = (received / (1024*1024)).toFixed(1);
-              setDlBtnBusy(btn, labelSpan, true, ttdlDict('preparing') + ' ' + mb + 'MB');
+              setDlBtnBusy(btn, labelSpan, true, mb + 'MB');
             }
             // On some mobile connections the whole response arrives as a
             // handful of very large, very fast chunks -- if this loop
