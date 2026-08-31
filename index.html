@@ -4434,6 +4434,27 @@
     transition:transform 0.12s ease;
   }
   .messenger-send-btn:active{ transform:scale(0.9); }
+
+  /* Floating reopen bubble -- same violet identity as the messenger
+     itself, sits above everything else on the page (but below the
+     messenger page and Discord gate, which are true full-screen
+     overlays) so it stays reachable no matter what section the visitor
+     is scrolled to. */
+  .active-chat-bubble{
+    position:fixed; right:18px; bottom:18px; z-index:9000;
+    width:56px; height:56px; border-radius:50%; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, #8b5cf6, #6d28d9); color:#fff;
+    box-shadow:0 8px 22px rgba(139,92,246,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+    animation:acbFloat 2.6s ease-in-out infinite;
+  }
+  @keyframes acbFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); } }
+  .acb-dot{
+    position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%;
+    background:#ff4d6d; border:2px solid #140d24;
+    animation:ttdlStatusPulse 1.8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .active-chat-bubble{ animation:none; } }
   .ttdl-header-text{ min-width:0; flex:1 1 auto; }
   .ttdl-heading{
     font-family:'BPG Glaho','Space Grotesk',sans-serif;
@@ -4879,6 +4900,16 @@
     </button>
   </div>
 </div>
+
+<!-- Floating "you have an active chat" bubble -- without this, closing
+     the messenger page was a dead end: the only way back in was
+     placing a brand new order, orphaning the real conversation. This
+     persists across the whole site (and across visits, since it's
+     looked up from the server by Discord ID, not local storage). -->
+<button type="button" id="activeChatBubble" class="active-chat-bubble" style="display:none;" aria-label="აქტიური ჩატის გახსნა">
+  <svg viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M4 4h16v12H8l-4 4V4z"/></svg>
+  <span class="acb-dot" id="activeChatBubbleDot" style="display:none;"></span>
+</button>
 
 <div class="discord-gate" id="discordGate" role="dialog" aria-modal="true" aria-labelledby="discordGateTitle">
   <div class="discord-gate-card">
@@ -9135,10 +9166,22 @@
     if (messengerSocket || typeof io === 'undefined') return messengerSocket;
     messengerSocket = io(CHAT_SERVER_URL);
     messengerSocket.on('new_message', (msg) => {
-      // Our own sent messages are already rendered optimistically in
-      // sendMessengerMessage() -- only render what actually came back
-      // from someone else (the admin) to avoid a duplicate bubble.
-      if (msg.from !== 'customer') renderMessageBubble(msg);
+      const pageOpen = document.getElementById('messengerPage')?.style.display === 'flex';
+      if (pageOpen){
+        // Our own sent messages are already rendered optimistically in
+        // sendMessengerMessage() -- only render what actually came back
+        // from someone else (the admin) to avoid a duplicate bubble.
+        if (msg.from !== 'customer') renderMessageBubble(msg);
+      } else if (msg.from === 'admin') {
+        // The chat is closed but the socket is still connected and still
+        // joined to this room, so a reply can arrive at any time. Surface
+        // it on the reopen bubble instead of it silently landing in a
+        // hidden page the visitor has no reason to reopen.
+        const bubble = document.getElementById('activeChatBubble');
+        const dot = document.getElementById('activeChatBubbleDot');
+        if (bubble) bubble.style.display = 'flex';
+        if (dot) dot.style.display = 'block';
+      }
     });
     messengerSocket.on('order_completed', () => {
       appendSystemMessage(t('messengerCompleted'));
@@ -9152,9 +9195,13 @@
     const orderIdEl = document.getElementById('messengerOrderId');
     const messagesEl = document.getElementById('messengerMessages');
     const pageEl = document.getElementById('messengerPage');
+    const bubble = document.getElementById('activeChatBubble');
+    const dot = document.getElementById('activeChatBubbleDot');
     if (orderIdEl) orderIdEl.textContent = orderId;
     if (messagesEl) messagesEl.innerHTML = '';
     if (pageEl) pageEl.style.display = 'flex';
+    if (bubble) bubble.style.display = 'none';
+    if (dot) dot.style.display = 'none';
     document.body.style.overflow = 'hidden';
 
     const socket = ensureMessengerSocket();
@@ -9173,7 +9220,42 @@
     if (pageEl) pageEl.style.display = 'none';
     document.body.style.overflow = '';
     messengerCurrentOrderId = null;
+    // The chat isn't gone -- it's just hidden. Re-check so the reopen
+    // bubble comes back if this order is still active server-side.
+    checkForActiveChat();
   }
+
+  // Looks up whether the logged-in Discord account has an active order
+  // chat and shows/hides the floating reopen bubble accordingly. This is
+  // what makes closing the messenger page a "minimize", not a dead end --
+  // without it, the only way back into an existing conversation was
+  // placing a brand new order, orphaning the real one.
+  async function checkForActiveChat(){
+    const bubble = document.getElementById('activeChatBubble');
+    if (!bubble) return;
+    if (!currentDiscordUser){ bubble.style.display = 'none'; return; }
+    try{
+      const res = await fetch(CHAT_SERVER_URL + '/api/sessions/by-customer/' + encodeURIComponent(currentDiscordUser.id));
+      if (!res.ok){ bubble.style.display = 'none'; return; }
+      const sessions = await res.json();
+      if (Array.isArray(sessions) && sessions.length > 0){
+        bubble.dataset.orderId = sessions[0].orderId;
+        bubble.style.display = (messengerCurrentOrderId === sessions[0].orderId) ? 'none' : 'flex';
+      } else {
+        bubble.style.display = 'none';
+      }
+    }catch(e){
+      // Silent -- the chat server may not be deployed yet, or the
+      // network hiccuped. The bubble simply won't show; nothing else on
+      // the page depends on this succeeding.
+    }
+  }
+
+  document.getElementById('activeChatBubble').addEventListener('click', () => {
+    const bubble = document.getElementById('activeChatBubble');
+    const orderId = bubble.dataset.orderId;
+    if (orderId) openMessengerPage(orderId);
+  });
 
   function sendMessengerMessage(){
     const input = document.getElementById('messengerInput');
@@ -12811,6 +12893,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // cache-then-network refresh) — this is what shows/hides the "package
     // activated" badge on the wp/mp order panels.
     refreshMySubscriptions();
+    checkForActiveChat();
     const chip = document.getElementById('discordChip');
     const avatarImg = document.getElementById('discordAvatarImg');
     const dpAvatarImg = document.getElementById('dpAvatarImg');
