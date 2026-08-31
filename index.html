@@ -4384,6 +4384,12 @@
     background:#3ddc84; box-shadow:0 0 0 0 rgba(61,220,132,0.55);
     animation: ttdlStatusPulse 1.8s ease-in-out infinite;
   }
+  .messenger-complete-btn{
+    flex:0 0 auto; padding:8px 14px; border-radius:100px; border:none; cursor:pointer;
+    background:#3ddc84; color:#0a2413; font-weight:700; font-size:12.5px;
+    font-family:'BPG Glaho','Space Grotesk',sans-serif;
+  }
+  .messenger-complete-btn:active{ transform:scale(0.95); }
   .messenger-messages{
     flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;
     padding:18px 14px; display:flex; flex-direction:column; gap:10px;
@@ -4455,6 +4461,20 @@
     animation:ttdlStatusPulse 1.8s ease-in-out infinite;
   }
   @media (prefers-reduced-motion: reduce){ .active-chat-bubble{ animation:none; } }
+
+  /* Admin panel -- Chats tab list */
+  .chat-admin-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
+  .chat-session-card{
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px; padding:12px 14px; margin-bottom:10px; cursor:pointer;
+    transition:.15s;
+  }
+  .chat-session-card:hover{ border-color:rgba(139,92,246,0.4); background:rgba(139,92,246,0.06); }
+  .chat-session-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .chat-session-name{ font-weight:700; color:#fff; font-size:13.5px; }
+  .chat-session-id{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); }
+  .chat-session-meta{ font-size:11.5px; color:var(--text-dim); margin-top:4px; }
+  .chat-session-last{ font-size:12.5px; color:var(--text-faint); margin-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .ttdl-header-text{ min-width:0; flex:1 1 auto; }
   .ttdl-heading{
     font-family:'BPG Glaho','Space Grotesk',sans-serif;
@@ -4891,6 +4911,7 @@
       <div class="messenger-header-sub"><span data-i18n="messengerOrderLabel">შეკვეთა #</span><span id="messengerOrderId"></span></div>
     </div>
     <div class="messenger-status-dot" id="messengerStatusDot" aria-hidden="true"></div>
+    <button type="button" id="messengerCompleteBtn" class="messenger-complete-btn" data-i18n="messengerCompleteBtn" style="display:none;">დასრულება</button>
   </div>
   <div class="messenger-messages" id="messengerMessages"></div>
   <div class="messenger-input-row">
@@ -6202,10 +6223,12 @@
         <button class="a-tab" id="adminTabAnalytics" data-i18n="adminTabAnalytics">ანალიტიკა</button>
         <button class="a-tab" id="adminTabUrgency" data-i18n="adminTabUrgency">ადგილები</button>
         <button class="a-tab" id="adminTabPromo" data-i18n="adminTabPromo">Promo</button>
+        <button class="a-tab" id="adminTabChats" data-i18n="adminTabChats">ჩატები</button>
       </div>
       <div class="a-panel active" id="adminPanelVisits"></div>
       <div class="a-panel" id="adminPanelComments"></div>
       <div class="a-panel" id="adminPanelArchive"></div>
+      <div class="a-panel" id="adminPanelChats"></div>
       <div class="a-panel" id="adminPanelOrders">
         <div class="a-chart-card" id="ordersDonutCard"></div>
         <div class="a-form-row"><label data-i18n="adminOrdersTotal">სულ შეკვეთა</label><input type="number" id="ordersTotalInput" min="0"></div>
@@ -6659,7 +6682,7 @@
       adminTabAnalytics: 'ანალიტიკა',
       adminTabUrgency: 'ადგილები',
       adminTabPromo: 'Promo',
-      adminOrdersTotal: 'სულ შეკვეთა',
+      adminTabChats: 'ჩატები',
       adminOrdersSuccess: 'წარმატებული',
       adminOrdersFail: 'წარუმატებელი',
       adminOrdersNote: 'სამივე რიცხვი (სულ / წარმატებული / წარუმატებელი) ჩანს საჯაროდ, საიტის ზედა ნაწილში, სოციალურ მტკიცებულების ზოლში.',
@@ -7062,6 +7085,7 @@
       adminTabAnalytics: 'Analytics',
       adminTabUrgency: 'Spots',
       adminTabPromo: 'Promo',
+      adminTabChats: 'Chats',
       adminOrdersTotal: 'Total orders',
       adminOrdersSuccess: 'Successful',
       adminOrdersFail: 'Failed',
@@ -9141,6 +9165,11 @@
   // ============================================================
   let messengerSocket = null;
   let messengerCurrentOrderId = null;
+  // 'customer' (default, used by the 5 order-flow buttons) or 'admin'
+  // (used by the admin panel's Chats tab). Same overlay, same events --
+  // only who's "me" for bubble styling and outgoing message tagging
+  // changes, plus the admin-only Complete-order button.
+  let messengerRole = 'customer';
 
   function renderMessageBubble(msg){
     const container = document.getElementById('messengerMessages');
@@ -9170,17 +9199,21 @@
       if (pageOpen){
         // Our own sent messages are already rendered optimistically in
         // sendMessengerMessage() -- only render what actually came back
-        // from someone else (the admin) to avoid a duplicate bubble.
-        if (msg.from !== 'customer') renderMessageBubble(msg);
-      } else if (msg.from === 'admin') {
+        // from the OTHER side, whichever role that is, to avoid a
+        // duplicate bubble.
+        if (msg.from !== messengerRole) renderMessageBubble(msg);
+      } else if (msg.from !== messengerRole) {
         // The chat is closed but the socket is still connected and still
         // joined to this room, so a reply can arrive at any time. Surface
         // it on the reopen bubble instead of it silently landing in a
-        // hidden page the visitor has no reason to reopen.
-        const bubble = document.getElementById('activeChatBubble');
-        const dot = document.getElementById('activeChatBubbleDot');
-        if (bubble) bubble.style.display = 'flex';
-        if (dot) dot.style.display = 'block';
+        // hidden page there's no reason to reopen. (Admin-side unread
+        // state is handled separately by admin_notify -- see below.)
+        if (messengerRole === 'customer'){
+          const bubble = document.getElementById('activeChatBubble');
+          const dot = document.getElementById('activeChatBubbleDot');
+          if (bubble) bubble.style.display = 'flex';
+          if (dot) dot.style.display = 'block';
+        }
       }
     });
     messengerSocket.on('order_completed', () => {
@@ -9190,18 +9223,21 @@
     return messengerSocket;
   }
 
-  function openMessengerPage(orderId){
+  function openMessengerPage(orderId, role){
+    messengerRole = role || 'customer';
     messengerCurrentOrderId = orderId;
     const orderIdEl = document.getElementById('messengerOrderId');
     const messagesEl = document.getElementById('messengerMessages');
     const pageEl = document.getElementById('messengerPage');
     const bubble = document.getElementById('activeChatBubble');
     const dot = document.getElementById('activeChatBubbleDot');
+    const completeBtn = document.getElementById('messengerCompleteBtn');
     if (orderIdEl) orderIdEl.textContent = orderId;
     if (messagesEl) messagesEl.innerHTML = '';
     if (pageEl) pageEl.style.display = 'flex';
     if (bubble) bubble.style.display = 'none';
     if (dot) dot.style.display = 'none';
+    if (completeBtn) completeBtn.style.display = (messengerRole === 'admin') ? 'block' : 'none';
     document.body.style.overflow = 'hidden';
 
     const socket = ensureMessengerSocket();
@@ -9222,7 +9258,9 @@
     messengerCurrentOrderId = null;
     // The chat isn't gone -- it's just hidden. Re-check so the reopen
     // bubble comes back if this order is still active server-side.
-    checkForActiveChat();
+    // (Only meaningful for the customer role -- the admin panel refreshes
+    // its own session list separately, see renderAdminChats.)
+    if (messengerRole === 'customer') checkForActiveChat();
   }
 
   // Looks up whether the logged-in Discord account has an active order
@@ -9254,7 +9292,7 @@
   document.getElementById('activeChatBubble').addEventListener('click', () => {
     const bubble = document.getElementById('activeChatBubble');
     const orderId = bubble.dataset.orderId;
-    if (orderId) openMessengerPage(orderId);
+    if (orderId) openMessengerPage(orderId, 'customer');
   });
 
   function sendMessengerMessage(){
@@ -9262,8 +9300,8 @@
     if (!input) return;
     const text = input.value.trim();
     if (!text || !messengerSocket || !messengerCurrentOrderId) return;
-    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: 'customer', text } });
-    renderMessageBubble({ from: 'customer', text });
+    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: messengerRole, text } });
+    renderMessageBubble({ from: messengerRole, text });
     input.value = '';
   }
 
@@ -9271,6 +9309,10 @@
   document.getElementById('messengerSendBtn').addEventListener('click', sendMessengerMessage);
   document.getElementById('messengerInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter'){ e.preventDefault(); sendMessengerMessage(); }
+  });
+  document.getElementById('messengerCompleteBtn').addEventListener('click', () => {
+    if (!messengerSocket || !messengerCurrentOrderId) return;
+    messengerSocket.emit('complete_order', { orderId: messengerCurrentOrderId });
   });
 
   // Single entry point used by every one of the 5 order flows below --
@@ -9310,7 +9352,7 @@
       console.error('[MOON] failed to create chat session -- the order is still saved in pendingOrders, but the chat itself may be empty until this succeeds.', e);
     }
 
-    openMessengerPage(orderId);
+    openMessengerPage(orderId, 'customer');
 
     if (btn) btn.disabled = false;
     if (textEl) textEl.textContent = t(idleKey);
@@ -11208,6 +11250,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminTabAnalytics = document.getElementById('adminTabAnalytics');
   const adminTabUrgency = document.getElementById('adminTabUrgency');
   const adminTabPromo = document.getElementById('adminTabPromo');
+  const adminTabChats = document.getElementById('adminTabChats');
   const adminPanelVisits = document.getElementById('adminPanelVisits');
   const adminPanelComments = document.getElementById('adminPanelComments');
   const adminPanelArchive = document.getElementById('adminPanelArchive');
@@ -11218,6 +11261,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminPanelAnalytics = document.getElementById('adminPanelAnalytics');
   const adminPanelUrgency = document.getElementById('adminPanelUrgency');
   const adminPanelPromo = document.getElementById('adminPanelPromo');
+  const adminPanelChats = document.getElementById('adminPanelChats');
 
   function openAdmin(){
     adminOverlay.classList.add('open');
@@ -12399,6 +12443,49 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     renderAdminPromo();
   });
 
+  // ---- Chats tab -- lists active order sessions from chat-server/ and
+  // opens the same messenger overlay customers use, just with
+  // messengerRole='admin' so replies are tagged correctly and the
+  // Complete-order button appears. This is the missing other half of the
+  // messenger feature: without it, a customer's message had nowhere to
+  // be seen or answered from. ----
+  async function renderAdminChats(){
+    if (adminPanelChats) adminPanelChats.innerHTML = '<div class="chat-admin-empty">…</div>';
+    let sessions = [];
+    try{
+      const res = await fetch(CHAT_SERVER_URL + '/api/sessions');
+      if (res.ok) sessions = await res.json();
+    }catch(e){
+      if (adminPanelChats) adminPanelChats.innerHTML = '<div class="chat-admin-empty">⚠️ ჩატის სერვერთან დაკავშირება ვერ მოხერხდა.</div>';
+      return;
+    }
+    if (!Array.isArray(sessions) || sessions.length === 0){
+      if (adminPanelChats) adminPanelChats.innerHTML = '<div class="chat-admin-empty">აქტიური ჩატი არ არის.</div>';
+      return;
+    }
+    adminPanelChats.innerHTML = sessions.map(s => {
+      const last = s.messages && s.messages.length ? s.messages[s.messages.length - 1] : null;
+      const lastText = last ? escapeHtml((last.from === 'admin' ? 'თქვენ: ' : '') + last.text) : '';
+      const meta = [s.order?.type, s.order?.price != null ? (s.order.price + ' ₾') : null].filter(Boolean).join(' · ');
+      return `<div class="chat-session-card" data-order-id="${escapeHtml(s.orderId)}">
+        <div class="chat-session-top">
+          <span class="chat-session-name">${escapeHtml(s.customer?.username || 'უცნობი')}</span>
+          <span class="chat-session-id">#${escapeHtml(s.orderId)}</span>
+        </div>
+        ${meta ? `<div class="chat-session-meta">${escapeHtml(meta)}</div>` : ''}
+        ${lastText ? `<div class="chat-session-last">${lastText}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  if (adminPanelChats) {
+    adminPanelChats.addEventListener('click', (e) => {
+      const card = e.target.closest('.chat-session-card');
+      if (!card) return;
+      openMessengerPage(card.getAttribute('data-order-id'), 'admin');
+    });
+  }
+
   adminPanelComments.addEventListener('click', async (e) => {
     const btn = e.target.closest('button[data-action]');
     if (!btn) return;
@@ -12506,6 +12593,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminTabAnalytics.classList.toggle('active', tab === 'analytics');
     adminTabUrgency.classList.toggle('active', tab === 'urgency');
     adminTabPromo.classList.toggle('active', tab === 'promo');
+    adminTabChats.classList.toggle('active', tab === 'chats');
     adminPanelVisits.classList.toggle('active', tab === 'visits');
     adminPanelComments.classList.toggle('active', tab === 'comments');
     adminPanelArchive.classList.toggle('active', tab === 'archive');
@@ -12516,6 +12604,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminPanelAnalytics.classList.toggle('active', tab === 'analytics');
     adminPanelUrgency.classList.toggle('active', tab === 'urgency');
     adminPanelPromo.classList.toggle('active', tab === 'promo');
+    adminPanelChats.classList.toggle('active', tab === 'chats');
     if (tab === 'visits') renderAdminVisits();
     else if (tab === 'comments') renderAdminComments();
     else if (tab === 'archive') renderAdminArchive();
@@ -12526,6 +12615,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     else if (tab === 'analytics') renderAdminAnalytics();
     else if (tab === 'urgency') renderAdminUrgency();
     else if (tab === 'promo') renderAdminPromo();
+    else if (tab === 'chats') renderAdminChats();
   }
   adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
   adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
@@ -12537,6 +12627,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   adminTabAnalytics.addEventListener('click', () => switchAdminTab('analytics'));
   adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
   adminTabPromo.addEventListener('click', () => switchAdminTab('promo'));
+  adminTabChats.addEventListener('click', () => switchAdminTab('chats'));
 
   let adminCheckInFlight = false;
   async function tryAdminLogin(){
