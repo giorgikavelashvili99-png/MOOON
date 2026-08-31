@@ -4350,7 +4350,7 @@
      a flat rectangle popping into place.
      ============================================================ */
   .messenger-page{
-    position:fixed; inset:0; z-index:10000;
+    position:fixed !important; inset:0 !important; z-index:10000;
     display:flex; flex-direction:column;
     background:linear-gradient(165deg, #0a0817 0%, #150a24 55%, #0a0817 100%);
     perspective:900px;
@@ -4381,8 +4381,7 @@
   }
   .messenger-status-dot{
     flex:0 0 auto; width:9px; height:9px; border-radius:50%;
-    background:#3ddc84; box-shadow:0 0 0 0 rgba(61,220,132,0.55);
-    animation: ttdlStatusPulse 1.8s ease-in-out infinite;
+    background:#3ddc84;
   }
   .messenger-complete-btn{
     flex:0 0 auto; padding:8px 14px; border-radius:100px; border:none; cursor:pointer;
@@ -4447,20 +4446,19 @@
      overlays) so it stays reachable no matter what section the visitor
      is scrolled to. */
   .active-chat-bubble{
-    position:fixed; right:18px; bottom:18px; z-index:9000;
+    position:fixed !important;
+    right:calc(18px + env(safe-area-inset-right, 0px));
+    bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+    z-index:9000;
     width:56px; height:56px; border-radius:50%; border:none; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
     background:linear-gradient(135deg, #8b5cf6, #6d28d9); color:#fff;
     box-shadow:0 8px 22px rgba(139,92,246,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
-    animation:acbFloat 2.6s ease-in-out infinite;
   }
-  @keyframes acbFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); } }
   .acb-dot{
     position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%;
     background:#ff4d6d; border:2px solid #140d24;
-    animation:ttdlStatusPulse 1.8s ease-in-out infinite;
   }
-  @media (prefers-reduced-motion: reduce){ .active-chat-bubble{ animation:none; } }
 
   /* Admin panel -- Chats tab list */
   .chat-admin-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
@@ -9268,14 +9266,30 @@
   // what makes closing the messenger page a "minimize", not a dead end --
   // without it, the only way back into an existing conversation was
   // placing a brand new order, orphaning the real one.
+  //
+  // checkForActiveChatToken guards against a real flicker bug: this runs
+  // every time setDiscordUI() fires (login, logout, cache-then-network
+  // refresh), so overlapping calls are routine, not an edge case. Fetches
+  // don't resolve in the order they were sent -- without this, a stale
+  // response arriving after a newer one can flip the bubble back on/off,
+  // which is exactly the flashing that made the bubble uncomfortable to
+  // look at. Only the most recently *started* call is allowed to touch
+  // the DOM; anything that resolves after being superseded is dropped.
+  let checkForActiveChatToken = 0;
   async function checkForActiveChat(){
+    const myToken = ++checkForActiveChatToken;
     const bubble = document.getElementById('activeChatBubble');
     if (!bubble) return;
-    if (!currentDiscordUser){ bubble.style.display = 'none'; return; }
+    if (!currentDiscordUser){
+      if (myToken === checkForActiveChatToken) bubble.style.display = 'none';
+      return;
+    }
     try{
       const res = await fetch(CHAT_SERVER_URL + '/api/sessions/by-customer/' + encodeURIComponent(currentDiscordUser.id));
+      if (myToken !== checkForActiveChatToken) return; // superseded -- ignore
       if (!res.ok){ bubble.style.display = 'none'; return; }
       const sessions = await res.json();
+      if (myToken !== checkForActiveChatToken) return; // superseded -- ignore
       if (Array.isArray(sessions) && sessions.length > 0){
         bubble.dataset.orderId = sessions[0].orderId;
         bubble.style.display = (messengerCurrentOrderId === sessions[0].orderId) ? 'none' : 'flex';
