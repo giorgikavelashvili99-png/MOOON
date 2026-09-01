@@ -2131,7 +2131,7 @@
     .scan-result .sr-row#srQualityRow.show{ display:grid; }
   }
   .scan-progress{
-    display:none; align-items:center; gap:10px; margin-top:14px;
+    display:none; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:12px; color:var(--text-dim);
   }
   .scan-progress.show{ display:flex; }
@@ -2142,6 +2142,11 @@
     flex:0 0 auto;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+  .scan-progress-stage{
+    flex:0 0 100%;
+    margin-left:24px; margin-top:-4px;
+    font-size:11px; color:var(--text-faint);
+  }
   .scan-progress-cancel{
     margin-left:auto; flex:0 0 auto;
     background:none; border:1px solid var(--border-soft); border-radius:20px;
@@ -5560,6 +5565,7 @@
         </div>
         <div class="scan-progress" id="scanProgress">
           <span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span>
+          <div class="scan-progress-stage" id="scanProgressStage" data-i18n="scanStageReading">ფაილის წაკითხვა…</div>
           <button type="button" class="scan-progress-cancel" id="scanProgressCancel" data-i18n="scanCancelBtn">გაუქმება</button>
         </div>
 
@@ -6764,6 +6770,8 @@
       dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
       scanProcessing: 'ვიდეო მუშავდება…',
       scanCancelBtn: 'გაუქმება',
+      scanStageReading: 'ფაილის წაკითხვა…',
+      scanStageFps: 'ხარისხისა და სიხშირის დადგენა…',
       srFile: 'ფაილი',
       srDuration: 'ხანგრძლივობა',
       srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
@@ -7175,6 +7183,8 @@
       dzSub: 'Drag it here or click — duration will be filled in automatically',
       scanProcessing: 'Processing video…',
       scanCancelBtn: 'Cancel',
+      scanStageReading: 'Reading file…',
+      scanStageFps: 'Detecting quality and frame rate…',
       srFile: 'File',
       srDuration: 'Duration',
       srDetectedFormat: 'Uploaded video format',
@@ -8908,6 +8918,7 @@
   const dropZone = document.getElementById('dropZone');
   const videoInput = document.getElementById('videoInput');
   const scanProgress = document.getElementById('scanProgress');
+  const scanProgressStage = document.getElementById('scanProgressStage');
   const scanResult = document.getElementById('scanResult');
   const srName = document.getElementById('srName');
   const srDuration = document.getElementById('srDuration');
@@ -9129,12 +9140,26 @@
   // scan) is simply dropped instead of overwriting what's on screen.
   let scanToken = 0;
 
+  // Points at the currently in-flight scan's cleanup() (pause/revoke/
+  // remove the hidden <video>). scanToken alone only stopped a stale
+  // scan's RESULT from being applied -- it never actually stopped the
+  // hidden video element itself, so pressing Cancel just hid the UI
+  // while that decode kept running in the background for several more
+  // seconds (its own internal watchdogs), and picking a new file to
+  // retry stacked a second hidden decode on top of the first. This lets
+  // resetScanner() actually tear down the real work, not just the UI.
+  let activeScanCleanup = null;
+
   const SR_AUTO_IDS = { wrap: 'srAuto', statusRow: 'srAutoStatus', statusText: 'srAutoStatusText', fill: 'srAutoFill', error: 'srAutoError' };
 
   // Fully resets the scanner back to its empty state — this is the
   // "cancel upload" action that was previously missing.
   function resetScanner(){
     scanToken++; // invalidate any scan still in flight
+    // Actually stop the hidden <video> right now instead of letting it
+    // keep decoding in the background until its own watchdog eventually
+    // fires -- see the comment on activeScanCleanup above.
+    if (activeScanCleanup) { activeScanCleanup(); activeScanCleanup = null; }
     scanProgress.classList.remove('show');
     videoInput.value = '';
     mainScannedFile = null;
@@ -9187,6 +9212,7 @@
     srReject.classList.remove('show');
     resetTransferPrompt();
     scanProgress.classList.add('show');
+    if (scanProgressStage) scanProgressStage.textContent = t('scanStageReading');
     // The upload prompt has done its job the instant a file is picked --
     // leaving it on screen alongside "processing..." is exactly the
     // "two things visible at once" bug the rest of this wizard was
@@ -9206,10 +9232,16 @@
 
     const cleanup = () => {
       if (myToken === scanToken) scanProgress.classList.remove('show');
+      if (activeScanCleanup === cleanup) activeScanCleanup = null;
       clearWatchdog();
+      try { videoEl.pause(); } catch(e){}
       URL.revokeObjectURL(videoEl.src);
       videoEl.remove();
     };
+    // Registered immediately so Cancel (resetScanner) can reach in and
+    // force an immediate teardown instead of just hiding the UI while
+    // this keeps running in the background -- see activeScanCleanup.
+    activeScanCleanup = cleanup;
 
     // Phase-1 safety net: only covers waiting for metadata to load (or
     // the Infinity-duration seek trick below) -- cleared the instant
@@ -9234,6 +9266,7 @@
       clearWatchdog(); // metadata phase done -- frame-rate detection gets its own budget below
       const width = videoEl.videoWidth;
       const height = videoEl.videoHeight;
+      if (scanProgressStage) scanProgressStage.textContent = t('scanStageFps');
       // Phase-2 safety net: detectFrameRate() already caps itself at
       // ~3s internally, so this is only a defense-in-depth backstop in
       // case that promise somehow never settles -- comfortably longer
