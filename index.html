@@ -9283,12 +9283,57 @@
     }
     return null;
   }
-  function srFindFpsInMp4(buf, bufIsFileStart){
+  // Parses duration (from mvhd) AND width/height/fps (from trak/tkhd/mdia)
+  // in one pass over an already-located moov box -- this is what lets
+  // handleVideoFile()/readVideoFileMeta() below skip creating a <video>
+  // element entirely for local files. That element (plus assigning it a
+  // blob: URL for the file) was the one thing every previous attempt at
+  // fixing this freeze still had in common, and is the most likely real
+  // cause: Chrome's own "Page Unresponsive" dialog only fires when the
+  // main thread is genuinely blocked synchronously, which no amount of
+  // setTimeout/Promise.race can ever preempt (a blocked thread can't run
+  // the timer either) -- so if opening a huge local video blob in a
+  // <video> element is what's actually stalling the renderer on some
+  // devices, no timeout wrapped around it could ever have helped. Pure
+  // byte-parsing of a bounded slice never touches the media pipeline at
+  // all, so that whole class of freeze becomes structurally impossible.
+  function srParseMp4Metadata(buf, bufIsFileStart){
+    const empty = { duration: null, width: null, height: null, fps: null };
     try {
-      if (!buf || buf.length < 8) return null;
+      if (!buf || buf.length < 8) return empty;
       const moov = srLocateMoovBox(buf, bufIsFileStart);
-      if (!moov) return null;
-      const traks = srReadMp4Boxes(buf, moov.start, moov.end).filter(b => b.type === 'trak');
+      if (!moov) return empty;
+      const moovBoxes = srReadMp4Boxes(buf, moov.start, moov.end);
+
+      // ---- duration from mvhd (movie header -- a direct child of moov,
+      // sibling of the trak boxes below). Layout after version(1)+flags(3):
+      // creation_time, modification_time, timescale, duration -- 4 bytes
+      // each for version 0; creation/modification_time widen to 8 bytes
+      // for version 1 but timescale stays 4 and duration widens to 8. ----
+      let duration = null;
+      const mvhd = moovBoxes.find(b => b.type === 'mvhd');
+      if (mvhd && mvhd.start < buf.length) {
+        const version = buf[mvhd.start];
+        if (version === 1) {
+          const timescale = srReadUint32(buf, mvhd.start + 20);
+          if (timescale && mvhd.start + 32 <= buf.length) {
+            const durHi = srReadUint32(buf, mvhd.start + 24);
+            const durLo = srReadUint32(buf, mvhd.start + 28);
+            duration = (durHi * 4294967296 + durLo) / timescale;
+          }
+        } else if (mvhd.start + 20 <= buf.length) {
+          const timescale = srReadUint32(buf, mvhd.start + 12);
+          const rawDuration = srReadUint32(buf, mvhd.start + 16);
+          if (timescale) duration = rawDuration / timescale;
+        }
+      }
+
+      // ---- width/height (tkhd) + fps (stbl > stts) from the video trak.
+      // Same box-reading technique as the TikTok downloader further down
+      // this file, re-implemented independently here so that widget is
+      // left completely untouched. ----
+      let width = null, height = null, fps = null;
+      const traks = moovBoxes.filter(b => b.type === 'trak');
       for (const trak of traks) {
         const trakBoxes = srReadMp4Boxes(buf, trak.start, trak.end);
         const mdia = trakBoxes.find(b => b.type === 'mdia');
@@ -9296,24 +9341,43 @@
         const mdiaBoxes = srReadMp4Boxes(buf, mdia.start, mdia.end);
         const hdlr = mdiaBoxes.find(b => b.type === 'hdlr');
         if (!hdlr || hdlr.start + 12 > buf.length || srReadFourCC(buf, hdlr.start + 8) !== 'vide') continue;
+
+        const tkhd = trakBoxes.find(b => b.type === 'tkhd');
+        if (tkhd && tkhd.start < buf.length) {
+          const tkhdVersion = buf[tkhd.start];
+          const timesSize = tkhdVersion === 1 ? 32 : 20;
+          const dimsOffset = tkhd.start + 4 + timesSize + 8 + 4 + 4 + 36;
+          if (dimsOffset + 8 <= buf.length) {
+            const w = Math.round(srReadUint32(buf, dimsOffset) / 65536);
+            const h = Math.round(srReadUint32(buf, dimsOffset + 4) / 65536);
+            if (w > 0 && h > 0) { width = w; height = h; }
+          }
+        }
+
         const mdhd = mdiaBoxes.find(b => b.type === 'mdhd');
         const minf = mdiaBoxes.find(b => b.type === 'minf');
-        if (!mdhd || !minf) continue;
-        const mdhdVersion = buf[mdhd.start];
-        const timescaleOff = mdhd.start + (mdhdVersion === 1 ? 20 : 12);
-        if (timescaleOff + 4 > buf.length) continue;
-        const timescale = srReadUint32(buf, timescaleOff);
-        const stbl = srReadMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
-        const stts = stbl ? srReadMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts') : null;
-        if (!stts || stts.start + 16 > buf.length) continue;
-        const sampleDelta = srReadUint32(buf, stts.start + 12);
-        if (sampleDelta && timescale) {
-          const rawFps = timescale / sampleDelta;
-          if (isFinite(rawFps) && rawFps > 0 && rawFps <= 300) return Math.round(rawFps * 100) / 100;
+        if (mdhd && minf) {
+          const mdhdVersion = buf[mdhd.start];
+          const timescaleOff = mdhd.start + (mdhdVersion === 1 ? 20 : 12);
+          if (timescaleOff + 4 <= buf.length) {
+            const timescale = srReadUint32(buf, timescaleOff);
+            const stbl = srReadMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
+            const stts = stbl ? srReadMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts') : null;
+            if (stts && stts.start + 16 <= buf.length) {
+              const sampleDelta = srReadUint32(buf, stts.start + 12);
+              if (sampleDelta && timescale) {
+                const rawFps = timescale / sampleDelta;
+                if (isFinite(rawFps) && rawFps > 0 && rawFps <= 300) fps = Math.round(rawFps * 100) / 100;
+              }
+            }
+          }
         }
+        if (width || height || fps != null) break; // found the video track -- stop looking
       }
-      return null;
-    } catch (e) { return null; }
+      return { duration, width, height, fps };
+    } catch (e) {
+      return { duration: null, width: null, height: null, fps: null };
+    }
   }
   // Reads one byte range of a local File via FileReader (reports real
   // loaded/total progress -- FileReader fires onprogress for local reads
@@ -9329,28 +9393,33 @@
   }
   // Web-optimized ("faststart") MP4s keep moov near the front; anything
   // recorded straight off a phone camera usually writes moov at the very
-  // end instead (after mdat) -- so if the front doesn't have it, this
-  // falls back to the tail before giving up and reporting fps unknown.
-  async function detectFpsFromFile(file, onProgress){
+  // end instead (after mdat) -- so if the front doesn't have everything,
+  // this falls back to the tail before giving up on whatever's missing.
+  async function detectMp4MetaFromFile(file, onProgress){
     const HEAD_BYTES = 2 * 1024 * 1024;
     const TAIL_BYTES = 10 * 1024 * 1024;
+    const empty = { duration: null, width: null, height: null, fps: null };
     try {
       const headBuf = await srReadFileRange(file, 0, Math.min(file.size, HEAD_BYTES), p => onProgress && onProgress(Math.round(p * 50)));
-      let fps = srFindFpsInMp4(headBuf, true);
-      if (fps == null && file.size > HEAD_BYTES) {
+      const meta = srParseMp4Metadata(headBuf, true);
+      if ((meta.duration == null || meta.fps == null || meta.width == null) && file.size > HEAD_BYTES) {
         const tailStart = Math.max(HEAD_BYTES, file.size - TAIL_BYTES);
         const tailBuf = await srReadFileRange(file, tailStart, file.size, p => onProgress && onProgress(50 + Math.round(p * 50)));
-        fps = srFindFpsInMp4(tailBuf, false);
+        const tailMeta = srParseMp4Metadata(tailBuf, false);
+        if (meta.duration == null) meta.duration = tailMeta.duration;
+        if (meta.fps == null) meta.fps = tailMeta.fps;
+        if (meta.width == null) meta.width = tailMeta.width;
+        if (meta.height == null) meta.height = tailMeta.height;
       }
       if (onProgress) onProgress(100);
-      return fps;
+      return meta;
     } catch (e) {
       if (onProgress) onProgress(100);
-      return null;
+      return empty;
     }
   }
 
-  function handleVideoFile(file){
+  async function handleVideoFile(file){
     if (!file.type.startsWith('video/')) {
       alert(t('alertNotVideo'));
       return;
@@ -9361,7 +9430,7 @@
     srReject.classList.remove('show');
     resetTransferPrompt();
     scanProgress.classList.add('show');
-    if (scanProgressStage) scanProgressStage.textContent = t('scanStageReading');
+    if (scanProgressStage) scanProgressStage.textContent = t('scanStageReading') + ' 0%';
     // The upload prompt has done its job the instant a file is picked --
     // leaving it on screen alongside "processing..." is exactly the
     // "two things visible at once" bug the rest of this wizard was
@@ -9369,202 +9438,40 @@
     // reject-retry, or re-upload after success all route through it).
     dropZone.classList.add('wizard-step-hidden');
 
-    const videoEl = document.createElement('video');
-    videoEl.preload = 'metadata';
-    videoEl.muted = true;
-    videoEl.playsInline = true;
-    videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
-    document.body.appendChild(videoEl);
-
-    let watchdogTimer = null;
-    const clearWatchdog = () => { if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; } };
-
+    // No hidden <video> element and no blob: URL here anymore -- every
+    // earlier attempt at fixing this freeze still had that in common,
+    // and Chrome's own "Page Unresponsive" dialog showing up (confirmed
+    // by a screenshot) proves the main thread itself was genuinely
+    // blocked, which no setTimeout/Promise.race wrapped around it could
+    // ever have rescued. Reading duration/width/height/fps by parsing
+    // the file's own bytes (detectMp4MetaFromFile, defined above) never
+    // touches the browser's media pipeline at all, so that entire class
+    // of freeze is now structurally impossible, not just timed out.
     const cleanup = () => {
       if (myToken === scanToken) scanProgress.classList.remove('show');
       if (activeScanCleanup === cleanup) activeScanCleanup = null;
-      clearWatchdog();
-      try { videoEl.pause(); } catch(e){}
-      URL.revokeObjectURL(videoEl.src);
-      videoEl.remove();
     };
     // Registered immediately so Cancel (resetScanner) can reach in and
-    // force an immediate teardown instead of just hiding the UI while
-    // this keeps running in the background -- see activeScanCleanup.
+    // reset the UI state even mid-read.
     activeScanCleanup = cleanup;
 
-    // Phase-1 safety net: only covers waiting for metadata to load (or
-    // the Infinity-duration seek trick below) -- cleared the instant
-    // metadata actually arrives, in proceed() below. It used to keep
-    // running straight through detectFrameRate() too, with no reset in
-    // between, so on a slower device or a large/4K file where frame-
-    // rate detection legitimately takes a few extra seconds (see the
-    // comments in detectFrameRate about slow WebView decoder start-up),
-    // the elapsed time from file-select could pass 9s while everything
-    // was still working -- firing a false "read error" alert(), which
-    // is a BLOCKING native dialog that freezes the whole page until
-    // dismissed, and simultaneously revoking/removing the video element
-    // out from under the detectFrameRate() call that was still using it.
-    // That combination is exactly the "browser freezes, nothing
-    // responds" symptom during upload.
-    watchdogTimer = setTimeout(() => {
+    // Pure last-resort backstop -- reading two bounded byte ranges from a
+    // local file should never take anywhere near this long, but this
+    // guarantees the modal can't stay open forever even in a scenario
+    // nobody has anticipated.
+    const watchdogTimer = setTimeout(() => {
       cleanup();
       if (myToken === scanToken) alert(t('alertReadError'));
-    }, 9000);
+    }, 15000);
 
-    const proceed = (duration) => {
-      clearWatchdog(); // metadata phase done -- frame-rate detection gets its own budget below
-      const width = videoEl.videoWidth;
-      const height = videoEl.videoHeight;
-      if (scanProgressStage) scanProgressStage.textContent = t('scanStageFps') + ' 0%';
-      // Hard cap, unconditional: no matter what detectFpsFromFile is doing
-      // underneath (a slow device, a browser quirk with FileReader, or
-      // anything else that hasn't been reproduced yet), this scan MUST
-      // move on within a few seconds. Proceeding with fps left unknown is
-      // already handled gracefully everywhere downstream (checkUploadAcceptable
-      // / finishScan) -- it's always better than a spinner that can get
-      // stuck forever for a reason nobody has been able to pin down.
-      const FPS_HARD_CAP_MS = 4000;
-      const fpsPromise = detectFpsFromFile(file, pct => {
-        if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageFps') + ' ' + pct + '%';
-      });
-      const capped = Promise.race([
-        fpsPromise,
-        new Promise(resolve => setTimeout(() => resolve(null), FPS_HARD_CAP_MS))
-      ]);
-      // Pure last-resort backstop in case even the race above somehow
-      // never settles -- cleared instantly once `capped` resolves, via
-      // cleanup() below, so this should never actually fire in practice.
-      watchdogTimer = setTimeout(() => {
-        cleanup();
-        if (myToken === scanToken) alert(t('alertReadError'));
-      }, 15000);
-      capped.then(fps => {
-        if (myToken === scanToken) finishScan(duration, file, width, height, fps);
-        cleanup();
-      });
-    };
-
-    videoEl.onloadedmetadata = function(){
-      if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
-        videoEl.currentTime = 1e101;
-        // Some mobile browsers never fire ontimeupdate after this seek —
-        // fall back to whatever duration is available rather than hang.
-        const durationTimeout = setTimeout(() => {
-          videoEl.ontimeupdate = null;
-          proceed(videoEl.duration || 0);
-        }, 2500);
-        videoEl.ontimeupdate = function(){
-          clearTimeout(durationTimeout);
-          videoEl.ontimeupdate = null;
-          const dur = videoEl.duration;
-          videoEl.currentTime = 0;
-          proceed(dur);
-        };
-      } else {
-        proceed(videoEl.duration);
-      }
-    };
-
-    videoEl.onerror = function(){
-      cleanup();
-      if (myToken === scanToken) alert(t('alertReadError'));
-    };
-
-    videoEl.src = URL.createObjectURL(file);
-  }
-
-  function detectFrameRate(videoEl){
-    return new Promise((resolve) => {
-      if (typeof videoEl.requestVideoFrameCallback !== 'function') {
-        resolve(null);
-        return;
-      }
-      // muted + playsInline + fully off-screen positioning (set where this
-      // video element is created) are what make a hidden, programmatic
-      // .play() safe on phones — no fullscreen takeover, no visible black
-      // flash — so frame-rate detection runs on every device that
-      // supports requestVideoFrameCallback, not just desktop.
-      const samples = [];
-      let settled = false;
-      let safetyTimer = null;
-      // Warm-up is skipped by ELAPSED MEDIA TIME, not a fixed frame count.
-      // A fixed count (the previous approach) assumes decode start-up
-      // takes roughly the same few frames everywhere, but that cost
-      // varies a lot by browser — a constrained in-app WebView (Messenger,
-      // Instagram, TikTok's own in-app browser, etc.) can take noticeably
-      // longer to spin up than a normal mobile/desktop browser, and even
-      // varies run-to-run on the SAME browser depending on device load.
-      // That's exactly what was producing the "1st upload works, 2nd
-      // upload of the identical file fails, 3rd works again" pattern —
-      // on a slow run, the fixed-count warm-up + a short safety timeout
-      // let a couple of irregular startup frames leak into the sample
-      // set, which skewed the computed fps just enough to miss the
-      // strict 60fps check. Time-based warm-up plus a longer timeout and
-      // a higher minimum sample count make the read consistent run to run.
-      const WARMUP_SECONDS = 0.15;
-      const MIN_SAMPLES = 8; // below this, the reading isn't trustworthy
-      const TARGET_SAMPLES = 14;
-
-      function finish(fps){
-        if (settled) return;
-        settled = true;
-        if (safetyTimer) clearTimeout(safetyTimer);
-        videoEl.pause();
-        resolve(fps);
-      }
-
-      function computeAndFinish(){
-        // Too few post-warm-up samples to trust — report "unknown" rather
-        // than risk a noisy number. Per checkUploadAcceptable, an unknown
-        // fps never blocks the upload on its own, so this fails safe.
-        if (samples.length < MIN_SAMPLES) { finish(null); return; }
-        const deltas = [];
-        for (let i = 1; i < samples.length; i++) {
-          const d = samples[i] - samples[i - 1];
-          if (d > 0) deltas.push(d);
-        }
-        if (deltas.length < MIN_SAMPLES - 1) { finish(null); return; }
-        deltas.sort((a, b) => a - b);
-        const mid = deltas[Math.floor(deltas.length / 2)];
-        const rawFps = 1 / mid;
-        const commonRates = [24, 25, 30, 50, 60, 120];
-        let closest = Math.round(rawFps);
-        let bestDiff = Infinity;
-        commonRates.forEach(r => {
-          const diff = Math.abs(r - rawFps);
-          if (diff < bestDiff) { bestDiff = diff; closest = r; }
-        });
-        // If the measured rate isn't reasonably close to any common rate,
-        // the sample set was probably still noisy (dropped/irregular
-        // frames) — better to report "unknown" than a confident-looking
-        // wrong number that then fails the strict 60fps check.
-        if (bestDiff > 4) { finish(null); return; }
-        finish(closest);
-      }
-
-      function onFrame(now, metadata){
-        if (metadata.mediaTime < WARMUP_SECONDS) {
-          if (!settled) videoEl.requestVideoFrameCallback(onFrame);
-          return;
-        }
-        samples.push(metadata.mediaTime);
-        if (samples.length < TARGET_SAMPLES && !settled) {
-          videoEl.requestVideoFrameCallback(onFrame);
-        } else {
-          computeAndFinish();
-        }
-      }
-
-      // Generous on purpose: a slow in-app WebView needs real room to
-      // both spin up the decoder and deliver ~14 post-warm-up frames.
-      // This is invisible to a normal browser (it resolves in well under
-      // a second there) but stops slow runs from being cut off mid-read.
-      safetyTimer = setTimeout(() => computeAndFinish(), 3000);
-
-      videoEl.play().then(() => {
-        videoEl.requestVideoFrameCallback(onFrame);
-      }).catch(() => finish(null));
+    const meta = await detectMp4MetaFromFile(file, pct => {
+      if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageReading') + ' ' + pct + '%';
     });
+
+    clearTimeout(watchdogTimer);
+    if (myToken !== scanToken) return; // superseded by Cancel or a newer file pick
+    cleanup();
+    finishScan(meta.duration || 0, file, meta.width, meta.height, meta.fps);
   }
 
   // Reusable, DOM-independent video metadata reader — reads duration,
@@ -9572,76 +9479,15 @@
   // scanner above and by the lighter-weight scanners on the weekly/
   // monthly cards below, so all three packages validate uploads the
   // same way without duplicating the tricky metadata-loading logic.
-  function readVideoFileMeta(file){
-    return new Promise((resolve, reject) => {
-      if (!file.type.startsWith('video/')) { reject('not-video'); return; }
-      const videoEl = document.createElement('video');
-      videoEl.preload = 'metadata';
-      videoEl.muted = true;
-      videoEl.playsInline = true;
-      videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
-      document.body.appendChild(videoEl);
-
-      let watchdogTimer = null;
-      const clearWatchdog = () => { if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; } };
-      const cleanup = () => {
-        clearWatchdog();
-        URL.revokeObjectURL(videoEl.src);
-        videoEl.remove();
-      };
-      // See the matching fix in handleVideoFile() above: this watchdog
-      // must only cover the metadata-loading phase, not detectFrameRate()
-      // too, or a slow (but perfectly fine) frame-rate read on a large
-      // file gets falsely rejected as 'read-timeout' after 9s even
-      // though it was still in progress.
-      watchdogTimer = setTimeout(() => {
-        cleanup();
-        reject('read-timeout');
-      }, 9000);
-      const proceed = (duration) => {
-        clearWatchdog();
-        const width = videoEl.videoWidth;
-        const height = videoEl.videoHeight;
-        // Same unconditional hard cap as handleVideoFile() above -- this
-        // MUST move on within a few seconds regardless of what
-        // detectFpsFromFile is doing, rather than risk ever getting stuck.
-        const capped = Promise.race([
-          detectFpsFromFile(file),
-          new Promise(resolve => setTimeout(() => resolve(null), 4000))
-        ]);
-        watchdogTimer = setTimeout(() => {
-          cleanup();
-          reject('read-timeout');
-        }, 15000);
-        capped.then(fps => {
-          cleanup();
-          resolve({ duration, width, height, fps, file });
-        });
-      };
-      videoEl.onloadedmetadata = function(){
-        if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
-          videoEl.currentTime = 1e101;
-          const durationTimeout = setTimeout(() => {
-            videoEl.ontimeupdate = null;
-            proceed(videoEl.duration || 0);
-          }, 2500);
-          videoEl.ontimeupdate = function(){
-            clearTimeout(durationTimeout);
-            videoEl.ontimeupdate = null;
-            const dur = videoEl.duration;
-            videoEl.currentTime = 0;
-            proceed(dur);
-          };
-        } else {
-          proceed(videoEl.duration);
-        }
-      };
-      videoEl.onerror = function(){
-        cleanup();
-        reject('read-error');
-      };
-      videoEl.src = URL.createObjectURL(file);
-    });
+  // No <video> element / blob: URL here (see handleVideoFile() above for
+  // why) -- pure byte-parsing via detectMp4MetaFromFile.
+  async function readVideoFileMeta(file){
+    if (!file.type.startsWith('video/')) throw 'not-video';
+    const meta = await Promise.race([
+      detectMp4MetaFromFile(file),
+      new Promise(resolve => setTimeout(() => resolve({ duration: null, width: null, height: null, fps: null }), 15000))
+    ]);
+    return { duration: meta.duration || 0, width: meta.width, height: meta.height, fps: meta.fps, file };
   }
 
   // Lightweight scanner for the flat-rate weekly/monthly cards: unlike the
