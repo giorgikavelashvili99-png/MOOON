@@ -1853,42 +1853,52 @@
     .scanner-stage{ padding: clamp(12px,3.2vw,16px); border-radius: clamp(14px,3vw,16px); }
   }
 
+  /* Complete visual rework of the upload prompt — solid layered card
+     with a floating accent icon, instead of the previous plain dashed
+     rectangle, and reads its color from --pc-accent so each package
+     keeps its own accent instead of a single fixed blue. */
   .drop-zone{
     position:relative;
-    border-radius:18px;
-    padding:22px 18px;
+    border-radius:22px;
+    padding:30px 20px;
     text-align:center;
     cursor:pointer;
-    background:#0a0a12;
-    border:1.5px dashed rgba(42,171,238,0.45);
-    transition: border-color .25s ease, background .25s ease;
+    background:
+      radial-gradient(ellipse 140% 90% at 50% -10%, color-mix(in srgb, var(--pc-accent, var(--cyan)) 16%, transparent), transparent 70%),
+      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01) 40%),
+      #0a0a12;
+    border:1px solid color-mix(in srgb, var(--pc-accent, var(--cyan)) 24%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease;
   }
   .drop-zone:hover, .drop-zone.dragover{
-    border-color: rgba(42,171,238,0.9);
-    background:#0d0f16;
+    border-color: color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--pc-accent, var(--cyan)) 18%, transparent) inset, 0 10px 30px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
   }
   .drop-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; z-index:2; }
   .drop-zone .dz-icon{
     position:relative;
-    width:52px; height:52px; margin:0 auto 14px;
+    width:58px; height:58px; margin:0 auto 16px;
     display:flex; align-items:center; justify-content:center;
-    border-radius:16px;
-    background: linear-gradient(150deg, #7fd4fb, #2aabee 55%, #1483ba);
-    box-shadow: 0 0 26px rgba(42,171,238,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+    border-radius:50%;
+    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.35), transparent 60%),
+                linear-gradient(150deg, color-mix(in srgb, var(--pc-accent, var(--cyan)) 85%, #fff), var(--pc-accent, var(--cyan)) 55%, color-mix(in srgb, var(--pc-accent, var(--cyan)) 70%, #04101a));
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--pc-accent, var(--cyan)) 10%, transparent), 0 10px 26px color-mix(in srgb, var(--pc-accent, var(--cyan)) 40%, transparent);
     transition: box-shadow .25s ease, transform .25s ease;
   }
   .drop-zone:hover .dz-icon, .drop-zone.dragover .dz-icon{
-    box-shadow: 0 0 38px rgba(42,171,238,0.75), inset 0 1px 0 rgba(255,255,255,0.45);
-    transform: scale(1.05);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--pc-accent, var(--cyan)) 16%, transparent), 0 14px 34px color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent);
+    transform: scale(1.06);
   }
   .drop-zone .dz-icon svg{
     display:block;
-    width:22px; height:22px;
+    width:24px; height:24px;
     overflow:visible;
   }
-  .dz-plus{ stroke:#04101a; stroke-width:2.6; stroke-linecap:round; }
+  .dz-plus{ stroke:#04101a; stroke-width:2.8; stroke-linecap:round; }
   .drop-zone .dz-title{
-    font-size:14px; font-weight:800; margin-bottom:6px; line-height:1.35; letter-spacing:0.005em;
+    font-size:15px; font-weight:800; margin-bottom:7px; line-height:1.35; letter-spacing:0.005em;
     /* Solid, always-visible color first, so the label never disappears —
        the gradient below only upgrades it on browsers that actually
        support text-clipped gradients, and is scoped with @supports so a
@@ -1903,29 +1913,34 @@
       -webkit-text-fill-color:transparent; color:transparent;
     }
   }
-  .drop-zone .dz-sub{ font-size:11.5px; color:var(--text-dim); max-width:320px; margin:0 auto; line-height:1.5; }
+  .drop-zone .dz-sub{ font-size:12px; color:var(--text-dim); max-width:320px; margin:0 auto; line-height:1.55; }
+  .drop-zone .dz-req{
+    display:inline-block; margin-top:12px; padding:5px 12px; border-radius:100px;
+    font-size:10.5px; font-weight:700; letter-spacing:0.01em; color:var(--text-faint);
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+  }
 
   /* Kept compact even on desktop now — a smaller, tighter scanner reads
      as more precise/utilitarian instead of an oversized hero element. */
   @media (min-width:640px) and (hover:hover) and (pointer:fine){
-    .drop-zone{ padding:24px 22px; }
-    .drop-zone .dz-icon{ width:48px; height:48px; margin-bottom:12px; }
-    .drop-zone .dz-title{ font-size:15px; }
+    .drop-zone{ padding:30px 26px; }
+    .drop-zone .dz-icon{ width:54px; height:54px; margin-bottom:14px; }
+    .drop-zone .dz-title{ font-size:16px; }
     .drop-zone .dz-sub{ font-size:12.5px; max-width:380px; }
   }
 
   @media (max-width:900px){
     .drop-zone{
-      padding: clamp(16px,4.6vw,22px) clamp(12px,3.6vw,14px);
-      border-radius: clamp(14px,3vw,16px);
+      padding: clamp(20px,5.4vw,28px) clamp(14px,4vw,18px);
+      border-radius: clamp(16px,3.4vw,20px);
     }
     .drop-zone .dz-icon{
-      width: clamp(38px,9.5vw,50px);
-      height: clamp(38px,9.5vw,50px);
-      margin-bottom: clamp(8px,2.4vw,12px);
+      width: clamp(44px,10.5vw,56px);
+      height: clamp(44px,10.5vw,56px);
+      margin-bottom: clamp(10px,2.8vw,14px);
     }
-    .drop-zone .dz-title{ font-size: clamp(12.5px,3.4vw,14.5px); margin-bottom:6px; }
-    .drop-zone .dz-sub{ font-size: clamp(10.5px,2.7vw,12px); max-width: clamp(220px,78vw,280px); line-height:1.42; }
+    .drop-zone .dz-title{ font-size: clamp(13px,3.6vw,15px); margin-bottom:6px; }
+    .drop-zone .dz-sub{ font-size: clamp(11px,2.8vw,12.5px); max-width: clamp(220px,78vw,280px); line-height:1.45; }
   }
 
   /* Lightweight upload result for the weekly/monthly scanners — just
@@ -2232,6 +2247,54 @@
     color:#ff9db0;
   }
   .st-no:hover:not(:disabled){ background:rgba(255,56,96,0.14); transform:translateY(-1px); }
+
+  /* ---------- Order wizard: yes/no gates + confirm step ---------- */
+  .wizard-question{
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap:16px; padding:22px 20px; border-radius:20px;
+    border:1px solid rgba(124,143,255,0.22);
+    background:
+      radial-gradient(ellipse 120% 100% at 50% 0%, rgba(124,143,255,0.1), transparent 65%),
+      rgba(255,255,255,0.02);
+  }
+  .wizard-question-gate{ margin-bottom:4px; }
+  .wq-text{ font-size:15px; font-weight:700; color:var(--text); line-height:1.4; }
+  .wq-text-lg{ font-size:19px; }
+  .wq-actions{ display:flex; gap:12px; width:100%; max-width:320px; }
+  .wq-btn{
+    flex:1; padding:13px 18px; border-radius:100px;
+    font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-weight:700; font-size:14px; cursor:pointer;
+    border:1.5px solid transparent;
+    transition: transform .15s, box-shadow .2s, background .2s;
+  }
+  .wq-yes{
+    background:linear-gradient(135deg, var(--purple), #6a7fff);
+    color:#fff;
+    box-shadow:0 8px 22px rgba(124,143,255,0.4);
+  }
+  .wq-yes:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(124,143,255,0.5); }
+  .wq-no{
+    background:rgba(255,255,255,0.03);
+    border-color:rgba(255,255,255,0.16);
+    color:var(--text-dim);
+  }
+  .wq-no:hover{ background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.3); transform:translateY(-2px); }
+  .wizard-confirm-btn{
+    display:block; width:100%; margin-top:14px;
+    padding:13px 18px; border-radius:100px; border:none;
+    font-family:'BPG Glaho','Space Grotesk',sans-serif;
+    font-weight:700; font-size:14px; cursor:pointer; color:#fff;
+    background:linear-gradient(135deg, var(--purple), #6a7fff);
+    box-shadow:0 8px 22px rgba(124,143,255,0.4);
+    transition: transform .15s, box-shadow .2s;
+  }
+  .wizard-confirm-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(124,143,255,0.5); }
+  /* Wizard steps start hidden and are revealed one at a time by JS as
+     each prior step completes (see initOrderWizard/advanceWizard) —
+     this rule only sets the *default*; .wizard-visible added by JS
+     overrides it back to a normal block. */
+  .wizard-step-hidden{ display:none !important; }
   .sr-transfer-done{
     display:flex; align-items:center; gap:7px;
     font-size:12.5px; font-weight:700; color:var(--wa);
@@ -5442,6 +5505,15 @@
 
         <div class="panel pc-accordion-body" id="orderFlowPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+
+    <div class="wizard-question wizard-question-gate" id="wantOrderGate">
+      <div class="wq-text wq-text-lg" data-i18n="wantOrderQ">გსურთ შეკვეთა?</div>
+      <div class="wq-actions">
+        <button type="button" class="wq-btn wq-yes" id="wantOrderYes" data-i18n="wizardYes">დიახ</button>
+        <button type="button" class="wq-btn wq-no" id="wantOrderNo" data-i18n="wizardNo">არა</button>
+      </div>
+    </div>
+
     <!-- Video duration checker — PRIMARY input method, now the very first thing in the panel -->
     <div class="panel-section scanner-primary" id="videoScannerPanel">
       <div class="panel-head scanner-head-row">
@@ -5529,7 +5601,7 @@
     <input type="hidden" id="secondsInput" value="5">
     <input type="hidden" id="msRange" value="0">
 
-    <div class="field">
+    <div class="field" id="qualityFieldWrap">
       <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი</label></div>
       <div class="quality-grid quality-grid-two" id="qualityGrid">
         <button type="button" class="quality-btn active" data-quality="1080_60">
@@ -5557,20 +5629,7 @@
       </div>
     </div>
 
-    <div class="field">
-      <div class="toggle-row">
-        <div class="toggle-copy">
-          <div class="t1" data-i18n="subscriberT1">ვარ არხის გამომწერი</div>
-          <div class="t2" data-i18n="subscriberT2">✓ დაბალი ტარიფი აქტიურდება</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="subToggle">
-          <span class="slider-toggle"></span>
-        </label>
-      </div>
-    </div>
-
-    <div class="field field-tiktok" style="margin-bottom:6px;">
+    <div class="field field-tiktok" id="tiktokFieldWrap" style="margin-bottom:6px;">
       <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
       <div class="link-input-wrap">
         <span class="icon">@</span>
@@ -5582,6 +5641,18 @@
       </button>
       <div class="tt-auto-note" id="tiktokAutoNote"></div>
       <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+      <button type="button" class="wizard-confirm-btn" id="tiktokConfirmBtn" data-i18n="wizardConfirmLink">დადასტურება</button>
+    </div>
+
+    <div class="field" id="subscriberFieldWrap">
+      <div class="wizard-question" id="subscriberQuestion">
+        <div class="wq-text" data-i18n="subscriberWizardQ">ხართ ჩვენი TikTok არხის გამომწერი?</div>
+        <div class="wq-actions">
+          <button type="button" class="wq-btn wq-yes" id="subYesBtn" data-i18n="wizardYes">დიახ</button>
+          <button type="button" class="wq-btn wq-no" id="subNoBtn" data-i18n="wizardNo">არა</button>
+        </div>
+      </div>
+      <input type="checkbox" id="subToggle" style="display:none">
     </div>
 
     <input type="hidden" id="videoLink">
@@ -6561,6 +6632,11 @@
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
+      wantOrderQ: 'გსურთ შეკვეთა?',
+      wizardYes: 'დიახ',
+      wizardNo: 'არა',
+      subscriberWizardQ: 'ხართ ჩვენი TikTok არხის გამომწერი?',
+      wizardConfirmLink: 'დადასტურება',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
       tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
       videoLinkLabel: 'ატვირთული ვიდეოს ლინკი *',
@@ -6964,6 +7040,11 @@
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
       subscriberT2: '✓ Lower rate activates',
+      wantOrderQ: 'Would you like to order?',
+      wizardYes: 'Yes',
+      wizardNo: 'No',
+      subscriberWizardQ: 'Are you a subscriber of our TikTok channel?',
+      wizardConfirmLink: 'Confirm',
       tiktokLabel: 'Your TikTok profile link *',
       tiktokError: '⚠️ A TikTok profile link is required to send the order!',
       videoLinkLabel: 'Uploaded video link *',
@@ -7942,6 +8023,91 @@
     refresh();
   });
   subToggle.addEventListener('change', () => refresh());
+
+  // ============================================================
+  // ORDER WIZARD — reveals "want order? -> upload -> quality ->
+  // tiktok link+confirm -> subscriber yes/no -> send order" one step
+  // at a time. Every underlying element/handler (scanner, quality
+  // buttons, subToggle+refresh(), order buttons) is completely
+  // unchanged -- this only controls which section is visible right now,
+  // by adding/removing .wizard-step-hidden on the wrapper divs.
+  // ============================================================
+  (function initOrderWizard(){
+    const gate = document.getElementById('wantOrderGate');
+    const scannerPanel = document.getElementById('videoScannerPanel');
+    const qualityWrap = document.getElementById('qualityFieldWrap');
+    const tiktokWrap = document.getElementById('tiktokFieldWrap');
+    const subscriberWrap = document.getElementById('subscriberFieldWrap');
+    const channelsPanel = document.getElementById('orderChannelsPanel');
+    const divider = document.querySelector('#orderFlowPanel .panel-divider');
+    if (!gate || !scannerPanel) return;
+
+    const gateYes = document.getElementById('wantOrderYes');
+    const tiktokConfirmBtn = document.getElementById('tiktokConfirmBtn');
+    const subYesBtn = document.getElementById('subYesBtn');
+    const subNoBtn = document.getElementById('subNoBtn');
+
+    [scannerPanel, qualityWrap, tiktokWrap, subscriberWrap, channelsPanel, divider].forEach(el => {
+      if (el) el.classList.add('wizard-step-hidden');
+    });
+
+    gateYes && gateYes.addEventListener('click', () => {
+      gate.classList.add('wizard-step-hidden');
+      scannerPanel.classList.remove('wizard-step-hidden');
+    });
+    // "არა" intentionally does nothing further -- staying on the gate
+    // IS the correct outcome of declining to order.
+
+    // finishScan() (further below) already does
+    // scanResult.classList.add('show') the instant a video passes the
+    // 1080p/60fps gate -- observing that same class change is a clean
+    // way to reveal the next wizard step without duplicating any of
+    // that validation logic here.
+    const scanResultEl = document.getElementById('scanResult');
+    if (scanResultEl) {
+      const scanObserver = new MutationObserver(() => {
+        if (scanResultEl.classList.contains('show') && qualityWrap) {
+          qualityWrap.classList.remove('wizard-step-hidden');
+        }
+      });
+      scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // Revealed the moment either quality tile is picked. Uses
+    // getElementById directly rather than the outer qualityGrid
+    // variable, since that const is declared further down this same
+    // script -- referencing it from here (this IIFE runs immediately)
+    // would hit it before initialization.
+    const qualityGridEl = document.getElementById('qualityGrid');
+    if (qualityGridEl) {
+      qualityGridEl.querySelectorAll('.quality-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        });
+      });
+    }
+
+    tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
+      const linkEl = document.getElementById('tiktokLink');
+      const errorEl = document.getElementById('tiktokError');
+      if (!linkEl || !linkEl.value.trim()) {
+        if (errorEl) errorEl.classList.add('show');
+        return;
+      }
+      if (errorEl) errorEl.classList.remove('show');
+      if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
+    });
+
+    function answerSubscriber(isSub){
+      subToggle.checked = isSub;
+      subToggle.dispatchEvent(new Event('change'));
+      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
+      if (divider) divider.classList.remove('wizard-step-hidden');
+    }
+    subYesBtn && subYesBtn.addEventListener('click', () => answerSubscriber(true));
+    subNoBtn && subNoBtn.addEventListener('click', () => answerSubscriber(false));
+  })();
+
 
   // ---- Manual duration fallback (collapsed by default; the scanner above
   // is the primary path) ----
