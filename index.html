@@ -9201,6 +9201,155 @@
     srTransfer.classList.remove('show');
   });
 
+  // ============================================================
+  // Local-file frame-rate detection via raw MP4 box parsing --
+  // deliberately independent of the TikTok downloader's own copy of this
+  // technique further down the file (that widget is left untouched).
+  //
+  // The previous approach called videoEl.play() and sampled real decoded
+  // frames via requestVideoFrameCallback. That depends on the device's
+  // video decoder actually being able to open and play the file in real
+  // time -- for a large/4K recording (exactly what this "checker" mostly
+  // sees) that can peg a phone's decoder hard enough to make the whole
+  // tab stop responding to input for several seconds, which is what was
+  // being reported as "the site freezes, Cancel doesn't even work".
+  //
+  // This instead reads a small, bounded slice of the file's own bytes
+  // (no network, no playback, no decoding) and parses the MP4 container
+  // structure directly -- moov > trak > mdia > minf > stbl > stts holds
+  // the exact frame duration the encoder wrote, which is where the fps
+  // number comes from. Pure binary parsing of at most ~12MB out of a
+  // file that can be gigabytes finishes in a fraction of a second on any
+  // device, so it can't hang waiting on a decoder the way play() could.
+  // ============================================================
+  function srReadFourCC(buf, pos){
+    return String.fromCharCode(buf[pos], buf[pos+1], buf[pos+2], buf[pos+3]);
+  }
+  function srReadUint32(buf, pos){
+    return (buf[pos] * 16777216) + (buf[pos+1] << 16) + (buf[pos+2] << 8) + buf[pos+3];
+  }
+  function srReadMp4Boxes(buf, start, end){
+    const boxes = [];
+    let pos = start;
+    while (pos + 8 <= end && pos + 8 <= buf.length) {
+      const size32 = srReadUint32(buf, pos);
+      const type = srReadFourCC(buf, pos + 4);
+      let headerSize = 8, size = size32;
+      if (size32 === 1) {
+        if (pos + 16 > buf.length) break;
+        size = srReadUint32(buf, pos + 8) * 4294967296 + srReadUint32(buf, pos + 12);
+        headerSize = 16;
+      } else if (size32 === 0) {
+        size = end - pos;
+      }
+      if (size < headerSize) break; // malformed -- bail out instead of looping forever
+      boxes.push({ type: type, start: pos + headerSize, end: Math.min(pos + size, end) });
+      pos += size;
+    }
+    return boxes;
+  }
+  // Returns just the fps (or null) -- width/height already come reliably
+  // from the hidden <video>'s own metadata elsewhere in handleVideoFile,
+  // so there's no need to duplicate that part here.
+  // A slice starting at byte 0 of the file is guaranteed to begin at a
+  // box boundary, so a normal top-down box walk finds moov directly.
+  // A slice taken from the MIDDLE of the file (the tail fallback below,
+  // for files where moov sits after a multi-megabyte mdat) almost
+  // certainly starts partway through mdat's raw video bytes, not at a
+  // box boundary -- a top-down walk from position 0 there would just
+  // misread random video bytes as a bogus box header. In that case this
+  // falls back to searching for the literal 4-byte "moov" signature and
+  // reconstructing the box from its size field (4 bytes before the
+  // signature), which works regardless of alignment.
+  function srLocateMoovBox(buf, bufIsFileStart){
+    if (bufIsFileStart) {
+      const found = srReadMp4Boxes(buf, 0, buf.length).find(b => b.type === 'moov');
+      if (found) return found;
+    }
+    for (let i = 4; i + 4 <= buf.length; i++) {
+      if (buf[i] === 0x6D && buf[i+1] === 0x6F && buf[i+2] === 0x6F && buf[i+3] === 0x76) { // 'moov'
+        const headerStart = i - 4;
+        const size32 = srReadUint32(buf, headerStart);
+        let headerSize = 8, size = size32;
+        if (size32 === 1 && headerStart + 16 <= buf.length) {
+          size = srReadUint32(buf, headerStart + 8) * 4294967296 + srReadUint32(buf, headerStart + 12);
+          headerSize = 16;
+        } else if (size32 === 0) {
+          size = buf.length - headerStart;
+        }
+        if (size < headerSize) continue; // false-positive match on raw video bytes -- keep scanning
+        return { type: 'moov', start: headerStart + headerSize, end: Math.min(headerStart + size, buf.length) };
+      }
+    }
+    return null;
+  }
+  function srFindFpsInMp4(buf, bufIsFileStart){
+    try {
+      if (!buf || buf.length < 8) return null;
+      const moov = srLocateMoovBox(buf, bufIsFileStart);
+      if (!moov) return null;
+      const traks = srReadMp4Boxes(buf, moov.start, moov.end).filter(b => b.type === 'trak');
+      for (const trak of traks) {
+        const trakBoxes = srReadMp4Boxes(buf, trak.start, trak.end);
+        const mdia = trakBoxes.find(b => b.type === 'mdia');
+        if (!mdia) continue;
+        const mdiaBoxes = srReadMp4Boxes(buf, mdia.start, mdia.end);
+        const hdlr = mdiaBoxes.find(b => b.type === 'hdlr');
+        if (!hdlr || hdlr.start + 12 > buf.length || srReadFourCC(buf, hdlr.start + 8) !== 'vide') continue;
+        const mdhd = mdiaBoxes.find(b => b.type === 'mdhd');
+        const minf = mdiaBoxes.find(b => b.type === 'minf');
+        if (!mdhd || !minf) continue;
+        const mdhdVersion = buf[mdhd.start];
+        const timescaleOff = mdhd.start + (mdhdVersion === 1 ? 20 : 12);
+        if (timescaleOff + 4 > buf.length) continue;
+        const timescale = srReadUint32(buf, timescaleOff);
+        const stbl = srReadMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
+        const stts = stbl ? srReadMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts') : null;
+        if (!stts || stts.start + 16 > buf.length) continue;
+        const sampleDelta = srReadUint32(buf, stts.start + 12);
+        if (sampleDelta && timescale) {
+          const rawFps = timescale / sampleDelta;
+          if (isFinite(rawFps) && rawFps > 0 && rawFps <= 300) return Math.round(rawFps * 100) / 100;
+        }
+      }
+      return null;
+    } catch (e) { return null; }
+  }
+  // Reads one byte range of a local File via FileReader (reports real
+  // loaded/total progress -- FileReader fires onprogress for local reads
+  // too, not just network ones).
+  function srReadFileRange(file, start, end, onProgress){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onprogress = (e) => { if (onProgress && e.lengthComputable) onProgress(e.loaded / e.total); };
+      reader.onload = () => resolve(new Uint8Array(reader.result));
+      reader.onerror = () => reject(reader.error || new Error('file-read-error'));
+      reader.readAsArrayBuffer(file.slice(start, end));
+    });
+  }
+  // Web-optimized ("faststart") MP4s keep moov near the front; anything
+  // recorded straight off a phone camera usually writes moov at the very
+  // end instead (after mdat) -- so if the front doesn't have it, this
+  // falls back to the tail before giving up and reporting fps unknown.
+  async function detectFpsFromFile(file, onProgress){
+    const HEAD_BYTES = 2 * 1024 * 1024;
+    const TAIL_BYTES = 10 * 1024 * 1024;
+    try {
+      const headBuf = await srReadFileRange(file, 0, Math.min(file.size, HEAD_BYTES), p => onProgress && onProgress(Math.round(p * 50)));
+      let fps = srFindFpsInMp4(headBuf, true);
+      if (fps == null && file.size > HEAD_BYTES) {
+        const tailStart = Math.max(HEAD_BYTES, file.size - TAIL_BYTES);
+        const tailBuf = await srReadFileRange(file, tailStart, file.size, p => onProgress && onProgress(50 + Math.round(p * 50)));
+        fps = srFindFpsInMp4(tailBuf, false);
+      }
+      if (onProgress) onProgress(100);
+      return fps;
+    } catch (e) {
+      if (onProgress) onProgress(100);
+      return null;
+    }
+  }
+
   function handleVideoFile(file){
     if (!file.type.startsWith('video/')) {
       alert(t('alertNotVideo'));
@@ -9266,16 +9415,18 @@
       clearWatchdog(); // metadata phase done -- frame-rate detection gets its own budget below
       const width = videoEl.videoWidth;
       const height = videoEl.videoHeight;
-      if (scanProgressStage) scanProgressStage.textContent = t('scanStageFps');
-      // Phase-2 safety net: detectFrameRate() already caps itself at
-      // ~3s internally, so this is only a defense-in-depth backstop in
-      // case that promise somehow never settles -- comfortably longer
-      // than its own internal cap so it should never fire in practice.
+      if (scanProgressStage) scanProgressStage.textContent = t('scanStageFps') + ' 0%';
+      // Reading a bounded local byte range (see detectFpsFromFile above)
+      // instead of playing the video -- this should finish in well under
+      // a second even for a huge file, but the watchdog stays as a
+      // defense-in-depth backstop in case a read genuinely stalls.
       watchdogTimer = setTimeout(() => {
         cleanup();
         if (myToken === scanToken) alert(t('alertReadError'));
-      }, 6000);
-      detectFrameRate(videoEl).then(fps => {
+      }, 8000);
+      detectFpsFromFile(file, pct => {
+        if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageFps') + ' ' + pct + '%';
+      }).then(fps => {
         if (myToken === scanToken) finishScan(duration, file, width, height, fps);
         cleanup();
       });
@@ -9439,13 +9590,14 @@
         clearWatchdog();
         const width = videoEl.videoWidth;
         const height = videoEl.videoHeight;
-        // Defense-in-depth only -- detectFrameRate() already caps itself
-        // at ~3s internally.
+        // See handleVideoFile() above -- reads a bounded local byte range
+        // instead of playing the file, so this finishes in well under a
+        // second on any device; the watchdog is only a backstop.
         watchdogTimer = setTimeout(() => {
           cleanup();
           reject('read-timeout');
-        }, 6000);
-        detectFrameRate(videoEl).then(fps => {
+        }, 8000);
+        detectFpsFromFile(file).then(fps => {
           cleanup();
           resolve({ duration, width, height, fps, file });
         });
