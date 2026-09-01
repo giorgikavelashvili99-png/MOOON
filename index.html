@@ -6773,6 +6773,7 @@
       scanStageReading: 'ფაილის წაკითხვა…',
       scanStageFps: 'ხარისხისა და სიხშირის დადგენა…',
       scanStageUploading: 'იტვირთება…',
+      scanStageFinalizing: 'ატვირთულია, სერვერის დადასტურება…',
       srFile: 'ფაილი',
       srDuration: 'ხანგრძლივობა',
       srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
@@ -7187,6 +7188,7 @@
       scanStageReading: 'Reading file…',
       scanStageFps: 'Detecting quality and frame rate…',
       scanStageUploading: 'Uploading…',
+      scanStageFinalizing: 'Uploaded, confirming with server…',
       srFile: 'File',
       srDuration: 'Duration',
       srDetectedFormat: 'Uploaded video format',
@@ -9455,7 +9457,14 @@
     // first. Real network progress from a battle-tested XHR call is
     // about as solid a progress indicator as exists in a browser.
     const uploadPromise = uploadFileToMoontransferr(file, pct => {
-      if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageUploading') + ' ' + pct + '%';
+      if (myToken !== scanToken || !scanProgressStage) return;
+      // 100% here means every byte has been SENT -- the backend still
+      // needs to acknowledge receipt and finalize the upload server-side
+      // (mooontransferr.onrender.com specifically can be slow to respond
+      // right after a cold start), which can take a bit longer with no
+      // further progress events. Saying so explicitly stops "100%" from
+      // reading as stuck when it's actually just waiting on the server.
+      scanProgressStage.textContent = pct >= 100 ? t('scanStageFinalizing') : (t('scanStageUploading') + ' ' + pct + '%');
     }).catch(() => null);
 
     // Duration/width/height/fps (needed for the price calculation and
