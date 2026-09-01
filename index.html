@@ -1670,96 +1670,96 @@
   .quality-grid{
     display:grid;
     grid-template-columns: minmax(0, 1fr);
-    gap:10px;
-    margin-top:12px;
+    gap:12px;
+    margin-top:14px;
   }
   .quality-grid-two{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
-  .quality-grid-two .quality-btn{ flex-direction:column; align-items:stretch; gap:8px; }
-  .quality-grid-two .quality-btn .q-right{ align-self:stretch; justify-content:flex-end; }
-  @media (max-width:480px){
-    .quality-grid-two{ grid-template-columns:minmax(0, 1fr); }
-    .quality-grid-two .quality-btn{ flex-direction:row; align-items:center; }
-    .quality-grid-two .quality-btn .q-right{ align-self:auto; justify-content:flex-start; }
-  }
   .quality-btn{ --qb-accent: var(--pc-accent, var(--gold)); --qb-accent-2: color-mix(in srgb, var(--pc-accent, var(--gold)) 55%, #04101a); }
 
+  /* Complete rework: vertical, icon-led cards with no price shown and
+     nothing pre-selected (see the HTML -- the .active class used to
+     default onto the 1080p button; the wizard now requires an explicit
+     tap before advancing to the next step either way). */
   .quality-btn{
     position:relative;
     min-width:0;
     overflow:visible;
-    display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:12px;
-    padding:16px 18px;
-    background:#0a0a12;
-    border:2px solid color-mix(in srgb, var(--qb-accent) 28%, transparent);
-    border-radius:18px;
-    cursor:pointer; text-align:left;
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px;
+    padding:24px 16px 20px;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% 0%, color-mix(in srgb, var(--qb-accent) 10%, transparent), transparent 65%),
+      #0a0a12;
+    border:1.5px solid color-mix(in srgb, var(--qb-accent) 22%, transparent);
+    border-radius:20px;
+    cursor:pointer;
     font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
     color:var(--text);
     transition: background .3s ease, border-color .25s ease, box-shadow .25s ease, transform .25s cubic-bezier(.4,0,.2,1);
   }
   .quality-btn:hover{
-    border-color: color-mix(in srgb, var(--qb-accent) 60%, transparent);
+    border-color: color-mix(in srgb, var(--qb-accent) 55%, transparent);
     transform: translateY(-3px);
   }
   .quality-btn:active{ transform: translateY(0) scale(0.97); }
   .quality-btn.active{
     border-color: transparent;
-    background: linear-gradient(150deg, var(--qb-accent), var(--qb-accent-2));
+    background: linear-gradient(160deg, var(--qb-accent), var(--qb-accent-2));
     box-shadow: 0 16px 34px -10px color-mix(in srgb, var(--qb-accent) 55%, transparent), inset 0 1px 0 rgba(255,255,255,0.35);
     transform: translateY(-2px) scale(1.02);
   }
 
-  .quality-btn .q-res{ font-size:16px; font-weight:800; letter-spacing:0.01em; line-height:1.15; }
+  .quality-btn .q-icon{
+    width:44px; height:44px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    background: color-mix(in srgb, var(--qb-accent) 14%, transparent);
+    border:1px solid color-mix(in srgb, var(--qb-accent) 30%, transparent);
+    color: var(--qb-accent);
+    transition: background .25s ease, border-color .25s ease, color .25s ease;
+  }
+  .quality-btn .q-icon svg{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.6; }
+  .quality-btn .q-icon-premium{ color: var(--qb-accent); }
+  .quality-btn.active .q-icon{
+    background: rgba(4,16,26,0.3); border-color: rgba(4,16,26,0.25); color:#04101a;
+  }
+
+  .quality-btn .q-res{ font-size:19px; font-weight:800; letter-spacing:0.01em; line-height:1.15; margin-top:2px; }
   .quality-btn.active .q-res{ color:#04101a; text-shadow:none; }
 
   .quality-btn .q-fps{
     display:inline-block;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:9.5px; letter-spacing:0.05em;
     color:var(--text-faint); text-transform:uppercase;
-    border:1px solid rgba(207,216,255,0.25); border-radius:20px; padding:2px 8px; margin-top:4px;
+    border:1px solid rgba(207,216,255,0.25); border-radius:20px; padding:2px 9px;
     transition: color .25s ease, border-color .25s ease, background .25s ease;
   }
   .quality-btn.active .q-fps{ color: rgba(4,16,26,0.75); border-color:rgba(4,16,26,0.3); background:rgba(255,255,255,0.25); }
 
-  .quality-btn .q-price{
-    font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:13px; font-weight:800; letter-spacing:0.01em;
-    color:var(--qb-accent); text-shadow:0 0 10px color-mix(in srgb, var(--qb-accent) 35%, transparent); margin-top:8px; line-height:1.35;
-    overflow-wrap:break-word; word-break:break-word;
-  }
-  .quality-btn.active .q-price{ color:#04101a; text-shadow:none; }
-
   .quality-btn .q-check{
-    position:absolute; top:10px; right:10px;
-    width:20px; height:20px; border-radius:50%; flex:0 0 auto;
+    position:absolute; top:12px; right:12px;
+    width:22px; height:22px; border-radius:50%; flex:0 0 auto;
     display:none; align-items:center; justify-content:center;
     background: #04101a;
-    color:#fff; font-size:10px; font-weight:800; line-height:1;
+    color:#fff; font-size:11px; font-weight:800; line-height:1;
     box-shadow:0 2px 8px rgba(0,0,0,0.3);
   }
   .quality-btn.active .q-check{ display:flex; }
 
   .quality-btn .q-rec{
-    display:inline-block; align-self:flex-start; max-width:100%;
-    font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:8.5px; font-weight:800; letter-spacing:0.03em;
+    display:inline-block; max-width:100%;
+    font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:9px; font-weight:800; letter-spacing:0.04em;
     background:linear-gradient(135deg, var(--qb-accent), color-mix(in srgb, var(--qb-accent) 60%, #fff)); color:#04101a;
-    padding:3px 7px; border-radius:6px; text-transform:uppercase;
-    white-space:normal; overflow-wrap:break-word; margin-bottom:2px; box-shadow:0 2px 6px rgba(0,0,0,0.3);
+    padding:4px 9px; border-radius:7px; text-transform:uppercase;
+    white-space:normal; overflow-wrap:break-word; box-shadow:0 2px 6px rgba(0,0,0,0.3);
   }
   .quality-btn.active .q-rec{ background:rgba(4,16,26,0.85); color:#fff; }
 
-  /* Single fixed-format badge: q-left holds the rec/res/fps block,
-     q-right holds price + check, laid out side by side. */
-  .quality-btn .q-left{ display:flex; flex-direction:column; align-items:flex-start; gap:3px; }
-  .quality-btn .q-right{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
-  .quality-btn .q-check{ position:static; }
-  .quality-btn .q-price{ margin-top:0; text-align:right; }
-
   @media (max-width:560px){
-    .quality-btn{ padding:14px 14px; }
-    .quality-btn .q-res{ font-size:15px; }
-    .quality-btn .q-fps{ font-size:9.5px; }
-    .quality-btn .q-rec{ font-size:8px; padding:2px 6px; }
-    .quality-btn .q-price{ font-size:12px; }
+    .quality-btn{ padding:20px 12px 16px; }
+    .quality-btn .q-icon{ width:38px; height:38px; }
+    .quality-btn .q-icon svg{ width:19px; height:19px; }
+    .quality-btn .q-res{ font-size:17px; }
+    .quality-btn .q-fps{ font-size:9px; }
+    .quality-btn .q-rec{ font-size:8px; padding:3px 7px; }
   }
 
   .quality-warn{
@@ -2019,6 +2019,26 @@
     box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .scan-result.show{ display:block; }
+  /* Detailed breakdown (file name, exact duration, requested/detected
+     format, computed price) stays fully populated by finishScan() as
+     before -- pricing later still needs that data -- it's just no
+     longer shown to the customer here. A simple "video uploaded"
+     confirmation replaces it visually. */
+  .sr-details-hidden{ display:none !important; }
+  .sr-success{
+    display:flex; align-items:center; gap:12px;
+    padding:20px 18px; margin:6px;
+  }
+  .sr-success-check{
+    flex:0 0 auto; width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; font-weight:800; color:#08210f;
+    background:linear-gradient(150deg, #4ee88a, #1aa851);
+    box-shadow:0 0 18px rgba(37,211,102,0.5);
+  }
+  .sr-success span[data-i18n="srSuccessText"]{
+    font-size:15px; font-weight:800; color:var(--text);
+  }
   .scan-result .sr-specs{
     padding:6px; display:grid;
     grid-template-columns:1fr 1fr; gap:8px;
@@ -2290,6 +2310,14 @@
     transition: transform .15s, box-shadow .2s;
   }
   .wizard-confirm-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(124,143,255,0.5); }
+  .wc-price-row{
+    display:flex; align-items:baseline; gap:8px; margin-bottom:2px;
+  }
+  .wc-price-label{ font-size:12.5px; color:var(--text-faint); }
+  .wc-price-value{
+    font-size:26px; font-weight:800; color:var(--gold);
+    text-shadow:0 0 16px rgba(255,210,63,0.4);
+  }
   /* Wizard steps start hidden and are revealed one at a time by JS as
      each prior step completes (see initOrderWizard/advanceWizard) —
      this rule only sets the *default*; .wizard-visible added by JS
@@ -4468,6 +4496,12 @@
     font-family:'BPG Glaho','Space Grotesk',sans-serif;
   }
   .messenger-header-info{ flex:1 1 auto; min-width:0; }
+  .messenger-header-avatar{
+    flex:0 0 auto; width:36px; height:36px; border-radius:50%;
+    overflow:hidden; border:1.5px solid rgba(124,143,255,0.4);
+    box-shadow:0 0 12px rgba(124,143,255,0.25);
+  }
+  .messenger-header-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .messenger-header-title{
     font-family:'BPG Glaho','Space Grotesk',sans-serif;
     font-weight:800; font-size:15px; color:#fff;
@@ -5001,8 +5035,11 @@
 <div id="messengerPage" class="messenger-page" style="display:none;" role="dialog" aria-modal="true" aria-label="Order chat">
   <div class="messenger-header">
     <button type="button" id="messengerBackBtn" class="messenger-back-btn" aria-label="დახურვა">‹</button>
+    <div class="messenger-header-avatar" id="messengerHeaderAvatar" style="display:none;">
+      <img id="messengerHeaderAvatarImg" src="" alt="">
+    </div>
     <div class="messenger-header-info">
-      <div class="messenger-header-title" data-i18n="messengerTitle">შეკვეთის ჩატი</div>
+      <div class="messenger-header-title" id="messengerHeaderTitle" data-i18n="messengerTitle">შეკვეთის ჩატი</div>
       <div class="messenger-header-sub"><span data-i18n="messengerOrderLabel">შეკვეთა #</span><span id="messengerOrderId"></span></div>
     </div>
     <div class="messenger-status-dot" id="messengerStatusDot" aria-hidden="true"></div>
@@ -5506,20 +5543,8 @@
         <div class="panel pc-accordion-body" id="orderFlowPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
 
-    <div class="wizard-question wizard-question-gate" id="wantOrderGate">
-      <div class="wq-text wq-text-lg" data-i18n="wantOrderQ">გსურთ შეკვეთა?</div>
-      <div class="wq-actions">
-        <button type="button" class="wq-btn wq-yes" id="wantOrderYes" data-i18n="wizardYes">დიახ</button>
-        <button type="button" class="wq-btn wq-no" id="wantOrderNo" data-i18n="wizardNo">არა</button>
-      </div>
-    </div>
-
     <!-- Video duration checker — PRIMARY input method, now the very first thing in the panel -->
     <div class="panel-section scanner-primary" id="videoScannerPanel">
-      <div class="panel-head scanner-head-row">
-        <div class="scanner-primary-badge"><span class="spb-dot"></span><span data-i18n="scannerPrimaryBadge">⚡ ავტომატური და ზუსტი</span></div>
-        <div class="label label-scanner" data-i18n="videoScanner">VIDEO SCANNER</div>
-      </div>
       <div class="scanner-stage">
         <div class="drop-zone" id="dropZone">
           <input type="file" id="videoInput" accept="video/*">
@@ -5529,7 +5554,6 @@
             </svg>
           </div>
           <div class="dz-title" data-i18n="dzTitle">ატვირთეთ ვიდეო ფასის გამოსათვლელად</div>
-          <div class="dz-req" data-i18n="dzReq">სავალდებულო ფორმატი: ზუსტად 1080p · 60fps</div>
         </div>
         <div class="scan-progress" id="scanProgress">
           <span class="spin"></span> <span data-i18n="scanProcessing">ვიდეო მუშავდება…</span>
@@ -5540,18 +5564,22 @@
           <button type="button" class="sr-reset-btn" id="srResetBtn" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
             <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
           </button>
-          <div class="sr-specs">
+          <div class="sr-success" id="srSuccess">
+            <span class="sr-success-check">✓</span>
+            <span data-i18n="srSuccessText">ატვირთულია ვიდეო</span>
+          </div>
+          <div class="sr-specs sr-details-hidden">
             <div class="sr-row"><span class="sr-ico"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/></svg></span><span class="sr-label" data-i18n="srFile">ფაილი</span><b id="srName">—</b></div>
             <div class="sr-row"><span class="sr-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/></svg></span><span class="sr-label" data-i18n="srDuration">ხანგრძლივობა</span><b id="srDuration">—</b></div>
             <div class="sr-row"><span class="sr-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor" stroke="none"/></svg></span><span class="sr-label" data-i18n="srRequestedFormat">მოთხოვნილი ხარისხი</span><b id="srRequested">—</b></div>
             <div class="sr-row" id="srQualityRow"><span class="sr-ico"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.85-4.85"/></svg></span><span class="sr-label" data-i18n="srDetectedFormat">ატვირთული ვიდეოს ფორმატი</span><b id="srQuality">—</b></div>
           </div>
-          <div class="sr-price-hero">
+          <div class="sr-price-hero sr-details-hidden">
             <span class="sr-price-tag" data-i18n="srPrice">გამოთვლილი ფასი</span>
             <span class="sr-price-value"><b id="srPrice">—</b></span>
           </div>
-          <div class="sr-info" id="srMatchNote" style="display:none;"></div>
-          <div class="sr-warn" id="srMismatchNote" style="display:none;"></div>
+          <div class="sr-info sr-details-hidden" id="srMatchNote" style="display:none;"></div>
+          <div class="sr-warn sr-details-hidden" id="srMismatchNote" style="display:none;"></div>
           <div class="sr-warn" id="srWarn" style="display:none;"></div>
 
           <div class="sr-transfer" id="srTransfer">
@@ -5602,29 +5630,25 @@
     <input type="hidden" id="msRange" value="0">
 
     <div class="field" id="qualityFieldWrap">
-      <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი</label></div>
+      <div class="field-top"><label data-i18n="qualityWizardLabel">მონიშნეთ რა ხარისხით გინდათ TikTok-ზე ატვირთვა</label></div>
       <div class="quality-grid quality-grid-two" id="qualityGrid">
-        <button type="button" class="quality-btn active" data-quality="1080_60">
-          <div class="q-left">
-            <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
-            <span class="q-res">1080p</span>
-            <span class="q-fps">60 FPS</span>
+        <button type="button" class="quality-btn" data-quality="1080_60">
+          <span class="q-check">✓</span>
+          <div class="q-icon">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
           </div>
-          <div class="q-right">
-            <span class="q-price" data-price-for="1080_60">—</span>
-            <span class="q-check">✓</span>
-          </div>
+          <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
+          <span class="q-res">1080p</span>
+          <span class="q-fps">60 FPS</span>
         </button>
         <button type="button" class="quality-btn" data-quality="4k_120">
-          <div class="q-left">
-            <span class="q-rec" data-i18n="qualityBadgePremium">პრემიუმი</span>
-            <span class="q-res">4K</span>
-            <span class="q-fps">60 FPS</span>
+          <span class="q-check">✓</span>
+          <div class="q-icon q-icon-premium">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
           </div>
-          <div class="q-right">
-            <span class="q-price" data-price-for="4k_120">—</span>
-            <span class="q-check">✓</span>
-          </div>
+          <span class="q-rec q-rec-premium" data-i18n="qualityBadgePremium">პრემიუმი</span>
+          <span class="q-res">4K</span>
+          <span class="q-fps">60 FPS</span>
         </button>
       </div>
     </div>
@@ -5641,7 +5665,6 @@
       </button>
       <div class="tt-auto-note" id="tiktokAutoNote"></div>
       <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
-      <button type="button" class="wizard-confirm-btn" id="tiktokConfirmBtn" data-i18n="wizardConfirmLink">დადასტურება</button>
     </div>
 
     <div class="field" id="subscriberFieldWrap">
@@ -5653,6 +5676,20 @@
         </div>
       </div>
       <input type="checkbox" id="subToggle" style="display:none">
+    </div>
+
+    <div class="field" id="sendConfirmFieldWrap">
+      <div class="wizard-question" id="sendConfirmQuestion">
+        <div class="wc-price-row">
+          <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
+          <span class="wc-price-value" id="wizardFinalPrice">—</span>
+        </div>
+        <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
+        <div class="wq-actions">
+          <button type="button" class="wq-btn wq-yes" id="sendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
+          <button type="button" class="wq-btn wq-no" id="sendOrderNoBtn" data-i18n="wizardNo">არა</button>
+        </div>
+      </div>
     </div>
 
     <input type="hidden" id="videoLink">
@@ -5774,33 +5811,29 @@
       </div>
     </div>
 
-    <div class="wp-grid wp-grid-two" id="wpQualityGrid" style="margin-top:14px;">
-      <button type="button" class="wp-box active" data-quality="1080_60">
-        <span class="wp-box-q">1080p</span>
-        <span class="wp-box-fps">60FPS</span>
-        <span class="wp-box-price"><s class="wp-old-price"></s><span class="wp-new-price">24.99<sup>₾</sup></span></span>
-      </button>
-      <button type="button" class="wp-box" data-quality="4k_120">
-        <span class="wp-box-q">4K</span>
-        <span class="wp-box-fps">60FPS</span>
-        <span class="wp-box-price"><s class="wp-old-price"></s><span class="wp-new-price">35.99<sup>₾</sup></span></span>
-      </button>
-    </div>
-
-    <div class="field" style="margin-top:14px;">
-      <div class="toggle-row">
-        <div class="toggle-copy">
-          <div class="t1" data-i18n="wpChannelT1">ვარ არხის გამომწერი</div>
-          <div class="t2" data-i18n="wpChannelT2">✓ −3₾ ფასდაკლება</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="wpChannelToggle">
-          <span class="slider-toggle"></span>
-        </label>
+    <div class="field" id="wpQualityFieldWrap" style="margin-top:14px;">
+      <div class="field-top"><label data-i18n="qualityWizardLabel">მონიშნეთ რა ხარისხით გინდათ TikTok-ზე ატვირთვა</label></div>
+      <div class="quality-grid quality-grid-two" id="wpQualityGrid">
+        <button type="button" class="quality-btn" data-quality="1080_60">
+          <span class="q-check">✓</span>
+          <div class="q-icon">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
+          </div>
+          <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
+          <span class="q-res">1080p</span>
+          <span class="q-fps">60 FPS</span>
+        </button>
+        <button type="button" class="quality-btn" data-quality="4k_120">
+          <span class="q-check">✓</span>
+          <div class="q-icon q-icon-premium">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
+          </div>
+          <span class="q-rec q-rec-premium" data-i18n="qualityBadgePremium">პრემიუმი</span>
+          <span class="q-res">4K</span>
+          <span class="q-fps">60 FPS</span>
+        </button>
       </div>
     </div>
-
-    <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
 
     <div class="field field-tiktok" id="tiktokFieldWp" style="margin-bottom:6px;">
       <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
@@ -5815,6 +5848,32 @@
       <div class="tt-auto-note" id="tiktokAutoNoteWp"></div>
       <div class="error-msg" id="tiktokErrorWp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
     </div>
+
+    <div class="field" id="wpSubscriberFieldWrap">
+      <div class="wizard-question" id="wpSubscriberQuestion">
+        <div class="wq-text" data-i18n="subscriberWizardQ">ხართ ჩვენი TikTok არხის გამომწერი?</div>
+        <div class="wq-actions">
+          <button type="button" class="wq-btn wq-yes" id="wpSubYesBtn" data-i18n="wizardYes">დიახ</button>
+          <button type="button" class="wq-btn wq-no" id="wpSubNoBtn" data-i18n="wizardNo">არა</button>
+        </div>
+      </div>
+      <input type="checkbox" id="wpChannelToggle" style="display:none">
+    </div>
+
+    <div class="field" id="wpSendConfirmFieldWrap">
+      <div class="wizard-question" id="wpSendConfirmQuestion">
+        <div class="wc-price-row">
+          <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
+          <span class="wc-price-value" id="wpWizardFinalPrice">—</span>
+        </div>
+        <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
+        <div class="wq-actions">
+          <button type="button" class="wq-btn wq-yes" id="wpSendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
+          <button type="button" class="wq-btn wq-no" id="wpSendOrderNoBtn" data-i18n="wizardNo">არა</button>
+        </div>
+      </div>
+    </div>
+
     <div class="sub-active-badge" id="subActiveBadgeWp">
       <span class="sub-active-check">✅</span>
       <span class="sub-active-text" data-i18n="subActivatedWeekly">თქვენ გააქტიურებული გაქვთ 1-კვირიანი პაკეტი</span>
@@ -5823,7 +5882,7 @@
     <input type="hidden" id="videoLinkWp">
 
 
-    <div class="order-grid" style="margin-top:18px;">
+    <div class="order-grid" id="wpOrderChannelsPanel" style="margin-top:18px;">
       <button class="order-btn chat" id="wpOrderBtnChat">
         <span data-i18n="wpSendChat" id="wpOrderBtnChatText">გაგზავნე შეკვეთა</span>
       </button>
@@ -5910,17 +5969,28 @@
       </div>
     </div>
 
-    <div class="mp-grid mp-grid-two" id="mpQualityGrid" style="margin-top:14px;">
-      <button type="button" class="mp-box active" data-quality="1080_60">
-        <span class="mp-box-q">1080p</span>
-        <span class="mp-box-fps">60FPS</span>
-        <span class="mp-box-price"><span class="mp-new-price">49.99<sup>₾</sup></span></span>
-      </button>
-      <button type="button" class="mp-box" data-quality="4k_120">
-        <span class="mp-box-q">4K</span>
-        <span class="mp-box-fps">60FPS</span>
-        <span class="mp-box-price"><span class="mp-new-price">69.99<sup>₾</sup></span></span>
-      </button>
+    <div class="field" id="mpQualityFieldWrap" style="margin-top:14px;">
+      <div class="field-top"><label data-i18n="qualityWizardLabel">მონიშნეთ რა ხარისხით გინდათ TikTok-ზე ატვირთვა</label></div>
+      <div class="quality-grid quality-grid-two" id="mpQualityGrid">
+        <button type="button" class="quality-btn" data-quality="1080_60">
+          <span class="q-check">✓</span>
+          <div class="q-icon">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
+          </div>
+          <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
+          <span class="q-res">1080p</span>
+          <span class="q-fps">60 FPS</span>
+        </button>
+        <button type="button" class="quality-btn" data-quality="4k_120">
+          <span class="q-check">✓</span>
+          <div class="q-icon q-icon-premium">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
+          </div>
+          <span class="q-rec q-rec-premium" data-i18n="qualityBadgePremium">პრემიუმი</span>
+          <span class="q-res">4K</span>
+          <span class="q-fps">60 FPS</span>
+        </button>
+      </div>
     </div>
 
     <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
@@ -5937,7 +6007,23 @@
       </button>
       <div class="tt-auto-note" id="tiktokAutoNoteMp"></div>
       <div class="error-msg" id="tiktokErrorMp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+      <button type="button" class="wizard-confirm-btn" id="mpTiktokConfirmBtn" data-i18n="wizardConfirmLink">დადასტურება</button>
     </div>
+
+    <div class="field" id="mpSendConfirmFieldWrap">
+      <div class="wizard-question" id="mpSendConfirmQuestion">
+        <div class="wc-price-row">
+          <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
+          <span class="wc-price-value" id="mpWizardFinalPrice">—</span>
+        </div>
+        <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
+        <div class="wq-actions">
+          <button type="button" class="wq-btn wq-yes" id="mpSendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
+          <button type="button" class="wq-btn wq-no" id="mpSendOrderNoBtn" data-i18n="wizardNo">არა</button>
+        </div>
+      </div>
+    </div>
+
     <div class="sub-active-badge" id="subActiveBadgeMp">
       <span class="sub-active-check">✅</span>
       <span class="sub-active-text" data-i18n="subActivatedMonthly">თქვენ გააქტიურებული გაქვთ 1-თვიანი პაკეტი</span>
@@ -5946,7 +6032,7 @@
     <input type="hidden" id="videoLinkMp">
 
 
-    <div class="order-grid" style="margin-top:18px;">
+    <div class="order-grid" id="mpOrderChannelsPanel" style="margin-top:18px;">
       <button class="order-btn chat" id="mpOrderBtnChat">
         <span data-i18n="mpSendChat" id="mpOrderBtnChatText">გაგზავნე შეკვეთა</span>
       </button>
@@ -6106,23 +6192,33 @@
           </div>
         </div>
       </div>
-      <div class="mp-grid mp-grid-two" id="cpQualityGrid" style="margin-top:14px;">
-        <button type="button" class="mp-box" data-quality="1080_60">
-          <span class="mp-box-q">1080p</span>
-          <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">0.99<sup>₾</sup></span></span>
-        </button>
-        <button type="button" class="mp-box" data-quality="4k_120">
-          <span class="mp-box-q">4K</span>
-          <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">1.99<sup>₾</sup></span></span>
-        </button>
+      <div class="field" id="cpQualityFieldWrap">
+        <div class="field-top"><label data-i18n="qualityWizardLabel">მონიშნეთ რა ხარისხით გინდათ TikTok-ზე ატვირთვა</label></div>
+        <div class="quality-grid quality-grid-two" id="cpQualityGrid">
+          <button type="button" class="quality-btn" data-quality="1080_60">
+            <span class="q-check">✓</span>
+            <div class="q-icon">
+              <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
+            </div>
+            <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
+            <span class="q-res">1080p</span>
+            <span class="q-fps">60 FPS</span>
+          </button>
+          <button type="button" class="quality-btn" data-quality="4k_120">
+            <span class="q-check">✓</span>
+            <div class="q-icon q-icon-premium">
+              <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.2"/><path d="M8 20.5h8" stroke-linecap="round"/></svg>
+            </div>
+            <span class="q-rec q-rec-premium" data-i18n="qualityBadgePremium">პრემიუმი</span>
+            <span class="q-res">4K</span>
+            <span class="q-fps">60 FPS</span>
+          </button>
+        </div>
       </div>
-      <div class="cp-upscale-hint" id="cpQualityHint" data-i18n="cpQualityHint">აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება</div>
 
       <div class="panel-divider" aria-hidden="true"><span class="panel-divider-dot"></span></div>
 
-      <div class="field field-tiktok" style="margin-bottom:6px;">
+      <div class="field field-tiktok" id="tiktokFieldCp" style="margin-bottom:6px;">
         <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
         <div class="link-input-wrap">
           <span class="icon">@</span>
@@ -6134,11 +6230,26 @@
         </button>
         <div class="tt-auto-note" id="tiktokAutoNoteCp"></div>
         <div class="error-msg" id="tiktokErrorCp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+        <button type="button" class="wizard-confirm-btn" id="cpTiktokConfirmBtn" data-i18n="wizardConfirmLink">დადასტურება</button>
+      </div>
+
+      <div class="field" id="cpSendConfirmFieldWrap">
+        <div class="wizard-question" id="cpSendConfirmQuestion">
+          <div class="wc-price-row">
+            <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
+            <span class="wc-price-value" id="cpWizardFinalPrice">—</span>
+          </div>
+          <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
+          <div class="wq-actions">
+            <button type="button" class="wq-btn wq-yes" id="cpSendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
+            <button type="button" class="wq-btn wq-no" id="cpSendOrderNoBtn" data-i18n="wizardNo">არა</button>
+          </div>
+        </div>
       </div>
 
       <input type="hidden" id="videoLinkCp">
 
-      <div class="order-grid" style="margin-top:14px;">
+      <div class="order-grid" id="cpOrderChannelsPanel" style="margin-top:14px;">
         <button class="order-btn chat" id="cpOrderBtnChat">
           <span data-i18n="cpSendChat" id="cpOrderBtnChatText">გაგზავნე შეკვეთა</span>
         </button>
@@ -6210,11 +6321,11 @@
 
             <div class="ttdl-dl-row" id="ttdlDlRow" style="display:none;">
               <button type="button" class="ttdl-dl-btn" id="ttdlDlSd" disabled>
-                <span class="ttdl-dl-ico" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg></span>
+                <span class="ttdl-dl-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3 8.5h18" stroke="currentColor" stroke-width="1.8"/><circle cx="6.3" cy="6.2" r="0.75" fill="currentColor"/><circle cx="8.6" cy="6.2" r="0.75" fill="currentColor"/><circle cx="10.9" cy="6.2" r="0.75" fill="currentColor"/></svg></span>
                 <span class="ttdl-dl-label" id="ttdlDlSdLabel">BROWSER QUALITY</span>
               </button>
               <button type="button" class="ttdl-dl-btn ttdl-dl-btn--hd" id="ttdlDlHd" disabled>
-                <span class="ttdl-dl-ico" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg></span>
+                <span class="ttdl-dl-ico" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 18.2h3.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
                 <span class="ttdl-dl-label" id="ttdlDlHdLabel">MOBILE QUALITY</span>
               </button>
             </div>
@@ -6616,6 +6727,7 @@
       msLabel: 'წამის მეასედები (00–59)',
       msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59.59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
       qualityLabel: 'ვიდეოს ხარისხი',
+      qualityWizardLabel: 'მონიშნეთ რა ხარისხით გინდათ TikTok-ზე ატვირთვა',
       scannerPrimaryBadge: '⚡ ავტომატური და ზუსტი',
       manualFallbackPrompt: 'არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით',
       manualFallbackSub: 'სწრაფი ხელით შეყვანა — წამები და მეასედები',
@@ -6637,6 +6749,7 @@
       wizardNo: 'არა',
       subscriberWizardQ: 'ხართ ჩვენი TikTok არხის გამომწერი?',
       wizardConfirmLink: 'დადასტურება',
+      sendOrderWizardQ: 'გსურთ გააგზავნოთ შეკვეთა?',
       tiktokLabel: 'თქვენი TikTok პროფილის ლინკი *',
       tiktokError: '⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!',
       videoLinkLabel: 'ატვირთული ვიდეოს ლინკი *',
@@ -6653,6 +6766,7 @@
       srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
       srRequestedFormat: 'მოთხოვნილი ხარისხი',
       srPrice: 'გამოთვლილი ფასი',
+      srSuccessText: 'ატვირთულია ვიდეო',
       srUnit: 'წმ',
       srFpsUnknown: 'fps უცნობია',
       srMatchNote: '✓ ატვირთული ვიდეო შეესაბამება მოთხოვნილ ხარისხს ({REQ})',
@@ -7024,6 +7138,7 @@
       msLabel: 'Hundredths of a second (00–59)',
       msHint: 'Maximum total duration is 59.59. Within this range the price is calculated at the 59-second rate.',
       qualityLabel: 'Video quality',
+      qualityWizardLabel: 'Select the quality you want for your TikTok upload',
       scannerPrimaryBadge: '⚡ Automatic & precise',
       manualFallbackPrompt: "Don't have a file? Enter the duration manually",
       manualFallbackSub: 'Quick manual entry — seconds and hundredths',
@@ -7045,6 +7160,7 @@
       wizardNo: 'No',
       subscriberWizardQ: 'Are you a subscriber of our TikTok channel?',
       wizardConfirmLink: 'Confirm',
+      sendOrderWizardQ: 'Would you like to send the order?',
       tiktokLabel: 'Your TikTok profile link *',
       tiktokError: '⚠️ A TikTok profile link is required to send the order!',
       videoLinkLabel: 'Uploaded video link *',
@@ -7061,6 +7177,7 @@
       srDetectedFormat: 'Uploaded video format',
       srRequestedFormat: 'Requested quality',
       srPrice: 'Calculated price',
+      srSuccessText: 'Video uploaded',
       srUnit: 's',
       srFpsUnknown: 'fps unknown',
       srMatchNote: '✓ The uploaded video matches the requested quality ({REQ})',
@@ -7813,45 +7930,95 @@
     return price;
   }
 
-  function updateWpBoxPrices(){
-    if (!wpQualityGrid) return;
-    const isChannelSub = !!(wpChannelToggle && wpChannelToggle.checked);
-    const promoOff = (promoApplied && currentPromo && currentPromo.weekSubDiscount) ? currentPromo.weekSubDiscount : 0;
-    wpQualityGrid.querySelectorAll('.wp-box').forEach(box => {
-      const q = box.getAttribute('data-quality');
-      const base = SUB_PRICES[q] || SUB_PRICES['1080_60'];
-      const oldEl = box.querySelector('.wp-old-price');
-      const newEl = box.querySelector('.wp-new-price');
-      const afterChannel = isChannelSub ? Math.max(0, base - WP_CHANNEL_DISCOUNT) : base;
-      const finalPrice = Math.max(0, afterChannel - promoOff);
-      const anyDiscount = isChannelSub || promoOff > 0;
-      box.classList.toggle('discounted', anyDiscount);
-      if (anyDiscount) {
-        oldEl.textContent = base.toFixed(2) + '₾';
-        oldEl.classList.add('show');
-        newEl.innerHTML = finalPrice.toFixed(2) + '<sup>₾</sup>';
-      } else {
-        oldEl.classList.remove('show');
-        newEl.innerHTML = base.toFixed(2) + '<sup>₾</sup>';
-      }
-    });
-  }
-
+  // Price is no longer shown inside the quality cards themselves (see
+  // the redesigned #wpQualityGrid markup, matching the main panel's
+  // .quality-btn/.quality-grid pattern) -- the wizard shows the final
+  // total in its own send-confirm step instead. selectedQuality tracking
+  // and the .active toggle both still matter for that later total.
   if (wpQualityGrid) {
-    wpQualityGrid.querySelectorAll('.wp-box').forEach(box => {
+    wpQualityGrid.querySelectorAll('.quality-btn').forEach(box => {
       box.addEventListener('click', () => {
         subSelectedQuality = box.getAttribute('data-quality');
-        wpQualityGrid.querySelectorAll('.wp-box').forEach(b => {
+        wpQualityGrid.querySelectorAll('.quality-btn').forEach(b => {
           b.classList.toggle('active', b === box);
         });
       });
     });
   }
 
-  if (wpChannelToggle) {
-    wpChannelToggle.addEventListener('change', updateWpBoxPrices);
-  }
-  updateWpBoxPrices();
+  // ============================================================
+  // WEEKLY ORDER WIZARD — same step-by-step reveal as the main
+  // panel's initOrderWizard (upload -> quality -> tiktok link +
+  // subscriber yes/no together -> price + send-order yes/no), adapted
+  // to this panel's own element ids. See the main panel's wizard for
+  // the full rationale of each choice; comments here only cover what's
+  // different for this panel.
+  // ============================================================
+  (function initWeeklyOrderWizard(){
+    const qualityWrap = document.getElementById('wpQualityFieldWrap');
+    const tiktokWrap = document.getElementById('tiktokFieldWp');
+    const subscriberWrap = document.getElementById('wpSubscriberFieldWrap');
+    const sendConfirmWrap = document.getElementById('wpSendConfirmFieldWrap');
+    const channelsPanel = document.getElementById('wpOrderChannelsPanel');
+    if (!qualityWrap) return;
+
+    const subYesBtn = document.getElementById('wpSubYesBtn');
+    const subNoBtn = document.getElementById('wpSubNoBtn');
+    const sendYesBtn = document.getElementById('wpSendOrderYesBtn');
+
+    [qualityWrap, tiktokWrap, subscriberWrap, sendConfirmWrap, channelsPanel].forEach(el => {
+      if (el) el.classList.add('wizard-step-hidden');
+    });
+
+    const scanResultEl = document.getElementById('scanResultWp');
+    const dropZoneEl = document.getElementById('dropZoneWp');
+    if (scanResultEl) {
+      const scanObserver = new MutationObserver(() => {
+        const succeeded = scanResultEl.classList.contains('show');
+        if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
+        if (succeeded) {
+          qualityWrap.classList.remove('wizard-step-hidden');
+        } else {
+          [qualityWrap, tiktokWrap, subscriberWrap, sendConfirmWrap].forEach(el => {
+            if (el) el.classList.add('wizard-step-hidden');
+          });
+          if (wpQualityGrid) wpQualityGrid.querySelectorAll('.quality-btn.active').forEach(b => b.classList.remove('active'));
+        }
+      });
+      scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (wpQualityGrid) {
+      wpQualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          qualityWrap.classList.add('wizard-step-hidden');
+          if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+          if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
+        });
+      });
+    }
+
+    function answerSubscriber(isSub){
+      const linkEl = document.getElementById('tiktokLinkWp');
+      const errorEl = document.getElementById('tiktokErrorWp');
+      if (!linkEl || !linkEl.value.trim()) {
+        if (errorEl) errorEl.classList.add('show');
+        return;
+      }
+      if (errorEl) errorEl.classList.remove('show');
+      wpChannelToggle.checked = isSub;
+      const priceEl = document.getElementById('wpWizardFinalPrice');
+      if (priceEl) priceEl.textContent = getWeeklyTotal(subSelectedQuality).toFixed(2) + ' ₾';
+      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+    }
+    subYesBtn && subYesBtn.addEventListener('click', () => answerSubscriber(true));
+    subNoBtn && subNoBtn.addEventListener('click', () => answerSubscriber(false));
+
+    sendYesBtn && sendYesBtn.addEventListener('click', () => {
+      const chatBtn = document.getElementById('wpOrderBtnChat');
+      if (chatBtn) chatBtn.click();
+    });
+  })();
 
   // ---- Monthly subscription (20 videos / 30 days, flat discounted price per quality) ----
   const MONTH_SUB_VIDEO_LIMIT = 20;
@@ -7870,29 +8037,84 @@
     return base;
   }
 
-  function updateMpBoxPrices(){
-    if (!mpQualityGrid) return;
-    const promoOff = (promoApplied && currentPromo && currentPromo.monthSubDiscount) ? currentPromo.monthSubDiscount : 0;
-    mpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
-      const q = box.getAttribute('data-quality');
-      const base = MONTH_PRICES[q] || MONTH_PRICES['1080_60'];
-      const newEl = box.querySelector('.mp-new-price');
-      const finalPrice = Math.max(0, base - promoOff);
-      if (newEl) newEl.innerHTML = finalPrice.toFixed(2) + '<sup>₾</sup>';
-    });
-  }
-
+  // Price is no longer shown inside the quality cards -- see the same
+  // note on the weekly panel's wizard above.
   if (mpQualityGrid) {
-    mpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
+    mpQualityGrid.querySelectorAll('.quality-btn').forEach(box => {
       box.addEventListener('click', () => {
         monthSelectedQuality = box.getAttribute('data-quality');
-        mpQualityGrid.querySelectorAll('.mp-box').forEach(b => {
+        mpQualityGrid.querySelectorAll('.quality-btn').forEach(b => {
           b.classList.toggle('active', b === box);
         });
       });
     });
   }
-  updateMpBoxPrices();
+
+  // ============================================================
+  // MONTHLY ORDER WIZARD — same pattern as weekly, minus the
+  // subscriber yes/no step (this panel has no channel-subscriber
+  // discount to ask about) -- tiktok link gets its own confirm button
+  // instead of being combined with a yes/no question.
+  // ============================================================
+  (function initMonthlyOrderWizard(){
+    const qualityWrap = document.getElementById('mpQualityFieldWrap');
+    const tiktokWrap = document.getElementById('tiktokFieldMp');
+    const sendConfirmWrap = document.getElementById('mpSendConfirmFieldWrap');
+    const channelsPanel = document.getElementById('mpOrderChannelsPanel');
+    if (!qualityWrap) return;
+
+    const tiktokConfirmBtn = document.getElementById('mpTiktokConfirmBtn');
+    const sendYesBtn = document.getElementById('mpSendOrderYesBtn');
+
+    [qualityWrap, tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
+      if (el) el.classList.add('wizard-step-hidden');
+    });
+
+    const scanResultEl = document.getElementById('scanResultMp');
+    const dropZoneEl = document.getElementById('dropZoneMp');
+    if (scanResultEl) {
+      const scanObserver = new MutationObserver(() => {
+        const succeeded = scanResultEl.classList.contains('show');
+        if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
+        if (succeeded) {
+          qualityWrap.classList.remove('wizard-step-hidden');
+        } else {
+          [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
+            if (el) el.classList.add('wizard-step-hidden');
+          });
+          if (mpQualityGrid) mpQualityGrid.querySelectorAll('.quality-btn.active').forEach(b => b.classList.remove('active'));
+        }
+      });
+      scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (mpQualityGrid) {
+      mpQualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          qualityWrap.classList.add('wizard-step-hidden');
+          if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        });
+      });
+    }
+
+    tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
+      const linkEl = document.getElementById('tiktokLinkMp');
+      const errorEl = document.getElementById('tiktokErrorMp');
+      if (!linkEl || !linkEl.value.trim()) {
+        if (errorEl) errorEl.classList.add('show');
+        return;
+      }
+      if (errorEl) errorEl.classList.remove('show');
+      const priceEl = document.getElementById('mpWizardFinalPrice');
+      if (priceEl) priceEl.textContent = getMonthlyTotal(monthSelectedQuality).toFixed(2) + ' ₾';
+      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+    });
+
+    sendYesBtn && sendYesBtn.addEventListener('click', () => {
+      const chatBtn = document.getElementById('mpOrderBtnChat');
+      if (chatBtn) chatBtn.click();
+    });
+  })();
 
   // ---- Edit Order (multiple selectable styles, each its own sample
   // video and its own price per quality tier — selecting a style swaps
@@ -8025,69 +8247,87 @@
   subToggle.addEventListener('change', () => refresh());
 
   // ============================================================
-  // ORDER WIZARD — reveals "want order? -> upload -> quality ->
-  // tiktok link+confirm -> subscriber yes/no -> send order" one step
+  // ORDER WIZARD — reveals "upload -> quality -> tiktok link +
+  // subscriber yes/no together -> price + send-order yes/no" one step
   // at a time. Every underlying element/handler (scanner, quality
-  // buttons, subToggle+refresh(), order buttons) is completely
-  // unchanged -- this only controls which section is visible right now,
-  // by adding/removing .wizard-step-hidden on the wrapper divs.
+  // buttons, subToggle+refresh(), orderBtnChat's own submit logic) is
+  // completely unchanged -- this only controls which section is visible
+  // right now, by adding/removing .wizard-step-hidden on the wrapper
+  // divs, and triggers the existing orderBtnChat click programmatically
+  // once the final yes/no is answered so none of that submission logic
+  // needs to be duplicated here.
   // ============================================================
   (function initOrderWizard(){
-    const gate = document.getElementById('wantOrderGate');
     const scannerPanel = document.getElementById('videoScannerPanel');
     const qualityWrap = document.getElementById('qualityFieldWrap');
     const tiktokWrap = document.getElementById('tiktokFieldWrap');
     const subscriberWrap = document.getElementById('subscriberFieldWrap');
+    const sendConfirmWrap = document.getElementById('sendConfirmFieldWrap');
     const channelsPanel = document.getElementById('orderChannelsPanel');
     const divider = document.querySelector('#orderFlowPanel .panel-divider');
-    if (!gate || !scannerPanel) return;
+    if (!scannerPanel) return; // this panel doesn't use the wizard (e.g. edit-order)
 
-    const gateYes = document.getElementById('wantOrderYes');
-    const tiktokConfirmBtn = document.getElementById('tiktokConfirmBtn');
     const subYesBtn = document.getElementById('subYesBtn');
     const subNoBtn = document.getElementById('subNoBtn');
+    const sendYesBtn = document.getElementById('sendOrderYesBtn');
+    const sendNoBtn = document.getElementById('sendOrderNoBtn');
 
-    [scannerPanel, qualityWrap, tiktokWrap, subscriberWrap, channelsPanel, divider].forEach(el => {
+    // Scanner shows immediately -- everything from quality selection
+    // onward stays hidden until its turn.
+    [qualityWrap, tiktokWrap, subscriberWrap, sendConfirmWrap, channelsPanel, divider].forEach(el => {
       if (el) el.classList.add('wizard-step-hidden');
     });
 
-    gateYes && gateYes.addEventListener('click', () => {
-      gate.classList.add('wizard-step-hidden');
-      scannerPanel.classList.remove('wizard-step-hidden');
-    });
-    // "არა" intentionally does nothing further -- staying on the gate
-    // IS the correct outcome of declining to order.
-
     // finishScan() (further below) already does
     // scanResult.classList.add('show') the instant a video passes the
-    // 1080p/60fps gate -- observing that same class change is a clean
-    // way to reveal the next wizard step without duplicating any of
-    // that validation logic here.
+    // 1080p/60fps gate, and resetScanner() removes it again on
+    // reupload -- observing that same class change is a clean way to
+    // toggle the drop-zone/quality-reveal without duplicating any of
+    // that validation/reset logic here.
     const scanResultEl = document.getElementById('scanResult');
+    const dropZoneEl = document.getElementById('dropZone');
     if (scanResultEl) {
       const scanObserver = new MutationObserver(() => {
-        if (scanResultEl.classList.contains('show') && qualityWrap) {
-          qualityWrap.classList.remove('wizard-step-hidden');
+        const succeeded = scanResultEl.classList.contains('show');
+        if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
+        if (succeeded) {
+          if (qualityWrap) qualityWrap.classList.remove('wizard-step-hidden');
+        } else {
+          // A reupload (resetScanner) clears scanResult's 'show' class --
+          // every step downstream of it needs to go back to hidden too,
+          // rather than leaving a stale quality/tiktok/subscriber/price
+          // selection visible for what is now a different video.
+          [qualityWrap, tiktokWrap, subscriberWrap, sendConfirmWrap].forEach(el => {
+            if (el) el.classList.add('wizard-step-hidden');
+          });
+          document.querySelectorAll('#qualityGrid .quality-btn.active').forEach(b => b.classList.remove('active'));
         }
       });
       scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
     }
 
-    // Revealed the moment either quality tile is picked. Uses
-    // getElementById directly rather than the outer qualityGrid
-    // variable, since that const is declared further down this same
-    // script -- referencing it from here (this IIFE runs immediately)
-    // would hit it before initialization.
+    // Revealed the moment either quality tile is picked -- the tiktok
+    // link field and the subscriber question appear together as one
+    // combined step. Uses getElementById directly rather than the outer
+    // qualityGrid variable, since that const is declared further down
+    // this same script -- referencing it from here (this IIFE runs
+    // immediately) would hit it before initialization.
     const qualityGridEl = document.getElementById('qualityGrid');
     if (qualityGridEl) {
       qualityGridEl.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+          if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
         });
       });
     }
 
-    tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
+    // Answering the subscriber question is what completes this combined
+    // step -- validates the tiktok link at that point (rather than a
+    // separate confirm button), then reveals the price + final
+    // send-order yes/no.
+    function answerSubscriber(isSub){
       const linkEl = document.getElementById('tiktokLink');
       const errorEl = document.getElementById('tiktokError');
       if (!linkEl || !linkEl.value.trim()) {
@@ -8095,17 +8335,28 @@
         return;
       }
       if (errorEl) errorEl.classList.remove('show');
-      if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
-    });
-
-    function answerSubscriber(isSub){
       subToggle.checked = isSub;
       subToggle.dispatchEvent(new Event('change'));
-      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
-      if (divider) divider.classList.remove('wizard-step-hidden');
+      const priceEl = document.getElementById('wizardFinalPrice');
+      if (priceEl) {
+        const { s, ms, quality } = currentValues();
+        priceEl.textContent = calculateExactPrice(s, ms, isSub, quality) + ' ₾';
+      }
+      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
     }
     subYesBtn && subYesBtn.addEventListener('click', () => answerSubscriber(true));
     subNoBtn && subNoBtn.addEventListener('click', () => answerSubscriber(false));
+
+    // "Send order? Yes" reuses orderBtnChat's own existing validation +
+    // submit + open-chat logic wholesale by triggering its click
+    // programmatically -- orderChannelsPanel stays hidden from view the
+    // whole time; a hidden button's click() still fires its listeners.
+    sendYesBtn && sendYesBtn.addEventListener('click', () => {
+      const chatBtn = document.getElementById('orderBtnChat');
+      if (chatBtn) chatBtn.click();
+    });
+    // "არა" intentionally does nothing further -- staying here IS the
+    // correct outcome of declining to send.
   })();
 
 
@@ -9425,12 +9676,20 @@
     const bubble = document.getElementById('activeChatBubble');
     const dot = document.getElementById('activeChatBubbleDot');
     const completeBtn = document.getElementById('messengerCompleteBtn');
+    const avatarWrap = document.getElementById('messengerHeaderAvatar');
+    const avatarImg = document.getElementById('messengerHeaderAvatarImg');
+    const titleEl = document.getElementById('messengerHeaderTitle');
     if (orderIdEl) orderIdEl.textContent = orderId;
     if (messagesEl) messagesEl.innerHTML = '';
     if (pageEl) pageEl.style.display = 'flex';
     if (bubble) bubble.style.display = 'none';
     if (dot) dot.style.display = 'none';
     if (completeBtn) completeBtn.style.display = (messengerRole === 'admin') ? 'block' : 'none';
+    // The avatar/customer-name swap only makes sense for the admin's view
+    // — a customer opening their own order chat already knows who they
+    // are, and showing their own tiny avatar back at them adds nothing.
+    if (avatarWrap) avatarWrap.style.display = 'none';
+    if (titleEl) titleEl.textContent = t('messengerTitle');
     document.body.style.overflow = 'hidden';
 
     const socket = ensureMessengerSocket();
@@ -9440,6 +9699,14 @@
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data && Array.isArray(data.messages)) data.messages.forEach(renderMessageBubble);
+        if (messengerRole === 'admin' && data && data.customer) {
+          if (titleEl && data.customer.username) titleEl.textContent = data.customer.username;
+          if (avatarWrap && avatarImg && data.customer.avatarUrl) {
+            avatarImg.src = data.customer.avatarUrl;
+            avatarImg.alt = data.customer.username || '';
+            avatarWrap.style.display = 'block';
+          }
+        }
       })
       .catch(() => { appendSystemMessage(t('messengerLoadFailed')); });
   }
@@ -9953,7 +10220,7 @@ ID: ${orderId}
     if (key !== '1080_60' && key !== '4k_120') return;
     cpSelectedQuality = key;
     if (cpQualityGrid) {
-      cpQualityGrid.querySelectorAll('.mp-box').forEach(b => {
+      cpQualityGrid.querySelectorAll('.quality-btn').forEach(b => {
         b.classList.toggle('active', b.getAttribute('data-quality') === key);
       });
     }
@@ -9967,19 +10234,90 @@ ID: ${orderId}
   // has to match the real uploaded quality). The only way to change tier
   // is to upload a different video; before any upload at all
   // (cpUploadedTier is null) both tiles are still freely clickable.
+  // Returns whether the click actually resulted in a selection (vs. being
+  // blocked by the popup) -- the wizard below uses this to decide whether
+  // to advance to the next step.
   function tryManualSelectCpQuality(key){
     if (cpUploadedTier && key !== cpUploadedTier) {
       showCpUpscaleBlockedPopup(cpUploadedTier === '1080_60' ? 'upgrade' : 'downgrade');
-      return;
+      return false;
     }
     selectCpQuality(key);
+    return true;
   }
 
-  if (cpQualityGrid) {
-    cpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
-      box.addEventListener('click', () => tryManualSelectCpQuality(box.getAttribute('data-quality')));
+  // Wired inside the wizard IIFE below (initCheapOrderWizard), together
+  // with the step-advance logic that depends on whether the click
+  // actually succeeded — see tryManualSelectCpQuality's return value.
+
+  // ============================================================
+  // CHEAP PACKAGE ORDER WIZARD — same reveal pattern as the other
+  // panels, but the quality step's own click handling has to live here
+  // (rather than a plain forEach wired at top level like the other
+  // panels) because advancing to the tiktok step must only happen when
+  // tryManualSelectCpQuality() actually succeeded -- a click blocked by
+  // the upscale/downgrade popup must NOT advance the wizard.
+  // ============================================================
+  (function initCheapOrderWizard(){
+    const qualityWrap = document.getElementById('cpQualityFieldWrap');
+    const tiktokWrap = document.getElementById('tiktokFieldCp');
+    const sendConfirmWrap = document.getElementById('cpSendConfirmFieldWrap');
+    const channelsPanel = document.getElementById('cpOrderChannelsPanel');
+    if (!qualityWrap) return;
+
+    const tiktokConfirmBtn = document.getElementById('cpTiktokConfirmBtn');
+    const sendYesBtn = document.getElementById('cpSendOrderYesBtn');
+
+    [qualityWrap, tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
+      if (el) el.classList.add('wizard-step-hidden');
     });
-  }
+
+    const scanResultEl = document.getElementById('scanResultCp');
+    const dropZoneEl = document.getElementById('dropZoneCp');
+    if (scanResultEl) {
+      const scanObserver = new MutationObserver(() => {
+        const succeeded = scanResultEl.classList.contains('show');
+        if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
+        if (succeeded) {
+          qualityWrap.classList.remove('wizard-step-hidden');
+        } else {
+          [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
+            if (el) el.classList.add('wizard-step-hidden');
+          });
+        }
+      });
+      scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (cpQualityGrid) {
+      cpQualityGrid.querySelectorAll('.quality-btn').forEach(box => {
+        box.addEventListener('click', () => {
+          const succeeded = tryManualSelectCpQuality(box.getAttribute('data-quality'));
+          if (!succeeded) return;
+          qualityWrap.classList.add('wizard-step-hidden');
+          if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        });
+      });
+    }
+
+    tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
+      const linkEl = document.getElementById('tiktokLinkCp');
+      const errorEl = document.getElementById('tiktokErrorCp');
+      if (!linkEl || !linkEl.value.trim()) {
+        if (errorEl) errorEl.classList.add('show');
+        return;
+      }
+      if (errorEl) errorEl.classList.remove('show');
+      const priceEl = document.getElementById('cpWizardFinalPrice');
+      if (priceEl) priceEl.textContent = (CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60']) + ' ₾';
+      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+    });
+
+    sendYesBtn && sendYesBtn.addEventListener('click', () => {
+      const chatBtn = document.getElementById('cpOrderBtnChat');
+      if (chatBtn) chatBtn.click();
+    });
+  })();
 
   const cpCopyNote = document.getElementById('cpCopyNote');
 
