@@ -1201,15 +1201,15 @@
     .tutorial-link{ padding:7px 14px; }
   }
 
-  .comments-panel .c-form{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .comments-panel .c-form{ display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
   .comments-panel input.c-name,
   .comments-panel textarea.c-text{
-    width:100%; background:#0a0a12; border:1px solid var(--border); border-radius:12px;
-    color:var(--text); padding:12px 14px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
-    font-size:16px; outline:none; transition:border-color .15s;
+    width:100%; background:rgba(255,255,255,0.03); border:1px solid rgba(124,143,255,0.16); border-radius:16px;
+    color:var(--text); padding:13px 16px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+    font-size:16px; outline:none; transition:border-color .15s, background .15s;
   }
   .comments-panel input.c-name:focus,
-  .comments-panel textarea.c-text:focus{ border-color: var(--purple-soft); }
+  .comments-panel textarea.c-text:focus{ border-color: rgba(124,143,255,0.6); background:rgba(255,255,255,0.05); }
   .comments-panel textarea.c-text{
     resize:none; height:90px; max-height:160px; overflow-y:auto; line-height:1.5;
   }
@@ -1217,8 +1217,8 @@
   .c-text-wrap textarea{ padding-right:44px !important; }
   .c-emoji-btn{
     position:absolute; right:8px; bottom:8px; z-index:2;
-    width:28px; height:28px; border-radius:8px;
-    background:rgba(255,255,255,0.05); border:1px solid var(--border-soft);
+    width:28px; height:28px; border-radius:10px;
+    background:rgba(255,255,255,0.05); border:1px solid rgba(124,143,255,0.16);
     font-size:15px; line-height:1; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
     opacity:0.75; transition:opacity .15s, background .15s;
@@ -1230,9 +1230,9 @@
     width:238px; max-width:calc(100vw - 60px);
     max-height:216px; overflow-y:auto; overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
-    background:#0f0f18; border:1px solid var(--border);
-    border-radius:12px; padding:8px;
-    box-shadow:0 12px 28px rgba(0,0,0,0.45);
+    background:#0f0f18; border:1px solid rgba(124,143,255,0.2);
+    border-radius:14px; padding:8px;
+    box-shadow:0 12px 28px rgba(0,0,0,0.5);
   }
   .c-emoji-panel.open{ display:grid; align-content:start; }
   .c-emoji-panel .c-emoji-opt{
@@ -1246,12 +1246,13 @@
   .c-emoji-panel::-webkit-scrollbar-track{ background:transparent; }
   .c-emoji-panel::-webkit-scrollbar-thumb{ background:var(--border); border-radius:6px; }
   .comments-panel .c-submit{
-    align-self:flex-end; background:var(--purple); color:#fff; border:none;
-    border-radius:12px; padding:11px 22px; font-weight:700; font-size:14px;
-    cursor:pointer; transition:.15s; min-height:44px;
+    align-self:flex-end; background:linear-gradient(135deg, var(--purple), #6a7fff); color:#fff; border:none;
+    border-radius:100px; padding:12px 26px; font-weight:700; font-size:14px;
+    cursor:pointer; transition:filter .15s, transform .15s; min-height:44px;
     font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+    box-shadow:0 8px 20px rgba(124,143,255,0.3);
   }
-  .comments-panel .c-submit:hover{ filter:brightness(1.1); }
+  .comments-panel .c-submit:hover{ filter:brightness(1.1); transform:translateY(-1px); }
 
   .c-discord-gate{
     display:flex; flex-direction:column; gap:10px; align-items:center; text-align:center;
@@ -1297,81 +1298,111 @@
     padding:9px 12px; border-radius:10px;
   }
   .comments-panel .c-error.show{ display:block; }
-  .comments-panel .c-list{ display:flex; flex-direction:column; gap:12px; }
+  .comments-panel .c-list{ display:flex; flex-direction:column; gap:16px; }
+  /* Complete visual rework -- same class names throughout (so every
+     querySelector in renderComments/wireVoteButtons/wireReplyButtons
+     etc. keeps matching exactly what it always has), only the styling
+     changes. Card moves from a flat dark box to a soft layered surface
+     with a gradient hairline border and a gentle ambient glow, on a
+     precise 4px/8px spacing rhythm throughout. */
   .comments-panel .c-item{
-    background:#0a0a12; border:1px solid var(--border-soft); border-radius:12px; padding:12px 14px;
+    position:relative;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01) 40%),
+      #0d0d16;
+    border:1px solid transparent;
+    background-clip:padding-box;
+    border-radius:20px; padding:18px 20px;
+    box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 10px 24px rgba(0,0,0,0.22);
+  }
+  .comments-panel .c-item::before{
+    content:''; position:absolute; inset:0; border-radius:20px; padding:1px;
+    background:linear-gradient(160deg, rgba(124,143,255,0.28), rgba(255,255,255,0.03) 45%, rgba(56,189,248,0.16));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    pointer-events:none;
   }
   .comments-panel .c-item.c-pinned{
-    border-color: rgba(207,216,255,0.45);
-    background: linear-gradient(180deg, rgba(207,216,255,0.07), #0a0a12 60%);
-    box-shadow: 0 0 18px rgba(207,216,255,0.08);
+    border-color: transparent;
+    background:
+      linear-gradient(180deg, rgba(207,216,255,0.1), rgba(255,255,255,0.01) 45%),
+      #0d0d16;
+    box-shadow:0 1px 0 rgba(255,255,255,0.06) inset, 0 0 0 1px rgba(207,216,255,0.16), 0 14px 30px rgba(124,143,255,0.14);
   }
   .comments-panel .c-item .c-top{
-    display:flex; align-items:flex-start; gap:11px; margin-bottom:6px;
+    display:flex; align-items:center; gap:14px; margin-bottom:12px;
   }
   .comments-panel .c-item .c-avatar{
-    flex:0 0 auto; width:38px; height:38px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; font-size:18px;
-    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), transparent 60%),
+    flex:0 0 auto; width:44px; height:44px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.14), transparent 60%),
                 linear-gradient(150deg, var(--panel-2), #0a0a12 75%);
-    border:1px solid var(--border-soft);
+    border:1.5px solid rgba(124,143,255,0.28);
+    box-shadow:0 0 0 3px rgba(124,143,255,0.06), 0 4px 10px rgba(0,0,0,0.3);
   }
   .comments-panel .c-item .c-avatar.c-avatar-admin{
-    border-color: rgba(207,216,255,0.55);
-    background: radial-gradient(circle at 32% 28%, rgba(207,216,255,0.22), transparent 60%),
-                linear-gradient(150deg, rgba(207,216,255,0.1), #0a0a12 75%);
+    border-color: rgba(207,216,255,0.6);
+    background: radial-gradient(circle at 32% 28%, rgba(207,216,255,0.26), transparent 60%),
+                linear-gradient(150deg, rgba(207,216,255,0.12), #0a0a12 75%);
+    box-shadow:0 0 0 3px rgba(207,216,255,0.12), 0 4px 12px rgba(124,143,255,0.25);
   }
   .comments-panel .c-item .c-avatar-img{
     width:100%; height:100%; border-radius:50%; object-fit:cover;
   }
-  .comments-panel .c-reply-item{ display:flex; align-items:flex-start; gap:9px; }
+  .comments-panel .c-reply-item{ display:flex; align-items:center; gap:11px; }
   .comments-panel .c-reply-item .c-reply-avatar{
-    flex:0 0 auto; width:26px; height:26px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; font-size:13px;
+    flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:14px;
     background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), transparent 60%),
                 linear-gradient(150deg, var(--panel-2), #0a0a12 75%);
-    border:1px solid var(--border-soft);
+    border:1.5px solid rgba(124,143,255,0.25);
   }
   .comments-panel .c-reply-item .c-reply-avatar.c-avatar-admin{
-    border-color: rgba(207,216,255,0.55);
-    background: radial-gradient(circle at 32% 28%, rgba(207,216,255,0.22), transparent 60%),
+    border-color: rgba(207,216,255,0.6);
+    background: radial-gradient(circle at 32% 28%, rgba(207,216,255,0.24), transparent 60%),
                 linear-gradient(150deg, rgba(207,216,255,0.1), #0a0a12 75%);
   }
   .comments-panel .c-reply-item .c-reply-body-wrap{ flex:1 1 auto; min-width:0; }
   .comments-panel .c-item .c-top .c-head{ flex:1 1 auto; min-width:0; }
+  /* Name stacked directly above date -- both left-aligned under the
+     same starting edge as the avatar's right side -- reads as far more
+     precise/intentional than squeezing a name against a right-pinned
+     date on the same line, especially once names get long. */
   .comments-panel .c-item .c-head{
-    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;
+    display:flex; flex-direction:column; gap:2px;
   }
-  .comments-panel .c-item .c-author{ font-weight:700; font-size:13px; color:var(--cyan); }
-  .comments-panel .c-item .c-date{ font-size:10.5px; color:var(--text-faint); }
-  .comments-panel .c-item .c-body{ font-size:13.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
+  .comments-panel .c-item .c-author{ font-weight:700; font-size:14px; color:#e4ecff; letter-spacing:0.01em; }
+  .comments-panel .c-item .c-date{ font-size:11px; color:var(--text-faint); font-variant-numeric:tabular-nums; }
+  .comments-panel .c-item .c-body{ font-size:14px; color:var(--text-dim); line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
   .comments-panel .c-item .c-body.c-clamped{
     display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:1; line-clamp:1;
     overflow:hidden;
   }
   .comments-panel .c-item .c-more-btn{
-    display:none; margin-top:6px; padding:0;
+    display:none; margin-top:8px; padding:0;
     background:none; border:none; cursor:pointer;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:11.5px; font-weight:700;
-    letter-spacing:0.02em; color:var(--cyan);
+    letter-spacing:0.02em; color:#8fa8ff;
   }
   .comments-panel .c-item .c-more-btn:hover{ text-decoration:underline; }
-  .comments-panel .c-empty{ font-size:12.5px; color:var(--text-faint); text-align:center; padding:14px 0; }
+  .comments-panel .c-empty{
+    font-size:13px; color:var(--text-faint); text-align:center; padding:32px 0;
+  }
   .comments-panel .c-pagination{
     display:flex; align-items:center; justify-content:center; gap:8px;
-    margin-top:16px; flex-wrap:wrap;
+    margin-top:18px; flex-wrap:wrap;
   }
   .comments-panel .c-page-btn{
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:12px; font-weight:700;
-    min-width:32px; height:32px; padding:0 4px; border-radius:9px;
-    border:1px solid var(--border-soft); background:#0a0a12; color:var(--text-dim);
+    min-width:34px; height:34px; padding:0 4px; border-radius:11px;
+    border:1px solid rgba(124,143,255,0.16); background:#0d0d16; color:var(--text-dim);
     cursor:pointer; transition:.15s;
   }
-  .comments-panel .c-page-btn:hover{ border-color:var(--purple-soft); color:var(--text); transform:translateY(-1px); }
+  .comments-panel .c-page-btn:hover{ border-color:rgba(124,143,255,0.5); color:var(--text); transform:translateY(-1px); }
   .comments-panel .c-page-btn.active{
     background:linear-gradient(180deg, var(--purple), #29337a);
     border-color:var(--purple); color:#fff;
-    box-shadow:0 0 14px rgba(124,143,255,0.45);
+    box-shadow:0 0 16px rgba(124,143,255,0.5);
   }
   .comments-panel .c-page-btn:disabled{ opacity:0.35; cursor:default; pointer-events:none; }
   .comments-panel .c-page-ellipsis{
@@ -3469,7 +3500,7 @@
   }
   .rating-picker .rp-star.filled{ color:var(--gold); text-shadow:0 0 8px rgba(207,216,255,0.5); }
   .rating-picker .rp-star:hover{ transform:scale(1.15); }
-  .c-item .c-stars{ color:var(--gold); font-size:12px; letter-spacing:1px; margin-left:8px; }
+  .c-item .c-stars{ color:var(--gold); font-size:12.5px; letter-spacing:1.5px; margin-left:8px; }
 
   .admin-mode-row{
     display:none; align-items:center; justify-content:space-between; gap:10px;
@@ -3499,62 +3530,66 @@
     display:inline-flex; align-items:center; gap:3px;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:9.5px; font-weight:800; letter-spacing:0.05em;
     background:linear-gradient(90deg, var(--purple), var(--cyan)); color:#04101a;
-    padding:2px 7px; border-radius:6px; margin-left:8px; text-transform:uppercase;
+    padding:3px 8px; border-radius:7px; margin-left:8px; text-transform:uppercase;
     vertical-align:middle;
-    box-shadow: 0 0 10px rgba(207,216,255,0.35);
+    box-shadow: 0 0 12px rgba(207,216,255,0.4);
   }
   .pin-badge{
     display:inline-flex; align-items:center; gap:3px;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:9.5px; font-weight:800; letter-spacing:0.05em;
     background:#cfd8ff; color:#12142b;
-    padding:2px 7px; border-radius:6px; margin-left:8px; text-transform:uppercase;
+    padding:3px 8px; border-radius:7px; margin-left:8px; text-transform:uppercase;
     vertical-align:middle;
-    box-shadow: 0 0 10px rgba(207,216,255,0.4);
+    box-shadow: 0 0 12px rgba(207,216,255,0.45);
   }
-  .c-item .c-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:6px; gap:10px; }
-  .c-vote-row{ display:flex; align-items:center; gap:6px; }
+  .c-item .c-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:14px; gap:10px; }
+  .c-vote-row{ display:flex; align-items:center; gap:8px; }
   .c-vote-btn{
-    display:inline-flex; align-items:center; gap:5px;
-    background:#0a0a12; border:1px solid var(--border-soft); border-radius:9px;
-    padding:5px 9px; font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:11.5px;
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(124,143,255,0.14); border-radius:100px;
+    padding:6px 12px; font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:12px;
     color:var(--text-dim); cursor:pointer; transition:.15s;
   }
-  .c-vote-btn:hover{ border-color:var(--purple-soft); color:var(--text); transform:translateY(-1px); }
-  .c-vote-btn .c-vote-count{ min-width:9px; text-align:left; }
+  .c-vote-btn:hover{ border-color:rgba(124,143,255,0.5); color:var(--text); transform:translateY(-1px); }
+  .c-vote-btn .c-vote-count{ min-width:9px; text-align:left; font-variant-numeric:tabular-nums; }
   .c-vote-btn.c-like.voted{
-    border-color: rgba(37,211,102,0.45); color:#8cffb0;
-    background:rgba(37,211,102,0.08);
+    border-color: rgba(37,211,102,0.5); color:#8cffb0;
+    background:rgba(37,211,102,0.1);
   }
   .c-vote-btn.c-dislike.voted{
-    border-color: rgba(255,92,61,0.45); color:#ffb3b3;
-    background:rgba(255,92,61,0.08);
+    border-color: rgba(255,92,61,0.5); color:#ffb3b3;
+    background:rgba(255,92,61,0.1);
   }
   .c-reply-btn{
-    background:none; border:none; color:var(--text-faint); font-size:11.5px;
-    font-family:'BPG Glaho', 'Space Grotesk', sans-serif; cursor:pointer; padding:4px 6px;
-    transition: color .15s ease;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(124,143,255,0.14); color:var(--text-faint);
+    font-size:12px; border-radius:100px; padding:6px 14px;
+    font-family:'BPG Glaho', 'Space Grotesk', sans-serif; cursor:pointer;
+    transition: color .15s ease, border-color .15s ease, transform .15s ease;
   }
-  .c-reply-btn:hover{ color:var(--cyan); }
+  .c-reply-btn:hover{ color:#8fa8ff; border-color:rgba(124,143,255,0.5); transform:translateY(-1px); }
   .c-reply-form{
-    display:none; flex-direction:column; gap:8px; margin-top:10px;
-    padding-top:10px; border-top:1px dashed var(--border-soft);
+    display:none; flex-direction:column; gap:10px; margin-top:14px;
+    padding-top:14px; border-top:1px solid rgba(124,143,255,0.12);
   }
   .c-reply-form.open{ display:flex; }
   .c-reply-form input, .c-reply-form textarea{
-    width:100%; background:#12121c; border:1px solid var(--border); border-radius:10px;
-    color:var(--text); padding:10px 12px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
-    font-size:16px; outline:none;
+    width:100%; background:#12121c; border:1px solid var(--border); border-radius:12px;
+    color:var(--text); padding:11px 13px; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+    font-size:16px; outline:none; transition:border-color .15s;
   }
+  .c-reply-form input:focus, .c-reply-form textarea:focus{ border-color:rgba(124,143,255,0.6); }
   .c-reply-form textarea{ resize:none; height:70px; max-height:140px; overflow-y:auto; line-height:1.5; }
   .c-reply-form .c-reply-submit{
-    align-self:flex-end; background:var(--cyan); color:#06231f; border:none;
-    border-radius:9px; padding:9px 16px; font-weight:700; font-size:13px; cursor:pointer; min-height:40px;
+    align-self:flex-end; background:linear-gradient(135deg, var(--cyan), #29a3d1); color:#06231f; border:none;
+    border-radius:100px; padding:10px 20px; font-weight:700; font-size:13px; cursor:pointer; min-height:40px;
+    transition: filter .15s ease;
   }
-  .c-replies{ display:flex; flex-direction:column; gap:8px; margin-top:10px; padding-left:14px; border-left:2px solid var(--border-soft); }
-  .c-reply-item .c-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
-  .c-reply-item .c-author{ font-weight:700; font-size:12px; color:var(--cyan); }
-  .c-reply-item .c-date{ font-size:10px; color:var(--text-faint); }
-  .c-reply-item .c-body{ font-size:12.5px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
+  .c-reply-form .c-reply-submit:hover{ filter:brightness(1.1); }
+  .c-replies{ display:flex; flex-direction:column; gap:12px; margin-top:14px; padding-left:16px; border-left:2px solid rgba(124,143,255,0.14); }
+  .c-reply-item .c-head{ display:flex; flex-direction:column; gap:1px; margin-bottom:4px; }
+  .c-reply-item .c-author{ font-weight:700; font-size:12.5px; color:#e4ecff; }
+  .c-reply-item .c-date{ font-size:10px; color:var(--text-faint); font-variant-numeric:tabular-nums; }
+  .c-reply-item .c-body{ font-size:12.5px; color:var(--text-dim); line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
 
   .chat-fab{
     position:fixed; right:20px; bottom:20px; z-index:50;
