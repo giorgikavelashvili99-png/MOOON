@@ -9140,6 +9140,7 @@
     mainScannedFile = null;
     scanResult.classList.remove('show');
     srReject.classList.remove('show');
+    dropZone.classList.remove('wizard-step-hidden');
     if (srReject4kNote) srReject4kNote.style.display = 'none';
     resetTransferPrompt();
     secondsInput.value = 5;
@@ -9186,6 +9187,12 @@
     srReject.classList.remove('show');
     resetTransferPrompt();
     scanProgress.classList.add('show');
+    // The upload prompt has done its job the instant a file is picked --
+    // leaving it on screen alongside "processing..." is exactly the
+    // "two things visible at once" bug the rest of this wizard was
+    // built to avoid. dropZone is restored in resetScanner() (cancel,
+    // reject-retry, or re-upload after success all route through it).
+    dropZone.classList.add('wizard-step-hidden');
 
     const videoEl = document.createElement('video');
     videoEl.preload = 'metadata';
