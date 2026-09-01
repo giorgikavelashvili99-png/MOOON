@@ -9201,25 +9201,47 @@
     videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
     document.body.appendChild(videoEl);
 
+    let watchdogTimer = null;
+    const clearWatchdog = () => { if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; } };
+
     const cleanup = () => {
       if (myToken === scanToken) scanProgress.classList.remove('show');
-      if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
+      clearWatchdog();
       URL.revokeObjectURL(videoEl.src);
       videoEl.remove();
     };
 
-    // Overall safety net: if metadata (or the Infinity-duration seek
-    // trick below) never resolves on some mobile browser/video codec,
-    // don't leave the scanner stuck spinning forever — surface an error
-    // and let the visitor try again.
-    let watchdogTimer = setTimeout(() => {
+    // Phase-1 safety net: only covers waiting for metadata to load (or
+    // the Infinity-duration seek trick below) -- cleared the instant
+    // metadata actually arrives, in proceed() below. It used to keep
+    // running straight through detectFrameRate() too, with no reset in
+    // between, so on a slower device or a large/4K file where frame-
+    // rate detection legitimately takes a few extra seconds (see the
+    // comments in detectFrameRate about slow WebView decoder start-up),
+    // the elapsed time from file-select could pass 9s while everything
+    // was still working -- firing a false "read error" alert(), which
+    // is a BLOCKING native dialog that freezes the whole page until
+    // dismissed, and simultaneously revoking/removing the video element
+    // out from under the detectFrameRate() call that was still using it.
+    // That combination is exactly the "browser freezes, nothing
+    // responds" symptom during upload.
+    watchdogTimer = setTimeout(() => {
       cleanup();
       if (myToken === scanToken) alert(t('alertReadError'));
     }, 9000);
 
     const proceed = (duration) => {
+      clearWatchdog(); // metadata phase done -- frame-rate detection gets its own budget below
       const width = videoEl.videoWidth;
       const height = videoEl.videoHeight;
+      // Phase-2 safety net: detectFrameRate() already caps itself at
+      // ~3s internally, so this is only a defense-in-depth backstop in
+      // case that promise somehow never settles -- comfortably longer
+      // than its own internal cap so it should never fire in practice.
+      watchdogTimer = setTimeout(() => {
+        cleanup();
+        if (myToken === scanToken) alert(t('alertReadError'));
+      }, 6000);
       detectFrameRate(videoEl).then(fps => {
         if (myToken === scanToken) finishScan(duration, file, width, height, fps);
         cleanup();
@@ -9364,18 +9386,32 @@
       videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
       document.body.appendChild(videoEl);
 
+      let watchdogTimer = null;
+      const clearWatchdog = () => { if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; } };
       const cleanup = () => {
-        if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
+        clearWatchdog();
         URL.revokeObjectURL(videoEl.src);
         videoEl.remove();
       };
-      let watchdogTimer = setTimeout(() => {
+      // See the matching fix in handleVideoFile() above: this watchdog
+      // must only cover the metadata-loading phase, not detectFrameRate()
+      // too, or a slow (but perfectly fine) frame-rate read on a large
+      // file gets falsely rejected as 'read-timeout' after 9s even
+      // though it was still in progress.
+      watchdogTimer = setTimeout(() => {
         cleanup();
         reject('read-timeout');
       }, 9000);
       const proceed = (duration) => {
+        clearWatchdog();
         const width = videoEl.videoWidth;
         const height = videoEl.videoHeight;
+        // Defense-in-depth only -- detectFrameRate() already caps itself
+        // at ~3s internally.
+        watchdogTimer = setTimeout(() => {
+          cleanup();
+          reject('read-timeout');
+        }, 6000);
         detectFrameRate(videoEl).then(fps => {
           cleanup();
           resolve({ duration, width, height, fps, file });
