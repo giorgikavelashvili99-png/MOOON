@@ -4736,6 +4736,9 @@
     padding:6px 10px;
   }
   .tqt-top{ display:flex; justify-content:space-between; gap:8px; font-weight:700; color:#fff; }
+  .ttdl-quality-ico{
+    display:inline-flex; vertical-align:-2px; margin-right:5px; color:var(--pc-accent, #7fd4fb);
+  }
   .tqt-sub{ color:var(--text-faint); margin-top:2px; }
   .ttdl-quality-original{ margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.12); color:#fff; font-weight:600; }
 
@@ -7977,6 +7980,7 @@
         const succeeded = scanResultEl.classList.contains('show');
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
+          scanResultEl.classList.remove('wizard-step-hidden');
           qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           [qualityWrap, tiktokWrap, subscriberWrap, sendConfirmWrap].forEach(el => {
@@ -7991,6 +7995,7 @@
     if (wpQualityGrid) {
       wpQualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
           if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
@@ -8009,6 +8014,8 @@
       wpChannelToggle.checked = isSub;
       const priceEl = document.getElementById('wpWizardFinalPrice');
       if (priceEl) priceEl.textContent = getWeeklyTotal(subSelectedQuality).toFixed(2) + ' ₾';
+      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
+      if (subscriberWrap) subscriberWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
     }
     subYesBtn && subYesBtn.addEventListener('click', () => answerSubscriber(true));
@@ -8077,6 +8084,10 @@
         const succeeded = scanResultEl.classList.contains('show');
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
+          // Fresh success each time (including a second upload after a
+          // reset) shows its own "✓ uploaded" banner again -- it only
+          // gets hidden once the visitor moves on to the next step below.
+          scanResultEl.classList.remove('wizard-step-hidden');
           qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
@@ -8091,6 +8102,11 @@
     if (mpQualityGrid) {
       mpQualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          // The "✓ uploaded" banner has done its job once quality is
+          // picked -- every step from here on should be the only thing
+          // on screen, matching the rest of the wizard's one-at-a-time
+          // reveal instead of leaving it stacked above later steps.
+          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
         });
@@ -8107,6 +8123,9 @@
       if (errorEl) errorEl.classList.remove('show');
       const priceEl = document.getElementById('mpWizardFinalPrice');
       if (priceEl) priceEl.textContent = getMonthlyTotal(monthSelectedQuality).toFixed(2) + ' ₾';
+      // Same one-at-a-time rule -- the tiktok-link step it just came
+      // from has to disappear, not stay stacked above the price/send step.
+      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
     });
 
@@ -8291,6 +8310,11 @@
         const succeeded = scanResultEl.classList.contains('show');
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
+          // Fresh success each time (including a second upload after a
+          // reset) shows its own "✓ uploaded" banner again -- it only
+          // gets hidden once the visitor moves on to quality selection
+          // below.
+          scanResultEl.classList.remove('wizard-step-hidden');
           if (qualityWrap) qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           // A reupload (resetScanner) clears scanResult's 'show' class --
@@ -8316,6 +8340,9 @@
     if (qualityGridEl) {
       qualityGridEl.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          // The "✓ uploaded" banner has done its job once quality is
+          // picked -- only one step should ever be on screen at a time.
+          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
           if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
@@ -8342,6 +8369,11 @@
         const { s, ms, quality } = currentValues();
         priceEl.textContent = calculateExactPrice(s, ms, isSub, quality) + ' ₾';
       }
+      // Same one-at-a-time rule -- the combined tiktok-link/subscriber
+      // step it just came from has to disappear, not stay stacked above
+      // the price/send step.
+      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
+      if (subscriberWrap) subscriberWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
     }
     subYesBtn && subYesBtn.addEventListener('click', () => answerSubscriber(true));
@@ -10279,6 +10311,7 @@ ID: ${orderId}
         const succeeded = scanResultEl.classList.contains('show');
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
+          scanResultEl.classList.remove('wizard-step-hidden');
           qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
@@ -10294,6 +10327,7 @@ ID: ${orderId}
         box.addEventListener('click', () => {
           const succeeded = tryManualSelectCpQuality(box.getAttribute('data-quality'));
           if (!succeeded) return;
+          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
         });
@@ -10310,6 +10344,7 @@ ID: ${orderId}
       if (errorEl) errorEl.classList.remove('show');
       const priceEl = document.getElementById('cpWizardFinalPrice');
       if (priceEl) priceEl.textContent = (CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60']) + ' ₾';
+      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
     });
 
@@ -14040,6 +14075,22 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       return '<div class="ttdl-stat-item">' + icon + ' ' + escapeHtml(label) + ': <b>' + escapeHtml(String(value)) + '</b></div>';
     }
 
+    // Same browser-window / phone glyphs as the two download buttons
+    // (ttdlDlSd/ttdlDlHd) below, so a visitor sees one consistent visual
+    // language for "this line is about the browser tier" / "this line
+    // is about the mobile tier" instead of only ever reading it in the
+    // label text. label can be either name alone or both joined with
+    // " / " (when a single source URL serves both tiers), so this
+    // checks for each substring independently rather than an exact match.
+    const TTDL_BROWSER_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3 8.5h18" stroke="currentColor" stroke-width="1.8"/><circle cx="6.3" cy="6.2" r="0.75" fill="currentColor"/><circle cx="8.6" cy="6.2" r="0.75" fill="currentColor"/><circle cx="10.9" cy="6.2" r="0.75" fill="currentColor"/></svg>';
+    const TTDL_MOBILE_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 18.2h3.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    function ttdlQualityIcons(label){
+      let out = '';
+      if (label.indexOf('BROWSER') !== -1) out += '<span class="ttdl-quality-ico">' + TTDL_BROWSER_ICON + '</span>';
+      if (label.indexOf('MOBILE') !== -1) out += '<span class="ttdl-quality-ico">' + TTDL_MOBILE_ICON + '</span>';
+      return out;
+    }
+
     function setBtnBusy(btn, busy, busyText){
       if (!btn) return;
       if (busy){
@@ -14132,7 +14183,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           // the background probe (phase 2, below) finishes.
           if (qualityBlock) {
             qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' +
-              urls.map(u => '<div class="ttdl-quality-tier"><div class="tqt-top"><span>' + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div></div>').join('') +
+              urls.map(u => '<div class="ttdl-quality-tier"><div class="tqt-top"><span>' + ttdlQualityIcons(labelsByUrl[u].join(' / ')) + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div></div>').join('') +
               '</div>';
           }
 
@@ -14197,7 +14248,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const bitrateTxt = tItem.bitrateMbps != null ? tItem.bitrateMbps + 'Mbps' : '?';
               const sizeTxt = tItem.sizeMb != null ? tItem.sizeMb + 'MB' : '?';
               return '<div class="ttdl-quality-tier">' +
-                       '<div class="tqt-top"><span>' + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + fpsTxt + '</span></div>' +
+                       '<div class="tqt-top"><span>' + ttdlQualityIcons(tItem.label) + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + fpsTxt + '</span></div>' +
                        '<div class="tqt-sub">↳ ' + bitrateTxt + ' · ' + sizeTxt + '</div>' +
                      '</div>';
             }).join('');
