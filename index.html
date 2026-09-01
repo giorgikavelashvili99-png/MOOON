@@ -9127,12 +9127,26 @@
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleVideoFile(e.dataTransfer.files[0]);
+      // TEMPORARY DIAGNOSTIC: handleVideoFile is async and was being
+      // called with no .catch() anywhere -- if anything inside it throws,
+      // that becomes a silent unhandled promise rejection: no crash, no
+      // visible error, the scan just stops updating exactly wherever it
+      // was and never moves again. That matches "stuck at 0%, nothing
+      // happens" far too well to rule out, and every previous fix here
+      // has been guessing blind without ever seeing a real error message.
+      // This surfaces one directly if it exists.
+      Promise.resolve(handleVideoFile(e.dataTransfer.files[0])).catch(err => {
+        alert('DEBUG: ' + (err && err.stack ? err.stack : err));
+      });
     }
   });
 
   videoInput.addEventListener('change', e => {
-    if (e.target.files && e.target.files[0]) handleVideoFile(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      Promise.resolve(handleVideoFile(e.target.files[0])).catch(err => {
+        alert('DEBUG: ' + (err && err.stack ? err.stack : err));
+      });
+    }
   });
 
   // The File the visitor scanned in the main calculator — kept in memory
