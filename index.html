@@ -9416,17 +9416,29 @@
       const width = videoEl.videoWidth;
       const height = videoEl.videoHeight;
       if (scanProgressStage) scanProgressStage.textContent = t('scanStageFps') + ' 0%';
-      // Reading a bounded local byte range (see detectFpsFromFile above)
-      // instead of playing the video -- this should finish in well under
-      // a second even for a huge file, but the watchdog stays as a
-      // defense-in-depth backstop in case a read genuinely stalls.
+      // Hard cap, unconditional: no matter what detectFpsFromFile is doing
+      // underneath (a slow device, a browser quirk with FileReader, or
+      // anything else that hasn't been reproduced yet), this scan MUST
+      // move on within a few seconds. Proceeding with fps left unknown is
+      // already handled gracefully everywhere downstream (checkUploadAcceptable
+      // / finishScan) -- it's always better than a spinner that can get
+      // stuck forever for a reason nobody has been able to pin down.
+      const FPS_HARD_CAP_MS = 4000;
+      const fpsPromise = detectFpsFromFile(file, pct => {
+        if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageFps') + ' ' + pct + '%';
+      });
+      const capped = Promise.race([
+        fpsPromise,
+        new Promise(resolve => setTimeout(() => resolve(null), FPS_HARD_CAP_MS))
+      ]);
+      // Pure last-resort backstop in case even the race above somehow
+      // never settles -- cleared instantly once `capped` resolves, via
+      // cleanup() below, so this should never actually fire in practice.
       watchdogTimer = setTimeout(() => {
         cleanup();
         if (myToken === scanToken) alert(t('alertReadError'));
-      }, 8000);
-      detectFpsFromFile(file, pct => {
-        if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageFps') + ' ' + pct + '%';
-      }).then(fps => {
+      }, 15000);
+      capped.then(fps => {
         if (myToken === scanToken) finishScan(duration, file, width, height, fps);
         cleanup();
       });
@@ -9590,14 +9602,18 @@
         clearWatchdog();
         const width = videoEl.videoWidth;
         const height = videoEl.videoHeight;
-        // See handleVideoFile() above -- reads a bounded local byte range
-        // instead of playing the file, so this finishes in well under a
-        // second on any device; the watchdog is only a backstop.
+        // Same unconditional hard cap as handleVideoFile() above -- this
+        // MUST move on within a few seconds regardless of what
+        // detectFpsFromFile is doing, rather than risk ever getting stuck.
+        const capped = Promise.race([
+          detectFpsFromFile(file),
+          new Promise(resolve => setTimeout(() => resolve(null), 4000))
+        ]);
         watchdogTimer = setTimeout(() => {
           cleanup();
           reject('read-timeout');
-        }, 8000);
-        detectFpsFromFile(file).then(fps => {
+        }, 15000);
+        capped.then(fps => {
           cleanup();
           resolve({ duration, width, height, fps, file });
         });
