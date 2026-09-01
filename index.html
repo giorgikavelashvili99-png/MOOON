@@ -14111,8 +14111,26 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     async function ttdlAnalyze(){
+      // Re-entrancy guard: the Analyze button already disables itself
+      // while a request is in flight, but the Enter-key handler on the
+      // URL input did NOT check that before this fix -- so mashing
+      // Enter while a slow/stalled request was still pending (exactly
+      // what a visitor does when the tool looks frozen) could fire off
+      // several overlapping ttdlAnalyze() calls at once. Whichever
+      // response happened to land LAST then won, even if it was the
+      // stale/earlier one -- that's what produced "used to show the
+      // right formats, now it mixes them up". Bailing out immediately
+      // whenever a request is already running makes that impossible.
+      if (analyzeBtn.disabled) return;
       const url = (urlInput.value || '').trim();
       if (!url){ ttdlLog(ttdlDict('needLink')); return; }
+      // Bumped up front (not just before the phase-2 probe like before)
+      // so every DOM-writing branch below -- success, API failure, and
+      // network error -- can check it and refuse to overwrite the
+      // screen with a stale result. Needed for the one case the guard
+      // above can't cover: pressing "Clear" while an analysis from a
+      // previous link is still in flight.
+      const myToken = ++ttdlAnalysisToken;
       setBtnBusy(analyzeBtn, true, ttdlDict('analyzing'));
       resultBox.style.display = 'none';
       if (detailsBox) detailsBox.style.display = 'none';
@@ -14123,10 +14141,21 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (sdBtnLabel) { sdBtnLabel.textContent = 'BROWSER QUALITY'; delete sdBtnLabel.dataset.originalText; }
       if (hdBtnLabel) { hdBtnLabel.textContent = 'MOBILE QUALITY'; delete hdBtnLabel.dataset.originalText; }
       ttdlLog(ttdlDict('logAnalyzing'));
+      // The tikwm request itself previously had NO timeout at all --
+      // unlike every other network call in this widget (the download
+      // fetch, the mp4-box probe), so a stalled or very slow mobile
+      // connection left the Analyze button stuck on "Analyzing..."
+      // forever with no way to recover short of reloading the page.
+      // That matches "everything freezes, nothing responds" exactly.
+      // A bounded timeout guarantees this always resolves one way or
+      // another within 20s.
+      const analyzeTimeoutController = new AbortController();
+      const analyzeTimeoutTimer = setTimeout(() => analyzeTimeoutController.abort(), 20000);
       try{
         const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
-        const res = await fetch(api);
+        const res = await fetch(api, { signal: analyzeTimeoutController.signal });
         const json = await res.json();
+        if (myToken !== ttdlAnalysisToken) return; // superseded by a newer analyze() or a Clear press
         if (json && json.code === 0 && json.data){
           const d = json.data;
 
@@ -14206,9 +14235,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           // probe. Deliberately NOT awaited before the code above runs --
           // this fills in the quality box a moment later without making
           // the visitor wait for it to do anything else. Guarded by
-          // ttdlAnalysisToken so a second Analyze click (new URL) can't
-          // have this stale probe overwrite the newer result. ----
-          const myToken = ++ttdlAnalysisToken;
+          // ttdlAnalysisToken (bumped at the top of ttdlAnalyze()) so a
+          // second Analyze click (new URL) can't have this stale probe
+          // overwrite the newer result. ----
           Promise.all(urls.map(async (u) => {
             const info = await probeMp4Info(u);
             // Rare fallback: if the box-parser above didn't find tkhd
@@ -14281,11 +14310,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             }
           });
         } else {
-          ttdlLog(ttdlDict('logFail'));
+          if (myToken === ttdlAnalysisToken) ttdlLog(ttdlDict('logFail'));
         }
       } catch(e){
-        ttdlLog(ttdlDict('logFail'));
+        if (myToken === ttdlAnalysisToken) ttdlLog(ttdlDict('logFail'));
       } finally {
+        clearTimeout(analyzeTimeoutTimer);
         setBtnBusy(analyzeBtn, false);
       }
     }
