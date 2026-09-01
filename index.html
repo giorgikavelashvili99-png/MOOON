@@ -6772,6 +6772,7 @@
       scanCancelBtn: 'გაუქმება',
       scanStageReading: 'ფაილის წაკითხვა…',
       scanStageFps: 'ხარისხისა და სიხშირის დადგენა…',
+      scanStageUploading: 'იტვირთება…',
       srFile: 'ფაილი',
       srDuration: 'ხანგრძლივობა',
       srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
@@ -7185,6 +7186,7 @@
       scanCancelBtn: 'Cancel',
       scanStageReading: 'Reading file…',
       scanStageFps: 'Detecting quality and frame rate…',
+      scanStageUploading: 'Uploading…',
       srFile: 'File',
       srDuration: 'Duration',
       srDetectedFormat: 'Uploaded video format',
@@ -9430,7 +9432,7 @@
     srReject.classList.remove('show');
     resetTransferPrompt();
     scanProgress.classList.add('show');
-    if (scanProgressStage) scanProgressStage.textContent = t('scanStageReading') + ' 0%';
+    if (scanProgressStage) scanProgressStage.textContent = t('scanStageUploading') + ' 0%';
     // The upload prompt has done its job the instant a file is picked --
     // leaving it on screen alongside "processing..." is exactly the
     // "two things visible at once" bug the rest of this wizard was
@@ -9438,15 +9440,6 @@
     // reject-retry, or re-upload after success all route through it).
     dropZone.classList.add('wizard-step-hidden');
 
-    // No hidden <video> element and no blob: URL here anymore -- every
-    // earlier attempt at fixing this freeze still had that in common,
-    // and Chrome's own "Page Unresponsive" dialog showing up (confirmed
-    // by a screenshot) proves the main thread itself was genuinely
-    // blocked, which no setTimeout/Promise.race wrapped around it could
-    // ever have rescued. Reading duration/width/height/fps by parsing
-    // the file's own bytes (detectMp4MetaFromFile, defined above) never
-    // touches the browser's media pipeline at all, so that entire class
-    // of freeze is now structurally impossible, not just timed out.
     const cleanup = () => {
       if (myToken === scanToken) scanProgress.classList.remove('show');
       if (activeScanCleanup === cleanup) activeScanCleanup = null;
@@ -9455,23 +9448,54 @@
     // reset the UI state even mid-read.
     activeScanCleanup = cleanup;
 
-    // Pure last-resort backstop -- reading two bounded byte ranges from a
-    // local file should never take anywhere near this long, but this
-    // guarantees the modal can't stay open forever even in a scenario
-    // nobody has anticipated.
+    // Uploads to mooontransferr immediately, right on file selection --
+    // this is the exact same proven, already-working XHR upload (with
+    // real percentage progress) used by the "yes, send for review"
+    // button elsewhere, instead of waiting on a separate local step
+    // first. Real network progress from a battle-tested XHR call is
+    // about as solid a progress indicator as exists in a browser.
+    const uploadPromise = uploadFileToMoontransferr(file, pct => {
+      if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageUploading') + ' ' + pct + '%';
+    }).catch(() => null);
+
+    // Duration/width/height/fps (needed for the price calculation and
+    // the 1080p/60fps gate) are read in parallel by parsing the file's
+    // own bytes directly -- no hidden <video> element and no blob: URL
+    // here anymore. Every earlier attempt at fixing the freeze still had
+    // that in common, and Chrome's own "Page Unresponsive" dialog
+    // showing up (confirmed by a screenshot) proves the main thread
+    // itself was genuinely blocked, which no setTimeout/Promise.race
+    // wrapped around it could ever have rescued. Pure byte-parsing of a
+    // bounded slice never touches the browser's media pipeline at all,
+    // so it finishes in well under a second regardless of how long the
+    // upload above takes.
+    const metaPromise = detectMp4MetaFromFile(file);
+
+    // Generous ceiling -- a real upload over mobile data can legitimately
+    // take a while; this only guards against something never settling.
     const watchdogTimer = setTimeout(() => {
       cleanup();
       if (myToken === scanToken) alert(t('alertReadError'));
-    }, 15000);
+    }, 120000);
 
-    const meta = await detectMp4MetaFromFile(file, pct => {
-      if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageReading') + ' ' + pct + '%';
-    });
+    const [uploadResult, meta] = await Promise.all([uploadPromise, metaPromise]);
 
     clearTimeout(watchdogTimer);
     if (myToken !== scanToken) return; // superseded by Cancel or a newer file pick
     cleanup();
+
+    if (uploadResult && uploadResult.link) {
+      const vg = videoLinkGroups.main;
+      if (vg.link) { vg.link.value = uploadResult.link; vg.link.classList.remove('error'); }
+      if (vg.error) vg.error.style.display = 'none';
+      videoLinkConfirmed.main = true;
+      updateVideoLinkConfirmBadge();
+    }
+
     finishScan(meta.duration || 0, file, meta.width, meta.height, meta.fps);
+    // The upload already happened above -- no need for the separate
+    // "send this for review?" prompt finishScan() would otherwise show.
+    srTransfer.classList.remove('show');
   }
 
   // Reusable, DOM-independent video metadata reader — reads duration,
