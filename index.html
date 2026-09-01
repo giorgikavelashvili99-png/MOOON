@@ -6811,6 +6811,7 @@
       mooonAutoErrorBackgrounded: '⚠️ ატვირთვა შეწყდა, რადგან გვერდი ფონში აღმოჩნდა (ეკრანი ჩაიკეტა ან სხვა აპზე გადახვედით). ',
       mooonAutoStayHint: '📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება',
       mooonAutoManualLink: 'ატვირთეთ ხელით mooontransferr.onrender.com-ზე →',
+      mooonManualPasteHint: 'ახალ ტაბში გაიხსნა mooontransferr — ატვირთე იქ ვიდეო და მიღებული ბმული ჩააკოპირე ქვემოთ, "ვიდეოს ბმული" ველში.',
       mooonAutoRetry: '↻ ხელახლა ცდა',
       mtUploadHeadline: 'ავტომატური ატვირთვა',
       tiktokAutoBtn: 'გახსენით TikTok და დააკოპირეთ თქვენი პროფილის ლინკი',
@@ -7226,6 +7227,7 @@
       mooonAutoErrorBackgrounded: '⚠️ The upload stopped because this page went to the background (screen locked or you switched app). ',
       mooonAutoStayHint: '📱 Keep this page open and your screen on until the upload finishes',
       mooonAutoManualLink: 'Upload manually on mooontransferr.onrender.com →',
+      mooonManualPasteHint: 'mooontransferr opened in a new tab — upload your video there and paste the link it gives you into the "Video link" field below.',
       mooonAutoRetry: '↻ Try again',
       mtUploadHeadline: 'Automatic upload',
       tiktokAutoBtn: 'Open TikTok and copy your profile link',
@@ -9195,10 +9197,26 @@
     srTransferNo.disabled = true;
     srTransferQ.style.display = 'none';
     srTransferActions.style.display = 'none';
-    // Upload the already-selected file straight to mooontransferr's API
-    // in the background — no second tab, no manual re-upload, no
-    // copy/pasting the link back by hand.
-    runMooonAutoUpload(mainScannedFile, SR_AUTO_IDS, 'main');
+    // Opens mooontransferr in its own tab so the visitor uploads there
+    // directly, on the site that's confirmed to handle large video
+    // uploads reliably -- rather than an automatic background upload
+    // through this page's own JS, which repeatedly failed to complete
+    // reliably. This is a genuine click, so the new tab isn't blocked
+    // as a popup the way opening one after an await/async gap can be.
+    window.open(VIDEO_REVIEW_TRANSFER_URL + '/', '_blank', 'noopener');
+    const wrap = document.getElementById(SR_AUTO_IDS.wrap);
+    if (wrap) {
+      wrap.classList.add('show');
+      const head = wrap.parentElement ? wrap.parentElement.querySelector('.mt-upload-head') : null;
+      if (head) head.classList.add('show');
+      const statusRow = document.getElementById(SR_AUTO_IDS.statusRow);
+      if (statusRow) statusRow.style.display = 'none';
+      const errorBox = document.getElementById(SR_AUTO_IDS.error);
+      if (errorBox) {
+        errorBox.innerHTML = escapeHtml(t('mooonManualPasteHint'));
+        errorBox.classList.add('show');
+      }
+    }
   });
 
   srTransferNo.addEventListener('click', () => {
@@ -9434,7 +9452,7 @@
     srReject.classList.remove('show');
     resetTransferPrompt();
     scanProgress.classList.add('show');
-    if (scanProgressStage) scanProgressStage.textContent = t('scanStageUploading') + ' 0%';
+    if (scanProgressStage) scanProgressStage.textContent = t('scanStageReading') + ' 0%';
     // The upload prompt has done its job the instant a file is picked --
     // leaving it on screen alongside "processing..." is exactly the
     // "two things visible at once" bug the rest of this wizard was
@@ -9450,61 +9468,28 @@
     // reset the UI state even mid-read.
     activeScanCleanup = cleanup;
 
-    // Uploads to mooontransferr immediately, right on file selection --
-    // this is the exact same proven, already-working XHR upload (with
-    // real percentage progress) used by the "yes, send for review"
-    // button elsewhere, instead of waiting on a separate local step
-    // first. Real network progress from a battle-tested XHR call is
-    // about as solid a progress indicator as exists in a browser.
-    const uploadPromise = uploadFileToMoontransferr(file, pct => {
-      if (myToken !== scanToken || !scanProgressStage) return;
-      // 100% here means every byte has been SENT -- the backend still
-      // needs to acknowledge receipt and finalize the upload server-side
-      // (mooontransferr.onrender.com specifically can be slow to respond
-      // right after a cold start), which can take a bit longer with no
-      // further progress events. Saying so explicitly stops "100%" from
-      // reading as stuck when it's actually just waiting on the server.
-      scanProgressStage.textContent = pct >= 100 ? t('scanStageFinalizing') : (t('scanStageUploading') + ' ' + pct + '%');
-    }).catch(() => null);
-
-    // Duration/width/height/fps (needed for the price calculation and
-    // the 1080p/60fps gate) are read in parallel by parsing the file's
-    // own bytes directly -- no hidden <video> element and no blob: URL
-    // here anymore. Every earlier attempt at fixing the freeze still had
-    // that in common, and Chrome's own "Page Unresponsive" dialog
-    // showing up (confirmed by a screenshot) proves the main thread
-    // itself was genuinely blocked, which no setTimeout/Promise.race
-    // wrapped around it could ever have rescued. Pure byte-parsing of a
-    // bounded slice never touches the browser's media pipeline at all,
-    // so it finishes in well under a second regardless of how long the
-    // upload above takes.
-    const metaPromise = detectMp4MetaFromFile(file);
-
-    // Generous ceiling -- a real upload over mobile data can legitimately
-    // take a while; this only guards against something never settling.
+    // Only local, pure byte-parsing here -- no upload, no <video>
+    // element, no blob: URL. Duration/width/height/fps come straight
+    // from the file's own bytes (detectMp4MetaFromFile, defined above),
+    // never touching the browser's media pipeline or the network, so
+    // this reliably finishes in well under a second regardless of file
+    // size. Sending the actual video file happens afterward, once the
+    // visitor confirms below -- opened directly on mooontransferr in
+    // its own tab (see srTransferYes below) rather than an automatic
+    // background upload through this page's own JS.
     const watchdogTimer = setTimeout(() => {
       cleanup();
       if (myToken === scanToken) alert(t('alertReadError'));
-    }, 120000);
+    }, 15000);
 
-    const [uploadResult, meta] = await Promise.all([uploadPromise, metaPromise]);
+    const meta = await detectMp4MetaFromFile(file, pct => {
+      if (myToken === scanToken && scanProgressStage) scanProgressStage.textContent = t('scanStageReading') + ' ' + pct + '%';
+    });
 
     clearTimeout(watchdogTimer);
     if (myToken !== scanToken) return; // superseded by Cancel or a newer file pick
     cleanup();
-
-    if (uploadResult && uploadResult.link) {
-      const vg = videoLinkGroups.main;
-      if (vg.link) { vg.link.value = uploadResult.link; vg.link.classList.remove('error'); }
-      if (vg.error) vg.error.style.display = 'none';
-      videoLinkConfirmed.main = true;
-      updateVideoLinkConfirmBadge();
-    }
-
     finishScan(meta.duration || 0, file, meta.width, meta.height, meta.fps);
-    // The upload already happened above -- no need for the separate
-    // "send this for review?" prompt finishScan() would otherwise show.
-    srTransfer.classList.remove('show');
   }
 
   // Reusable, DOM-independent video metadata reader — reads duration,
