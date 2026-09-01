@@ -7980,8 +7980,12 @@
         const succeeded = scanResultEl.classList.contains('show');
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
+          // Quality selection deliberately does NOT reveal here -- see
+          // the main panel's identical fix/comment. mooonPromptWp (the
+          // "send to our team?" yes/no that actually starts the upload)
+          // is a child of this same scanResultWp, so hiding it right
+          // away would take that still-unanswered prompt down with it.
           scanResultEl.classList.remove('wizard-step-hidden');
-          qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           [qualityWrap, tiktokWrap, subscriberWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
@@ -7992,10 +7996,18 @@
       scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
     }
 
+    const mooonPromptYesWp = document.getElementById('mooonPromptYesWp');
+    const mooonPromptNoWp = document.getElementById('mooonPromptNoWp');
+    function proceedToQualityStepWp(){
+      scanResultEl.classList.add('wizard-step-hidden');
+      if (qualityWrap) qualityWrap.classList.remove('wizard-step-hidden');
+    }
+    mooonPromptYesWp && mooonPromptYesWp.addEventListener('click', proceedToQualityStepWp);
+    mooonPromptNoWp && mooonPromptNoWp.addEventListener('click', proceedToQualityStepWp);
+
     if (wpQualityGrid) {
       wpQualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
           if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
@@ -8084,11 +8096,12 @@
         const succeeded = scanResultEl.classList.contains('show');
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
-          // Fresh success each time (including a second upload after a
-          // reset) shows its own "✓ uploaded" banner again -- it only
-          // gets hidden once the visitor moves on to the next step below.
+          // Quality selection deliberately does NOT reveal here -- see
+          // the main panel's identical fix/comment. mooonPromptMp (the
+          // "send to our team?" yes/no that actually starts the upload)
+          // is a child of this same scanResultMp, so hiding it right
+          // away would take that still-unanswered prompt down with it.
           scanResultEl.classList.remove('wizard-step-hidden');
-          qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
@@ -8099,14 +8112,18 @@
       scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
     }
 
+    const mooonPromptYesMp = document.getElementById('mooonPromptYesMp');
+    const mooonPromptNoMp = document.getElementById('mooonPromptNoMp');
+    function proceedToQualityStepMp(){
+      scanResultEl.classList.add('wizard-step-hidden');
+      if (qualityWrap) qualityWrap.classList.remove('wizard-step-hidden');
+    }
+    mooonPromptYesMp && mooonPromptYesMp.addEventListener('click', proceedToQualityStepMp);
+    mooonPromptNoMp && mooonPromptNoMp.addEventListener('click', proceedToQualityStepMp);
+
     if (mpQualityGrid) {
       mpQualityGrid.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          // The "✓ uploaded" banner has done its job once quality is
-          // picked -- every step from here on should be the only thing
-          // on screen, matching the rest of the wizard's one-at-a-time
-          // reveal instead of leaving it stacked above later steps.
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
         });
@@ -8311,11 +8328,16 @@
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
           // Fresh success each time (including a second upload after a
-          // reset) shows its own "✓ uploaded" banner again -- it only
-          // gets hidden once the visitor moves on to quality selection
-          // below.
+          // reset) shows its own "✓ uploaded" banner again, WITH the
+          // srTransfer "send to our team?" yes/no inside it -- quality
+          // selection deliberately does NOT reveal here. srTransfer is a
+          // child of scanResult (see the HTML), so hiding scanResult
+          // right away -- which quality selection used to do -- was
+          // taking that still-unanswered transfer prompt down with it
+          // before the actual upload to MoonTransfer had even been
+          // requested. It only reveals once srTransferYes/No is
+          // answered, below.
           scanResultEl.classList.remove('wizard-step-hidden');
-          if (qualityWrap) qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           // A reupload (resetScanner) clears scanResult's 'show' class --
           // every step downstream of it needs to go back to hidden too,
@@ -8330,6 +8352,21 @@
       scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
     }
 
+    // The transfer prompt (srTransfer, inside scanResult) is what
+    // actually triggers uploadFileToMoontransferr() -- quality selection
+    // only becomes visible, and the "✓ uploaded" banner + transfer
+    // prompt only hide, once the visitor has answered it. This is the
+    // fix for the exact bug above: answering is what starts the real
+    // upload, so it must happen before the visitor can click past it.
+    const srTransferYesBtn = document.getElementById('srTransferYes');
+    const srTransferNoBtn = document.getElementById('srTransferNo');
+    function proceedToQualityStep(){
+      scanResultEl.classList.add('wizard-step-hidden');
+      if (qualityWrap) qualityWrap.classList.remove('wizard-step-hidden');
+    }
+    srTransferYesBtn && srTransferYesBtn.addEventListener('click', proceedToQualityStep);
+    srTransferNoBtn && srTransferNoBtn.addEventListener('click', proceedToQualityStep);
+
     // Revealed the moment either quality tile is picked -- the tiktok
     // link field and the subscriber question appear together as one
     // combined step. Uses getElementById directly rather than the outer
@@ -8340,9 +8377,10 @@
     if (qualityGridEl) {
       qualityGridEl.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          // The "✓ uploaded" banner has done its job once quality is
-          // picked -- only one step should ever be on screen at a time.
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
+          // scanResult (and the "✓ uploaded" banner inside it) was
+          // already hidden by proceedToQualityStep() above, once
+          // srTransfer got answered -- this only needs to move past its
+          // own step now.
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
           if (subscriberWrap) subscriberWrap.classList.remove('wizard-step-hidden');
@@ -10318,8 +10356,12 @@ ID: ${orderId}
         const succeeded = scanResultEl.classList.contains('show');
         if (dropZoneEl) dropZoneEl.classList.toggle('wizard-step-hidden', succeeded);
         if (succeeded) {
+          // Quality selection deliberately does NOT reveal here -- see
+          // the main panel's identical fix/comment. mooonPromptCp (the
+          // "send to our team?" yes/no that actually starts the upload)
+          // is a child of this same scanResultCp, so hiding it right
+          // away would take that still-unanswered prompt down with it.
           scanResultEl.classList.remove('wizard-step-hidden');
-          qualityWrap.classList.remove('wizard-step-hidden');
         } else {
           [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
@@ -10329,12 +10371,20 @@ ID: ${orderId}
       scanObserver.observe(scanResultEl, { attributes: true, attributeFilter: ['class'] });
     }
 
+    const mooonPromptYesCp = document.getElementById('mooonPromptYesCp');
+    const mooonPromptNoCp = document.getElementById('mooonPromptNoCp');
+    function proceedToQualityStepCp(){
+      scanResultEl.classList.add('wizard-step-hidden');
+      if (qualityWrap) qualityWrap.classList.remove('wizard-step-hidden');
+    }
+    mooonPromptYesCp && mooonPromptYesCp.addEventListener('click', proceedToQualityStepCp);
+    mooonPromptNoCp && mooonPromptNoCp.addEventListener('click', proceedToQualityStepCp);
+
     if (cpQualityGrid) {
       cpQualityGrid.querySelectorAll('.quality-btn').forEach(box => {
         box.addEventListener('click', () => {
           const succeeded = tryManualSelectCpQuality(box.getAttribute('data-quality'));
           if (!succeeded) return;
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
         });
