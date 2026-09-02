@@ -6307,7 +6307,6 @@
         <button class="a-tab" id="adminTabArchive" data-i18n="adminTabArchive">არქივი</button>
         <button class="a-tab" id="adminTabOrders" data-i18n="adminTabOrders">შეკვეთები</button>
         <button class="a-tab" id="adminTabDiscordUsers" data-i18n="adminTabDiscordUsers">Discord მომხმარებლები</button>
-        <button class="a-tab" id="adminTabDiscordNotify" data-i18n="adminTabDiscordNotify">Discord შეტყობინებები</button>
         <button class="a-tab" id="adminTabTiktokNotify" data-i18n="adminTabTiktokNotify">TikTok ანალიტიკის გაგზავნა</button>
         <button class="a-tab" id="adminTabAnalytics" data-i18n="adminTabAnalytics">ანალიტიკა</button>
         <button class="a-tab" id="adminTabUrgency" data-i18n="adminTabUrgency">ადგილები</button>
@@ -6345,21 +6344,12 @@
         <div class="a-form-row"><input type="text" id="activeSubsSearch" data-i18n-placeholder="adminActiveSubsSearchPh" placeholder="ძებნა Discord სახელით..."></div>
         <div id="activeSubsList"></div>
       </div>
-      <div class="a-panel" id="adminPanelDiscordNotify">
-        <div class="a-subheading" data-i18n="adminDiscordNotifyTitle">Discord შეტყობინებები (ჩაბარების ვადა)</div>
-        <div class="a-stat-note" data-i18n="adminDiscordNotifyNote">დადასტურებული შეკვეთები, რომლებიც Discord ანგარიშითაა შეკვეთილი — უგზავნი მომხმარებელს პირად შეტყობინებას სავარაუდო ჩაბარების ვადით.</div>
-        <div class="a-form-row"><input type="text" id="discordNotifySearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
-        <div id="discordNotifyList"></div>
-      </div>
-      <!-- Separate "second bot" tab: sends the customer their FINISHED
-           video's full analytics embed (views/likes/quality/shadow-ban —
-           the same pipeline bot.py runs) once the admin pastes that
-           video's own link, once it's live on the customer's profile.
-           Deliberately its own tab, own list render, own send function —
-           never mixed with the plain ETA text above, and always sent via
-           a completely separate bot process (see adminTabDiscordNotify's
-           worker vs. DISCORD_TIKTOK_NOTIFY_WORKER_URL below), so the two
-           can never both fire for the same click. -->
+      <!-- TikTok analytics tab: sends the customer their FINISHED
+           video's full analytics embed (views/likes/quality/shadow-ban)
+           once the admin pastes that video's own link, once it's live on
+           the customer's profile. Also has its own plain-text "send a
+           message" field per order (see aor-message-input below), both
+           going through the single unified bot. -->
       <div class="a-panel" id="adminPanelTiktokNotify">
         <div class="tnf-header">
           <div class="tnf-header-icon" aria-hidden="true">
@@ -6774,7 +6764,6 @@
       adminUnblockIp: 'IP-ის განბლოკვა',
       adminTabOrders: 'შეკვეთები',
       adminTabDiscordUsers: 'Discord მომხმარებლები',
-      adminTabDiscordNotify: 'Discord შეტყობინებები',
       adminTabTiktokNotify: 'TikTok ანალიტიკის გაგზავნა',
       adminTabAnalytics: 'ანალიტიკა',
       adminTabUrgency: 'ადგილები',
@@ -6796,14 +6785,6 @@
       adminConfirmedOrdersTitle: 'დადასტურებული შეკვეთების არქივი',
       adminNoConfirmedOrders: 'დადასტურებული შეკვეთა ჯერ არ არის.',
       adminNoConfirmedOrdersMatch: 'ამ ID-ით დადასტურებულ შეკვეთებში ვერაფერი მოიძებნა.',
-      adminEtaPlaceholder: 'რაოდენობა',
-      adminEtaUnitHours: 'საათი',
-      adminEtaUnitDays: 'დღე',
-      adminEtaUnitMinutes: 'წუთი',
-      adminSendDiscordEta: 'Discord შეტყობინება',
-      adminSendingDiscord: 'იგზავნება…',
-      adminDiscordEtaSent: 'Discord შეტყობინება გაიგზავნა',
-      adminDiscordSendFailed: 'ვერ გაიგზავნა — გადაამოწმე Worker-ის მისამართი და სცადე თავიდან.',
       adminActiveSubsTitle: 'აქტიური პაკეტები (Discord)',
       adminActiveSubsNote: 'როცა ზემოთ დაუდასტურებელი 1-კვირიანი/1-თვიანი შეკვეთა დაადასტურებ, დისქორდით შესული მომხმარებლისთვის აქ ავტომატურად გააქტიურდება პაკეტი — მანამ, სანამ არ ამოიწურება, საიტზე მას აღარ მოეთხოვება TikTok ლინკის ხელახლა შეყვანა.',
       adminActiveSubsSearchPh: 'ძებნა Discord სახელით...',
@@ -6817,10 +6798,6 @@
       adminDuLogout: 'გამოსვლა',
       adminDuBlocked: 'დაბლოკილია',
       adminDuBlockConfirm: 'დარწმუნებული ხარ, რომ გინდა ამ Discord მომხმარებლის დაბლოკვა? მას აღარ შეეძლება საიტზე Discord-ით შესვლა და დაუყოვნებლივ გამოვა სისტემიდან.',
-      adminDiscordNotifyTitle: 'Discord შეტყობინებები (ჩაბარების ვადა)',
-      adminDiscordNotifyNote: 'დადასტურებული შეკვეთები, რომლებიც Discord ანგარიშითაა შეკვეთილი — უგზავნი მომხმარებელს პირად შეტყობინებას სავარაუდო ჩაბარების ვადით.',
-      adminNoDiscordNotify: 'დისქორდით შეკვეთილი დადასტურებული შეკვეთა ჯერ არ არის.',
-      adminNoDiscordNotifyMatch: 'ვერაფერი მოიძებნა.',
       adminTiktokNotifyTitle: 'TikTok ანალიტიკის გაგზავნა (მეორე ბოტი)',
       adminTiktokNotifyNote: 'დადასტურებული შეკვეთები Discord ანგარიშით — ჩაასვი მზა ვიდეოს TikTok ლინკი და გაუგზავნე მომხმარებელს სრული ანალიტიკის ჩანაწერი. ეს იგზავნება ცალკე ბოტიდან, ზემოთა Discord შეტყობინებისგან დამოუკიდებლად.',
       adminNoTiktokNotify: 'დისქორდით შეკვეთილი დადასტურებული შეკვეთა ჯერ არ არის.',
@@ -7190,7 +7167,6 @@
       adminUnblockIp: 'Unblock IP',
       adminTabOrders: 'Orders',
       adminTabDiscordUsers: 'Discord Users',
-      adminTabDiscordNotify: 'Discord Notifications',
       adminTabTiktokNotify: 'Send TikTok Analytics',
       adminTabAnalytics: 'Analytics',
       adminTabUrgency: 'Spots',
@@ -7213,14 +7189,6 @@
       adminConfirmedOrdersTitle: 'Confirmed orders archive',
       adminNoConfirmedOrders: 'No confirmed orders yet.',
       adminNoConfirmedOrdersMatch: 'No confirmed order found with that ID.',
-      adminEtaPlaceholder: 'amount',
-      adminEtaUnitHours: 'hours',
-      adminEtaUnitDays: 'days',
-      adminEtaUnitMinutes: 'minutes',
-      adminSendDiscordEta: 'Discord notify',
-      adminSendingDiscord: 'Sending…',
-      adminDiscordEtaSent: 'Discord notification sent',
-      adminDiscordSendFailed: 'Failed to send — check the worker URL and try again.',
       adminActiveSubsTitle: 'Active packages (Discord)',
       adminActiveSubsNote: 'When you confirm a pending 1-week/1-month order above, the Discord-logged-in customer\'s package is activated here automatically — until it expires, the site no longer asks them to re-enter their TikTok link.',
       adminActiveSubsSearchPh: 'Search by Discord name...',
@@ -7234,10 +7202,6 @@
       adminDuLogout: 'Log out',
       adminDuBlocked: 'Blocked',
       adminDuBlockConfirm: 'Are you sure you want to block this Discord user? They will no longer be able to sign in with Discord on this site, and will be signed out immediately.',
-      adminDiscordNotifyTitle: 'Discord Notifications (delivery ETA)',
-      adminDiscordNotifyNote: 'Confirmed orders placed with a Discord account — send the customer a direct message with an estimated delivery time.',
-      adminNoDiscordNotify: 'No confirmed Discord orders yet.',
-      adminNoDiscordNotifyMatch: 'No matches found.',
       adminTiktokNotifyTitle: 'Send TikTok Analytics (second bot)',
       adminTiktokNotifyNote: "Confirmed orders placed with a Discord account — paste the finished video's TikTok link and send the customer its full analytics report. This is sent from a completely separate bot, independent of the Discord notification above.",
       adminNoTiktokNotify: 'No confirmed Discord orders yet.',
@@ -11413,7 +11377,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminTabArchive = document.getElementById('adminTabArchive');
   const adminTabOrders = document.getElementById('adminTabOrders');
   const adminTabDiscordUsers = document.getElementById('adminTabDiscordUsers');
-  const adminTabDiscordNotify = document.getElementById('adminTabDiscordNotify');
   const adminTabTiktokNotify = document.getElementById('adminTabTiktokNotify');
   const adminTabAnalytics = document.getElementById('adminTabAnalytics');
   const adminTabUrgency = document.getElementById('adminTabUrgency');
@@ -11424,7 +11387,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const adminPanelArchive = document.getElementById('adminPanelArchive');
   const adminPanelOrders = document.getElementById('adminPanelOrders');
   const adminPanelDiscordUsers = document.getElementById('adminPanelDiscordUsers');
-  const adminPanelDiscordNotify = document.getElementById('adminPanelDiscordNotify');
   const adminPanelTiktokNotify = document.getElementById('adminPanelTiktokNotify');
   const adminPanelAnalytics = document.getElementById('adminPanelAnalytics');
   const adminPanelUrgency = document.getElementById('adminPanelUrgency');
@@ -11878,62 +11840,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   }
 
   // ============================================================
-  // DISCORD NOTIFICATIONS (delivery ETA): confirmed orders placed with a
-  // Discord account, listed in their own admin tab (see adminPanelDiscordNotify)
-  // instead of inline inside the confirmed-orders archive above — reuses
-  // the same confirmedOrdersCache, just filtered down to o.discordId rows.
-  // ============================================================
-  function renderDiscordNotifyList(){
-    const listEl = document.getElementById('discordNotifyList');
-    if (!listEl) return;
-    const searchEl = document.getElementById('discordNotifySearch');
-    const query = (searchEl && searchEl.value || '').trim();
-    const withDiscord = confirmedOrdersCache.filter(o => o.discordId);
-    const sorted = withDiscord.slice().sort((a, b) => (b.confirmedAt || b.ts || 0) - (a.confirmedAt || a.ts || 0));
-    const filtered = query ? sorted.filter(o => String(o.id).includes(query)) : sorted;
-
-    if (!sorted.length) {
-      listEl.innerHTML = '<div class="c-empty">' + t('adminNoDiscordNotify') + '</div>';
-      return;
-    }
-    if (!filtered.length) {
-      listEl.innerHTML = '<div class="c-empty">' + t('adminNoDiscordNotifyMatch') + '</div>';
-      return;
-    }
-
-    listEl.innerHTML = filtered.map(o =>
-      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
-        '<div class="aor-top">' +
-          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
-          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · 🎮 ' + escapeHtml(o.discordUsername || String(o.discordId)) + '</span>' +
-        '</div>' +
-        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
-        '<div class="aor-discord-notify">' +
-          '<input type="number" min="0" step="0.5" class="aor-eta-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminEtaPlaceholder') + '">' +
-          '<select class="aor-eta-unit" data-id="' + escapeHtml(String(o.id)) + '">' +
-            '<option value="minutes">' + t('adminEtaUnitMinutes') + '</option>' +
-            '<option value="hours" selected>' + t('adminEtaUnitHours') + '</option>' +
-            '<option value="days">' + t('adminEtaUnitDays') + '</option>' +
-          '</select>' +
-          '<button class="a-discord-btn" data-action="send-discord-eta" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminSendDiscordEta') + '</button>' +
-        '</div>' +
-        (o.discordEtaSentAt ? '<div class="aor-discord-sent">✅ ' + t('adminDiscordEtaSent') + ' — ' + formatCommentDate(o.discordEtaSentAt) + '</div>' : '') +
-      '</div>'
-    ).join('');
-  }
-
-  async function renderAdminDiscordNotify(){
-    const listEl = document.getElementById('discordNotifyList');
-    if (listEl) listEl.innerHTML = '<div class="c-empty">…</div>';
-    const data = await mdbRead('confirmedOrders');
-    confirmedOrdersCache = (data && Array.isArray(data.list)) ? data.list : [];
-    renderDiscordNotifyList();
-  }
-
-  const discordNotifySearchInput = document.getElementById('discordNotifySearch');
-  if (discordNotifySearchInput) discordNotifySearchInput.addEventListener('input', renderDiscordNotifyList);
-
-  // ============================================================
   // TIKTOK ANALYTICS SEND ("second bot"): same confirmed-Discord-order
   // list as above, but each row lets the admin paste the customer's
   // now-finished video's own TikTok link and send them a full analytics
@@ -12313,74 +12219,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     });
   }
 
-  // Formats an exact countdown one tick short of the round number the
-  // admin typed — the same "one second (or minute) less than the full
-  // amount" logic across all three units:
-  //   - minutes → "MM:SS"    (30 წუთი  → "29:59")
-  //   - hours   → "HH:MM:SS" (25 საათი → "24:59:59")
-  //   - days    → "HH:MM:SS", HH = TOTAL hours, never wrapped at 24, so a
-  //               31-day window still reads as one number, not "1d 23h"
-  //               (2 დღე  → "47:59:59", 31 დღე → "743:59:59")
-  // This only produces a one-time snapshot string for the message text
-  // below — Discord messages can't tick down live on their own, so this
-  // is what "დროის ათვლა დაიწყო" is announcing.
-  function formatCountdown(rawValue, unit){
-    const pad = n => String(n).padStart(2, '0');
-    if (unit === 'minutes'){
-      const totalSeconds = Math.max(0, Math.round(rawValue * 60) - 1);
-      const mm = Math.floor(totalSeconds / 60);
-      const ss = totalSeconds % 60;
-      return pad(mm) + ':' + pad(ss);
-    }
-    const totalHours = unit === 'days' ? rawValue * 24 : rawValue;
-    const totalSeconds = Math.max(0, Math.round(totalHours * 3600) - 1);
-    const hh = Math.floor(totalSeconds / 3600);
-    const mm = Math.floor((totalSeconds % 3600) / 60);
-    const ss = totalSeconds % 60;
-    return pad(hh) + ':' + pad(mm) + ':' + pad(ss);
-  }
-
-  // Builds the exact Discord ETA message from whatever the admin typed
-  // (a plain number) plus the chosen unit (hours / days / minutes).
-  // "rawValue" is kept in the sentence as-is (e.g. "25 საათში" /
-  // "2 დღეში" / "30 წუთში"), while the countdown line always uses the
-  // format from formatCountdown() above.
-  function buildDiscordEtaMessage(rawValue, unit){
-    const totalHours = unit === 'days' ? rawValue * 24 : (unit === 'minutes' ? rawValue / 60 : rawValue);
-    const countdown = formatCountdown(rawValue, unit);
-    const cleanValue = String(rawValue);
-    const unitWord = unit === 'days' ? 'დღეში' : (unit === 'minutes' ? 'წუთში' : 'საათში');
-    const text =
-      'ძვირფასო მომხმარებელო! 💌\n' +
-      'თქვენი შეკვეთის დამუშავება მიმდინარეობს!\n' +
-      'შეკვეთა ჩაგებარდებათ არაუმეტეს ' + cleanValue + ' ' + unitWord + ' ❤️\n' +
-      countdown + ' — დროის ათვლა დაიწყო!';
-    return { totalHours, countdown, unit, unitValue: rawValue, text };
-  }
-
-  async function sendDiscordOrderUpdate(orderId, built){
-    try{
-      const res = await fetch(DISCORD_NOTIFY_WORKER_URL + '/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // "hours" is kept for backward compatibility with the current
-        // worker; "countdown" and "message" are the new exact-text fields
-        // — once the worker sends body.message verbatim (instead of
-        // building its own Discord relative timestamp), the "in a day"
-        // wording goes away and the exact HH:MM:SS countdown shows instead.
-        body: JSON.stringify({
-          orderId: orderId,
-          hours: built.totalHours,
-          unit: built.unit,
-          unitValue: built.unitValue,
-          countdown: built.countdown,
-          message: built.text
-        })
-      });
-      return res.ok;
-    } catch(e){ return false; }
-  }
-
   const confirmedOrdersListEl = document.getElementById('confirmedOrdersList');
   if (confirmedOrdersListEl) {
     confirmedOrdersListEl.addEventListener('click', async (e) => {
@@ -12390,38 +12228,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       confirmedOrdersCache = confirmedOrdersCache.filter(o => String(o.id) !== String(id));
       await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
       renderConfirmedOrdersList();
-    });
-  }
-
-  const discordNotifyListEl = document.getElementById('discordNotifyList');
-  if (discordNotifyListEl) {
-    discordNotifyListEl.addEventListener('click', async (e) => {
-      const discordBtn = e.target.closest('button[data-action="send-discord-eta"]');
-      if (!discordBtn) return;
-      const id = discordBtn.getAttribute('data-id');
-      const input = discordNotifyListEl.querySelector('.aor-eta-input[data-id="' + CSS.escape(id) + '"]');
-      const unitSel = discordNotifyListEl.querySelector('.aor-eta-unit[data-id="' + CSS.escape(id) + '"]');
-      const rawValue = input ? parseFloat(input.value) : NaN;
-      const unit = unitSel ? unitSel.value : 'hours';
-      if (!rawValue || rawValue <= 0) {
-        if (input) { input.classList.add('error'); input.focus(); }
-        return;
-      }
-      const built = buildDiscordEtaMessage(rawValue, unit);
-      discordBtn.disabled = true;
-      const originalText = discordBtn.textContent;
-      discordBtn.textContent = t('adminSendingDiscord');
-      const ok = await sendDiscordOrderUpdate(id, built);
-      discordBtn.disabled = false;
-      discordBtn.textContent = originalText;
-      if (ok) {
-        const order = confirmedOrdersCache.find(o => String(o.id) === String(id));
-        if (order) order.discordEtaSentAt = Date.now();
-        await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
-        renderDiscordNotifyList();
-      } else {
-        alert(t('adminDiscordSendFailed'));
-      }
     });
   }
 
@@ -12813,7 +12619,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminTabArchive.classList.toggle('active', tab === 'archive');
     adminTabOrders.classList.toggle('active', tab === 'orders');
     adminTabDiscordUsers.classList.toggle('active', tab === 'discordUsers');
-    adminTabDiscordNotify.classList.toggle('active', tab === 'discordNotify');
     adminTabTiktokNotify.classList.toggle('active', tab === 'tiktokNotify');
     adminTabAnalytics.classList.toggle('active', tab === 'analytics');
     adminTabUrgency.classList.toggle('active', tab === 'urgency');
@@ -12824,7 +12629,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminPanelArchive.classList.toggle('active', tab === 'archive');
     adminPanelOrders.classList.toggle('active', tab === 'orders');
     adminPanelDiscordUsers.classList.toggle('active', tab === 'discordUsers');
-    adminPanelDiscordNotify.classList.toggle('active', tab === 'discordNotify');
     adminPanelTiktokNotify.classList.toggle('active', tab === 'tiktokNotify');
     adminPanelAnalytics.classList.toggle('active', tab === 'analytics');
     adminPanelUrgency.classList.toggle('active', tab === 'urgency');
@@ -12835,7 +12639,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     else if (tab === 'archive') renderAdminArchive();
     else if (tab === 'orders') renderAdminOrders();
     else if (tab === 'discordUsers') renderAdminDiscordUsers();
-    else if (tab === 'discordNotify') renderAdminDiscordNotify();
     else if (tab === 'tiktokNotify') renderAdminTiktokNotify();
     else if (tab === 'analytics') renderAdminAnalytics();
     else if (tab === 'urgency') renderAdminUrgency();
@@ -12847,7 +12650,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   adminTabArchive.addEventListener('click', () => switchAdminTab('archive'));
   adminTabOrders.addEventListener('click', () => switchAdminTab('orders'));
   adminTabDiscordUsers.addEventListener('click', () => switchAdminTab('discordUsers'));
-  adminTabDiscordNotify.addEventListener('click', () => switchAdminTab('discordNotify'));
   adminTabTiktokNotify.addEventListener('click', () => switchAdminTab('tiktokNotify'));
   adminTabAnalytics.addEventListener('click', () => switchAdminTab('analytics'));
   adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
@@ -13077,14 +12879,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   const DISCORD_CLIENT_ID = '1539515656020688927';
   const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
   const DISCORD_AUTH_WORKER_URL = 'https://moon-discord-auth.giorgikavelashvili99.workers.dev';
-  const DISCORD_NOTIFY_WORKER_URL = 'https://discordbottoken.giorgikavelashvili99.workers.dev';
-  // "Second bot" — a completely separate Discord bot process (its own
-  // token, own deployment) whose only job is to DM a customer their
-  // finished video's full TikTok analytics embed. This site never talks
-  // to that bot directly (that would mean shipping its shared secret to
-  // every visitor's browser) — it goes through its own small Worker proxy
-  // instead, exactly like DISCORD_NOTIFY_WORKER_URL above. Deploy
-  // discord-tiktok-notify-worker.js, then paste its URL here.
+  // The one unified Discord bot -- handles both a plain "send a message"
+  // DM and the "send TikTok analytics" DM (see the admin panel's TikTok
+  // ანალიტიკის გაგზავნა tab). This site never talks to that bot directly
+  // (that would mean shipping its shared secret to every visitor's
+  // browser) -- it goes through a small Worker proxy instead. Deploy
+  // discord-worker.js, then paste its URL here.
   const DISCORD_TIKTOK_NOTIFY_WORKER_URL = 'https://moonttcheckepro.giorgikavelashvili99.workers.dev';
   const DISCORD_INVITE_URL = 'https://discord.gg/7bbmeHKq4';
   const DISCORD_STATE_KEY = 'moon_discord_oauth_state';
