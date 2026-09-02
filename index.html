@@ -13250,6 +13250,34 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
   function initTiktokDownloader(){
     const urlInput = document.getElementById('ttdlUrlInput');
+    // Auto-fills from the clipboard the instant this field is focused —
+    // covers the single most common path (TikTok app -> Share -> Copy
+    // link -> switch to this site) without an extra "paste" tap, and
+    // without needing any TikTok login/approval at all. Broader than
+    // extractTiktokLink() above on purpose: that one is scoped to profile
+    // links for the order flow's identity step, while a checker input
+    // specifically needs to accept a single VIDEO's link, including the
+    // vt.tiktok.com / vm.tiktok.com short-link domains TikTok's own
+    // native "Copy link" share sheet commonly produces for a video (as
+    // opposed to a profile), which the profile-only regex doesn't match.
+    // Reading the clipboard requires a real user gesture in every
+    // browser that supports the API at all -- focusing this input via a
+    // tap/click satisfies that, an unconditional page-load check would
+    // not. Silently does nothing if the permission is denied or the
+    // clipboard holds something else entirely, leaving manual paste as
+    // the fallback either way.
+    if (urlInput && navigator.clipboard && navigator.clipboard.readText) {
+      urlInput.addEventListener('focus', () => {
+        if (urlInput.value.trim()) return; // don't clobber something already typed/pasted
+        navigator.clipboard.readText().then(text => {
+          const trimmed = (text || '').trim();
+          if (urlInput.value.trim()) return; // re-check: focus can race a fast manual paste
+          if (/^https?:\/\/(?:www\.|vt\.|vm\.|m\.)?tiktok\.com\/\S+$/i.test(trimmed)) {
+            urlInput.value = trimmed;
+          }
+        }).catch(() => { /* silent -- manual paste still works as the fallback */ });
+      });
+    }
     const analyzeBtn = document.getElementById('ttdlAnalyzeBtn');
     const resultBox = document.getElementById('ttdlResult');
     const detailsBox = document.getElementById('ttdlDetails');
