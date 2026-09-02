@@ -513,6 +513,18 @@
     .tnf-send-btn:hover:not(:disabled){ background-position:100% 0; transform:translateY(-1px); box-shadow:0 10px 22px rgba(254,44,85,0.22); }
   }
   .tnf-send-btn:disabled{ opacity:0.55; cursor:default; box-shadow:none; }
+  /* Plain-message variant of the same button -- a distinct purple/blue
+     instead of the TikTok-brand gradient above, so the two actions read
+     as visually different at a glance rather than looking like the same
+     button duplicated. */
+  .tnf-send-btn-msg{
+    background:linear-gradient(120deg, var(--purple), #6a7fff);
+    background-size:180% 100%; background-position:0% 0;
+    box-shadow:0 6px 16px rgba(124,143,255,0.22);
+  }
+  @media (hover:hover) and (pointer:fine){
+    .tnf-send-btn-msg:hover:not(:disabled){ box-shadow:0 10px 22px rgba(124,143,255,0.32); }
+  }
   .tnf-sent{
     display:inline-flex; align-items:center; gap:6px; width:fit-content;
     font-size:11px; font-weight:700; color:#3ddc84;
@@ -6817,6 +6829,11 @@
       adminSendTiktokAnalytics: 'ანალიტიკის გაგზავნა',
       adminSendingTiktokAnalytics: 'გაანალიზება და გაგზავნა…',
       adminTiktokAnalyticsSent: 'ანალიტიკა გაიგზავნა',
+      adminCustomMessagePh: 'ჩაწერე შეტყობინება მომხმარებლისთვის',
+      adminSendCustomMessage: 'გაგზავნა',
+      adminSendingCustomMessage: 'იგზავნება…',
+      adminCustomMessageSent: 'შეტყობინება გაიგზავნა',
+      adminCustomMessageRequired: 'ჩაწერე შეტყობინების ტექსტი.',
       adminTiktokSendFailed: 'ვერ გაიგზავნა — გადაამოწმე TikTok ლინკი და Worker-ის მისამართი, და სცადე თავიდან.',
       adminTiktokLinkRequired: 'ჩაწერე TikTok ვიდეოს ლინკი.',
       adminNoActiveSubs: 'აქტიური პაკეტი ჯერ არავის აქვს.',
@@ -7229,6 +7246,11 @@
       adminSendTiktokAnalytics: 'Send analytics',
       adminSendingTiktokAnalytics: 'Analyzing and sending…',
       adminTiktokAnalyticsSent: 'Analytics sent',
+      adminCustomMessagePh: 'Type a message for the customer',
+      adminSendCustomMessage: 'Send',
+      adminSendingCustomMessage: 'Sending…',
+      adminCustomMessageSent: 'Message sent',
+      adminCustomMessageRequired: 'Type a message first.',
       adminTiktokSendFailed: 'Failed to send — check the TikTok link and the worker URL, and try again.',
       adminTiktokLinkRequired: 'Enter a TikTok video link.',
       adminNoActiveSubs: 'No one has an active package yet.',
@@ -11954,6 +11976,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           '<button class="tnf-send-btn" data-action="send-tiktok-analytics" data-id="' + escapeHtml(String(o.id)) + '"><span aria-hidden="true">✦</span>' + t('adminSendTiktokAnalytics') + '</button>' +
         '</div>' +
         (o.tiktokAnalyticsSentAt ? '<span class="tnf-sent">✅ ' + t('adminTiktokAnalyticsSent') + ' — ' + formatCommentDate(o.tiktokAnalyticsSentAt) + '</span>' : '') +
+        '<div class="tnf-input-row" style="margin-top:8px;">' +
+          '<span class="tnf-input-wrap">' +
+            '<span class="tnf-input-icon" aria-hidden="true">✉️</span>' +
+            '<input type="text" class="aor-message-input" data-id="' + escapeHtml(String(o.id)) + '" placeholder="' + t('adminCustomMessagePh') + '">' +
+          '</span>' +
+          '<button class="tnf-send-btn tnf-send-btn-msg" data-action="send-custom-message" data-id="' + escapeHtml(String(o.id)) + '"><span aria-hidden="true">➤</span>' + t('adminSendCustomMessage') + '</button>' +
+        '</div>' +
+        (o.customMessageSentAt ? '<span class="tnf-sent">✅ ' + t('adminCustomMessageSent') + ' — ' + formatCommentDate(o.customMessageSentAt) + '</span>' : '') +
       '</div>'
     ).join('');
   }
@@ -12436,6 +12466,55 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (ok) {
         order.tiktokAnalyticsSentAt = Date.now();
         await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+        renderTiktokNotifyList();
+      } else {
+        alert(t('adminTiktokSendFailed'));
+      }
+    });
+  }
+
+  // Plain text DM -- whatever the admin typed goes to that customer
+  // verbatim, through the same bot's /send-message endpoint (see
+  // discord-worker.js). Deliberately its own separate button/input per
+  // row rather than reusing the TikTok one above: sending a custom note
+  // has nothing to do with running the analytics pipeline, and mixing
+  // the two would mean guessing which one a filled-in box was meant for.
+  async function sendCustomMessage(discordId, text){
+    try{
+      const res = await fetch(DISCORD_TIKTOK_NOTIFY_WORKER_URL + '/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ discordId: discordId, text: text })
+      });
+      return res.ok;
+    } catch(e){ return false; }
+  }
+
+  if (tiktokNotifyListEl) {
+    tiktokNotifyListEl.addEventListener('click', async (e) => {
+      const sendBtn = e.target.closest('button[data-action="send-custom-message"]');
+      if (!sendBtn) return;
+      const id = sendBtn.getAttribute('data-id');
+      const input = tiktokNotifyListEl.querySelector('.aor-message-input[data-id="' + CSS.escape(id) + '"]');
+      const text = input ? input.value.trim() : '';
+      if (!text) {
+        if (input) { input.classList.add('error'); input.focus(); }
+        alert(t('adminCustomMessageRequired'));
+        return;
+      }
+      const order = confirmedOrdersCache.find(o => String(o.id) === String(id));
+      if (!order || !order.discordId) return;
+
+      sendBtn.disabled = true;
+      const originalHtml = sendBtn.innerHTML;
+      sendBtn.textContent = t('adminSendingCustomMessage');
+      const ok = await sendCustomMessage(order.discordId, text);
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = originalHtml;
+      if (ok) {
+        order.customMessageSentAt = Date.now();
+        await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
+        if (input) input.value = '';
         renderTiktokNotifyList();
       } else {
         alert(t('adminTiktokSendFailed'));
