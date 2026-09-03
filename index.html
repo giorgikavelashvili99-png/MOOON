@@ -4930,26 +4930,21 @@
     content:'★'; font-size:9px; color:#f5a623; line-height:1;
   }
 
-  /* Weekly/Monthly info tag (video count + spots-left) — lives at the
-     top of the card, right-aligned, instead of repeating inside the
-     wizard modal. Deliberately NOT position:absolute with a negative
-     offset like .pc-badge above: those two cards aren't wrapped in a
-     .pc-card-wrap sibling container the way indiv/cheap are, so an
-     overhanging ribbon here would get clipped by .pc-card's own
-     overflow:hidden. Sitting in normal flow avoids that entirely. */
-  .pc-corner-ribbon{
-    display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px 8px;
-    align-self:flex-end;
-    margin-bottom:12px;
-    padding:5px 12px; border-radius:100px;
-    background: linear-gradient(135deg, var(--tile-accent), color-mix(in srgb, var(--tile-accent) 55%, #1c140c));
-    color:#1c140c; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
-    font-size:9.5px; font-weight:800; line-height:1.3;
-    box-shadow:0 4px 12px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.25);
+  /* Weekly/Monthly spots-left badge — same exact size/shape/position as
+     the "პოპულარული" badge above (now that these two cards are wrapped
+     in .pc-card-wrap the same way indiv/cheap are), just re-colored for
+     urgency and with a flame instead of the default star. The earlier
+     version of this (a normal-flow "ribbon" holding both the video-count
+     AND the spots-left text) rendered far too wide/banner-like instead
+     of a small corner tag — video-count is dropped entirely here per
+     feedback, keeping just the spots-left part in the Popular badge's
+     exact style. */
+  .pc-badge--urgency{
+    background: linear-gradient(135deg, #ff6b4a, #ff3860);
+    color:#fff;
   }
-  .pc-corner-ribbon .pcr-sep{ opacity:0.5; }
-  .pc-corner-ribbon .pcr-urgency{ display:inline-flex; align-items:center; gap:3px; }
-  .pc-corner-ribbon .pcr-urgency svg{ width:9px; height:9px; fill:#7a1414; flex:0 0 auto; }
+  .pc-badge--urgency::before{ content:none; }
+  .pc-badge--urgency svg{ width:10px; height:10px; fill:#ffe27a; flex:0 0 auto; }
 
   .pc-head{
     display:flex; align-items:center; gap:12px; margin-bottom:16px;
@@ -5896,12 +5891,9 @@
       </div>
 
       <!-- Card 2 — weekly subscription package -->
+      <div class="pc-card-wrap">
+      <span class="pc-badge pc-badge--urgency" id="wpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">დარჩა</span></span>
       <div class="pc-card pc-card--weekly">
-        <div class="pc-corner-ribbon">
-          <span data-i18n="wpBadge">5 ვიდეო / 7 დღე</span>
-          <span class="pcr-sep">·</span>
-          <span class="pcr-urgency" id="wpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">დარჩა</span></span>
-        </div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">📅</div>
           <div class="pc-head-text">
@@ -6054,14 +6046,12 @@
     <div class="copy-note" id="wpCopyNote"></div>
   </div>
         </div>
+      </div>
 
       <!-- Card 3 — monthly subscription package -->
+      <div class="pc-card-wrap">
+      <span class="pc-badge pc-badge--urgency" id="mpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">დარჩა</span></span>
       <div class="pc-card pc-card--monthly">
-        <div class="pc-corner-ribbon">
-          <span data-i18n="mpBadge">20 ვიდეო / თვე</span>
-          <span class="pcr-sep">·</span>
-          <span class="pcr-urgency" id="mpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">დარჩა</span></span>
-        </div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">👑</div>
           <div class="pc-head-text">
@@ -6203,6 +6193,7 @@
     <div class="copy-note" id="mpCopyNote"></div>
   </div>
         </div>
+      </div>
 
       <!-- Card 4 — edit order (character edit) -->
       <div class="pc-duo-row">
@@ -9624,7 +9615,26 @@
         }
         if (deltas.length < MIN_SAMPLES - 1) { finish(null); return; }
         deltas.sort((a, b) => a - b);
-        const mid = deltas[Math.floor(deltas.length / 2)];
+        // Frame-delivery noise from throttling (background/backgrounded
+        // playback, low battery / power-saving mode, a loaded device —
+        // all common on a phone mid-upload) is ONE-SIDED: a throttled
+        // callback fires LATE (a bigger gap between samples), it never
+        // fires EARLY (a gap smaller than the video's true native frame
+        // interval). The median gets dragged upward by however many
+        // samples were throttled during this particular scan — enough
+        // of them, and the median lands near 2x the true interval,
+        // which reads out as exactly HALF the real fps (60fps measuring
+        // as 30, 30 as 15, etc.). That's this exact bug: a genuinely
+        // 60fps upload, scanned while the phone happens to be in
+        // power-saving mode, gets its fps under-measured and rejected
+        // outright even though the file itself is fine.
+        // A low percentile is far more robust here: still an average
+        // over many samples rather than a single possibly-glitched
+        // minimum, but it sits close to the fastest consistently-
+        // repeated interval — the true native rate — instead of being
+        // pulled upward by whichever samples happened to be throttled.
+        const percentileIndex = Math.max(0, Math.floor(deltas.length * 0.2));
+        const mid = deltas[percentileIndex];
         const rawFps = 1 / mid;
         const commonRates = [24, 25, 30, 50, 60, 120];
         let closest = Math.round(rawFps);
