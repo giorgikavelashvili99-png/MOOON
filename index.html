@@ -32,6 +32,14 @@
     --volt: #3dd6ff;
     --volt-soft: rgba(61,214,255,0.4);
 
+    /* --- Warm tile palette (format/fps tiles + upload area) — softer,
+       warmer tones instead of stark pure-white on near-black, per
+       design feedback. --- */
+    --warm-ivory: #f4ead9;
+    --warm-ivory-dim: #e7d9bf;
+    --warm-tile-bg-1: #1c140c;
+    --warm-tile-bg-2: #120d08;
+
     /* --- Moonfade palette (admin panel) --- */
     --moon-bg: #050810;
     --moon-deep: #070c18;
@@ -1878,7 +1886,7 @@
     background:
       radial-gradient(ellipse 140% 90% at 50% -10%, color-mix(in srgb, var(--pc-accent, var(--cyan)) 16%, transparent), transparent 70%),
       linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01) 40%),
-      #0a0a12;
+      var(--warm-tile-bg-1);
     border:1px solid color-mix(in srgb, var(--pc-accent, var(--cyan)) 24%, transparent);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease;
@@ -1916,11 +1924,11 @@
        support text-clipped gradients, and is scoped with @supports so a
        partial/odd implementation can't leave the text painted transparent
        with nothing behind it (which is what an invisible title looks like). */
-    color:#c9d9f5;
+    color: var(--warm-ivory);
   }
   @supports ((background-clip:text) or (-webkit-background-clip:text)){
     .drop-zone .dz-title{
-      background:linear-gradient(120deg, #d3e0fb, #a9c3f0);
+      background:linear-gradient(120deg, #f7ecd8, var(--warm-ivory-dim));
       -webkit-background-clip:text; background-clip:text;
       -webkit-text-fill-color:transparent; color:transparent;
     }
@@ -3066,7 +3074,7 @@
     min-width:0;
     aspect-ratio:1 / 1;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
-    background: linear-gradient(160deg, color-mix(in srgb, var(--pc-accent) 22%, #0a0a12), #0a0a12 65%);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--pc-accent) 18%, var(--warm-tile-bg-1)), var(--warm-tile-bg-2) 65%);
     border:2px solid color-mix(in srgb, var(--pc-accent) 45%, transparent);
     border-radius:18px;
     cursor:pointer; font-family:'BPG Glaho', 'Space Grotesk', sans-serif; color:var(--text);
@@ -3075,24 +3083,24 @@
   }
   .wp-box:hover{ border-color:color-mix(in srgb, var(--pc-accent) 75%, transparent); transform:translateY(-3px); }
   .wp-box:active{ transform:translateY(0) scale(0.96); }
-  .wp-box-q{ position:relative; z-index:1; font-size:14px; font-weight:800; letter-spacing:0.01em; line-height:1; color:#fff; text-shadow:0 0 2px rgba(0,0,0,0.8), 0 0 8px color-mix(in srgb, var(--pc-accent) 55%, transparent); }
+  .wp-box-q{ position:relative; z-index:1; font-size:14px; font-weight:800; letter-spacing:0.01em; line-height:1; color:var(--warm-ivory); text-shadow:0 0 2px rgba(0,0,0,0.8), 0 0 8px color-mix(in srgb, var(--pc-accent) 55%, transparent); }
   .wp-box-fps{
     position:relative; z-index:1; margin-top:5px;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:8.5px; letter-spacing:0.03em;
-    color:#fff; text-transform:uppercase; line-height:1;
-    border:1px solid color-mix(in srgb, var(--pc-accent) 55%, rgba(255,255,255,0.35)); border-radius:20px; padding:2px 7px;
+    color:var(--warm-ivory-dim); text-transform:uppercase; line-height:1;
+    border:1px solid color-mix(in srgb, var(--pc-accent) 55%, rgba(244,234,217,0.35)); border-radius:20px; padding:2px 7px;
     background:rgba(0,0,0,0.25);
     transition: color .25s ease, border-color .25s ease, background .25s ease;
   }
   .wp-box-price{
     position:relative; z-index:1;
     margin-top:8px; font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-weight:800;
-    font-size:15.5px; line-height:1; color:#fff; text-shadow:0 0 2px rgba(0,0,0,0.85), 0 0 12px color-mix(in srgb, var(--pc-accent) 70%, transparent), 0 2px 4px rgba(0,0,0,0.6);
+    font-size:15.5px; line-height:1; color:var(--warm-ivory); text-shadow:0 0 2px rgba(0,0,0,0.85), 0 0 12px color-mix(in srgb, var(--pc-accent) 70%, transparent), 0 2px 4px rgba(0,0,0,0.6);
     display:flex; flex-direction:column; align-items:center; gap:2px;
   }
   .wp-box-price sup{ font-size:0.58em; margin-left:1px; opacity:0.75; }
   .wp-old-price{
-    font-size:10px; font-weight:700; color:#fff; opacity:0.65;
+    font-size:10px; font-weight:700; color:var(--warm-ivory-dim); opacity:0.65;
     text-decoration:line-through; line-height:1; display:none;
   }
   .wp-old-price.show{ display:block; }
@@ -3168,7 +3176,7 @@
     min-width:0;
     aspect-ratio:1 / 1;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
-    background: linear-gradient(160deg, color-mix(in srgb, var(--pc-accent) 22%, #0a0a12), #0a0a12 65%);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--pc-accent) 18%, var(--warm-tile-bg-1)), var(--warm-tile-bg-2) 65%);
     border:2px solid color-mix(in srgb, var(--pc-accent) 45%, transparent);
     border-radius:18px;
     cursor:pointer; font-family:'BPG Glaho', 'Space Grotesk', sans-serif; color:var(--text);
@@ -3177,12 +3185,12 @@
   }
   .mp-box:hover{ border-color:color-mix(in srgb, var(--pc-accent) 75%, transparent); transform:translateY(-3px); }
   .mp-box:active{ transform:translateY(0) scale(0.96); }
-  .mp-box-q{ position:relative; z-index:1; font-size:14px; font-weight:800; letter-spacing:0.01em; line-height:1; color:#fff; text-shadow:0 0 2px rgba(0,0,0,0.8), 0 0 8px color-mix(in srgb, var(--pc-accent) 55%, transparent); }
+  .mp-box-q{ position:relative; z-index:1; font-size:14px; font-weight:800; letter-spacing:0.01em; line-height:1; color:var(--warm-ivory); text-shadow:0 0 2px rgba(0,0,0,0.8), 0 0 8px color-mix(in srgb, var(--pc-accent) 55%, transparent); }
   .mp-box-fps{
     position:relative; z-index:1; margin-top:5px;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:8.5px; letter-spacing:0.03em;
-    color:#fff; text-transform:uppercase; line-height:1;
-    border:1px solid color-mix(in srgb, var(--pc-accent) 55%, rgba(255,255,255,0.35)); border-radius:20px; padding:2px 7px;
+    color:var(--warm-ivory-dim); text-transform:uppercase; line-height:1;
+    border:1px solid color-mix(in srgb, var(--pc-accent) 55%, rgba(244,234,217,0.35)); border-radius:20px; padding:2px 7px;
     background:rgba(0,0,0,0.25);
     transition: color .25s ease, border-color .25s ease, background .25s ease;
   }
@@ -3194,10 +3202,10 @@
   }
   .mp-box-price sup{ font-size:0.58em; margin-left:1px; opacity:0.75; }
   .mp-old-price{
-    font-size:10px; font-weight:700; color:#fff; opacity:0.65;
+    font-size:10px; font-weight:700; color:var(--warm-ivory-dim); opacity:0.65;
     text-decoration:line-through; line-height:1;
   }
-  .mp-new-price{ display:block; color:#fff; font-size:1.15em; text-shadow:0 0 2px rgba(0,0,0,0.85), 0 0 12px color-mix(in srgb, var(--pc-accent) 70%, transparent), 0 2px 4px rgba(0,0,0,0.6); }
+  .mp-new-price{ display:block; color:var(--warm-ivory); font-size:1.15em; text-shadow:0 0 2px rgba(0,0,0,0.85), 0 0 12px color-mix(in srgb, var(--pc-accent) 70%, transparent), 0 2px 4px rgba(0,0,0,0.6); }
   .mp-box.active{
     border-color: transparent;
     background: linear-gradient(150deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #04101a));
@@ -8113,7 +8121,14 @@
           if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
           wpQualityGrid.classList.remove('wizard-step-hidden');
           setWizardStage('wizardStepsWp', 2);
-          autoObserver.disconnect();
+          // NOT disconnected: a reset-and-reupload cycle reuses this exact
+          // DOM node (resetMooonAutoUI empties it, runMooonAutoUpload
+          // refills it), so a one-shot observer here previously meant the
+          // wizard could only ever advance past step 1 ONCE per page
+          // load — every later re-upload attempt got stuck showing the
+          // "upload complete" state forever, with no way forward short of
+          // a full page refresh. Re-firing on every completed upload is
+          // harmless (advancing to a step you're already on is a no-op).
         }
       });
       autoObserver.observe(autoWrapEl, { childList: true });
@@ -8143,9 +8158,12 @@
     });
 
     tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
-      const linkEl = document.getElementById('tiktokLinkWp');
       const errorEl = document.getElementById('tiktokErrorWp');
-      if (!linkEl || !linkEl.value.trim()) {
+      // getTiktokValue() returns the active subscription's on-file link
+      // when there is one — checking the raw (and, for a subscriber,
+      // hidden/empty) input directly always failed validation and left
+      // subscribers unable to ever press past this step.
+      if (!getTiktokValue('wp')) {
         if (errorEl) errorEl.classList.add('show');
         return;
       }
@@ -8250,7 +8268,9 @@
           if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
           mpQualityGrid.classList.remove('wizard-step-hidden');
           setWizardStage('wizardStepsMp', 2);
-          autoObserver.disconnect();
+          // NOT disconnected — see the identical comment in
+          // initWeeklyOrderWizard above for why a one-shot observer here
+          // broke every re-upload after the first successful one.
         }
       });
       autoObserver.observe(autoWrapEl, { childList: true });
@@ -8280,9 +8300,9 @@
     });
 
     tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
-      const linkEl = document.getElementById('tiktokLinkMp');
       const errorEl = document.getElementById('tiktokErrorMp');
-      if (!linkEl || !linkEl.value.trim()) {
+      // See the identical fix + comment in initWeeklyOrderWizard above.
+      if (!getTiktokValue('mp')) {
         if (errorEl) errorEl.classList.add('show');
         return;
       }
@@ -8493,7 +8513,10 @@
           if (scannerPanelEl) scannerPanelEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.remove('wizard-step-hidden');
           setWizardStage('wizardStepsMain', 2);
-          autoObserver.disconnect(); // one-shot -- a reupload rebuilds this whole DOM node fresh anyway
+          // NOT disconnected — see the identical comment in
+          // initWeeklyOrderWizard for why a one-shot observer here broke
+          // every re-upload after the first successful one (this DOM
+          // node is reused, not rebuilt, on every subsequent upload).
         }
       });
       autoObserver.observe(srAutoEl, { childList: true });
@@ -8771,14 +8794,22 @@
     const fieldEl = document.getElementById(panelKey === 'wp' ? 'tiktokFieldWp' : 'tiktokFieldMp');
     const badgeEl = document.getElementById(panelKey === 'wp' ? 'subActiveBadgeWp' : 'subActiveBadgeMp');
     if (!fieldEl || !badgeEl) return;
+    // Only the MANUAL-entry pieces (label, input, auto-upload
+    // button/note, error) get hidden for an active subscriber — never
+    // the whole field. The "დადასტურება" confirm button that advances
+    // the wizard to the next step lives inside this same container;
+    // hiding fieldEl wholesale (the old behaviour) hid that button too,
+    // leaving a subscriber with no way to actually press confirm and
+    // continue even though their TikTok link was already on file.
+    const manualBits = fieldEl.querySelectorAll('.field-top, .link-input-wrap, .tt-auto-btn, .tt-auto-note, .error-msg');
     if (sub){
-      fieldEl.style.display = 'none';
+      manualBits.forEach(el => { el.style.display = 'none'; });
       badgeEl.classList.add('show');
       // The link is already on file from the original order — treat the
       // field as satisfied so validateBeforeSend() never blocks on it.
       tiktokLinkConfirmed[panelKey] = true;
     } else {
-      fieldEl.style.display = '';
+      manualBits.forEach(el => { el.style.display = ''; });
       badgeEl.classList.remove('show');
       const g = tiktokGroups[panelKey];
       tiktokLinkConfirmed[panelKey] = !!(g && g.link && g.link.value.trim());
@@ -9012,6 +9043,22 @@
       if (g.link) g.link.classList.remove('error');
       if (g.error) g.error.style.display = 'none';
     });
+  }
+
+  // Fully wipes one panel's "video attached" state — the confirmed flag,
+  // the stored transfer link, and its error/badge display. Used whenever
+  // an upload is rejected, cancelled, or the wizard is reset, so a
+  // PREVIOUS (accepted) upload's link can never silently linger and make
+  // a later rejected/cancelled attempt look like a video is still
+  // attached. Without this, declining or cancelling only reset the
+  // visible wizard step — the underlying confirmed-video state (and
+  // whatever reads it, e.g. order-sending) stayed stuck on the old file.
+  function resetVideoLinkFor(panelKey){
+    const g = videoLinkGroups[panelKey];
+    if (g && g.link) g.link.value = '';
+    if (g && g.error) g.error.style.display = 'none';
+    videoLinkConfirmed[panelKey] = false;
+    updateVideoLinkConfirmBadge();
   }
 
   Object.keys(videoLinkGroups).forEach(key => {
@@ -9322,6 +9369,7 @@
     dropZone.classList.remove('dz-scanning-hidden');
     if (srReject4kNote) srReject4kNote.style.display = 'none';
     resetTransferPrompt();
+    resetVideoLinkFor('main');
     secondsInput.value = 5;
     msRange.value = 0;
     refresh();
@@ -9666,7 +9714,18 @@
       // nothing to hold the visitor's quality pick to, so lift the
       // upscale restriction until a valid video is scanned again.
       if (cfg.allowFourK && typeof cpUploadedTier !== 'undefined') cpUploadedTier = null;
+      // A rejected upload must not leave behind a stale "video already
+      // confirmed" state from a PREVIOUS (accepted) upload in this same
+      // session — otherwise the order can still look/behave as if a
+      // valid video were attached even though the visible result is a
+      // rejection. See resetVideoLinkFor below.
+      if (cfg.panelKey) resetVideoLinkFor(cfg.panelKey);
       resetPrompt();
+      // Bring the uploader back immediately — don't make a rejected
+      // upload a dead end that only the tiny cancel (X) button escapes.
+      // The visitor should be able to just drop/pick a different file
+      // right away.
+      zone.classList.remove('dz-scanning-hidden');
     }
     function showIdle(){
       currentFile = null;
@@ -9680,6 +9739,9 @@
       // could still get blocked as an "upscale/downgrade" of a video that
       // no longer counts.
       if (cfg.allowFourK && typeof cpUploadedTier !== 'undefined') cpUploadedTier = null;
+      // Same stale-state guard as showReject() above — cancelling/resetting
+      // must never leave a previous upload's "confirmed" video link behind.
+      if (cfg.panelKey) resetVideoLinkFor(cfg.panelKey);
       resetPrompt();
       // Bring the uploader back — this is the only way back to it once a
       // file's been picked, now that it hides itself the same way the
@@ -10581,7 +10643,9 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
           cpQualityGrid.classList.remove('wizard-step-hidden');
           setWizardStage('wizardStepsCp', 2);
-          autoObserver.disconnect();
+          // NOT disconnected — see the identical comment in
+          // initWeeklyOrderWizard for why a one-shot observer here broke
+          // every re-upload after the first successful one.
         }
       });
       autoObserver.observe(autoWrapEl, { childList: true });
