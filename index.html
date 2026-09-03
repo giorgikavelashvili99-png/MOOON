@@ -8161,8 +8161,12 @@
     const sendNoBtn = document.getElementById('wpSendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
       if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
-      setWizardStage('wizardStepsWp', 3);
+      const linkEl = document.getElementById('tiktokLinkWp');
+      const errorEl = document.getElementById('tiktokErrorWp');
+      if (linkEl) linkEl.value = '';
+      if (errorEl) errorEl.classList.remove('show');
+      const resetBtn = document.getElementById('scanResetWp');
+      if (resetBtn) resetBtn.click();
     });
   })();
 
@@ -8294,8 +8298,12 @@
     const sendNoBtn = document.getElementById('mpSendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
       if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
-      setWizardStage('wizardStepsMp', 3);
+      const linkEl = document.getElementById('tiktokLinkMp');
+      const errorEl = document.getElementById('tiktokErrorMp');
+      if (linkEl) linkEl.value = '';
+      if (errorEl) errorEl.classList.remove('show');
+      const resetBtn = document.getElementById('scanResetMp');
+      if (resetBtn) resetBtn.click();
     });
   })();
 
@@ -8543,14 +8551,18 @@
       const chatBtn = document.getElementById('orderBtnChat');
       if (chatBtn) chatBtn.click();
     });
-    // "No" steps back to the TikTok-link field so the visitor can review
-    // or change something before deciding whether to send, rather than
-    // being a dead end with no visible reaction to the tap at all.
+    // "No" fully restarts the flow — same as pressing the scanner's own
+    // cancel button — rather than just stepping back one stage, so
+    // declining to send really does put everything back where it was
+    // before anything was uploaded at all.
     const sendNoBtn = document.getElementById('sendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
       if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
-      setWizardStage('wizardStepsMain', 3);
+      const linkEl = document.getElementById('tiktokLink');
+      const errorEl = document.getElementById('tiktokError');
+      if (linkEl) linkEl.value = '';
+      if (errorEl) errorEl.classList.remove('show');
+      resetScanner();
     });
   })();
 
@@ -10600,8 +10612,12 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     const sendNoBtn = document.getElementById('cpSendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
       if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
-      setWizardStage('wizardStepsCp', 3);
+      const linkEl = document.getElementById('tiktokLinkCp');
+      const errorEl = document.getElementById('tiktokErrorCp');
+      if (linkEl) linkEl.value = '';
+      if (errorEl) errorEl.classList.remove('show');
+      const resetBtn = document.getElementById('scanResetCp');
+      if (resetBtn) resetBtn.click();
     });
   })();
 
