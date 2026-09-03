@@ -4596,6 +4596,7 @@
     max-width:78%; padding:11px 15px; border-radius:19px;
     font-family:'BPG Glaho','Space Grotesk',sans-serif;
     font-size:14px; line-height:1.5; word-wrap:break-word;
+    white-space:pre-wrap;
     animation:msgBubbleIn 0.28s cubic-bezier(.2,.9,.3,1.2) both;
     transform-style:preserve-3d;
   }
@@ -4613,6 +4614,8 @@
     background:linear-gradient(135deg, #ffcb73, #f2994a);
     box-shadow:0 8px 20px rgba(242,153,74,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
   }
+  .msg-bubble a{ color:inherit; text-decoration:underline; word-break:break-all; }
+  .msg-bubble a:active{ opacity:0.7; }
   .msg-system{
     align-self:center; font-family:'JetBrains Mono',monospace; font-size:11px;
     color:var(--text-faint); background:rgba(255,255,255,0.05);
@@ -9876,12 +9879,31 @@
   // changes, plus the admin-only Complete-order button.
   let messengerRole = 'customer';
 
+  // Escapes the raw message text first (so nothing in it can ever be
+  // interpreted as HTML/script), THEN turns URL-looking spans into real
+  // clickable <a> tags. Order matters: linkifying before escaping would
+  // let the escaping step mangle the just-inserted <a> tags right back
+  // into visible text.
+  function linkifyMessengerText(text){
+    const escaped = escapeHtml(text);
+    // Matches full http(s):// links AND bare domains like
+    // "mooontransferr.onrender.com/d/xyz" (the site's own order messages
+    // don't include a protocol prefix on the video-link line). The
+    // (?<![\w@.]) guard stops it from also grabbing the "gmail.com" tail
+    // out of a plain email address like mooncr26@gmail.com.
+    const urlRe = /(?<![\w@.])(https?:\/\/[^\s<]+|(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s<]*)?)/gi;
+    return escaped.replace(urlRe, (match) => {
+      const href = /^https?:\/\//i.test(match) ? match : 'https://' + match;
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+    });
+  }
+
   function renderMessageBubble(msg){
     const container = document.getElementById('messengerMessages');
     if (!container) return;
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble ' + (msg.from === 'admin' ? 'admin' : 'customer');
-    bubble.textContent = msg.text;
+    bubble.innerHTML = linkifyMessengerText(msg.text);
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
   }
