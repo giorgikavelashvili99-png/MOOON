@@ -9641,6 +9641,12 @@
       if (okEl) okEl.classList.remove('show');
       if (rejectEl) rejectEl.classList.remove('show');
       if (fourKNoteEl) fourKNoteEl.style.display = 'none';
+      // Cheap Package only: cancelling clears whatever tier the (now
+      // abandoned) upload had locked in, the same way a rejected upload
+      // already does -- otherwise a manually-picked tile after cancelling
+      // could still get blocked as an "upscale/downgrade" of a video that
+      // no longer counts.
+      if (cfg.allowFourK && typeof cpUploadedTier !== 'undefined') cpUploadedTier = null;
       resetPrompt();
       // Bring the uploader back — this is the only way back to it once a
       // file's been picked, now that it hides itself the same way the
@@ -10508,7 +10514,12 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
       if (el) el.classList.add('wizard-step-hidden');
     });
-    cpQualityGrid.classList.add('wizard-step-hidden');
+    // Unlike the other three packages, the Cheap Package's quality tiles
+    // are meant to be usable BEFORE any upload too — tryManualSelectCpQuality
+    // explicitly allows free clicking while cpUploadedTier is still null,
+    // and cpQualityHint's own copy ("choose a quality OR upload a video")
+    // says so. Gating the grid behind the upload step like the other
+    // wizards contradicted that, so it stays visible from the start here.
     setWizardStage('wizardStepsCp', 1);
 
     const autoWrapEl = document.getElementById('mooonAutoCp');
@@ -10518,7 +10529,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           const scanResultEl = document.getElementById('scanResultCp');
           if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
-          cpQualityGrid.classList.remove('wizard-step-hidden');
           setWizardStage('wizardStepsCp', 2);
           autoObserver.disconnect();
         }
@@ -10530,7 +10540,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     if (scanResultEl2) {
       const resetObserver = new MutationObserver(() => {
         if (!scanResultEl2.classList.contains('show')) {
-          [cpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
+          // Quality picks are independent of upload state here, so a
+          // cancelled/reset upload should NOT wipe out or hide a manual
+          // tile selection — only the downstream TikTok/confirm steps
+          // (which really did depend on this now-cancelled upload) reset.
+          [tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
           });
           if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
