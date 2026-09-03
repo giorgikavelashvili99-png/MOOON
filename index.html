@@ -72,6 +72,7 @@
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
+  html{ zoom:1.25; }
 
   .bg-layer{
     position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
@@ -1957,7 +1958,7 @@
 
   /* Lightweight upload result for the weekly/monthly scanners — just
      accepted/rejected, no per-second price breakdown like the main one. */
-  .simple-scan-result{ display:none; margin-top:14px; }
+  .simple-scan-result{ display:none; position:relative; margin-top:14px; }
   .simple-scan-result.show{ display:block; }
   .simple-scan-ok{
     display:none; align-items:center; gap:8px; flex-wrap:wrap;
@@ -2338,6 +2339,56 @@
      doesn't sit on screen next to the "processing..." indicator while
      the video's duration/resolution are being read. */
   .dz-scanning-hidden{ display:none !important; }
+
+  /* ---------- Wizard stage indicator (Upload -> Quality -> TikTok ->
+     Confirm) shown at the top of every order panel, right under the ✕.
+     Reads its accent from --pc-accent so it matches whichever package
+     card it lives in, same as the quality tiles. ---------- */
+  .wizard-steps{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:2px; margin:0 0 20px;
+  }
+  .wizard-step{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    flex:0 0 auto; min-width:0;
+    opacity:0.45; transition:opacity .25s ease;
+  }
+  .wizard-step.is-active, .wizard-step.is-done{ opacity:1; }
+  .wizard-step-dot{
+    width:24px; height:24px; border-radius:50%; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'BPG Glaho','JetBrains Mono',sans-serif; font-size:11px; font-weight:800;
+    color:var(--text-dim);
+    background:rgba(255,255,255,0.05);
+    border:1.5px solid var(--border);
+    transition: background .25s ease, border-color .25s ease, color .25s ease, box-shadow .25s ease;
+  }
+  .wizard-step.is-active .wizard-step-dot{
+    background: linear-gradient(150deg, var(--pc-accent, var(--cyan)), color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, #04101a));
+    border-color: transparent; color:#04101a;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--pc-accent, var(--cyan)) 20%, transparent);
+  }
+  .wizard-step.is-done .wizard-step-dot{
+    background: color-mix(in srgb, var(--pc-accent, var(--cyan)) 30%, transparent);
+    border-color: color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent);
+    color: var(--pc-accent, var(--cyan));
+  }
+  .wizard-step.is-done .wizard-step-dot::before{ content:'✓'; }
+  .wizard-step-label{
+    font-family:'BPG Glaho','Space Grotesk',sans-serif; font-size:9px; letter-spacing:0.02em;
+    color:var(--text-faint); text-transform:uppercase; white-space:nowrap;
+    max-width:64px; overflow:hidden; text-overflow:ellipsis;
+  }
+  .wizard-step.is-active .wizard-step-label{ color:var(--text); }
+  .wizard-step-line{
+    flex:1 1 auto; height:2px; min-width:6px; margin-top:11px;
+    background: var(--border-soft);
+    transition: background .3s ease;
+  }
+  .wizard-step-line.is-done{ background: color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent); }
+  @media (max-width:360px){
+    .wizard-step-label{ display:none; }
+  }
 
   .sr-transfer-done{
     display:flex; align-items:center; gap:7px;
@@ -2981,7 +3032,8 @@
   .copy-note.active{ color:var(--cyan); text-shadow:0 0 8px rgba(207,216,255,0.5); margin-top:4px; min-height:14px; }
 
   /* ---------- Weekly subscription panel ---------- */
-  .wp-panel .panel-head{ gap:10px; flex-wrap:wrap; }
+  .wp-panel .panel-head{ flex-direction:column; align-items:flex-start; gap:12px; }
+  .wp-badges-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; width:100%; }
   .wp-count-badge{
     display:inline-flex; align-items:center; gap:6px; flex:0 0 auto;
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:10.5px; font-weight:800; letter-spacing:0.03em;
@@ -3095,7 +3147,8 @@
     width:70%; height:1px;
     background:linear-gradient(90deg, transparent, rgba(207,216,255,0.7), transparent);
   }
-  .mp-panel .panel-head{ gap:10px; flex-wrap:wrap; }
+  .mp-panel .panel-head{ flex-direction:column; align-items:flex-start; gap:12px; }
+  .mp-badges-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; width:100%; }
   .mp-crown{ font-size:13px; margin-right:5px; filter:drop-shadow(0 0 3px rgba(207,216,255,0.35)); }
   .mp-count-badge{
     display:inline-flex; align-items:center; gap:6px; flex:0 0 auto;
@@ -5561,6 +5614,16 @@
         <div class="panel pc-accordion-body" id="orderFlowPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
 
+    <div class="wizard-steps" id="wizardStepsMain">
+      <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="2"><span class="wizard-step-dot">2</span><span class="wizard-step-label" data-i18n="wizStepQuality">ხარისხი</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="3"><span class="wizard-step-dot">3</span><span class="wizard-step-label">TikTok</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="4"><span class="wizard-step-dot">4</span><span class="wizard-step-label" data-i18n="wizStepConfirm">დადასტურება</span></div>
+    </div>
+
     <!-- Video duration checker — PRIMARY input method, now the very first thing in the panel -->
     <div class="panel-section scanner-primary" id="videoScannerPanel">
       <div class="scanner-stage">
@@ -5651,26 +5714,16 @@
       <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი</label></div>
       <div class="quality-grid quality-grid-two" id="qualityGrid">
         <button type="button" class="quality-btn" data-quality="1080_60">
-          <div class="q-left">
-            <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
-            <span class="q-res">1080p</span>
-            <span class="q-fps">60 FPS</span>
-          </div>
-          <div class="q-right">
-            <span class="q-price" data-price-for="1080_60">—</span>
-            <span class="q-check">✓</span>
-          </div>
+          <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
+          <span class="q-res">1080p</span>
+          <span class="q-fps">60 FPS</span>
+          <span class="q-check">✓</span>
         </button>
         <button type="button" class="quality-btn" data-quality="4k_120">
-          <div class="q-left">
-            <span class="q-rec" data-i18n="qualityBadgePremium">პრემიუმი</span>
-            <span class="q-res">4K</span>
-            <span class="q-fps">60 FPS</span>
-          </div>
-          <div class="q-right">
-            <span class="q-price" data-price-for="4k_120">—</span>
-            <span class="q-check">✓</span>
-          </div>
+          <span class="q-rec" data-i18n="qualityBadgePremium">პრემიუმი</span>
+          <span class="q-res">4K</span>
+          <span class="q-fps">60 FPS</span>
+          <span class="q-check">✓</span>
         </button>
       </div>
     </div>
@@ -5783,11 +5836,23 @@
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
     <div class="panel-head">
       <div class="label" data-i18n="wpLabel">1-კვირიანი გამოწერა</div>
-      <div class="wp-count-badge" data-i18n="wpBadge">5 ვიდეო / 7 დღე</div>
-      <div class="urgency-badge" id="wpUrgencyBadge"><svg class="u-flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">ადგილი დარჩა</span></div>
+      <div class="wp-badges-row">
+        <div class="wp-count-badge" data-i18n="wpBadge">5 ვიდეო / 7 დღე</div>
+        <div class="urgency-badge" id="wpUrgencyBadge"><svg class="u-flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">ადგილი დარჩა</span></div>
+      </div>
     </div>
 
-    <div class="field" style="margin-top:14px;">
+    <div class="wizard-steps" id="wizardStepsWp">
+      <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="2"><span class="wizard-step-dot">2</span><span class="wizard-step-label" data-i18n="wizStepQuality">ხარისხი</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="3"><span class="wizard-step-dot">3</span><span class="wizard-step-label">TikTok</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="4"><span class="wizard-step-dot">4</span><span class="wizard-step-label" data-i18n="wizStepConfirm">დადასტურება</span></div>
+    </div>
+
+    <div class="field" id="wpScannerField" style="margin-top:14px;">
       <div class="field-top"><label data-i18n="simpleScanLabel">ვიდეო სკანერი</label></div>
       <div class="scanner-stage">
         <div class="drop-zone simple-drop-zone" id="dropZoneWp">
@@ -5801,6 +5866,9 @@
           <div class="dz-sub" data-i18n="dzSubSimple">გადმოაგდეთ ან დააჭირეთ ასარჩევად</div>
         </div>
         <div class="simple-scan-result" id="scanResultWp">
+          <button type="button" class="sr-reset-btn" id="scanResetWp" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
           <div class="simple-scan-ok" id="scanOkWp">
             <span class="simple-scan-ok-check">✓</span>
             <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
@@ -5931,11 +5999,23 @@
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
     <div class="panel-head mp-panel-head">
       <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
-      <div class="mp-count-badge" data-i18n="mpBadge">20 ვიდეო / თვე</div>
-      <div class="urgency-badge" id="mpUrgencyBadge"><svg class="u-flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">ადგილი დარჩა ამ თვეს</span></div>
+      <div class="mp-badges-row">
+        <div class="mp-count-badge" data-i18n="mpBadge">20 ვიდეო / თვე</div>
+        <div class="urgency-badge" id="mpUrgencyBadge"><svg class="u-flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">ადგილი დარჩა ამ თვეს</span></div>
+      </div>
     </div>
 
-    <div class="field" style="margin-top:14px;">
+    <div class="wizard-steps" id="wizardStepsMp">
+      <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="2"><span class="wizard-step-dot">2</span><span class="wizard-step-label" data-i18n="wizStepQuality">ხარისხი</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="3"><span class="wizard-step-dot">3</span><span class="wizard-step-label">TikTok</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="4"><span class="wizard-step-dot">4</span><span class="wizard-step-label" data-i18n="wizStepConfirm">დადასტურება</span></div>
+    </div>
+
+    <div class="field" id="mpScannerField" style="margin-top:14px;">
       <div class="field-top"><label data-i18n="simpleScanLabel">ვიდეო სკანერი</label></div>
       <div class="scanner-stage">
         <div class="drop-zone simple-drop-zone" id="dropZoneMp">
@@ -5949,6 +6029,9 @@
           <div class="dz-sub" data-i18n="dzSubSimple">გადმოაგდეთ ან დააჭირეთ ასარჩევად</div>
         </div>
         <div class="simple-scan-result" id="scanResultMp">
+          <button type="button" class="sr-reset-btn" id="scanResetMp" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
           <div class="simple-scan-ok" id="scanOkMp">
             <span class="simple-scan-ok-check">✓</span>
             <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
@@ -6137,6 +6220,15 @@
 
         <div class="panel pc-accordion-body" id="cheapOrderPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="wizard-steps" id="wizardStepsCp">
+      <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="2"><span class="wizard-step-dot">2</span><span class="wizard-step-label" data-i18n="wizStepQuality">ხარისხი</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="3"><span class="wizard-step-dot">3</span><span class="wizard-step-label">TikTok</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="4"><span class="wizard-step-dot">4</span><span class="wizard-step-label" data-i18n="wizStepConfirm">დადასტურება</span></div>
+    </div>
     <div class="eo-box moon-glow-card">
       <div class="qn-stars" aria-hidden="true">
         <span style="top:10%;left:8%;animation-delay:0s;"></span>
@@ -6149,7 +6241,7 @@
         <div class="eo-caption" data-i18n="cpCaption">იაფი პაკეტი — სწრაფი და ეკონომიური დამუშავება, TOPAZ-ისა და ეფექტების გარეშე</div>
       </div>
 
-      <div class="field" style="margin-top:14px;">
+      <div class="field" id="cpScannerField" style="margin-top:14px;">
         <div class="field-top"><label data-i18n="simpleScanLabel">ვიდეო სკანერი</label></div>
         <div class="scanner-stage">
           <div class="drop-zone simple-drop-zone" id="dropZoneCp">
@@ -6163,6 +6255,9 @@
             <div class="dz-sub" data-i18n="dzSubSimple">გადმოაგდეთ ან დააჭირეთ ასარჩევად</div>
           </div>
           <div class="simple-scan-result" id="scanResultCp">
+            <button type="button" class="sr-reset-btn" id="scanResetCp" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
+              <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
             <div class="simple-scan-ok" id="scanOkCp">
               <span class="simple-scan-ok-check">✓</span>
               <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
@@ -6548,6 +6643,25 @@
 
 <script>
   // ============================================================
+  // -3) WIZARD STAGE INDICATOR — shared by all four order panels
+  //     (individual / weekly / monthly / cheap). Marks steps before
+  //     stepNum as done (checkmark) and the current one as active;
+  //     safe no-op if the panel passed in doesn't have one.
+  // ============================================================
+  function setWizardStage(stepsId, stepNum){
+    const wrap = document.getElementById(stepsId);
+    if (!wrap) return;
+    wrap.querySelectorAll('.wizard-step').forEach(el => {
+      const n = parseInt(el.getAttribute('data-step'), 10);
+      el.classList.toggle('is-active', n === stepNum);
+      el.classList.toggle('is-done', n < stepNum);
+    });
+    wrap.querySelectorAll('.wizard-step-line').forEach((el, idx) => {
+      el.classList.toggle('is-done', (idx + 1) < stepNum);
+    });
+  }
+
+  // ============================================================
   // -2) PERFORMANCE: pause decorative animations while the tab/app
   //     is backgrounded, and on very low-powered devices, to
   //     reduce sustained CPU/GPU load (device heating).
@@ -6705,6 +6819,9 @@
       msLabel: 'წამის მეასედები (00–59)',
       msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59.59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
       qualityLabel: 'ვიდეოს ხარისხი',
+      wizStepUpload: 'ატვირთვა',
+      wizStepQuality: 'ხარისხი',
+      wizStepConfirm: 'დადასტურება',
       qualityWizardLabel: 'მონიშნეთ რა ხარისხით გინდათ TikTok-ზე ატვირთვა',
       scannerPrimaryBadge: '⚡ ავტომატური და ზუსტი',
       manualFallbackPrompt: 'არ გაქვს ფაილი? შეიყვანე ხანგრძლივობა ხელით',
@@ -7112,6 +7229,9 @@
       msLabel: 'Hundredths of a second (00–59)',
       msHint: 'Maximum total duration is 59.59. Within this range the price is calculated at the 59-second rate.',
       qualityLabel: 'Video quality',
+      wizStepUpload: 'Upload',
+      wizStepQuality: 'Quality',
+      wizStepConfirm: 'Confirm',
       qualityWizardLabel: 'Select the quality you want for your TikTok upload',
       scannerPrimaryBadge: '⚡ Automatic & precise',
       manualFallbackPrompt: "Don't have a file? Enter the duration manually",
@@ -7721,6 +7841,12 @@
     const panel = card.querySelector('.pc-accordion-body');
     card.classList.add('pc-open');
     if (btn) btn.setAttribute('aria-expanded', 'true');
+    // Remember exactly where the page was scrolled to before this modal
+    // opened, so closing it (✕, scrim click, or Escape) can put the
+    // visitor back at that same spot instead of wherever the page
+    // happens to land once the panel's returned to its normal position
+    // in the document flow.
+    card._pcScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     // Move the panel out of the card and into the scrim, which centers it.
     // This is what keeps it safe from the card's own desktop-only hover
     // transform — while the panel lived inside .pc-card permanently, that
@@ -7750,6 +7876,13 @@
     if (btn) btn.setAttribute('aria-expanded', 'false');
     if (pcModalScrim) pcModalScrim.classList.remove('open');
     unlockBodyScroll();
+    // Jump straight back to wherever the page was before this modal
+    // opened — no animation, so it reads as "closing returned me to
+    // where I was" rather than a visible scroll.
+    if (typeof card._pcScrollY === 'number') {
+      window.scrollTo(0, card._pcScrollY);
+      card._pcScrollY = null;
+    }
     // The edit-order card holds the sample video — stop it (and reset it
     // to the start) the moment its card closes, whether that's the ✕
     // button, the scrim, Escape, or just opening a different card. This
@@ -7955,12 +8088,19 @@
     const tiktokConfirmBtn = document.getElementById('wpTiktokConfirmBtn');
     const sendYesBtn = document.getElementById('wpSendOrderYesBtn');
 
+    // Whole uploader box (label + bordered shell around the drop zone) --
+    // hidden once the visitor reaches the quality step, the same way the
+    // individual-order calculator hides its own uploader, so an empty
+    // padded shell isn't left sitting on screen with nothing inside it.
+    const scannerFieldEl = document.getElementById('wpScannerField');
+
     [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
       if (el) el.classList.add('wizard-step-hidden');
     });
     // wpQualityGrid itself has no separate wrapper div -- it IS the
     // field, so it gets the hidden class directly.
     wpQualityGrid.classList.add('wizard-step-hidden');
+    setWizardStage('wizardStepsWp', 1);
 
     const autoWrapEl = document.getElementById('mooonAutoWp');
     if (autoWrapEl) {
@@ -7968,7 +8108,9 @@
         if (autoWrapEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResultWp');
           if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
+          if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
           wpQualityGrid.classList.remove('wizard-step-hidden');
+          setWizardStage('wizardStepsWp', 2);
           autoObserver.disconnect();
         }
       });
@@ -7982,7 +8124,9 @@
           [wpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
           });
+          if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
           wpQualityGrid.querySelectorAll('.wp-box.active').forEach(b => b.classList.remove('active'));
+          setWizardStage('wizardStepsWp', 1);
         }
       });
       resetObserver.observe(scanResultEl2, { attributes: true, attributeFilter: ['class'] });
@@ -7992,6 +8136,7 @@
       btn.addEventListener('click', () => {
         wpQualityGrid.classList.add('wizard-step-hidden');
         if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        setWizardStage('wizardStepsWp', 3);
       });
     });
 
@@ -8007,6 +8152,7 @@
       if (priceEl) priceEl.textContent = getWeeklyTotal(subSelectedQuality).toFixed(2) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsWp', 4);
     });
 
     sendYesBtn && sendYesBtn.addEventListener('click', () => {
@@ -8071,10 +8217,17 @@
     const tiktokConfirmBtn = document.getElementById('mpTiktokConfirmBtn');
     const sendYesBtn = document.getElementById('mpSendOrderYesBtn');
 
+    // Whole uploader box (label + bordered shell around the drop zone) --
+    // hidden once the visitor reaches the quality step, the same way the
+    // individual-order calculator hides its own uploader, so an empty
+    // padded shell isn't left sitting on screen with nothing inside it.
+    const scannerFieldEl = document.getElementById('mpScannerField');
+
     [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
       if (el) el.classList.add('wizard-step-hidden');
     });
     mpQualityGrid.classList.add('wizard-step-hidden');
+    setWizardStage('wizardStepsMp', 1);
 
     const autoWrapEl = document.getElementById('mooonAutoMp');
     if (autoWrapEl) {
@@ -8082,7 +8235,9 @@
         if (autoWrapEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResultMp');
           if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
+          if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
           mpQualityGrid.classList.remove('wizard-step-hidden');
+          setWizardStage('wizardStepsMp', 2);
           autoObserver.disconnect();
         }
       });
@@ -8096,7 +8251,9 @@
           [mpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
           });
+          if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
           mpQualityGrid.querySelectorAll('.mp-box.active').forEach(b => b.classList.remove('active'));
+          setWizardStage('wizardStepsMp', 1);
         }
       });
       resetObserver.observe(scanResultEl2, { attributes: true, attributeFilter: ['class'] });
@@ -8106,6 +8263,7 @@
       btn.addEventListener('click', () => {
         mpQualityGrid.classList.add('wizard-step-hidden');
         if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        setWizardStage('wizardStepsMp', 3);
       });
     });
 
@@ -8121,6 +8279,7 @@
       if (priceEl) priceEl.textContent = getMonthlyTotal(monthSelectedQuality).toFixed(2) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsMp', 4);
     });
 
     sendYesBtn && sendYesBtn.addEventListener('click', () => {
@@ -8291,9 +8450,17 @@
     // programmatically, which fires just fine on a hidden button. It
     // only ever gets hidden here so it isn't sitting on screen from the
     // very start, before the visitor has even uploaded anything.
+    // The uploader box itself (border/background shell around the drop
+    // zone + scan result) -- hidden as a whole once the visitor reaches
+    // the quality step, otherwise its empty padded shell is left sitting
+    // on screen with nothing inside it (the dropzone already hid itself
+    // via dz-scanning-hidden, but the shell around it did not).
+    const scannerPanelEl = document.getElementById('videoScannerPanel');
+
     [qualityWrap, tiktokWrap, sendConfirmWrap, channelsPanel, divider].forEach(el => {
       if (el) el.classList.add('wizard-step-hidden');
     });
+    setWizardStage('wizardStepsMain', 1);
 
     const srAutoEl = document.getElementById('srAuto');
     if (srAutoEl) {
@@ -8301,7 +8468,9 @@
         if (srAutoEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResult');
           if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
+          if (scannerPanelEl) scannerPanelEl.classList.add('wizard-step-hidden');
           qualityWrap.classList.remove('wizard-step-hidden');
+          setWizardStage('wizardStepsMain', 2);
           autoObserver.disconnect(); // one-shot -- a reupload rebuilds this whole DOM node fresh anyway
         }
       });
@@ -8319,7 +8488,9 @@
           [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
           });
+          if (scannerPanelEl) scannerPanelEl.classList.remove('wizard-step-hidden');
           document.querySelectorAll('#qualityGrid .quality-btn.active').forEach(b => b.classList.remove('active'));
+          setWizardStage('wizardStepsMain', 1);
         }
       });
       resetObserver.observe(scanResultEl2, { attributes: true, attributeFilter: ['class'] });
@@ -8331,6 +8502,7 @@
         btn.addEventListener('click', () => {
           qualityWrap.classList.add('wizard-step-hidden');
           if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+          setWizardStage('wizardStepsMain', 3);
         });
       });
     }
@@ -8350,6 +8522,7 @@
       }
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsMain', 4);
     });
 
     // "Send order? Yes" reuses orderBtnChat's own existing validation +
@@ -9433,6 +9606,8 @@
 
     const fourKNoteEl = cfg.fourKNoteId ? document.getElementById(cfg.fourKNoteId) : null;
 
+    const resetBtn = cfg.resetId ? document.getElementById(cfg.resetId) : null;
+
     function showOk(file){
       currentFile = file;
       result.classList.add('show');
@@ -9467,6 +9642,17 @@
       if (rejectEl) rejectEl.classList.remove('show');
       if (fourKNoteEl) fourKNoteEl.style.display = 'none';
       resetPrompt();
+      // Bring the uploader back — this is the only way back to it once a
+      // file's been picked, now that it hides itself the same way the
+      // individual-order calculator's does.
+      zone.classList.remove('dz-scanning-hidden');
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        input.value = '';
+        showIdle();
+      });
     }
 
     if (promptYes) {
@@ -9488,6 +9674,11 @@
       if (!file || !file.type.startsWith('video/')) { alert(t('alertNotVideo')); return; }
       showIdle();
       zone.classList.add('scanning');
+      // Hide the uploader itself the instant a file is picked — same
+      // "two things visible at once" fix already used by the main
+      // calculator's scanner, now applied here too. showIdle() (reset
+      // button, or picking a new file) is what brings it back.
+      zone.classList.add('dz-scanning-hidden');
       readVideoFileMeta(file).then(meta => {
         zone.classList.remove('scanning');
         const acceptability = checkUploadAcceptable(meta.width, meta.height, meta.fps, cfg.allowFourK);
@@ -9508,6 +9699,7 @@
         }
       }).catch(() => {
         zone.classList.remove('scanning');
+        zone.classList.remove('dz-scanning-hidden'); // metadata read failed outright — let them just try again directly
         alert(t('alertReadError'));
       });
     }
@@ -9526,6 +9718,7 @@
 
   initSimpleScanner({
     zoneId: 'dropZoneWp', inputId: 'videoInputWp', resultId: 'scanResultWp', okId: 'scanOkWp', okNameId: 'scanOkNameWp', rejectId: 'scanRejectWp',
+    resetId: 'scanResetWp',
     fourKNoteId: 'scanRejectWp4kNote',
     promptId: 'mooonPromptWp', promptQId: 'mooonPromptQWp', promptActionsId: 'mooonPromptActionsWp', promptYesId: 'mooonPromptYesWp', promptNoId: 'mooonPromptNoWp', promptDoneId: 'mooonPromptDoneWp',
     panelKey: 'wp',
@@ -9533,6 +9726,7 @@
   });
   initSimpleScanner({
     zoneId: 'dropZoneMp', inputId: 'videoInputMp', resultId: 'scanResultMp', okId: 'scanOkMp', okNameId: 'scanOkNameMp', rejectId: 'scanRejectMp',
+    resetId: 'scanResetMp',
     fourKNoteId: 'scanRejectMp4kNote',
     promptId: 'mooonPromptMp', promptQId: 'mooonPromptQMp', promptActionsId: 'mooonPromptActionsMp', promptYesId: 'mooonPromptYesMp', promptNoId: 'mooonPromptNoMp', promptDoneId: 'mooonPromptDoneMp',
     panelKey: 'mp',
@@ -9540,6 +9734,7 @@
   });
   initSimpleScanner({
     zoneId: 'dropZoneCp', inputId: 'videoInputCp', resultId: 'scanResultCp', okId: 'scanOkCp', okNameId: 'scanOkNameCp', rejectId: 'scanRejectCp',
+    resetId: 'scanResetCp',
     // Only the Cheap Package sells both a 1080p AND a 4K output tier, so
     // its scanner is the one that also accepts 4K uploads (any fps — see
     // checkUploadAcceptable / selectCpQuality below).
@@ -10304,10 +10499,17 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     const tiktokConfirmBtn = document.getElementById('cpTiktokConfirmBtn');
     const sendYesBtn = document.getElementById('cpSendOrderYesBtn');
 
+    // Whole uploader box (label + bordered shell around the drop zone) --
+    // hidden once the visitor reaches the quality step, the same way the
+    // individual-order calculator hides its own uploader, so an empty
+    // padded shell isn't left sitting on screen with nothing inside it.
+    const scannerFieldEl = document.getElementById('cpScannerField');
+
     [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
       if (el) el.classList.add('wizard-step-hidden');
     });
     cpQualityGrid.classList.add('wizard-step-hidden');
+    setWizardStage('wizardStepsCp', 1);
 
     const autoWrapEl = document.getElementById('mooonAutoCp');
     if (autoWrapEl) {
@@ -10315,7 +10517,9 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         if (autoWrapEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResultCp');
           if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
+          if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
           cpQualityGrid.classList.remove('wizard-step-hidden');
+          setWizardStage('wizardStepsCp', 2);
           autoObserver.disconnect();
         }
       });
@@ -10329,6 +10533,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           [cpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
           });
+          if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
+          setWizardStage('wizardStepsCp', 1);
         }
       });
       resetObserver.observe(scanResultEl2, { attributes: true, attributeFilter: ['class'] });
@@ -10340,6 +10546,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         if (!succeeded) return;
         cpQualityGrid.classList.add('wizard-step-hidden');
         if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        setWizardStage('wizardStepsCp', 3);
       });
     });
 
@@ -10355,6 +10562,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       if (priceEl) priceEl.textContent = (CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60']) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsCp', 4);
     });
 
     sendYesBtn && sendYesBtn.addEventListener('click', () => {
