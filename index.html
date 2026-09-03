@@ -8181,13 +8181,8 @@
     });
     const sendNoBtn = document.getElementById('wpSendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      const linkEl = document.getElementById('tiktokLinkWp');
-      const errorEl = document.getElementById('tiktokErrorWp');
-      if (linkEl) linkEl.value = '';
-      if (errorEl) errorEl.classList.remove('show');
-      const resetBtn = document.getElementById('scanResetWp');
-      if (resetBtn) resetBtn.click();
+      // Full reload — guaranteed complete reset, see srTransferNo above.
+      window.location.reload();
     });
   })();
 
@@ -8320,13 +8315,8 @@
     });
     const sendNoBtn = document.getElementById('mpSendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      const linkEl = document.getElementById('tiktokLinkMp');
-      const errorEl = document.getElementById('tiktokErrorMp');
-      if (linkEl) linkEl.value = '';
-      if (errorEl) errorEl.classList.remove('show');
-      const resetBtn = document.getElementById('scanResetMp');
-      if (resetBtn) resetBtn.click();
+      // Full reload — guaranteed complete reset, see srTransferNo above.
+      window.location.reload();
     });
   })();
 
@@ -8583,12 +8573,8 @@
     // before anything was uploaded at all.
     const sendNoBtn = document.getElementById('sendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      const linkEl = document.getElementById('tiktokLink');
-      const errorEl = document.getElementById('tiktokError');
-      if (linkEl) linkEl.value = '';
-      if (errorEl) errorEl.classList.remove('show');
-      resetScanner();
+      // Full reload — guaranteed complete reset, see srTransferNo above.
+      window.location.reload();
     });
   })();
 
@@ -9358,21 +9344,11 @@
   const SR_AUTO_IDS = { wrap: 'srAuto', statusRow: 'srAutoStatus', statusText: 'srAutoStatusText', fill: 'srAutoFill', error: 'srAutoError' };
 
   // Fully resets the scanner back to its empty state — this is the
-  // "cancel upload" action that was previously missing.
+  // "cancel upload" action. A hand-rolled soft reset here kept leaving
+  // some piece of state behind across repeated cancel/reject/reupload
+  // cycles, so this is now a real, guaranteed full page reload instead.
   function resetScanner(){
-    scanToken++; // invalidate any scan still in flight
-    scanProgress.classList.remove('show');
-    videoInput.value = '';
-    mainScannedFile = null;
-    scanResult.classList.remove('show');
-    srReject.classList.remove('show');
-    dropZone.classList.remove('dz-scanning-hidden');
-    if (srReject4kNote) srReject4kNote.style.display = 'none';
-    resetTransferPrompt();
-    resetVideoLinkFor('main');
-    secondsInput.value = 5;
-    msRange.value = 0;
-    refresh();
+    window.location.reload();
   }
 
   function resetTransferPrompt(){
@@ -9400,7 +9376,13 @@
   });
 
   srTransferNo.addEventListener('click', () => {
-    srTransfer.classList.remove('show');
+    // A partial/soft JS reset repeatedly failed to catch every piece of
+    // lingering state (confirmed flags, hidden dropzone, stuck scanner
+    // state) across re-upload attempts. Per explicit request: declining
+    // here now does a real, unconditional full page reload — the one
+    // way to *guarantee* the site is back to its exact initial state,
+    // with zero chance of any leftover state surviving.
+    window.location.reload();
   });
 
   function handleVideoFile(file){
@@ -9751,8 +9733,11 @@
 
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        input.value = '';
-        showIdle();
+        // Full reload — same reasoning as srTransferNo/promptNo above:
+        // repeated partial JS resets kept leaving some piece of state
+        // behind across cancel-then-reupload cycles. A reload guarantees
+        // a completely clean scanner for the next attempt.
+        window.location.reload();
       });
     }
 
@@ -9768,7 +9753,12 @@
       });
     }
     if (promptNo) {
-      promptNo.addEventListener('click', () => { if (prompt) prompt.classList.remove('show'); });
+      promptNo.addEventListener('click', () => {
+        // Same fix as the main panel's srTransferNo — a full, guaranteed
+        // reload instead of a partial JS reset that kept missing edge
+        // cases across repeated cancel/re-upload cycles.
+        window.location.reload();
+      });
     }
 
     function handle(file){
@@ -10697,13 +10687,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     });
     const sendNoBtn = document.getElementById('cpSendOrderNoBtn');
     sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
-      const linkEl = document.getElementById('tiktokLinkCp');
-      const errorEl = document.getElementById('tiktokErrorCp');
-      if (linkEl) linkEl.value = '';
-      if (errorEl) errorEl.classList.remove('show');
-      const resetBtn = document.getElementById('scanResetCp');
-      if (resetBtn) resetBtn.click();
+      // Full reload — guaranteed complete reset, see srTransferNo above.
+      window.location.reload();
     });
   })();
 
