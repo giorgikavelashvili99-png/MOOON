@@ -8158,6 +8158,12 @@
       const chatBtn = document.getElementById('wpOrderBtnChat');
       if (chatBtn) chatBtn.click();
     });
+    const sendNoBtn = document.getElementById('wpSendOrderNoBtn');
+    sendNoBtn && sendNoBtn.addEventListener('click', () => {
+      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
+      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsWp', 3);
+    });
   })();
 
   // ---- Monthly subscription (20 videos / 30 days, flat discounted price per quality) ----
@@ -8284,6 +8290,12 @@
     sendYesBtn && sendYesBtn.addEventListener('click', () => {
       const chatBtn = document.getElementById('mpOrderBtnChat');
       if (chatBtn) chatBtn.click();
+    });
+    const sendNoBtn = document.getElementById('mpSendOrderNoBtn');
+    sendNoBtn && sendNoBtn.addEventListener('click', () => {
+      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
+      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsMp', 3);
     });
   })();
 
@@ -8531,8 +8543,15 @@
       const chatBtn = document.getElementById('orderBtnChat');
       if (chatBtn) chatBtn.click();
     });
-    // "არა" intentionally does nothing further -- staying here IS the
-    // correct outcome of declining to send.
+    // "No" steps back to the TikTok-link field so the visitor can review
+    // or change something before deciding whether to send, rather than
+    // being a dead end with no visible reaction to the tap at all.
+    const sendNoBtn = document.getElementById('sendOrderNoBtn');
+    sendNoBtn && sendNoBtn.addEventListener('click', () => {
+      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
+      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsMain', 3);
+    });
   })();
 
 
@@ -10513,12 +10532,10 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
       if (el) el.classList.add('wizard-step-hidden');
     });
-    // Unlike the other three packages, the Cheap Package's quality tiles
-    // are meant to be usable BEFORE any upload too — tryManualSelectCpQuality
-    // explicitly allows free clicking while cpUploadedTier is still null,
-    // and cpQualityHint's own copy ("choose a quality OR upload a video")
-    // says so. Gating the grid behind the upload step like the other
-    // wizards contradicted that, so it stays visible from the start here.
+    // Same upload-gated logic as the individual/weekly/monthly wizards:
+    // quality tiles stay hidden until a video's actually been uploaded
+    // and transferred.
+    cpQualityGrid.classList.add('wizard-step-hidden');
     setWizardStage('wizardStepsCp', 1);
 
     const autoWrapEl = document.getElementById('mooonAutoCp');
@@ -10528,6 +10545,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           const scanResultEl = document.getElementById('scanResultCp');
           if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
           if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
+          cpQualityGrid.classList.remove('wizard-step-hidden');
           setWizardStage('wizardStepsCp', 2);
           autoObserver.disconnect();
         }
@@ -10539,14 +10557,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     if (scanResultEl2) {
       const resetObserver = new MutationObserver(() => {
         if (!scanResultEl2.classList.contains('show')) {
-          // Quality picks are independent of upload state here, so a
-          // cancelled/reset upload should NOT wipe out or hide a manual
-          // tile selection — only the downstream TikTok/confirm steps
-          // (which really did depend on this now-cancelled upload) reset.
-          [tiktokWrap, sendConfirmWrap].forEach(el => {
+          [cpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
             if (el) el.classList.add('wizard-step-hidden');
           });
           if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
+          cpQualityGrid.querySelectorAll('.mp-box.active').forEach(b => b.classList.remove('active'));
           setWizardStage('wizardStepsCp', 1);
         }
       });
@@ -10581,6 +10596,12 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     sendYesBtn && sendYesBtn.addEventListener('click', () => {
       const chatBtn = document.getElementById('cpOrderBtnChat');
       if (chatBtn) chatBtn.click();
+    });
+    const sendNoBtn = document.getElementById('cpSendOrderNoBtn');
+    sendNoBtn && sendNoBtn.addEventListener('click', () => {
+      if (sendConfirmWrap) sendConfirmWrap.classList.add('wizard-step-hidden');
+      if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+      setWizardStage('wizardStepsCp', 3);
     });
   })();
 
