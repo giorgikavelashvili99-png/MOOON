@@ -1992,7 +1992,7 @@
     font-weight:500; overflow-wrap:break-word; word-break:break-word; max-width:100%;
   }
   .simple-scan-reject{
-    display:none; padding:12px 14px; border-radius:14px;
+    display:none; padding:12px 40px 12px 14px; border-radius:14px;
     background:rgba(255,56,96,0.08);
     border:1px solid rgba(255,56,96,0.35);
     color:#ffb3c0; font-size:12.5px; line-height:1.5;
@@ -2003,6 +2003,11 @@
     border-top:1px dashed rgba(255,56,96,0.35);
     color:var(--gold); font-weight:600;
   }
+  .ssr-detected-info{
+    margin-top:6px; font-size:11px; color:var(--text-dim); opacity:0.85;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .ssr-detected-info:empty{ display:none; }
   .drop-zone.scanning{ opacity:0.6; pointer-events:none; }
 
   /* "Send to mooontransferr for manager review?" prompt, shown right
@@ -2039,9 +2044,9 @@
     margin-top:16px;
     padding:6px;
     border-radius:20px;
-    border:1px solid color-mix(in srgb, var(--pc-accent) 28%, transparent);
+    border:1px solid color-mix(in srgb, var(--tile-accent) 28%, transparent);
     background:
-      radial-gradient(ellipse 90% 60% at 50% 0%, color-mix(in srgb, var(--pc-accent) 10%, transparent), transparent 60%),
+      radial-gradient(ellipse 90% 60% at 50% 0%, color-mix(in srgb, var(--tile-accent) 10%, transparent), transparent 60%),
       linear-gradient(180deg, rgba(23,23,36,0.92), rgba(13,13,21,0.92));
     box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
   }
@@ -2084,18 +2089,18 @@
   .scan-result .sr-ico{
     width:28px; height:28px; flex:0 0 auto; border-radius:10px;
     display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(160deg, color-mix(in srgb, var(--pc-accent) 24%, transparent), color-mix(in srgb, var(--pc-accent) 6%, transparent));
-    border:1px solid color-mix(in srgb, var(--pc-accent) 38%, transparent);
-    box-shadow:0 0 14px color-mix(in srgb, var(--pc-accent) 18%, transparent);
+    background:linear-gradient(160deg, color-mix(in srgb, var(--tile-accent) 24%, transparent), color-mix(in srgb, var(--tile-accent) 6%, transparent));
+    border:1px solid color-mix(in srgb, var(--tile-accent) 38%, transparent);
+    box-shadow:0 0 14px color-mix(in srgb, var(--tile-accent) 18%, transparent);
   }
   .scan-result .sr-ico svg{
-    width:14px; height:14px; fill:none; stroke:var(--pc-accent);
+    width:14px; height:14px; fill:none; stroke:var(--tile-accent);
     stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
   }
   .scan-result .sr-label{ color:var(--text-dim); flex:1; }
   .scan-result .sr-row b{
-    font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; color:var(--pc-accent);
-    text-shadow:0 0 10px color-mix(in srgb, var(--pc-accent) 45%, transparent);
+    font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; color:var(--tile-accent);
+    text-shadow:0 0 10px color-mix(in srgb, var(--tile-accent) 45%, transparent);
     font-size:12.5px; text-align:right; white-space:nowrap;
   }
   .scan-result .sr-price-hero{
@@ -2103,9 +2108,9 @@
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     padding:16px 18px;
     border-radius:16px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--pc-accent) 20%, transparent), color-mix(in srgb, var(--pc-accent) 4%, transparent));
-    border:1px solid color-mix(in srgb, var(--pc-accent) 45%, transparent);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--pc-accent) 16%, transparent), inset 0 1px 0 rgba(255,255,255,0.06);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--tile-accent) 20%, transparent), color-mix(in srgb, var(--tile-accent) 4%, transparent));
+    border:1px solid color-mix(in srgb, var(--tile-accent) 45%, transparent);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--tile-accent) 16%, transparent), inset 0 1px 0 rgba(255,255,255,0.06);
   }
   .scan-result .sr-price-tag{
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:11px; font-weight:700;
@@ -2114,10 +2119,10 @@
   .scan-result .sr-price-value{ flex:0 0 auto; }
   .scan-result .sr-price-value b{
     font-family:'BPG Glaho', 'JetBrains Mono', sans-serif; font-size:25px; font-weight:800;
-    color:#fff; white-space:nowrap;
-    text-shadow:0 0 14px color-mix(in srgb, var(--pc-accent) 75%, transparent), 0 0 26px color-mix(in srgb, var(--pc-accent) 45%, transparent);
+    color:var(--warm-ivory); white-space:nowrap;
+    text-shadow:0 0 14px color-mix(in srgb, var(--tile-accent) 75%, transparent), 0 0 26px color-mix(in srgb, var(--tile-accent) 45%, transparent);
   }
-  .scan-result .sr-price-value sup{ color: var(--pc-accent); }
+  .scan-result .sr-price-value sup{ color: var(--tile-accent); }
   .scan-result .sr-warn{
     margin:10px 12px 8px; font-size:12px; color:var(--gold); padding:0 2px;
   }
@@ -4899,6 +4904,27 @@
     content:'★'; font-size:9px; color:#f5a623; line-height:1;
   }
 
+  /* Weekly/Monthly info tag (video count + spots-left) — lives at the
+     top of the card, right-aligned, instead of repeating inside the
+     wizard modal. Deliberately NOT position:absolute with a negative
+     offset like .pc-badge above: those two cards aren't wrapped in a
+     .pc-card-wrap sibling container the way indiv/cheap are, so an
+     overhanging ribbon here would get clipped by .pc-card's own
+     overflow:hidden. Sitting in normal flow avoids that entirely. */
+  .pc-corner-ribbon{
+    display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px 8px;
+    align-self:flex-end;
+    margin-bottom:12px;
+    padding:5px 12px; border-radius:100px;
+    background: linear-gradient(135deg, var(--tile-accent), color-mix(in srgb, var(--tile-accent) 55%, #1c140c));
+    color:#1c140c; font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+    font-size:9.5px; font-weight:800; line-height:1.3;
+    box-shadow:0 4px 12px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.25);
+  }
+  .pc-corner-ribbon .pcr-sep{ opacity:0.5; }
+  .pc-corner-ribbon .pcr-urgency{ display:inline-flex; align-items:center; gap:3px; }
+  .pc-corner-ribbon .pcr-urgency svg{ width:9px; height:9px; fill:#7a1414; flex:0 0 auto; }
+
   .pc-head{
     display:flex; align-items:center; gap:12px; margin-bottom:16px;
   }
@@ -5107,7 +5133,7 @@
     .pc-modal-scrim > .pc-accordion-body.panel{ zoom:0.8; }
   }
   .pc-modal-close{
-    position:absolute; top:14px; right:14px; z-index:66;
+    position:absolute; top:8px; right:8px; z-index:66;
     width:34px; height:34px; border-radius:10px;
     background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22);
     color:#fff; font-size:15px; font-weight:700; line-height:1;
@@ -5781,7 +5807,7 @@
       </div>
       <button type="button" class="tt-auto-btn" id="tiktokAutoBtn">
         <span class="tt-auto-ico">🔗</span>
-        <span data-i18n="tiktokAutoBtn">გახსენით TikTok და დააკოპირეთ თქვენი პროფილის ლინკი</span>
+        <span data-i18n="tiktokAutoBtn">TikTok-ის გახსნა</span>
       </button>
       <div class="tt-auto-note" id="tiktokAutoNote"></div>
       <div class="error-msg" id="tiktokError" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
@@ -5845,6 +5871,11 @@
 
       <!-- Card 2 — weekly subscription package -->
       <div class="pc-card pc-card--weekly">
+        <div class="pc-corner-ribbon">
+          <span data-i18n="wpBadge">5 ვიდეო / 7 დღე</span>
+          <span class="pcr-sep">·</span>
+          <span class="pcr-urgency" id="wpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">დარჩა</span></span>
+        </div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">📅</div>
           <div class="pc-head-text">
@@ -5868,14 +5899,6 @@
 
         <div class="panel wp-panel pc-accordion-body" id="weeklySubPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
-    <div class="panel-head">
-      <div class="label" data-i18n="wpLabel">1-კვირიანი გამოწერა</div>
-      <div class="wp-badges-row">
-        <div class="wp-count-badge" data-i18n="wpBadge">5 ვიდეო / 7 დღე</div>
-        <div class="urgency-badge" id="wpUrgencyBadge"><svg class="u-flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">ადგილი დარჩა</span></div>
-      </div>
-    </div>
-
     <div class="wizard-steps" id="wizardStepsWp">
       <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
       <div class="wizard-step-line"></div>
@@ -5887,7 +5910,6 @@
     </div>
 
     <div class="field" id="wpScannerField" style="margin-top:14px;">
-      <div class="field-top"><label data-i18n="simpleScanLabel">ვიდეო სკანერი</label></div>
       <div class="scanner-stage">
         <div class="drop-zone simple-drop-zone" id="dropZoneWp">
           <input type="file" id="videoInputWp" accept="video/*">
@@ -5910,6 +5932,7 @@
           </div>
           <div class="simple-scan-reject" id="scanRejectWp">
             <div data-i18n="srRejectTextShort">ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps</div>
+            <div class="ssr-detected-info" id="scanRejectWpDetected"></div>
             <div class="ssr-4k-note" id="scanRejectWp4kNote" style="display:none;" data-i18n="srReject4kNoteShort">ℹ️ 4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“</div>
           </div>
           <div class="mooon-prompt" id="mooonPromptWp">
@@ -5968,7 +5991,7 @@
       </div>
       <button type="button" class="tt-auto-btn" id="tiktokAutoBtnWp">
         <span class="tt-auto-ico">🔗</span>
-        <span data-i18n="tiktokAutoBtn">გახსენით TikTok და დააკოპირეთ თქვენი პროფილის ლინკი</span>
+        <span data-i18n="tiktokAutoBtn">TikTok-ის გახსნა</span>
       </button>
       <div class="tt-auto-note" id="tiktokAutoNoteWp"></div>
       <div class="error-msg" id="tiktokErrorWp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
@@ -6008,6 +6031,11 @@
 
       <!-- Card 3 — monthly subscription package -->
       <div class="pc-card pc-card--monthly">
+        <div class="pc-corner-ribbon">
+          <span data-i18n="mpBadge">20 ვიდეო / თვე</span>
+          <span class="pcr-sep">·</span>
+          <span class="pcr-urgency" id="mpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">დარჩა</span></span>
+        </div>
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">👑</div>
           <div class="pc-head-text">
@@ -6031,14 +6059,6 @@
 
         <div class="panel mp-panel pc-accordion-body" id="monthlySubPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
-    <div class="panel-head mp-panel-head">
-      <div class="label" data-i18n="mpLabel"><span class="mp-crown">👑</span>1-თვიანი გამოწერა</div>
-      <div class="mp-badges-row">
-        <div class="mp-count-badge" data-i18n="mpBadge">20 ვიდეო / თვე</div>
-        <div class="urgency-badge" id="mpUrgencyBadge"><svg class="u-flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">ადგილი დარჩა ამ თვეს</span></div>
-      </div>
-    </div>
-
     <div class="wizard-steps" id="wizardStepsMp">
       <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
       <div class="wizard-step-line"></div>
@@ -6050,7 +6070,6 @@
     </div>
 
     <div class="field" id="mpScannerField" style="margin-top:14px;">
-      <div class="field-top"><label data-i18n="simpleScanLabel">ვიდეო სკანერი</label></div>
       <div class="scanner-stage">
         <div class="drop-zone simple-drop-zone" id="dropZoneMp">
           <input type="file" id="videoInputMp" accept="video/*">
@@ -6073,6 +6092,7 @@
           </div>
           <div class="simple-scan-reject" id="scanRejectMp">
             <div data-i18n="srRejectTextShort">ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps</div>
+            <div class="ssr-detected-info" id="scanRejectMpDetected"></div>
             <div class="ssr-4k-note" id="scanRejectMp4kNote" style="display:none;" data-i18n="srReject4kNoteShort">ℹ️ 4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“</div>
           </div>
           <div class="mooon-prompt" id="mooonPromptMp">
@@ -6120,7 +6140,7 @@
       </div>
       <button type="button" class="tt-auto-btn" id="tiktokAutoBtnMp">
         <span class="tt-auto-ico">🔗</span>
-        <span data-i18n="tiktokAutoBtn">გახსენით TikTok და დააკოპირეთ თქვენი პროფილის ლინკი</span>
+        <span data-i18n="tiktokAutoBtn">TikTok-ის გახსნა</span>
       </button>
       <div class="tt-auto-note" id="tiktokAutoNoteMp"></div>
       <div class="error-msg" id="tiktokErrorMp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
@@ -6271,12 +6291,7 @@
         <span style="top:82%;left:80%;animation-delay:.3s;"></span>
         <span style="top:46%;left:6%;animation-delay:1.6s;"></span>
       </div>
-      <div class="eo-content">
-        <div class="eo-caption" data-i18n="cpCaption">იაფი პაკეტი — სწრაფი და ეკონომიური დამუშავება, TOPAZ-ისა და ეფექტების გარეშე</div>
-      </div>
-
       <div class="field" id="cpScannerField" style="margin-top:14px;">
-        <div class="field-top"><label data-i18n="simpleScanLabel">ვიდეო სკანერი</label></div>
         <div class="scanner-stage">
           <div class="drop-zone simple-drop-zone" id="dropZoneCp">
             <input type="file" id="videoInputCp" accept="video/*">
@@ -6297,7 +6312,8 @@
               <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
               <span class="simple-scan-ok-name" id="scanOkNameCp"></span>
             </div>
-            <div class="simple-scan-reject" id="scanRejectCp" data-i18n="srRejectTextCp">ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps ან 4K / 60fps</div>
+            <div class="simple-scan-reject" id="scanRejectCp" data-i18n="srRejectTextCp">გარჩევადობა 1080p-ზე დაბალია — საჭიროა მინიმუმ 1080p (ნებისმიერი fps)</div>
+            <div class="ssr-detected-info" id="scanRejectCpDetected"></div>
             <div class="mooon-prompt" id="mooonPromptCp">
               <div class="mooon-prompt-q" id="mooonPromptQCp" data-i18n="mooonPromptQ">გსურთ, ატვირთული ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს შესამოწმებლად?</div>
               <div class="mooon-prompt-actions" id="mooonPromptActionsCp">
@@ -6333,7 +6349,6 @@
           <span class="mp-box-price"><span class="mp-new-price">1.99<sup>₾</sup></span></span>
         </button>
       </div>
-      <div class="cp-upscale-hint" id="cpQualityHint" data-i18n="cpQualityHint">აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება</div>
 
       <div class="field field-tiktok" id="tiktokFieldCp" style="margin-bottom:6px;">
         <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
@@ -6343,7 +6358,7 @@
         </div>
         <button type="button" class="tt-auto-btn" id="tiktokAutoBtnCp">
           <span class="tt-auto-ico">🔗</span>
-          <span data-i18n="tiktokAutoBtn">გახსენით TikTok და დააკოპირეთ თქვენი პროფილის ლინკი</span>
+          <span data-i18n="tiktokAutoBtn">TikTok-ის გახსნა</span>
         </button>
         <div class="tt-auto-note" id="tiktokAutoNoteCp"></div>
         <div class="error-msg" id="tiktokErrorCp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
@@ -6933,7 +6948,7 @@
       mooonAutoManualLink: 'ატვირთეთ ხელით mooontransferr.onrender.com-ზე →',
       mooonAutoRetry: '↻ ხელახლა ცდა',
       mtUploadHeadline: 'ავტომატური ატვირთვა',
-      tiktokAutoBtn: 'გახსენით TikTok და დააკოპირეთ თქვენი პროფილის ლინკი',
+      tiktokAutoBtn: 'TikTok-ის გახსნა',
       tiktokAutoWaitingBtn: 'დააკოპირეთ ლინკი და დააჭირეთ აქ ისევ',
       tiktokAutoOpenedNote: 'TikTok გაიხსნა ახალ ტაბში — გადადით თქვენს პროფილზე, დააჭირეთ „გაზიარებას" და დააკოპირეთ ლინკი. შემდეგ დაბრუნდით აქ და დააჭირეთ ღილაკს ისევ.',
       tiktokAutoFound: '✓ ლინკი ავტომატურად ამოვიცანით და დავადასტურეთ',
@@ -7343,7 +7358,7 @@
       mooonAutoManualLink: 'Upload manually on mooontransferr.onrender.com →',
       mooonAutoRetry: '↻ Try again',
       mtUploadHeadline: 'Automatic upload',
-      tiktokAutoBtn: 'Open TikTok and copy your profile link',
+      tiktokAutoBtn: 'Open TikTok',
       tiktokAutoWaitingBtn: "Copy the link, then tap here again",
       tiktokAutoOpenedNote: 'TikTok opened in a new tab — go to your profile, tap "Share" and copy the link. Then come back here and tap the button again.',
       tiktokAutoFound: '✓ Link detected and confirmed automatically',
@@ -8826,6 +8841,49 @@
     }
   }
 
+  // ============================================================
+  // Remembered TikTok link per Discord user — separate from the
+  // subscription-badge system above. That one only ever applies to an
+  // ACTIVE, unexpired weekly/monthly package. This persists indefinitely
+  // instead, purely as a convenience: a returning customer's TikTok link
+  // gets pre-filled on EVERY panel (main/weekly/monthly/cheap), not just
+  // the two subscription ones, so they never have to retype it on a
+  // second order just because their first one wasn't a subscription (or
+  // its subscription window already ended).
+  // ============================================================
+  async function rememberTiktokForUser(tiktok){
+    if (!currentDiscordUser || !currentDiscordUser.id || !tiktok) return;
+    try{
+      const data = await mdbRead('tiktokProfiles');
+      // Same data-loss guard as activeSubscriptions: a failed/malformed
+      // read must never turn into a write that wipes every OTHER
+      // customer's saved link down to just this one.
+      if (data && typeof data.map !== 'object') return;
+      const map = (data && data.map) ? Object.assign({}, data.map) : {};
+      map[String(currentDiscordUser.id)] = {
+        tiktok,
+        discordUsername: currentDiscordUser.username || '',
+        updatedAt: Date.now()
+      };
+      await mdbWrite('tiktokProfiles', { map });
+    } catch(e){ /* silent — the order itself already went through either way */ }
+  }
+
+  async function loadRememberedTiktokForUser(){
+    if (!currentDiscordUser || !currentDiscordUser.id) return;
+    try{
+      const data = await mdbRead('tiktokProfiles');
+      const entry = data && data.map ? data.map[String(currentDiscordUser.id)] : null;
+      if (!entry || !entry.tiktok) return;
+      // Only fills in EMPTY fields — never overwrites something the
+      // visitor has already typed this session.
+      Object.keys(tiktokGroups).forEach(key => {
+        const g = tiktokGroups[key];
+        if (g && g.link && !g.link.value.trim()) g.link.value = entry.tiktok;
+      });
+    } catch(e){ /* silent */ }
+  }
+
   function applySubscriptionUI(){
     applySubscriptionUIFor('wp');
     applySubscriptionUIFor('mp');
@@ -9669,6 +9727,7 @@
     const okEl = document.getElementById(cfg.okId);
     const okName = document.getElementById(cfg.okNameId);
     const rejectEl = document.getElementById(cfg.rejectId);
+    const detectedEl = document.getElementById(cfg.rejectId + 'Detected');
     const prompt = document.getElementById(cfg.promptId);
     const promptQ = document.getElementById(cfg.promptQId);
     const promptActions = document.getElementById(cfg.promptActionsId);
@@ -9705,11 +9764,24 @@
       resetPrompt();
       if (prompt) prompt.classList.add('show');
     }
-    function showReject(acceptability){
+    function showReject(acceptability, meta){
       currentFile = null;
       result.classList.add('show');
       if (okEl) okEl.classList.remove('show');
       if (rejectEl) rejectEl.classList.add('show');
+      // Show exactly what the scanner detected — without this, a
+      // borderline/misdetected file is an opaque, undebuggable rejection.
+      if (detectedEl) {
+        if (meta) {
+          const hasDims = !!(meta.width && meta.height);
+          const fpsLabel = meta.fps ? `${meta.fps}fps` : t('srFpsUnknown');
+          detectedEl.textContent = hasDims
+            ? `აღმოჩენილია: ${meta.width}×${meta.height} · ${fpsLabel}`
+            : `აღმოჩენილია: ${fpsLabel}`;
+        } else {
+          detectedEl.textContent = '';
+        }
+      }
       // This package doesn't sell a 4K tier itself — if that's exactly why
       // the upload was rejected, point the visitor at the Cheap Package
       // instead of leaving them with just a generic mismatch message.
@@ -9738,6 +9810,7 @@
       result.classList.remove('show');
       if (okEl) okEl.classList.remove('show');
       if (rejectEl) rejectEl.classList.remove('show');
+      if (detectedEl) detectedEl.textContent = '';
       if (fourKNoteEl) fourKNoteEl.style.display = 'none';
       // Cheap Package only: cancelling clears whatever tier the (now
       // abandoned) upload had locked in, the same way a rejected upload
@@ -9798,7 +9871,7 @@
         zone.classList.remove('scanning');
         const acceptability = checkUploadAcceptable(meta.width, meta.height, meta.fps, cfg.allowFourK);
         if (acceptability.rejected) {
-          showReject(acceptability);
+          showReject(acceptability, meta);
         } else {
           // Cheap Package only: auto-mark the 1080p or 4K price tile to
           // match whichever format was actually detected on upload, and
@@ -10395,6 +10468,7 @@ TikTok პროფილი: ${getTiktokValue('main')}
       duration: `${s}.${String(ms).padStart(2,'0')}`, quality, isSub, price,
       tiktok: getTiktokValue('main'), videoLink: getVideoLinkValue('main')
     };
+    rememberTiktokForUser(orderData.tiktok);
     const firstMessage = buildOrderMessage('');
     startOrderChat(orderData, firstMessage, btn, textEl, 'sendChat', flashCopyNote);
   });
@@ -10444,6 +10518,7 @@ TikTok პროფილი: ${getTiktokValue('wp')}
       type: 'weekly', quality, isSub: isChannelSub, price: total,
       tiktok: getTiktokValue('wp'), videoLink: getVideoLinkValue('wp')
     };
+    rememberTiktokForUser(orderData.tiktok);
     const firstMessage = buildWeeklySubOrderMessage('');
     startOrderChat(orderData, firstMessage, btn, textEl, 'wpSendChat', flashWpCopyNote);
   });
@@ -10488,6 +10563,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       type: 'monthly', quality, price: total,
       tiktok: getTiktokValue('mp'), videoLink: getVideoLinkValue('mp')
     };
+    rememberTiktokForUser(orderData.tiktok);
     const firstMessage = buildMonthlySubOrderMessage('');
     startOrderChat(orderData, firstMessage, btn, textEl, 'mpSendChat', flashMpCopyNote);
   });
@@ -10741,6 +10817,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       type: 'cheapOrder', price,
       tiktok: getTiktokValue('cp'), videoLink: getVideoLinkValue('cp')
     };
+    rememberTiktokForUser(orderData.tiktok);
     const firstMessage = buildCheapOrderMessage('');
     startOrderChat(orderData, firstMessage, btn, textEl, 'cpSendChat', flashCpCopyNote);
   });
@@ -13811,6 +13888,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // cache-then-network refresh) — this is what shows/hides the "package
     // activated" badge on the wp/mp order panels.
     refreshMySubscriptions();
+    loadRememberedTiktokForUser();
     checkForActiveChat();
     const chip = document.getElementById('discordChip');
     const avatarImg = document.getElementById('discordAvatarImg');
