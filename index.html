@@ -88,6 +88,32 @@
     overflow-x:hidden;
   }
 
+  /* ---------- iOS-only fix: harsh/heavy-looking bold text ----------
+     'BPG Glaho' (see @font-face above) ships exactly ONE real weight
+     (400). Every font-weight:700/800/900 used across this stylesheet
+     (there are hundreds) has no matching real bold face to draw, so
+     EVERY browser "fakes" it by synthetically thickening the regular
+     glyphs. Android's Chrome and desktop browsers do this fairly
+     gently; iOS's WebKit renders synthetic bold noticeably heavier
+     and rougher — that mismatch is exactly the "sharp/harsh, doesn't
+     look like iOS" complaint. `-webkit-touch-callout` is a real CSS
+     property implemented ONLY by iOS WebKit (it controls the
+     long-press callout menu) and nowhere else, which makes this
+     @supports block a reliable, well-known way to target iOS
+     specifically — Android and desktop are completely unaffected by
+     it, matching the request to leave those two alone. Turning
+     synthetic weight synthesis off makes iOS render the same clean
+     400-weight glyphs everywhere instead of an artificially
+     thickened one; `font-synthesis: none` is kept alongside the
+     newer, more precise `font-synthesis-weight` for older iOS/Safari
+     versions that don't recognize the granular property yet. */
+  @supports (-webkit-touch-callout: none) {
+    html, body{
+      font-synthesis-weight: none;
+      font-synthesis: none;
+    }
+  }
+
   .bg-layer{
     position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
     contain:strict;
