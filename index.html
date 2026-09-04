@@ -9269,34 +9269,19 @@
   }
 
   function uploadFileToMoontransferr(file, onProgress){
-    // Mobile browsers aggressively suspend/throttle JS and network activity
-    // for backgrounded tabs (screen lock, switching app to check WhatsApp,
-    // etc.) — by far the most common reason a large upload silently dies
-    // partway through on a phone but never on desktop. We can't prevent
-    // that OS-level suspension, but we CAN detect it happened and say so,
-    // instead of a generic "network error" that gives no clue what to do
-    // differently next time.
-    let wasBackgrounded = false;
-    const onVisChange = () => { if (document.visibilityState === 'hidden') wasBackgrounded = true; };
-    document.addEventListener('visibilitychange', onVisChange);
-
     let xhrRef = null;
-    // Video uploads over mobile data can legitimately take a while — this
-    // is a generous ceiling so a real (if slow) upload isn't cut off, just
-    // one that has genuinely stalled.
-    const UPLOAD_TIMEOUT_MS = 120000;
+    // Video uploads over mobile data can legitimately take a long time,
+    // especially for a large 4K file on a weak connection. This ceiling
+    // is deliberately generous so a real-but-slow upload is never cut
+    // off partway; only a genuinely dead connection should ever hit it.
+    const UPLOAD_TIMEOUT_MS = 600000; // 10 minutes
     // The two plain JSON API calls below (request-upload / finalize) are
-    // small and should normally resolve almost instantly -- 20s is a
-    // generous ceiling that only kicks in if one of them has genuinely
-    // stalled (see fetchWithTimeout above for why this matters).
-    const API_TIMEOUT_MS = 20000;
+    // small, but the transfer service is a free-tier instance that can
+    // need a cold start, so this has to allow for that wake-up time
+    // rather than failing the whole upload before the server is even up.
+    const API_TIMEOUT_MS = 90000;
 
-    const cleanupTracking = () => document.removeEventListener('visibilitychange', onVisChange);
-
-    const withBackgroundHint = (err) => {
-      if (wasBackgrounded) err.backgrounded = true;
-      return err;
-    };
+    const cleanupTracking = () => {};
 
     return fetchWithTimeout(VIDEO_REVIEW_TRANSFER_URL + '/api/request-upload', {
       method: 'POST',
@@ -9319,9 +9304,9 @@
         xhr.upload.onprogress = e => {
           if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
         };
-        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(withBackgroundHint(new Error('upload-failed-' + xhr.status)));
-        xhr.onerror = () => reject(withBackgroundHint(new Error('upload-network-error')));
-        xhr.ontimeout = () => reject(withBackgroundHint(new Error('upload-timeout')));
+        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('upload-failed-' + xhr.status));
+        xhr.onerror = () => reject(new Error('upload-network-error'));
+        xhr.ontimeout = () => reject(new Error('upload-timeout'));
         xhr.send(file);
       }).then(() => file_id);
     })
@@ -9377,7 +9362,7 @@
       const stayHint = wrap.querySelector('.mooon-auto-stay');
       if (stayHint) stayHint.style.display = 'none';
       if (errorBox) {
-        const msg = (err && err.backgrounded) ? t('mooonAutoErrorBackgrounded') : t('mooonAutoError');
+        const msg = t('mooonAutoError');
         errorBox.innerHTML =
           escapeHtml(msg) +
           '<a href="' + VIDEO_REVIEW_TRANSFER_URL + '/" target="_blank" rel="noopener">' + escapeHtml(t('mooonAutoManualLink')) + '</a>' +
