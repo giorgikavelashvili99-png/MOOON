@@ -4278,6 +4278,14 @@
      ============================================================ */
   .pc-section{ margin-bottom:8px; }
   .pc-intro{ text-align:center; padding:6px 6px 22px; }
+  .pc-guide-row{
+    display:flex; flex-wrap:nowrap; justify-content:flex-start; align-items:center;
+    gap:8px; margin-top:10px; margin-bottom:14px;
+  }
+  .pc-guide-row .pc-guide-link{ margin-bottom:0; flex:0 1 auto; min-width:0; }
+  .pc-guide-row .pc-guide-link span:last-child{
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
   .pc-heading{
     margin:0 0 8px; font-size:clamp(20px, 5.5vw, 30px); font-weight:800; letter-spacing:normal;
     color:#fff; text-shadow:0 0 22px rgba(59,109,255,0.35);
@@ -4288,11 +4296,11 @@
     overflow-wrap:break-word;
   }
   .pc-guide-link{
-    display:inline-flex; align-items:center; gap:7px;
-    margin-bottom:14px; padding:8px 18px; border-radius:999px;
+    display:inline-flex; align-items:center; gap:5px;
+    margin-bottom:14px; padding:6px 12px; border-radius:999px;
     background:linear-gradient(120deg, rgba(255,210,63,0.16), rgba(34,195,255,0.14));
     border:1px solid rgba(255,210,63,0.5);
-    color:var(--gold); font-size:12.5px; font-weight:700; text-decoration:none;
+    color:var(--gold); font-size:clamp(9.5px, 2.9vw, 11.5px); font-weight:700; text-decoration:none;
     box-shadow:0 0 18px rgba(255,210,63,0.15);
     transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
   }
@@ -4300,7 +4308,7 @@
     transform:translateY(-1px); border-color:var(--gold);
     box-shadow:0 0 24px rgba(255,210,63,0.3);
   }
-  .pc-guide-ico{ font-size:14px; }
+  .pc-guide-ico{ font-size:12px; flex:0 0 auto; }
 
   .pricing-cards{
     display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px;
@@ -4725,13 +4733,20 @@
      is scrolled to. */
   .active-chat-bubble{
     position:fixed !important;
-    right:calc(18px + env(safe-area-inset-right, 0px));
+    left:calc(18px + env(safe-area-inset-left, 0px));
     bottom:calc(18px + env(safe-area-inset-bottom, 0px));
     z-index:9000;
     width:56px; height:56px; border-radius:50%; border:none; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:4px; text-align:center; overflow:hidden;
     background:linear-gradient(135deg, #8b5cf6, #6d28d9); color:#fff;
     box-shadow:0 8px 22px rgba(139,92,246,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .active-chat-bubble .acb-label{
+    display:block; width:100%;
+    font-family:'BPG Glaho', 'Space Grotesk', sans-serif;
+    font-size:8px; font-weight:800; line-height:1.15;
+    color:#fff; white-space:nowrap;
   }
   .acb-dot{
     position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%;
@@ -5225,7 +5240,7 @@
      persists across the whole site (and across visits, since it's
      looked up from the server by Discord ID, not local storage). -->
 <button type="button" id="activeChatBubble" class="active-chat-bubble" style="display:none;" aria-label="აქტიური ჩატის გახსნა">
-  <svg viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M4 4h16v12H8l-4 4V4z"/></svg>
+  <span class="acb-label" data-i18n="acbLabelLine1">შეკვეთის</span><span class="acb-label" data-i18n="acbLabelLine2">გაგრძელება</span>
   <span class="acb-dot" id="activeChatBubbleDot" style="display:none;"></span>
 </button>
 
@@ -5671,10 +5686,16 @@
 
   <div class="pc-section">
     <div class="pc-intro">
-      <a class="pc-guide-link" href="rogor-shevukvetot-gzamkvlevi.pdf" target="_blank" rel="noopener">
-        <span class="pc-guide-ico" aria-hidden="true">📄</span>
-        <span data-i18n="pcGuideLinkText">როგორ შევუკვეთოთ?</span>
-      </a>
+      <div class="pc-guide-row">
+        <a class="pc-guide-link" href="rogor-shevukvetot-gzamkvlevi.pdf" target="_blank" rel="noopener">
+          <span class="pc-guide-ico" aria-hidden="true">📄</span>
+          <span data-i18n="pcGuideLinkText">როგორ შევუკვეთოთ?</span>
+        </a>
+        <a class="pc-guide-link" href="rogor-avtvirtot-gzamkvlevi.pdf" target="_blank" rel="noopener">
+          <span class="pc-guide-ico" aria-hidden="true">⬆️</span>
+          <span data-i18n="pcGuideLinkText2">როგორ ავტვირთოთ?</span>
+        </a>
+      </div>
       <h1 class="pc-heading" data-i18n="pcSubheading">შეარჩიეთ სასურველი პაკეტი</h1>
     </div>
 
@@ -6792,6 +6813,7 @@
       pcHeading: 'აირჩიეთ პაკეტი',
       pcSubheading: 'შეარჩიეთ სასურველი პაკეტი',
       pcGuideLinkText: 'როგორ შევუკვეთოთ?',
+      pcGuideLinkText2: 'როგორ ავტვირთოთ?',
       pcCalcBtn: 'შეკვეთა',
       pcRibbon: 'პოპულარული',
       pcFrom: 'დან',
@@ -7019,6 +7041,8 @@
       contactDiscordSub: 'შემოდი სერვერზე ♥',
       footer: 'MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">ზუსტი</span> კალკულაცია, კადრამდე სიზუსტით',
       chatAssistant: 'ასისტენტი',
+      acbLabelLine1: 'შეკვეთის',
+      acbLabelLine2: 'გაგრძელება',
       chatOnline: 'ონლაინ',
       chatInputPlaceholder: 'დასვი კითხვა…',
       tutorialLink: '🎬 ტუტორიალი',
@@ -7202,6 +7226,7 @@
       pcHeading: 'Choose your package',
       pcSubheading: 'Select your preferred package',
       pcGuideLinkText: 'How to order?',
+      pcGuideLinkText2: 'How to upload?',
       pcCalcBtn: 'Order',
       pcRibbon: 'Popular',
       pcFrom: 'from',
@@ -7429,6 +7454,8 @@
       contactDiscordSub: 'Join and message us',
       footer: 'MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">precise</span> calculation, down to the frame',
       chatAssistant: 'Assistant',
+      acbLabelLine1: 'Continue',
+      acbLabelLine2: 'order',
       chatOnline: 'Online',
       chatInputPlaceholder: 'Ask a question…',
       tutorialLink: '🎬 Tutorial',
