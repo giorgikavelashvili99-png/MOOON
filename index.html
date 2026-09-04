@@ -8257,6 +8257,11 @@
         return;
       }
       if (errorEl) errorEl.classList.remove('show');
+      // The button is literally the "confirm" step -- getting here means
+      // validation above already passed, so mark the link confirmed
+      // regardless of whether it was typed, pasted, auto-detected from
+      // the clipboard, or pre-filled from a previous order.
+      tiktokLinkConfirmed['wp'] = true;
       const priceEl = document.getElementById('wpWizardFinalPrice');
       if (priceEl) priceEl.textContent = getWeeklyTotal(subSelectedQuality).toFixed(2) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
@@ -8386,6 +8391,11 @@
         return;
       }
       if (errorEl) errorEl.classList.remove('show');
+      // The button is literally the "confirm" step -- getting here means
+      // validation above already passed, so mark the link confirmed
+      // regardless of whether it was typed, pasted, auto-detected from
+      // the clipboard, or pre-filled from a previous order.
+      tiktokLinkConfirmed['mp'] = true;
       const priceEl = document.getElementById('mpWizardFinalPrice');
       if (priceEl) priceEl.textContent = getMonthlyTotal(monthSelectedQuality).toFixed(2) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
@@ -8624,6 +8634,11 @@
         return;
       }
       if (errorEl) errorEl.classList.remove('show');
+      // The button is literally the "confirm" step -- getting here means
+      // validation above already passed, so mark the link confirmed
+      // regardless of whether it was typed, pasted, auto-detected from
+      // the clipboard, or pre-filled from a previous order.
+      tiktokLinkConfirmed['main'] = true;
       const priceEl = document.getElementById('wizardFinalPrice');
       if (priceEl) {
         const { s, ms, quality } = currentValues();
@@ -8902,7 +8917,18 @@
       // visitor has already typed this session.
       Object.keys(tiktokGroups).forEach(key => {
         const g = tiktokGroups[key];
-        if (g && g.link && !g.link.value.trim()) g.link.value = entry.tiktok;
+        if (g && g.link && !g.link.value.trim()) {
+          g.link.value = entry.tiktok;
+          // CRITICAL: tiktokLinkConfirmed is normally set by the field's
+          // 'input' listener, but assigning .value from JS does NOT fire
+          // that event. Without this line the field looks filled in while
+          // the flag stays false, so validateBeforeSend() rejects the
+          // order and pressing "send" does nothing at all — which is
+          // exactly the "send button is dead everywhere except Edit
+          // Order" bug (Edit Order is the one panel that never calls
+          // validateBeforeSend).
+          tiktokLinkConfirmed[key] = true;
+        }
       });
     } catch(e){ /* silent */ }
   }
@@ -10843,6 +10869,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         return;
       }
       if (errorEl) errorEl.classList.remove('show');
+      // The button is literally the "confirm" step -- getting here means
+      // validation above already passed, so mark the link confirmed
+      // regardless of whether it was typed, pasted, auto-detected from
+      // the clipboard, or pre-filled from a previous order.
+      tiktokLinkConfirmed['cp'] = true;
       const priceEl = document.getElementById('cpWizardFinalPrice');
       if (priceEl) priceEl.textContent = (CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60']) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
