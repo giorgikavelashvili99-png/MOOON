@@ -5885,11 +5885,6 @@
           <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
           <span class="wc-price-value" id="wizardFinalPrice">—</span>
         </div>
-        <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
-        <div class="wq-actions">
-          <button type="button" class="wq-btn wq-yes" id="sendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
-          <button type="button" class="wq-btn wq-no" id="sendOrderNoBtn" data-i18n="wizardNo">არა</button>
-        </div>
       </div>
     </div>
 
@@ -6066,11 +6061,6 @@
           <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
           <span class="wc-price-value" id="wpWizardFinalPrice">—</span>
         </div>
-        <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
-        <div class="wq-actions">
-          <button type="button" class="wq-btn wq-yes" id="wpSendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
-          <button type="button" class="wq-btn wq-no" id="wpSendOrderNoBtn" data-i18n="wizardNo">არა</button>
-        </div>
       </div>
     </div>
 
@@ -6212,11 +6202,6 @@
         <div class="wc-price-row">
           <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
           <span class="wc-price-value" id="mpWizardFinalPrice">—</span>
-        </div>
-        <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
-        <div class="wq-actions">
-          <button type="button" class="wq-btn wq-yes" id="mpSendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
-          <button type="button" class="wq-btn wq-no" id="mpSendOrderNoBtn" data-i18n="wizardNo">არა</button>
         </div>
       </div>
     </div>
@@ -6431,11 +6416,6 @@
           <div class="wc-price-row">
             <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
             <span class="wc-price-value" id="cpWizardFinalPrice">—</span>
-          </div>
-          <div class="wq-text" data-i18n="sendOrderWizardQ">გსურთ გააგზავნოთ შეკვეთა?</div>
-          <div class="wq-actions">
-            <button type="button" class="wq-btn wq-yes" id="cpSendOrderYesBtn" data-i18n="wizardYes">დიახ</button>
-            <button type="button" class="wq-btn wq-no" id="cpSendOrderNoBtn" data-i18n="wizardNo">არა</button>
           </div>
         </div>
       </div>
@@ -8204,7 +8184,6 @@
     if (!wpQualityGrid) return;
 
     const tiktokConfirmBtn = document.getElementById('wpTiktokConfirmBtn');
-    const sendYesBtn = document.getElementById('wpSendOrderYesBtn');
 
     // Whole uploader box (label + bordered shell around the drop zone) --
     // hidden once the visitor reaches the quality step, the same way the
@@ -8280,17 +8259,13 @@
       if (priceEl) priceEl.textContent = getWeeklyTotal(subSelectedQuality).toFixed(2) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      // The real "გაგზავნე შეკვეთა" button lives in channelsPanel — per
+      // explicit request, the redundant "are you sure? Yes/No" step in
+      // between is gone, so this now needs revealing directly alongside
+      // the price instead of only ever being triggered indirectly by a
+      // since-removed Yes button.
+      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
       setWizardStage('wizardStepsWp', 4);
-    });
-
-    sendYesBtn && sendYesBtn.addEventListener('click', () => {
-      const chatBtn = document.getElementById('wpOrderBtnChat');
-      if (chatBtn) chatBtn.click();
-    });
-    const sendNoBtn = document.getElementById('wpSendOrderNoBtn');
-    sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      // Full reload — guaranteed complete reset, see srTransferNo above.
-      window.location.reload();
     });
   })();
 
@@ -8348,7 +8323,6 @@
     if (!mpQualityGrid) return;
 
     const tiktokConfirmBtn = document.getElementById('mpTiktokConfirmBtn');
-    const sendYesBtn = document.getElementById('mpSendOrderYesBtn');
 
     // Whole uploader box (label + bordered shell around the drop zone) --
     // hidden once the visitor reaches the quality step, the same way the
@@ -8414,17 +8388,8 @@
       if (priceEl) priceEl.textContent = getMonthlyTotal(monthSelectedQuality).toFixed(2) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
       setWizardStage('wizardStepsMp', 4);
-    });
-
-    sendYesBtn && sendYesBtn.addEventListener('click', () => {
-      const chatBtn = document.getElementById('mpOrderBtnChat');
-      if (chatBtn) chatBtn.click();
-    });
-    const sendNoBtn = document.getElementById('mpSendOrderNoBtn');
-    sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      // Full reload — guaranteed complete reset, see srTransferNo above.
-      window.location.reload();
     });
   })();
 
@@ -8583,13 +8548,12 @@
     if (!qualityWrap) return;
 
     const tiktokConfirmBtn = document.getElementById('tiktokConfirmBtn');
-    const sendYesBtn = document.getElementById('sendOrderYesBtn');
 
-    // channelsPanel (the actual "გაგზავნე შეკვეთა" button) never needs
-    // to become visible again -- sendYesBtn below triggers its click()
-    // programmatically, which fires just fine on a hidden button. It
-    // only ever gets hidden here so it isn't sitting on screen from the
-    // very start, before the visitor has even uploaded anything.
+    // channelsPanel (the actual "გაგზავნე შეკვეთა" button) is hidden
+    // here so it isn't sitting on screen from the very start, before
+    // the visitor has uploaded anything -- it gets revealed again at
+    // the final step by the tiktokConfirmBtn handler below, now that
+    // the intermediate "are you sure? Yes/No" step has been removed.
     // The uploader box itself (border/background shell around the drop
     // zone + scan result) -- hidden as a whole once the visitor reaches
     // the quality step, otherwise its empty padded shell is left sitting
@@ -8665,24 +8629,12 @@
       }
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      // Per explicit request, the "are you sure? Yes/No" step is gone —
+      // channelsPanel (the real send button, previously only ever
+      // triggered indirectly via the since-removed Yes button's
+      // click()) is now revealed directly alongside the price instead.
+      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
       setWizardStage('wizardStepsMain', 4);
-    });
-
-    // "Send order? Yes" reuses orderBtnChat's own existing validation +
-    // submit + open-chat logic wholesale by triggering its click
-    // programmatically, rather than duplicating any of that here.
-    sendYesBtn && sendYesBtn.addEventListener('click', () => {
-      const chatBtn = document.getElementById('orderBtnChat');
-      if (chatBtn) chatBtn.click();
-    });
-    // "No" fully restarts the flow — same as pressing the scanner's own
-    // cancel button — rather than just stepping back one stage, so
-    // declining to send really does put everything back where it was
-    // before anything was uploaded at all.
-    const sendNoBtn = document.getElementById('sendOrderNoBtn');
-    sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      // Full reload — guaranteed complete reset, see srTransferNo above.
-      window.location.reload();
     });
   })();
 
@@ -10806,7 +10758,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     if (!cpQualityGrid) return;
 
     const tiktokConfirmBtn = document.getElementById('cpTiktokConfirmBtn');
-    const sendYesBtn = document.getElementById('cpSendOrderYesBtn');
 
     // Whole uploader box (label + bordered shell around the drop zone) --
     // hidden once the visitor reaches the quality step, the same way the
@@ -10877,17 +10828,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       if (priceEl) priceEl.textContent = (CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60']) + ' ₾';
       if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
       if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
+      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
       setWizardStage('wizardStepsCp', 4);
-    });
-
-    sendYesBtn && sendYesBtn.addEventListener('click', () => {
-      const chatBtn = document.getElementById('cpOrderBtnChat');
-      if (chatBtn) chatBtn.click();
-    });
-    const sendNoBtn = document.getElementById('cpSendOrderNoBtn');
-    sendNoBtn && sendNoBtn.addEventListener('click', () => {
-      // Full reload — guaranteed complete reset, see srTransferNo above.
-      window.location.reload();
     });
   })();
 
