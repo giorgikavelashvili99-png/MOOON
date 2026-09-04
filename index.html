@@ -10153,7 +10153,7 @@
     return messengerSocket;
   }
 
-  function openMessengerPage(orderId, role){
+  function openMessengerPage(orderId, role, optimisticFirstMessage){
     messengerRole = role || 'customer';
     messengerCurrentOrderId = orderId;
     const orderIdEl = document.getElementById('messengerOrderId');
@@ -10181,10 +10181,31 @@
     const socket = ensureMessengerSocket();
     if (socket) socket.emit('join_order', { orderId });
 
+    // Show the order text straight away.
+    //
+    // The chat is now opened before the server-side session finishes
+    // being created (so a sleeping free-tier server can't make the send
+    // button look dead), which means the history fetch below usually
+    // comes back empty on this very first open -- leaving the customer
+    // staring at a blank chat and only seeing their order after closing
+    // and reopening it. Rendering the text we already have locally fixes
+    // that; the fetch below then replaces it with the authoritative
+    // server copy as soon as that exists.
+    if (optimisticFirstMessage) {
+      renderMessageBubble({ from: 'customer', text: optimisticFirstMessage });
+    }
+
     fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data && Array.isArray(data.messages)) data.messages.forEach(renderMessageBubble);
+        // Only replace what's on screen once the server actually has
+        // messages -- otherwise an empty/404 response (normal while the
+        // session is still being created) would wipe the optimistic
+        // bubble and put us right back to a blank chat.
+        if (data && Array.isArray(data.messages) && data.messages.length) {
+          if (messagesEl) messagesEl.innerHTML = '';
+          data.messages.forEach(renderMessageBubble);
+        }
         if (messengerRole === 'admin' && data && data.customer) {
           if (titleEl && data.customer.username) titleEl.textContent = data.customer.username;
           if (avatarWrap && avatarImg && data.customer.avatarUrl) {
@@ -10194,7 +10215,11 @@
           }
         }
       })
-      .catch(() => { appendSystemMessage(t('messengerLoadFailed')); });
+      .catch(() => {
+        // Don't cover the order text with a load-failure notice when we
+        // already have it rendered locally.
+        if (!optimisticFirstMessage) appendSystemMessage(t('messengerLoadFailed'));
+      });
   }
 
   function closeMessengerPage(){
@@ -10314,7 +10339,7 @@
     // the order is already saved to pendingOrders above, and the chat
     // page fetches its own history on open. So it now runs in the
     // background while the chat is already visible.
-    openMessengerPage(orderId, 'customer');
+    openMessengerPage(orderId, 'customer', firstMessageText);
     if (btn) btn.disabled = false;
     if (textEl) textEl.textContent = t(idleKey);
 
@@ -10336,6 +10361,13 @@
           }),
           signal: controller.signal
         });
+        // Session now exists server-side. If the customer is still
+        // sitting in this chat, reload it so what's on screen is the
+        // real stored conversation rather than only the local copy
+        // rendered optimistically a moment ago.
+        if (messengerCurrentOrderId === orderId) {
+          openMessengerPage(orderId, 'customer', firstMessageText);
+        }
       }catch(e){
         console.error('[MOON] failed to create chat session -- the order is still saved in pendingOrders, but the chat itself may be empty until this succeeds.', e);
       }finally{
