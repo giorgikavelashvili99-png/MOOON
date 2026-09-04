@@ -32,6 +32,13 @@
     --volt: #3dd6ff;
     --volt-soft: rgba(61,214,255,0.4);
 
+    /* Fixed identity for the video-upload progress card — deliberately
+       NOT --pc-accent. It must look the same in every package panel and
+       must not echo any single package's own accent (green/magenta/
+       gold/red), so it stays on this dedicated indigo->cyan pair. */
+    --upload-accent: #34d6ff;
+    --upload-accent-2: #5b6dff;
+
     /* --- Warm tile palette (format/fps tiles + upload area) — softer,
        warmer tones instead of stark pure-white on near-black, per
        design feedback. --- */
@@ -2477,19 +2484,20 @@
      video is accepted, it starts uploading in the background on its own,
      no yes/no question and no manual link field. This card is the ONLY
      UI for that requirement, so it doubles as the "please wait" / error
-     target that validation points the visitor to. */
-  .mt-upload-head{
-    display:none; align-items:center; gap:9px;
-    margin-bottom:10px;
-  }
-  .mt-upload-head.show{ display:flex; }
+     target that validation points the visitor to.
+
+     Redesigned as a single self-contained glowing card with one fixed
+     identity (--upload-accent / --upload-accent-2) instead of a header
+     row + separate box. It intentionally never reads --pc-accent, so it
+     looks identical in every package panel and never borrows that
+     package's own color. All wording is stripped down to just the
+     "keep the screen on" hint — the old headline row and the "იტვირთება…"
+     status label are hidden; the spinner + progress bar carry the rest. */
+  .mt-upload-head, .mt-upload-head.show{ display:none !important; }
   .mt-upload-head-badge{
     width:26px; height:26px; border-radius:50%; flex:0 0 auto;
     display:flex; align-items:center; justify-content:center;
     font-size:13px;
-    background:linear-gradient(145deg, color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent), color-mix(in srgb, var(--pc-accent, var(--cyan)) 15%, transparent));
-    border:1px solid color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent);
-    box-shadow:0 0 14px color-mix(in srgb, var(--pc-accent, var(--cyan)) 30%, transparent);
   }
   .mt-upload-head-text{
     font-size:12px; line-height:1.4; color:var(--text-dim); font-weight:600;
@@ -2497,45 +2505,68 @@
   }
   .mooon-auto{
     display:none; margin-top:10px;
-    padding:14px 15px;
-    border-radius:16px;
-    border:1px solid color-mix(in srgb, var(--pc-accent, var(--cyan)) 30%, transparent);
+    padding:20px 16px 16px;
+    border-radius:20px;
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+    border:1px solid color-mix(in srgb, var(--upload-accent) 34%, transparent);
     background:
-      radial-gradient(ellipse 100% 100% at 15% 0%, color-mix(in srgb, var(--pc-accent, var(--purple)) 14%, transparent), transparent 65%),
-      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      radial-gradient(ellipse 130% 90% at 50% -15%, color-mix(in srgb, var(--upload-accent-2) 22%, transparent), transparent 65%),
+      linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01) 45%),
+      linear-gradient(180deg, #10152a, #090b14);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .mooon-auto.show{ display:block; }
+  .mooon-auto::before{
+    content:'';
+    display:flex; align-items:center; justify-content:center;
+    width:40px; height:40px; margin:0 auto 12px;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.4), transparent 60%),
+      linear-gradient(150deg, var(--upload-accent), var(--upload-accent-2));
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--upload-accent) 12%, transparent), 0 10px 24px color-mix(in srgb, var(--upload-accent) 40%, transparent);
+  }
   .upload-attention{ animation: ttShake 0.4s ease; }
   .mooon-auto-status{
-    display:flex; align-items:center; gap:9px;
-    font-size:12.5px; color:var(--text); font-weight:600; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    font-size:12.5px; color:var(--text); font-weight:600; margin-bottom:14px;
   }
+  /* Only the spinner stays visible in the "uploading" row — every text
+     label next to it (uploading… / finalizing…) is stripped per the
+     "keep only the screen-on line" request. */
+  .mooon-auto-status span:not(.mooon-auto-spin){ display:none; }
   .mooon-auto-spin{
-    width:16px; height:16px; border-radius:50%; flex:0 0 auto;
-    border:2px solid color-mix(in srgb, var(--pc-accent, var(--cyan)) 25%, transparent);
-    border-top-color: var(--pc-accent, var(--cyan));
+    width:20px; height:20px; border-radius:50%; flex:0 0 auto;
+    border:3px solid color-mix(in srgb, var(--upload-accent) 22%, transparent);
+    border-top-color: var(--upload-accent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--upload-accent) 45%, transparent);
     animation: moonAutoSpin 0.8s linear infinite;
   }
   @keyframes moonAutoSpin{ to{ transform:rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .mooon-auto-spin{ animation:none; } }
   .mooon-auto-track{
-    height:8px; border-radius:100px; overflow:hidden;
+    height:9px; border-radius:100px; overflow:hidden;
     background:rgba(255,255,255,0.08);
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
   }
   .mooon-auto-fill{
     height:100%; width:0%; border-radius:100px;
-    background:linear-gradient(90deg, var(--pc-accent, var(--purple)), color-mix(in srgb, var(--pc-accent, var(--cyan)) 70%, #fff));
-    box-shadow: 0 0 10px color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent);
+    background:linear-gradient(90deg, var(--upload-accent-2), var(--upload-accent));
+    box-shadow: 0 0 12px color-mix(in srgb, var(--upload-accent) 60%, transparent);
     transition: width 0.2s ease;
   }
   .mooon-auto-stay{
-    font-size:11px; line-height:1.5; color:var(--text-faint);
-    margin-top:9px; text-align:center;
+    font-size:11px; line-height:1.5; color:var(--warm-ivory);
+    margin-top:14px; text-align:center;
+    padding:9px 12px; border-radius:12px;
+    background: color-mix(in srgb, var(--upload-accent) 12%, transparent);
+    border:1px solid color-mix(in srgb, var(--upload-accent) 28%, transparent);
   }
   .mooon-auto-done{
-    display:flex; align-items:center; gap:8px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:12px;
     font-size:13px; font-weight:700; color:var(--wa);
   }
   .mooon-auto-done span:first-child{
@@ -5230,18 +5261,19 @@
      ============================================================ */
   .mooon-auto{
     margin-top:8px;
-    padding:11px 12px;
-    border-radius:14px;
+    padding:16px 12px 12px;
+    border-radius:16px;
   }
+  .mooon-auto::before{ width:34px; height:34px; margin-bottom:9px; }
   .mooon-auto-status{
-    font-size:12px; margin-bottom:8px; line-height:1.35;
+    margin-bottom:10px;
   }
-  .mooon-auto-track{ height:6px; }
+  .mooon-auto-track{ height:7px; }
   /* The "keep this page open" hint is a single tight line instead of a
      four-line paragraph -- same message, a fraction of the height. */
   .mooon-auto-stay{
-    font-size:10.5px; line-height:1.4; margin-top:7px;
-    opacity:0.75;
+    font-size:10.5px; line-height:1.4; margin-top:10px;
+    padding:7px 10px;
   }
   .scan-result{ margin-top:10px; padding:4px; border-radius:16px; }
   .simple-scan-result{ margin-top:10px; }
@@ -5258,7 +5290,7 @@
   @media (max-width:600px){
     .drop-zone{ padding:16px 13px; }
     .drop-zone .dz-icon{ width:40px; height:40px; margin-bottom:9px; }
-    .mooon-auto{ padding:10px; }
+    .mooon-auto{ padding:14px 10px 10px; }
     .mooon-auto-stay{ font-size:10px; }
   }
 
