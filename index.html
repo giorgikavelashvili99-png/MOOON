@@ -2366,8 +2366,8 @@
     color:var(--text-dim);
   }
   .wq-no:hover{ background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.3); transform:translateY(-2px); }
-  .wc-price-row{ display:flex; align-items:baseline; gap:8px; margin-bottom:2px; }
-  .wc-price-label{ font-size:12.5px; color:var(--text-faint); }
+  .wc-price-row{ display:flex; flex-direction:column; align-items:center; gap:3px; margin-bottom:8px; text-align:center; }
+  .wc-price-label{ font-size:12.5px; color:var(--text-faint); white-space:nowrap; }
   .wc-price-value{
     font-size:26px; font-weight:800; color:var(--gold);
     text-shadow:0 0 16px rgba(255,210,63,0.4);
@@ -5200,6 +5200,16 @@
     .pc-card{ padding:16px 12px 14px; }
     .pc-toggle-btn{ padding:13px 8px; }
   }
+
+  /* Per-tile price hidden on the format-selection tiles for weekly/
+     monthly/cheap — per explicit request, the price should only appear
+     once at the final "computed price" step right before sending, not
+     repeated on every quality tile too. Edit Order is deliberately
+     excluded (kept showing its own per-style/per-quality price, as
+     before) since it was named as the one exception. */
+  .wp-box-price{ display:none; }
+  .mp-box-price{ display:none; }
+  #editOrderPanel .mp-box-price{ display:flex; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -6966,6 +6976,7 @@
       srDetectedFormat: 'ატვირთული ვიდეოს ფორმატი',
       srRequestedFormat: 'მოთხოვნილი ხარისხი',
       srPrice: 'გამოთვლილი ფასი',
+      videoNotReadyAlert: 'შეკვეთის გასაგზავნად საჭიროა, რომ თქვენი ვიდეო წარმატებით გადაეცეს ჩვენს გუნდს. გთხოვთ დაბრუნდეთ ატვირთვის ეტაპზე და დაადასტუროთ ვიდეოს ავტომატური გაგზავნა (ან ატვირთოთ ხელახლა, თუ ჯერ არ დაგისრულებიათ).',
       srSuccessText: 'ატვირთულია ვიდეო',
       srUnit: 'წმ',
       srFpsUnknown: 'fps უცნობია',
@@ -7379,6 +7390,7 @@
       srDetectedFormat: 'Uploaded video format',
       srRequestedFormat: 'Requested quality',
       srPrice: 'Calculated price',
+      videoNotReadyAlert: "To send your order, your video needs to have been successfully delivered to our team first. Please go back to the upload step and confirm the automatic transfer (or upload again if you haven't finished yet).",
       srSuccessText: 'Video uploaded',
       srUnit: 's',
       srFpsUnknown: 'fps unknown',
@@ -10470,7 +10482,17 @@ TikTok პროფილი: ${getTiktokValue('main')}
     const wrap = document.getElementById(m.wrap);
     const zone = document.getElementById(m.zone);
     const target = (wrap && wrap.classList.contains('show')) ? wrap : zone;
-    if (!target) return;
+    // By the time a visitor reaches the final "send?" step, the upload
+    // section from step 1 is hidden behind quality/TikTok/confirm --
+    // scrolling to and highlighting a display:none element is entirely
+    // invisible, which is exactly why pressing "send" looked like it did
+    // nothing at all. offsetParent is null for any element that (or
+    // whose ancestor) is display:none, so this reliably detects that
+    // case and falls back to a message the visitor can't miss instead.
+    if (!target || target.offsetParent === null) {
+      alert(t('videoNotReadyAlert'));
+      return;
+    }
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     target.classList.remove('upload-attention');
     void target.offsetWidth;
