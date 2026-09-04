@@ -4338,6 +4338,19 @@
      ambient animation. Two different elements needing two different
      overflow behaviors is exactly why this wrapper exists. */
   .pc-card-wrap{ position:relative; min-width:0; }
+  /* The grid stretches .pc-card-wrap itself to match the tallest card
+     in its row (CSS Grid's default align-items:stretch) — but that
+     stretched height doesn't automatically pass down to the .pc-card
+     INSIDE the wrapper, since a block element's height is normally
+     sized to its own content regardless of its parent's height. That
+     mismatch is exactly why wrapped cards (individual, and now
+     weekly/monthly since they got wrapped too, for their corner badge)
+     came out shorter than an un-wrapped neighbor with more content —
+     the outer wrapper was the right height, the card inside it wasn't
+     filling it. This one rule fixes it everywhere a .pc-card-wrap is
+     used, not just the cheap-package case it was originally written
+     for below. */
+  .pc-card-wrap > .pc-card{ height:100%; }
 
   .pc-card{
     position:relative;
