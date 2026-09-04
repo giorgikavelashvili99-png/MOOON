@@ -6957,6 +6957,7 @@
       srRequestedFormat: 'მოთხოვნილი ხარისხი',
       srPrice: 'გამოთვლილი ფასი',
       videoNotReadyAlert: 'შეკვეთის გასაგზავნად საჭიროა, რომ თქვენი ვიდეო წარმატებით გადაეცეს ჩვენს გუნდს. გთხოვთ დაბრუნდეთ ატვირთვის ეტაპზე და დაადასტუროთ ვიდეოს ავტომატური გაგზავნა (ან ატვირთოთ ხელახლა, თუ ჯერ არ დაგისრულებიათ).',
+      videoStillUploadingAlert: 'თქვენი ვიდეო ჯერ კიდევ იტვირთება — გთხოვთ დაელოდოთ ატვირთვის დასრულებას და შემდეგ სცადოთ ხელახლა. (პირველი ატვირთვა შეიძლება უფრო დიდხანს გაგრძელდეს, სანამ სერვერი გაიღვიძებს.)',
       srSuccessText: 'ატვირთულია ვიდეო',
       srUnit: 'წმ',
       srFpsUnknown: 'fps უცნობია',
@@ -7371,6 +7372,7 @@
       srRequestedFormat: 'Requested quality',
       srPrice: 'Calculated price',
       videoNotReadyAlert: "To send your order, your video needs to have been successfully delivered to our team first. Please go back to the upload step and confirm the automatic transfer (or upload again if you haven't finished yet).",
+      videoStillUploadingAlert: "Your video is still uploading — please wait for it to finish, then try again. (The very first upload can take longer while the server wakes up.)",
       srSuccessText: 'Video uploaded',
       srUnit: 's',
       srFpsUnknown: 'fps unknown',
@@ -10458,6 +10460,14 @@ TikTok პროფილი: ${getTiktokValue('main')}
     const wrap = document.getElementById(m.wrap);
     const zone = document.getElementById(m.zone);
     const target = (wrap && wrap.classList.contains('show')) ? wrap : zone;
+
+    // Distinguish the two very different reasons a send can be blocked
+    // here, because telling someone to "go upload a video" when their
+    // video is in fact already uploading (just slowly, against a
+    // cold-starting free-tier transfer server) is actively misleading
+    // and is what made this feel broken rather than merely slow.
+    const uploadInProgress = !!(wrap && wrap.classList.contains('show') && !wrap.querySelector('.mooon-auto-done'));
+
     // By the time a visitor reaches the final "send?" step, the upload
     // section from step 1 is hidden behind quality/TikTok/confirm --
     // scrolling to and highlighting a display:none element is entirely
@@ -10466,7 +10476,7 @@ TikTok პროფილი: ${getTiktokValue('main')}
     // whose ancestor) is display:none, so this reliably detects that
     // case and falls back to a message the visitor can't miss instead.
     if (!target || target.offsetParent === null) {
-      alert(t('videoNotReadyAlert'));
+      alert(uploadInProgress ? t('videoStillUploadingAlert') : t('videoNotReadyAlert'));
       return;
     }
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
