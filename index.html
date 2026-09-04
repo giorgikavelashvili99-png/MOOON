@@ -4673,7 +4673,15 @@
   }
   .messenger-complete-btn:active{ transform:scale(0.95); }
   .messenger-messages{
-    flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    flex:1 1 auto;
+    /* min-height:0 is what actually makes this scroll. A flex item
+       defaults to min-height:auto, meaning it refuses to shrink below
+       its own content height -- so the container just grew taller and
+       taller with each message and overflow-y:auto never had anything
+       to overflow. */
+    min-height:0;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
     padding:18px 14px; display:flex; flex-direction:column; gap:10px;
   }
   .msg-bubble{
@@ -5210,6 +5218,81 @@
   .wp-box-price{ display:none; }
   .mp-box-price{ display:none; }
   #editOrderPanel .mp-box-price{ display:flex; }
+
+  /* ============================================================
+     COMPACT UPLOAD PANEL
+     The upload step had grown into several nested bordered boxes
+     stacked vertically (scan-result shell > success banner >
+     auto-upload box > progress > hint paragraph), which stretched the
+     modal far down the page -- especially on phones, where it pushed
+     everything else off screen. This flattens and tightens that whole
+     stack without removing any of the actual functionality.
+     ============================================================ */
+  .mooon-auto{
+    margin-top:8px;
+    padding:11px 12px;
+    border-radius:14px;
+  }
+  .mooon-auto-status{
+    font-size:12px; margin-bottom:8px; line-height:1.35;
+  }
+  .mooon-auto-track{ height:6px; }
+  /* The "keep this page open" hint is a single tight line instead of a
+     four-line paragraph -- same message, a fraction of the height. */
+  .mooon-auto-stay{
+    font-size:10.5px; line-height:1.4; margin-top:7px;
+    opacity:0.75;
+  }
+  .scan-result{ margin-top:10px; padding:4px; border-radius:16px; }
+  .simple-scan-result{ margin-top:10px; }
+  .simple-scan-ok{ padding:11px 40px 11px 12px; border-radius:12px; }
+  .simple-scan-reject{ padding:11px 40px 11px 12px; border-radius:12px; }
+
+  /* Tighter drop zone: the original 30px vertical padding plus a 58px
+     icon made an unnecessarily tall empty box before anything is even
+     uploaded. */
+  .drop-zone{ padding:20px 16px; border-radius:18px; }
+  .drop-zone .dz-icon{ width:46px; height:46px; margin-bottom:11px; }
+  .drop-zone .dz-title{ font-size:14px; margin-bottom:5px; }
+
+  @media (max-width:600px){
+    .drop-zone{ padding:16px 13px; }
+    .drop-zone .dz-icon{ width:40px; height:40px; margin-bottom:9px; }
+    .mooon-auto{ padding:10px; }
+    .mooon-auto-stay{ font-size:10px; }
+  }
+
+  /* ============================================================
+     PERFORMANCE ON PHONES / WEAKER DEVICES
+     The site reads as sluggish on mobile mainly because of three
+     things that are individually cheap but very expensive in bulk:
+     backdrop-filter (forces the GPU to re-sample everything behind an
+     element on every frame), always-running infinite animations, and
+     large blurred glows. `low-power` is already applied automatically
+     on narrow screens and low-core/low-memory devices, so this simply
+     extends it to cover the genuinely costly effects rather than only
+     decorative keyframes.
+     ============================================================ */
+  html.low-power .site-menu,
+  html.low-power .discord-gate,
+  html.low-power .pc-modal-scrim,
+  html.low-power .messenger-page{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+
+  /* Decorative starfields and orbs are pure ornament -- hiding them on
+     weak devices removes a large number of independently animated
+     layers at zero cost to functionality. */
+  html.low-power .qn-stars{ display:none !important; }
+  html.low-power .orb{ display:none !important; }
+
+  /* Stop paying for animation work while the tab isn't even visible. */
+  body.anims-paused *,
+  body.anims-paused *::before,
+  body.anims-paused *::after{
+    animation-play-state:paused !important;
+  }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -5770,7 +5853,7 @@
           <button type="button" class="sr-reset-btn" id="srResetBtn" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
             <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
           </button>
-          <div class="sr-success" id="srSuccess">
+          <div class="sr-success sr-details-hidden" id="srSuccess">
             <span class="sr-success-check">✓</span>
             <span data-i18n="srSuccessText">ატვირთულია ვიდეო</span>
           </div>
