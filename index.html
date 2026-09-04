@@ -6873,8 +6873,8 @@
       ttdlAnalyzeBtn: 'გაანალიზება',
       ttdlIosLinkText: '<span class="ttdl-ios-link-ico" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>ვიდეოს შენახვა — დააჭირეთ აქ',
       cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
-      cpUpscaleModalText4k: 'ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.',
-      cpUpscaleModalTextDowngrade: 'ძვირფასო მომხმარებელო, თქვენი ატვირთული ვიდეო 1080p-ზე მაღალი ხარისხისაა, ამიტომ ფასი ავტომატურად <b>4K</b> ტარიფზეა დაფიქსირებული — <b>1080p</b>-ის ფასზე გადასვლა შეუძლებელია. თუ გსურთ 1080p ფასით სარგებლობა, ატვირთეთ ზუსტად 1080p ფორმატის ვიდეო.',
+      cpUpscaleModalText4k: 'გთხოვთ მონიშნოთ <b>1080p / 60FPS</b> ვერსია, რადგან სწორედ ამ ფორმატშია თქვენი ვიდეო ატვირთული. თუ გსურთ 4K ფორმატით სარგებლობა TikTok-ზე, მაშინ ატვირთეთ ვიდეო, რომელიც რეალურად <b>4K</b> ფორმატშია.',
+      cpUpscaleModalTextDowngrade: 'გთხოვთ მონიშნოთ <b>4K / 60FPS</b> ვერსია, რადგან სწორედ ამ ფორმატშია თქვენი ვიდეო ატვირთული. თუ გსურთ 1080p ფორმატით სარგებლობა TikTok-ზე, მაშინ ატვირთეთ ვიდეო, რომელიც ზუსტად <b>1080p</b> ფორმატშია.',
       qnHowto: 'როგორ შევუკვეთო',
       qnPromo: 'პრომო კოდი',
       qnBeforeAfter: 'მონტაჟამდე / მონტაჟის შემდეგ',
@@ -7286,8 +7286,8 @@
       ttdlAnalyzeBtn: 'Analyze Video',
       ttdlIosLinkText: '<span class="ttdl-ios-link-ico" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>Save video — tap here',
       cpUpscaleModalTitle: "You can't switch to this quality",
-      cpUpscaleModalText4k: "Dear customer, your video was uploaded in <b>1080p</b> — whatever its FPS, it can't be converted to <b>4K</b>. To use the 4K option, please upload a video that is actually filmed/exported in 4K.",
-      cpUpscaleModalTextDowngrade: "Dear customer, your uploaded video is higher quality than 1080p, so the price is automatically locked to the <b>4K</b> rate — switching to the <b>1080p</b> price isn't possible. If you want the 1080p price, upload a video that is exactly 1080p.",
+      cpUpscaleModalText4k: "Please select the <b>1080p / 60FPS</b> option — that's the format your video was actually uploaded in. If you'd like to use 4K on TikTok, upload a video that is actually in <b>4K</b> format.",
+      cpUpscaleModalTextDowngrade: "Please select the <b>4K / 60FPS</b> option — that's the format your video was actually uploaded in. If you'd like to use 1080p on TikTok, upload a video that is exactly <b>1080p</b> format.",
       qnHowto: 'How it works',
       qnPromo: 'Promo code',
       qnBeforeAfter: 'Before / After',
@@ -9949,15 +9949,16 @@
         if (acceptability.rejected) {
           showReject(acceptability, meta);
         } else {
-          // Cheap Package only: auto-mark the 1080p or 4K price tile to
-          // match whichever format was actually detected on upload, and
-          // remember that as the ceiling for the manual click handler —
-          // e.g. 1080p/2K footage only ever unlocks the 1080p tile; trying
-          // to hand-pick 4K afterwards gets blocked (see
-          // tryManualSelectCpQuality) instead of silently allowed.
-          if (cfg.allowFourK && acceptability.matchedTier && typeof selectCpQuality === 'function') {
-            selectCpQuality(acceptability.matchedTier);
-            if (typeof cpUploadedTier !== 'undefined') cpUploadedTier = acceptability.matchedTier;
+          // Cheap Package only: remember which tier the uploaded footage
+          // actually supports, as the ceiling for the manual click
+          // handler below — e.g. 1080p/2K footage only ever unlocks the
+          // 1080p tile; trying to hand-pick 4K afterwards gets blocked
+          // (see tryManualSelectCpQuality). Per explicit request, this
+          // NO LONGER auto-highlights either tile — the visitor must
+          // click one themselves; only the locking (not the pre-pick)
+          // survives the upload.
+          if (cfg.allowFourK && acceptability.matchedTier && typeof cpUploadedTier !== 'undefined') {
+            cpUploadedTier = acceptability.matchedTier;
           }
           showOk(file);
         }
