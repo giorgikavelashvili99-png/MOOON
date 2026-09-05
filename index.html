@@ -14008,7 +14008,23 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     return 'https://discord.com/api/oauth2/authorize?' + params.toString();
   }
 
-  function startDiscordLogin(){ window.location.href = discordAuthorizeUrl(); }
+  function startDiscordLogin(){
+    const url = discordAuthorizeUrl();
+    // A real anchor-element click (rather than a raw location.href
+    // assignment) is what gives mobile OSes a fair chance to hand this
+    // off to the Discord app instead of the browser, via iOS Universal
+    // Links / Android App Links -- Discord does register discord.com for
+    // this, but many browsers only honor it for an actual link click, not
+    // a script-driven redirect. This can't force the handoff (that part
+    // is entirely up to the OS/browser and whether Discord is installed),
+    // it just gives the app its best chance to intercept the navigation.
+    const a = document.createElement('a');
+    a.href = url;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 
   let currentDiscordUser = null;
 
