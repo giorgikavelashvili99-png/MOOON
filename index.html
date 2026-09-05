@@ -4983,19 +4983,6 @@
     text-shadow: 0 0 2px rgba(0,0,0,0.85), 0 0 9px color-mix(in srgb, var(--pc-accent) 60%, transparent), 0 1px 4px rgba(0,0,0,0.55);
     overflow-wrap:break-word; word-break:break-word;
   }
-  /* Forces specific pc-desc lines (edit-order / cheap-package captions)
-     onto a single line instead of their default two-line wrap. Same
-     shrink-to-fit approach as .pc-price-note--nowrap below: a fixed
-     starting size, then the JS fitNowrapText() function measures the
-     real rendered overflow and shrinks font-size in small steps only
-     until it truly fits on any column width / device. */
-  .pc-desc.pc-desc--nowrap{
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
-    font-size:11.5px;
-  }
-  @media (max-width:360px){
-    .pc-desc.pc-desc--nowrap{ font-size:10px; }
-  }
   .pc-desc-spec{
     display:inline-block; font-size:clamp(9px, 2.5vw, 10.5px); white-space:nowrap;
     letter-spacing:normal;
@@ -5328,9 +5315,9 @@
     /* pc-guide-link, pc-price-note AND pc-desc are deliberately excluded
        here — all three are precision-fit elements with their own
        carefully tuned sizing for the narrow pricing-card columns
-       (clamp()-based, and pc-price-note/pc-desc--nowrap additionally
-       have a runtime JS function that measures and shrinks them to fit
-       at 0.25px steps). Forcing pc-desc to 16px overrode that sizing —
+       (clamp()-based, and pc-price-note additionally has a runtime JS
+       function that measures and shrinks it to fit at 0.25px steps).
+       Forcing pc-desc to 16px overrode that sizing —
        !important beats an inline style set by JS regardless of
        selector specificity — so the card description text rendered
        far larger than designed and wrapped onto a 3rd line instead of
@@ -6381,7 +6368,7 @@
         <div class="pc-icon" aria-hidden="true">✨</div>
           <div class="pc-head-text">
           <div class="pc-title" data-i18n="eoLabel">ედითის შეკვეთა</div>
-          <div class="pc-desc pc-desc--nowrap" data-i18n="pc4Desc">მსგავსი ედითი — თქვენი პერსონაჟით</div>
+          <div class="pc-desc" data-i18n="pc4Desc">მსგავსი ედითი —<br>თქვენი პერსონაჟით</div>
           </div>
         </div>
         <div class="pc-price-line"><b>9.99<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
@@ -6451,7 +6438,7 @@
         <div class="pc-icon" aria-hidden="true">⚡</div>
           <div class="pc-head-text">
           <div class="pc-title" data-i18n="cpLabel">იაფი პაკეტი</div>
-          <div class="pc-desc pc-desc--nowrap" data-i18n="cpDesc">ბიუჯეტური ვარიანტი — მარტივი დამუშავება</div>
+          <div class="pc-desc" data-i18n="cpDesc">ბიუჯეტური ვარიანტი —<br>მარტივი დამუშავება</div>
           </div>
         </div>
         <div class="pc-price-line pc-price-line--dual"><b>0.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>1.99<sup>₾</sup></b></div>
@@ -7097,7 +7084,7 @@
       pc3PriceNote: '1080p/4K — არჩევანი ატვირთვისას',
       pc3Feature1: '1 თვის განმავლობაში<br>სრული შეკვეთა',
       pc3Feature2: '4K • 60FPS',
-      pc4Desc: 'მსგავსი ედითი — თქვენი პერსონაჟით',
+      pc4Desc: 'მსგავსი ედითი —<br>თქვენი პერსონაჟით',
       pc4PriceNote: '<span class="pc-price-note-line">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე</span><span class="pc-price-note-line">(1080p / 4K)</span>',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
@@ -7122,7 +7109,7 @@
       eoPriceLabel: 'ფასი',
       eoSendChat: 'გაგზავნე შეკვეთა',
       cpLabel: 'იაფი პაკეტი',
-      cpDesc: 'ბიუჯეტური ვარიანტი — მარტივი დამუშავება',
+      cpDesc: 'ბიუჯეტური ვარიანტი —<br>მარტივი დამუშავება',
       cpPriceNote: '1080p / 4K — ფასი ფიქსირებულია',
       cpFeatureFast: 'ჩაბარდება მაქსიმუმ 30 წუთში',
       cpFeature1: '1080P • 60FPS',
@@ -7518,7 +7505,7 @@
       pc3PriceNote: '1080p/4K — choose after upload',
       pc3Feature1: 'Within 1 month<br>full order',
       pc3Feature2: '4K • 60FPS',
-      pc4Desc: 'A similar edit — with your character',
+      pc4Desc: 'A similar edit —<br>with your character',
       pc4PriceNote: '<span class="pc-price-note-line">Price depends on the chosen style and quality</span><span class="pc-price-note-line">(1080p / 4K)</span>',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
@@ -7543,7 +7530,7 @@
       eoPriceLabel: 'Price',
       eoSendChat: 'Send order',
       cpLabel: 'Cheap Package',
-      cpDesc: 'Budget option — simple processing',
+      cpDesc: 'Budget option —<br>simple processing',
       cpPriceNote: '1080p / 4K — fixed price',
       cpFeatureFast: 'Delivered within 30 minutes max',
       cpFeature1: '1080P • 60FPS',
@@ -7909,9 +7896,8 @@
     return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || (TRANSLATIONS.ka[key] || '');
   }
 
-  /* Keeps every .pc-price-note--nowrap and .pc-desc--nowrap on exactly
-     one line, on any real device, without relying on hand-picked pixel
-     breakpoints.
+  /* Keeps every .pc-price-note--nowrap on exactly one line, on any real
+     device, without relying on hand-picked pixel breakpoints.
      Earlier this was "fixed" with a media query tuned to one specific
      headless-browser measurement — that was fragile by construction:
      different browsers/OSes hint and kern this embedded Georgian font
@@ -7924,7 +7910,7 @@
      only until it truly fits — then stops. If there's room, it stays
      at full size; nothing is pre-guessed. */
   function fitNowrapText(){
-    document.querySelectorAll('.pc-price-note--nowrap, .pc-desc--nowrap').forEach(el => {
+    document.querySelectorAll('.pc-price-note--nowrap').forEach(el => {
       el.style.fontSize = ''; // reset to CSS baseline before measuring
       let size = parseFloat(getComputedStyle(el).fontSize);
       const minSize = 7; // floor so it never shrinks into illegibility
