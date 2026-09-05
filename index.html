@@ -10350,6 +10350,15 @@
   // ============================================================
   let messengerSocket = null;
   let messengerCurrentOrderId = null;
+  // How many messages are already painted into #messengerMessages for
+  // the CURRENTLY open order. refreshMessengerHistory uses this to only
+  // append whatever's new instead of clearing and redrawing everything
+  // it gets back every time — a chat's own messages never change or
+  // reorder once sent, so there is never a good reason to redraw ones
+  // already on screen, and doing so is exactly what caused a visible
+  // "blank, then repopulate" flicker even when the redrawn content was
+  // byte-for-byte identical to what was already there.
+  let messengerRenderedCount = 0;
   // 'customer' (default, used by the 5 order-flow buttons) or 'admin'
   // (used by the admin panel's Chats tab). Same overlay, same events --
   // only who's "me" for bubble styling and outgoing message tagging
@@ -10383,6 +10392,15 @@
     bubble.innerHTML = linkifyMessengerText(msg.text);
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
+    // Every bubble that ever gets painted goes through this one function
+    // (the optimistic first message, real-time socket replies, and the
+    // customer's own sends alike) — counting it here, in the one choke
+    // point, is what keeps this in sync with reality. Tracking it
+    // separately at each call site is exactly how it drifted out of
+    // sync before, which would have made refreshMessengerHistory
+    // re-render (duplicate) messages that were already on screen from a
+    // socket event.
+    messengerRenderedCount++;
   }
 
   function appendSystemMessage(text){
@@ -10441,6 +10459,7 @@
     const titleEl = document.getElementById('messengerHeaderTitle');
     if (orderIdEl) orderIdEl.textContent = orderId;
     if (messagesEl) messagesEl.innerHTML = '';
+    messengerRenderedCount = 0;
     if (pageEl) pageEl.style.display = 'flex';
     if (bubble) bubble.style.display = 'none';
     if (dot) dot.style.display = 'none';
@@ -10480,20 +10499,21 @@
   // message list, which is exactly what looked like a flicker/blink
   // right after the chat first appeared.
   function refreshMessengerHistory(orderId, optimisticFirstMessage){
-    const messagesEl = document.getElementById('messengerMessages');
     const avatarWrap = document.getElementById('messengerHeaderAvatar');
     const avatarImg = document.getElementById('messengerHeaderAvatarImg');
     const titleEl = document.getElementById('messengerHeaderTitle');
     fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        // Only replace what's on screen once the server actually has
-        // messages -- otherwise an empty/404 response (normal while the
-        // session is still being created) would wipe the optimistic
-        // bubble and put us right back to a blank chat.
-        if (data && Array.isArray(data.messages) && data.messages.length) {
-          if (messagesEl) messagesEl.innerHTML = '';
-          data.messages.forEach(renderMessageBubble);
+        if (data && Array.isArray(data.messages) && data.messages.length > messengerRenderedCount) {
+          // Only the messages beyond what's already painted — this never
+          // touches the bubbles already on screen, so there is nothing
+          // to blank out or redraw. If the very first fetch is the one
+          // that lands after the optimistic bubble, this correctly skips
+          // re-rendering that same message a second time (it's message
+          // #1, already counted) and only appends anything past it.
+          data.messages.slice(messengerRenderedCount).forEach(renderMessageBubble);
+          messengerRenderedCount = data.messages.length;
         }
         if (messengerRole === 'admin' && data && data.customer) {
           if (titleEl && data.customer.username) titleEl.textContent = data.customer.username;
