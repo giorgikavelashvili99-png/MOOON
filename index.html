@@ -2374,6 +2374,32 @@
      downstream quality -> tiktok+subscriber -> price+send steps, and
      only once the real upload has already fully finished. */
   .wizard-step-hidden{ display:none !important; }
+  /* Every step of every order wizard (quality tiles, TikTok field,
+     confirm+price, send button) is shown/hidden by toggling this one
+     class. Animating "no longer hidden" here — rather than needing a
+     bespoke animation per element type — covers all of them in one
+     place. Same "runs automatically the moment display leaves none"
+     mechanism as .messenger-page's fade-in above. */
+  .field:not(.wizard-step-hidden),
+  .wp-grid:not(.wizard-step-hidden),
+  .mp-grid:not(.wizard-step-hidden),
+  .quality-grid:not(.wizard-step-hidden),
+  .order-grid:not(.wizard-step-hidden),
+  .scan-result:not(.wizard-step-hidden),
+  .simple-scan-result:not(.wizard-step-hidden){
+    animation: wizardStepIn .3s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes wizardStepIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:none; }
+  }
+  html.low-power .field,
+  html.low-power .wp-grid,
+  html.low-power .mp-grid,
+  html.low-power .quality-grid,
+  html.low-power .order-grid,
+  html.low-power .scan-result,
+  html.low-power .simple-scan-result{ animation:none !important; }
 
   /* Hides the upload prompt itself the instant a file is picked, so it
      doesn't sit on screen next to the "processing..." indicator while
@@ -4573,7 +4599,17 @@
     display:flex; flex-direction:column;
     background:linear-gradient(165deg, #0a0817 0%, #150a24 55%, #0a0817 100%);
     perspective:900px;
+    /* Runs every time the JS switches this from display:none to
+       display:flex — a plain style.display toggle has no way to
+       transition on its own, so without this the whole chat used to
+       just snap into view instantly. */
+    animation: messengerFadeIn .28s cubic-bezier(.2,.7,.3,1);
   }
+  @keyframes messengerFadeIn{
+    from{ opacity:0; transform:scale(0.97) translateY(10px); }
+    to{ opacity:1; transform:none; }
+  }
+  html.low-power .messenger-page{ animation:none; }
   .messenger-header{
     flex:0 0 auto; display:flex; align-items:center; gap:12px;
     padding:16px 16px calc(16px + env(safe-area-inset-top,0px));
@@ -5112,7 +5148,26 @@
     background:rgba(3,3,7,0.88);
     padding:16px; box-sizing:border-box;
   }
-  .pc-modal-scrim.open{ display:flex; }
+  .pc-modal-scrim.open{
+    display:flex;
+    /* Same reasoning as .messenger-page's fade-in — a plain display:none
+       -> flex toggle can't transition on its own, so every pricing
+       panel used to just snap open instantly. */
+    animation: pcModalFadeIn .22s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes pcModalFadeIn{
+    from{ opacity:0; }
+    to{ opacity:1; }
+  }
+  .pc-modal-scrim.open > .pc-accordion-body.panel{
+    animation: pcPanelFadeIn .26s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes pcPanelFadeIn{
+    from{ opacity:0; transform:scale(0.95) translateY(14px); }
+    to{ opacity:1; transform:none; }
+  }
+  html.low-power .pc-modal-scrim.open,
+  html.low-power .pc-modal-scrim.open > .pc-accordion-body.panel{ animation:none; }
 
   .pc-accordion-body.panel{
     display:none;
@@ -10408,12 +10463,27 @@
     // comes back empty on this very first open -- leaving the customer
     // staring at a blank chat and only seeing their order after closing
     // and reopening it. Rendering the text we already have locally fixes
-    // that; the fetch below then replaces it with the authoritative
-    // server copy as soon as that exists.
+    // that; refreshMessengerHistory below then replaces it with the
+    // authoritative server copy as soon as that exists.
     if (optimisticFirstMessage) {
       renderMessageBubble({ from: 'customer', text: optimisticFirstMessage });
     }
 
+    refreshMessengerHistory(orderId, optimisticFirstMessage);
+  }
+
+  // Split out of openMessengerPage so a later refresh (e.g. once the
+  // session has actually finished being created server-side, in
+  // startOrderChat below) can just re-fetch and patch in new messages
+  // without re-running the full "open the page" setup — re-opening the
+  // whole page a second time cleared and instantly re-rendered the
+  // message list, which is exactly what looked like a flicker/blink
+  // right after the chat first appeared.
+  function refreshMessengerHistory(orderId, optimisticFirstMessage){
+    const messagesEl = document.getElementById('messengerMessages');
+    const avatarWrap = document.getElementById('messengerHeaderAvatar');
+    const avatarImg = document.getElementById('messengerHeaderAvatarImg');
+    const titleEl = document.getElementById('messengerHeaderTitle');
     fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -10622,11 +10692,13 @@
           signal: controller.signal
         });
         // Session now exists server-side. If the customer is still
-        // sitting in this chat, reload it so what's on screen is the
-        // real stored conversation rather than only the local copy
-        // rendered optimistically a moment ago.
+        // sitting in this chat, patch in the real stored messages —
+        // refreshMessengerHistory only touches the message list itself,
+        // it doesn't redo the whole "open the page" setup, so this
+        // can't visibly flicker the way calling openMessengerPage a
+        // second time did.
         if (messengerCurrentOrderId === orderId) {
-          openMessengerPage(orderId, 'customer', firstMessageText);
+          refreshMessengerHistory(orderId, firstMessageText);
         }
       }catch(e){
         console.error('[MOON] failed to create chat session -- the order is still saved in pendingOrders, but the chat itself may be empty until this succeeds.', e);
