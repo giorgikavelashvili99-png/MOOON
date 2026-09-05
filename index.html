@@ -3953,22 +3953,18 @@
     height:auto;
   }
 
-  /* --- Desktop-only 125% zoom ---
-     A previous version of this rule broke the pricing-card / order modal:
-     that modal used to be `position:fixed` + `top/left:50%` + a
-     translate(-50%,-50%) transform to center itself, and CSS `zoom` on
-     <html> doesn't combine safely with that — the fixed layer's
-     coordinate math would double up with the zoomed layout on desktop
-     Chrome, so the modal rendered as a flickering, overlapping mess.
-     The modal has since been rebuilt to center itself with flexbox
-     instead (see .pc-modal-scrim / .pc-accordion-body.panel below) and
-     is no longer position:fixed at all once it's open, so it's no
-     longer sensitive to this — restoring zoom here is safe.
-     Scoped to hover-capable, fine-pointer devices, i.e. desktop only —
-     phones and tablets are untouched. */
-  @media (hover:hover) and (pointer:fine){
-    html{ zoom:1.25; }
-  }
+  /* --- Desktop 125% zoom: REMOVED ---
+     This was reported as pixelated/blurry text on desktop even after
+     fixing an earlier double-zoom bug -- CSS `zoom` re-rasterizes the
+     whole page at the scaled size, and the custom BPG Glaho web font
+     apparently doesn't have hinting that holds up cleanly at a 1.25x
+     scale factor, so text came out visibly soft/blocky. Native 100%
+     rendering (the browser's own, unscaled text layout) is the only way
+     to guarantee crisp text, so that's what desktop gets now, same as
+     mobile. If a larger desktop presentation is wanted again later, it
+     needs to come from actually increasing font-size/spacing values
+     rather than a blanket zoom, since that's what avoids this
+     rescaling-blur problem entirely. */
 
   /* --- Direct contact panel --- */
   .contact-panel{ position:relative; overflow:hidden; }
@@ -5176,13 +5172,12 @@
     padding-top:50px;
     border-color: color-mix(in srgb, var(--pc-accent) 30%, var(--border));
   }
-  @media (hover:hover) and (pointer:fine){
-    /* Desktop-only: shrink the whole panel so most orders fit on screen
-       without needing to scroll inside it. Safe to zoom here (unlike the
-       old html-level rule used to be) because this element is a plain
-       flex child now, not position:fixed. */
-    .pc-modal-scrim > .pc-accordion-body.panel{ zoom:0.8; }
-  }
+  /* Desktop-only zoom:0.8 here (to shrink the panel so more orders fit
+     without internal scrolling) removed for the same reason as the
+     page-level 125% zoom above — any non-1.0 zoom value risks the same
+     text-blur problem with this custom font. The panel already scrolls
+     internally (max-height:85vh + overflow-y:auto above) if its content
+     runs long, so this is safe to drop. */
   .pc-modal-close{
     position:absolute; top:16px; right:16px; z-index:66;
     width:34px; height:34px; border-radius:10px;
