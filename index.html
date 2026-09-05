@@ -7053,6 +7053,9 @@
       authLoginBtn: 'შესვლა Discord-ით',
       authJoinBtn: 'შემოუერთდი ჩვენს Discord სერვერს',
       authGateSkip: 'გაგრძელება სტუმრად',
+      guildGateTitle: 'საჭიროა ჩვენს Discord სერვერზე გაწევრიანება',
+      guildGateSub: 'შეკვეთის გასაგზავნად საჭიროა იყოთ ჩვენი Discord სერვერის წევრი. შემოუერთდით ქვემოთა ღილაკით, შემდეგ დააჭირეთ „ვცადო თავიდან".',
+      guildGateRetry: 'გავწევრიანდი — ვცადო თავიდან',
       authLoggedInSub: 'Discord-ით შესული ხარ',
       authMemberBadge: 'MEMBER',
       authLogout: 'გამოსვლა',
@@ -7474,6 +7477,9 @@
       authLoginBtn: 'Log in with Discord',
       authJoinBtn: 'Join our Discord server',
       authGateSkip: 'Continue as guest',
+      guildGateTitle: 'You need to join our Discord server',
+      guildGateSub: "To send an order you need to be a member of our Discord server. Join the server using the button below, then press the retry button.",
+      guildGateRetry: "I've joined — retry",
       authLoggedInSub: 'Signed in with Discord',
       authMemberBadge: 'MEMBER',
       authLogout: 'Log out',
@@ -10701,10 +10707,44 @@
   // window.open() it". Requires a Discord login first (same account
   // system comments already use), since a session needs a real
   // identity to notify and to let the admin panel say who's ordering.
+  function showGuildJoinGate(){
+    const gate = document.getElementById('discordGate');
+    const titleEl = document.getElementById('discordGateTitle');
+    const subEl = gate ? gate.querySelector('.discord-gate-sub') : null;
+    const loginBtn = document.getElementById('discordLoginBtn');
+    const skipEl = document.getElementById('discordGateSkip');
+    if (!gate) return;
+    if (titleEl) titleEl.textContent = t('guildGateTitle');
+    if (subEl) subEl.textContent = t('guildGateSub');
+    // Already logged in at this point -- the login button has nothing left
+    // to do here, only the join link (already in the markup) is relevant.
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (skipEl){
+      skipEl.textContent = t('guildGateRetry');
+      skipEl.onclick = () => {
+        // Re-running the full OAuth flow (rather than just re-checking the
+        // existing session) is deliberate: the signed session cookie was
+        // stamped with isMember at the moment of the ORIGINAL login, so it
+        // can't reflect a membership gained just now by joining. Only a
+        // fresh /exchange (which this triggers) re-checks the guild list.
+        startDiscordLogin();
+      };
+    }
+    gate.classList.add('open');
+  }
+
   async function startOrderChat(orderData, firstMessageText, btn, textEl, idleKey, flashFn){
     if (!currentDiscordUser){
       alert(t('messengerNeedsLogin'));
       startDiscordLogin();
+      return;
+    }
+    // isMember comes from the auth worker's own guild-membership check
+    // (Discord's /users/@me/guilds, using the access token that never
+    // reaches this page) — not something set or trusted from the
+    // frontend, so this can't be bypassed by editing local state.
+    if (currentDiscordUser.isMember === false){
+      showGuildJoinGate();
       return;
     }
     if (btn) btn.disabled = true;
@@ -13962,7 +14002,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       client_id: DISCORD_CLIENT_ID,
       redirect_uri: DISCORD_REDIRECT_URI,
       response_type: 'code',
-      scope: 'identify',
+      scope: 'identify guilds',
       state: state
     });
     return 'https://discord.com/api/oauth2/authorize?' + params.toString();
@@ -14087,7 +14127,20 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       syncDiscordUserWithBackend(user);
     } else {
       chip.classList.remove('is-authed');
-      if (gate) gate.classList.add('open');
+      if (gate) {
+        // Undo any guild-join-gate override (see showGuildJoinGate) so a
+        // logged-out visitor always sees the normal login prompt here,
+        // never leftover "please join" copy from an earlier session.
+        const loginBtn = document.getElementById('discordLoginBtn');
+        const titleEl = document.getElementById('discordGateTitle');
+        const subEl = gate.querySelector('.discord-gate-sub');
+        const skipEl = document.getElementById('discordGateSkip');
+        if (loginBtn) loginBtn.style.display = '';
+        if (titleEl) titleEl.textContent = t('authGateTitle');
+        if (subEl) subEl.textContent = t('authGateSub');
+        if (skipEl) { skipEl.textContent = t('authGateSkip'); skipEl.onclick = null; }
+        gate.classList.add('open');
+      }
     }
     updateCommentAuthUI();
   }
