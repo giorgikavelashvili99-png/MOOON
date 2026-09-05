@@ -26,6 +26,13 @@
     --warn: #ff3860;
     --warn-soft: rgba(255,56,96,0.35);
     --gold: #ffd23f;
+    /* Dedicated to the quality-tile "selected" state only — deliberately
+       NOT blue/purple (matches the order buttons, which read as
+       "duplicating" them) and NOT the muddy warm-gold tried before.
+       A clean, solid-reading orange that isn't any package's own brand
+       color either. */
+    --tile-selected-1: #FF9142;
+    --tile-selected-2: #FF6B1A;
     --tg: #38b6ff;
     --tg-soft: rgba(56,182,255,0.35);
     --wa: #25D366;
@@ -47,11 +54,11 @@
     --warm-tile-bg-1: #1c140c;
     --warm-tile-bg-2: #120d08;
     /* Shared accent for the upload dropzone + scan-result panel below —
-       kept as its own variable (rather than referencing --cyan inline
-       everywhere) so it can still be retargeted in one place. Matches
-       the quality tiles' new blue design for full consistency across
-       every package, per explicit request. */
-    --tile-accent: var(--cyan);
+       kept as its own variable (rather than referencing --tile-selected-1
+       inline everywhere) so it can still be retargeted in one place.
+       Matches the quality tiles' accent for full consistency across
+       every package. */
+    --tile-accent: var(--tile-selected-1);
 
     /* --- Moonfade palette (admin panel) --- */
     --moon-bg: #050810;
@@ -1733,7 +1740,7 @@
     margin-top:14px;
   }
   .quality-grid-two{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
-  .quality-btn{ --qb-accent: var(--cyan); --qb-accent-2: var(--purple); }
+  .quality-btn{ --qb-accent: var(--tile-selected-1); --qb-accent-2: var(--tile-selected-2); }
 
   /* Complete rework: vertical, icon-led cards with no price shown and
      nothing pre-selected (see the HTML -- the .active class used to
@@ -3151,7 +3158,7 @@
     transition: transform .25s cubic-bezier(.4,0,.2,1), border-color .25s ease, background .3s ease, box-shadow .25s ease;
     padding:6px;
   }
-  .wp-box:hover{ border-color:rgba(34,195,255,0.45); transform:translateY(-3px); }
+  .wp-box:hover{ border-color:rgba(255,145,66,0.45); transform:translateY(-3px); }
   .wp-box:active{ transform:translateY(0) scale(0.96); }
   .wp-box-q{ position:relative; z-index:1; font-size:14px; font-weight:800; letter-spacing:0.01em; line-height:1; color:var(--text); }
   .wp-box-fps{
@@ -3179,14 +3186,14 @@
   .wp-box.active.discounted .wp-new-price{ color:#fff; }
   .wp-box.active{
     border-color: transparent;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    background: linear-gradient(135deg, var(--tile-selected-1), var(--tile-selected-2));
     transform: translateY(-2px) scale(1.035);
-    box-shadow: 0 16px 34px -10px rgba(34,195,255,0.5), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: 0 16px 34px -10px rgba(255,107,26,0.55), inset 0 1px 0 rgba(255,255,255,0.35);
   }
   .wp-box.active::after{
     content:'✓'; position:absolute; top:7px; right:7px; z-index:2;
     width:17px; height:17px; border-radius:50%;
-    background:rgba(255,255,255,0.95); color:#1447e6;
+    background:rgba(255,255,255,0.95); color:#c2410c;
     font-size:10px; font-weight:900; line-height:17px; text-align:center;
     box-shadow:0 2px 6px rgba(0,0,0,0.35);
   }
@@ -3262,7 +3269,7 @@
     transition: transform .25s cubic-bezier(.4,0,.2,1), border-color .25s ease, background .3s ease, box-shadow .25s ease;
     padding:6px;
   }
-  .mp-box:hover{ border-color:rgba(34,195,255,0.45); transform:translateY(-3px); }
+  .mp-box:hover{ border-color:rgba(255,145,66,0.45); transform:translateY(-3px); }
   .mp-box:active{ transform:translateY(0) scale(0.96); }
   .mp-box-q{ position:relative; z-index:1; font-size:14px; font-weight:800; letter-spacing:0.01em; line-height:1; color:var(--text); }
   .mp-box-fps{
@@ -3287,14 +3294,14 @@
   .mp-new-price{ display:block; color:var(--text); font-size:1.15em; }
   .mp-box.active{
     border-color: transparent;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    background: linear-gradient(135deg, var(--tile-selected-1), var(--tile-selected-2));
     transform: translateY(-2px) scale(1.035);
-    box-shadow: 0 16px 34px -10px rgba(34,195,255,0.5), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: 0 16px 34px -10px rgba(255,107,26,0.55), inset 0 1px 0 rgba(255,255,255,0.35);
   }
   .mp-box.active::after{
     content:'✓'; position:absolute; top:7px; right:7px; z-index:2;
     width:17px; height:17px; border-radius:50%;
-    background:rgba(255,255,255,0.95); color:#1447e6;
+    background:rgba(255,255,255,0.95); color:#c2410c;
     font-size:10px; font-weight:900; line-height:17px; text-align:center;
     box-shadow:0 2px 6px rgba(0,0,0,0.35);
   }
