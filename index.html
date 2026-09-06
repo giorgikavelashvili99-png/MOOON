@@ -10742,8 +10742,23 @@
     gate.classList.add('open');
   }
 
+  const PENDING_ORDER_KEY = 'moon_pending_order';
+
+  function savePendingOrder(orderData, firstMessageText, idleKey){
+    try{
+      sessionStorage.setItem(PENDING_ORDER_KEY, JSON.stringify({ orderData, firstMessageText, idleKey }));
+    }catch(e){ /* sessionStorage unavailable -- resuming just won't work, sending itself still will */ }
+  }
+
   async function startOrderChat(orderData, firstMessageText, btn, textEl, idleKey, flashFn){
     if (!currentDiscordUser){
+      // Login means a full navigation to discord.com and back -- every
+      // in-memory JS variable (this exact order, which step of which
+      // wizard it came from) is gone by the time the page reloads. This
+      // is what let a completed OAuth login come back to a "start over"
+      // page instead of actually sending what the customer had just
+      // filled in.
+      savePendingOrder(orderData, firstMessageText, idleKey);
       alert(t('messengerNeedsLogin'));
       startDiscordLogin();
       return;
@@ -10753,6 +10768,7 @@
     // reaches this page) — not something set or trusted from the
     // frontend, so this can't be bypassed by editing local state.
     if (currentDiscordUser.isMember === false){
+      savePendingOrder(orderData, firstMessageText, idleKey);
       showGuildJoinGate();
       return;
     }
@@ -14128,6 +14144,35 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }catch(e){ /* best-effort */ }
   }
 
+  // Consumes the order (if any) saved by savePendingOrder() right before a
+  // Discord OAuth redirect. Called every time login state is established
+  // (fresh OAuth return AND normal page-load session restore alike) --
+  // safe either way because the very first thing this does on a match is
+  // delete the stored entry, so it can only ever fire once per redirect
+  // round-trip, never on a later, unrelated page load.
+  function resumePendingOrderIfAny(user){
+    let raw;
+    try{ raw = sessionStorage.getItem(PENDING_ORDER_KEY); }catch(e){ return; }
+    if (!raw) return;
+    if (user.isMember === false){
+      // Still not a member -- leave it saved. showGuildJoinGate's retry
+      // button re-runs the OAuth flow, which calls back in here once
+      // membership is actually confirmed.
+      showGuildJoinGate();
+      return;
+    }
+    try{ sessionStorage.removeItem(PENDING_ORDER_KEY); }catch(e){}
+    let pending;
+    try{ pending = JSON.parse(raw); }catch(e){ return; }
+    if (!pending || !pending.orderData) return;
+    // No original button/text-element to restore here (the page just
+    // reloaded) -- startOrderChat already treats those as optional, so
+    // the order still sends correctly, it just can't show a "sending…"
+    // state on a button that no longer has this specific click in
+    // progress.
+    startOrderChat(pending.orderData, pending.firstMessageText, null, null, pending.idleKey, null);
+  }
+
   function setDiscordUI(user){
     currentDiscordUser = user;
     // Re-check the logged-in Discord account's weekly/monthly package
@@ -14150,6 +14195,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (dpName) dpName.textContent = user.username || '';
       if (gate) gate.classList.remove('open');
       syncDiscordUserWithBackend(user);
+      resumePendingOrderIfAny(user);
     } else {
       chip.classList.remove('is-authed');
       if (gate) {
