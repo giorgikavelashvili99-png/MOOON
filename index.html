@@ -53,12 +53,11 @@
     --warm-ivory-dim: #e7d9bf;
     --warm-tile-bg-1: #1c140c;
     --warm-tile-bg-2: #120d08;
-    /* Shared accent for the upload dropzone + scan-result panel below —
-       kept as its own variable (rather than referencing --tile-selected-1
-       inline everywhere) so it can still be retargeted in one place.
-       Matches the quality tiles' accent for full consistency across
-       every package. */
-    --tile-accent: var(--tile-selected-1);
+    /* Shared accent for the upload dropzone + scan-result panel below.
+       Neutral silver-gray to match the quality tiles' current white/
+       navy "selected" design (an earlier orange version here became
+       inconsistent once the tiles moved away from any specific hue). */
+    --tile-accent: #cfd6e6;
 
     /* --- Moonfade palette (admin panel) --- */
     --moon-bg: #050810;
@@ -4926,6 +4925,8 @@
     grid-column: 1 / -1;
     width:100%;
     min-width:0;
+    max-width:640px;
+    margin:0 auto;
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -7376,6 +7377,7 @@
       adminTabUrgency: 'ადგილები',
       adminTabPromo: 'Promo',
       adminTabChats: 'ჩატები',
+      adminOrdersTotal: 'სულ შეკვეთა',
       adminOrdersSuccess: 'წარმატებული',
       adminOrdersFail: 'წარუმატებელი',
       adminOrdersNote: 'სამივე რიცხვი (სულ / წარმატებული / წარუმატებელი) ჩანს საჯაროდ, საიტის ზედა ნაწილში, სოციალურ მტკიცებულების ზოლში.',
