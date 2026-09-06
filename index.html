@@ -14150,14 +14150,29 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // safe either way because the very first thing this does on a match is
   // delete the stored entry, so it can only ever fire once per redirect
   // round-trip, never on a later, unrelated page load.
+  let pendingOrderResumeAttempted = false;
+
   function resumePendingOrderIfAny(user){
+    // Only ever act once per page load. setDiscordUI (which calls this)
+    // runs repeatedly during normal use -- on the initial session check,
+    // after every background subscription refresh, etc. -- not just once
+    // right after an OAuth redirect. Without this guard, a pending order
+    // that couldn't be resumed (e.g. isMember still reads false) got
+    // re-checked, and the join-gate re-opened, on every single one of
+    // those unrelated re-checks -- which is exactly what looked like the
+    // gate reappearing "every second no matter what button I press".
+    if (pendingOrderResumeAttempted) return;
+    pendingOrderResumeAttempted = true;
+
     let raw;
     try{ raw = sessionStorage.getItem(PENDING_ORDER_KEY); }catch(e){ return; }
     if (!raw) return;
     if (user.isMember === false){
-      // Still not a member -- leave it saved. showGuildJoinGate's retry
-      // button re-runs the OAuth flow, which calls back in here once
-      // membership is actually confirmed.
+      // Deliberately NOT removed here -- this needs to survive the
+      // "join the server, then retry" full-page navigation too, not just
+      // the first OAuth round trip. The one-shot guard above already
+      // stops this from re-firing repeatedly within this same page load;
+      // removal only happens once an attempt actually completes (below).
       showGuildJoinGate();
       return;
     }
