@@ -5347,7 +5347,11 @@
     .wp-old-price, .mp-old-price{ font-size:13px !important; }
     .c-date{ font-size:13px !important; }
     .c-more-btn{ font-size:13px !important; }
-    .acb-label{ font-size:11px !important; }
+    /* .acb-label deliberately excluded -- same reasoning as
+       pc-guide-link/pc-price-note above. This is a fixed 56px circular
+       badge; even 11px nowrap text is wide enough to overflow both
+       sides of it, and centered overflow like that renders as
+       completely invisible text, not just clipped. */
     /* Give the now-bigger square tiles a bit more room so 16px+ text
        inside them isn't tight against the edges. */
     .wp-grid-two, .mp-grid-two, .quality-grid-two{
@@ -10653,6 +10657,7 @@
     function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
 
     bubble.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
       const r = bubble.getBoundingClientRect();
       startX = e.clientX - r.left;
       startY = e.clientY - r.top;
