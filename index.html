@@ -4257,7 +4257,17 @@
     display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px;
     margin-bottom:22px;
   }
-  @media (max-width:900px){
+  /* Tablets (iPad portrait ~768-834px, landscape up to ~1024px, and
+     similar Android tablets) were falling into the exact same
+     single-column rule as phones below, despite having far more width
+     to work with -- that's what left a large empty area beside a single
+     narrow stacked column on an iPad. 2 columns fits this range properly
+     without being as cramped as forcing the full 3-column desktop grid
+     into a narrower tablet width would be. */
+  @media (min-width:701px) and (max-width:1099px){
+    .pricing-cards{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width:700px){
     .pricing-cards{ grid-template-columns:minmax(0, 1fr); }
   }
   /* The 4th (edit-order) card is deliberately featured on its own row
@@ -4284,8 +4294,12 @@
      resolved the cascade which way, which is exactly what caused two
      cards to sit side-by-side while the third broke onto its own
      full-width row instead of all three stacking together. */
-  @media (max-width:900px){
-    .pc-duo-row{ grid-template-columns:1fr; max-width:420px; }
+  @media (min-width:701px) and (max-width:1099px){
+    .pc-duo-row{ grid-template-columns:repeat(2, 1fr); max-width:640px; margin:0 auto; }
+    .pc-duo-row > *{ grid-column:auto; }
+  }
+  @media (max-width:700px){
+    .pc-duo-row{ grid-template-columns:1fr; max-width:420px; margin:0 auto; }
   }
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
      sit OUTSIDE the card's own clipped box (poking above its top edge),
