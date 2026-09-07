@@ -4257,45 +4257,21 @@
     display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px;
     margin-bottom:22px;
   }
-  /* Explicit preference: 2 cards per row on tablet widths, not 3 — the
-     3rd (odd) card sitting alone on its own row underneath is accepted
-     as an unavoidable consequence of an odd card count in 2 columns. */
+  /* All 6 cards (the first 3 plus edit-order/cheap/cheap-monthly, which
+     used to live in a separately-nested .pc-duo-row grid) are now direct
+     children of this one grid. 6 divides evenly by 1, 2, and 3, so at
+     every breakpoint below they land as clean full rows with no card
+     ever left as an odd one out needing centering or special-casing —
+     the .pc-duo-row nested-grid approach could only ever really work
+     right at exactly 3 columns; splitting into 2 columns turned it into
+     two separate 3-item grids (each with its own leftover card) instead
+     of one continuous 6-item sequence, which is what an actual DOM
+     unwrap fixes at the source instead of working around in CSS. */
   @media (min-width:701px) and (max-width:1099px){
     .pricing-cards{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
-    /* display:contents removes .pc-duo-row itself from layout (no box,
-       no grid-column:1/-1) while keeping its 3 children in the document
-       -- they then become direct grid items of .pricing-cards instead,
-       flowing right on from cards 1-3 in the SAME 2-column grid. With
-       all 6 cards now in one continuous sequence, they land as exactly
-       3 clean rows of 2 -- no card is ever the odd one out, so there's
-       nothing left to center or special-case. */
-    .pc-duo-row{ display:contents; }
-    .pc-duo-row > *{
-      grid-column:auto; width:auto; max-width:none; margin:0; height:100%;
-    }
   }
   @media (max-width:700px){
     .pricing-cards{ grid-template-columns:minmax(0, 1fr); }
-  }
-  /* The 4th (edit-order) card is deliberately featured on its own row
-     below the three main packages, centered rather than stretched
-     edge-to-edge — this is what looked right, not an accident this time. */
-  /* Edith's order and the cheap package now sit side by side as a
-     matched pair (equal width, equal height via default grid stretch)
-     instead of each getting its own full-width row. */
-  .pc-duo-row{
-    grid-column: 1 / -1;
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;
-    width:100%;
-  }
-  .pc-duo-row > *{
-    min-width:0; height:100%;
-    grid-column:auto; width:auto; max-width:none; margin:0;
-  }
-  .pc-duo-row .pc-card-wrap--cheap .pc-card--cheap,
-  .pc-duo-row .pc-card-wrap--cheapmonthly .pc-card--cheapmonthly{ height:100%; }
-  @media (max-width:700px){
-    .pc-duo-row{ grid-template-columns:1fr; max-width:420px; margin:0 auto; }
   }
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
      sit OUTSIDE the card's own clipped box (poking above its top edge),
@@ -6386,7 +6362,7 @@
       </div>
 
       <!-- Card 4 — edit order (character edit) -->
-      <div class="pc-duo-row">
+      
       <div class="pc-card pc-card--edit">
         <div class="pc-head">
         <div class="pc-icon" aria-hidden="true">✨</div>
@@ -6738,7 +6714,7 @@
         </div>
       </div>
       </div>
-      </div>
+      
 
       <!-- Card 6 — free TikTok video downloader, styled as its own console
            window rather than another pricing card. -->
