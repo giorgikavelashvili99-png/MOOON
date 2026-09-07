@@ -4262,6 +4262,17 @@
      as an unavoidable consequence of an odd card count in 2 columns. */
   @media (min-width:701px) and (max-width:1099px){
     .pricing-cards{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    /* The 3rd card (monthly) is the odd one out in a 2-column grid --
+       instead of leaving it stuck to the left half with empty space
+       beside it, span it across both columns and cap+center its own
+       width so it reads as a deliberate centered card, not a leftover. */
+    .pricing-cards > .pc-card-wrap:nth-child(3),
+    .pricing-cards > *:nth-child(3){
+      grid-column: 1 / -1;
+      max-width:calc(50% - 8px);
+      margin:0 auto;
+      width:100%;
+    }
   }
   @media (max-width:700px){
     .pricing-cards{ grid-template-columns:minmax(0, 1fr); }
@@ -4293,6 +4304,11 @@
   @media (min-width:701px) and (max-width:1099px){
     .pc-duo-row{ grid-template-columns:repeat(2, 1fr); max-width:640px; margin:0 auto; }
     .pc-duo-row > *{ grid-column:auto; }
+    .pc-duo-row > *:nth-child(3){
+      grid-column: 1 / -1;
+      max-width:calc(50% - 8px);
+      margin:0 auto;
+    }
   }
   @media (max-width:700px){
     .pc-duo-row{ grid-template-columns:1fr; max-width:420px; margin:0 auto; }
