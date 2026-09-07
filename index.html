@@ -4262,16 +4262,16 @@
      as an unavoidable consequence of an odd card count in 2 columns. */
   @media (min-width:701px) and (max-width:1099px){
     .pricing-cards{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
-    /* The 3rd card (monthly) is the odd one out in a 2-column grid --
-       instead of leaving it stuck to the left half with empty space
-       beside it, span it across both columns and cap+center its own
-       width so it reads as a deliberate centered card, not a leftover. */
-    .pricing-cards > .pc-card-wrap:nth-child(3),
-    .pricing-cards > *:nth-child(3){
-      grid-column: 1 / -1;
-      max-width:calc(50% - 8px);
-      margin:0 auto;
-      width:100%;
+    /* display:contents removes .pc-duo-row itself from layout (no box,
+       no grid-column:1/-1) while keeping its 3 children in the document
+       -- they then become direct grid items of .pricing-cards instead,
+       flowing right on from cards 1-3 in the SAME 2-column grid. With
+       all 6 cards now in one continuous sequence, they land as exactly
+       3 clean rows of 2 -- no card is ever the odd one out, so there's
+       nothing left to center or special-case. */
+    .pc-duo-row{ display:contents; }
+    .pc-duo-row > *{
+      grid-column:auto; width:auto; max-width:none; margin:0; height:100%;
     }
   }
   @media (max-width:700px){
@@ -4294,22 +4294,6 @@
   }
   .pc-duo-row .pc-card-wrap--cheap .pc-card--cheap,
   .pc-duo-row .pc-card-wrap--cheapmonthly .pc-card--cheapmonthly{ height:100%; }
-  /* Single breakpoint, same treatment for all three cards — no
-     special-casing one of them to span full width at an intermediate
-     size. Two overlapping breakpoints with conflicting per-card rules
-     (the previous version) meant the outcome depended on which browser
-     resolved the cascade which way, which is exactly what caused two
-     cards to sit side-by-side while the third broke onto its own
-     full-width row instead of all three stacking together. */
-  @media (min-width:701px) and (max-width:1099px){
-    .pc-duo-row{ grid-template-columns:repeat(2, 1fr); max-width:640px; margin:0 auto; }
-    .pc-duo-row > *{ grid-column:auto; }
-    .pc-duo-row > *:nth-child(3){
-      grid-column: 1 / -1;
-      max-width:calc(50% - 8px);
-      margin:0 auto;
-    }
-  }
   @media (max-width:700px){
     .pc-duo-row{ grid-template-columns:1fr; max-width:420px; margin:0 auto; }
   }
