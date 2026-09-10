@@ -2461,9 +2461,9 @@
   }
   .wizard-step.is-active, .wizard-step.is-done{ opacity:1; }
   .wizard-step-dot{
-    width:24px; height:24px; border-radius:50%; flex:0 0 auto;
+    width:30px; height:30px; border-radius:50%; flex:0 0 auto;
     display:flex; align-items:center; justify-content:center;
-    font-family:'BPGAcademiuriU',sans-serif; font-size:11px; font-weight:800;
+    font-family:'BPGAcademiuriU',sans-serif; font-size:14px; font-weight:800;
     color:var(--text-dim);
     background:rgba(255,255,255,0.05);
     border:1.5px solid var(--border);
@@ -2474,25 +2474,29 @@
     border-color: transparent; color:#04101a;
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--pc-accent, var(--cyan)) 20%, transparent);
   }
+  /* Completed steps now get the same fully solid fill as the active
+     step (previously a faint 30%-opacity tint, which read as an
+     unfilled/hollow ring rather than a completed checkmark). No glow
+     ring here so the current step still reads as visually distinct. */
   .wizard-step.is-done .wizard-step-dot{
-    background: color-mix(in srgb, var(--pc-accent, var(--cyan)) 30%, transparent);
-    border-color: color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent);
-    color: var(--pc-accent, var(--cyan));
+    background: linear-gradient(150deg, var(--pc-accent, var(--cyan)), color-mix(in srgb, var(--pc-accent, var(--cyan)) 65%, #04101a));
+    border-color: transparent;
+    color:#04101a;
   }
   .wizard-step.is-done .wizard-step-dot::before{ content:'✓'; }
   .wizard-step-label{
-    font-family:'BPGAcademiuriU','Space Grotesk',sans-serif; font-size:9px; letter-spacing:normal;
+    font-family:'BPGAcademiuriU','Space Grotesk',sans-serif; font-size:11.5px; letter-spacing:normal;
     color:var(--text-faint); text-transform:uppercase; white-space:nowrap;
-    max-width:64px; overflow:hidden; text-overflow:ellipsis;
+    max-width:78px; overflow:hidden; text-overflow:ellipsis;
   }
   .wizard-step.is-active .wizard-step-label{ color:var(--text); }
   .wizard-step-line{
-    flex:1 1 auto; height:2px; min-width:6px; margin-top:11px;
+    flex:1 1 auto; height:2px; min-width:6px; margin-top:14px;
     background: var(--border-soft);
     transition: background .3s ease;
   }
   .wizard-step-line.is-done{ background: color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent); }
-  @media (max-width:360px){
+  @media (max-width:380px){
     .wizard-step-label{ display:none; }
   }
 
@@ -5233,31 +5237,44 @@
     display:block;
     position:relative; z-index:65;
     margin:auto;
-    max-height:85vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
-    overscroll-behavior:contain;
+    /* No overflow/max-height here anymore -- that now lives on the
+       .pc-modal-scroll wrapper below, so this outer box stays
+       overflow:visible and the ✕ button (a direct child, positioned
+       with negative offsets) can float above its top-right corner
+       instead of being clipped by a scrolling ancestor. */
+    overflow:visible;
     width:calc(100% - 32px); max-width:640px;
     flex:0 0 auto;
     box-sizing:border-box;
     border-radius:22px;
-    padding-top:50px;
+    padding-top:30px;
     border-color: color-mix(in srgb, var(--pc-accent) 30%, var(--border));
   }
   /* Desktop-only zoom:0.8 here (to shrink the panel so more orders fit
      without internal scrolling) removed for the same reason as the
      page-level 125% zoom above — any non-1.0 zoom value risks the same
      text-blur problem with this custom font. The panel already scrolls
-     internally (max-height:85vh + overflow-y:auto above) if its content
-     runs long, so this is safe to drop. */
-  .pc-modal-close{
-    position:absolute; top:16px; right:16px; z-index:66;
-    width:34px; height:34px; border-radius:10px;
-    background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22);
-    color:#fff; font-size:15px; font-weight:700; line-height:1;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; transition: color .2s, border-color .2s, background .2s, transform .15s;
-    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+     internally (.pc-modal-scroll below) if its content runs long, so
+     this is safe to drop. */
+  /* Everything in the panel except the ✕ button lives inside this
+     wrapper, which is what actually scrolls now. Keeping the scroll
+     clipping off the outer .pc-accordion-body.panel is what lets the
+     ✕ sit above the rounded corner without being cut off. */
+  .pc-modal-scroll{
+    max-height:80vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
   }
-  .pc-modal-close:hover{ color:#fff; border-color:var(--purple-soft); background:rgba(124,143,255,0.1); }
+  .pc-modal-close{
+    position:absolute; top:-14px; right:-14px; z-index:70;
+    width:36px; height:36px; border-radius:12px;
+    background:linear-gradient(160deg, #232c46, #12172a);
+    border:1px solid rgba(255,255,255,0.28);
+    color:#fff; font-size:16px; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition: color .2s, border-color .2s, background .2s, transform .15s, box-shadow .2s;
+    box-shadow:0 8px 20px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .pc-modal-close:hover{ color:#fff; border-color:var(--purple-soft); background:linear-gradient(160deg, #2c3660, #171d38); transform:translateY(-1px); }
   .pc-modal-close:active{ transform:scale(0.92); }
 
   @media (max-width:600px){
@@ -5960,6 +5977,7 @@
 
         <div class="panel pc-accordion-body" id="orderFlowPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="pc-modal-scroll">
 
     <div class="wizard-steps" id="wizardStepsMain">
       <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
@@ -6154,6 +6172,7 @@
     </div>
   </div>
   </div>
+    </div>
         </div>
       </div>
 
@@ -6184,6 +6203,7 @@
 
         <div class="panel wp-panel pc-accordion-body" id="weeklySubPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="pc-modal-scroll">
     <div class="wizard-steps" id="wizardStepsWp">
       <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
       <div class="wizard-step-line"></div>
@@ -6312,6 +6332,7 @@
     </div>
     <div class="copy-note" id="wpCopyNote"></div>
   </div>
+    </div>
         </div>
       </div>
 
@@ -6342,6 +6363,7 @@
 
         <div class="panel mp-panel pc-accordion-body" id="monthlySubPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="pc-modal-scroll">
     <div class="wizard-steps" id="wizardStepsMp">
       <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
       <div class="wizard-step-line"></div>
@@ -6459,6 +6481,7 @@
     </div>
     <div class="copy-note" id="mpCopyNote"></div>
   </div>
+    </div>
         </div>
       </div>
 
@@ -6488,6 +6511,7 @@
 
         <div class="panel pc-accordion-body" id="editOrderPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="pc-modal-scroll">
     <div class="eo-box moon-glow-card">
       <div class="qn-stars" aria-hidden="true">
         <span style="top:10%;left:8%;animation-delay:0s;"></span>
@@ -6529,6 +6553,7 @@
       <div class="copy-note" id="eoCopyNote"></div>
     </div>
         </div>
+    </div>
       </div>
 
       <!-- Card 5 — cheap package (fixed price, no Topaz/effects) -->
@@ -6558,6 +6583,7 @@
 
         <div class="panel pc-accordion-body" id="cheapOrderPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="pc-modal-scroll">
     <div class="wizard-steps" id="wizardStepsCp">
       <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
       <div class="wizard-step-line"></div>
@@ -6673,6 +6699,7 @@
       <div class="copy-note" id="cpCopyNote"></div>
     </div>
         </div>
+    </div>
       </div>
       </div>
 
@@ -6703,6 +6730,7 @@
 
         <div class="panel pc-accordion-body" id="cheapMonthlyPanel">
     <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="pc-modal-scroll">
     <div class="wizard-steps" id="wizardStepsCpm">
       <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
       <div class="wizard-step-line"></div>
@@ -6823,6 +6851,7 @@
       <div class="copy-note" id="cpmCopyNote"></div>
     </div>
         </div>
+    </div>
       </div>
       </div>
       
