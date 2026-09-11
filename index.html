@@ -253,7 +253,7 @@
     padding:6px 4px; margin-bottom:28px;
   }
   .topbar-left{
-    display:flex; align-items:flex-start; flex-wrap:nowrap; gap:18px; min-width:0;
+    display:flex; align-items:flex-start; flex-wrap:nowrap; gap:30px; min-width:0;
   }
   /* Desktop-only PDF guide links, shown next to the logo. Hidden by
      default (mobile keeps its existing layout, with the guide links
@@ -268,7 +268,7 @@
        noticeably lower than the actual "MOONFULL 4K" text. This nudges
        them down from the top just enough to line up with the text
        itself instead. */
-    margin-top:22px;
+    margin-top:14px;
   }
   @media (min-width:900px){
     .topbar-guide-links{ display:flex; }
@@ -4056,17 +4056,17 @@
     height:auto;
   }
 
-  /* --- Desktop 115% zoom ---
-     Re-added at a lower value (115%, was 125%) per explicit request,
-     after being removed for causing blurry text with the Futura Book
-     Mta font at 125%. This is still the same fundamental technique
-     (CSS zoom re-rasterizes the page at the scaled size), so the same
-     blur risk technically still applies -- just less pronounced at a
-     smaller scale factor. Scoped to desktop widths only; phones/tablets
-     stay at native 100%. */
-  @media (min-width:901px){
-    html{ zoom:1.15; }
-  }
+  /* --- Desktop zoom removed ---
+     Was zoom:1.15 (previously 1.25). CSS zoom re-rasterizes the whole
+     page at the scaled size, and the custom display font never rendered
+     fully crisply at either scale factor — reducing it from 125% to
+     115% made the blur less pronounced but didn't eliminate it, and it
+     was still visibly softening text and slightly muddying colors
+     site-wide on desktop. Removed outright rather than reduced further,
+     since native 100% rendering is the only way to guarantee sharp
+     text with this font. Desktop sizing now relies on the explicit
+     min-width:901px rules elsewhere in this file instead of a global
+     scale-up. */
 
   /* --- Direct contact panel --- */
   .contact-panel{ position:relative; overflow:hidden; }
