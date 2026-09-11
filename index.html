@@ -6187,7 +6187,7 @@
           <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
           <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
           <p data-i18n="warnP4">ატვირთვისას მასალა ყოველთვის უნდა იყოს <b>ზუსტად 1080p / 60fps</b> — გამომავალი კი შეგიძლიათ აირჩიოთ: სტანდარტული 1080p ან პრემიუმ 4K/60fps.</p>
-          <p class="spec">REC.SPEC → 1080×1920 · 60fps · MAX 59.59s</p>
+          <p class="spec">REC.SPEC → 1080x1920 · 60fps · MAX 59.59s</p>
         </div>
       </div>
     </div>
@@ -10326,7 +10326,7 @@
           const hasDims = !!(meta.width && meta.height);
           const fpsLabel = meta.fps ? `${meta.fps}fps` : t('srFpsUnknown');
           detectedEl.textContent = hasDims
-            ? `აღმოჩენილია: ${meta.width}×${meta.height} · ${fpsLabel}`
+            ? `აღმოჩენილია: ${meta.width}x${meta.height} · ${fpsLabel}`
             : `აღმოჩენილია: ${fpsLabel}`;
         } else {
           detectedEl.textContent = '';
@@ -10503,7 +10503,7 @@
     const acceptability = checkUploadAcceptable(width, height, fps);
     if (acceptability.rejected) {
       const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
-      srRejectDetected.textContent = hasDimensions ? `${width}×${height} · ${fpsLabel}` : fpsLabel;
+      srRejectDetected.textContent = hasDimensions ? `${width}x${height} · ${fpsLabel}` : fpsLabel;
       scanResult.classList.remove('show');
       srReject.classList.add('show');
       // Point 4K uploads specifically at the Cheap Package, since this
@@ -10546,7 +10546,7 @@
 
     if (hasDimensions) {
       const fpsLabel = fps ? `${fps}fps` : t('srFpsUnknown');
-      srQuality.textContent = `${width}×${height} · ${fpsLabel}`;
+      srQuality.textContent = `${width}x${height} · ${fpsLabel}`;
       srQualityRow.classList.add('show');
 
       const reqLabel = QUALITY_LABELS[requestedQuality] || QUALITY_LABELS['1080_60'];
