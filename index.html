@@ -10867,6 +10867,22 @@
 
     function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
 
+    // Desktop applies `zoom:1.15` to <html> (see the "Desktop 115% zoom"
+    // rule above). CSS `zoom` re-rasterizes the page, which means
+    // pointer-event coordinates (e.clientX/Y), getBoundingClientRect(),
+    // and window.innerWidth/Height are all real, post-zoom screen
+    // pixels — but a value written to style.left/top is interpreted as
+    // a *pre-zoom* logical pixel and gets multiplied by the zoom factor
+    // again when it renders. Mixing the two without correcting for that
+    // is exactly what made the bubble fly away much faster than the
+    // cursor while dragging on desktop (and land off-screen, i.e.
+    // "disappear") — touch devices never hit this because that zoom
+    // rule only applies at desktop widths.
+    function getPageZoom(){
+      const z = parseFloat(getComputedStyle(document.documentElement).zoom);
+      return (z && !isNaN(z)) ? z : 1;
+    }
+
     bubble.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       const r = bubble.getBoundingClientRect();
@@ -10882,11 +10898,19 @@
       const dx = Math.abs(e.clientX - (bubble.getBoundingClientRect().left + startX));
       const dy = Math.abs(e.clientY - (bubble.getBoundingClientRect().top + startY));
       if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) moved = true;
-      const w = bubble.offsetWidth, h = bubble.offsetHeight;
-      const left = clamp(e.clientX - startX, 6, window.innerWidth - w - 6);
-      const top = clamp(e.clientY - startY, 6, window.innerHeight - h - 6);
-      bubble.style.left = left + 'px';
-      bubble.style.top = top + 'px';
+      const zoom = getPageZoom();
+      const rect = bubble.getBoundingClientRect(); // real, post-zoom pixels
+      const w = rect.width, h = rect.height;
+      // Target position, still in real/post-zoom pixels (same space as
+      // e.clientX and window.innerWidth/Height, so the clamp bounds are
+      // consistent with the target value here).
+      const leftReal = clamp(e.clientX - startX, 6, window.innerWidth - w - 6);
+      const topReal = clamp(e.clientY - startY, 6, window.innerHeight - h - 6);
+      // Only now convert down to the pre-zoom logical pixels that
+      // style.left/top actually expect, so the rendered (post-zoom)
+      // result lands exactly under the cursor instead of drifting.
+      bubble.style.left = (leftReal / zoom) + 'px';
+      bubble.style.top = (topReal / zoom) + 'px';
       bubble.style.right = 'auto';
       bubble.style.bottom = 'auto';
     });
