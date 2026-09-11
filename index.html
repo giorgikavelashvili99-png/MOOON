@@ -345,20 +345,20 @@
       radial-gradient(ellipse 100% 100% at 30% 0%, color-mix(in srgb, var(--purple) 22%, transparent), transparent 70%),
       linear-gradient(160deg, rgba(255,255,255,0.03), transparent 50%),
       rgba(14,16,26,0.7);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 6px 16px -8px color-mix(in srgb, var(--purple) 50%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 6px 16px -8px rgba(59,109,255,0.5);
     cursor:pointer; padding:0;
     transition: border-color .25s ease, background .25s ease, transform .2s ease, box-shadow .25s ease;
   }
   .menu-toggle:hover{
     border-color: color-mix(in srgb, var(--cyan) 55%, var(--border));
     transform: translateY(-2px);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 10px 22px -8px color-mix(in srgb, var(--cyan) 55%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 10px 22px -8px rgba(34,195,255,0.55);
   }
   .menu-toggle:active{ transform: translateY(0); }
   .menu-toggle-bar{
     display:block; width:19px; height:2px; border-radius:2px;
     background:linear-gradient(90deg, var(--purple), var(--cyan));
-    box-shadow: 0 0 6px color-mix(in srgb, var(--cyan) 50%, transparent);
+    box-shadow: 0 0 6px rgba(34,195,255,0.5);
     transition: transform .28s ease, opacity .2s ease;
   }
   .menu-toggle[aria-expanded="true"] .menu-toggle-bar:nth-child(1){ transform:translateY(7px) rotate(45deg); }
@@ -723,7 +723,7 @@
   .lang-btn.active{
     opacity:1; color:#04101a;
     background: linear-gradient(120deg, var(--purple), var(--cyan));
-    box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--cyan) 60%, transparent);
+    box-shadow: 0 4px 14px -4px rgba(34,195,255,0.6);
     text-shadow:none;
   }
 
@@ -781,7 +781,7 @@
        so it's unmistakably visible, not something you have to squint for. */
     height:3px; width:100%;
     background:linear-gradient(90deg, transparent, var(--purple) 15%, var(--cyan) 50%, var(--purple) 85%, transparent);
-    box-shadow: 0 0 16px 1px color-mix(in srgb, var(--cyan) 60%, transparent);
+    box-shadow: 0 0 16px 1px rgba(34,195,255,0.6);
   }
   .site-menu-close{
     position:absolute; top:16px; right:16px; z-index:2;
@@ -1975,7 +1975,7 @@
   }
   .drop-zone:hover, .drop-zone.dragover{
     border-color: color-mix(in srgb, var(--tile-accent) 55%, transparent);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--tile-accent) 18%, transparent) inset, 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     transform: translateY(-1px);
   }
   .drop-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; z-index:2; }
@@ -1986,11 +1986,11 @@
     border-radius:50%;
     background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.35), transparent 60%),
                 linear-gradient(150deg, color-mix(in srgb, var(--tile-accent) 85%, #fff), var(--tile-accent) 55%, color-mix(in srgb, var(--tile-accent) 70%, #04101a));
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--tile-accent) 10%, transparent), 0 10px 26px color-mix(in srgb, var(--tile-accent) 40%, transparent);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.35);
     transition: box-shadow .25s ease, transform .25s ease;
   }
   .drop-zone:hover .dz-icon, .drop-zone.dragover .dz-icon{
-    box-shadow: 0 0 0 8px color-mix(in srgb, var(--tile-accent) 16%, transparent), 0 14px 34px color-mix(in srgb, var(--tile-accent) 55%, transparent);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.4);
     transform: scale(1.06);
   }
   .drop-zone .dz-icon svg{
@@ -2159,7 +2159,6 @@
     display:flex; align-items:center; justify-content:center;
     background:linear-gradient(160deg, color-mix(in srgb, var(--tile-accent) 24%, transparent), color-mix(in srgb, var(--tile-accent) 6%, transparent));
     border:1px solid color-mix(in srgb, var(--tile-accent) 38%, transparent);
-    box-shadow:0 0 14px color-mix(in srgb, var(--tile-accent) 18%, transparent);
   }
   .scan-result .sr-ico svg{
     width:14px; height:14px; fill:none; stroke:var(--tile-accent);
@@ -2178,7 +2177,7 @@
     border-radius:16px;
     background: linear-gradient(135deg, color-mix(in srgb, var(--tile-accent) 20%, transparent), color-mix(in srgb, var(--tile-accent) 4%, transparent));
     border:1px solid color-mix(in srgb, var(--tile-accent) 45%, transparent);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--tile-accent) 16%, transparent), inset 0 1px 0 rgba(255,255,255,0.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
   }
   .scan-result .sr-price-tag{
     font-family:'BPGAcademiuriU', sans-serif; font-size:11px; font-weight:700;
@@ -3586,7 +3585,7 @@
   .howto-step:hover{
     transform:translateX(4px);
     border-color: color-mix(in srgb, var(--hs-accent, var(--purple)) 55%, var(--border-soft)) !important;
-    box-shadow: 0 12px 28px -14px color-mix(in srgb, var(--hs-accent, var(--purple)) 45%, transparent);
+    box-shadow: 0 12px 28px -14px rgba(0,0,0,0.45);
   }
   .howto-steps .howto-step:nth-child(1){ --hs-accent: #3fd9c7; }
   .howto-steps .howto-step:nth-child(2){ --hs-accent: #a78bfa; }
@@ -3595,7 +3594,7 @@
   .moon-glow-card.howto-step .hs-num{
     background:linear-gradient(135deg, var(--hs-accent, var(--purple)), color-mix(in srgb, var(--hs-accent, var(--purple)) 55%, #fff)) !important;
     color:#04101a !important; text-shadow:none !important;
-    border:none !important; box-shadow:0 6px 16px -6px color-mix(in srgb, var(--hs-accent, var(--purple)) 60%, transparent);
+    border:none !important; box-shadow:0 6px 16px -6px rgba(0,0,0,0.5);
   }
   .moon-glow-card.howto-step .hs-title{ color:#fff !important; text-shadow:0 0 10px color-mix(in srgb, var(--hs-accent, var(--purple)) 55%, transparent) !important; }
   .moon-glow-card.howto-step .hs-text{ color:var(--text-dim) !important; }
@@ -4240,7 +4239,7 @@
   .eo-style-tab.active{
     background:linear-gradient(135deg, var(--gold), #fff3d1 60%, var(--gold));
     color:#241a00; border-color:transparent;
-    box-shadow:0 6px 16px -4px color-mix(in srgb, var(--gold) 55%, transparent);
+    box-shadow:0 6px 16px -4px rgba(255,210,63,0.55);
   }
   .eo-video-wrap{
     position:relative; width:170px; margin:0 0 14px;
@@ -4385,7 +4384,7 @@
     border-radius:24px;
     border:1.5px solid var(--pc-border, var(--border));
     background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
-    box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 10%, transparent));
+    box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45));
     padding:26px 22px 22px;
     display:flex; flex-direction:column;
     overflow:hidden;
@@ -4403,7 +4402,7 @@
     .pc-card:not(.pc-open):hover{
       transform:translateY(-4px);
       border-color: color-mix(in srgb, var(--pc-accent) 65%, var(--pc-border, var(--border)));
-      box-shadow: 0 26px 60px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in srgb, var(--pc-accent) 22%, transparent);
+      box-shadow: 0 26px 60px rgba(0,0,0,0.5);
     }
   }
   .pc-card::before{
@@ -4794,7 +4793,17 @@
     background:linear-gradient(135deg, #8b5cf6, #6d28d9); color:#fff;
     box-shadow:0 8px 22px rgba(139,92,246,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
     touch-action:none; user-select:none; -webkit-user-select:none;
+    -webkit-user-drag:none; user-drag:none;
   }
+  /* Custom drag is handled entirely in JS via pointer events (see
+     makeActiveChatBubbleDraggable below). Without draggable="false" +
+     -webkit-user-drag:none, desktop mouse users could accidentally kick
+     off the browser's own native HTML5 drag-and-drop on this element
+     instead (touch has no equivalent, which is why this only ever
+     showed up on computer) — the native drag ghost takes over and the
+     real button is left hidden mid-drag with nothing to end that state,
+     since only pointer events (not dragstart/dragend) are wired up. */
+  .active-chat-bubble *{ -webkit-user-drag:none; user-drag:none; pointer-events:none; }
   .active-chat-bubble.dragging{
     cursor:grabbing;
     box-shadow:0 12px 30px rgba(139,92,246,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
@@ -4807,8 +4816,13 @@
     color:#fff; white-space:nowrap;
   }
   .acb-dot{
-    position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%;
-    background:#ff4d6d; border:2px solid #140d24;
+    position:absolute; top:5px; right:5px; min-width:17px; height:17px;
+    padding:0 3px; border-radius:999px;
+    background:#ff4d6d; border:1.5px solid #140d24;
+    display:flex; align-items:center; justify-content:center;
+    font-size:9px; font-weight:800; line-height:1; color:#fff;
+    font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
+    box-shadow:0 0 0 1px rgba(255,77,109,0.4);
   }
 
   /* Admin panel -- Chats tab list */
@@ -5045,7 +5059,7 @@
     font-size:22px; line-height:1;
     background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
     border:1px solid color-mix(in srgb, var(--pc-accent) 60%, transparent);
-    box-shadow:0 8px 20px -6px color-mix(in srgb, var(--pc-accent) 65%, transparent), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -6px 10px -6px rgba(0,0,0,0.35);
+    box-shadow:0 8px 20px -6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -6px 10px -6px rgba(0,0,0,0.35);
   }
   .pc-icon::after{
     content:''; position:absolute; inset:-5px; border-radius:19px;
@@ -5188,10 +5202,10 @@
        else on the button. */
     background: linear-gradient(135deg, rgba(255,255,255,0.35), transparent 22%), var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
     border: 1.5px solid rgba(255,255,255,0.55);
-    box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px color-mix(in srgb, var(--pc-accent) 70%, transparent)), inset 0 1px 0 rgba(255,255,255,0.4);
+    box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.4);
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
   }
-  .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px color-mix(in srgb, var(--pc-accent) 80%, transparent); }
+  .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px rgba(0,0,0,0.55); }
   .pc-toggle-btn:active{ transform:translateY(0); }
 
   /* Opens directly on top of the page — the exact same mechanism as the
@@ -5484,7 +5498,7 @@
      placing a brand new order, orphaning the real conversation. This
      persists across the whole site (and across visits, since it's
      looked up from the server by Discord ID, not local storage). -->
-<button type="button" id="activeChatBubble" class="active-chat-bubble" style="display:none;" aria-label="აქტიური ჩატის გახსნა">
+<button type="button" id="activeChatBubble" class="active-chat-bubble" style="display:none;" aria-label="აქტიური ჩატის გახსნა" draggable="false">
   <span class="acb-label" data-i18n="acbLabelLine1">შეკვეთის</span><span class="acb-label" data-i18n="acbLabelLine2">გაგრძელება</span>
   <span class="acb-dot" id="activeChatBubbleDot" style="display:none;"></span>
 </button>
@@ -10587,6 +10601,39 @@
   // only who's "me" for bubble styling and outgoing message tagging
   // changes, plus the admin-only Complete-order button.
   let messengerRole = 'customer';
+  // How many admin messages have arrived while the customer had the
+  // chat closed — shown as the number inside the reopen bubble's red
+  // dot (see .acb-dot) so it reads like a normal unread-message badge
+  // instead of just an unlabeled dot. Reset to 0 whenever the customer
+  // actually opens the chat. Persisted across page loads (per browser)
+  // via localStorage, keyed by order id, so a refresh doesn't lose the
+  // count before the customer has seen it.
+  const ACB_UNREAD_KEY = 'moonAcbUnread';
+  function getUnreadAdminCount(orderId){
+    try{
+      const raw = JSON.parse(localStorage.getItem(ACB_UNREAD_KEY) || '{}');
+      return (orderId && raw[orderId]) || 0;
+    }catch(e){ return 0; }
+  }
+  function setUnreadAdminCount(orderId, count){
+    if (!orderId) return;
+    try{
+      const raw = JSON.parse(localStorage.getItem(ACB_UNREAD_KEY) || '{}');
+      if (count > 0) raw[orderId] = count; else delete raw[orderId];
+      localStorage.setItem(ACB_UNREAD_KEY, JSON.stringify(raw));
+    }catch(e){}
+  }
+  function renderAcbDot(count){
+    const dot = document.getElementById('activeChatBubbleDot');
+    if (!dot) return;
+    if (count > 0){
+      dot.textContent = count > 99 ? '99+' : String(count);
+      dot.style.display = 'flex';
+    } else {
+      dot.textContent = '';
+      dot.style.display = 'none';
+    }
+  }
 
   // Escapes the raw message text first (so nothing in it can ever be
   // interpreted as HTML/script), THEN turns URL-looking spans into real
@@ -10655,9 +10702,11 @@
         // state is handled separately by admin_notify -- see below.)
         if (messengerRole === 'customer'){
           const bubble = document.getElementById('activeChatBubble');
-          const dot = document.getElementById('activeChatBubbleDot');
           if (bubble) bubble.style.display = 'flex';
-          if (dot) dot.style.display = 'block';
+          const orderId = messengerCurrentOrderId || (bubble && bubble.dataset.orderId);
+          const nextCount = getUnreadAdminCount(orderId) + 1;
+          setUnreadAdminCount(orderId, nextCount);
+          renderAcbDot(nextCount);
         }
       }
     });
@@ -10675,7 +10724,6 @@
     const messagesEl = document.getElementById('messengerMessages');
     const pageEl = document.getElementById('messengerPage');
     const bubble = document.getElementById('activeChatBubble');
-    const dot = document.getElementById('activeChatBubbleDot');
     const completeBtn = document.getElementById('messengerCompleteBtn');
     const avatarWrap = document.getElementById('messengerHeaderAvatar');
     const avatarImg = document.getElementById('messengerHeaderAvatarImg');
@@ -10685,7 +10733,8 @@
     messengerRenderedCount = 0;
     if (pageEl) pageEl.style.display = 'flex';
     if (bubble) bubble.style.display = 'none';
-    if (dot) dot.style.display = 'none';
+    if (messengerRole === 'customer') setUnreadAdminCount(orderId, 0);
+    renderAcbDot(0);
     if (completeBtn) completeBtn.style.display = (messengerRole === 'admin') ? 'block' : 'none';
     // The avatar/customer-name swap only makes sense for the admin's view
     // — a customer opening their own order chat already knows who they
@@ -10797,7 +10846,9 @@
       if (myToken !== checkForActiveChatToken) return; // superseded -- ignore
       if (Array.isArray(sessions) && sessions.length > 0){
         bubble.dataset.orderId = sessions[0].orderId;
-        bubble.style.display = (messengerCurrentOrderId === sessions[0].orderId) ? 'none' : 'flex';
+        const isOpenAlready = messengerCurrentOrderId === sessions[0].orderId;
+        bubble.style.display = isOpenAlready ? 'none' : 'flex';
+        renderAcbDot(isOpenAlready ? 0 : getUnreadAdminCount(sessions[0].orderId));
       } else {
         bubble.style.display = 'none';
       }
