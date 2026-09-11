@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MOON — შეუკვეთეთ ვიდეო საუკეთესო ხარისხში </title>
+<title>MOON — შეუკვეთეთ ვიდეო საუკეთესო ხარისხში</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #050810;
-    --bg-alt: #070c18;
-    --panel: #0b1220;
-    --panel-2: #101a30;
+    --bg: #09090a;
+    --bg-alt: #0d0d0e;
+    --panel: #131314;
+    --panel-2: #1c1c1e;
     --border: #2a3c66;
     --border-soft: #1a2440;
     --text: #eef3ff;
@@ -730,7 +730,7 @@
   /* ---------- Hamburger drawer menu ---------- */
   .site-menu-scrim{
     position:fixed; inset:0; z-index:59;
-    background:rgba(3,3,7,0.94);
+    background:rgba(6,6,7,0.94);
     opacity:0; visibility:hidden;
     transition: opacity .28s ease, visibility 0s linear .28s;
   }
@@ -2578,60 +2578,38 @@
     background:
       radial-gradient(ellipse 130% 90% at 50% -15%, color-mix(in srgb, var(--upload-accent-2) 22%, transparent), transparent 65%),
       linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01) 45%),
-      linear-gradient(180deg, #10152a, #090b14);
+      linear-gradient(180deg, #1c1c1e, #09090a);
     box-shadow: 0 16px 36px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .mooon-auto.show{ display:block; }
   .upload-attention{ animation: ttShake 0.4s ease; }
-  /* ---------- Live percentage ring (replaces the old plain spinner
-     "ball" + flat bar). One SVG ring per upload panel, driven purely by
-     the real xhr.upload.onprogress percentage already computed in JS
-     (Math.round((loaded/total)*100)) — nothing here recalculates or
-     estimates progress, it only draws the number that's already
-     correct, so there's no separate guess that can drift or get stuck. */
+  /* ---------- Live percentage text (no ring/circle — just the number).
+     Driven purely by the real xhr.upload.onprogress percentage already
+     computed in JS (Math.round((loaded/total)*100)) — nothing here
+     recalculates or estimates progress, it only draws the number
+     that's already correct, so there's no separate guess that can
+     drift or get stuck. */
   .mooon-auto-status{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     margin-bottom:16px;
   }
   .mooon-auto-ring-box{
-    position:relative; width:96px; height:96px; flex:0 0 auto;
-  }
-  .mooon-auto-ring{
-    display:block; width:100%; height:100%;
-    transform:rotate(-90deg);
-  }
-  .mooon-auto-ring-track{
-    fill:none;
-    stroke:rgba(255,255,255,0.08);
-    stroke-width:7;
-  }
-  .mooon-auto-ring-fill{
-    fill:none;
-    stroke:var(--upload-accent);
-    stroke-width:7;
-    stroke-linecap:round;
-    stroke-dasharray:226.19;
-    stroke-dashoffset:226.19;
-    transition: stroke-dashoffset 0.3s ease;
-    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--upload-accent) 60%, transparent));
+    display:flex; align-items:center; justify-content:center;
+    min-height:56px;
   }
   /* Gentle pulse once the upload itself reaches 100% and the UI is
      waiting on the finalize call — signals it's still working without
-     bringing back a text label. */
-  .mooon-auto-ring-box.is-finalizing .mooon-auto-ring-fill{
+     needing extra decoration. */
+  .mooon-auto-ring-box.is-finalizing .mooon-auto-ring-percent{
     animation: moonRingPulse 1.1s ease-in-out infinite;
   }
   @keyframes moonRingPulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
   @media (prefers-reduced-motion: reduce){
-    .mooon-auto-ring-box.is-finalizing .mooon-auto-ring-fill{ animation:none; }
-  }
-  .mooon-auto-ring-center{
-    position:absolute; inset:0;
-    display:flex; align-items:center; justify-content:center;
+    .mooon-auto-ring-box.is-finalizing .mooon-auto-ring-percent{ animation:none; }
   }
   .mooon-auto-ring-percent{
     font-family:'BPGAcademiuriU','Space Grotesk',sans-serif;
-    font-size:21px; font-weight:800; letter-spacing:normal;
+    font-size:34px; font-weight:800; letter-spacing:normal;
     /* Solid color first — same safety pattern used elsewhere on this
        page — so the number is never invisible on a browser with
        partial/odd support for clipped-gradient text. */
@@ -2645,11 +2623,11 @@
     }
   }
   /* Status text stays in the DOM (screen readers still get "Uploading…"
-     / "Finalizing…") but is hidden visually — the ring + percentage now
-     carry that information on screen. The one exception is while
+     / "Finalizing…") but is hidden visually — the percentage now
+     carries that information on screen. The one exception is while
      finalizing: that wait can take up to a minute (the transfer
      service's free hosting tier has to cold-start), and a silent
-     pulsing ring with no explanation for that long reads as frozen —
+     pulsing number with no explanation for that long reads as frozen —
      so the label reappears just for that phase. */
   .mooon-auto-sr-only{
     position:absolute; width:1px; height:1px; margin:-1px; padding:0;
@@ -3148,7 +3126,7 @@
   .discord-gate{
     position:fixed; inset:0; z-index:99999;
     display:flex; align-items:center; justify-content:center; padding:20px;
-    background:rgba(5,8,16,0.92); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    background:rgba(9,9,10,0.92); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
     opacity:0; visibility:hidden; transition: opacity .25s ease, visibility 0s linear .25s;
   }
   .discord-gate.open{ opacity:1; visibility:visible; transition: opacity .25s ease, visibility 0s; }
@@ -5243,7 +5221,7 @@
   .pc-modal-scrim{
     display:none;
     position:fixed; inset:0; z-index:64;
-    background:rgba(3,3,7,0.88);
+    background:rgba(6,6,7,0.88);
     padding:16px; box-sizing:border-box;
   }
   .pc-modal-scrim.open{
@@ -5350,8 +5328,8 @@
   .mooon-auto-status{
     margin-bottom:10px;
   }
-  .mooon-auto-ring-box{ width:78px; height:78px; }
-  .mooon-auto-ring-percent{ font-size:18px; }
+  .mooon-auto-ring-box{ min-height:44px; }
+  .mooon-auto-ring-percent{ font-size:26px; }
   /* The "keep this page open" hint is a single tight line instead of a
      four-line paragraph -- same message, a fraction of the height. */
   .mooon-auto-stay{
@@ -6085,11 +6063,7 @@
             <div class="mooon-auto" id="srAuto">
               <div class="mooon-auto-status" id="srAutoStatus">
                 <div class="mooon-auto-ring-box" id="srAutoRingBox">
-                  <svg class="mooon-auto-ring" viewBox="0 0 84 84" aria-hidden="true">
-                    <circle class="mooon-auto-ring-track" cx="42" cy="42" r="36"></circle>
-                    <circle class="mooon-auto-ring-fill" id="srAutoFill" cx="42" cy="42" r="36"></circle>
-                  </svg>
-                  <div class="mooon-auto-ring-center"><span class="mooon-auto-ring-percent" id="srAutoPercent">0%</span></div>
+                  <span class="mooon-auto-ring-percent" id="srAutoPercent">0%</span>
                 </div>
                 <span id="srAutoStatusText" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
               </div>
@@ -6298,11 +6272,7 @@
             <div class="mooon-auto" id="mooonAutoWp">
               <div class="mooon-auto-status" id="mooonAutoStatusWp">
                 <div class="mooon-auto-ring-box" id="mooonAutoRingBoxWp">
-                  <svg class="mooon-auto-ring" viewBox="0 0 84 84" aria-hidden="true">
-                    <circle class="mooon-auto-ring-track" cx="42" cy="42" r="36"></circle>
-                    <circle class="mooon-auto-ring-fill" id="mooonAutoFillWp" cx="42" cy="42" r="36"></circle>
-                  </svg>
-                  <div class="mooon-auto-ring-center"><span class="mooon-auto-ring-percent" id="mooonAutoPercentWp">0%</span></div>
+                  <span class="mooon-auto-ring-percent" id="mooonAutoPercentWp">0%</span>
                 </div>
                 <span id="mooonAutoStatusTextWp" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
               </div>
@@ -6458,11 +6428,7 @@
             <div class="mooon-auto" id="mooonAutoMp">
               <div class="mooon-auto-status" id="mooonAutoStatusMp">
                 <div class="mooon-auto-ring-box" id="mooonAutoRingBoxMp">
-                  <svg class="mooon-auto-ring" viewBox="0 0 84 84" aria-hidden="true">
-                    <circle class="mooon-auto-ring-track" cx="42" cy="42" r="36"></circle>
-                    <circle class="mooon-auto-ring-fill" id="mooonAutoFillMp" cx="42" cy="42" r="36"></circle>
-                  </svg>
-                  <div class="mooon-auto-ring-center"><span class="mooon-auto-ring-percent" id="mooonAutoPercentMp">0%</span></div>
+                  <span class="mooon-auto-ring-percent" id="mooonAutoPercentMp">0%</span>
                 </div>
                 <span id="mooonAutoStatusTextMp" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
               </div>
@@ -6682,11 +6648,7 @@
               <div class="mooon-auto" id="mooonAutoCp">
                 <div class="mooon-auto-status" id="mooonAutoStatusCp">
                   <div class="mooon-auto-ring-box" id="mooonAutoRingBoxCp">
-                    <svg class="mooon-auto-ring" viewBox="0 0 84 84" aria-hidden="true">
-                      <circle class="mooon-auto-ring-track" cx="42" cy="42" r="36"></circle>
-                      <circle class="mooon-auto-ring-fill" id="mooonAutoFillCp" cx="42" cy="42" r="36"></circle>
-                    </svg>
-                    <div class="mooon-auto-ring-center"><span class="mooon-auto-ring-percent" id="mooonAutoPercentCp">0%</span></div>
+                    <span class="mooon-auto-ring-percent" id="mooonAutoPercentCp">0%</span>
                   </div>
                   <span id="mooonAutoStatusTextCp" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
                 </div>
@@ -6829,11 +6791,7 @@
               <div class="mooon-auto" id="mooonAutoCpm">
                 <div class="mooon-auto-status" id="mooonAutoStatusCpm">
                   <div class="mooon-auto-ring-box" id="mooonAutoRingBoxCpm">
-                    <svg class="mooon-auto-ring" viewBox="0 0 84 84" aria-hidden="true">
-                      <circle class="mooon-auto-ring-track" cx="42" cy="42" r="36"></circle>
-                      <circle class="mooon-auto-ring-fill" id="mooonAutoFillCpm" cx="42" cy="42" r="36"></circle>
-                    </svg>
-                    <div class="mooon-auto-ring-center"><span class="mooon-auto-ring-percent" id="mooonAutoPercentCpm">0%</span></div>
+                    <span class="mooon-auto-ring-percent" id="mooonAutoPercentCpm">0%</span>
                   </div>
                   <span id="mooonAutoStatusTextCpm" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
                 </div>
@@ -9870,30 +9828,19 @@
     });
   }
 
-  // Circle radius must match the r="36" used in every .mooon-auto-ring-fill
-  // element in the markup above; this is the one source of truth used for
-  // every update (the CSS stroke-dasharray/-dashoffset are only there so
-  // the ring doesn't flash full before the first JS update lands).
-  const MOOON_RING_CIRCUMFERENCE = 2 * Math.PI * 36;
-
-  // Single place that turns a 0-100 upload percentage into what's drawn
-  // on screen: the ring's stroke-dashoffset and the number in its
-  // center. Both always come from the exact same `pct` passed in — which
-  // itself comes straight from xhr.upload.onprogress in
-  // uploadFileToMoontransferr below — so the ring and the number can
-  // never disagree with each other or with the real transfer, and there
-  // is no separate timer/estimate here that could drift or get stuck.
+  // Turns a 0-100 upload percentage into the number on screen. Comes
+  // straight from xhr.upload.onprogress in uploadFileToMoontransferr
+  // below — no separate timer/estimate here that could drift or get
+  // stuck; this only ever draws the number that's already correct.
   function setMooonAutoProgress(ids, pct, opts){
     opts = opts || {};
     const clamped = Math.max(0, Math.min(100, Math.round(pct || 0)));
-    const circle = document.getElementById(ids.fill);
-    if (circle) {
-      circle.style.strokeDashoffset = (MOOON_RING_CIRCUMFERENCE * (1 - clamped / 100)).toFixed(2);
-      const ringBox = circle.closest('.mooon-auto-ring-box');
+    const percentEl = ids.percent ? document.getElementById(ids.percent) : null;
+    if (percentEl) {
+      percentEl.textContent = clamped + '%';
+      const ringBox = percentEl.closest('.mooon-auto-ring-box');
       if (ringBox) ringBox.classList.toggle('is-finalizing', !!opts.finalizing);
     }
-    const percentEl = ids.percent ? document.getElementById(ids.percent) : null;
-    if (percentEl) percentEl.textContent = clamped + '%';
   }
 
   function resetMooonAutoUI(ids){
