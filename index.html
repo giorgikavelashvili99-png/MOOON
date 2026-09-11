@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MOONFULL4K — შეუკვეთეთ ვიდეოები საუკეთესო ხარისხით </title>
+<title>MOON — ვიდეო მონტაჟის კალკულატორი</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2646,10 +2646,25 @@
   }
   /* Status text stays in the DOM (screen readers still get "Uploading…"
      / "Finalizing…") but is hidden visually — the ring + percentage now
-     carry that information on screen. */
+     carry that information on screen. The one exception is while
+     finalizing: that wait can take up to a minute (the transfer
+     service's free hosting tier has to cold-start), and a silent
+     pulsing ring with no explanation for that long reads as frozen —
+     so the label reappears just for that phase. */
   .mooon-auto-sr-only{
     position:absolute; width:1px; height:1px; margin:-1px; padding:0;
     overflow:hidden; white-space:nowrap; border:0; clip:rect(0,0,0,0);
+  }
+  .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only{
+    position:static; width:auto; height:auto; margin:10px 0 0; padding:0;
+    overflow:visible; white-space:normal; clip:auto;
+    display:block; text-align:center;
+    font-size:12px; font-weight:600; color:var(--upload-accent);
+    animation: moonFinalizingFade 1.6s ease-in-out infinite;
+  }
+  @keyframes moonFinalizingFade{ 0%,100%{ opacity:1; } 50%{ opacity:0.55; } }
+  @media (prefers-reduced-motion: reduce){
+    .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only{ animation:none; }
   }
   .mooon-auto-stay{
     font-size:11px; line-height:1.5; color:var(--warm-ivory);
@@ -2767,6 +2782,7 @@
   .sr-reject-text{ font-size:13px; line-height:1.6; color:var(--text); margin:0 0 14px; }
   .sr-reject-text b{ color:#ffd23f; }
   .sr-reject-4k-note{ color:var(--gold); font-weight:600; }
+  .sr-reject-ratio-note{ color:var(--cyan); font-weight:600; }
   .sr-reject-apps-row{
     display:flex; flex-wrap:wrap; align-items:center; gap:7px;
     margin-bottom:8px; font-size:12px;
@@ -5375,16 +5391,21 @@
   html.low-power .site-menu,
   html.low-power .discord-gate,
   html.low-power .pc-modal-scrim,
-  html.low-power .messenger-page{
+  html.low-power .messenger-page,
+  html.low-power .admin-overlay,
+  html.low-power .ba-tag,
+  html.low-power .eo-video-badge{
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
   }
 
-  /* Decorative starfields and orbs are pure ornament -- hiding them on
-     weak devices removes a large number of independently animated
-     layers at zero cost to functionality. */
+  /* Decorative starfields, orbs, and the floating hero badge are pure
+     ornament -- hiding them on weak devices removes a large number of
+     independently animated layers (plus one more backdrop-filter, on
+     the badge) at zero cost to functionality. */
   html.low-power .qn-stars{ display:none !important; }
   html.low-power .orb{ display:none !important; }
+  html.low-power .badge-float{ display:none !important; }
 
   /* Stop paying for animation work while the tab isn't even visible. */
   body.anims-paused *,
@@ -6086,6 +6107,8 @@
           <div class="sr-reject-detected-row"><span data-i18n="srRejectDetectedLabel">ატვირთული ფაილის მონაცემები:</span> <b id="srRejectDetected">—</b></div>
           <p class="sr-reject-text" data-i18n="srRejectText">ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.</p>
           <p class="sr-reject-text sr-reject-4k-note" id="srReject4kNote" style="display:none;" data-i18n="srReject4kNote">ℹ️ 4K ფორმატის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.</p>
+          <p class="sr-reject-text sr-reject-ratio-note" data-i18n="srRejectRatioMobile">📱 თუ იყენებთ მობილურის აპლიკაციებს — გთხოვთ, ვიდეო გადაიყვანოთ <b>1:1</b> ან <b>16:9</b> ფორმატში.</p>
+          <p class="sr-reject-text sr-reject-ratio-note" data-i18n="srRejectRatioDesktop">🖥️ თუ იყენებთ კომპიუტერს — გადაიყვანეთ <b>1080x1080</b> ფორმატში.</p>
           <div class="sr-reject-apps-row">
             <span class="sr-reject-apps-label" data-i18n="srRejectAppsMobile">მობილურებისთვის / აიფონისთვის / აიპადებისთვის:</span>
             <span class="sr-chip">CapCut</span><span class="sr-chip">InShot</span><span class="sr-reject-etc" data-i18n="srRejectEtc">და ა.შ.</span>
@@ -7401,6 +7424,8 @@
       srRejectDetectedLabel: 'ატვირთული ფაილის მონაცემები:',
       srRejectText: 'ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.',
       srReject4kNote: 'ℹ️ 1080p-ზე მაღალი ხარისხის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას (ფასდება 4K ტარიფით) — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
+      srRejectRatioMobile: '📱 თუ იყენებთ მობილურის აპლიკაციებს — გთხოვთ, ვიდეო გადაიყვანოთ <b>1:1</b> ან <b>16:9</b> ფორმატში.',
+      srRejectRatioDesktop: '🖥️ თუ იყენებთ კომპიუტერს — გადაიყვანეთ <b>1080x1080</b> ფორმატში.',
       srReject4kNoteShort: 'ℹ️ 2K/4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“',
       srRejectAppsMobile: 'მობილურებისთვის / აიფონისთვის / აიპადებისთვის:',
       srRejectAppsDesktop: 'კომპიუტერისთვის:',
@@ -7826,6 +7851,8 @@
       srRejectDetectedLabel: 'Uploaded file details:',
       srRejectText: 'Dear user, you must upload the video in <b>1080p / 60fps</b> format — exactly this format, no more and no less. Any other resolution or frame rate (e.g. 720p, 2K, 4K, 30fps, 120fps) will not be accepted.',
       srReject4kNote: 'ℹ️ Uploading a video above 1080p quality is only possible when ordering the "Cheap Package" (priced at the 4K rate) — for every other package, the uploaded video must be exactly 1080p / 60fps.',
+      srRejectRatioMobile: '📱 If you\'re using mobile apps — please convert the video to <b>1:1</b> or <b>16:9</b> format.',
+      srRejectRatioDesktop: '🖥️ If you\'re using a computer — convert it to <b>1080x1080</b> format.',
       srReject4kNoteShort: 'ℹ️ 2K/4K upload is only possible in the "Cheap Package"',
       srRejectAppsMobile: 'For mobile / iPhone / iPad:',
       srRejectAppsDesktop: 'For desktop:',
@@ -9747,6 +9774,26 @@
 
   const VIDEO_REVIEW_TRANSFER_URL = 'https://mooontransferr.onrender.com';
 
+  // mooontransferr runs on a free Render instance, which spins down after
+  // a period of inactivity and takes something like 30-60s (sometimes
+  // more) to wake back up on the next request — that cold start is
+  // almost certainly why "finalize" can take close to a minute right
+  // after the upload bar hits 100%: the PUT upload itself can proceed
+  // the instant the visitor picks a file, but the very first request
+  // this service sees, whichever one that is, pays the wake-up cost.
+  // Firing one harmless, ignored-response ping the moment a video is
+  // selected — well before the actual upload begins — lets that wake-up
+  // happen in parallel with scanning/reviewing the video instead of
+  // being stacked onto the end of the wait, after 100%.
+  let transferServiceWoken = false;
+  function wakeTransferService(){
+    if (transferServiceWoken) return;
+    transferServiceWoken = true;
+    try {
+      fetch(VIDEO_REVIEW_TRANSFER_URL + '/', { method: 'GET', mode: 'no-cors' }).catch(() => {});
+    } catch(e){}
+  }
+
   // ============================================================
   // Automatic hand-off to mooontransferr — the visitor already picked
   // the video on THIS page (for the scanner/price calc); "yes" now
@@ -10003,6 +10050,7 @@
       alert(t('alertNotVideo'));
       return;
     }
+    wakeTransferService();
     const myToken = ++scanToken;
     mainScannedFile = file;
     scanResult.classList.remove('show');
@@ -10410,6 +10458,7 @@
 
     function handle(file){
       if (!file || !file.type.startsWith('video/')) { alert(t('alertNotVideo')); return; }
+      wakeTransferService();
       showIdle();
       zone.classList.add('scanning');
       // Hide the uploader itself the instant a file is picked — same
@@ -10717,9 +10766,18 @@
     return messengerSocket;
   }
 
+  // Set only when openMessengerPage is called with an optimistic first
+  // message — i.e. the chat was just opened as the immediate result of
+  // submitting a brand new order, not reopened later via the floating
+  // bubble to check on an existing conversation. Read by
+  // closeMessengerPage() to decide whether closing this particular chat
+  // should reset the order flow (see there for why).
+  let justSubmittedFreshOrder = false;
+
   function openMessengerPage(orderId, role, optimisticFirstMessage){
     messengerRole = role || 'customer';
     messengerCurrentOrderId = orderId;
+    justSubmittedFreshOrder = !!optimisticFirstMessage;
     const orderIdEl = document.getElementById('messengerOrderId');
     const messagesEl = document.getElementById('messengerMessages');
     const pageEl = document.getElementById('messengerPage');
@@ -10804,6 +10862,18 @@
   }
 
   function closeMessengerPage(){
+    // A customer closing the chat right after submitting a new order is
+    // done with this order-flow session entirely — reopening any
+    // package's "order" button afterward should start at step 1 with a
+    // clean scanner, not resume wherever the just-finished flow left
+    // off (stuck on the final step, old file/quality/link still shown,
+    // etc). A full reload is simpler and far more reliable than trying
+    // to manually rewind every field this could have touched across all
+    // five order wizards, and matches how a fresh visit already behaves.
+    if (messengerRole === 'customer' && justSubmittedFreshOrder) {
+      location.reload();
+      return;
+    }
     const pageEl = document.getElementById('messengerPage');
     if (pageEl) pageEl.style.display = 'none';
     document.body.style.overflow = '';
