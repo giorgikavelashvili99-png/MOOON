@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MOON — შეუკვეთეთ ვიდეო საუკეთესო ხარისხში</title>
+<title>MOON — ვიდეო მონტაჟის კალკულატორი</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -4750,6 +4750,50 @@
     color:var(--text-faint); background:rgba(255,255,255,0.05);
     padding:6px 14px; border-radius:100px; margin:6px 0;
   }
+  /* Payment-method picker — a small interactive card that appears once,
+     right after a brand new order's first message. Choosing an option
+     is purely informational (no payment is actually processed here):
+     it sends a plain chat message recording the customer's preference
+     so the admin can follow up with the right account details, exactly
+     matching how payment already works on this site (confirmed
+     manually, in chat). */
+  .pm-picker{
+    align-self:stretch; margin:10px 0; padding:14px 14px 12px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+    border-radius:16px;
+  }
+  .pm-picker-prompt{
+    font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:10px; text-align:center;
+  }
+  .pm-picker-options{ display:flex; gap:10px; flex-wrap:wrap; }
+  .pm-option{
+    flex:1 1 130px; min-width:130px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    padding:14px 10px; border-radius:12px; border:1.5px solid rgba(255,255,255,0.14);
+    background:rgba(255,255,255,0.03);
+    transition: transform .15s ease, border-color .2s ease, background .2s ease, opacity .2s ease;
+  }
+  .pm-option:hover{ transform:translateY(-2px); background:rgba(255,255,255,0.06); }
+  .pm-option:active{ transform:translateY(0); }
+  .pm-option.pm-paypal:hover{ border-color:#00457C; }
+  .pm-option.pm-bank:hover{ border-color:rgba(255,255,255,0.35); }
+  .pm-option-logo{
+    font-family:'Space Grotesk', sans-serif; font-size:19px; font-weight:800; letter-spacing:-0.5px;
+    color:#0070BA;
+  }
+  .pm-option-logo b{ color:#00457C; font-weight:800; }
+  .pm-bank-logos{ display:flex; flex-direction:column; gap:5px; align-items:center; }
+  .pm-bank-name{
+    font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:800;
+    padding:3px 10px; border-radius:6px; white-space:nowrap;
+  }
+  .pm-bank-name.pm-bog{ color:#E4032E; background:rgba(228,3,46,0.12); }
+  .pm-bank-name.pm-tbc{ color:#1cbbba; background:rgba(28,187,186,0.12); }
+  /* Once a choice is made, both options fade + lock so it reads as
+     "answered" rather than staying interactive. */
+  .pm-picker.pm-picker-done .pm-option{ pointer-events:none; }
+  .pm-picker.pm-picker-done .pm-option:not(.pm-chosen){ opacity:0.35; }
+  .pm-picker.pm-picker-done .pm-option.pm-chosen{ border-color:var(--cyan); background:rgba(34,195,255,0.08); }
   .messenger-input-row{
     flex:0 0 auto; display:flex; gap:10px; align-items:center;
     padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
@@ -7425,6 +7469,10 @@
       messengerInputPh: 'დაწერე შეტყობინება...',
       messengerNeedsLogin: 'შეკვეთის ჩატისთვის საჭიროა Discord-ით შესვლა.',
       messengerCompleted: 'შეკვეთა დასრულებულია — მადლობა! ✅',
+      pmPickerPrompt: 'გთხოვთ, აირჩიოთ გადახდის მეთოდი:',
+      pmBankMethodLabel: 'ბანკის გადარიცხვა',
+      pmChosenPrefix: 'არჩეული გადახდის მეთოდი:',
+      pmThankYou: 'ჩვენო ძვირფასო მომხმარებელო, ადმინისტრატორი მალე ნახავს თქვენს შეკვეთას 💚',
       messengerLoadFailed: 'ისტორიის ჩატვირთვა ვერ მოხერხდა — შეტყობინებების გაგზავნა მაინც შესაძლებელია.',
       orderProcessing: 'მუშავდება თქვენი შეკვეთა…',
       orderProcessed: 'თქვენი შეკვეთა დამუშავებულია ✓',
@@ -7852,6 +7900,10 @@
       messengerInputPh: 'Write a message...',
       messengerNeedsLogin: 'Please log in with Discord to open the order chat.',
       messengerCompleted: 'Order completed — thank you! ✅',
+      pmPickerPrompt: 'Please choose a payment method:',
+      pmBankMethodLabel: 'Bank transfer',
+      pmChosenPrefix: 'Chosen payment method:',
+      pmThankYou: 'Dear customer, our administrator will review your order shortly 💚',
       messengerLoadFailed: "Couldn't load the chat history — you can still send messages.",
       orderProcessing: 'Processing your order…',
       orderProcessed: 'Your order has been processed ✓',
@@ -10679,6 +10731,49 @@
     container.scrollTop = container.scrollHeight;
   }
 
+  // Shown once, right after a brand new order's first message, so the
+  // customer can flag which payment method they'd use. This does not
+  // process any payment itself — the site has never had an automated
+  // checkout, payment is always confirmed manually in chat (see
+  // rule8Text) — it just records the preference as a normal chat
+  // message so the admin knows which account details to send.
+  function appendPaymentMethodPicker(){
+    const container = document.getElementById('messengerMessages');
+    if (!container) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'pm-picker';
+    wrap.innerHTML =
+      '<div class="pm-picker-prompt">' + t('pmPickerPrompt') + '</div>' +
+      '<div class="pm-picker-options">' +
+        '<button type="button" class="pm-option pm-paypal" data-method="PayPal">' +
+          '<span class="pm-option-logo">Pay<b>Pal</b></span>' +
+        '</button>' +
+        '<button type="button" class="pm-option pm-bank" data-method="' + t('pmBankMethodLabel') + '">' +
+          '<span class="pm-bank-logos">' +
+            '<span class="pm-bank-name pm-bog">საქართველოს ბანკი</span>' +
+            '<span class="pm-bank-name pm-tbc">თიბისი</span>' +
+          '</span>' +
+        '</button>' +
+      '</div>';
+    container.appendChild(wrap);
+    container.scrollTop = container.scrollHeight;
+
+    wrap.querySelectorAll('.pm-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (wrap.classList.contains('pm-picker-done')) return; // already answered
+        const method = btn.dataset.method;
+        wrap.classList.add('pm-picker-done');
+        btn.classList.add('pm-chosen');
+        const text = t('pmChosenPrefix') + ' ' + method;
+        if (messengerSocket && messengerCurrentOrderId) {
+          messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: 'customer', text } });
+        }
+        renderMessageBubble({ from: 'customer', text });
+        appendSystemMessage(t('pmThankYou'));
+      });
+    });
+  }
+
   function ensureMessengerSocket(){
     if (messengerSocket || typeof io === 'undefined') return messengerSocket;
     messengerSocket = io(CHAT_SERVER_URL);
@@ -10763,6 +10858,7 @@
     // authoritative server copy as soon as that exists.
     if (optimisticFirstMessage) {
       renderMessageBubble({ from: 'customer', text: optimisticFirstMessage });
+      if (messengerRole === 'customer') appendPaymentMethodPicker();
     }
 
     refreshMessengerHistory(orderId, optimisticFirstMessage);
