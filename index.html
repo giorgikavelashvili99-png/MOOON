@@ -1961,59 +1961,35 @@
      keeps its own accent instead of a single fixed blue. */
   .drop-zone{
     position:relative;
-    border-radius:22px;
-    padding:30px 20px;
+    border-radius:20px;
+    padding:32px 20px;
     text-align:center;
     cursor:pointer;
-    background:
-      radial-gradient(ellipse 140% 90% at 50% -10%, color-mix(in srgb, var(--tile-accent) 16%, transparent), transparent 70%),
-      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01) 40%),
-      var(--warm-tile-bg-1);
-    border:1px solid color-mix(in srgb, var(--tile-accent) 24%, transparent);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-    transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease;
+    background: linear-gradient(180deg, #1c1c1e, #0e0e0f);
+    border:1.5px solid rgba(255,255,255,0.14);
+    transition: border-color .25s ease;
   }
   .drop-zone:hover, .drop-zone.dragover{
-    border-color: color-mix(in srgb, var(--tile-accent) 55%, transparent);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.4);
   }
   .drop-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; z-index:2; }
   .drop-zone .dz-icon{
     position:relative;
-    width:58px; height:58px; margin:0 auto 16px;
+    width:56px; height:56px; margin:0 auto 16px;
     display:flex; align-items:center; justify-content:center;
     border-radius:50%;
-    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.35), transparent 60%),
-                linear-gradient(150deg, color-mix(in srgb, var(--tile-accent) 85%, #fff), var(--tile-accent) 55%, color-mix(in srgb, var(--tile-accent) 70%, #04101a));
-    box-shadow: 0 10px 26px rgba(0,0,0,0.35);
-    transition: box-shadow .25s ease, transform .25s ease;
-  }
-  .drop-zone:hover .dz-icon, .drop-zone.dragover .dz-icon{
-    box-shadow: 0 14px 34px rgba(0,0,0,0.4);
-    transform: scale(1.06);
+    background:#fff;
+    border:1.5px solid rgba(255,255,255,0.7);
   }
   .drop-zone .dz-icon svg{
     display:block;
     width:24px; height:24px;
     overflow:visible;
   }
-  .dz-plus{ stroke:#04101a; stroke-width:2.8; stroke-linecap:round; }
+  .dz-plus{ stroke:#0e0e0f; stroke-width:2.8; stroke-linecap:round; }
   .drop-zone .dz-title{
     font-size:15px; font-weight:800; margin-bottom:7px; line-height:1.35; letter-spacing:normal;
-    /* Solid, always-visible color first, so the label never disappears —
-       the gradient below only upgrades it on browsers that actually
-       support text-clipped gradients, and is scoped with @supports so a
-       partial/odd implementation can't leave the text painted transparent
-       with nothing behind it (which is what an invisible title looks like). */
-    color: var(--warm-ivory);
-  }
-  @supports ((background-clip:text) or (-webkit-background-clip:text)){
-    .drop-zone .dz-title{
-      background:linear-gradient(120deg, #f7ecd8, var(--warm-ivory-dim));
-      -webkit-background-clip:text; background-clip:text;
-      -webkit-text-fill-color:transparent; color:transparent;
-    }
+    color:#fff;
   }
   .drop-zone .dz-sub{ font-size:12px; color:var(--text-dim); max-width:320px; margin:0 auto; line-height:1.55; }
   .drop-zone .dz-req{
@@ -4418,7 +4394,7 @@
     --pc-cta-bg: var(--pc-green-shine);
     --pc-cta-text: #042b04;
   }
-  #orderFlowPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #orderFlowPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
   /* ---------- Weekly package — violet, sampled directly from the
      reference photo, same treatment as monthly's gold. ---------- */
@@ -4433,7 +4409,7 @@
     --pc-cta-text: #fff;
     --pc-ribbon-bg: var(--pc-purple-shine);
   }
-  #weeklySubPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #weeklySubPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
   /* ---------- Monthly package — gold foil shine (sampled directly from
      the reference photo: dark gold -> pale gold highlight -> dark gold
@@ -4453,7 +4429,7 @@
     --pc-cta-shadow: 0 12px 30px rgba(242, 187, 6, 0.4);
     --pc-chip: #F2BB06;
   }
-  #monthlySubPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #monthlySubPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
   /* Slow diagonal light sweep — the "catches the light" glint real gold
      foil gets. Passes over everything on the card face; pointer-events
@@ -4482,7 +4458,7 @@
     --pc-cta-bg: var(--pc-red-shine);
     --pc-cta-text: #fff;
   }
-  #editOrderPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #editOrderPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
   /* ---------- Cheap package — blue, sampled directly from the
      reference photo, same treatment as monthly's gold. ---------- */
@@ -4496,7 +4472,7 @@
     --pc-cta-bg: var(--pc-blue-shine);
     --pc-cta-text: #fff;
   }
-  #cheapOrderPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #cheapOrderPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
   /* "Cheap Package (Unlimited Monthly)" — premium brushed-carbon/metal
      identity per the reference swatch image, deliberately grayscale
@@ -4512,7 +4488,7 @@
     --pc-cta-bg: var(--pc-carbon-shine);
     --pc-cta-text: #14161b;
   }
-  #cheapMonthlyPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #cheapMonthlyPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
   /* ---------- Free TikTok Downloader — deliberately NOT another foil
      pricing card. It's a free utility sitting among paid packages, so it
