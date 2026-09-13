@@ -4375,11 +4375,11 @@
     position:relative;
     min-width:0;
     max-width:100%;
-    border-radius:24px;
-    border:1.5px solid var(--pc-border, var(--border));
+    border-radius:28px;
+    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
     background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
     box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45));
-    padding:26px 22px 22px;
+    padding:28px 24px 24px;
     display:flex; flex-direction:column;
     overflow:hidden;
     transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s ease, border-color .25s ease;
@@ -4396,14 +4396,21 @@
     .pc-card:not(.pc-open):hover{
       transform:translateY(-4px);
       border-color: color-mix(in srgb, var(--pc-accent) 65%, var(--pc-border, var(--border)));
-      box-shadow: 0 26px 60px rgba(0,0,0,0.5);
+      box-shadow: 0 26px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.14);
     }
   }
   .pc-card::before{
-    content:''; position:absolute; top:0; left:14%; right:14%; height:2px;
+    content:''; position:absolute; top:0; left:0; right:0; height:4px;
     background:linear-gradient(90deg, transparent, var(--pc-accent), transparent);
-    opacity:0.8;
+    box-shadow: 0 0 16px 1px color-mix(in srgb, var(--pc-accent) 70%, transparent);
+    opacity:0.95;
   }
+  .pc-card::after{
+    content:''; position:absolute; top:-40%; right:-30%; width:65%; height:65%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--pc-accent) 35%, transparent), transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  .pc-card > *{ position:relative; z-index:1; }
 
   /* ---------- Individual / single order — green, sampled directly from
      the reference photo, same treatment as monthly's gold. ---------- */
@@ -4417,7 +4424,7 @@
     --pc-cta-bg: var(--pc-green-shine);
     --pc-cta-text: #042b04;
   }
-  #orderFlowPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #orderFlowPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
 
   /* ---------- Weekly package — violet, sampled directly from the
      reference photo, same treatment as monthly's gold. ---------- */
@@ -4432,7 +4439,7 @@
     --pc-cta-text: #fff;
     --pc-ribbon-bg: var(--pc-purple-shine);
   }
-  #weeklySubPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #weeklySubPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
 
   /* ---------- Monthly package — gold foil shine (sampled directly from
      the reference photo: dark gold -> pale gold highlight -> dark gold
@@ -4452,7 +4459,7 @@
     --pc-cta-shadow: 0 12px 30px rgba(242, 187, 6, 0.4);
     --pc-chip: #F2BB06;
   }
-  #monthlySubPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #monthlySubPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
 
   /* Slow diagonal light sweep — the "catches the light" glint real gold
      foil gets. Passes over everything on the card face; pointer-events
@@ -4481,7 +4488,7 @@
     --pc-cta-bg: var(--pc-red-shine);
     --pc-cta-text: #fff;
   }
-  #editOrderPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #editOrderPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
 
   /* ---------- Cheap package — blue, sampled directly from the
      reference photo, same treatment as monthly's gold. ---------- */
@@ -4495,7 +4502,7 @@
     --pc-cta-bg: var(--pc-blue-shine);
     --pc-cta-text: #fff;
   }
-  #cheapOrderPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #cheapOrderPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
 
   /* "Cheap Package (Unlimited Monthly)" — premium brushed-carbon/metal
      identity per the reference swatch image, deliberately grayscale
@@ -4511,7 +4518,7 @@
     --pc-cta-bg: var(--pc-carbon-shine);
     --pc-cta-text: #14161b;
   }
-  #cheapMonthlyPanel{ background: radial-gradient(ellipse 100% 45% at 50% 0%, color-mix(in srgb, var(--pc-accent) 30%, transparent), transparent 70%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
+  #cheapMonthlyPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
 
   /* ---------- Free TikTok Downloader — deliberately NOT another foil
      pricing card. It's a free utility sitting among paid packages, so it
@@ -5061,7 +5068,7 @@
     color:#0b0f1c; font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
     font-size:9.5px; font-weight:800; letter-spacing:normal; text-transform:uppercase;
     white-space:nowrap;
-    box-shadow:0 6px 16px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.7), 0 0 13px rgba(255,255,255,0.3);
+    box-shadow:0 6px 16px rgba(0,0,0,0.45), 0 0 13px rgba(255,255,255,0.3);
   }
   .pc-badge::before{
     content:'★'; font-size:9px; color:#f5a623; line-height:1;
@@ -5084,21 +5091,21 @@
   .pc-badge--urgency svg{ width:10px; height:10px; fill:#ffe27a; flex:0 0 auto; }
 
   .pc-head{
-    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
   }
   .pc-head-text{ min-width:0; flex:1 1 auto; }
   .pc-icon{
-    width:48px; height:48px; border-radius:15px; flex:0 0 auto;
+    width:56px; height:56px; border-radius:50%; flex:0 0 auto;
     position:relative;
     display:flex; align-items:center; justify-content:center;
-    font-size:22px; line-height:1;
+    font-size:25px; line-height:1;
     background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
-    border:1px solid color-mix(in srgb, var(--pc-accent) 60%, transparent);
-    box-shadow:0 8px 20px -6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -6px 10px -6px rgba(0,0,0,0.35);
+    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    box-shadow:0 10px 22px -6px rgba(0,0,0,0.45), inset 0 -8px 12px -6px rgba(0,0,0,0.4);
   }
   .pc-icon::after{
-    content:''; position:absolute; inset:-5px; border-radius:19px;
-    border:1px solid color-mix(in srgb, var(--pc-accent) 45%, transparent);
+    content:''; position:absolute; inset:-6px; border-radius:50%;
+    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
     pointer-events:none;
   }
 
@@ -5134,8 +5141,12 @@
 
   .pc-price-line{
     font-family:'BPGAcademiuriU', sans-serif;
-    display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+    display:inline-flex; align-items:baseline; gap:8px; flex-wrap:wrap;
     margin-bottom:2px;
+    width:fit-content; max-width:100%;
+    padding:6px 14px; border-radius:14px;
+    background: rgba(0,0,0,0.22);
+    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
   }
   .pc-price-line b{
     font-size:clamp(21px, 6vw, 26px); font-weight:800;
@@ -5206,25 +5217,25 @@
   }
   .pc-feature span:last-child{ overflow-wrap:break-word; word-break:break-word; min-width:0; }
   .pc-feature .pc-check{
-    flex:0 0 auto; width:18px; height:18px; border-radius:50%; margin-top:1px;
-    display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800;
-    background:rgba(4,16,26,0.8);
-    color:#4ade80;
-    border:1.5px solid rgba(74,222,128,0.85);
-    box-shadow:0 0 6px rgba(0,0,0,0.4);
+    flex:0 0 auto; width:20px; height:20px; border-radius:50%; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;
+    background: linear-gradient(150deg, #4ade80, #16a34a);
+    color:#052e12;
+    border:none;
+    box-shadow:0 3px 8px -2px rgba(0,0,0,0.5);
   }
   .pc-feature--no{ opacity:0.75; }
   .pc-feature--no span:last-child{ text-decoration:line-through; color:var(--text-faint); }
   .pc-feature--no .pc-check{
-    background:color-mix(in srgb, var(--warn) 25%, transparent);
-    color:var(--warn);
-    border:1px solid color-mix(in srgb, var(--warn) 55%, transparent);
+    background: linear-gradient(150deg, color-mix(in srgb, var(--warn) 90%, #fff), var(--warn));
+    color:#3a0009;
+    border:none;
   }
 
   .pc-toggle-btn{
     appearance:none; border:none; cursor:pointer; width:100%;
-    display:flex; align-items:center; justify-content:center;
-    padding:14px 10px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:15px 10px; border-radius:16px;
     font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
     font-size:clamp(11.5px, 3.6vw, 14.5px); font-weight:800; letter-spacing:normal;
     color: var(--pc-cta-text, #04101a);
@@ -5235,10 +5246,10 @@
        underneath it. Now it's a much smaller, subtler highlight (fades
        out by 22%) so the true --pc-cta-bg color shows fully everywhere
        else on the button. */
-    background: linear-gradient(135deg, rgba(255,255,255,0.35), transparent 22%), var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
-    border: 1.5px solid rgba(255,255,255,0.55);
-    box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.4);
-    transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
+    background: var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
+    border: 1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5));
+    transition:transform .15s ease, box-shadow .2s ease, background .2s ease, gap .2s ease;
   }
   .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px rgba(0,0,0,0.55); }
   .pc-toggle-btn:active{ transform:translateY(0); }
