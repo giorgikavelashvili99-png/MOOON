@@ -10742,8 +10742,8 @@
   // message for the common case.
   const PAYMENT_METHOD_DETAILS = {
     PayPal: { url: 'https://paypal.me/ggio86', display: 'paypal.me/ggio86' },
-    TBC: { account: 'GE34TB7111645061100123', recipient: 'გ.ყ', appScheme: 'tbcbank://' },
-    BOG: { account: 'GE63BG0000000549873761', recipient: 'გ.ყ', appScheme: 'bogmobile://' }
+    TBC: { account: 'GE34TB7111645061100123', recipient: 'გ.ყ' },
+    BOG: { account: 'GE63BG0000000549873761', recipient: 'გ.ყ' }
   };
 
   function copyTextSilently(text){
@@ -10790,16 +10790,14 @@
           window.open(info.url, '_blank', 'noopener');
         } else if (info && info.account) {
           // Bank transfer: copy the account number so it's ready to paste
-          // the moment their banking app is open, and make a best-effort
-          // attempt to launch that app directly via its scheme (this part
-          // isn't guaranteed — if the scheme is wrong or the app isn't
-          // installed, it silently does nothing and the copied number is
-          // still there to paste manually).
+          // the moment their banking app is open. (An earlier version of
+          // this also tried to auto-launch the bank's app via a guessed
+          // URL scheme — confirmed on real iOS Safari to pop up a scary
+          // "Safari cannot open the page because the address is invalid"
+          // error instead of failing quietly, so that attempt is gone.
+          // Clipboard copy alone is reliable and has no such downside.)
           copyTextSilently(info.account);
           text = t('pmChosenPrefix') + ' ' + method + '\n\n' + info.account + '\nმიმღები: ' + info.recipient + '\n\n' + t('pmAccountCopied');
-          if (info.appScheme) {
-            try { window.location.href = info.appScheme; } catch(e){}
-          }
         } else {
           text = t('pmChosenPrefix') + ' ' + method;
         }
