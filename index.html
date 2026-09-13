@@ -4376,7 +4376,7 @@
     min-width:0;
     max-width:100%;
     border-radius:28px;
-    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    border:1.5px solid var(--pc-accent);
     background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
     box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45));
     padding:28px 24px 24px;
@@ -4405,12 +4405,6 @@
     box-shadow: 0 0 16px 1px color-mix(in srgb, var(--pc-accent) 70%, transparent);
     opacity:0.95;
   }
-  .pc-card::after{
-    content:''; position:absolute; top:-40%; right:-30%; width:65%; height:65%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--pc-accent) 35%, transparent), transparent 70%);
-    pointer-events:none; z-index:0;
-  }
-  .pc-card > *{ position:relative; z-index:1; }
 
   /* ---------- Individual / single order — green, sampled directly from
      the reference photo, same treatment as monthly's gold. ---------- */
@@ -4424,7 +4418,7 @@
     --pc-cta-bg: var(--pc-green-shine);
     --pc-cta-text: #042b04;
   }
-  #orderFlowPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
+  #orderFlowPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
   /* ---------- Weekly package — violet, sampled directly from the
      reference photo, same treatment as monthly's gold. ---------- */
@@ -4439,7 +4433,7 @@
     --pc-cta-text: #fff;
     --pc-ribbon-bg: var(--pc-purple-shine);
   }
-  #weeklySubPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
+  #weeklySubPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
   /* ---------- Monthly package — gold foil shine (sampled directly from
      the reference photo: dark gold -> pale gold highlight -> dark gold
@@ -4459,7 +4453,7 @@
     --pc-cta-shadow: 0 12px 30px rgba(242, 187, 6, 0.4);
     --pc-chip: #F2BB06;
   }
-  #monthlySubPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
+  #monthlySubPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
   /* Slow diagonal light sweep — the "catches the light" glint real gold
      foil gets. Passes over everything on the card face; pointer-events
@@ -4488,7 +4482,7 @@
     --pc-cta-bg: var(--pc-red-shine);
     --pc-cta-text: #fff;
   }
-  #editOrderPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
+  #editOrderPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
   /* ---------- Cheap package — blue, sampled directly from the
      reference photo, same treatment as monthly's gold. ---------- */
@@ -4502,7 +4496,7 @@
     --pc-cta-bg: var(--pc-blue-shine);
     --pc-cta-text: #fff;
   }
-  #cheapOrderPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
+  #cheapOrderPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
   /* "Cheap Package (Unlimited Monthly)" — premium brushed-carbon/metal
      identity per the reference swatch image, deliberately grayscale
@@ -4518,7 +4512,7 @@
     --pc-cta-bg: var(--pc-carbon-shine);
     --pc-cta-text: #14161b;
   }
-  #cheapMonthlyPanel{ background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.5)), var(--pc-cta-bg); }
+  #cheapMonthlyPanel{ background: radial-gradient(ellipse 150% 35% at 50% 0%, var(--pc-accent), transparent 100%), linear-gradient(180deg, var(--panel), var(--panel-2)); }
 
   /* ---------- Free TikTok Downloader — deliberately NOT another foil
      pricing card. It's a free utility sitting among paid packages, so it
@@ -5100,13 +5094,8 @@
     display:flex; align-items:center; justify-content:center;
     font-size:25px; line-height:1;
     background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
-    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    border:1.5px solid var(--pc-accent);
     box-shadow:0 10px 22px -6px rgba(0,0,0,0.45), inset 0 -8px 12px -6px rgba(0,0,0,0.4);
-  }
-  .pc-icon::after{
-    content:''; position:absolute; inset:-6px; border-radius:50%;
-    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
-    pointer-events:none;
   }
 
   .pc-title{
@@ -5146,7 +5135,7 @@
     width:fit-content; max-width:100%;
     padding:6px 14px; border-radius:14px;
     background: rgba(0,0,0,0.22);
-    border:1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    border:1.5px solid var(--pc-accent);
   }
   .pc-price-line b{
     font-size:clamp(21px, 6vw, 26px); font-weight:800;
@@ -5247,7 +5236,7 @@
        out by 22%) so the true --pc-cta-bg color shows fully everywhere
        else on the button. */
     background: var(--pc-cta-bg, linear-gradient(120deg, var(--pc-accent), color-mix(in srgb, var(--pc-accent) 55%, #fff)));
-    border: 1.5px solid color-mix(in srgb, var(--pc-accent) 55%, transparent);
+    border: 1.5px solid var(--pc-accent);
     box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5));
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease, gap .2s ease;
   }
