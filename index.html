@@ -59,6 +59,21 @@
        inconsistent once the tiles moved away from any specific hue). */
     --tile-accent: #cfd6e6;
 
+    /* --- TikTok checker "stat chip" palette — one hue per metric so the
+       analytics row (views/likes/comments/etc.) reads as a small
+       dashboard instead of a wall of identical gray pills. Views/likes
+       reuse the site's own TikTok cyan/pink identity; the rest are new
+       but chosen to stay legible on the dark chip background and
+       distinct from one another at a glance. --- */
+    --stat-views: #25F4EE;
+    --stat-likes: #FE2C55;
+    --stat-comments: #8b5cf6;
+    --stat-favorites: #ffd23f;
+    --stat-shares: #3ddc84;
+    --stat-downloads: #38b6ff;
+    --stat-id: #8a94b8;
+    --stat-region: #ff9142;
+
     /* --- Moonfade palette (admin panel) --- */
     --moon-bg: #050810;
     --moon-deep: #070c18;
@@ -4914,7 +4929,8 @@
 
   .ttdl-result{
     display:flex; align-items:center; gap:11px;
-    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+    background:linear-gradient(120deg, rgba(37,244,238,0.06), rgba(254,44,85,0.05));
+    border:1px solid rgba(255,255,255,0.1);
     border-radius:12px; padding:9px 11px; margin-bottom:10px;
   }
   .ttdl-thumb-wrap{
@@ -4937,11 +4953,11 @@
 
   .ttdl-dl-row{ display:flex; gap:8px; margin-bottom:10px; }
   .ttdl-dl-btn{
-    position:relative; flex:1; padding:12px 10px 12px 14px; border-radius:10px; cursor:pointer;
-    border:1px solid rgba(255,255,255,0.12); overflow:hidden;
-    background:#151517;
+    position:relative; flex:1; padding:11px 12px 11px 14px; border-radius:12px; cursor:pointer;
+    border:1px solid rgba(37,244,238,0.24); overflow:hidden;
+    background:linear-gradient(160deg, rgba(37,244,238,0.09), rgba(255,255,255,0.02) 65%), #131315;
     color:#fff; font-family:'BPGAcademiuriU',monospace; font-weight:700; font-size:11.5px; letter-spacing:normal;
-    display:flex; align-items:center; justify-content:center; gap:7px;
+    display:flex; align-items:center; justify-content:center; gap:9px;
     transition:all .2s ease; min-width:0;
   }
   .ttdl-dl-btn::before{
@@ -4949,12 +4965,16 @@
     background:#25F4EE;
   }
   .ttdl-dl-btn--hd::before{ background:#FE2C55; }
-  .ttdl-dl-ico{ flex:0 0 auto; color:#25F4EE; display:flex; }
-  .ttdl-dl-btn--hd .ttdl-dl-ico{ color:#FE2C55; }
+  .ttdl-dl-ico{
+    flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(37,244,238,0.15); color:#25F4EE;
+  }
+  .ttdl-dl-btn--hd .ttdl-dl-ico{ background:rgba(254,44,85,0.15); color:#FE2C55; }
   .ttdl-dl-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .ttdl-dl-btn:hover{ border-color:rgba(37,244,238,0.45); background:#1c1c1f; transform:translateY(-1px); }
-  .ttdl-dl-btn--hd{ background:#151517; border-color:rgba(255,255,255,0.12); }
-  .ttdl-dl-btn--hd:hover{ border-color:rgba(254,44,85,0.45); background:#1c1c1f; }
+  .ttdl-dl-btn:hover{ border-color:rgba(37,244,238,0.5); transform:translateY(-1px); box-shadow:0 8px 18px rgba(37,244,238,0.2); }
+  .ttdl-dl-btn--hd{ border-color:rgba(254,44,85,0.24); background:linear-gradient(160deg, rgba(254,44,85,0.09), rgba(255,255,255,0.02) 65%), #131315; }
+  .ttdl-dl-btn--hd:hover{ border-color:rgba(254,44,85,0.5); box-shadow:0 8px 18px rgba(254,44,85,0.2); }
   .ttdl-dl-btn:disabled{ opacity:0.4; cursor:default; box-shadow:none; transform:none; }
 
   /* ---------- Merged analytics details (stats + quality) — same numbers
@@ -4964,42 +4984,91 @@
      now individual wrapping chips instead of a fixed grid, so a long
      value on a narrow phone wraps to its own line instead of clipping. ---------- */
   .ttdl-details{ margin-bottom:10px; }
-  .ttdl-stats-grid{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px; }
+  .ttdl-stats-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
   .ttdl-stat-item{
-    display:inline-flex; align-items:center; gap:5px;
-    background:#151517; border:1px solid rgba(255,255,255,0.1);
-    border-radius:100px; padding:6px 12px;
+    /* --stat-c/-soft/-ring default to the neutral "id" tone; each
+       ttdl-stat--<kind> modifier below overrides the three so the icon
+       badge, ring and value color all follow from one place per metric. */
+    --stat-c: var(--stat-id);
+    --stat-c-soft: rgba(138,148,184,0.14);
+    --stat-c-ring: rgba(138,148,184,0.38);
+    display:inline-flex; align-items:center; gap:7px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+    border:1px solid var(--stat-c-ring);
+    border-radius:100px; padding:5px 13px 5px 5px;
     font-family:'BPGAcademiuriU',monospace; font-size:10.5px; color:var(--text-dim);
     white-space:nowrap;
   }
-  .ttdl-stat-item b{ color:#fff; font-weight:700; }
-  .ttdl-shadow-yes{ color:var(--warn); font-weight:700; }
-  .ttdl-shadow-no{ color:#3ddc84; font-weight:700; }
-  .ttdl-shadow-unknown{ color:var(--text-faint); font-weight:700; }
+  .ttdl-stat-ico{
+    flex:0 0 auto; width:21px; height:21px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--stat-c-soft);
+    box-shadow:inset 0 0 0 1px var(--stat-c-ring);
+    font-size:10.5px; line-height:1;
+  }
+  .ttdl-stat-item b{ color:var(--stat-c); font-weight:700; letter-spacing:0.2px; }
+  .ttdl-stat--views{ --stat-c:var(--stat-views); --stat-c-soft:rgba(37,244,238,0.16); --stat-c-ring:rgba(37,244,238,0.4); }
+  .ttdl-stat--likes{ --stat-c:var(--stat-likes); --stat-c-soft:rgba(254,44,85,0.16); --stat-c-ring:rgba(254,44,85,0.4); }
+  .ttdl-stat--comments{ --stat-c:var(--stat-comments); --stat-c-soft:rgba(139,92,246,0.16); --stat-c-ring:rgba(139,92,246,0.4); }
+  .ttdl-stat--favorites{ --stat-c:var(--stat-favorites); --stat-c-soft:rgba(255,210,63,0.16); --stat-c-ring:rgba(255,210,63,0.4); }
+  .ttdl-stat--shares{ --stat-c:var(--stat-shares); --stat-c-soft:rgba(61,220,132,0.16); --stat-c-ring:rgba(61,220,132,0.4); }
+  .ttdl-stat--downloads{ --stat-c:var(--stat-downloads); --stat-c-soft:rgba(56,182,255,0.16); --stat-c-ring:rgba(56,182,255,0.4); }
+  .ttdl-stat--region{ --stat-c:var(--stat-region); --stat-c-soft:rgba(255,145,66,0.16); --stat-c-ring:rgba(255,145,66,0.4); }
+  /* id + shadow deliberately keep the neutral default above -- an ID
+     number isn't a "metric" worth drawing the eye to, and shadow-ban
+     already gets its own semantic red/green/gray via the spans below. */
+  .ttdl-stat-item .ttdl-shadow-yes{ color:var(--warn); font-weight:700; }
+  .ttdl-stat-item .ttdl-shadow-no{ color:#3ddc84; font-weight:700; }
+  .ttdl-stat-item .ttdl-shadow-unknown{ color:var(--text-faint); font-weight:700; }
   .ttdl-quality-block{
-    background:#151517; border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);
     border-radius:12px; padding:12px 14px; margin-bottom:8px;
     font-family:'BPGAcademiuriU',monospace; font-size:10.5px; color:var(--text-dim);
   }
-  .ttdl-quality-tiers{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:6px 14px; }
+  .ttdl-quality-tiers{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:8px 14px; }
   .ttdl-quality-tier{
+    position:relative; overflow:hidden;
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(255,255,255,0.09);
-    border-radius:9px;
-    padding:7px 11px;
+    border-radius:10px;
+    padding:8px 11px 8px 14px;
   }
-  .tqt-top{ display:flex; justify-content:space-between; gap:8px; font-weight:700; color:#fff; }
+  .ttdl-quality-tier::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:rgba(255,255,255,0.16);
+  }
+  /* Same cyan/pink split as the two quality tiles + download buttons
+     below, so "checking quality" and "download this tier" read as the
+     same browser/mobile identity instead of three unrelated color
+     schemes for one concept. */
+  .ttdl-quality-tier--browser{ background:rgba(37,244,238,0.055); border-color:rgba(37,244,238,0.2); }
+  .ttdl-quality-tier--browser::before{ background:#25F4EE; }
+  .ttdl-quality-tier--mobile{ background:rgba(254,44,85,0.055); border-color:rgba(254,44,85,0.2); }
+  .ttdl-quality-tier--mobile::before{ background:#FE2C55; }
+  .tqt-top{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-weight:700; color:#fff; }
   .ttdl-quality-ico{
     display:inline-flex; vertical-align:-2px; margin-right:5px; color:var(--pc-accent, #7fd4fb);
   }
-  .tqt-sub{ color:var(--text-faint); margin-top:2px; }
-  .ttdl-quality-original{ margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.12); color:#fff; font-weight:600; }
+  .ttdl-quality-tier--browser .ttdl-quality-ico{ color:#25F4EE; }
+  .ttdl-quality-tier--mobile .ttdl-quality-ico{ color:#FE2C55; }
+  .tqt-sub{ color:var(--text-faint); margin-top:3px; font-size:10px; }
+  .ttdl-quality-original{
+    margin-top:8px; padding:8px 12px; border-radius:9px;
+    background:linear-gradient(90deg, rgba(37,244,238,0.12), rgba(254,44,85,0.1));
+    border:1px solid rgba(255,255,255,0.12);
+    color:#fff; font-weight:700; letter-spacing:0.2px;
+  }
 
   .ttdl-log{
-    background:rgba(0,0,0,0.5); border:1px solid rgba(37,244,238,0.22); border-radius:9px;
-    padding:8px 9px; font-family:'BPGAcademiuriU',monospace; font-size:10px; line-height:1.5;
-    color:#9fb0c8; height:60px; overflow-y:auto;
+    background:radial-gradient(130% 160% at 0% 0%, rgba(37,244,238,0.06), rgba(0,0,0,0.55) 60%);
+    border:1px solid rgba(37,244,238,0.22); border-radius:9px;
+    padding:9px 10px; font-family:'BPGAcademiuriU',monospace; font-size:10px; line-height:1.65;
+    color:#c3cee0; height:78px; overflow-y:auto;
   }
+  .ttdl-log::-webkit-scrollbar{ width:5px; }
+  .ttdl-log::-webkit-scrollbar-track{ background:transparent; }
+  .ttdl-log::-webkit-scrollbar-thumb{ background:rgba(37,244,238,0.35); border-radius:100px; }
+  .ttdl-log-time{ color:#5fe6df; font-weight:700; margin-right:4px; }
   .ttdl-photo-grid{
     display:grid; grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:8px;
     margin-bottom:10px;
@@ -14935,7 +15004,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (!logEl || !msg) return;
       const time = new Date().toLocaleTimeString();
       const line = document.createElement('div');
-      line.textContent = `[${time}] ${msg}`;
+      const timeEl = document.createElement('span');
+      timeEl.className = 'ttdl-log-time';
+      timeEl.textContent = `[${time}]`;
+      line.appendChild(timeEl);
+      line.appendChild(document.createTextNode(` ${msg}`));
       logEl.appendChild(line);
       logEl.scrollTop = logEl.scrollHeight;
     }
@@ -15191,8 +15264,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
 
-    function ttdlStatRow(icon, label, value){
-      return '<div class="ttdl-stat-item">' + icon + ' ' + escapeHtml(label) + ': <b>' + escapeHtml(String(value)) + '</b></div>';
+    function ttdlStatRow(kind, icon, label, value){
+      return '<div class="ttdl-stat-item ttdl-stat--' + kind + '"><span class="ttdl-stat-ico">' + icon + '</span>' + escapeHtml(label) + ': <b>' + escapeHtml(String(value)) + '</b></div>';
     }
 
     // Same browser-window / phone glyphs as the two download buttons
@@ -15209,6 +15282,19 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (label.indexOf('BROWSER') !== -1) out += '<span class="ttdl-quality-ico">' + TTDL_BROWSER_ICON + '</span>';
       if (label.indexOf('MOBILE') !== -1) out += '<span class="ttdl-quality-ico">' + TTDL_MOBILE_ICON + '</span>';
       return out;
+    }
+    // Same cyan/mobile-pink split as the icons above, as a class instead
+    // of inline color so the whole tile (border + left accent bar), not
+    // just the glyph, picks up the tier's identity. Left blank when a
+    // single source URL serves both tiers at once (label has neither
+    // substring alone), which keeps that tile neutral rather than
+    // guessing an owner for it.
+    function ttdlQualityTierClass(label){
+      const hasBrowser = label.indexOf('BROWSER') !== -1;
+      const hasMobile = label.indexOf('MOBILE') !== -1;
+      if (hasBrowser && !hasMobile) return ' ttdl-quality-tier--browser';
+      if (hasMobile && !hasBrowser) return ' ttdl-quality-tier--mobile';
+      return '';
     }
 
     function setBtnBusy(btn, busy, busyText){
@@ -15268,14 +15354,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const shadowClass = shadow === 'YES' ? 'ttdl-shadow-yes' : (shadow === 'NO' ? 'ttdl-shadow-no' : 'ttdl-shadow-unknown');
               const shadowText = shadow || ttdlDict('unknownRes');
               statsGrid.innerHTML =
-                ttdlStatRow('👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
-                ttdlStatRow('♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
-                ttdlStatRow('💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
-                ttdlStatRow('🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
-                ttdlStatRow('↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
-                ttdlStatRow('🆔', ttdlDict('statId'), d.id || '?') +
-                ttdlStatRow('📍', ttdlDict('statRegion'), d.region || '?') +
-                '<div class="ttdl-stat-item">👻 ' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
+                ttdlStatRow('views', '👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
+                ttdlStatRow('likes', '♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
+                ttdlStatRow('comments', '💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
+                ttdlStatRow('favorites', '🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
+                ttdlStatRow('shares', '↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
+                ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?') +
+                ttdlStatRow('region', '📍', ttdlDict('statRegion'), d.region || '?') +
+                '<div class="ttdl-stat-item ttdl-stat--shadow"><span class="ttdl-stat-ico">👻</span>' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
             }
             if (detailsBox) detailsBox.style.display = 'block';
             if (qualityBlock) qualityBlock.innerHTML = '';
@@ -15343,22 +15429,22 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             const shadowClass = shadow === 'YES' ? 'ttdl-shadow-yes' : (shadow === 'NO' ? 'ttdl-shadow-no' : 'ttdl-shadow-unknown');
             const shadowText = shadow || ttdlDict('unknownRes');
             statsGrid.innerHTML =
-              ttdlStatRow('👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
-              ttdlStatRow('♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
-              ttdlStatRow('💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
-              ttdlStatRow('🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
-              ttdlStatRow('↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
-              ttdlStatRow('⬇', ttdlDict('statDownloads'), ttdlFormatCount(d.download_count)) +
-              ttdlStatRow('🆔', ttdlDict('statId'), d.id || '?') +
-              ttdlStatRow('📍', ttdlDict('statRegion'), d.region || '?') +
-              '<div class="ttdl-stat-item">👻 ' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
+              ttdlStatRow('views', '👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
+              ttdlStatRow('likes', '♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
+              ttdlStatRow('comments', '💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
+              ttdlStatRow('favorites', '🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
+              ttdlStatRow('shares', '↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
+              ttdlStatRow('downloads', '⬇', ttdlDict('statDownloads'), ttdlFormatCount(d.download_count)) +
+              ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?') +
+              ttdlStatRow('region', '📍', ttdlDict('statRegion'), d.region || '?') +
+              '<div class="ttdl-stat-item ttdl-stat--shadow"><span class="ttdl-stat-ico">👻</span>' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
           }
 
           // Placeholder quality box -- swapped for the real numbers once
           // the background probe (phase 2, below) finishes.
           if (qualityBlock) {
             qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' +
-              urls.map(u => '<div class="ttdl-quality-tier"><div class="tqt-top"><span>' + ttdlQualityIcons(labelsByUrl[u].join(' / ')) + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div></div>').join('') +
+              urls.map(u => '<div class="ttdl-quality-tier' + ttdlQualityTierClass(labelsByUrl[u].join(' / ')) + '"><div class="tqt-top"><span>' + ttdlQualityIcons(labelsByUrl[u].join(' / ')) + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div></div>').join('') +
               '</div>';
           }
 
@@ -15430,7 +15516,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const fpsTxt = tItem.fps != null ? (tItem.fps + 'fps') : '?fps';
               const bitrateTxt = tItem.bitrateMbps != null ? tItem.bitrateMbps + 'Mbps' : '?';
               const sizeTxt = tItem.sizeMb != null ? tItem.sizeMb + 'MB' : '?';
-              return '<div class="ttdl-quality-tier">' +
+              return '<div class="ttdl-quality-tier' + ttdlQualityTierClass(tItem.label) + '">' +
                        '<div class="tqt-top"><span>' + ttdlQualityIcons(tItem.label) + escapeHtml(tItem.label) + '</span><span>' + escapeHtml(resLabel) + ' · ' + fpsTxt + '</span></div>' +
                        '<div class="tqt-sub">↳ ' + bitrateTxt + ' · ' + sizeTxt + '</div>' +
                      '</div>';
