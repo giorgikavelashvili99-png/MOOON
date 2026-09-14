@@ -4984,7 +4984,7 @@
      now individual wrapping chips instead of a fixed grid, so a long
      value on a narrow phone wraps to its own line instead of clipping. ---------- */
   .ttdl-details{ margin-bottom:10px; }
-  .ttdl-stats-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .ttdl-stats-grid{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:10px; }
   .ttdl-stat-item{
     /* --stat-c/-soft/-ring default to the neutral "id" tone; each
        ttdl-stat--<kind> modifier below overrides the three so the icon
@@ -15362,8 +15362,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
                 ttdlStatRow('favorites', '🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
                 ttdlStatRow('shares', '↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
                 ttdlStatRow('region', '📍', ttdlDict('statRegion'), d.region || '?') +
-                ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?') +
-                '<div class="ttdl-stat-item ttdl-stat--shadow"><span class="ttdl-stat-ico">👻</span>' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
+                '<div class="ttdl-stat-item ttdl-stat--shadow"><span class="ttdl-stat-ico">👻</span>' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>' +
+                ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?');
             }
             if (detailsBox) detailsBox.style.display = 'block';
             if (qualityBlock) qualityBlock.innerHTML = '';
@@ -15438,8 +15438,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               ttdlStatRow('shares', '↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
               ttdlStatRow('region', '📍', ttdlDict('statRegion'), d.region || '?') +
               ttdlStatRow('downloads', '⬇', ttdlDict('statDownloads'), ttdlFormatCount(d.download_count)) +
-              ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?') +
-              '<div class="ttdl-stat-item ttdl-stat--shadow"><span class="ttdl-stat-ico">👻</span>' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
+              '<div class="ttdl-stat-item ttdl-stat--shadow"><span class="ttdl-stat-ico">👻</span>' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>' +
+              ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?');
           }
 
           // Placeholder quality box -- swapped for the real numbers once
