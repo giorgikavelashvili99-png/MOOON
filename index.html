@@ -5000,6 +5000,35 @@
     padding:8px 9px; font-family:'BPGAcademiuriU',monospace; font-size:10px; line-height:1.5;
     color:#9fb0c8; height:60px; overflow-y:auto;
   }
+  .ttdl-photo-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:8px;
+    margin-bottom:10px;
+  }
+  .ttdl-photo-item{
+    position:relative; border-radius:10px; overflow:hidden; aspect-ratio:9/16;
+    border:1px solid rgba(255,255,255,0.12); background:#151517;
+  }
+  .ttdl-photo-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .ttdl-photo-dl{
+    position:absolute; right:6px; bottom:6px; width:28px; height:28px; border-radius:50%;
+    background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.3);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    text-decoration:none; transition:transform .15s ease, background .2s ease;
+  }
+  .ttdl-photo-dl:hover{ background:#25F4EE; border-color:#25F4EE; color:#04141a; transform:translateY(-1px); }
+  .ttdl-photo-num{
+    position:absolute; left:6px; top:6px; padding:2px 7px; border-radius:100px;
+    background:rgba(0,0,0,0.6); color:#fff; font-size:9.5px; font-weight:700;
+    font-family:'BPGAcademiuriU',monospace;
+  }
+  .ttdl-photo-dl-all{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:12px; margin-bottom:10px; border-radius:10px; cursor:pointer;
+    border:1px solid rgba(255,255,255,0.14); background:#151517; color:#fff;
+    font-family:'BPGAcademiuriU','Space Grotesk',sans-serif; font-weight:800; font-size:12.5px;
+    transition:all .2s ease;
+  }
+  .ttdl-photo-dl-all:hover{ border-color:#25F4EE; box-shadow:0 8px 20px rgba(37,244,238,0.22); }
   .ttdl-log div{ white-space:normal; word-break:break-word; }
 
   .ttdl-ios-link-wrap{ margin-bottom:10px; }
@@ -6928,13 +6957,20 @@
             <div class="ttdl-result" id="ttdlResult" style="display:none;">
               <span class="ttdl-thumb-wrap">
                 <img class="ttdl-thumb" id="ttdlThumb" src="" alt="">
-                <span class="ttdl-thumb-play" aria-hidden="true">▶</span>
+                <span class="ttdl-thumb-play" aria-hidden="true" id="ttdlThumbPlay">▶</span>
               </span>
               <div class="ttdl-result-info">
                 <div class="ttdl-result-title" id="ttdlResultTitle"></div>
                 <div class="ttdl-result-meta" id="ttdlResultMeta"></div>
               </div>
             </div>
+
+            <!-- TikTok "photo mode" posts (slideshows) have no video file
+                 at all -- tikwm returns an `images` array instead of the
+                 usual play/hdplay URLs. Shown instead of the quality/
+                 download-tier UI below, which only makes sense for a
+                 single video file. -->
+            <div class="ttdl-photo-grid" id="ttdlPhotoGrid" style="display:none;"></div>
 
             <div class="ttdl-details" id="ttdlDetails" style="display:none;">
               <div class="ttdl-stats-grid" id="ttdlStatsGrid"></div>
@@ -14804,6 +14840,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       analyzing: ['მუშავდება...', 'Analyzing...'],
       logAnalyzing: ['ვიდეოს ანალიზი მიმდინარეობს...', 'Analyzing video...'],
       logFound: ['ვიდეო მოიძებნა — აირჩიეთ ხარისხი.', 'Video found — choose a quality.'],
+      logFoundPhotos: ['ფოტო-პოსტი მოიძებნა — {n} სურათი მზადაა გადმოსაწერად.', 'Photo post found — {n} photos ready to download.'],
+      downloadPhoto: ['სურათის გადმოწერა', 'Download photo'],
       checkingQuality: ['მოწმდება...', 'Checking...'],
       logFail: ['ვერ მოხერხდა ვიდეოს ანალიზი. შეამოწმეთ ლინკი.', 'Could not analyze this link. Check the URL.'],
       logNoLink: ['ამ ხარისხში ბმული ვერ მოიძებნა.', 'No download link available for this quality.'],
@@ -14871,6 +14909,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const statsGrid = document.getElementById('ttdlStatsGrid');
     const qualityBlock = document.getElementById('ttdlQualityBlock');
     const thumbEl = document.getElementById('ttdlThumb');
+    const thumbPlayEl = document.getElementById('ttdlThumbPlay');
+    const photoGrid = document.getElementById('ttdlPhotoGrid');
     const titleEl = document.getElementById('ttdlResultTitle');
     const metaEl = document.getElementById('ttdlResultMeta');
     const dlRow = document.getElementById('ttdlDlRow');
@@ -14960,7 +15000,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // while width/height are already populated by then regardless.
     function probeVideoMeta(url){
       return new Promise((resolve) => {
-        if (!url) { resolve({ width:null, height:null }); return; }
+        if (!url) { resolve({ width:null, height:null, durationSec:null }); return; }
         const v = document.createElement('video');
         v.preload = 'metadata';
         v.muted = true;
@@ -14975,18 +15015,19 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const tryReport = () => {
           if (v.videoWidth && v.videoHeight) {
             clearTimeout(timer);
-            finish({ width: v.videoWidth, height: v.videoHeight });
+            const d = (isFinite(v.duration) && v.duration > 0) ? v.duration : null;
+            finish({ width: v.videoWidth, height: v.videoHeight, durationSec: d });
           }
         };
         // Large 4K originals need real headroom on a mobile connection --
         // 8s was tuned for the much smaller SD/HD tiers and was cutting
         // off 4K probes on iOS before Safari had actually finished.
         const timeoutMs = ttdlIsIOS() ? 20000 : 8000;
-        const timer = setTimeout(() => finish({ width: v.videoWidth || null, height: v.videoHeight || null }), timeoutMs);
+        const timer = setTimeout(() => finish({ width: v.videoWidth || null, height: v.videoHeight || null, durationSec: (isFinite(v.duration) && v.duration > 0) ? v.duration : null }), timeoutMs);
         v.onloadedmetadata = tryReport;
         v.onloadeddata = tryReport;
         v.ondurationchange = tryReport;
-        v.onerror = () => { clearTimeout(timer); finish({ width:null, height:null }); };
+        v.onerror = () => { clearTimeout(timer); finish({ width:null, height:null, durationSec:null }); };
         v.src = url;
         v.load();
       });
@@ -15036,7 +15077,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // of "unknown" resolution appearing even on videos whose fps came
     // through correctly via this exact same box-parsing technique.
     function parseTrackInfoFromMp4Buffer(buf){
-      const empty = { width: null, height: null, fps: null };
+      const empty = { width: null, height: null, fps: null, durationSec: null };
       try {
         if (!buf || buf.length < 8) return empty;
         const moov = readMp4Boxes(buf, 0, buf.length).find(b => b.type === 'moov');
@@ -15070,28 +15111,49 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             }
           }
 
-          // ---- fps from stbl > stts (unchanged from before) ----
+          // ---- fps from stbl > stts, and precise duration from mdhd
+          // itself. mdhd stores duration in "timescale" units (not
+          // seconds), so real seconds = raw_duration / timescale -- an
+          // exact, sub-second figure straight from the file, unlike
+          // tikwm's API duration field which comes back as a rounded
+          // whole number of seconds. That rounding is exactly what was
+          // making the bitrate readout (size*8/duration) run high: a
+          // real 15.7s video reported as "16" or truncated to "15"
+          // shifts the denominator enough to inflate Mbps by several
+          // tenths, which lines up with the ~0.8Mbps-too-high reports. ----
           let fps = null;
+          let durationSec = null;
           const mdhd = mdiaBoxes.find(b => b.type === 'mdhd');
           const minf = mdiaBoxes.find(b => b.type === 'minf');
-          if (mdhd && minf) {
+          if (mdhd) {
             const mdhdVersion = buf[mdhd.start];
             const timescaleOff = mdhd.start + (mdhdVersion === 1 ? 20 : 12);
             if (timescaleOff + 4 <= buf.length) {
               const timescale = readUint32(buf, timescaleOff);
-              const stbl = readMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
-              const stts = stbl ? readMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts') : null;
-              if (stts && stts.start + 16 <= buf.length) {
-                const sampleDelta = readUint32(buf, stts.start + 12);
-                if (sampleDelta && timescale) {
-                  const rawFps = timescale / sampleDelta;
-                  if (isFinite(rawFps) && rawFps > 0 && rawFps <= 300) fps = Math.round(rawFps * 100) / 100;
+              const durOff = timescaleOff + 4;
+              if (timescale && mdhdVersion === 1 && durOff + 8 <= buf.length) {
+                const hi = readUint32(buf, durOff), lo = readUint32(buf, durOff + 4);
+                const rawDuration = hi * 4294967296 + lo;
+                if (isFinite(rawDuration) && rawDuration > 0) durationSec = rawDuration / timescale;
+              } else if (timescale && durOff + 4 <= buf.length) {
+                const rawDuration = readUint32(buf, durOff);
+                if (rawDuration > 0) durationSec = rawDuration / timescale;
+              }
+              if (minf) {
+                const stbl = readMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
+                const stts = stbl ? readMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts') : null;
+                if (stts && stts.start + 16 <= buf.length) {
+                  const sampleDelta = readUint32(buf, stts.start + 12);
+                  if (sampleDelta && timescale) {
+                    const rawFps = timescale / sampleDelta;
+                    if (isFinite(rawFps) && rawFps > 0 && rawFps <= 300) fps = Math.round(rawFps * 100) / 100;
+                  }
                 }
               }
             }
           }
 
-          if (width || height || fps != null) return { width, height, fps };
+          if (width || height || fps != null) return { width, height, fps, durationSec };
         }
         return empty;
       } catch (e) {
@@ -15099,7 +15161,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
     async function probeMp4Info(url, maxBytes){
-      const empty = { width: null, height: null, fps: null };
+      const empty = { width: null, height: null, fps: null, durationSec: null };
       if (!url) return empty;
       maxBytes = maxBytes || 3 * 1024 * 1024;
       const controller = new AbortController();
@@ -15180,6 +15242,61 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const json = await res.json();
         if (json && json.code === 0 && json.data){
           const d = json.data;
+
+          // ---- TikTok "photo mode" posts (slideshows) have no video file
+          // at all -- tikwm returns an `images` array of full-res photo
+          // URLs instead of play/hdplay. Handled as its own short path:
+          // same title/stats rendering as a normal video, but a photo
+          // grid with a download link per image instead of quality tiers
+          // (there's no resolution/fps/bitrate to probe for a still image). ----
+          if (Array.isArray(d.images) && d.images.length){
+            const shadow = ttdlShadowBan(d.digg_count, d.play_count);
+            lastData = {
+              sd: null, hd: null,
+              cover: d.cover || d.origin_cover || d.images[0],
+              title: d.title,
+              author: d.author && d.author.nickname,
+              views: d.play_count
+            };
+            thumbEl.src = lastData.cover || '';
+            if (thumbPlayEl) thumbPlayEl.style.display = 'none'; // it's a photo, not a video -- no play glyph
+            titleEl.textContent = lastData.title || ttdlDict('untitled');
+            metaEl.textContent = (lastData.author ? '@' + lastData.author + ' · ' : '') + ttdlFormatCount(lastData.views) + ' ' + ttdlDict('views');
+            resultBox.style.display = 'flex';
+
+            if (statsGrid) {
+              const shadowClass = shadow === 'YES' ? 'ttdl-shadow-yes' : (shadow === 'NO' ? 'ttdl-shadow-no' : 'ttdl-shadow-unknown');
+              const shadowText = shadow || ttdlDict('unknownRes');
+              statsGrid.innerHTML =
+                ttdlStatRow('👁', ttdlDict('statViews'), ttdlFormatCount(d.play_count)) +
+                ttdlStatRow('♡', ttdlDict('statLikes'), ttdlFormatCount(d.digg_count)) +
+                ttdlStatRow('💬', ttdlDict('statComments'), ttdlFormatCount(d.comment_count)) +
+                ttdlStatRow('🔖', ttdlDict('statFavorites'), ttdlFormatCount(d.collect_count)) +
+                ttdlStatRow('↗', ttdlDict('statShares'), ttdlFormatCount(d.share_count)) +
+                ttdlStatRow('🆔', ttdlDict('statId'), d.id || '?') +
+                ttdlStatRow('📍', ttdlDict('statRegion'), d.region || '?') +
+                '<div class="ttdl-stat-item">👻 ' + escapeHtml(ttdlDict('statShadow')) + ': <span class="' + shadowClass + '">' + escapeHtml(shadowText) + '</span></div>';
+            }
+            if (detailsBox) detailsBox.style.display = 'block';
+            if (qualityBlock) qualityBlock.innerHTML = '';
+            if (photoGrid) {
+              photoGrid.style.display = 'grid';
+              photoGrid.innerHTML = d.images.map((imgUrl, i) =>
+                '<div class="ttdl-photo-item">' +
+                  '<img src="' + escapeHtml(imgUrl) + '" alt="' + (i+1) + '" loading="lazy">' +
+                  '<span class="ttdl-photo-num">' + (i+1) + '/' + d.images.length + '</span>' +
+                  '<a class="ttdl-photo-dl" href="' + escapeHtml(imgUrl) + '" download="tiktok-photo-' + (i+1) + '.jpg" target="_blank" rel="noopener" aria-label="' + escapeHtml(ttdlDict('downloadPhoto')) + '">⬇</a>' +
+                '</div>'
+              ).join('');
+            }
+            if (dlRow) dlRow.style.display = 'none';
+            if (clearBtn) clearBtn.style.display = 'flex';
+            ttdlLog(ttdlDict('logFoundPhotos').replace('{n}', d.images.length));
+            setBtnBusy(analyzeBtn, false);
+            return;
+          }
+          if (photoGrid) { photoGrid.style.display = 'none'; photoGrid.innerHTML = ''; }
+          if (thumbPlayEl) thumbPlayEl.style.display = '';
 
           // ---- Per-tier quality (mirrors bot.py's probe_all_sources):
           // dedupe identical URLs across play/hdplay/wmplay into one
@@ -15270,6 +15387,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const dims = await probeVideoMeta(u);
               info.width = info.width || dims.width;
               info.height = info.height || dims.height;
+              info.durationSec = info.durationSec || dims.durationSec;
             }
             return info;
           })).then((metas) => {
@@ -15281,12 +15399,19 @@ TikTok პროფილი: ${getTiktokValue('cp')}
                 const candidate = d[TTDL_SIZE_KEYS[key]];
                 if (candidate) { sizeBytes = candidate; break; }
               }
-              let sizeMb = null, bitrateMbps = null;
-              if (sizeBytes && duration) {
-                sizeMb = Math.round((sizeBytes / (1024*1024)) * 10) / 10;
-                bitrateMbps = Math.round(((sizeBytes * 8 / duration) / 1000000) * 10) / 10;
-              }
               const info = metas[i];
+              // Prefer the exact duration read straight out of this tier's
+              // own file (sub-second precision) over the API's duration
+              // field, which tikwm reports as a rounded whole number of
+              // seconds -- that rounding was the actual source of the
+              // "bitrate reads ~0.8Mbps high" reports, since a slightly
+              // too-small denominator inflates size*8/duration.
+              const effectiveDuration = (info.durationSec && isFinite(info.durationSec) && info.durationSec > 0) ? info.durationSec : duration;
+              let sizeMb = null, bitrateMbps = null;
+              if (sizeBytes && effectiveDuration) {
+                sizeMb = Math.round((sizeBytes / (1024*1024)) * 10) / 10;
+                bitrateMbps = Math.round(((sizeBytes * 8 / effectiveDuration) / 1000000) * 10) / 10;
+              }
               return { label: labelsByUrl[tierUrl].join(' / '), url: tierUrl, width: info.width, height: info.height, fps: info.fps, sizeMb, bitrateMbps };
             });
 
