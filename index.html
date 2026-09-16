@@ -8478,6 +8478,21 @@
 
   function lockBodyScroll(){
     pcBodyScrollLockCount++;
+    if (pcBodyScrollLockCount === 1) {
+      // Hiding overflow makes the scrollbar disappear, which frees up
+      // whatever width it was taking and shifts the whole page right
+      // by that amount -- very noticeable on desktop browsers with a
+      // classic, space-taking scrollbar (a no-op on mobile/overlay
+      // scrollbars, which never took up layout space to begin with).
+      // Adding that same width back as padding on the body cancels the
+      // shift out. Measured only on this first, outermost lock call --
+      // by the time a second nested lock happens the scrollbar is
+      // already hidden, so measuring again would just read back 0.
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = scrollbarWidth + 'px';
+      }
+    }
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     document.body.style.overscrollBehavior = 'contain';
@@ -8488,6 +8503,7 @@
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
       document.body.style.overscrollBehavior = '';
+      document.body.style.paddingRight = '';
     }
   }
 
