@@ -5582,6 +5582,38 @@
       max-width:336px !important;
     }
   }
+
+  /* ============================================================
+     SCROLL REVEAL — fade + slide-up as the page's real scrolled
+     content (the pricing-card row, the comments section) enters the
+     viewport. Applied automatically via JS (initScrollReveal, near the
+     bottom of the closing script block) rather than by hand-tagging
+     markup, so it's purely additive: nothing here renames a class or
+     restructures a container, it only toggles .reveal-auto/.reveal-in
+     on top of elements that already exist. Deliberately scoped to
+     .pricing-cards/.pc-intro/.comments-panel only -- every other
+     section on this page (Why MOON, Portfolio, How-to, Rules, etc.)
+     lives inside the click-to-open qn-drop menu popover, not the
+     normal top-to-bottom page scroll, so a scroll-triggered reveal
+     doesn't apply to those. Respects prefers-reduced-motion and the
+     site's own low-power mode, same as every other animation here.
+     ============================================================ */
+  .reveal-auto{
+    opacity:0;
+    transform:translateY(26px);
+    transition:opacity .65s cubic-bezier(.25,1,.5,1),
+               transform .65s cubic-bezier(.25,1,.5,1);
+    transition-delay:var(--reveal-delay, 0s);
+    will-change:opacity, transform;
+  }
+  .reveal-auto.reveal-in{
+    opacity:1;
+    transform:none;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .reveal-auto{ transition:none !important; opacity:1 !important; transform:none !important; }
+  }
+  html.low-power .reveal-auto{ transition:none !important; opacity:1 !important; transform:none !important; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -15793,6 +15825,53 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // very end, which would make the downloader look completely broken on
   // whatever browser/device happened to trip that earlier error, with no
   // console noise pointing at the downloader itself as the "cause".
+  // ---------- Scroll reveal: fade + slide-up as content enters the
+  // viewport ----------
+  // Purely additive -- assigns .reveal-auto/.reveal-in via JS instead of
+  // hand-editing markup, so it can never collide with an existing class
+  // or an existing inline transform (e.g. the tilt-3d hover effect
+  // above only ever writes its own inline style.transform on hover/
+  // pointermove, well after .reveal-in has already cleared this
+  // class's transform to "none" via the stylesheet). Skips entirely
+  // without IntersectionObserver support; stays inert under
+  // prefers-reduced-motion / html.low-power via the CSS rules alone,
+  // so there's no need to branch on either condition here too.
+  //
+  // Scoped to the pricing-card row and the comments panel only -- the
+  // only two blocks that are actually part of the page's normal
+  // top-to-bottom scroll. Everything else (Why MOON, Portfolio,
+  // How-to, Rules, etc.) lives inside the click-to-open qn-drop menu
+  // popover instead, so a scroll-triggered reveal wouldn't apply to it
+  // the same way, and reaches for it via openQnDrop() rather than this.
+  function initScrollReveal(){
+    if (!('IntersectionObserver' in window)) return;
+    const selector = '.pc-intro, .pricing-cards > *, .comments-panel';
+    const targets = Array.from(document.querySelectorAll(selector));
+    if (!targets.length) return;
+
+    const groupCounters = new WeakMap();
+    targets.forEach(el => {
+      el.classList.add('reveal-auto');
+      const group = el.parentElement;
+      if (group) {
+        const n = groupCounters.get(group) || 0;
+        el.style.setProperty('--reveal-delay', Math.min(n * 0.08, 0.32) + 's');
+        groupCounters.set(group, n + 1);
+      }
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    targets.forEach(el => observer.observe(el));
+  }
+
   function ttdlSafeInit(fn){
     try{ fn(); }catch(e){ if (window.console && console.error) console.error(e); }
   }
@@ -15803,6 +15882,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   ttdlSafeInit(initTilt3D);
   ttdlSafeInit(initDiscordAuth);
   ttdlSafeInit(initTiktokDownloader);
+  ttdlSafeInit(initScrollReveal);
 
   // Wake the backing servers up as soon as the page loads.
   //
