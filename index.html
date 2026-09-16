@@ -757,9 +757,9 @@
     position:fixed; z-index:60;
     top:0; left:0; right:0;
     max-height:100vh; overflow-y:scroll; -webkit-overflow-scrolling:touch;
-    transform:translateY(-12px);
+    transform:translateY(-40px) scale(0.98);
     opacity:0; visibility:hidden; pointer-events:none;
-    transition: opacity .26s ease, transform .26s ease, visibility 0s linear .26s;
+    transition: opacity .32s cubic-bezier(.16,1,.3,1), transform .32s cubic-bezier(.16,1,.3,1), visibility 0s linear .32s;
     scrollbar-color: rgba(124,143,255,0.5) transparent;
     scrollbar-width: thin;
   }
@@ -767,9 +767,13 @@
   .site-menu::-webkit-scrollbar-thumb{ background:rgba(124,143,255,0.45); border-radius:20px; }
   .site-menu::-webkit-scrollbar-track{ background:transparent; }
   .site-menu.open{
-    opacity:1; transform:translateY(0);
+    opacity:1; transform:translateY(0) scale(1);
     visibility:visible; pointer-events:auto;
-    transition: opacity .26s ease, transform .26s ease, visibility 0s linear 0s;
+    transition: opacity .32s cubic-bezier(.16,1,.3,1), transform .32s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .site-menu{ transition:opacity .15s ease, visibility 0s linear .15s; }
+    .site-menu.open{ transition:opacity .15s ease, visibility 0s linear 0s; }
   }
   .site-menu-panel{
     position:relative; max-width:760px; margin:0 auto;
