@@ -15815,43 +15815,71 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // any stylesheet rule regardless of specificity, so there's nothing
   // else on the page that can interfere with them.
   //
-  // Two different triggers, because the pricing-card row and the
-  // comments panel are in genuinely different situations:
+  // Two different triggers, because different parts of the page are in
+  // genuinely different situations, and that situation itself depends
+  // on how wide the screen is:
   //
-  // - The pricing-card row sits right at the top of the page, so it's
-  //   effectively always inside the initial viewport already -- an
-  //   IntersectionObserver there fires within the very first frame,
-  //   which reads as "already revealed" rather than a deliberate
-  //   entrance. Instead, each card is hidden immediately and a plain
-  //   setTimeout reveals it a little later, staggered per card.
+  // - On a phone (single-column pricing-card layout, same <=700px
+  //   breakpoint the cards themselves switch on), only the topbar, the
+  //   intro heading, and the very first package are actually anywhere
+  //   near the initial viewport -- everything from the second package
+  //   onward is below the fold at load, so it now reveals as the
+  //   visitor scrolls down to it (IntersectionObserver), same as the
+  //   comments panel, rather than firing on a fixed timer before it's
+  //   ever seen.
+  // - On a wider screen (tablet's 2-column layout, desktop's 3-column
+  //   layout), most or all of the row is already visible together, so
+  //   an IntersectionObserver there would just fire within the very
+  //   first frame anyway -- it keeps the fast page-load timer instead,
+  //   staggered per card.
   // - The comments panel further down the page genuinely isn't in view
-  //   until the visitor scrolls to it, so it keeps the normal
-  //   IntersectionObserver trigger, reacting the moment it's scrolled
-  //   into view rather than waiting on a fixed delay too.
+  //   until the visitor scrolls to it on any screen size, so it always
+  //   uses the scroll trigger.
   //
   // Respects prefers-reduced-motion by skipping the hide/reveal
   // entirely -- checked directly in JS here rather than left to a CSS
   // override, since inline styles would otherwise ignore any such
   // stylesheet rule. Deliberately NOT gated behind the site's own
-  // low-power/narrow-screen flag: a single one-shot opacity+transform
-  // transition is cheap (GPU-composited, runs once, never loops),
-  // unlike the continuous animations that flag exists to suppress, and
-  // this needs to work identically on every device, phones included.
+  // low-power flag: a single one-shot opacity+transform transition is
+  // cheap (GPU-composited, runs once, never loops), unlike the
+  // continuous animations that flag exists to suppress.
   function initScrollReveal(){
     const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    const hiddenStyle = 'opacity .3s cubic-bezier(.25,1,.5,1), transform .3s cubic-bezier(.25,1,.5,1)';
+    const isPhoneLayout = !!(window.matchMedia && window.matchMedia('(max-width: 700px)').matches);
+
+    // Desktop gets a more polished entrance -- a touch of scale plus a
+    // soft focus-blur alongside the usual fade/slide, eased with a
+    // smooth "expo-out" curve (fast start, long graceful settle, no
+    // bounce/overshoot -- that reads calmer and more premium than a
+    // springy one for a paid service). Phones keep the lighter,
+    // opacity+translateY-only version from before: a blur transition is
+    // extra GPU work, and the phone reveal is deliberately tuned to
+    // feel instant/snappy rather than a showcase moment.
+    const hiddenTransform = isPhoneLayout ? 'translateY(26px)' : 'translateY(34px) scale(0.96)';
+    const hiddenFilter = isPhoneLayout ? 'none' : 'blur(7px)';
+    const duration = isPhoneLayout ? '.3s' : '.6s';
+    const easing = isPhoneLayout ? 'cubic-bezier(.25,1,.5,1)' : 'cubic-bezier(.16,1,.3,1)';
+    const hiddenStyle = `opacity ${duration} ${easing}, transform ${duration} ${easing}, filter ${duration} ${easing}`;
 
     function hide(el){
       el.style.opacity = '0';
-      el.style.transform = 'translateY(26px)';
+      el.style.transform = hiddenTransform;
+      el.style.filter = hiddenFilter;
       el.style.transition = hiddenStyle;
     }
     function reveal(el){
       el.style.opacity = '1';
       el.style.transform = 'none';
+      el.style.filter = 'none';
     }
 
-    const loadTargets = Array.from(document.querySelectorAll('.pc-intro, .pricing-cards > *'));
+    const pricingCards = Array.from(document.querySelectorAll('.pricing-cards > *'));
+    const immediateCards = isPhoneLayout ? pricingCards.slice(0, 1) : pricingCards;
+    const laterCards = isPhoneLayout ? pricingCards.slice(1) : [];
+
+    const loadTargets = [document.querySelector('.topbar'), document.querySelector('.pc-intro')]
+      .filter(Boolean)
+      .concat(immediateCards);
     if (reduceMotion) {
       loadTargets.forEach(reveal);
     } else {
@@ -15862,11 +15890,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         // can land in the same style recalculation and the transition
         // never visibly plays.
         void el.offsetHeight;
-        setTimeout(() => reveal(el), 1000 + i * 100);
+        setTimeout(() => reveal(el), 200 + i * 60);
       });
     }
 
-    const scrollTargets = Array.from(document.querySelectorAll('.comments-panel'));
+    const scrollTargets = laterCards.concat(Array.from(document.querySelectorAll('.comments-panel')));
     if (reduceMotion || !('IntersectionObserver' in window)) {
       scrollTargets.forEach(reveal);
       return;
