@@ -5583,36 +5583,13 @@
     }
   }
 
-  /* ============================================================
-     SCROLL REVEAL — fade + slide-up as the page's real scrolled
-     content (the pricing-card row, the comments section) enters the
-     viewport. Applied automatically via JS (initScrollReveal, near the
-     bottom of the closing script block) rather than by hand-tagging
-     markup, so it's purely additive: nothing here renames a class or
-     restructures a container, it only toggles .reveal-auto/.reveal-in
-     on top of elements that already exist. Deliberately scoped to
-     .pricing-cards/.pc-intro/.comments-panel only -- every other
-     section on this page (Why MOON, Portfolio, How-to, Rules, etc.)
-     lives inside the click-to-open qn-drop menu popover, not the
-     normal top-to-bottom page scroll, so a scroll-triggered reveal
-     doesn't apply to those. Respects prefers-reduced-motion and the
-     site's own low-power mode, same as every other animation here.
-     ============================================================ */
-  .reveal-auto{
-    opacity:0;
-    transform:translateY(26px);
-    transition:opacity .65s cubic-bezier(.25,1,.5,1),
-               transform .65s cubic-bezier(.25,1,.5,1);
-    transition-delay:var(--reveal-delay, 0s);
-    will-change:opacity, transform;
-  }
-  .reveal-auto.reveal-in{
-    opacity:1;
-    transform:none;
-  }
-  @media (prefers-reduced-motion: reduce){
-    .reveal-auto{ transition:none !important; opacity:1 !important; transform:none !important; }
-  }
+  /* Scroll-reveal entrance for the pricing-card row and the comments
+     panel is driven entirely from JS now (initScrollReveal, in the
+     closing script block) via direct inline styles rather than a
+     toggled class -- simpler and far more robust than a CSS-custom-
+     property-driven transition-delay, which turned out to silently
+     fail to fire on some devices. See that function for the full
+     rationale. */
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -15826,12 +15803,17 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // console noise pointing at the downloader itself as the "cause".
   // ---------- Scroll reveal: fade + slide-up as content enters the
   // viewport ----------
-  // Purely additive -- assigns .reveal-auto/.reveal-in via JS instead of
-  // hand-editing markup, so it can never collide with an existing class
-  // or an existing inline transform (e.g. the tilt-3d hover effect
-  // above only ever writes its own inline style.transform on hover/
-  // pointermove, well after .reveal-in has already cleared this
-  // class's transform to "none" via the stylesheet).
+  // Drives the effect entirely through direct inline styles set from
+  // JS, not a toggled CSS class -- the earlier version (a .reveal-auto
+  // class plus a --reveal-delay custom property read by a stylesheet
+  // transition-delay) turned out to be fragile: it depended on the
+  // browser correctly picking up an inline custom property inside a
+  // stylesheet rule and on a double requestAnimationFrame actually
+  // flushing styles in the right order, and on some cards/devices that
+  // silently never fired, leaving them simply visible with no reveal at
+  // all. Inline styles have no such indirection -- they always win over
+  // any stylesheet rule regardless of specificity, so there's nothing
+  // else on the page that can interfere with them.
   //
   // Two different triggers, because the pricing-card row and the
   // comments panel are in genuinely different situations:
@@ -15840,42 +15822,60 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   //   effectively always inside the initial viewport already -- an
   //   IntersectionObserver there fires within the very first frame,
   //   which reads as "already revealed" rather than a deliberate
-  //   entrance. Instead, it's hidden immediately, then settles into
-  //   place with a stagger via a plain CSS transition-delay set from
-  //   JS (no setTimeout needed -- the browser handles the wait once
-  //   .reveal-in is added). Under prefers-reduced-motion / low-power
-  //   the CSS rules below simply force full opacity with no delay, so
-  //   nothing here needs to branch on either condition itself.
+  //   entrance. Instead, each card is hidden immediately and a plain
+  //   setTimeout reveals it a little later, staggered per card.
   // - The comments panel further down the page genuinely isn't in view
   //   until the visitor scrolls to it, so it keeps the normal
   //   IntersectionObserver trigger, reacting the moment it's scrolled
   //   into view rather than waiting on a fixed delay too.
+  //
+  // Respects prefers-reduced-motion by skipping the hide/reveal
+  // entirely -- checked directly in JS here rather than left to a CSS
+  // override, since inline styles would otherwise ignore any such
+  // stylesheet rule. Deliberately NOT gated behind the site's own
+  // low-power/narrow-screen flag: a single one-shot opacity+transform
+  // transition is cheap (GPU-composited, runs once, never loops),
+  // unlike the continuous animations that flag exists to suppress, and
+  // this needs to work identically on every device, phones included.
   function initScrollReveal(){
+    const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const hiddenStyle = 'opacity .65s cubic-bezier(.25,1,.5,1), transform .65s cubic-bezier(.25,1,.5,1)';
+
+    function hide(el){
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(26px)';
+      el.style.transition = hiddenStyle;
+    }
+    function reveal(el){
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    }
+
     const loadTargets = Array.from(document.querySelectorAll('.pc-intro, .pricing-cards > *'));
-    loadTargets.forEach((el, i) => {
-      el.classList.add('reveal-auto');
-      el.style.setProperty('--reveal-delay', (1 + i * 0.1) + 's');
-    });
-    // Two frames so the browser commits the hidden state above before
-    // the transition to visible gets queued -- otherwise both could
-    // land in the same style recalculation and the transition would
-    // never actually play.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        loadTargets.forEach(el => el.classList.add('reveal-in'));
+    if (reduceMotion) {
+      loadTargets.forEach(reveal);
+    } else {
+      loadTargets.forEach((el, i) => {
+        hide(el);
+        // Force the browser to actually paint the hidden state before
+        // the timer below flips it to visible -- otherwise both changes
+        // can land in the same style recalculation and the transition
+        // never visibly plays.
+        void el.offsetHeight;
+        setTimeout(() => reveal(el), 1000 + i * 100);
       });
-    });
+    }
 
     const scrollTargets = Array.from(document.querySelectorAll('.comments-panel'));
-    scrollTargets.forEach(el => el.classList.add('reveal-auto'));
-    if (!('IntersectionObserver' in window)) {
-      scrollTargets.forEach(el => el.classList.add('reveal-in'));
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      scrollTargets.forEach(reveal);
       return;
     }
+    scrollTargets.forEach(el => { hide(el); void el.offsetHeight; });
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('reveal-in');
+          reveal(entry.target);
           observer.unobserve(entry.target);
         }
       });
