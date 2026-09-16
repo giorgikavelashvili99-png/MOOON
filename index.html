@@ -4861,6 +4861,23 @@
     border-radius:14px; cursor:zoom-in;
   }
   .msg-bubble-caption{ padding:7px 6px 2px; }
+  /* Full-size chat photo viewer -- an in-page overlay rather than a new
+     tab/window, since the photo is a data: URL and Chrome blocks
+     top-level navigation straight to one (see chatImageViewer's HTML
+     comment). Sits above the messenger page itself. */
+  .chat-image-viewer{
+    position:fixed; inset:0; z-index:100000;
+    background:rgba(5,5,10,0.92);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px; cursor:zoom-out;
+    animation:chatImageViewerFadeIn .18s ease both;
+  }
+  @keyframes chatImageViewerFadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  .chat-image-viewer img{
+    max-width:100%; max-height:100%; border-radius:10px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    cursor:default;
+  }
 
   /* Floating reopen bubble -- same violet identity as the messenger
      itself, sits above everything else on the page (but below the
@@ -5688,6 +5705,16 @@
       <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3 20l18-8L3 4v6l12 2-12 2v6z"/></svg>
     </button>
   </div>
+</div>
+
+<!-- Full-size viewer for chat photos. Deliberately not window.open() --
+     Chrome blocks top-level navigation straight to a data: URL (an
+     anti-phishing restriction), which is exactly what a chat photo is
+     before it's ever uploaded anywhere. Showing it in an overlay on
+     this same page sidesteps that entirely and needs no navigation at
+     all. -->
+<div id="chatImageViewer" class="chat-image-viewer" style="display:none;" role="dialog" aria-modal="true" aria-label="Photo">
+  <img id="chatImageViewerImg" src="" alt="">
 </div>
 
 <!-- Floating "you have an active chat" bubble -- without this, closing
@@ -10893,6 +10920,29 @@
     });
   }
 
+  // In-page viewer for a full-size chat photo. Not window.open() --
+  // Chrome blocks top-level navigation straight to a data: URL (an
+  // anti-phishing restriction), which silently ate every attempt to
+  // open a chat photo that way. An overlay on this same page needs no
+  // navigation at all, so it isn't affected.
+  function openChatImageViewer(dataUrl){
+    const viewer = document.getElementById('chatImageViewer');
+    const img = document.getElementById('chatImageViewerImg');
+    if (!viewer || !img) return;
+    img.src = dataUrl;
+    viewer.style.display = 'flex';
+  }
+  function closeChatImageViewer(){
+    const viewer = document.getElementById('chatImageViewer');
+    const img = document.getElementById('chatImageViewerImg');
+    if (viewer) viewer.style.display = 'none';
+    if (img) img.src = ''; // stop holding onto a (possibly large) data: URL once closed
+  }
+  (function initChatImageViewer(){
+    const viewer = document.getElementById('chatImageViewer');
+    if (viewer) viewer.addEventListener('click', closeChatImageViewer);
+  })();
+
   function renderMessageBubble(msg){
     const container = document.getElementById('messengerMessages');
     if (!container) return;
@@ -10904,9 +10954,10 @@
       img.className = 'msg-bubble-img';
       img.src = msg.image;
       img.alt = '';
-      // Full-size in a new tab on tap/click, same as any photo viewer --
-      // simplest possible "view larger" with nothing extra to build.
-      img.addEventListener('click', () => window.open(msg.image, '_blank', 'noopener'));
+      // Full-size in the in-page lightbox on tap/click -- not
+      // window.open(), which Chrome blocks for a data: URL (see
+      // #chatImageViewer's HTML comment).
+      img.addEventListener('click', () => openChatImageViewer(msg.image));
       bubble.appendChild(img);
       if (msg.text) {
         const caption = document.createElement('div');
@@ -11437,19 +11488,33 @@
     if (!sure) return;
 
     const btn = document.getElementById('messengerCancelBtn');
-    if (btn) btn.disabled = true;
-
-    // Told to the admin's live view in case they have this chat open
-    // right now too — the DB write below is what actually makes the
-    // order disappear from the admin panel's list either way, this
-    // just avoids the admin's screen looking stale in the meantime.
-    if (messengerSocket) {
-      messengerSocket.emit('cancel_order', { orderId: messengerCurrentOrderId });
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = currentLang === 'ka' ? 'მიმდინარეობს...' : 'Cancelling...';
     }
 
-    await cancelMyOrder(messengerCurrentOrderId);
-    appendSystemMessage(currentLang === 'ka' ? 'შეკვეთა გაუქმდა' : 'Order cancelled');
-    setTimeout(() => window.location.reload(), 1200);
+    // Whatever happens below -- a network hiccup, a slow or unreachable
+    // DB, a socket that never connected -- the customer still needs to
+    // see this go through instead of the button silently sitting there
+    // disabled forever. cancelMyOrder already catches its own errors;
+    // this outer try/finally is a backstop so a failure ANYWHERE in the
+    // chain (including the socket emit) can never swallow the visible
+    // "cancelled" feedback and reload below.
+    try {
+      if (messengerSocket) {
+        try {
+          messengerSocket.emit('cancel_order', { orderId: messengerCurrentOrderId });
+        } catch(e) {
+          if (window.console && console.error) console.error('[MOON] cancel_order emit failed', e);
+        }
+      }
+      await cancelMyOrder(messengerCurrentOrderId);
+    } catch(e) {
+      if (window.console && console.error) console.error('[MOON] order cancellation flow failed', e);
+    } finally {
+      appendSystemMessage(currentLang === 'ka' ? 'შეკვეთა გაუქმდა' : 'Order cancelled');
+      setTimeout(() => window.location.reload(), 1200);
+    }
   });
 
   // Single entry point used by every one of the 5 order flows below --
