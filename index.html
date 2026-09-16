@@ -15832,34 +15832,47 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // or an existing inline transform (e.g. the tilt-3d hover effect
   // above only ever writes its own inline style.transform on hover/
   // pointermove, well after .reveal-in has already cleared this
-  // class's transform to "none" via the stylesheet). Skips entirely
-  // without IntersectionObserver support; stays inert under
-  // prefers-reduced-motion / html.low-power via the CSS rules alone,
-  // so there's no need to branch on either condition here too.
+  // class's transform to "none" via the stylesheet).
   //
-  // Scoped to the pricing-card row and the comments panel only -- the
-  // only two blocks that are actually part of the page's normal
-  // top-to-bottom scroll. Everything else (Why MOON, Portfolio,
-  // How-to, Rules, etc.) lives inside the click-to-open qn-drop menu
-  // popover instead, so a scroll-triggered reveal wouldn't apply to it
-  // the same way, and reaches for it via openQnDrop() rather than this.
+  // Two different triggers, because the pricing-card row and the
+  // comments panel are in genuinely different situations:
+  //
+  // - The pricing-card row sits right at the top of the page, so it's
+  //   effectively always inside the initial viewport already -- an
+  //   IntersectionObserver there fires within the very first frame,
+  //   which reads as "already revealed" rather than a deliberate
+  //   entrance. Instead, it's hidden immediately, then settles into
+  //   place with a stagger via a plain CSS transition-delay set from
+  //   JS (no setTimeout needed -- the browser handles the wait once
+  //   .reveal-in is added). Under prefers-reduced-motion / low-power
+  //   the CSS rules below simply force full opacity with no delay, so
+  //   nothing here needs to branch on either condition itself.
+  // - The comments panel further down the page genuinely isn't in view
+  //   until the visitor scrolls to it, so it keeps the normal
+  //   IntersectionObserver trigger, reacting the moment it's scrolled
+  //   into view rather than waiting on a fixed delay too.
   function initScrollReveal(){
-    if (!('IntersectionObserver' in window)) return;
-    const selector = '.pc-intro, .pricing-cards > *, .comments-panel';
-    const targets = Array.from(document.querySelectorAll(selector));
-    if (!targets.length) return;
-
-    const groupCounters = new WeakMap();
-    targets.forEach(el => {
+    const loadTargets = Array.from(document.querySelectorAll('.pc-intro, .pricing-cards > *'));
+    loadTargets.forEach((el, i) => {
       el.classList.add('reveal-auto');
-      const group = el.parentElement;
-      if (group) {
-        const n = groupCounters.get(group) || 0;
-        el.style.setProperty('--reveal-delay', Math.min(n * 0.08, 0.32) + 's');
-        groupCounters.set(group, n + 1);
-      }
+      el.style.setProperty('--reveal-delay', (1 + i * 0.1) + 's');
+    });
+    // Two frames so the browser commits the hidden state above before
+    // the transition to visible gets queued -- otherwise both could
+    // land in the same style recalculation and the transition would
+    // never actually play.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        loadTargets.forEach(el => el.classList.add('reveal-in'));
+      });
     });
 
+    const scrollTargets = Array.from(document.querySelectorAll('.comments-panel'));
+    scrollTargets.forEach(el => el.classList.add('reveal-auto'));
+    if (!('IntersectionObserver' in window)) {
+      scrollTargets.forEach(el => el.classList.add('reveal-in'));
+      return;
+    }
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -15868,8 +15881,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-
-    targets.forEach(el => observer.observe(el));
+    scrollTargets.forEach(el => observer.observe(el));
   }
 
   function ttdlSafeInit(fn){
