@@ -4702,8 +4702,9 @@
   }
   .messenger-status-dot{
     flex:0 0 auto; width:9px; height:9px; border-radius:50%;
-    background:#3ddc84;
+    background:#3ddc84; transition:background .2s ease;
   }
+  .messenger-status-dot.is-offline{ background:#6b7280; }
   .messenger-complete-btn{
     flex:0 0 auto; padding:8px 14px; border-radius:100px; border:none; cursor:pointer;
     background:#3ddc84; color:#0a2413; font-weight:700; font-size:12.5px;
@@ -4802,6 +4803,38 @@
   .msg-action-btn:active{ background:rgba(255,255,255,0.08); }
   .msg-action-btn.msg-action-delete{ color:#ff8080; }
   .msg-action-btn + .msg-action-btn{ border-top:1px solid rgba(255,255,255,0.08); }
+  .msg-action-reactions{
+    display:flex; gap:2px; padding:8px 8px 9px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .msg-reaction-option{
+    appearance:none; border:none; background:none; cursor:pointer;
+    font-size:20px; line-height:1; padding:5px; border-radius:50%;
+    transition:transform .1s ease, background .1s ease;
+  }
+  .msg-reaction-option:active{ transform:scale(1.25); }
+  .msg-reaction-option.active{ background:rgba(255,255,255,0.14); }
+  .msg-bubble-reactions{
+    display:flex; gap:4px; margin-top:5px;
+  }
+  .msg-bubble-reactions span{
+    font-size:12px; background:rgba(0,0,0,0.22); border-radius:100px;
+    padding:2px 7px; line-height:1.4;
+  }
+  .msg-seen-marker{
+    font-size:10px; opacity:0.6; text-align:right; margin-top:3px;
+  }
+  .msg-typing-bubble{ display:flex; align-items:center; gap:4px; padding:14px 15px; }
+  .msg-typing-bubble span{
+    width:6px; height:6px; border-radius:50%; background:currentColor;
+    opacity:0.5; animation:msgTypingDot 1.1s ease-in-out infinite;
+  }
+  .msg-typing-bubble span:nth-child(2){ animation-delay:.15s; }
+  .msg-typing-bubble span:nth-child(3){ animation-delay:.3s; }
+  @keyframes msgTypingDot{
+    0%, 60%, 100%{ transform:translateY(0); opacity:0.5; }
+    30%{ transform:translateY(-4px); opacity:1; }
+  }
   .messenger-reply-preview{
     display:flex; align-items:center; gap:10px;
     padding:8px 14px; background:rgba(255,255,255,0.05);
@@ -10928,6 +10961,19 @@
   // along with the next outgoing message and cleared right after (or if
   // the person cancels it from the preview banner above the input).
   let messengerReplyTarget = null;
+  // The other role's last "I've seen up to here" timestamp -- a single
+  // high-water mark, same as most chat apps, not a per-message flag.
+  // Used to decide which of MY OWN messages (if any) gets the "seen"
+  // marker: whichever is the latest one with ts <= this.
+  let messengerLastSeenTs = 0;
+  // Handle for the typing bubble's own auto-hide timer, so a fresh
+  // "typing" event from the other side can reset the same countdown
+  // instead of stacking up multiple pending hides.
+  let messengerTypingHideTimer = null;
+  // Throttles this side's own outgoing "typing" events to at most one
+  // every couple seconds while actively typing, rather than one per
+  // keystroke.
+  let messengerLastTypingEmit = 0;
   // How many admin messages have arrived while the customer had the
   // chat closed — shown as the number inside the reopen bubble's red
   // dot (see .acb-dot) so it reads like a normal unread-message badge
@@ -11040,12 +11086,105 @@
     el.addEventListener('mouseleave', cancel);
   }
 
+  // Online-status dot -- green while the other role has this order's
+  // room open somewhere, dim gray otherwise. Purely presentational; the
+  // chat itself works the same either way (messages queue on the server
+  // regardless of whether anyone's actively looking).
+  function updateMessengerStatusDot(isOnline){
+    const dot = document.getElementById('messengerStatusDot');
+    if (dot) dot.classList.toggle('is-offline', !isOnline);
+  }
+
+  function showTypingIndicator(){
+    const container = document.getElementById('messengerMessages');
+    if (!container) return;
+    let el = document.getElementById('messengerTypingBubble');
+    if (!el) {
+      // Styled like the OTHER role's own bubbles (not always "admin"),
+      // since it's standing in for a message that role is about to send.
+      const otherRole = messengerRole === 'admin' ? 'customer' : 'admin';
+      el = document.createElement('div');
+      el.id = 'messengerTypingBubble';
+      el.className = 'msg-bubble ' + otherRole + ' msg-typing-bubble';
+      el.innerHTML = '<span></span><span></span><span></span>';
+      container.appendChild(el);
+    }
+    container.scrollTop = container.scrollHeight;
+    clearTimeout(messengerTypingHideTimer);
+    // No explicit stop_typing event from the server -- if the other
+    // side stops typing without sending anything, this is what clears
+    // the bubble instead of it sitting there forever.
+    messengerTypingHideTimer = setTimeout(hideTypingIndicator, 3000);
+  }
+  function hideTypingIndicator(){
+    const el = document.getElementById('messengerTypingBubble');
+    if (el) el.remove();
+  }
+
+  // Re-derives which of MY OWN messages (if any) should carry the "seen"
+  // marker, given the other side's latest read-receipt timestamp: the
+  // most recent own-message bubble at or before that timestamp. Re-run
+  // from scratch each time rather than incrementally, since a marker
+  // needs to actually move from an older message to a newer one as more
+  // of mine get read, not just get added once and forgotten.
+  function renderReadReceipt(){
+    const container = document.getElementById('messengerMessages');
+    if (!container) return;
+    container.querySelectorAll('.msg-seen-marker').forEach(el => el.remove());
+    if (!messengerLastSeenTs) return;
+    const ownBubbles = Array.from(container.querySelectorAll('.msg-bubble.' + messengerRole));
+    let target = null;
+    ownBubbles.forEach(b => {
+      const ts = parseInt(b.dataset.ts || '0', 10);
+      if (ts && ts <= messengerLastSeenTs) target = b; // last qualifying one wins, in DOM/chronological order
+    });
+    if (target) {
+      const marker = document.createElement('div');
+      marker.className = 'msg-seen-marker';
+      marker.textContent = currentLang === 'ka' ? '✓ ნანახია' : '✓ Seen';
+      target.appendChild(marker);
+    }
+  }
+
+  const MESSENGER_QUICK_REACTIONS = ['❤️', '👍', '😂', '😮', '😢'];
+
+  function reactToMessengerMessage(messageId, emoji){
+    if (!messageId || !messengerSocket || !messengerCurrentOrderId) return;
+    messengerSocket.emit('react_message', { orderId: messengerCurrentOrderId, messageId, emoji });
+  }
+
+  // Shows the reaction(s) a message has as small badges under it.
+  // Collapses matching emoji from both sides into one "emoji ×2" badge
+  // rather than showing the same one twice, same as most chat apps.
+  function renderMessageReactions(bubbleEl, reactions){
+    let badge = bubbleEl.querySelector('.msg-bubble-reactions');
+    const emojis = reactions ? Object.values(reactions) : [];
+    if (!emojis.length) {
+      if (badge) badge.remove();
+      return;
+    }
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'msg-bubble-reactions';
+      bubbleEl.appendChild(badge);
+    }
+    const counts = {};
+    emojis.forEach(e => { counts[e] = (counts[e] || 0) + 1; });
+    badge.innerHTML = '';
+    Object.entries(counts).forEach(([emoji, count]) => {
+      const span = document.createElement('span');
+      span.textContent = count > 1 ? emoji + ' ' + count : emoji;
+      badge.appendChild(span);
+    });
+  }
+
   function renderMessageBubble(msg){
     const container = document.getElementById('messengerMessages');
     if (!container) return;
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble ' + (msg.from === 'admin' ? 'admin' : 'customer');
     if (msg.id) bubble.dataset.msgId = msg.id;
+    if (msg.ts) bubble.dataset.ts = msg.ts;
 
     // Meta row: avatar + timestamp together, at the top of every bubble.
     // Admin's icon is a plain full-moon emoji (this chat has no separate
@@ -11145,6 +11284,7 @@
       attachLongPress(bubble, () => openMessageActionMenu(bubble, msg));
     }
     container.appendChild(bubble);
+    if (msg.reactions) renderMessageReactions(bubble, msg.reactions);
     container.scrollTop = container.scrollHeight;
     // Every bubble that ever gets painted goes through this one function
     // (the optimistic first message, real-time socket replies, and the
@@ -11178,6 +11318,37 @@
     const menu = document.createElement('div');
     menu.id = 'msgActionMenu';
     menu.className = 'msg-action-menu';
+
+    if (msg.id) {
+      const reactRow = document.createElement('div');
+      reactRow.className = 'msg-action-reactions';
+      MESSENGER_QUICK_REACTIONS.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'msg-reaction-option';
+        btn.textContent = emoji;
+        if (msg.reactions && msg.reactions[messengerRole] === emoji) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+          reactToMessengerMessage(msg.id, emoji);
+          closeMessageActionMenu();
+        });
+        reactRow.appendChild(btn);
+      });
+      menu.appendChild(reactRow);
+    }
+
+    if (msg.text) {
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'msg-action-btn';
+      copyBtn.textContent = currentLang === 'ka' ? '📋 კოპირება' : '📋 Copy';
+      copyBtn.addEventListener('click', () => {
+        copyTextSilently(msg.text);
+        appendSystemMessage(currentLang === 'ka' ? 'დაკოპირდა' : 'Copied');
+        closeMessageActionMenu();
+      });
+      menu.appendChild(copyBtn);
+    }
 
     const replyBtn = document.createElement('button');
     replyBtn.type = 'button';
@@ -11379,7 +11550,16 @@
         // sendMessengerMessage() -- only render what actually came back
         // from the OTHER side, whichever role that is, to avoid a
         // duplicate bubble.
-        if (msg.from !== messengerRole) renderMessageBubble(msg);
+        if (msg.from !== messengerRole) {
+          hideTypingIndicator(); // a real message arriving supersedes "is typing"
+          renderMessageBubble(msg);
+          // The chat is open and the message just got painted, so it's
+          // been seen -- let the other side know right away rather than
+          // waiting for them to guess.
+          if (messengerSocket && messengerCurrentOrderId) {
+            messengerSocket.emit('mark_read', { orderId: messengerCurrentOrderId });
+          }
+        }
       } else if (msg.from !== messengerRole) {
         // The chat is closed but the socket is still connected and still
         // joined to this room, so a reply can arrive at any time. Surface
@@ -11412,6 +11592,25 @@
       if (!messageId) return;
       const el = document.querySelector('#messengerMessages [data-msg-id="' + CSS.escape(messageId) + '"]');
       if (el) el.remove();
+    });
+    // Online-status dot: reflects whichever role isn't "me". Presence is
+    // per-order (see the server), so this only ever means "is the other
+    // person in THIS specific chat's room right now."
+    messengerSocket.on('presence', ({ adminOnline, customerOnline }) => {
+      updateMessengerStatusDot(messengerRole === 'customer' ? adminOnline : customerOnline);
+    });
+    messengerSocket.on('typing', ({ from }) => {
+      if (from !== messengerRole) showTypingIndicator();
+    });
+    messengerSocket.on('read_receipt', ({ from, ts }) => {
+      if (from !== messengerRole && ts) {
+        messengerLastSeenTs = ts;
+        renderReadReceipt();
+      }
+    });
+    messengerSocket.on('message_reacted', ({ messageId, reactions }) => {
+      const bubbleEl = document.querySelector('#messengerMessages [data-msg-id="' + CSS.escape(messageId) + '"]');
+      if (bubbleEl) renderMessageReactions(bubbleEl, reactions);
     });
     return messengerSocket;
   }
@@ -11453,6 +11652,9 @@
     messengerCustomerAvatarUrl = (messengerRole === 'customer' && currentDiscordUser) ? (currentDiscordUser.avatarUrl || '') : '';
     messengerReplyTarget = null;
     cancelMessengerReplyPreview();
+    messengerLastSeenTs = 0;
+    hideTypingIndicator();
+    updateMessengerStatusDot(false); // corrected the moment a fresh presence event arrives for this order
     // The avatar/customer-name swap only makes sense for the admin's view
     // — a customer opening their own order chat already knows who they
     // are, and showing their own tiny avatar back at them adds nothing.
@@ -11462,7 +11664,10 @@
     document.body.style.overflow = 'hidden';
 
     const socket = ensureMessengerSocket();
-    if (socket) socket.emit('join_order', { orderId });
+    if (socket) {
+      socket.emit('join_order', { orderId, role: messengerRole });
+      socket.emit('mark_read', { orderId });
+    }
 
     // Show the order text straight away.
     //
@@ -11843,6 +12048,14 @@
   document.getElementById('messengerSendBtn').addEventListener('click', sendMessengerMessage);
   document.getElementById('messengerInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter'){ e.preventDefault(); sendMessengerMessage(); }
+  });
+  document.getElementById('messengerInput').addEventListener('input', () => {
+    const now = Date.now();
+    if (now - messengerLastTypingEmit < 2000) return; // at most once every 2s while actively typing
+    messengerLastTypingEmit = now;
+    if (messengerSocket && messengerCurrentOrderId) {
+      messengerSocket.emit('typing', { orderId: messengerCurrentOrderId });
+    }
   });
   document.getElementById('messengerCompleteBtn').addEventListener('click', () => {
     if (!messengerSocket || !messengerCurrentOrderId) return;
