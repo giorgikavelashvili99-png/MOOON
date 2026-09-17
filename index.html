@@ -10957,9 +10957,10 @@
   // session's customer info the first time the admin side loads this
   // order's history (see refreshMessengerHistory).
   let messengerCustomerAvatarUrl = '';
-  // The message currently selected via long-press "Reply", or null. Sent
-  // along with the next outgoing message and cleared right after (or if
-  // the person cancels it from the preview banner above the input).
+  // The message currently selected via the action menu's "Reply", or
+  // null. Sent along with the next outgoing message and cleared right
+  // after (or if the person cancels it from the preview banner above
+  // the input).
   let messengerReplyTarget = null;
   // The other role's last "I've seen up to here" timestamp -- a single
   // high-water mark, same as most chat apps, not a per-message flag.
@@ -11061,29 +11062,6 @@
       const locale = currentLang === 'ka' ? 'ka-GE' : 'en-GB';
       return d.toLocaleString(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     } catch(e) { return ''; }
-  }
-
-  // A no-op-safe long-press detector: fires callback if the pointer (touch
-  // or mouse) stays down on el for HOLD_MS without moving, same gesture
-  // Messenger itself uses for its message action menu. Handles both touch
-  // and mouse so it works identically on phones and on desktop.
-  const LONG_PRESS_MS = 480;
-  function attachLongPress(el, callback){
-    let timer = null;
-    let moved = false;
-    const start = (e) => {
-      moved = false;
-      timer = setTimeout(() => { if (!moved) callback(e); }, LONG_PRESS_MS);
-    };
-    const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
-    const onMove = () => { moved = true; cancel(); };
-    el.addEventListener('touchstart', start, { passive: true });
-    el.addEventListener('touchend', cancel);
-    el.addEventListener('touchmove', onMove, { passive: true });
-    el.addEventListener('touchcancel', cancel);
-    el.addEventListener('mousedown', start);
-    el.addEventListener('mouseup', cancel);
-    el.addEventListener('mouseleave', cancel);
   }
 
   // Online-status dot -- green while the other role has this order's
@@ -11275,13 +11253,17 @@
       textEl.innerHTML = linkifyMessengerText(msg.text);
       bubble.appendChild(textEl);
     }
-    // Long-press (or click-and-hold with a mouse) opens the Reply/Delete
-    // action menu, same gesture Messenger itself uses. Skipped for
+    // A single tap opens the Copy/React/Reply/Delete menu -- skipped for
     // messages that never got a real id (a system-style message, or one
-    // rendered before the server has confirmed it) -- there is nothing a
-    // reply or delete could reliably target yet.
+    // rendered before the server has confirmed it), since there's
+    // nothing such a menu could reliably act on yet. Taps on an actually
+    // interactive child (the photo, the video, a link, the reply-quote)
+    // are left alone to do their own thing instead of also opening this.
     if (msg.id) {
-      attachLongPress(bubble, () => openMessageActionMenu(bubble, msg));
+      bubble.addEventListener('click', (e) => {
+        if (e.target.closest('img.msg-bubble-img, video.msg-bubble-video, a, .msg-bubble-reply-quote')) return;
+        openMessageActionMenu(bubble, msg);
+      });
     }
     container.appendChild(bubble);
     if (msg.reactions) renderMessageReactions(bubble, msg.reactions);
@@ -11297,9 +11279,9 @@
     messengerRenderedCount++;
   }
 
-  // Long-press action menu -- Reply always, Delete only for a message
+  // Tap-to-open action menu -- Reply always, Delete only for a message
   // the current role actually sent (own messages only, same as most
-  // chat apps). Positioned near the bubble that was pressed, flipped
+  // chat apps). Positioned near the bubble that was tapped, flipped
   // below it if there isn't enough room above.
   function closeMessageActionMenuOnOutsideClick(e){
     const menu = document.getElementById('msgActionMenu');
@@ -11388,9 +11370,8 @@
       menu.style.left = left + 'px';
       menu.style.top = top + 'px';
     });
-    // Deferred so the very tap/click that opened this menu (long-press
-    // can end in a synthetic click right after) doesn't immediately
-    // close it again before the listener is even attached.
+    // Deferred so the very click that opened this menu doesn't
+    // immediately close it again before the listener is even attached.
     setTimeout(() => document.addEventListener('click', closeMessageActionMenuOnOutsideClick), 0);
   }
 
@@ -11906,9 +11887,9 @@
 
   // Generated client-side (not left to the server) so the optimistic
   // bubble rendered immediately below carries the exact same id the
-  // server ends up storing -- letting long-press reply/delete target it
-  // right away instead of only working once the server's own copy of
-  // the message round-trips back.
+  // server ends up storing -- letting reply/delete target it right away
+  // instead of only working once the server's own copy of the message
+  // round-trips back.
   function newMessengerMessageId(){
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
     return 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2);
