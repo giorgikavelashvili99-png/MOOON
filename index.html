@@ -5739,6 +5739,7 @@
     </div>
     <div class="messenger-header-info">
       <div class="messenger-header-title" id="messengerHeaderTitle" data-i18n="messengerTitle">შეკვეთის ჩატი</div>
+      <div class="messenger-header-sub" id="messengerHeaderSubtitle" style="display:none;"></div>
     </div>
     <div class="messenger-status-dot" id="messengerStatusDot" aria-hidden="true"></div>
     <button type="button" id="messengerCompleteBtn" class="messenger-complete-btn" data-i18n="messengerCompleteBtn" style="display:none;">დასრულება</button>
@@ -11436,6 +11437,7 @@
     const avatarWrap = document.getElementById('messengerHeaderAvatar');
     const avatarImg = document.getElementById('messengerHeaderAvatarImg');
     const titleEl = document.getElementById('messengerHeaderTitle');
+    const subtitleEl = document.getElementById('messengerHeaderSubtitle');
     if (orderIdEl) orderIdEl.textContent = orderId;
     if (messagesEl) messagesEl.innerHTML = '';
     messengerRenderedCount = 0;
@@ -11455,6 +11457,7 @@
     // — a customer opening their own order chat already knows who they
     // are, and showing their own tiny avatar back at them adds nothing.
     if (avatarWrap) avatarWrap.style.display = 'none';
+    if (subtitleEl) { subtitleEl.style.display = 'none'; subtitleEl.textContent = ''; }
     if (titleEl) titleEl.textContent = t('messengerTitle');
     document.body.style.overflow = 'hidden';
 
@@ -11489,6 +11492,7 @@
     const avatarWrap = document.getElementById('messengerHeaderAvatar');
     const avatarImg = document.getElementById('messengerHeaderAvatarImg');
     const titleEl = document.getElementById('messengerHeaderTitle');
+    const subtitleEl = document.getElementById('messengerHeaderSubtitle');
     fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -11499,6 +11503,25 @@
             avatarImg.src = data.customer.avatarUrl;
             avatarImg.alt = data.customer.username || '';
             avatarWrap.style.display = 'block';
+          }
+          // Admin-only support info: the IP itself, plus a rough
+          // city/region guess from it where the server's lookup managed
+          // to resolve one. Not precise location -- IP geolocation only
+          // ever gets to city/region level at best, and can be wrong
+          // entirely for a mobile carrier or anyone on a VPN. The
+          // customer's own view of this same chat never renders this
+          // (messengerRole there is always 'customer'), even though the
+          // fetched data technically carries it.
+          if (subtitleEl) {
+            const loc = data.customerLocation;
+            const locText = loc ? [loc.city, loc.region, loc.country].filter(Boolean).join(', ') : '';
+            const parts = [];
+            if (data.customerIp) parts.push(data.customerIp);
+            if (locText) parts.push(locText);
+            if (parts.length) {
+              subtitleEl.textContent = parts.join(' · ');
+              subtitleEl.style.display = 'block';
+            }
           }
         }
         if (data && Array.isArray(data.messages) && data.messages.length > messengerRenderedCount) {
