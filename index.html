@@ -11301,6 +11301,10 @@
     if (msg.id) {
       bubble.addEventListener('click', (e) => {
         if (e.target.closest('img.msg-bubble-img, video.msg-bubble-video, a, .msg-bubble-reply-quote')) return;
+        if (messageActionMenuOpenForId === msg.id) {
+          closeMessageActionMenu();
+          return;
+        }
         openMessageActionMenu(bubble, msg);
       });
     }
@@ -11322,6 +11326,7 @@
   // the current role actually sent (own messages only, same as most
   // chat apps). Positioned near the bubble that was tapped, flipped
   // below it if there isn't enough room above.
+  let messageActionMenuOpenForId = null;
   function closeMessageActionMenuOnOutsideClick(e){
     const menu = document.getElementById('msgActionMenu');
     if (menu && !menu.contains(e.target)) closeMessageActionMenu();
@@ -11331,9 +11336,11 @@
     if (menu) menu.remove();
     document.querySelectorAll('.msg-bubble-selected').forEach(b => b.classList.remove('msg-bubble-selected'));
     document.removeEventListener('click', closeMessageActionMenuOnOutsideClick);
+    messageActionMenuOpenForId = null;
   }
   function openMessageActionMenu(bubbleEl, msg){
     closeMessageActionMenu();
+    messageActionMenuOpenForId = msg.id;
     bubbleEl.classList.add('msg-bubble-selected');
 
     const menu = document.createElement('div');
