@@ -4753,9 +4753,73 @@
   }
   .msg-bubble a{ color:inherit; text-decoration:underline; word-break:break-all; }
   .msg-bubble a:active{ opacity:0.7; }
+  .msg-bubble-meta{
+    display:flex; align-items:center; gap:5px;
+    margin-bottom:4px; opacity:0.75;
+  }
+  .msg-bubble-avatar{
+    width:16px; height:16px; border-radius:50%; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; line-height:1; overflow:hidden;
+    background:rgba(255,255,255,0.18);
+  }
+  .msg-bubble-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .msg-bubble-avatar-blank{ visibility:hidden; }
   .msg-bubble-time{
-    font-size:10.5px; font-weight:700; opacity:0.6;
-    margin-bottom:3px; letter-spacing:0.2px;
+    font-size:10.5px; font-weight:700; letter-spacing:0.2px;
+  }
+  .msg-bubble-reply-quote{
+    display:flex; flex-direction:column; gap:1px;
+    padding:6px 9px; margin-bottom:6px; border-radius:10px;
+    background:rgba(0,0,0,0.16); border-left:3px solid rgba(255,255,255,0.5);
+    cursor:pointer; font-size:12.5px;
+  }
+  .msg-bubble-reply-quote b{ font-size:11px; opacity:0.85; }
+  .msg-bubble-reply-quote span{
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    overflow:hidden; opacity:0.85;
+  }
+  .msg-bubble.msg-bubble-selected{
+    outline:2px solid rgba(255,255,255,0.55); outline-offset:2px;
+  }
+  .msg-action-menu{
+    position:fixed; z-index:10500;
+    display:flex; flex-direction:column; overflow:hidden;
+    min-width:150px; border-radius:14px;
+    background:#241c38; border:1px solid rgba(255,255,255,0.14);
+    box-shadow:0 14px 34px rgba(0,0,0,0.5);
+    animation:msgActionMenuIn .14s ease both;
+  }
+  @keyframes msgActionMenuIn{
+    from{ opacity:0; transform:scale(0.94); }
+    to{ opacity:1; transform:none; }
+  }
+  .msg-action-btn{
+    appearance:none; border:none; background:none; cursor:pointer;
+    padding:12px 16px; text-align:left; font-size:14px; font-weight:700;
+    color:#f1edff; font-family:'BPGAcademiuriU','Space Grotesk',sans-serif;
+  }
+  .msg-action-btn:active{ background:rgba(255,255,255,0.08); }
+  .msg-action-btn.msg-action-delete{ color:#ff8080; }
+  .msg-action-btn + .msg-action-btn{ border-top:1px solid rgba(255,255,255,0.08); }
+  .messenger-reply-preview{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 14px; background:rgba(255,255,255,0.05);
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .messenger-reply-preview .mrp-text{
+    flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;
+    font-size:12.5px; color:var(--text-faint);
+    border-left:3px solid var(--purple, #8b5cf6); padding-left:8px;
+  }
+  .messenger-reply-preview .mrp-text b{ color:#fff; font-size:12px; }
+  .messenger-reply-preview .mrp-text span{
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .messenger-reply-preview .mrp-cancel{
+    appearance:none; border:none; background:rgba(255,255,255,0.08); color:#fff;
+    width:26px; height:26px; border-radius:50%; flex:0 0 auto; cursor:pointer;
+    font-size:14px; line-height:1;
   }
   .msg-system{
     align-self:center; font-family:'BPGAcademiuriU',monospace; font-size:11px;
@@ -5681,6 +5745,7 @@
     <button type="button" id="messengerCancelBtn" class="messenger-cancel-btn" style="display:none;">გაუქმება</button>
   </div>
   <div class="messenger-messages" id="messengerMessages"></div>
+  <div class="messenger-reply-preview" id="messengerReplyPreview" style="display:none;"></div>
   <div class="messenger-input-row">
     <button type="button" id="messengerAttachBtn" class="messenger-attach-btn" aria-label="ფოტოს ან ვიდეოს დამატება">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a5.5 5.5 0 0 1-7.78-7.78l9.2-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.48"/></svg>
@@ -10852,6 +10917,16 @@
   // only who's "me" for bubble styling and outgoing message tagging
   // changes, plus the admin-only Complete-order button.
   let messengerRole = 'customer';
+  // The customer's Discord avatar, used as their bubble icon regardless
+  // of which side is viewing: known immediately from currentDiscordUser
+  // on the customer's own screen, or filled in from the fetched
+  // session's customer info the first time the admin side loads this
+  // order's history (see refreshMessengerHistory).
+  let messengerCustomerAvatarUrl = '';
+  // The message currently selected via long-press "Reply", or null. Sent
+  // along with the next outgoing message and cleared right after (or if
+  // the person cancels it from the preview banner above the input).
+  let messengerReplyTarget = null;
   // How many admin messages have arrived while the customer had the
   // chat closed — shown as the number inside the reopen bubble's red
   // dot (see .acb-dot) so it reads like a normal unread-message badge
@@ -10936,13 +11011,32 @@
     if (!ts) return '';
     try {
       const d = new Date(ts);
-      const now = new Date();
       const locale = currentLang === 'ka' ? 'ka-GE' : 'en-GB';
-      if (d.toDateString() === now.toDateString()) {
-        return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-      }
       return d.toLocaleString(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     } catch(e) { return ''; }
+  }
+
+  // A no-op-safe long-press detector: fires callback if the pointer (touch
+  // or mouse) stays down on el for HOLD_MS without moving, same gesture
+  // Messenger itself uses for its message action menu. Handles both touch
+  // and mouse so it works identically on phones and on desktop.
+  const LONG_PRESS_MS = 480;
+  function attachLongPress(el, callback){
+    let timer = null;
+    let moved = false;
+    const start = (e) => {
+      moved = false;
+      timer = setTimeout(() => { if (!moved) callback(e); }, LONG_PRESS_MS);
+    };
+    const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
+    const onMove = () => { moved = true; cancel(); };
+    el.addEventListener('touchstart', start, { passive: true });
+    el.addEventListener('touchend', cancel);
+    el.addEventListener('touchmove', onMove, { passive: true });
+    el.addEventListener('touchcancel', cancel);
+    el.addEventListener('mousedown', start);
+    el.addEventListener('mouseup', cancel);
+    el.addEventListener('mouseleave', cancel);
   }
 
   function renderMessageBubble(msg){
@@ -10950,12 +11044,55 @@
     if (!container) return;
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble ' + (msg.from === 'admin' ? 'admin' : 'customer');
+    if (msg.id) bubble.dataset.msgId = msg.id;
+
+    // Meta row: avatar + timestamp together, at the top of every bubble.
+    // Admin's icon is a plain full-moon emoji (this chat has no separate
+    // small admin-only logo asset to reuse); the customer's is their
+    // actual Discord avatar, which is known either from their own login
+    // (their own view) or from the session's stored customer info
+    // (admin's view — see messengerCustomerAvatarUrl).
+    const meta = document.createElement('div');
+    meta.className = 'msg-bubble-meta';
+    const avatar = document.createElement('span');
+    avatar.className = 'msg-bubble-avatar';
+    if (msg.from === 'admin') {
+      avatar.textContent = '🌕';
+    } else if (messengerCustomerAvatarUrl) {
+      const av = document.createElement('img');
+      av.src = messengerCustomerAvatarUrl;
+      av.alt = '';
+      avatar.appendChild(av);
+    } else {
+      avatar.classList.add('msg-bubble-avatar-blank');
+    }
+    meta.appendChild(avatar);
     if (msg.ts) {
-      const time = document.createElement('div');
+      const time = document.createElement('span');
       time.className = 'msg-bubble-time';
       time.textContent = formatMessageTime(msg.ts);
-      bubble.appendChild(time);
+      meta.appendChild(time);
     }
+    bubble.appendChild(meta);
+
+    // Quoted preview of whatever this message is replying to, if
+    // anything -- tapping it jumps back to the original (when it's still
+    // on screen; a reply to something from before this chat session was
+    // opened has nothing to scroll to, so the tap is just a no-op then).
+    if (msg.replyTo && msg.replyTo.preview) {
+      const quote = document.createElement('div');
+      quote.className = 'msg-bubble-reply-quote';
+      const who = msg.replyTo.from === 'admin' ? '🌕' : (currentLang === 'ka' ? 'თქვენ' : 'You');
+      quote.innerHTML = '<b></b><span></span>';
+      quote.querySelector('b').textContent = who;
+      quote.querySelector('span').textContent = msg.replyTo.preview;
+      quote.addEventListener('click', () => {
+        const target = container.querySelector('[data-msg-id="' + msg.replyTo.id + '"]');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      bubble.appendChild(quote);
+    }
+
     if (msg.image) {
       bubble.classList.add('has-image');
       const img = document.createElement('img');
@@ -10991,12 +11128,20 @@
       }
     } else {
       // A child element rather than bubble.innerHTML = ... directly --
-      // that would have wiped out the timestamp div just appended above
+      // that would have wiped out the meta row/quote just appended above
       // it, since innerHTML replaces everything already inside.
       const textEl = document.createElement('div');
       textEl.className = 'msg-bubble-text';
       textEl.innerHTML = linkifyMessengerText(msg.text);
       bubble.appendChild(textEl);
+    }
+    // Long-press (or click-and-hold with a mouse) opens the Reply/Delete
+    // action menu, same gesture Messenger itself uses. Skipped for
+    // messages that never got a real id (a system-style message, or one
+    // rendered before the server has confirmed it) -- there is nothing a
+    // reply or delete could reliably target yet.
+    if (msg.id) {
+      attachLongPress(bubble, () => openMessageActionMenu(bubble, msg));
     }
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
@@ -11009,6 +11154,116 @@
     // re-render (duplicate) messages that were already on screen from a
     // socket event.
     messengerRenderedCount++;
+  }
+
+  // Long-press action menu -- Reply always, Delete only for a message
+  // the current role actually sent (own messages only, same as most
+  // chat apps). Positioned near the bubble that was pressed, flipped
+  // below it if there isn't enough room above.
+  function closeMessageActionMenuOnOutsideClick(e){
+    const menu = document.getElementById('msgActionMenu');
+    if (menu && !menu.contains(e.target)) closeMessageActionMenu();
+  }
+  function closeMessageActionMenu(){
+    const menu = document.getElementById('msgActionMenu');
+    if (menu) menu.remove();
+    document.querySelectorAll('.msg-bubble-selected').forEach(b => b.classList.remove('msg-bubble-selected'));
+    document.removeEventListener('click', closeMessageActionMenuOnOutsideClick);
+  }
+  function openMessageActionMenu(bubbleEl, msg){
+    closeMessageActionMenu();
+    bubbleEl.classList.add('msg-bubble-selected');
+
+    const menu = document.createElement('div');
+    menu.id = 'msgActionMenu';
+    menu.className = 'msg-action-menu';
+
+    const replyBtn = document.createElement('button');
+    replyBtn.type = 'button';
+    replyBtn.className = 'msg-action-btn';
+    replyBtn.textContent = currentLang === 'ka' ? '↩ პასუხი' : '↩ Reply';
+    replyBtn.addEventListener('click', () => {
+      startMessengerReply(msg);
+      closeMessageActionMenu();
+    });
+    menu.appendChild(replyBtn);
+
+    if (msg.from === messengerRole) {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'msg-action-btn msg-action-delete';
+      deleteBtn.textContent = currentLang === 'ka' ? '🗑 წაშლა' : '🗑 Delete';
+      deleteBtn.addEventListener('click', () => {
+        deleteMessengerMessage(msg.id, bubbleEl);
+        closeMessageActionMenu();
+      });
+      menu.appendChild(deleteBtn);
+    }
+
+    document.body.appendChild(menu);
+    const rect = bubbleEl.getBoundingClientRect();
+    // Positioned in two passes: placed roughly first so it has a real
+    // box to measure, then nudged to fit the viewport and flipped below
+    // the bubble if there isn't enough room above it.
+    menu.style.left = Math.max(8, rect.left) + 'px';
+    menu.style.top = Math.max(8, rect.top - 10) + 'px';
+    requestAnimationFrame(() => {
+      const menuRect = menu.getBoundingClientRect();
+      let left = rect.left + rect.width / 2 - menuRect.width / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - menuRect.width - 8));
+      let top = rect.top - menuRect.height - 8;
+      if (top < 8) top = Math.min(rect.bottom + 8, window.innerHeight - menuRect.height - 8);
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+    });
+    // Deferred so the very tap/click that opened this menu (long-press
+    // can end in a synthetic click right after) doesn't immediately
+    // close it again before the listener is even attached.
+    setTimeout(() => document.addEventListener('click', closeMessageActionMenuOnOutsideClick), 0);
+  }
+
+  function startMessengerReply(msg){
+    const preview = msg.text
+      ? msg.text.slice(0, 120)
+      : msg.image ? (currentLang === 'ka' ? '📷 ფოტო' : '📷 Photo')
+      : msg.video ? (currentLang === 'ka' ? '🎥 ვიდეო' : '🎥 Video')
+      : '';
+    messengerReplyTarget = { id: msg.id, from: msg.from, preview };
+    renderMessengerReplyPreview();
+    const input = document.getElementById('messengerInput');
+    if (input) input.focus();
+  }
+
+  function renderMessengerReplyPreview(){
+    const row = document.getElementById('messengerReplyPreview');
+    if (!row) return;
+    if (!messengerReplyTarget) {
+      row.style.display = 'none';
+      row.innerHTML = '';
+      return;
+    }
+    const who = messengerReplyTarget.from === 'admin' ? '🌕 MOON' : (currentLang === 'ka' ? 'თქვენ' : 'You');
+    row.innerHTML = '<div class="mrp-text"><b></b><span></span></div><button type="button" class="mrp-cancel" aria-label="Cancel reply">✕</button>';
+    row.querySelector('b').textContent = who;
+    row.querySelector('span').textContent = messengerReplyTarget.preview;
+    row.style.display = 'flex';
+    row.querySelector('.mrp-cancel').addEventListener('click', cancelMessengerReplyPreview);
+  }
+
+  function cancelMessengerReplyPreview(){
+    messengerReplyTarget = null;
+    const row = document.getElementById('messengerReplyPreview');
+    if (row) { row.style.display = 'none'; row.innerHTML = ''; }
+  }
+
+  function deleteMessengerMessage(id, bubbleEl){
+    if (!id) return;
+    // Optimistic, matching every other action in this chat -- removed
+    // immediately rather than waiting on the round trip.
+    if (bubbleEl && bubbleEl.parentNode) bubbleEl.remove();
+    if (messengerSocket && messengerCurrentOrderId) {
+      messengerSocket.emit('delete_message', { orderId: messengerCurrentOrderId, messageId: id, from: messengerRole });
+    }
   }
 
   function appendSystemMessage(text){
@@ -11094,9 +11349,12 @@
         }
 
         if (messengerSocket && messengerCurrentOrderId) {
-          messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: 'customer', text } });
+          const id = newMessengerMessageId();
+          messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { id, from: 'customer', text } });
+          renderMessageBubble({ id, from: 'customer', text, ts: Date.now() });
+        } else {
+          renderMessageBubble({ from: 'customer', text, ts: Date.now() });
         }
-        renderMessageBubble({ from: 'customer', text, ts: Date.now() });
         appendSystemMessage(t('pmThankYou'));
         // The picker itself has done its job — remove it entirely rather
         // than leaving a greyed-out row of buttons behind.
@@ -11145,6 +11403,15 @@
       appendSystemMessage(currentLang === 'ka' ? 'შეკვეთა გაუქმდა' : 'Order cancelled');
       setTimeout(closeMessengerPage, 2500);
     });
+    // Covers both directions: the other party deleting one of their own
+    // messages, and the server's confirmation of a deletion this side
+    // already removed optimistically (a harmless no-op then, since the
+    // element is already gone).
+    messengerSocket.on('message_deleted', ({ messageId }) => {
+      if (!messageId) return;
+      const el = document.querySelector('#messengerMessages [data-msg-id="' + CSS.escape(messageId) + '"]');
+      if (el) el.remove();
+    });
     return messengerSocket;
   }
 
@@ -11156,7 +11423,7 @@
   // should reset the order flow (see there for why).
   let justSubmittedFreshOrder = false;
 
-  function openMessengerPage(orderId, role, optimisticFirstMessage){
+  function openMessengerPage(orderId, role, optimisticFirstMessage, optimisticFirstMessageId){
     messengerRole = role || 'customer';
     messengerCurrentOrderId = orderId;
     justSubmittedFreshOrder = !!optimisticFirstMessage;
@@ -11178,6 +11445,12 @@
     renderAcbDot(0);
     if (completeBtn) completeBtn.style.display = (messengerRole === 'admin') ? 'block' : 'none';
     if (cancelBtn) cancelBtn.style.display = (messengerRole === 'customer') ? 'block' : 'none';
+    // Known immediately for the customer's own view (they're the one
+    // logged in); left blank for admin until refreshMessengerHistory
+    // fills it in from the fetched session's customer info below.
+    messengerCustomerAvatarUrl = (messengerRole === 'customer' && currentDiscordUser) ? (currentDiscordUser.avatarUrl || '') : '';
+    messengerReplyTarget = null;
+    cancelMessengerReplyPreview();
     // The avatar/customer-name swap only makes sense for the admin's view
     // — a customer opening their own order chat already knows who they
     // are, and showing their own tiny avatar back at them adds nothing.
@@ -11199,7 +11472,7 @@
     // that; refreshMessengerHistory below then replaces it with the
     // authoritative server copy as soon as that exists.
     if (optimisticFirstMessage) {
-      renderMessageBubble({ from: 'customer', text: optimisticFirstMessage, ts: Date.now() });
+      renderMessageBubble({ id: optimisticFirstMessageId, from: 'customer', text: optimisticFirstMessage, ts: Date.now() });
     }
 
     refreshMessengerHistory(orderId, optimisticFirstMessage);
@@ -11219,6 +11492,15 @@
     fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
+        if (messengerRole === 'admin' && data && data.customer) {
+          if (titleEl && data.customer.username) titleEl.textContent = data.customer.username;
+          if (data.customer.avatarUrl) messengerCustomerAvatarUrl = data.customer.avatarUrl;
+          if (avatarWrap && avatarImg && data.customer.avatarUrl) {
+            avatarImg.src = data.customer.avatarUrl;
+            avatarImg.alt = data.customer.username || '';
+            avatarWrap.style.display = 'block';
+          }
+        }
         if (data && Array.isArray(data.messages) && data.messages.length > messengerRenderedCount) {
           // Only the messages beyond what's already painted — this never
           // touches the bubbles already on screen, so there is nothing
@@ -11245,14 +11527,6 @@
           const pmPrefix = t('pmChosenPrefix');
           const alreadyChosen = data.messages.some(m => m.from === 'customer' && typeof m.text === 'string' && pmPrefix && m.text.startsWith(pmPrefix));
           if (!alreadyChosen) appendPaymentMethodPicker();
-        }
-        if (messengerRole === 'admin' && data && data.customer) {
-          if (titleEl && data.customer.username) titleEl.textContent = data.customer.username;
-          if (avatarWrap && avatarImg && data.customer.avatarUrl) {
-            avatarImg.src = data.customer.avatarUrl;
-            avatarImg.alt = data.customer.username || '';
-            avatarWrap.style.display = 'block';
-          }
         }
       })
       .catch(() => {
@@ -11402,14 +11676,27 @@
     });
   })();
 
+  // Generated client-side (not left to the server) so the optimistic
+  // bubble rendered immediately below carries the exact same id the
+  // server ends up storing -- letting long-press reply/delete target it
+  // right away instead of only working once the server's own copy of
+  // the message round-trips back.
+  function newMessengerMessageId(){
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  }
+
   function sendMessengerMessage(){
     const input = document.getElementById('messengerInput');
     if (!input) return;
     const text = input.value.trim();
     if (!text || !messengerSocket || !messengerCurrentOrderId) return;
-    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: messengerRole, text } });
-    renderMessageBubble({ from: messengerRole, text, ts: Date.now() });
+    const id = newMessengerMessageId();
+    const replyTo = messengerReplyTarget;
+    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { id, from: messengerRole, text, replyTo } });
+    renderMessageBubble({ id, from: messengerRole, text, ts: Date.now(), replyTo });
     input.value = '';
+    cancelMessengerReplyPreview();
   }
 
   // Shrinks whatever photo the visitor picked down to a sane size before
@@ -11450,14 +11737,20 @@
 
   function sendMessengerImage(dataUrl){
     if (!messengerSocket || !messengerCurrentOrderId) return;
-    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: messengerRole, image: dataUrl } });
-    renderMessageBubble({ from: messengerRole, image: dataUrl, ts: Date.now() });
+    const id = newMessengerMessageId();
+    const replyTo = messengerReplyTarget;
+    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { id, from: messengerRole, image: dataUrl, replyTo } });
+    renderMessageBubble({ id, from: messengerRole, image: dataUrl, ts: Date.now(), replyTo });
+    cancelMessengerReplyPreview();
   }
 
   function sendMessengerVideo(dataUrl){
     if (!messengerSocket || !messengerCurrentOrderId) return;
-    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: messengerRole, video: dataUrl } });
-    renderMessageBubble({ from: messengerRole, video: dataUrl, ts: Date.now() });
+    const id = newMessengerMessageId();
+    const replyTo = messengerReplyTarget;
+    messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { id, from: messengerRole, video: dataUrl, replyTo } });
+    renderMessageBubble({ id, from: messengerRole, video: dataUrl, ts: Date.now(), replyTo });
+    cancelMessengerReplyPreview();
   }
 
   // Videos aren't resized/re-encoded the way photos are -- doing that
@@ -11693,6 +11986,7 @@
     if (textEl) textEl.textContent = t('orderProcessing') || '…';
 
     const orderId = generateOrderId();
+    const firstMessageId = newMessengerMessageId();
     const fullOrder = Object.assign({}, orderData, {
       id: orderId, ts: Date.now(), channel: 'Chat',
       discordId: currentDiscordUser.id, discordUsername: currentDiscordUser.username
@@ -11715,7 +12009,7 @@
     // the order is already saved to pendingOrders above, and the chat
     // page fetches its own history on open. So it now runs in the
     // background while the chat is already visible.
-    openMessengerPage(orderId, 'customer', firstMessageText);
+    openMessengerPage(orderId, 'customer', firstMessageText, firstMessageId);
     if (btn) btn.disabled = false;
     if (textEl) textEl.textContent = t(idleKey);
 
@@ -11733,7 +12027,7 @@
             orderId,
             customer: { discordId: currentDiscordUser.id, username: currentDiscordUser.username, avatarUrl: currentDiscordUser.avatarUrl },
             order: fullOrder,
-            firstMessage: { from: 'customer', text: firstMessageText }
+            firstMessage: { id: firstMessageId, from: 'customer', text: firstMessageText }
           }),
           signal: controller.signal
         });
