@@ -4753,6 +4753,10 @@
   }
   .msg-bubble a{ color:inherit; text-decoration:underline; word-break:break-all; }
   .msg-bubble a:active{ opacity:0.7; }
+  .msg-bubble-time{
+    font-size:10.5px; font-weight:700; opacity:0.6;
+    margin-bottom:3px; letter-spacing:0.2px;
+  }
   .msg-system{
     align-self:center; font-family:'BPGAcademiuriU',monospace; font-size:11px;
     color:var(--text-faint); background:rgba(255,255,255,0.05);
@@ -10924,11 +10928,34 @@
     if (viewer) viewer.addEventListener('click', closeChatImageViewer);
   })();
 
+  // Same "today gets just a time, anything older also gets a date"
+  // logic chat apps generally use -- a bare "14:32" is ambiguous once
+  // it's not from today, but a full date on every single message is
+  // more clutter than a chat bubble needs.
+  function formatMessageTime(ts){
+    if (!ts) return '';
+    try {
+      const d = new Date(ts);
+      const now = new Date();
+      const locale = currentLang === 'ka' ? 'ka-GE' : 'en-GB';
+      if (d.toDateString() === now.toDateString()) {
+        return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+      }
+      return d.toLocaleString(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    } catch(e) { return ''; }
+  }
+
   function renderMessageBubble(msg){
     const container = document.getElementById('messengerMessages');
     if (!container) return;
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble ' + (msg.from === 'admin' ? 'admin' : 'customer');
+    if (msg.ts) {
+      const time = document.createElement('div');
+      time.className = 'msg-bubble-time';
+      time.textContent = formatMessageTime(msg.ts);
+      bubble.appendChild(time);
+    }
     if (msg.image) {
       bubble.classList.add('has-image');
       const img = document.createElement('img');
@@ -10963,7 +10990,13 @@
         bubble.appendChild(caption);
       }
     } else {
-      bubble.innerHTML = linkifyMessengerText(msg.text);
+      // A child element rather than bubble.innerHTML = ... directly --
+      // that would have wiped out the timestamp div just appended above
+      // it, since innerHTML replaces everything already inside.
+      const textEl = document.createElement('div');
+      textEl.className = 'msg-bubble-text';
+      textEl.innerHTML = linkifyMessengerText(msg.text);
+      bubble.appendChild(textEl);
     }
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
@@ -11063,7 +11096,7 @@
         if (messengerSocket && messengerCurrentOrderId) {
           messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: 'customer', text } });
         }
-        renderMessageBubble({ from: 'customer', text });
+        renderMessageBubble({ from: 'customer', text, ts: Date.now() });
         appendSystemMessage(t('pmThankYou'));
         // The picker itself has done its job — remove it entirely rather
         // than leaving a greyed-out row of buttons behind.
@@ -11166,7 +11199,7 @@
     // that; refreshMessengerHistory below then replaces it with the
     // authoritative server copy as soon as that exists.
     if (optimisticFirstMessage) {
-      renderMessageBubble({ from: 'customer', text: optimisticFirstMessage });
+      renderMessageBubble({ from: 'customer', text: optimisticFirstMessage, ts: Date.now() });
     }
 
     refreshMessengerHistory(orderId, optimisticFirstMessage);
@@ -11197,16 +11230,21 @@
           messengerRenderedCount = data.messages.length;
         }
         // The payment picker belongs right under the auto-reply (message
-        // #2: the customer's own order text is #1) -- not immediately
-        // after the customer's own message, which is what showed it
-        // before the auto-reply had even arrived. A fresh order calls
-        // this function twice (once optimistically before the session
-        // exists server-side, once again after it's actually created),
-        // so this only fires once the auto-reply is actually in the
-        // fetched history, and the DOM check stops it from appending a
-        // second time on the later call.
-        if (messengerRole === 'customer' && optimisticFirstMessage && data && Array.isArray(data.messages) && data.messages.length >= 2 && !document.querySelector('#messengerMessages .pm-picker')) {
-          appendPaymentMethodPicker();
+        // #2: the customer's own order text is #1). It needs to show up
+        // both right after a fresh order (once the auto-reply actually
+        // lands, not immediately after the customer's own message) AND
+        // every time the customer reopens an existing chat where they
+        // haven't picked a method yet -- closing and reopening used to
+        // lose it entirely, since the old check only fired for a brand
+        // new order. "Already chosen" is detected from the message
+        // history itself (the picker's own click handler sends a message
+        // starting with pmChosenPrefix), and the DOM check stops it from
+        // appending a second time across this function's two calls for
+        // one fresh order.
+        if (messengerRole === 'customer' && data && Array.isArray(data.messages) && data.messages.length >= 2 && !document.querySelector('#messengerMessages .pm-picker')) {
+          const pmPrefix = t('pmChosenPrefix');
+          const alreadyChosen = data.messages.some(m => m.from === 'customer' && typeof m.text === 'string' && pmPrefix && m.text.startsWith(pmPrefix));
+          if (!alreadyChosen) appendPaymentMethodPicker();
         }
         if (messengerRole === 'admin' && data && data.customer) {
           if (titleEl && data.customer.username) titleEl.textContent = data.customer.username;
@@ -11370,7 +11408,7 @@
     const text = input.value.trim();
     if (!text || !messengerSocket || !messengerCurrentOrderId) return;
     messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: messengerRole, text } });
-    renderMessageBubble({ from: messengerRole, text });
+    renderMessageBubble({ from: messengerRole, text, ts: Date.now() });
     input.value = '';
   }
 
@@ -11413,13 +11451,13 @@
   function sendMessengerImage(dataUrl){
     if (!messengerSocket || !messengerCurrentOrderId) return;
     messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: messengerRole, image: dataUrl } });
-    renderMessageBubble({ from: messengerRole, image: dataUrl });
+    renderMessageBubble({ from: messengerRole, image: dataUrl, ts: Date.now() });
   }
 
   function sendMessengerVideo(dataUrl){
     if (!messengerSocket || !messengerCurrentOrderId) return;
     messengerSocket.emit('send_message', { orderId: messengerCurrentOrderId, message: { from: messengerRole, video: dataUrl } });
-    renderMessageBubble({ from: messengerRole, video: dataUrl });
+    renderMessageBubble({ from: messengerRole, video: dataUrl, ts: Date.now() });
   }
 
   // Videos aren't resized/re-encoded the way photos are -- doing that
