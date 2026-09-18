@@ -5297,6 +5297,16 @@
     transition:all .2s ease;
   }
   .ttdl-photo-dl-all:hover{ border-color:#25F4EE; box-shadow:0 8px 20px rgba(37,244,238,0.22); }
+  .ttdl-music-row{ margin-bottom:10px; }
+  .ttdl-music-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:12px; border-radius:10px; cursor:pointer;
+    border:1px solid rgba(255,255,255,0.14); background:#151517; color:#fff;
+    font-family:'BPGAcademiuriU','Space Grotesk',sans-serif; font-weight:800; font-size:12.5px;
+    transition:all .2s ease;
+  }
+  .ttdl-music-btn:hover{ border-color:#25F4EE; box-shadow:0 8px 20px rgba(37,244,238,0.22); }
+  .ttdl-music-ico{ font-size:15px; }
   .ttdl-log div{ white-space:normal; word-break:break-word; }
 
   .ttdl-ios-link-wrap{ margin-bottom:10px; }
@@ -7284,6 +7294,18 @@
               </button>
             </div>
 
+            <!-- Background music track, when tikwm reports one -- present
+                 for both a regular video post and a photo-mode slideshow
+                 alike, so this sits after both of those instead of being
+                 tied to just one. -->
+            <div class="ttdl-music-row" id="ttdlMusicRow" style="display:none;">
+              <button type="button" class="ttdl-music-btn" id="ttdlMusicBtn">
+                <span class="ttdl-music-ico" aria-hidden="true">🎵</span>
+                <span class="ttdl-music-label" id="ttdlMusicLabel" data-i18n="ttdlDownloadMusic">მუსიკის ჩამოტვირთვა</span>
+              </button>
+            </div>
+
+
             <!-- iOS Safari sometimes silently blocks the auto-opened tab
                  (its "Block Pop-ups" setting is on by default), so this is
                  a guaranteed, real, user-tappable link the visitor can use
@@ -7641,6 +7663,7 @@
       ttdlDesc: 'ჩამოტვირთვა უმაღლესი ხარისხით<br>გაიგე თუ რა ხარისხში გაქვს ატვირთული ვიდეო',
       ttdlInputPh: 'ჩასვი TikTok ვიდეოს ლინკი...',
       ttdlAnalyzeBtn: 'გაანალიზება',
+      ttdlDownloadMusic: 'მუსიკის ჩამოტვირთვა',
       ttdlIosLinkText: '<span class="ttdl-ios-link-ico" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>ვიდეოს შენახვა — დააჭირეთ აქ',
       cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
       cpUpscaleModalText4k: 'გთხოვთ მონიშნოთ <b>1080p / 60FPS</b> ვერსია, რადგან სწორედ ამ ფორმატშია თქვენი ვიდეო ატვირთული. თუ გსურთ 4K ფორმატით სარგებლობა TikTok-ზე, მაშინ ატვირთეთ ვიდეო, რომელიც რეალურად <b>4K</b> ფორმატშია.',
@@ -8073,6 +8096,7 @@
       ttdlDesc: 'Download in the highest quality<br>Find out what quality your video was uploaded in',
       ttdlInputPh: 'Paste a TikTok video link...',
       ttdlAnalyzeBtn: 'Analyze Video',
+      ttdlDownloadMusic: 'Download music',
       ttdlIosLinkText: '<span class="ttdl-ios-link-ico" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>Save video — tap here',
       cpUpscaleModalTitle: "You can't switch to this quality",
       cpUpscaleModalText4k: "Please select the <b>1080p / 60FPS</b> option — that's the format your video was actually uploaded in. If you'd like to use 4K on TikTok, upload a video that is actually in <b>4K</b> format.",
@@ -15980,6 +16004,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const hdBtn = document.getElementById('ttdlDlHd');
     const sdBtnLabel = document.getElementById('ttdlDlSdLabel');
     const hdBtnLabel = document.getElementById('ttdlDlHdLabel');
+    const musicRow = document.getElementById('ttdlMusicRow');
+    const musicBtn = document.getElementById('ttdlMusicBtn');
+    const musicLabel = document.getElementById('ttdlMusicLabel');
     const clearBtn = document.getElementById('ttdlClearBtn');
     const logEl = document.getElementById('ttdlLog');
     const iosLinkWrap = document.getElementById('ttdlIosLinkWrap');
@@ -16028,6 +16055,20 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (likes >= TTDL_SHADOW_HIGH_LIKES) return 'NO';
       if (likes <= TTDL_SHADOW_LOW_LIKES && views >= TTDL_SHADOW_MIN_VIEWS) return 'YES';
       return null; // ambiguous -- reported as "unknown" rather than guessed
+    }
+
+    // Background music track, when tikwm reports one -- present for both
+    // a regular video post and a photo-mode slideshow alike, so both
+    // branches of ttdlAnalyze call this the same way. music_info.play is
+    // the actual playable track; the top-level "music" field tikwm also
+    // returns is a smaller, lower-quality preview clip, not the fallback
+    // it might look like -- preferred here only when music_info itself
+    // is missing entirely.
+    function ttdlExtractMusic(d){
+      const info = d && d.music_info;
+      const url = (info && info.play) || d.music || null;
+      if (!url) return null;
+      return { url, title: (info && info.title) || null };
     }
 
     function ttdlVqScore(bitrateMbps, height){
@@ -16309,6 +16350,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       resultBox.style.display = 'none';
       if (detailsBox) detailsBox.style.display = 'none';
       dlRow.style.display = 'none';
+      if (musicRow) musicRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       if (iosLinkWrap) iosLinkWrap.style.display = 'none';
       sdBtn.disabled = true; hdBtn.disabled = true;
@@ -16330,12 +16372,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           // (there's no resolution/fps/bitrate to probe for a still image). ----
           if (Array.isArray(d.images) && d.images.length){
             const shadow = ttdlShadowBan(d.digg_count, d.play_count);
+            const music = ttdlExtractMusic(d);
             lastData = {
               sd: null, hd: null,
               cover: d.cover || d.origin_cover || d.images[0],
               title: d.title,
               author: d.author && d.author.nickname,
-              views: d.play_count
+              views: d.play_count,
+              music
             };
             thumbEl.src = lastData.cover || '';
             if (thumbPlayEl) thumbPlayEl.style.display = 'none'; // it's a photo, not a video -- no play glyph
@@ -16369,6 +16413,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               ).join('');
             }
             if (dlRow) dlRow.style.display = 'none';
+            if (musicRow) musicRow.style.display = music ? 'block' : 'none';
             if (clearBtn) clearBtn.style.display = 'flex';
             ttdlLog(ttdlDict('logFoundPhotos').replace('{n}', d.images.length));
             setBtnBusy(analyzeBtn, false);
@@ -16404,19 +16449,22 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           // below, which used to block the ENTIRE result from appearing
           // for up to 8-20 seconds even though it only affects the small
           // "quality" detail box, not whether downloading works at all. ----
+          const music = ttdlExtractMusic(d);
           lastData = {
             sd: d.play,
             hd: d.hdplay || d.play,
             cover: d.cover || d.origin_cover,
             title: d.title,
             author: d.author && d.author.nickname,
-            views: d.play_count
+            views: d.play_count,
+            music
           };
 
           thumbEl.src = lastData.cover || '';
           titleEl.textContent = lastData.title || ttdlDict('untitled');
           metaEl.textContent = (lastData.author ? '@' + lastData.author + ' · ' : '') + ttdlFormatCount(lastData.views) + ' ' + ttdlDict('views');
           resultBox.style.display = 'flex';
+          if (musicRow) musicRow.style.display = music ? 'block' : 'none';
 
           if (statsGrid) {
             const shadowClass = shadow === 'YES' ? 'ttdl-shadow-yes' : (shadow === 'NO' ? 'ttdl-shadow-no' : 'ttdl-shadow-unknown');
@@ -16609,8 +16657,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // "Do you want to download...?" prompt. A plain <a href> tap is all
     // that's needed once the server sends the right header; no upload,
     // no Share Sheet, no async orchestration needed on our side at all.
-    function ttdlBuildProxyDownloadUrl(tikwmUrl, quality){
-      const filename = `tiktok_${Date.now()}_${quality}.mp4`;
+    function ttdlBuildProxyDownloadUrl(tikwmUrl, filename){
       return DISCORD_TIKTOK_NOTIFY_WORKER_URL + '/dl?url=' + encodeURIComponent(tikwmUrl) + '&name=' + encodeURIComponent(filename);
     }
 
@@ -16625,7 +16672,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         // No fetch/upload/Share Sheet needed -- just hand the visitor a
         // real link to the proxy above and let Safari's own download
         // handling take it from there.
-        const proxyUrl = ttdlBuildProxyDownloadUrl(link, quality);
+        const proxyUrl = ttdlBuildProxyDownloadUrl(link, `tiktok_${Date.now()}_${quality}.mp4`);
         ttdlShowIosLink(proxyUrl);
         ttdlLog(ttdlDict('logMtReady'));
         return;
@@ -16741,6 +16788,88 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       }
     }
 
+    // Same exact approach as ttdlDownload above (iOS proxy fallback,
+    // streaming with live progress, cross-origin fallback to a direct
+    // link) -- kept as its own function rather than folding into
+    // ttdlDownload's quality-tier-specific logic, since there's no
+    // "sd/hd" concept for a single audio track and duplicating this
+    // (already fairly involved) function is safer than adding branching
+    // to the battle-tested video path for an unrelated file type.
+    async function ttdlDownloadMusic(){
+      if (!lastData || !lastData.music) return;
+      const link = lastData.music.url;
+      const filename = `tiktok_music_${Date.now()}.mp3`;
+
+      if (ttdlIsIOS()){
+        const proxyUrl = ttdlBuildProxyDownloadUrl(link, filename);
+        ttdlShowIosLink(proxyUrl);
+        ttdlLog(ttdlDict('logMtReady'));
+        return;
+      }
+
+      setDlBtnBusy(musicBtn, musicLabel, true, '0%');
+      ttdlLog(ttdlDict('logDownloading'));
+
+      const dlTimeoutController = new AbortController();
+      let dlTimeoutTimer = null;
+      try{
+        dlTimeoutTimer = setTimeout(() => dlTimeoutController.abort(), 90000);
+        const res = await fetch(link, { signal: dlTimeoutController.signal });
+        if (!res.ok) throw new Error('bad response');
+        const totalBytes = Number(res.headers.get('Content-Length')) || 0;
+        const contentType = res.headers.get('Content-Type') || 'audio/mpeg';
+        let buf;
+        if (res.body && res.body.getReader) {
+          const reader = res.body.getReader();
+          let received = 0;
+          const chunks = [];
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            received += value.length;
+            if (totalBytes) {
+              const pct = Math.min(100, Math.round((received / totalBytes) * 100));
+              setDlBtnBusy(musicBtn, musicLabel, true, pct + '%');
+            } else {
+              const mb = (received / (1024*1024)).toFixed(1);
+              setDlBtnBusy(musicBtn, musicLabel, true, mb + 'MB');
+            }
+            // See the matching comment in ttdlDownload -- plain setTimeout,
+            // not requestAnimationFrame, so this keeps updating (just less
+            // often) even if the tab gets backgrounded mid-download rather
+            // than hanging forever waiting on a callback that stops firing.
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+          buf = new Uint8Array(received);
+          let offset = 0;
+          for (const c of chunks) { buf.set(c, offset); offset += c.length; }
+        } else {
+          buf = new Uint8Array(await (await res.blob()).arrayBuffer());
+        }
+        const blob = new Blob([buf], { type: contentType });
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 8000);
+        ttdlLog(ttdlDict('logDone'));
+      } catch(e){
+        // Cross-origin fetch was blocked -- fall back to just opening the
+        // direct link; the browser's own handling still lets the visitor
+        // save it from there.
+        ttdlOpenLinkViaAnchor(link);
+        ttdlShowIosLink(link);
+        ttdlLog(ttdlDict('logFallback'));
+      } finally {
+        clearTimeout(dlTimeoutTimer);
+        setDlBtnBusy(musicBtn, musicLabel, false);
+      }
+    }
+
 
     function ttdlClear(){
       urlInput.value = '';
@@ -16755,6 +16884,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (qualityBlock) qualityBlock.innerHTML = '';
       if (bodyEl) bodyEl.classList.remove('ttdl-expanded');
       dlRow.style.display = 'none';
+      if (musicRow) musicRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       if (iosLinkWrap) iosLinkWrap.style.display = 'none';
       sdBtn.disabled = true;
@@ -16770,6 +16900,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ttdlAnalyze(); });
     sdBtn.addEventListener('click', () => ttdlDownload('sd'));
     hdBtn.addEventListener('click', () => ttdlDownload('hd'));
+    if (musicBtn) musicBtn.addEventListener('click', ttdlDownloadMusic);
     if (clearBtn) clearBtn.addEventListener('click', ttdlClear);
 
     ttdlLog(ttdlDict('logReady'));
