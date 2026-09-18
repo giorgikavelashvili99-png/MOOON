@@ -2468,6 +2468,27 @@
     from{ opacity:0; transform:translateY(10px); }
     to{ opacity:1; transform:none; }
   }
+  /* ---------- Wizard step SWAP (outgoing half), driven by wizStepSwap()
+     in JS. Previously a step vanished the instant the JS added
+     .wizard-step-hidden — display:none applied in the very same frame
+     the next step's wizardStepIn animation started, so the panel
+     visibly snapped to its new height while the incoming step was
+     still fading up. This class gives the outgoing step a brief
+     fade+lift-out first; wizStepSwap holds the panel's height steady
+     while it plays, then morphs the height to match the incoming step
+     once it's actually swapped in. */
+  .wiz-step-exit{
+    animation: wizardStepOut .19s cubic-bezier(.4,0,.7,1) forwards !important;
+    pointer-events:none;
+  }
+  @keyframes wizardStepOut{
+    from{ opacity:1; transform:none; }
+    to{ opacity:0; transform:translateY(-10px) scale(0.985); }
+  }
+  html.low-power .wiz-step-exit{ animation:none !important; opacity:0 !important; }
+  @media (prefers-reduced-motion: reduce){
+    .wiz-step-exit{ animation:none !important; opacity:0 !important; }
+  }
   html.low-power .field,
   html.low-power .wp-grid,
   html.low-power .mp-grid,
@@ -7649,6 +7670,67 @@
   }
 
   // ============================================================
+  // -3b) WIZARD STEP SWAP — shared by every order wizard (individual /
+  //      weekly / monthly / cheap / cheap-monthly) for moving between
+  //      steps. Replaces the old instant display:none swap, which
+  //      dropped the outgoing step in the same frame the incoming one
+  //      started fading in and made the whole panel jump straight to
+  //      its new height. Instead: fade+lift the outgoing step(s) out
+  //      first, THEN swap the hidden classes (letting the incoming
+  //      step's existing wizardStepIn animation play as before) while
+  //      smoothly morphing the panel's height from the old to the new
+  //      value, so the whole step change reads as one continuous
+  //      motion instead of a snap. Falls back to the old instant swap
+  //      under prefers-reduced-motion / html.low-power, or if no
+  //      .pc-modal-scroll ancestor is found to morph the height of.
+  //      hideEls/showEls may contain null/undefined entries.
+  // ============================================================
+  function wizStepSwap(hideEls, showEls, midCallback){
+    hideEls = (hideEls || []).filter(Boolean);
+    showEls = (showEls || []).filter(Boolean);
+    const reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+      document.documentElement.classList.contains('low-power');
+    const anchor = hideEls[0] || showEls[0];
+    const container = anchor ? anchor.closest('.pc-modal-scroll') : null;
+
+    function instantSwap(){
+      hideEls.forEach(el => el.classList.add('wizard-step-hidden'));
+      if (midCallback) midCallback();
+      showEls.forEach(el => el.classList.remove('wizard-step-hidden'));
+    }
+
+    if (reduce || !container) { instantSwap(); return; }
+
+    const startH = container.getBoundingClientRect().height;
+    container.style.height = startH + 'px';
+    container.style.overflowY = 'hidden';
+
+    hideEls.forEach(el => el.classList.add('wiz-step-exit'));
+
+    window.setTimeout(function(){
+      hideEls.forEach(el => {
+        el.classList.remove('wiz-step-exit');
+        el.classList.add('wizard-step-hidden');
+      });
+      if (midCallback) midCallback();
+      showEls.forEach(el => el.classList.remove('wizard-step-hidden'));
+
+      container.style.height = 'auto';
+      const endH = container.getBoundingClientRect().height;
+      container.style.height = startH + 'px';
+      void container.offsetHeight;
+      container.style.transition = 'height .38s cubic-bezier(.2,.7,.3,1)';
+      container.style.height = endH + 'px';
+
+      window.setTimeout(function(){
+        container.style.transition = '';
+        container.style.height = '';
+        container.style.overflowY = '';
+      }, 400);
+    }, 190);
+  }
+
+  // ============================================================
   // -2) PERFORMANCE: pause decorative animations while the tab/app
   //     is backgrounded, and on very low-powered devices, to
   //     reduce sustained CPU/GPU load (device heating).
@@ -9163,9 +9245,7 @@
       const autoObserver = new MutationObserver(() => {
         if (autoWrapEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResultWp');
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
-          if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
-          wpQualityGrid.classList.remove('wizard-step-hidden');
+          wizStepSwap([scanResultEl, scannerFieldEl], [wpQualityGrid]);
           setWizardStage('wizardStepsWp', 2);
           // NOT disconnected: a reset-and-reupload cycle reuses this exact
           // DOM node (resetMooonAutoUI empties it, runMooonAutoUpload
@@ -9184,10 +9264,7 @@
     if (scanResultEl2) {
       const resetObserver = new MutationObserver(() => {
         if (!scanResultEl2.classList.contains('show')) {
-          [wpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
-            if (el) el.classList.add('wizard-step-hidden');
-          });
-          if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
+          wizStepSwap([wpQualityGrid, tiktokWrap, sendConfirmWrap], [scannerFieldEl]);
           wpQualityGrid.querySelectorAll('.wp-box.active').forEach(b => b.classList.remove('active'));
           setWizardStage('wizardStepsWp', 1);
         }
@@ -9197,8 +9274,7 @@
 
     wpQualityGrid.querySelectorAll('.wp-box').forEach(btn => {
       btn.addEventListener('click', () => {
-        wpQualityGrid.classList.add('wizard-step-hidden');
-        if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        wizStepSwap([wpQualityGrid], [tiktokWrap]);
         setWizardStage('wizardStepsWp', 3);
       });
     });
@@ -9221,14 +9297,12 @@
       tiktokLinkConfirmed['wp'] = true;
       const priceEl = document.getElementById('wpWizardFinalPrice');
       if (priceEl) priceEl.textContent = getWeeklyTotal(subSelectedQuality).toFixed(2) + ' ₾';
-      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
-      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
       // The real "გაგზავნე შეკვეთა" button lives in channelsPanel — per
       // explicit request, the redundant "are you sure? Yes/No" step in
       // between is gone, so this now needs revealing directly alongside
       // the price instead of only ever being triggered indirectly by a
       // since-removed Yes button.
-      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
+      wizStepSwap([tiktokWrap], [sendConfirmWrap, channelsPanel]);
       setWizardStage('wizardStepsWp', 4);
     });
   })();
@@ -9305,9 +9379,7 @@
       const autoObserver = new MutationObserver(() => {
         if (autoWrapEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResultMp');
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
-          if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
-          mpQualityGrid.classList.remove('wizard-step-hidden');
+          wizStepSwap([scanResultEl, scannerFieldEl], [mpQualityGrid]);
           setWizardStage('wizardStepsMp', 2);
           // NOT disconnected — see the identical comment in
           // initWeeklyOrderWizard above for why a one-shot observer here
@@ -9321,10 +9393,7 @@
     if (scanResultEl2) {
       const resetObserver = new MutationObserver(() => {
         if (!scanResultEl2.classList.contains('show')) {
-          [mpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
-            if (el) el.classList.add('wizard-step-hidden');
-          });
-          if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
+          wizStepSwap([mpQualityGrid, tiktokWrap, sendConfirmWrap], [scannerFieldEl]);
           mpQualityGrid.querySelectorAll('.mp-box.active').forEach(b => b.classList.remove('active'));
           setWizardStage('wizardStepsMp', 1);
         }
@@ -9334,8 +9403,7 @@
 
     mpQualityGrid.querySelectorAll('.mp-box').forEach(btn => {
       btn.addEventListener('click', () => {
-        mpQualityGrid.classList.add('wizard-step-hidden');
-        if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        wizStepSwap([mpQualityGrid], [tiktokWrap]);
         setWizardStage('wizardStepsMp', 3);
       });
     });
@@ -9355,9 +9423,7 @@
       tiktokLinkConfirmed['mp'] = true;
       const priceEl = document.getElementById('mpWizardFinalPrice');
       if (priceEl) priceEl.textContent = getMonthlyTotal(monthSelectedQuality).toFixed(2) + ' ₾';
-      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
-      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
-      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
+      wizStepSwap([tiktokWrap], [sendConfirmWrap, channelsPanel]);
       setWizardStage('wizardStepsMp', 4);
     });
   })();
@@ -9540,9 +9606,7 @@
       const autoObserver = new MutationObserver(() => {
         if (srAutoEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResult');
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
-          if (scannerPanelEl) scannerPanelEl.classList.add('wizard-step-hidden');
-          qualityWrap.classList.remove('wizard-step-hidden');
+          wizStepSwap([scanResultEl, scannerPanelEl], [qualityWrap]);
           setWizardStage('wizardStepsMain', 2);
           // NOT disconnected — see the identical comment in
           // initWeeklyOrderWizard for why a one-shot observer here broke
@@ -9561,10 +9625,7 @@
     if (scanResultEl2) {
       const resetObserver = new MutationObserver(() => {
         if (!scanResultEl2.classList.contains('show')) {
-          [qualityWrap, tiktokWrap, sendConfirmWrap].forEach(el => {
-            if (el) el.classList.add('wizard-step-hidden');
-          });
-          if (scannerPanelEl) scannerPanelEl.classList.remove('wizard-step-hidden');
+          wizStepSwap([qualityWrap, tiktokWrap, sendConfirmWrap], [scannerPanelEl]);
           document.querySelectorAll('#qualityGrid .quality-btn.active').forEach(b => b.classList.remove('active'));
           setWizardStage('wizardStepsMain', 1);
         }
@@ -9576,8 +9637,7 @@
     if (qualityGridEl) {
       qualityGridEl.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          qualityWrap.classList.add('wizard-step-hidden');
-          if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+          wizStepSwap([qualityWrap], [tiktokWrap]);
           setWizardStage('wizardStepsMain', 3);
         });
       });
@@ -9601,13 +9661,11 @@
         const { s, ms, quality } = currentValues();
         priceEl.textContent = calculateExactPrice(s, ms, subToggle.checked, quality) + ' ₾';
       }
-      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
-      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
       // Per explicit request, the "are you sure? Yes/No" step is gone —
       // channelsPanel (the real send button, previously only ever
       // triggered indirectly via the since-removed Yes button's
       // click()) is now revealed directly alongside the price instead.
-      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
+      wizStepSwap([tiktokWrap], [sendConfirmWrap, channelsPanel]);
       setWizardStage('wizardStepsMain', 4);
     });
   })();
@@ -12981,9 +13039,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const autoObserver = new MutationObserver(() => {
         if (autoWrapEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResultCp');
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
-          if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
-          cpQualityGrid.classList.remove('wizard-step-hidden');
+          wizStepSwap([scanResultEl, scannerFieldEl], [cpQualityGrid]);
           setWizardStage('wizardStepsCp', 2);
           // NOT disconnected — see the identical comment in
           // initWeeklyOrderWizard for why a one-shot observer here broke
@@ -12997,10 +13053,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     if (scanResultEl2) {
       const resetObserver = new MutationObserver(() => {
         if (!scanResultEl2.classList.contains('show')) {
-          [cpQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
-            if (el) el.classList.add('wizard-step-hidden');
-          });
-          if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
+          wizStepSwap([cpQualityGrid, tiktokWrap, sendConfirmWrap], [scannerFieldEl]);
           cpQualityGrid.querySelectorAll('.mp-box.active').forEach(b => b.classList.remove('active'));
           setWizardStage('wizardStepsCp', 1);
         }
@@ -13012,8 +13065,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       box.addEventListener('click', () => {
         const succeeded = tryManualSelectCpQuality(box.getAttribute('data-quality'));
         if (!succeeded) return;
-        cpQualityGrid.classList.add('wizard-step-hidden');
-        if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        wizStepSwap([cpQualityGrid], [tiktokWrap]);
         setWizardStage('wizardStepsCp', 3);
       });
     });
@@ -13033,9 +13085,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       tiktokLinkConfirmed['cp'] = true;
       const priceEl = document.getElementById('cpWizardFinalPrice');
       if (priceEl) priceEl.textContent = (CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60']) + ' ₾';
-      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
-      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
-      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
+      wizStepSwap([tiktokWrap], [sendConfirmWrap, channelsPanel]);
       setWizardStage('wizardStepsCp', 4);
     });
   })();
@@ -13071,13 +13121,10 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     // Shared by both the "skip straight to step 4" repeat-order path and
     // the normal step-4 TikTok-confirm path below, so the price line is
     // computed identically either way.
-    function revealSendStep(){
+    function revealSendStep(extraHide){
       const priceEl = document.getElementById('cpmWizardFinalPrice');
       if (priceEl) priceEl.textContent = (CPM_PRICES[cpmSelectedQuality] || CPM_PRICES['1080_60']) + ' ₾';
-      if (tiktokWrap) tiktokWrap.classList.add('wizard-step-hidden');
-      cpmQualityGrid.classList.add('wizard-step-hidden');
-      if (sendConfirmWrap) sendConfirmWrap.classList.remove('wizard-step-hidden');
-      if (channelsPanel) channelsPanel.classList.remove('wizard-step-hidden');
+      wizStepSwap((extraHide || []).concat([tiktokWrap, cpmQualityGrid]), [sendConfirmWrap, channelsPanel]);
       setWizardStage('wizardStepsCpm', 4);
     }
 
@@ -13086,8 +13133,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const autoObserver = new MutationObserver(() => {
         if (autoWrapEl.querySelector('.mooon-auto-done')) {
           const scanResultEl = document.getElementById('scanResultCpm');
-          if (scanResultEl) scanResultEl.classList.add('wizard-step-hidden');
-          if (scannerFieldEl) scannerFieldEl.classList.add('wizard-step-hidden');
 
           const activeSub = getActiveSubFor('cpm');
           if (activeSub && activeSub.quality) {
@@ -13096,10 +13141,10 @@ TikTok პროფილი: ${getTiktokValue('mp')}
             selectCpmQuality(activeSub.quality);
             cpmUploadedTier = activeSub.quality;
             tiktokLinkConfirmed['cpm'] = true;
-            revealSendStep();
+            revealSendStep([scanResultEl, scannerFieldEl]);
           } else {
             // First order — normal quality-pick step.
-            cpmQualityGrid.classList.remove('wizard-step-hidden');
+            wizStepSwap([scanResultEl, scannerFieldEl], [cpmQualityGrid]);
             setWizardStage('wizardStepsCpm', 2);
           }
           // NOT disconnected — see the identical comment in
@@ -13114,10 +13159,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     if (scanResultEl2) {
       const resetObserver = new MutationObserver(() => {
         if (!scanResultEl2.classList.contains('show')) {
-          [cpmQualityGrid, tiktokWrap, sendConfirmWrap].forEach(el => {
-            if (el) el.classList.add('wizard-step-hidden');
-          });
-          if (scannerFieldEl) scannerFieldEl.classList.remove('wizard-step-hidden');
+          wizStepSwap([cpmQualityGrid, tiktokWrap, sendConfirmWrap], [scannerFieldEl]);
           cpmQualityGrid.querySelectorAll('.mp-box.active').forEach(b => b.classList.remove('active'));
           setWizardStage('wizardStepsCpm', 1);
         }
@@ -13129,8 +13171,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       box.addEventListener('click', () => {
         const succeeded = tryManualSelectCpmQuality(box.getAttribute('data-quality'));
         if (!succeeded) return;
-        cpmQualityGrid.classList.add('wizard-step-hidden');
-        if (tiktokWrap) tiktokWrap.classList.remove('wizard-step-hidden');
+        wizStepSwap([cpmQualityGrid], [tiktokWrap]);
         setWizardStage('wizardStepsCpm', 3);
       });
     });
