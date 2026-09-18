@@ -17637,8 +17637,29 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   ttdlSafeInit(initTilt3D);
   ttdlSafeInit(initDiscordAuth);
   ttdlSafeInit(initTiktokDownloader);
-  ttdlSafeInit(initScrollReveal);
+  // NOTE: initPricingCarousel MUST run before initScrollReveal. The
+  // carousel moves each individual .pricing-cards > * card into its own
+  // .pc-slide wrapper (which owns the card's position/opacity via CSS,
+  // driven by --pc-x/--pc-z/--pc-op custom properties). If scroll-reveal
+  // ran first, it would grab those same individual cards, stamp its own
+  // inline opacity/transform/filter on each one (staggered per card,
+  // independent of which slide is active), and THEN the carousel would
+  // wrap them -- leaving two unrelated animation systems fighting on the
+  // same nested elements. Visually that looked like the pricing cards
+  // "opening" two or three times with janky, out-of-order frames, since
+  // every card (including ones parked off to the side of the carousel)
+  // kept doing its own separate fade/slide-up on its own timer.
+  //
+  // Running the carousel first means that by the time scroll-reveal
+  // queries '.pricing-cards > *', the individual cards are already
+  // inside .pc-slide wrappers and are no longer direct children -- so
+  // scroll-reveal naturally picks up the single carousel shell instead
+  // and fades it in as one piece. Below the carousel's own breakpoint
+  // (very narrow screens where it never builds), the cards are still
+  // plain direct children at this point, so the original per-card
+  // reveal behavior is preserved exactly as before.
   ttdlSafeInit(initPricingCarousel);
+  ttdlSafeInit(initScrollReveal);
 
   // Wake the backing servers up as soon as the page loads.
   //
