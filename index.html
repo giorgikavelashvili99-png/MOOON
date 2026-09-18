@@ -1769,41 +1769,75 @@
   .admin-box .a-blocklist-item .a-unblock-btn:hover{ filter:brightness(1.12); }
   .admin-box .a-blocklist-item .a-unblock-btn:active{ transform:scale(0.95); }
 
-  /* --- Moonfade stat cards & animated charts (admin dashboard) --- */
-  .a-stat-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  /* --- Moonfade stat cards & animated charts (admin dashboard) ---
+     Premium glass/glow treatment: soft radial glow field behind each
+     card, a hairline gradient border, a faint top sheen (glass
+     reflection), and a stronger, gradient-stroked line/donut so the
+     charts read as a polished product surface rather than flat boxes. */
+  .a-stat-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
   .a-stat-card{
-    position:relative; overflow:hidden; padding:12px 10px; border-radius:14px;
-    background:linear-gradient(160deg, rgba(207,216,255,0.06), rgba(124,143,255,0.02));
+    position:relative; overflow:hidden; padding:16px 10px 14px; border-radius:16px;
+    background:
+      radial-gradient(circle at 30% -10%, rgba(34,195,255,0.16), transparent 60%),
+      linear-gradient(160deg, rgba(207,216,255,0.07), rgba(124,143,255,0.02));
     border:1px solid var(--moon-line); text-align:center;
+    box-shadow:0 10px 24px -14px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .a-stat-card::before{
+    content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background:linear-gradient(160deg, rgba(207,216,255,0.35), rgba(34,195,255,0.08) 40%, transparent 70%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;
+  }
+  .a-stat-card:hover{
+    transform:translateY(-2px);
+    border-color:var(--moon-glow);
+    box-shadow:0 14px 30px -14px rgba(34,195,255,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .a-stat-card .asc-num{
-    font-family:'BPGAcademiuriU', sans-serif; font-weight:800; font-size:20px; color:var(--moon-silver);
-    text-shadow:0 0 7px rgba(207,216,255,0.35);
+    position:relative; font-family:'BPGAcademiuriU', sans-serif; font-weight:800; font-size:22px; color:var(--moon-silver);
+    text-shadow:0 0 12px rgba(34,195,255,0.45);
   }
-  .a-stat-card .asc-label{ margin-top:4px; font-size:10px; color:var(--moon-silver-dim); letter-spacing:normal; text-transform:uppercase; }
+  .a-stat-card .asc-label{
+    position:relative; margin-top:5px; font-size:10px; color:var(--moon-silver-dim);
+    letter-spacing:.04em; text-transform:uppercase;
+  }
   .a-chart-card{
-    padding:14px 14px 8px; border-radius:16px; margin-bottom:16px;
-    background:linear-gradient(160deg, rgba(207,216,255,0.05), rgba(124,143,255,0.015));
+    position:relative; overflow:hidden; padding:16px 16px 10px; border-radius:18px; margin-bottom:18px;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(34,195,255,0.10), transparent 55%),
+      linear-gradient(160deg, rgba(207,216,255,0.06), rgba(124,143,255,0.015));
     border:1px solid var(--moon-line);
+    box-shadow:0 16px 34px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .a-chart-card::after{
+    content:''; position:absolute; top:0; left:8%; right:8%; height:1px; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
   }
   .a-chart-card .acc-title{
-    font-size:11px; font-weight:700; color:var(--moon-silver-dim); text-transform:uppercase;
-    letter-spacing:normal; margin-bottom:8px;
+    position:relative; font-size:11px; font-weight:700; color:var(--moon-silver-dim); text-transform:uppercase;
+    letter-spacing:.05em; margin-bottom:10px;
   }
-  .a-chart-svg{ display:block; width:100%; height:auto; overflow:visible; }
+  .a-chart-svg{ position:relative; display:block; width:100%; height:auto; overflow:visible; }
   .a-chart-svg .acs-area{ opacity:0; animation:acsFadeIn .6s ease forwards .15s; }
   .a-chart-svg .acs-line{
-    fill:none; stroke:var(--moon-glow); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;
-    filter:drop-shadow(0 0 6px rgba(207,216,255,0.55));
+    fill:none; stroke:url(#acsLineGrad); stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round;
+    filter:drop-shadow(0 0 8px rgba(34,195,255,0.65));
   }
-  .a-chart-svg .acs-dot{ fill:var(--moon-silver); filter:drop-shadow(0 0 5px rgba(207,216,255,0.8)); }
+  .a-chart-svg .acs-dot{
+    fill:var(--moon-silver); filter:drop-shadow(0 0 6px rgba(34,195,255,0.9));
+  }
   @keyframes acsFadeIn{ to{ opacity:1; } }
-  .a-donut-wrap{ display:flex; align-items:center; gap:18px; }
-  .a-donut-ring{ transform:rotate(-90deg); flex:0 0 auto; }
+  .a-donut-wrap{ display:flex; align-items:center; gap:20px; }
+  .a-donut-ring{ transform:rotate(-90deg); flex:0 0 auto; filter:drop-shadow(0 0 10px rgba(34,195,255,0.35)); }
   .a-donut-ring circle{ transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1); }
-  .a-donut-legend{ display:flex; flex-direction:column; gap:8px; font-size:12px; }
+  .a-donut-legend{ display:flex; flex-direction:column; gap:9px; font-size:12px; }
   .a-donut-legend .adl-row{ display:flex; align-items:center; gap:7px; color:var(--moon-silver-dim); }
-  .a-donut-legend .adl-dot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .a-donut-legend .adl-dot{
+    width:9px; height:9px; border-radius:50%; flex:0 0 auto;
+    box-shadow:0 0 6px currentColor;
+  }
   .a-donut-legend b{ color:var(--moon-silver); }
 
   .quality-grid{
@@ -14087,9 +14121,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const area = line + ' L' + pts[pts.length - 1][0].toFixed(1) + ',' + (h - pad) + ' L' + pts[0][0].toFixed(1) + ',' + (h - pad) + ' Z';
     const dots = pts.map(p => '<circle class="acs-dot" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="2.6"></circle>').join('');
     return '<svg class="a-chart-svg" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
-      '<defs><linearGradient id="acsGrad" x1="0" y1="0" x2="0" y2="1">' +
+      '<defs>' +
+      '<linearGradient id="acsGrad" x1="0" y1="0" x2="0" y2="1">' +
       '<stop offset="0%" stop-color="var(--moon-glow)" stop-opacity="0.35"/>' +
-      '<stop offset="100%" stop-color="var(--moon-glow)" stop-opacity="0"/></linearGradient></defs>' +
+      '<stop offset="100%" stop-color="var(--moon-glow)" stop-opacity="0"/></linearGradient>' +
+      '<linearGradient id="acsLineGrad" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0%" stop-color="var(--moon-glow)"/>' +
+      '<stop offset="100%" stop-color="var(--moon-blue)"/></linearGradient>' +
+      '</defs>' +
       '<path class="acs-area" d="' + area + '" fill="url(#acsGrad)"></path>' +
       '<path class="acs-line" d="' + line + '"></path>' +
       dots +
@@ -14117,8 +14156,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(207,216,255,0.12)" stroke-width="' + sw + '"></circle>' +
       '<circle class="a-donut-fg" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#donutGrad)" stroke-width="' + sw + '" ' +
       'stroke-linecap="round" stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + circ.toFixed(1) + '" data-target-offset="' + (circ * (1 - fraction)).toFixed(1) + '"></circle>' +
-      '<defs><linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0%" stop-color="var(--moon-glow)"/><stop offset="100%" stop-color="var(--moon-blue)"/></linearGradient></defs>' +
+      '<defs>' +
+      '<linearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0%" stop-color="var(--moon-glow)"/><stop offset="100%" stop-color="var(--moon-blue)"/></linearGradient>' +
+      '<radialGradient id="donutSheen" cx="35%" cy="25%" r="70%">' +
+      '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>' +
+      '<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient>' +
+      '</defs>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r - sw / 2 - 1) + '" fill="url(#donutSheen)"></circle>' +
       '</svg>';
   }
 
@@ -15977,18 +16022,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // not. Silently does nothing if the permission is denied or the
     // clipboard holds something else entirely, leaving manual paste as
     // the fallback either way.
-    // Set to true right before ttdlClear() programmatically refocuses the
-    // input as a courtesy (so the next paste doesn't need an extra tap) --
-    // without this, that refocus retriggers the very next block below,
-    // which reads the still-there clipboard link right back into the
-    // field it was just cleared from. This flag exists so that block can
-    // tell "the person tapped the field themselves, probably to paste
-    // something new" apart from "the code just refocused it as a side
-    // effect," and only auto-pastes for the former.
-    let ttdlSuppressAutoPaste = false;
     if (urlInput && navigator.clipboard && navigator.clipboard.readText) {
       urlInput.addEventListener('focus', () => {
-        if (ttdlSuppressAutoPaste) { ttdlSuppressAutoPaste = false; return; }
         if (urlInput.value.trim()) return; // don't clobber something already typed/pasted
         navigator.clipboard.readText().then(text => {
           const trimmed = (text || '').trim();
@@ -16904,7 +16939,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (hdBtnLabel) { hdBtnLabel.textContent = 'MOBILE QUALITY'; delete hdBtnLabel.dataset.originalText; }
       if (logEl) logEl.innerHTML = '';
       ttdlLog(ttdlDict('logReady'));
-      ttdlSuppressAutoPaste = true;
       urlInput.focus();
     }
 
