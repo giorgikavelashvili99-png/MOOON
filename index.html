@@ -4488,7 +4488,8 @@
       transition:
         transform .72s cubic-bezier(.22,1.02,.24,1),
         opacity .5s cubic-bezier(.4,0,.2,1),
-        filter .55s cubic-bezier(.4,0,.2,1);
+        filter .55s cubic-bezier(.4,0,.2,1),
+        visibility 0s linear 0s;
       will-change:transform;
       transform:translate3d(calc(-50% + var(--pc-x,0px)), var(--pc-y,0px), var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
       opacity:var(--pc-op,1);
@@ -4497,6 +4498,24 @@
       pointer-events:var(--pc-pe,auto);
     }
     .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--active{ cursor:default; }
+    /* Slides beyond maxVisible are already invisible (--pc-op:0 below),
+       but without this they still fully participate in layout, paint
+       and GPU compositing (3D transform, box-shadow, gradients) on
+       every frame of every swipe -- on weaker Android phones, with up
+       to 4-5 such slides transitioning at once alongside the visible
+       ones, that's exactly what made switching between packages feel
+       like it freezes for a moment. Cutting them to visibility:hidden
+       the instant they're marked hidden costs nothing visually (they
+       were already faded to zero opacity by that point) but lets the
+       browser skip rendering them completely. */
+    .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--offscreen{
+      visibility:hidden;
+      transition:
+        transform .72s cubic-bezier(.22,1.02,.24,1),
+        opacity .5s cubic-bezier(.4,0,.2,1),
+        filter .55s cubic-bezier(.4,0,.2,1),
+        visibility 0s linear .5s;
+    }
     /* Soft pool of light under whichever card currently holds focus.
        It lives on a pseudo-element so it fades on its own timing and
        never inherits the slide's 3D transform. */
@@ -4561,7 +4580,10 @@
       filter:var(--pc-filter-lite, none) !important;
       /* Shorter than desktop's .72s — a swipe should land under the
          finger, not drift on after it. */
-      transition:transform .5s cubic-bezier(.22,1,.3,1), opacity .34s ease, filter .34s ease;
+      transition:transform .5s cubic-bezier(.22,1,.3,1), opacity .34s ease, filter .34s ease, visibility 0s linear 0s;
+    }
+    .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--offscreen{
+      transition:transform .5s cubic-bezier(.22,1,.3,1), opacity .34s ease, filter .34s ease, visibility 0s linear .34s;
     }
   }
   @media (min-width:360px) and (prefers-reduced-motion: reduce){
@@ -17594,6 +17616,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         );
         slide.style.setProperty('--pc-pe', hide ? 'none' : 'auto');
         slide.classList.toggle('pc-slide--active', offset === 0);
+        // See the .pc-slide--offscreen CSS rule above: skips paint/
+        // compositing entirely for slides that are already invisible,
+        // instead of leaving 4-5 fully-styled 3D-transformed cards
+        // silently animating behind the visible ones on every swipe.
+        slide.classList.toggle('pc-slide--offscreen', hide);
       });
       dots.forEach((d, i) => d.classList.toggle('is-active', i === activeIndex));
       if (prevBtn) prevBtn.disabled = activeIndex <= 0;
