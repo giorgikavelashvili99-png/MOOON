@@ -9026,37 +9026,6 @@
   const pcModalScrim = document.getElementById('pcModalScrim');
   let pcBodyScrollLockCount = 0;
 
-  function lockBodyScroll(){
-    pcBodyScrollLockCount++;
-    if (pcBodyScrollLockCount === 1) {
-      // Hiding overflow makes the scrollbar disappear, which frees up
-      // whatever width it was taking and shifts the whole page right
-      // by that amount -- very noticeable on desktop browsers with a
-      // classic, space-taking scrollbar (a no-op on mobile/overlay
-      // scrollbars, which never took up layout space to begin with).
-      // Adding that same width back as padding on the body cancels the
-      // shift out. Measured only on this first, outermost lock call --
-      // by the time a second nested lock happens the scrollbar is
-      // already hidden, so measuring again would just read back 0.
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      if (scrollbarWidth > 0) {
-        document.body.style.paddingRight = scrollbarWidth + 'px';
-      }
-    }
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.overscrollBehavior = 'contain';
-  }
-  function unlockBodyScroll(){
-    pcBodyScrollLockCount = Math.max(0, pcBodyScrollLockCount - 1);
-    if (pcBodyScrollLockCount === 0) {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-      document.body.style.overscrollBehavior = '';
-      document.body.style.paddingRight = '';
-    }
-  }
-
   // Hard guarantee, independent of the CSS overflow/overscroll-behavior
   // lock above: while any pricing-card modal is open, block every wheel
   // or touch-drag scroll gesture that isn't happening *inside* the open
@@ -9082,8 +9051,58 @@
     if (modalBody && modalBody.contains(e.target)) return;
     e.preventDefault();
   }
-  document.addEventListener('wheel', blockScrollOutsideModal, { passive: false });
-  document.addEventListener('touchmove', blockScrollOutsideModal, { passive: false });
+
+  // NOTE: these used to be bound once, globally, for the entire page's
+  // lifetime. A document-level touchmove listener registered with
+  // { passive: false } forces the browser to hold off scrolling and wait
+  // for this handler to finish on the main thread on EVERY touch-move
+  // event anywhere on the page -- even though blockScrollOutsideModal()
+  // is a no-op almost all the time (no modal open). That's what made
+  // ordinary scrolling on phones feel like it kept "catching"/stuttering
+  // on transitions. They're now attached only while a modal is actually
+  // open (see lockBodyScroll/unlockBodyScroll below), so normal page
+  // scrolling is never intercepted by them at all.
+  function addModalScrollBlockers(){
+    document.addEventListener('wheel', blockScrollOutsideModal, { passive: false });
+    document.addEventListener('touchmove', blockScrollOutsideModal, { passive: false });
+  }
+  function removeModalScrollBlockers(){
+    document.removeEventListener('wheel', blockScrollOutsideModal, { passive: false });
+    document.removeEventListener('touchmove', blockScrollOutsideModal, { passive: false });
+  }
+
+  function lockBodyScroll(){
+    pcBodyScrollLockCount++;
+    if (pcBodyScrollLockCount === 1) {
+      // Hiding overflow makes the scrollbar disappear, which frees up
+      // whatever width it was taking and shifts the whole page right
+      // by that amount -- very noticeable on desktop browsers with a
+      // classic, space-taking scrollbar (a no-op on mobile/overlay
+      // scrollbars, which never took up layout space to begin with).
+      // Adding that same width back as padding on the body cancels the
+      // shift out. Measured only on this first, outermost lock call --
+      // by the time a second nested lock happens the scrollbar is
+      // already hidden, so measuring again would just read back 0.
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = scrollbarWidth + 'px';
+      }
+      addModalScrollBlockers();
+    }
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'contain';
+  }
+  function unlockBodyScroll(){
+    pcBodyScrollLockCount = Math.max(0, pcBodyScrollLockCount - 1);
+    if (pcBodyScrollLockCount === 0) {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.overscrollBehavior = '';
+      document.body.style.paddingRight = '';
+      removeModalScrollBlockers();
+    }
+  }
 
   function openPricingCard(card){
     if (!card || card.classList.contains('pc-open')) return;
