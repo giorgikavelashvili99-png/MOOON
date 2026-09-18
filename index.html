@@ -153,18 +153,11 @@
     background-size: 3px 3px;
     opacity:0.5;
   }
-  .ruler{
-    position:absolute; inset:0;
-    background-image: repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,0.028) 0px,
-      rgba(255,255,255,0.028) 1px,
-      transparent 1px,
-      transparent 80px
-    );
-    opacity:0.6;
-    mask-image: linear-gradient(180deg, transparent, black 15%, black 85%, transparent);
-  }
+  /* The vertical "ruler" pinstripes are gone by request — they showed
+     up as faint white columns over the whole background. Kept as a
+     no-op rule rather than deleting the element so nothing that
+     queries .ruler breaks. */
+  .ruler{ display:none !important; }
   .orb{
     position:absolute; border-radius:50%;
     filter:blur(50px);
@@ -260,7 +253,22 @@
      exactly what looked unfinished/"stretched onto a big monitor"
      rather than like an actual desktop site. */
   @media (min-width:900px){
-    .wrap{ max-width:1100px; padding:32px 32px 40px; }
+    .wrap{ max-width:1180px; padding:32px 32px 40px; }
+  }
+  /* Wide-screen ladder. A single hard cap (the old 1100px) meant a
+     1920px monitor showed ~800px of dead margin on each side, which is
+     exactly the "everything is squeezed into the middle" look. Each
+     step below hands the extra pixels back to the content instead,
+     while min() keeps a breathing gutter so nothing ever touches the
+     edge of the viewport. */
+  @media (min-width:1280px){
+    .wrap{ max-width:min(1480px, 94vw); padding:34px 40px 44px; }
+  }
+  @media (min-width:1600px){
+    .wrap{ max-width:min(1760px, 93vw); padding:38px 56px 52px; }
+  }
+  @media (min-width:1900px){
+    .wrap{ max-width:min(2080px, 92vw); padding:42px 72px 58px; }
   }
 
   .topbar{
@@ -268,7 +276,13 @@
     padding:6px 4px; margin-bottom:28px;
   }
   .topbar-left{
-    display:flex; align-items:flex-start; flex-wrap:nowrap; gap:30px; min-width:0;
+    display:flex; align-items:flex-start; flex-wrap:nowrap; gap:clamp(18px, 3vw, 46px); min-width:0;
+    /* Allowed to grow so the guide links can be centred in the space
+       between the logo and the right-hand actions. Previously this was
+       a fixed-size block, which parked both guide buttons hard against
+       the logo and left one large empty stretch across the middle of
+       the bar. */
+    flex:1 1 auto;
   }
   /* Desktop-only PDF guide links, shown next to the logo. Hidden by
      default (mobile keeps its existing layout, with the guide links
@@ -276,7 +290,11 @@
      900px breakpoint the rest of the desktop layout switches on. */
   .topbar-guide-links{
     display:none;
-    align-items:center; flex-wrap:nowrap; gap:12px; flex:0 0 auto;
+    align-items:center; flex-wrap:nowrap; gap:clamp(10px, 1.4vw, 22px);
+    /* Takes the leftover width and centres itself inside it, so the
+       two buttons sit in the middle of the bar rather than crowding
+       the logo with a large empty area to their right. */
+    flex:1 1 auto; justify-content:center;
     /* The logo image is a tall 98px box that includes a decorative
        swash tail below the wordmark, so align-items:center on the row
        would center this against that whole box and land the buttons
@@ -285,12 +303,18 @@
        itself instead. */
     margin-top:5px;
   }
-  @media (min-width:900px){
+  /* Dropped from 900px to 760px so tablets get the same topbar as
+     desktop instead of the separate mobile arrangement. */
+  @media (min-width:760px){
     .topbar-guide-links{ display:flex; }
   }
+  @media (min-width:760px) and (max-width:1023px){
+    .topbar-guide-link{ padding:10px 16px; font-size:14px; }
+    .topbar-guide-ico{ font-size:15px; }
+  }
   .topbar-guide-link{
-    display:inline-flex; align-items:center; gap:9px;
-    padding:13px 24px; border-radius:14px;
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    padding:13px clamp(20px, 2.2vw, 40px); border-radius:14px;
     background:#050508;
     border:1px solid rgba(59,109,255,0.42);
     box-shadow:
@@ -1538,6 +1562,20 @@
     cursor:pointer; transition:.15s;
   }
   .comments-panel .c-page-btn:hover{ border-color:rgba(124,143,255,0.5); color:var(--text); transform:translateY(-1px); }
+
+  /* ---- Compact comments panel ----------------------------------
+     Requested: the block was noticeably taller than it needed to be.
+     Nothing is removed — every element is still there, the vertical
+     rhythm is just tightened. The numbers below add up to roughly
+     100px (~2.6cm at 96dpi) off the total height. */
+  .comments-panel .c-form{ gap:8px; margin-bottom:12px; }
+  .comments-panel textarea.c-text{ height:64px; max-height:130px; }
+  .comments-panel .c-list{ gap:9px; }
+  .comments-panel .c-item{ padding:10px 14px; }
+  .comments-panel .c-item .c-top{ margin-bottom:6px; }
+  .comments-panel .c-empty{ padding:20px 0; }
+  .comments-panel .c-pagination{ margin-top:12px; }
+  .comments-panel .c-submit{ padding-top:11px; padding-bottom:11px; }
   .comments-panel .c-page-btn.active{
     background:linear-gradient(180deg, var(--purple), #29337a);
     border-color:var(--purple); color:#fff;
@@ -4354,7 +4392,7 @@
   /* On desktop these two links now live in the topbar next to the logo
      (see .topbar-guide-links), so the inline copy here is hidden to
      avoid showing the same two buttons twice. Mobile is untouched. */
-  @media (min-width:900px){
+  @media (min-width:760px){
     .pc-guide-row{ display:none; }
   }
   .pc-heading{
@@ -4413,28 +4451,58 @@
   .pc-carousel-shell, .pc-carousel-track, .pc-slide{ display:contents; }
   .pc-nav, .pc-dots{ display:none; }
 
-  @media (min-width:1100px){
+  /* Lowered from 1100px: phones and tablets used to fall back to a
+     plain stacked grid, which is the single biggest way the mobile
+     layout diverged from desktop. They now get the same 3D package
+     carousel, sized down rather than replaced. */
+  @media (min-width:360px){
     .pricing-cards.pc-carousel-mode{ display:block; }
     .pricing-cards.pc-carousel-mode > .pc-carousel-shell{
-      display:block; position:relative; padding:0 60px; margin-bottom:6px;
+      display:block; position:relative;
+      /* Shrinks to almost nothing on a phone so the card itself gets
+         the width, and opens back up to the original 60px gutters on
+         a desktop monitor where the arrows sit beside the cards. */
+      padding:0 clamp(6px, 6vw, 60px); margin-bottom:6px;
     }
+    /* pan-y lets the page still scroll vertically under the carousel
+       while horizontal swipes are handed to the drag handler. */
+    .pricing-cards.pc-carousel-mode .pc-carousel-track{ touch-action:pan-y; }
     .pricing-cards.pc-carousel-mode .pc-carousel-track{
       display:block; position:relative;
-      perspective:1900px; perspective-origin:50% 42%;
-      margin:0 auto 22px; max-width:940px;
+      perspective:2200px; perspective-origin:50% 44%;
+      margin:0 auto 22px; max-width:100%;
     }
     .pricing-cards.pc-carousel-mode .pc-slide{
       display:block; position:absolute; top:0; left:50%;
-      width:296px; cursor:pointer;
+      width:var(--pc-card-w, 296px); cursor:pointer;
       transform-style:preserve-3d;
-      transition:transform .55s cubic-bezier(.16,1,.3,1), opacity .45s ease, filter .4s ease;
-      transform:translate3d(calc(-50% + var(--pc-x,0px)), 0, var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
+      /* Transform runs on a springier curve than opacity/filter so the
+         card lands first and the depth cues settle a beat later — that
+         small stagger is what reads as "smooth" rather than everything
+         snapping at once. will-change keeps it on the compositor so a
+         fast double-click doesn't stutter mid-flight. */
+      transition:
+        transform .72s cubic-bezier(.22,1.02,.24,1),
+        opacity .5s cubic-bezier(.4,0,.2,1),
+        filter .55s cubic-bezier(.4,0,.2,1);
+      will-change:transform, opacity, filter;
+      transform:translate3d(calc(-50% + var(--pc-x,0px)), var(--pc-y,0px), var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
       opacity:var(--pc-op,1);
       filter:var(--pc-filter,none);
       z-index:var(--pc-zi,1);
       pointer-events:var(--pc-pe,auto);
     }
     .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--active{ cursor:default; }
+    /* Soft pool of light under whichever card currently holds focus.
+       It lives on a pseudo-element so it fades on its own timing and
+       never inherits the slide's 3D transform. */
+    .pricing-cards.pc-carousel-mode .pc-slide::after{
+      content:''; position:absolute; left:8%; right:8%; bottom:-26px; height:40px;
+      border-radius:50%; pointer-events:none;
+      background:radial-gradient(ellipse at center, rgba(124,143,255,0.34), rgba(124,143,255,0) 70%);
+      opacity:0; transition:opacity .55s ease; z-index:-1;
+    }
+    .pricing-cards.pc-carousel-mode .pc-slide--active::after{ opacity:1; }
     .pricing-cards.pc-carousel-mode .pc-carousel-track.pc-dragging .pc-slide{ transition:none; }
     .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
     .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
@@ -4450,11 +4518,24 @@
       transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease, opacity .2s ease;
     }
     .pricing-cards.pc-carousel-mode .pc-nav{ display:flex; }
-    .pc-nav:hover:not(:disabled){ transform:translateY(-50%) scale(1.08); border-color:var(--cyan,#22c3ff); box-shadow:0 14px 32px rgba(34,195,255,0.3); }
-    .pc-nav:active:not(:disabled){ transform:translateY(-50%) scale(0.94); }
+    /* The arrows used to jump 26px upward the moment you hovered them:
+       the base rule positions with margin-top:-26px, but the hover and
+       active rules re-declared transform with a translateY(-50%) the
+       base state never had, so the button shifted position instead of
+       just scaling. Scale only — they now stay exactly where they are. */
+    .pc-nav:hover:not(:disabled){ transform:scale(1.08); border-color:var(--cyan,#22c3ff); box-shadow:0 14px 32px rgba(34,195,255,0.3); }
+    .pc-nav:active:not(:disabled){ transform:scale(0.94); }
     .pc-nav:disabled{ opacity:0.28; cursor:default; }
     .pc-nav--prev{ left:0; }
     .pc-nav--next{ right:0; }
+    /* Below tablet width the arrows would sit on top of the card, so
+       they drop their opacity and move to the very edge instead. */
+    @media (max-width:700px){
+      .pc-nav{ width:40px; height:40px; margin-top:-20px; opacity:0.82; }
+      .pc-nav svg{ width:18px; height:18px; }
+      .pc-nav--prev{ left:-4px; }
+      .pc-nav--next{ right:-4px; }
+    }
     .pc-nav svg{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
 
     .pc-dots{ justify-content:center; align-items:center; gap:9px; }
@@ -4467,7 +4548,7 @@
     .pc-dot:hover{ background:rgba(255,255,255,0.5); }
     .pc-dot.is-active{ background:#fff; transform:scale(1.35); }
   }
-  @media (min-width:1100px) and (prefers-reduced-motion: reduce){
+  @media (min-width:360px) and (prefers-reduced-motion: reduce){
     .pricing-cards.pc-carousel-mode .pc-slide{ transition:opacity .2s ease; }
   }
 
@@ -7454,7 +7535,7 @@
   </div>
 
   <!-- Comments -->
-  <div class="panel comments-panel" style="padding:22px;">
+  <div class="panel comments-panel" style="padding:16px 18px;">
     <div class="panel-head" style="margin-bottom:10px;">
       <div class="label" data-i18n="commentsLabel">კომენტარები</div>
     </div>
@@ -7935,6 +8016,8 @@
       videoLinkError: '⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!',
       tiktokConfirmPrompt: 'დააჭირეთ დასადასტურებლად',
       tiktokConfirmDone: '✓ დადასტურებულია',
+      tiktokMissingAlert: 'შეკვეთის გასაგზავნად ჯერ მიუთითეთ თქვენი TikTok პროფილის ლინკი და დააჭირეთ „დადასტურებას“.',
+      tiktokUnconfirmedAlert: 'თქვენი TikTok ლინკი ჯერ არ არის დადასტურებული. დაბრუნდით ლინკის ველთან და დააჭირეთ „დადასტურებას“.',
       videoScanner: 'VIDEO SCANNER',
       dzTitle: 'ატვირთეთ ვიდეო ფასის გამოსათვლელად',
       dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
@@ -8368,6 +8451,8 @@
       videoLinkError: '⚠️ A link to your uploaded video is required to send the order!',
       tiktokConfirmPrompt: 'Click to confirm',
       tiktokConfirmDone: '✓ Confirmed',
+      tiktokMissingAlert: 'Before sending the order, enter your TikTok profile link and press “Confirm”.',
+      tiktokUnconfirmedAlert: 'Your TikTok link has not been confirmed yet. Go back to the link field and press “Confirm”.',
       videoScanner: 'VIDEO SCANNER',
       dzTitle: 'Upload a video for automatic measurement',
       dzSub: 'Drag it here or click — duration will be filled in automatically',
@@ -12661,15 +12746,27 @@ TikTok პროფილი: ${getTiktokValue('main')}
     // already on file from the original order, so skip the field entirely
     // (it's hidden in the UI too, see applySubscriptionUIFor()).
     if (!activeSub && g.link) {
+      // Same trap the video-link branch below already guards against:
+      // by the time someone reaches the final "send" step, the TikTok
+      // field from an earlier step is usually hidden. focus(),
+      // scrollIntoView() and the shake animation are all completely
+      // invisible on a display:none element, so the send was silently
+      // refused and the button genuinely looked dead. offsetParent is
+      // null for anything hidden that way, so fall back to a message
+      // the visitor cannot miss.
+      const ttVisible = g.link.offsetParent !== null;
       const linkVal = g.link.value.trim();
       if (!linkVal) {
         g.link.classList.add('error');
         if (g.error) g.error.style.display = 'block';
+        if (!ttVisible) { alert(t('tiktokMissingAlert') || t('tiktokError')); return false; }
         g.link.focus();
+        g.link.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return false;
       }
       if (!tiktokLinkConfirmed[panelKey]) {
         if (g.error) g.error.style.display = 'none';
+        if (!ttVisible) { alert(t('tiktokUnconfirmedAlert')); return false; }
         g.link.classList.remove('tt-shake', 'tt-error-flash');
         void g.link.offsetWidth;
         g.link.classList.add('tt-shake', 'tt-error-flash');
@@ -17221,13 +17318,36 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const container = document.querySelector('.pricing-cards');
     if (!container) return;
 
-    const BREAKPOINT = 1100;
-    const SPACING_X = 236;
+    // Matches the CSS media query above — the carousel is now the
+    // layout on phones and tablets too, not a desktop-only extra.
+    const BREAKPOINT = 360;
     const SPACING_Z = -150;
     const ROTATE_Y = 11;
     const SCALE_STEP = 0.13;
     const MIN_SCALE = 0.6;
-    const MAX_VISIBLE_OFFSET = 2;
+
+    // Everything below used to be fixed pixel constants tuned for a
+    // ~1100px shell. Now that .wrap keeps widening past that, they're
+    // derived from the actual shell width instead, so a 1920px monitor
+    // shows bigger cards and one more card per side rather than the
+    // same small cluster floating in the middle of empty space.
+    function metrics(){
+      const w = (track && track.parentElement ? track.parentElement.clientWidth : 0) || window.innerWidth;
+      // Narrow screens get one big readable card with its neighbours
+      // just peeking in at the edges; wide screens keep the full fan of
+      // two cards per side. A third per side would have to be clipped
+      // (body is overflow-x:hidden), which looks worse than hiding it.
+      if (w < 620){
+        const cardW = Math.round(Math.min(330, Math.max(210, w * 0.8)));
+        return { cardW, spacingX: Math.round(cardW * 0.62), maxVisible: 1 };
+      }
+      if (w < 900){
+        const cardW = Math.round(Math.min(330, w * 0.42));
+        return { cardW, spacingX: Math.round(cardW * 0.72), maxVisible: 2 };
+      }
+      const cardW = Math.round(Math.max(296, Math.min(380, w * 0.235)));
+      return { cardW, spacingX: Math.round(cardW * 0.78), maxVisible: 2 };
+    }
 
     let built = false;
     let active = false;
@@ -17311,15 +17431,32 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // to the >=1100px breakpoint already, so touch input never
       // reaches this code path in the first place).
       let dragging = false, moved = false, startX = 0;
+      // Touch is no longer excluded: the carousel is the phone layout
+      // now, so a finger swipe has to move it the same way a mouse drag
+      // does. Vertical page scrolling still works because the track is
+      // touch-action:pan-y.
+      let startY = 0, axisLocked = '';
       track.addEventListener('pointerdown', (e) => {
-        if (!active || e.pointerType === 'touch') return;
-        dragging = true; moved = false; startX = e.clientX;
+        if (!active) return;
+        dragging = true; moved = false; axisLocked = '';
+        startX = e.clientX; startY = e.clientY;
         track.classList.add('pc-dragging');
         try{ track.setPointerCapture(e.pointerId); }catch(err){}
       });
       track.addEventListener('pointermove', (e) => {
         if (!dragging) return;
-        if (Math.abs(e.clientX - startX) > 6) moved = true;
+        const dx = Math.abs(e.clientX - startX);
+        const dy = Math.abs(e.clientY - startY);
+        // Decide once whether this gesture is a horizontal swipe or a
+        // vertical scroll, then stick with it — otherwise a finger
+        // scrolling down the page drifts sideways and flips the card.
+        if (!axisLocked && (dx > 8 || dy > 8)) axisLocked = dx > dy ? 'x' : 'y';
+        if (axisLocked === 'y') { dragging = false; track.classList.remove('pc-dragging'); return; }
+        // 6px was low enough that ordinary hand-tremor while clicking
+        // counted as a drag — and a "drag" swallows the click that ends
+        // it, so pressing the order button on the centre card could do
+        // nothing at all. A real swipe easily clears 14px.
+        if (dx > 14) moved = true;
       });
       function endDrag(e){
         if (!dragging) return;
@@ -17328,8 +17465,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if (moved) {
           suppressClick = true;
           const dx = e.clientX - startX;
-          if (dx > 55) goTo(activeIndex - 1);
-          else if (dx < -55) goTo(activeIndex + 1);
+          const threshold = window.innerWidth < 620 ? 34 : 55;
+          if (dx > threshold) goTo(activeIndex - 1);
+          else if (dx < -threshold) goTo(activeIndex + 1);
         }
       }
       track.addEventListener('pointerup', endDrag);
@@ -17354,19 +17492,31 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     function position(){
+      const m = metrics();
+      if (track) track.style.setProperty('--pc-card-w', m.cardW + 'px');
       slides.forEach((slide, i) => {
         const offset = i - activeIndex;
         const abs = Math.abs(offset);
         const dir = offset === 0 ? 0 : (offset > 0 ? 1 : -1);
         const clampedAbs = Math.min(abs, 3);
-        const hide = abs > MAX_VISIBLE_OFFSET;
-        slide.style.setProperty('--pc-x', (offset * SPACING_X) + 'px');
+        const hide = abs > m.maxVisible;
+        slide.style.setProperty('--pc-x', (offset * m.spacingX) + 'px');
         slide.style.setProperty('--pc-z', (clampedAbs * SPACING_Z) + 'px');
+        // Side cards drop a few pixels so the centre one visibly rises
+        // out of the row instead of only growing in place.
+        slide.style.setProperty('--pc-y', (offset === 0 ? -6 : clampedAbs * 10) + 'px');
         slide.style.setProperty('--pc-ry', (-dir * clampedAbs * ROTATE_Y) + 'deg');
         slide.style.setProperty('--pc-scale', Math.max(1 - clampedAbs * SCALE_STEP, MIN_SCALE));
-        slide.style.setProperty('--pc-op', hide ? 0 : Math.max(1 - abs * 0.28, 0.4));
+        slide.style.setProperty('--pc-op', hide ? 0 : Math.max(1 - abs * 0.24, 0.38));
         slide.style.setProperty('--pc-zi', String(100 - abs));
-        slide.style.setProperty('--pc-filter', offset === 0 ? 'brightness(1) saturate(1)' : 'brightness(.72) saturate(.85)');
+        // A touch of blur on the off-centre cards reads as real depth
+        // and makes the card you're actually choosing unmistakable.
+        slide.style.setProperty(
+          '--pc-filter',
+          offset === 0
+            ? 'brightness(1) saturate(1.04) blur(0px)'
+            : 'brightness(' + Math.max(0.58, 0.78 - (clampedAbs - 1) * 0.1).toFixed(2) + ') saturate(.85) blur(' + (clampedAbs * 1.1).toFixed(1) + 'px)'
+        );
         slide.style.setProperty('--pc-pe', hide ? 'none' : 'auto');
         slide.classList.toggle('pc-slide--active', offset === 0);
       });
@@ -17382,7 +17532,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const card = slide.firstElementChild;
         if (card) maxH = Math.max(maxH, card.offsetHeight);
       });
-      if (maxH) track.style.height = (maxH + 34) + 'px';
+      if (maxH) track.style.height = (maxH + 64) + 'px';
     }
 
     function activate(){
@@ -17409,7 +17559,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     let resizeTimer = null;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { sync(); if (active) measureHeight(); }, 150);
+      resizeTimer = setTimeout(() => {
+        sync();
+        // position() has to re-run too now that card width and spacing
+        // are derived from the shell width rather than fixed constants.
+        if (active) { position(); measureHeight(); }
+      }, 150);
     });
     window.addEventListener('load', () => { if (active) measureHeight(); });
 
