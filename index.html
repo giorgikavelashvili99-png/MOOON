@@ -2720,16 +2720,25 @@
      finalizing: that wait can take up to a minute (the transfer
      service's free hosting tier has to cold-start), and a silent
      pulsing number with no explanation for that long reads as frozen —
-     so the label reappears just for that phase. */
+     so the label reappears just for that phase.
+
+     IMPORTANT: this element's box is reserved from the very start
+     (real height, just invisible via opacity) rather than collapsed to
+     1x1px and then switched to position:static/display:block only once
+     finalizing begins. That switch used to insert a real block of text
+     — with real height — into the card with no transition, so the
+     whole upload card visibly grew and "resettled" at a taller size
+     right as finalizing kicked in. Reserving the space up front means
+     the card is the same size for the entire upload, start to finish;
+     only the text's opacity changes. */
   .mooon-auto-sr-only{
-    position:absolute; width:1px; height:1px; margin:-1px; padding:0;
-    overflow:hidden; white-space:nowrap; border:0; clip:rect(0,0,0,0);
+    display:block; text-align:center; margin-top:10px;
+    font-size:12px; font-weight:600; color:var(--upload-accent);
+    line-height:1.4;
+    opacity:0; transition:opacity .25s ease;
   }
   .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only{
-    position:static; width:auto; height:auto; margin:10px 0 0; padding:0;
-    overflow:visible; white-space:normal; clip:auto;
-    display:block; text-align:center;
-    font-size:12px; font-weight:600; color:var(--upload-accent);
+    opacity:1;
     animation: moonFinalizingFade 1.6s ease-in-out infinite;
   }
   @keyframes moonFinalizingFade{ 0%,100%{ opacity:1; } 50%{ opacity:0.55; } }
