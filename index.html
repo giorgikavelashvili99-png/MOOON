@@ -17468,12 +17468,28 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // does. Vertical page scrolling still works because the track is
       // touch-action:pan-y.
       let startY = 0, axisLocked = '';
+      let capturedPointerId = null;
       track.addEventListener('pointerdown', (e) => {
         if (!active) return;
         dragging = true; moved = false; axisLocked = '';
         startX = e.clientX; startY = e.clientY;
-        track.classList.add('pc-dragging');
-        try{ track.setPointerCapture(e.pointerId); }catch(err){}
+        capturedPointerId = e.pointerId;
+        // NOTE: pointer capture is deliberately NOT taken here on every
+        // press anymore. Chrome retargets the click event that follows a
+        // captured pointer to the CAPTURING element (this track) instead
+        // of whatever was actually under the cursor -- so with capture
+        // taken on every single pointerdown, EVERY click on the centre
+        // card's "შეკვეთა" button (even a perfectly still one, zero
+        // movement) was silently retargeted to the track div and never
+        // reached the button's own click handler at all. This is the
+        // real root cause of "the order button does nothing on desktop"
+        // (confirmed by instrumenting real mouse-driven pointerdown/
+        // pointerup/click events end-to-end -- the earlier fix below,
+        // which only guarded the suppressClick flag, did not address
+        // this and left the bug fully in place). Capture is now only
+        // claimed once we KNOW a real horizontal swipe is happening
+        // (see pointermove below), so a plain click never captures the
+        // pointer and its click event keeps its natural target.
       });
       track.addEventListener('pointermove', (e) => {
         if (!dragging) return;
@@ -17482,7 +17498,13 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         // Decide once whether this gesture is a horizontal swipe or a
         // vertical scroll, then stick with it — otherwise a finger
         // scrolling down the page drifts sideways and flips the card.
-        if (!axisLocked && (dx > 8 || dy > 8)) axisLocked = dx > dy ? 'x' : 'y';
+        if (!axisLocked && (dx > 8 || dy > 8)) {
+          axisLocked = dx > dy ? 'x' : 'y';
+          if (axisLocked === 'x') {
+            track.classList.add('pc-dragging');
+            try{ track.setPointerCapture(capturedPointerId); }catch(err){}
+          }
+        }
         if (axisLocked === 'y') { dragging = false; track.classList.remove('pc-dragging'); return; }
         // 6px was low enough that ordinary hand-tremor while clicking
         // counted as a drag — and a "drag" swallows the click that ends
