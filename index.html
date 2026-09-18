@@ -6101,7 +6101,6 @@
 
 <div class="discord-gate" id="discordGate" role="dialog" aria-modal="true" aria-labelledby="discordGateTitle">
   <div class="discord-gate-card">
-    <button type="button" class="discord-gate-close" id="discordGateClose" aria-label="დახურვა">✕</button>
     <div class="discord-gate-logo" aria-hidden="true">🌙</div>
     <div class="discord-gate-title" id="discordGateTitle" data-i18n="authGateTitle">შედი Discord ანგარიშით</div>
     <div class="discord-gate-sub" data-i18n="authGateSub">დაუკავშირდი შენს Discord ანგარიშს, რომ თვალი ადევნო შენს შეკვეთებს და პირველმა მიიღო სიახლეები.</div>
@@ -6113,7 +6112,6 @@
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authJoinBtn">შემოუერთდი ჩვენს Discord სერვერს</span>
     </a>
-    <div class="discord-gate-skip" id="discordGateSkip" data-i18n="authGateSkip">გაგრძელება სტუმრად</div>
   </div>
 </div>
 
@@ -12544,15 +12542,11 @@
       startDiscordLogin();
       return;
     }
-    // isMember comes from the auth worker's own guild-membership check
-    // (Discord's /users/@me/guilds, using the access token that never
-    // reaches this page) — not something set or trusted from the
-    // frontend, so this can't be bypassed by editing local state.
-    if (currentDiscordUser.isMember === false){
-      savePendingOrder(orderData, firstMessageText, idleKey);
-      showGuildJoinGate();
-      return;
-    }
+    // Being a member of the Discord server is deliberately NOT required
+    // anymore -- a plain Discord login (currentDiscordUser, checked just
+    // above) is enough on its own to send an order. showGuildJoinGate()
+    // below is kept only because savePendingOrder()/resumePendingOrderIfAny
+    // still reference it defensively; it is no longer called from here.
     if (btn) btn.disabled = true;
     if (textEl) textEl.textContent = t('orderProcessing') || '…';
 
@@ -15960,15 +15954,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     let raw;
     try{ raw = sessionStorage.getItem(PENDING_ORDER_KEY); }catch(e){ return; }
     if (!raw) return;
-    if (user.isMember === false){
-      // Deliberately NOT removed here -- this needs to survive the
-      // "join the server, then retry" full-page navigation too, not just
-      // the first OAuth round trip. The one-shot guard above already
-      // stops this from re-firing repeatedly within this same page load;
-      // removal only happens once an attempt actually completes (below).
-      showGuildJoinGate();
-      return;
-    }
+    // Guild membership is no longer required to resume/send a pending
+    // order either (see the matching change in startOrderChat).
     try{ sessionStorage.removeItem(PENDING_ORDER_KEY); }catch(e){}
     let pending;
     try{ pending = JSON.parse(raw); }catch(e){ return; }
@@ -16013,11 +16000,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const loginBtn = document.getElementById('discordLoginBtn');
         const titleEl = document.getElementById('discordGateTitle');
         const subEl = gate.querySelector('.discord-gate-sub');
-        const skipEl = document.getElementById('discordGateSkip');
         if (loginBtn) loginBtn.style.display = '';
         if (titleEl) titleEl.textContent = t('authGateTitle');
         if (subEl) subEl.textContent = t('authGateSub');
-        if (skipEl) { skipEl.textContent = t('authGateSkip'); skipEl.onclick = null; }
         gate.classList.add('open');
       }
     }
@@ -16127,8 +16112,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const logoutBtn = document.getElementById('discordLogoutBtn');
     const refreshBtn = document.getElementById('discordRefreshBtn');
     const gate = document.getElementById('discordGate');
-    const gateClose = document.getElementById('discordGateClose');
-    const gateSkip = document.getElementById('discordGateSkip');
     const joinBtn = document.getElementById('discordJoinBtn');
     if (joinBtn) joinBtn.href = DISCORD_INVITE_URL;
 
@@ -16179,8 +16162,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       await checkDiscordSession();
       refreshBtn.disabled = false;
     });
-    if (gateClose) gateClose.addEventListener('click', () => gate && gate.classList.remove('open'));
-    if (gateSkip) gateSkip.addEventListener('click', () => gate && gate.classList.remove('open'));
+    // Login is mandatory now: the close (✕) and "continue as guest"
+    // controls have been removed from the markup entirely, so there is
+    // deliberately no way left to dismiss this gate without completing
+    // Discord login.
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
