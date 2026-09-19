@@ -4415,9 +4415,12 @@
   .pc-carousel-shell, .pc-carousel-track, .pc-slide{ display:contents; }
   .pc-nav, .pc-dots{ display:none; }
 
-  /* Looping 3D carousel on EVERY screen size. Only transform + opacity
-     are animated (GPU-only); the old brightness/saturate filter on six
-     huge cards is replaced by a cheap dark overlay (--pc-dim). */
+  /* Looping 3D carousel on every screen size. Smoothness rules: each card
+     is ONE stable GPU layer; only transform/opacity change and they are
+     written inline (no inherited CSS variables -> no style recalculation
+     of the hundreds of elements inside each card). While a move runs
+     (.pc-moving) everything inside the cards is frozen and ignores the
+     pointer, so nothing repaints mid-flight. */
   .pricing-cards.pc-carousel-mode{ display:block; overflow-x:clip; --pc-w:min(296px, calc(100vw - 96px)); }
   .pricing-cards.pc-carousel-mode > .pc-carousel-shell{ display:flex; flex-direction:column; position:relative; padding:0; margin-bottom:6px; }
   .pricing-cards.pc-carousel-mode .pc-carousel-track{
@@ -4427,23 +4430,23 @@
   }
   .pricing-cards.pc-carousel-mode .pc-slide{
     display:block; position:absolute; top:0; left:50%; width:var(--pc-w); cursor:pointer;
-    transform:translate3d(calc(-50% + var(--pc-x,0px)), 0, var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
-    opacity:var(--pc-op,1); z-index:var(--pc-zi,1);
-    visibility:var(--pc-vis,visible); pointer-events:var(--pc-pe,auto);
-    transition:transform .42s cubic-bezier(.22,.8,.28,1), opacity .35s ease, visibility 0s linear var(--pc-vd,0s);
-    will-change:transform, opacity;
-    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    transform:translate3d(-50%,0,0);
+    will-change:transform;
   }
-  .pricing-cards.pc-carousel-mode .pc-slide::after{
-    content:''; position:absolute; inset:0; border-radius:28px; z-index:5;
-    background:#05060c; opacity:var(--pc-dim,0); pointer-events:none;
-    transition:opacity .35s ease;
+  .pc-dim{
+    position:absolute; inset:0; border-radius:28px; z-index:5;
+    background:#05060c; opacity:0; pointer-events:none;
+    transition:opacity .35s ease; will-change:opacity;
   }
   .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--active{ cursor:default; }
-  /* Only the centered card runs its ambient animations. */
   .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *,
   .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *::before,
   .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *::after{ animation-play-state:paused !important; }
+  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide{ pointer-events:none; }
+  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide *:not(.pc-dim),
+  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide *::before,
+  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide *::after{ animation-play-state:paused !important; transition:none !important; }
+  .pricing-cards.pc-carousel-mode.pc-moving .pc-card--monthly::after{ visibility:hidden; }
   .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
   .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
 
@@ -17360,6 +17363,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         slide.className = 'pc-slide';
         track.appendChild(slide);
         slide.appendChild(el);
+        const dim = document.createElement('i');
+        dim.className = 'pc-dim';
+        slide.appendChild(dim);
+        slide._dim = dim;
         return slide;
       });
 
@@ -17445,37 +17452,47 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     // Circular: after the last card comes the first, and vice-versa.
+    let moveTimer = 0;
     function goTo(i){
       const n = slides.length;
       activeIndex = ((i % n) + n) % n;
+      container.classList.add('pc-moving');
+      clearTimeout(moveTimer);
+      moveTimer = setTimeout(() => container.classList.remove('pc-moving'), 480);
       position();
     }
 
+    function trans(hide){
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return 'opacity .2s ease';
+      return 'transform .42s cubic-bezier(.22,.8,.28,1), opacity .3s ease, visibility 0s linear ' + (hide ? '.42s' : '0s');
+    }
+
     function position(){
-      const n = slides.length, m = metrics(), jumped = [];
+      const n = slides.length, m = metrics(), snapped = [];
       slides.forEach((slide, i) => {
         let off = i - activeIndex;
         if (off > n / 2) off -= n; else if (off < -n / 2) off += n;
         const abs = Math.abs(off), dir = off === 0 ? 0 : (off > 0 ? 1 : -1);
         const c = Math.min(abs, 3), hide = abs > m.vis, s = slide.style;
-        // A card that wraps around the ring while invisible must not fly
-        // across the stage — snap it, fade only.
-        const jump = slide._off !== undefined && Math.abs(off - slide._off) > 2;
-        if (jump) { s.transition = 'opacity .35s ease'; jumped.push(s); }
+        const first = slide._off === undefined;
+        // first paint, or a card wrapping round the ring while invisible:
+        // don't fly across the stage — snap (fade only).
+        const snap = first || Math.abs(off - slide._off) > 2;
         slide._off = off;
-        s.setProperty('--pc-x', (off * m.sx) + 'px');
-        s.setProperty('--pc-z', (c * m.sz) + 'px');
-        s.setProperty('--pc-ry', (-dir * c * m.ry) + 'deg');
-        s.setProperty('--pc-scale', Math.max(1 - c * m.step, 0.6));
-        s.setProperty('--pc-op', hide ? 0 : Math.max(1 - abs * 0.28, 0.45));
-        s.setProperty('--pc-zi', String(100 - abs));
-        s.setProperty('--pc-dim', off === 0 ? 0 : 0.32);
-        s.setProperty('--pc-vis', hide ? 'hidden' : 'visible');
-        s.setProperty('--pc-vd', hide ? '.42s' : '0s');
-        s.setProperty('--pc-pe', hide ? 'none' : 'auto');
+        s.transition = first ? 'none' : (snap ? 'opacity .3s ease' : trans(hide));
+        if (snap) snapped.push(slide);
+        s.transform = 'translate3d(calc(-50% + ' + (off * m.sx) + 'px),0,' + (c * m.sz) + 'px) rotateY(' + (-dir * c * m.ry) + 'deg) scale(' + Math.max(1 - c * m.step, 0.6) + ')';
+        s.opacity = hide ? '0' : '1';
+        s.visibility = hide ? 'hidden' : 'visible';
+        s.zIndex = String(100 - abs);
+        if (slide._dim) slide._dim.style.opacity = off === 0 ? '0' : String(Math.min(0.28 + 0.14 * (abs - 1), 0.6));
         slide.classList.toggle('pc-slide--active', off === 0);
       });
-      if (jumped.length) { void track.offsetWidth; jumped.forEach(s => { s.transition = ''; }); }
+      if (snapped.length) {
+        void track.offsetWidth;
+        snapped.forEach(sl => { sl.style.transition = trans(Math.abs(sl._off) > m.vis); });
+      }
       dots.forEach((d, i) => d.classList.toggle('is-active', i === activeIndex));
     }
 
