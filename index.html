@@ -5981,12 +5981,6 @@
   /* Question (Yes/No) and progress card share one grid cell, and the card
      is laid out (invisible) from the start, so the box has the same height
      before, during and after the upload — no grow/shrink jumps. */
-  .sr-transfer.show, .mooon-prompt.show{ display:grid; grid-template-columns:minmax(0,1fr); }
-  .sr-transfer > *, .mooon-prompt > *{ grid-column:1; min-width:0; }
-  .sr-transfer > .sr-transfer-q, .mooon-prompt > .mooon-prompt-q{ grid-row:1; align-self:end; }
-  .sr-transfer > .sr-transfer-actions, .mooon-prompt > .mooon-prompt-actions{ grid-row:2; align-self:start; }
-  .sr-transfer > .mooon-auto, .mooon-prompt > .mooon-auto{ grid-row:1 / span 2; display:block; visibility:hidden; }
-  .sr-transfer > .mooon-auto.show, .mooon-prompt > .mooon-auto.show{ visibility:visible; }
 
   /* ============================================================
      ORDER MODAL — same phone-style size/design on every screen and
@@ -6001,6 +5995,32 @@
   .pc-modal-scrim .drop-zone{ padding:30px 18px; border-radius:22px; min-height:150px; }
   .pc-modal-scrim .drop-zone .dz-icon{ width:46px; height:46px; margin-bottom:12px; }
   .pc-modal-scrim .drop-zone .dz-title{ font-size:15px; }
+
+  /* Tight vertical rhythm on EVERY step (upload / quality / TikTok /
+     confirm) and every package: no leftover gaps. */
+  .pc-modal-scrim .pc-modal-scroll .field{ margin-bottom:12px; }
+  .pc-modal-scrim .pc-modal-scroll .panel-divider{ margin:16px 0 14px; }
+  .pc-modal-scrim .pc-modal-scroll .panel-head{ margin-bottom:12px !important; padding-bottom:10px; }
+  .pc-modal-scrim .scanner-stage{ padding:14px; }
+  .pc-modal-scrim .scan-result{ margin-top:0; }
+  .pc-modal-scrim .sr-transfer{ margin:10px 0 0; padding:14px; }
+  .pc-modal-scrim .wizard-question{ padding:16px; gap:12px; }
+  .pc-modal-scrim > .pc-accordion-body.panel{ padding-bottom:16px; }
+  /* Progress card: compact, so it swaps in without changing the box height. */
+  .pc-modal-scrim .mooon-auto{ margin-top:0; padding:12px 14px; }
+  .pc-modal-scrim .mooon-auto-status{ margin-bottom:8px; }
+  .pc-modal-scrim .mooon-auto-ring-box{ min-height:0; }
+  .pc-modal-scrim .mooon-auto-ring-percent{ font-size:30px; }
+  .pc-modal-scrim .mooon-auto-stay{ margin-top:8px; }
+  .pc-modal-scrim .mooon-auto-status .mooon-auto-sr-only{ margin-top:4px; }
+
+  /* Desktop: the SAME phone design, just scaled up uniformly so it
+     fills the screen the way the phone version does (every step and
+     every package scales together). Change the 1.5 to resize all. */
+  @media (min-width:901px){
+    .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1.5; }
+    .pc-modal-scrim .pc-modal-scroll{ max-height:calc(90vh / 1.65); }
+  }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -7777,7 +7797,7 @@
 
     if (reduce || !container) { instantSwap(); return; }
 
-    const startH = container.getBoundingClientRect().height;
+    const startH = container.offsetHeight;
     container.style.height = startH + 'px';
     container.style.overflowY = 'hidden';
 
@@ -7792,7 +7812,7 @@
       showEls.forEach(el => el.classList.remove('wizard-step-hidden'));
 
       container.style.height = 'auto';
-      const endH = container.getBoundingClientRect().height;
+      const endH = container.offsetHeight;
       container.style.height = startH + 'px';
       void container.offsetHeight;
       container.style.transition = 'height .38s cubic-bezier(.2,.7,.3,1)';
