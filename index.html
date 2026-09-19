@@ -6013,16 +6013,10 @@
       /* scroll-reveal is pointless in a horizontal strip */
       opacity:1 !important; transform:none !important; filter:none !important;
     }
-    /* TikTok downloader row lives under the cards: pinned to the viewport
-       edge so it does not slide away while swiping cards. */
-    .pricing-cards > .pc-ttdl-row{
-      grid-row:2; grid-column:1;
-      position:sticky; left:8px;
-      width:var(--pc-row-w, calc(100vw - 42px));
-      align-self:start;
-      touch-action:pan-y;
-      opacity:1 !important; transform:none !important; filter:none !important;
-    }
+    /* Each card is its own compositor layer: it is painted once and then only
+       moved while swiping, instead of being re-rasterised as it scrolls in. */
+    .pricing-cards > .pc-card-wrap,
+    .pricing-cards > .pc-card{ will-change:transform; }
     .pc-phone-dots{
       display:flex; justify-content:center; align-items:center; gap:9px;
       margin:4px 0 -6px;
@@ -6036,19 +6030,6 @@
     }
     .pc-phone-dots button::after{ content:''; position:absolute; inset:-10px -5px; }
     .pc-phone-dots button.on{ width:24px; border-radius:6px; background:#fff; }
-  }
-
-  /* ============================================================
-     Order shell: constant size on desktop/tablet.
-     Every wizard order panel (single / weekly / monthly / cheap) keeps
-     ONE fixed height for the whole flow (drop zone -> upload -> quality ->
-     link -> send). Content taller than that scrolls inside the shell.
-     ============================================================ */
-  @media (min-width:701px){
-    .pc-modal-scroll:has(#videoScannerPanel, #scanResultWp, #scanResultMp, #scanResultCp, #scanResultCpm){
-      --pc-shell-fixed:1;
-      height:min(80vh, 460px);
-    }
   }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -7826,24 +7807,6 @@
 
     if (reduce || !container) { instantSwap(); return; }
 
-    // Desktop/tablet: the order shell has ONE fixed height (see
-    // .pc-modal-scroll:has(...) in the CSS), so steps swap inside it without
-    // any height animation -> the shell never grows/shrinks between steps.
-    if (window.matchMedia && window.matchMedia('(min-width:701px)').matches &&
-        getComputedStyle(container).getPropertyValue('--pc-shell-fixed').trim() === '1') {
-      hideEls.forEach(el => el.classList.add('wiz-step-exit'));
-      window.setTimeout(function(){
-        hideEls.forEach(el => {
-          el.classList.remove('wiz-step-exit');
-          el.classList.add('wizard-step-hidden');
-        });
-        if (midCallback) midCallback();
-        showEls.forEach(el => el.classList.remove('wizard-step-hidden'));
-        container.scrollTop = 0;
-      }, 190);
-      return;
-    }
-
     const startH = container.getBoundingClientRect().height;
     container.style.height = startH + 'px';
     container.style.overflowY = 'hidden';
@@ -9135,6 +9098,42 @@
     document.removeEventListener('touchmove', blockScrollOutsideModal, { passive: false });
   }
 
+  // Desktop/tablet: while an order is open, its shell may only GROW (never
+  // shrink back) so it no longer jumps big -> small -> big between steps.
+  // It starts at its natural compact size, so there is no empty space at
+  // step 1. Phones keep their normal behaviour.
+  let shellRatchet = null;
+  function startShellRatchet(panel){
+    stopShellRatchet();
+    if (!panel || !window.ResizeObserver || !window.matchMedia || !window.matchMedia('(min-width:701px)').matches) return;
+    const sc = panel.querySelector('.pc-modal-scroll');
+    if (!sc) return;
+    sc.style.minHeight = '';
+    let maxH = 0;
+    const ro = new ResizeObserver(() => {
+      // offsetHeight (layout px) — NOT getBoundingClientRect, which includes
+      // transforms/zoom and made this feed back on itself.
+      const h = sc.offsetHeight;
+      if (h > maxH + 0.5) {
+        maxH = h;
+        // min-height applies to the content box unless box-sizing is border-box
+        const cs = getComputedStyle(sc);
+        const extra = cs.boxSizing === 'border-box' ? 0 :
+          (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) +
+          (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+        sc.style.minHeight = (h - extra) + 'px';
+      }
+    });
+    ro.observe(sc);
+    shellRatchet = { ro, sc };
+  }
+  function stopShellRatchet(){
+    if (!shellRatchet) return;
+    shellRatchet.ro.disconnect();
+    shellRatchet.sc.style.minHeight = '';
+    shellRatchet = null;
+  }
+
   function openPricingCard(card){
     if (!card || card.classList.contains('pc-open')) return;
     // Only one card open at a time.
@@ -9161,6 +9160,7 @@
     if (panel && pcModalScrim) {
       panel._pcHomeCard = card;
       pcModalScrim.appendChild(panel);
+      startShellRatchet(panel);
     }
     if (pcModalScrim) pcModalScrim.classList.add('open');
     lockBodyScroll();
@@ -9171,6 +9171,7 @@
     const btn = card.querySelector('.pc-toggle-btn');
     // Move the panel back to its original spot in the card markup.
     const panel = pcModalScrim ? pcModalScrim.querySelector('.pc-accordion-body') : null;
+    stopShellRatchet();
     if (panel && panel._pcHomeCard === card) {
       if (btn && btn.parentNode === card) card.insertBefore(panel, btn.nextSibling);
       else card.appendChild(panel);
@@ -17620,43 +17621,110 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   ttdlSafeInit(initScrollReveal);
   ttdlSafeInit(initPricingCarousel);
 
-  // Phone (<=700px): dots for the scroll-snap card strip.
+  // Phone (<=700px): endless swipe + dots for the scroll-snap card strip.
+  // Endless = the cards are re-ORDERED with CSS `order` while the strip is
+  // idle (no DOM moves -> no re-created layers / re-paints -> no hitch),
+  // with scrollLeft compensated so nothing visibly moves. A card therefore
+  // always exists on both sides of the current one.
   function initPhoneCardDots(){
     const container = document.querySelector('.pricing-cards');
     if (!container) return;
-    const cards = Array.from(container.children).filter(c => c.classList.contains('pc-card-wrap') || c.classList.contains('pc-card'));
-    if (cards.length < 2) return;
+    const isCard = c => c.classList && (c.classList.contains('pc-card-wrap') || c.classList.contains('pc-card'));
+    const orig = Array.from(container.children).filter(isCard);
+    const N = orig.length;
+    if (N < 2) return;
+    let seq = orig.slice();                       // current logical order
+    const ttdl = container.querySelector(':scope > .pc-ttdl-row');
+    const isPhone = () => window.innerWidth <= 700;
+    container.style.overflowAnchor = 'none';
+
     const dots = document.createElement('div');
     dots.className = 'pc-phone-dots';
     dots.setAttribute('aria-hidden', 'true');
-    const btns = cards.map((c, i) => {
+    const btns = orig.map(c => {
       const b = document.createElement('button');
       b.type = 'button'; b.tabIndex = -1;
       b.addEventListener('click', () => {
-        const step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : container.clientWidth;
-        container.scrollTo({ left: i * step, behavior: 'smooth' });
+        const st = stepPx(), j = seq.indexOf(c);
+        if (st && j !== -1) container.scrollTo({ left: j * st, behavior: 'smooth' });
       });
       dots.appendChild(b);
       return b;
     });
-    container.insertAdjacentElement('beforebegin', dots);  // above the strip: the TikTok row lives inside the same scroller
-    let cur = -1, ticking = false;
-    function update(){
-      ticking = false;
-      const step = cards[1].offsetLeft - cards[0].offsetLeft;
-      if (!step) return;
-      const i = Math.max(0, Math.min(cards.length - 1, Math.round(container.scrollLeft / step)));
-      if (i === cur) return;
-      cur = i;
-      btns.forEach((b, k) => b.classList.toggle('on', k === i));
+    container.insertAdjacentElement('beforebegin', dots);
+
+    function applyOrder(){ seq.forEach((c, i) => { c.style.order = String(i); }); }
+    function stepPx(){ return seq[1].offsetLeft - seq[0].offsetLeft; }
+    function currentIndex(){
+      const st = stepPx();
+      if (!st) return 0;
+      return Math.max(0, Math.min(N - 1, Math.round(container.scrollLeft / st)));
     }
+    let cur = -1;
+    function updateDots(){
+      const k = orig.indexOf(seq[currentIndex()]);
+      if (k === cur || k === -1) return;
+      cur = k;
+      btns.forEach((b, i) => b.classList.toggle('on', i === k));
+    }
+
+    // keep the current card in the middle band (positions 2..N-3)
+    function recenter(){
+      if (!isPhone()) return;
+      const st = stepPx();
+      if (!st) return;
+      let i = currentIndex();
+      const lo = 2, hi = N - 3;
+      if (i >= lo && i <= hi) return;
+      const ref = seq[i];
+      const x0 = ref.getBoundingClientRect().left;
+      let guard = 0;
+      while (i < lo && guard++ < N)       { seq.unshift(seq.pop());   i++; }
+      while (i > hi && guard++ < 2 * N)   { seq.push(seq.shift());    i--; }
+      applyOrder();
+      container.scrollLeft += ref.getBoundingClientRect().left - x0;
+    }
+
+    // The TikTok row must not live inside the horizontal scroller
+    // (a sticky heavy widget is re-composited on every scroll frame).
+    function moveTtdlOut(){ if (ttdl && ttdl.parentNode === container) container.insertAdjacentElement('afterend', ttdl); }
+    function moveTtdlIn(){ if (ttdl && ttdl.parentNode !== container) container.appendChild(ttdl); }
+    // leaving the phone layout: desktop carousel wants the original order/DOM
+    function restore(){
+      seq = orig.slice();
+      orig.forEach(c => { c.style.order = ''; });
+      moveTtdlIn();
+      container.scrollLeft = 0;
+    }
+
+    let touching = false, settleTimer = null;
+    function armSettle(){
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => { if (touching) { armSettle(); return; } recenter(); updateDots(); }, 140);
+    }
+    container.addEventListener('touchstart', () => { touching = true; }, { passive: true });
+    container.addEventListener('touchend', () => { touching = false; armSettle(); }, { passive: true });
+    container.addEventListener('touchcancel', () => { touching = false; armSettle(); }, { passive: true });
+    let ticking = false;
     container.addEventListener('scroll', () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; updateDots(); }); }
+      armSettle();
     }, { passive: true });
-    function sizeRow(){ container.style.setProperty('--pc-row-w', Math.max(0, container.clientWidth - 16) + 'px'); }
+
     let lastW = window.innerWidth;
-    window.addEventListener('resize', () => { if (window.innerWidth !== lastW) { lastW = window.innerWidth; sizeRow(); update(); } });
-    sizeRow(); update();
+    window.addEventListener('resize', () => {
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
+      if (isPhone()) { moveTtdlOut(); recenter(); } else { restore(); }
+      updateDots();
+    });
+    if (isPhone()) {
+      moveTtdlOut();
+      applyOrder();
+      requestAnimationFrame(() => { recenter(); updateDots(); });
+      window.addEventListener('load', () => { if (isPhone() && container.scrollLeft < 1) recenter(); updateDots(); }, { once: true });
+    }
+    updateDots();
   }
   ttdlSafeInit(initPhoneCardDots);
 
