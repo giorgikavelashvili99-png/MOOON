@@ -4415,7 +4415,7 @@
   .pc-carousel-shell, .pc-carousel-track, .pc-slide{ display:contents; }
   .pc-nav, .pc-dots{ display:none; }
 
-  @media (min-width:1100px){
+  @media (min-width:701px){
     .pricing-cards.pc-carousel-mode{ display:block; }
     .pricing-cards.pc-carousel-mode > .pc-carousel-shell{
       display:block; position:relative; padding:0 60px; margin-bottom:6px;
@@ -4440,6 +4440,8 @@
     .pricing-cards.pc-carousel-mode .pc-carousel-track.pc-dragging .pc-slide{ transition:none; }
     .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
     .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
+    /* touch swipe (phone/tablet in "desktop site" mode) */
+    .pricing-cards.pc-carousel-mode .pc-carousel-track{ touch-action:pan-y; }
 
     .pc-nav{
       position:absolute; top:50%; margin-top:-26px;
@@ -4469,7 +4471,7 @@
     .pc-dot:hover{ background:rgba(255,255,255,0.5); }
     .pc-dot.is-active{ background:#fff; transform:scale(1.35); }
   }
-  @media (min-width:1100px) and (prefers-reduced-motion: reduce){
+  @media (min-width:701px) and (prefers-reduced-motion: reduce){
     .pricing-cards.pc-carousel-mode .pc-slide{ transition:opacity .2s ease; }
   }
 
@@ -17367,7 +17369,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const container = document.querySelector('.pricing-cards');
     if (!container) return;
 
-    const BREAKPOINT = 1100;
+    // "Desktop site" on a phone/tablet: desktop UA (no "Mobi") + touch screen.
+    // Those show a ~980px-wide page, so give them the real desktop carousel
+    // too instead of waiting for a 1100px window.
+    const DESKTOP_SITE_TOUCH = navigator.maxTouchPoints > 0 && !/Mobi/i.test(navigator.userAgent);
+    const BREAKPOINT = DESKTOP_SITE_TOUCH ? 701 : 1100;
     const SPACING_X = 236;
     const SPACING_Z = -150;
     const ROTATE_Y = 11;
@@ -17458,7 +17464,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // reaches this code path in the first place).
       let dragging = false, moved = false, startX = 0;
       track.addEventListener('pointerdown', (e) => {
-        if (!active || e.pointerType === 'touch') return;
+        if (!active || (e.pointerType === 'touch' && !DESKTOP_SITE_TOUCH)) return;
         dragging = true; moved = false; startX = e.clientX;
       });
       track.addEventListener('pointermove', (e) => {
@@ -17478,6 +17484,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         track.classList.remove('pc-dragging');
         if (moved) {
           suppressClick = true;
+          // a touch swipe produces no click afterwards, which used to leave
+          // this flag stuck and swallow the next real tap
+          setTimeout(() => { suppressClick = false; }, 350);
           const dx = e.clientX - startX;
           if (dx > 55) goTo(activeIndex - 1);
           else if (dx < -55) goTo(activeIndex + 1);
