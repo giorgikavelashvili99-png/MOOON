@@ -17552,6 +17552,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     if (!container) return;
 
     let built = false, activeIndex = 0, slides = [], track = null, dots = [];
+    // Tracks the activeIndex position() last ran with, so it can compute a
+    // single, consistent "how far did the carousel actually move" delta for
+    // this call (see position() below) instead of re-deriving each card's
+    // offset from scratch and independently guessing which way it wrapped.
+    let lastActiveIndex = null;
     let prevBtn = null, nextBtn = null, suppressClick = false;
     let lastW = window.innerWidth, raf = 0;
 
@@ -17729,6 +17734,28 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
     function position(){
       const n = slides.length, m = M, snapped = [];
+      // How far the carousel itself actually moved since the last call,
+      // wrapped to the shortest direction (e.g. prevBtn from the first
+      // card to the last is a real navigation of -1, not +5, even though
+      // that's a jump of +5 in raw array-index terms). This used to be
+      // decided PER CARD below, by comparing each card's own freshly
+      // wrapped offset against its stored previous one -- but that
+      // comparison is only reliable for cards on the "near" side of the
+      // fan. For whichever card sits exactly opposite the active one, an
+      // ordinary single next/prev step can flip its wrapped offset from
+      // e.g. +3 straight to -3 (a raw difference of 6, not 1), even
+      // though the carousel only moved one real step. That false "big
+      // jump" reading made just that one card skip its glide and pop
+      // instantly into or out of view once per lap. Deciding smooth-vs-
+      // instant ONCE here, from the real navigation distance, and
+      // applying it the same way to every card fixes that: the antipodal
+      // card still ends up on the opposite side of the fan when the wrap
+      // falls its way, but it now glides there like everything else
+      // instead of popping.
+      let activeDelta = lastActiveIndex === null ? 0 : activeIndex - lastActiveIndex;
+      if (activeDelta > n / 2) activeDelta -= n; else if (activeDelta < -n / 2) activeDelta += n;
+      const globalSnap = lastActiveIndex !== null && Math.abs(activeDelta) > 2;
+      lastActiveIndex = activeIndex;
       slides.forEach((slide, i) => {
         let off = i - activeIndex;
         if (off > n / 2) off -= n; else if (off < -n / 2) off += n;
@@ -17738,7 +17765,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const po = hide ? (off > 0 ? m.vis + 1 : -(m.vis + 1)) : off;
         const dir = po === 0 ? 0 : (po > 0 ? 1 : -1), c = Math.min(Math.abs(po), 3), s = slide.style;
         const first = slide._off === undefined;
-        const snap = first || Math.abs(off - slide._off) > 2;
+        const snap = first || globalSnap;
         slide._off = off;
         s.transition = first ? 'none' : (snap ? 'opacity .3s ease' : trans());
         if (snap) snapped.push(slide);
