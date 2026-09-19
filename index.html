@@ -9273,7 +9273,14 @@
       billedSeconds = totalSeconds;
     }
 
-    const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE;
+    // From 6 whole seconds up, the price is 15% higher. Everything below 6s
+    // (the 5-second minimum included) keeps the base price, so a 5s video
+    // still costs exactly 1.49 ₾ at 1080p·60fps.
+    const LONG_VIDEO_FROM_SECONDS = 6;
+    const LONG_VIDEO_SURCHARGE = 1.15;
+    const lengthFactor = (s >= LONG_VIDEO_FROM_SECONDS) ? LONG_VIDEO_SURCHARGE : 1;
+
+    const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE * lengthFactor;
     const discounted = (typeof promoApplied !== 'undefined' && promoApplied && currentPromo && currentPromo.singleDiscountPercent)
       ? totalPrice * (1 - currentPromo.singleDiscountPercent / 100)
       : totalPrice;
