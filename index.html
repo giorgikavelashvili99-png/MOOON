@@ -4427,29 +4427,34 @@
   .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
 
   .pc-nav{
-    position:absolute; top:50%; margin-top:-22px;
-    width:44px; height:44px; border-radius:50%;
+    position:absolute; top:calc(50% - 16px); margin-top:-30px; padding:0;
+    width:60px; height:60px; border-radius:50%;
     align-items:center; justify-content:center;
-    background:rgba(19,19,26,0.55);
-    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,0.16);
-    color:#eef3ff; cursor:pointer; z-index:80;
-    box-shadow:0 8px 20px rgba(0,0,0,0.35);
-    transition:transform .2s ease, border-color .2s ease, background .2s ease;
+    color:#eef8ff; cursor:pointer; z-index:200;
+    background:
+      radial-gradient(circle at 30% 24%, rgba(255,255,255,0.24), transparent 55%),
+      linear-gradient(145deg, rgba(34,195,255,0.32), rgba(124,143,255,0.22) 55%, rgba(19,19,26,0.78));
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border:1.5px solid rgba(255,255,255,0.28);
+    box-shadow:0 12px 32px rgba(0,0,0,0.5), 0 0 0 7px rgba(34,195,255,0.07), inset 0 1px 0 rgba(255,255,255,0.35);
+    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
   }
-  .pc-nav:hover{ background:rgba(28,28,36,0.7); }
+  .pc-nav:hover{
+    transform:scale(1.1); border-color:var(--cyan,#22c3ff);
+    box-shadow:0 14px 36px rgba(0,0,0,0.55), 0 0 0 9px rgba(34,195,255,0.13), 0 0 28px rgba(34,195,255,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
   .pc-nav:active{ transform:scale(0.94); }
-  /* Anchored past the card track to the true edges of the screen (not the
-     track's own edges), using the standard "full-bleed" calc trick: it
-     offsets from the container's center out to the viewport edge, plus a
-     fixed gutter, regardless of how wide the track/container is. This is
-     what keeps the buttons clear of every card at any screen size, instead
-     of sitting flush against the track where a peeking side-card can reach
-     them. Needs the track's own overflow-x:clip (above) so it no longer
-     clips these buttons, which live outside it as its siblings. */
-  .pc-nav--prev{ left:calc(-50vw + 50% + 14px); }
-  .pc-nav--next{ right:calc(-50vw + 50% + 14px); }
-  .pc-nav svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+  /* Fallback position (inside the section). On desktop the JS in
+     initPricingCarousel (placeNavs) then moves them to the true left and
+     right edges of the SCREEN. That is done by measurement instead of the
+     old `calc(-50vw + 50% ...)` trick, because the desktop `html{zoom:1.25}`
+     rule makes `vw` inside the page 25% too wide -- which pushed both
+     buttons completely off-screen on desktop (they were "gone"). */
+  .pc-nav--prev{ left:8px; }
+  .pc-nav--next{ right:8px; }
+  .pc-nav svg{ width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; transition:transform .22s ease; }
+  .pc-nav--prev:hover svg{ transform:translateX(-2px); }
+  .pc-nav--next:hover svg{ transform:translateX(2px); }
   /* Hidden whenever the hamburger drawer is open — see .site-menu-open
      toggle in JS — so they never float on top of the menu. */
   body.site-menu-open .pc-nav{ display:none !important; }
@@ -4467,7 +4472,11 @@
     .pricing-cards.pc-carousel-mode > .pc-carousel-shell{ padding:0 60px; }
     .pricing-cards.pc-carousel-mode .pc-nav{ display:flex; }
     .pricing-cards.pc-carousel-mode .pc-dots{ order:2; margin:0; }
-    .pc-nav:hover{ border-color:var(--cyan,#22c3ff); }
+    /* The side cards used to be sliced off by a straight vertical line at
+       the edge of the track (overflow-x:clip) while there was still empty
+       screen next to them. On desktop they now fan out freely; the page's
+       own overflow-x:hidden is the only edge, i.e. the screen edge. */
+    .pricing-cards.pc-carousel-mode .pc-carousel-track{ overflow:visible; }
   }
 
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
@@ -4862,6 +4871,34 @@
   }
   .messenger-cancel-btn:active{ transform:scale(0.95); }
   .messenger-cancel-btn:disabled{ opacity:0.55; cursor:default; }
+  /* In-page confirm dialog (replaces the browser's window.confirm, which
+     in-app browsers and "block extra dialogs" settings can silently
+     suppress -- making the cancel button look dead). */
+  .moon-confirm{
+    position:fixed; inset:0; z-index:10050; display:none;
+    align-items:center; justify-content:center; padding:20px;
+    background:rgba(6,4,14,0.74);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  }
+  .moon-confirm.is-open{ display:flex; animation:messengerFadeIn .18s ease; }
+  .moon-confirm-box{
+    width:100%; max-width:360px; padding:24px 22px 20px; border-radius:24px; text-align:center;
+    background:linear-gradient(165deg,#1d1433,#0f0a1e);
+    border:1px solid rgba(255,255,255,0.14);
+    box-shadow:0 24px 60px rgba(0,0,0,0.6);
+    color:#fff; font-family:'BPGAcademiuriU','Space Grotesk',sans-serif;
+  }
+  .moon-confirm-ico{ font-size:34px; line-height:1; }
+  .moon-confirm-title{ font-size:17px; font-weight:800; margin:10px 0 6px; }
+  .moon-confirm-text{ font-size:13.5px; line-height:1.55; color:rgba(255,255,255,0.72); margin:0 0 18px; }
+  .moon-confirm-actions{ display:flex; gap:10px; }
+  .moon-confirm-actions button{
+    flex:1; padding:12px 10px; border-radius:100px; border:none; cursor:pointer;
+    font-weight:700; font-size:13.5px; font-family:inherit; touch-action:manipulation;
+  }
+  .moon-confirm-no{ background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2) !important; }
+  .moon-confirm-yes{ background:#ff5c5c; color:#2a0505; }
+  .moon-confirm-actions button:active{ transform:scale(0.96); }
   .messenger-messages{
     flex:1 1 auto;
     /* min-height:0 is what actually makes this scroll. A flex item
@@ -11282,6 +11319,11 @@
   // ============================================================
   let messengerSocket = null;
   let messengerCurrentOrderId = null;
+  // orderId -> promise of the background POST /api/sessions in
+  // startOrderChat. Cancelling has to wait for it, otherwise a fast
+  // "place order, then cancel" deletes a session that doesn't exist yet
+  // and the chat is created right after -- i.e. the cancel "didn't work".
+  const pendingSessionCreates = {};
   // How many messages are already painted into #messengerMessages for
   // the CURRENTLY open order. refreshMessengerHistory uses this to only
   // append whatever's new instead of clearing and redrawing everything
@@ -11983,7 +12025,13 @@
     if (messengerRole === 'customer') setUnreadAdminCount(orderId, 0);
     renderAcbDot(0);
     if (completeBtn) completeBtn.style.display = (messengerRole === 'admin') ? 'block' : 'none';
-    if (cancelBtn) cancelBtn.style.display = (messengerRole === 'customer') ? 'block' : 'none';
+    if (cancelBtn) {
+      cancelBtn.style.display = (messengerRole === 'customer') ? 'block' : 'none';
+      // A previous attempt used to leave this disabled with "in progress"
+      // text until a full page reload, so a second try did nothing.
+      cancelBtn.disabled = false;
+      cancelBtn.textContent = currentLang === 'ka' ? 'გაუქმება' : 'Cancel';
+    }
     // Known immediately for the customer's own view (they're the one
     // logged in); left blank for admin until refreshMessengerHistory
     // fills it in from the fetched session's customer info below.
@@ -12153,9 +12201,15 @@
       const res = await fetch(CHAT_SERVER_URL + '/api/sessions/by-customer/' + encodeURIComponent(currentDiscordUser.id));
       if (myToken !== checkForActiveChatToken) return; // superseded -- ignore
       if (!res.ok){ bubble.style.display = 'none'; return; }
-      const sessions = await res.json();
+      const allSessions = await res.json();
       if (myToken !== checkForActiveChatToken) return; // superseded -- ignore
-      if (Array.isArray(sessions) && sessions.length > 0){
+      // Orders this customer already cancelled never come back as a
+      // chat bubble, even if the server hasn't finished deleting the
+      // session yet -- the leftover clean-up is retried in the
+      // background (see flushCancelQueue).
+      const sessions = Array.isArray(allSessions) ? allSessions.filter(x => !isOrderCancelled(x.orderId)) : [];
+      if (Array.isArray(allSessions) && sessions.length < allSessions.length) flushCancelQueue();
+      if (sessions.length > 0){
         bubble.dataset.orderId = sessions[0].orderId;
         const isOpenAlready = messengerCurrentOrderId === sessions[0].orderId;
         bubble.style.display = isOpenAlready ? 'none' : 'flex';
@@ -12400,99 +12454,224 @@
     messengerSocket.emit('complete_order', { orderId: messengerCurrentOrderId });
   });
 
-  // Removes the order from whichever list it's actually sitting in --
-  // still pending, or already moved to confirmedOrders by the admin --
-  // same shared DB the admin panel's own "delete order" button reads
-  // and writes. Re-reads fresh right before writing (rather than
-  // trusting whatever's cached in memory) for the same reason as the
-  // admin panel: writing back a stale in-memory list risks silently
-  // discarding another order that arrived in the meantime.
+  // ============================================================
+  // CUSTOMER-SIDE ORDER CANCELLATION
   //
-  // This alone used to leave the actual CHAT behind: the messages and
-  // the "you have an active chat" bubble live on the separate chat
-  // server (CHAT_SERVER_URL's own session store), not in this DB at
-  // all, so removing the order record here didn't touch them --
-  // checkForActiveChat() would just find the same session again on the
-  // very next page load via /api/sessions/by-customer and bring the
-  // bubble (and the chat) right back. Deleting the session there too,
-  // and clearing the local unread-count entry that's keyed by this
-  // order id, is what actually makes the chat itself disappear.
-  async function cancelMyOrder(orderId){
-    let removedSomething = false;
-    try {
-      const freshPending = await mdbRead('pendingOrders');
-      if (freshPending && Array.isArray(freshPending.list)) {
-        const filtered = freshPending.list.filter(o => String(o.id) !== String(orderId));
-        if (filtered.length !== freshPending.list.length) {
-          await mdbWrite('pendingOrders', { list: filtered });
-          removedSomething = true;
-        }
-      }
-      const freshConfirmed = await mdbRead('confirmedOrders');
-      if (freshConfirmed && Array.isArray(freshConfirmed.list)) {
-        const filtered = freshConfirmed.list.filter(o => String(o.id) !== String(orderId));
-        if (filtered.length !== freshConfirmed.list.length) {
-          await mdbWrite('confirmedOrders', { list: filtered });
-          removedSomething = true;
-        }
-      }
-    } catch(e) {
-      console.error('[MOON] cancelMyOrder: order-record removal failed', e);
-    }
-    try {
-      const res = await fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId), { method: 'DELETE' });
-      if (res.ok) removedSomething = true;
-      else if (res.status !== 404) console.warn('[MOON] cancelMyOrder: deleting chat session returned ' + res.status);
-    } catch(e) {
-      // Same as every other CHAT_SERVER_URL call in this file -- the
-      // server is a free-tier instance that can be asleep or
-      // unreachable, and that's not worth failing the whole
-      // cancellation over. The order record above is already gone
-      // either way; the chat bubble may just take a bit longer to stop
-      // reappearing if this particular call didn't land.
-      console.warn('[MOON] cancelMyOrder: could not reach chat server to delete the session', e);
-    }
-    setUnreadAdminCount(orderId, 0);
-    return removedSomething;
+  // Goal: one tap on "გაუქმება" cancels the order, every time.
+  //
+  // What used to go wrong:
+  //  * the whole thing waited on the free-tier chat server (it sleeps and
+  //    can take 30-60s to wake) with no timeout and no retry -- so the
+  //    button sat on "in progress", the person left, and the chat was
+  //    still there next time;
+  //  * a cancel right after placing an order deleted the chat session
+  //    before it had even been created;
+  //  * one failed read/write of the order lists was silently ignored;
+  //  * the button stayed disabled after the first attempt, and the
+  //    native confirm() can be blocked, which looks like a dead button.
+  //
+  // How it works now: the cancel is recorded locally FIRST (so the chat
+  // bubble can never come back on this device), then the server-side
+  // clean-up -- order lists + chat session -- runs with timeouts, retries
+  // and verification, and anything that still isn't done is kept in a
+  // queue that is retried on every page load, when the connection comes
+  // back, and every 20s while the page is open.
+  // ============================================================
+  function readCancelQueue(){
+    try{
+      const q = JSON.parse(localStorage.getItem('moon_cancel_queue_v1') || '{}');
+      return (q && typeof q === 'object') ? q : {};
+    }catch(e){ return {}; }
+  }
+  function writeCancelQueue(q){
+    try{ localStorage.setItem('moon_cancel_queue_v1', JSON.stringify(q)); }catch(e){}
+  }
+  function isOrderCancelled(orderId){
+    return !!readCancelQueue()[String(orderId)];
+  }
+  function updateCancelEntry(id, patch){
+    const q = readCancelQueue();
+    if (!q[id]) return;
+    Object.assign(q[id], patch);
+    writeCancelQueue(q);
+  }
+  function sleepMs(ms){ return new Promise(r => setTimeout(r, ms)); }
+  async function fetchWithTimeout(url, opts, ms){
+    const c = new AbortController();
+    const id = setTimeout(() => c.abort(), ms);
+    try{ return await fetch(url, Object.assign({}, opts, { signal: c.signal })); }
+    finally{ clearTimeout(id); }
   }
 
+  // Like mdbRead, but tells "nothing saved there" (404, fine) apart from
+  // "couldn't read it" (must be retried, never treated as empty).
+  async function mdbReadList(path){
+    try{
+      const r = await fetchWithTimeout(MDB_BASE + '/' + MDB_NS + '/' + path, { cache: 'no-store' }, 12000);
+      if (r.status === 404) return { list: [] };
+      if (!r.ok) return null;
+      const d = await r.json();
+      return (d && Array.isArray(d.list)) ? { list: d.list } : null;
+    }catch(e){ return null; }
+  }
+  // Removes the order from one shared list -- same DB the admin panel
+  // uses. Always re-reads fresh right before writing (never trusts a
+  // cached copy, so no other customer's order gets dropped) and
+  // verifies with a final read that it's really gone.
+  async function removeOrderFromList(path, orderId){
+    const has = (d) => d.list.some(o => String(o && o.id) === String(orderId));
+    for (let i = 0; i < 3; i++){
+      const cur = await mdbReadList(path);
+      if (!cur){ await sleepMs(700 * (i + 1)); continue; }
+      if (!has(cur)) return true;
+      await mdbWrite(path, { list: cur.list.filter(o => String(o && o.id) !== String(orderId)) });
+    }
+    const last = await mdbReadList(path);
+    return !!last && !has(last);
+  }
+  async function removeOrderRecords(orderId){
+    const res = await Promise.all([
+      removeOrderFromList('pendingOrders', orderId),
+      removeOrderFromList('confirmedOrders', orderId)
+    ]);
+    return res.every(Boolean);
+  }
+  async function deleteChatSession(orderId){
+    // A chat session that is still being created must finish first.
+    const creating = pendingSessionCreates[orderId];
+    if (creating){ try{ await Promise.race([creating, sleepMs(50000)]); }catch(e){} }
+    for (let i = 0; i < 3; i++){
+      try{
+        const res = await fetchWithTimeout(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId), { method: 'DELETE' }, 25000);
+        if (res.ok) return true;
+        if (res.status === 404){
+          // Already gone -- unless the cancel is only seconds old and the
+          // session's creation request is still on its way to a
+          // sleeping server. Then keep checking for a minute.
+          const entry = readCancelQueue()[String(orderId)];
+          if (!entry || Date.now() - entry.ts > 60000) return true;
+          return false;
+        }
+      }catch(e){}
+      await sleepMs(1500 * (i + 1));
+    }
+    return false;
+  }
+
+  const cancelJobsInFlight = {};
+  function runCancelJob(orderId){
+    const id = String(orderId);
+    if (cancelJobsInFlight[id]) return cancelJobsInFlight[id];
+    const entry = readCancelQueue()[id];
+    if (!entry) return Promise.resolve(false);
+    const job = (async () => {
+      const tasks = [];
+      if (!entry.orders) tasks.push(removeOrderRecords(id).then(ok => { if (ok) updateCancelEntry(id, { orders: true }); return ok; }));
+      if (!entry.session) tasks.push(deleteChatSession(id).then(ok => { if (ok) updateCancelEntry(id, { session: true }); return ok; }));
+      const results = await Promise.all(tasks);
+      return results.every(Boolean);
+    })().catch(e => { console.warn('[MOON] cancel job failed, will retry', e); return false; })
+      .finally(() => { delete cancelJobsInFlight[id]; });
+    cancelJobsInFlight[id] = job;
+    return job;
+  }
+  // Retries every cancel whose server-side clean-up isn't finished.
+  // Finished entries stay for a week as a tombstone (see
+  // isOrderCancelled) and are then pruned.
+  function flushCancelQueue(){
+    const q = readCancelQueue(), now = Date.now(), WEEK = 7 * 24 * 3600 * 1000;
+    let pruned = false;
+    Object.keys(q).forEach(id => {
+      const e = q[id];
+      if (!e || now - e.ts > WEEK){ delete q[id]; pruned = true; return; }
+      if (!(e.orders && e.session)) runCancelJob(id);
+    });
+    if (pruned) writeCancelQueue(q);
+  }
+  window.addEventListener('online', flushCancelQueue);
+  setInterval(() => {
+    const q = readCancelQueue();
+    if (Object.keys(q).some(id => q[id] && !(q[id].orders && q[id].session))) flushCancelQueue();
+  }, 20000);
+  setTimeout(flushCancelQueue, 1500);
+
+  // Styled confirm dialog. Resolves true only on an explicit "yes".
+  function showMoonConfirm(o){
+    return new Promise(resolve => {
+      let el = document.getElementById('moonConfirm');
+      if (!el){
+        el = document.createElement('div');
+        el.id = 'moonConfirm';
+        el.className = 'moon-confirm';
+        el.setAttribute('role', 'alertdialog');
+        el.setAttribute('aria-modal', 'true');
+        el.innerHTML = '<div class="moon-confirm-box"><div class="moon-confirm-ico">⚠️</div>' +
+          '<div class="moon-confirm-title"></div><p class="moon-confirm-text"></p>' +
+          '<div class="moon-confirm-actions"><button type="button" class="moon-confirm-no"></button>' +
+          '<button type="button" class="moon-confirm-yes"></button></div></div>';
+        document.body.appendChild(el);
+      }
+      el.querySelector('.moon-confirm-title').textContent = o.title;
+      el.querySelector('.moon-confirm-text').textContent = o.text;
+      const yesBtn = el.querySelector('.moon-confirm-yes'), noBtn = el.querySelector('.moon-confirm-no');
+      yesBtn.textContent = o.yes; noBtn.textContent = o.no;
+      const done = (v) => {
+        el.classList.remove('is-open');
+        yesBtn.onclick = noBtn.onclick = el.onclick = null;
+        document.removeEventListener('keydown', onKey, true);
+        resolve(v);
+      };
+      const onKey = (e) => { if (e.key === 'Escape'){ e.stopPropagation(); done(false); } };
+      document.addEventListener('keydown', onKey, true);
+      yesBtn.onclick = () => done(true);
+      noBtn.onclick = () => done(false);
+      el.onclick = (e) => { if (e.target === el) done(false); };
+      el.classList.add('is-open');
+      setTimeout(() => { try{ noBtn.focus(); }catch(e){} }, 30); // default focus = the safe choice
+    });
+  }
+
+  let cancelUiBusy = false;
   document.getElementById('messengerCancelBtn').addEventListener('click', async () => {
-    if (!messengerCurrentOrderId) return;
-    const sure = window.confirm(
-      currentLang === 'ka'
-        ? 'ნამდვილად გსურთ შეკვეთის გაუქმება? ეს ქმედება ვერ გაუქმდება.'
-        : 'Are you sure you want to cancel this order? This cannot be undone.'
-    );
+    if (!messengerCurrentOrderId || cancelUiBusy) return;
+    const orderId = messengerCurrentOrderId;
+    const ka = currentLang === 'ka';
+    const sure = await showMoonConfirm({
+      title: ka ? 'შეკვეთის გაუქმება' : 'Cancel order',
+      text: ka ? 'ნამდვილად გსურთ შეკვეთის გაუქმება? ეს ქმედება ვერ გაუქმდება.'
+               : 'Are you sure you want to cancel this order? This cannot be undone.',
+      yes: ka ? 'დიახ, გაუქმება' : 'Yes, cancel',
+      no: ka ? 'არა, დარჩენა' : 'No, keep it'
+    });
     if (!sure) return;
 
+    cancelUiBusy = true;
     const btn = document.getElementById('messengerCancelBtn');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = currentLang === 'ka' ? 'მიმდინარეობს...' : 'Cancelling...';
-    }
+    if (btn){ btn.disabled = true; btn.textContent = ka ? 'მიმდინარეობს...' : 'Cancelling...'; }
 
-    // Whatever happens below -- a network hiccup, a slow or unreachable
-    // DB, a socket that never connected -- the customer still needs to
-    // see this go through instead of the button silently sitting there
-    // disabled forever. cancelMyOrder already catches its own errors;
-    // this outer try/finally is a backstop so a failure ANYWHERE in the
-    // chain (including the socket emit) can never swallow the visible
-    // "cancelled" feedback and reload below.
-    try {
-      if (messengerSocket) {
-        try {
-          messengerSocket.emit('cancel_order', { orderId: messengerCurrentOrderId });
-        } catch(e) {
-          if (window.console && console.error) console.error('[MOON] cancel_order emit failed', e);
-        }
-      }
-      await cancelMyOrder(messengerCurrentOrderId);
-    } catch(e) {
-      if (window.console && console.error) console.error('[MOON] order cancellation flow failed', e);
-    } finally {
-      appendSystemMessage(currentLang === 'ka' ? 'შეკვეთა გაუქმდა' : 'Order cancelled');
-      setTimeout(() => window.location.reload(), 1200);
-    }
+    // 1) Recorded on this device immediately and synchronously: from this
+    //    moment the order can no longer reappear here, whatever the
+    //    network or the sleeping server does next.
+    const q = readCancelQueue();
+    q[String(orderId)] = { ts: Date.now(), orders: false, session: false };
+    writeCancelQueue(q);
+    setUnreadAdminCount(orderId, 0);
+    const bubble = document.getElementById('activeChatBubble');
+    if (bubble) bubble.style.display = 'none';
+
+    // 2) Tell the chat server over the socket (real-time notice to the
+    //    admin), then do the real clean-up. The customer waits for it
+    //    only while it is quick; a slow/asleep server never blocks them
+    //    -- the queue keeps retrying after the reload.
+    try{
+      if (messengerSocket) messengerSocket.emit('cancel_order', { orderId: orderId });
+    }catch(e){ console.error('[MOON] cancel_order emit failed', e); }
+    try{
+      await Promise.race([runCancelJob(orderId), sleepMs(3500)]);
+    }catch(e){ console.error('[MOON] order cancellation flow failed', e); }
+
+    appendSystemMessage(ka ? 'შეკვეთა გაუქმდა' : 'Order cancelled');
+    setTimeout(() => window.location.reload(), 900);
   });
 
   // Single entry point used by every one of the 5 order flows below --
@@ -12590,7 +12769,7 @@
     // Fire-and-forget, with a hard timeout so a sleeping/unreachable
     // server can never leave this request hanging forever in the
     // background either.
-    (async () => {
+    const sessionCreateP = (async () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
       try{
@@ -12620,6 +12799,8 @@
         clearTimeout(timeoutId);
       }
     })();
+    pendingSessionCreates[orderId] = sessionCreateP;
+    sessionCreateP.then(() => { delete pendingSessionCreates[orderId]; });
   }
 
   const copyNote = document.getElementById('copyNote');
@@ -17351,8 +17532,47 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     function calcMetrics(){
       const phone = window.innerWidth < 900;
       const w = slides[0] ? slides[0].offsetWidth : 296;
+      // Desktop: show the 2nd-level side cards only when the screen is wide
+      // enough to show them whole (half the screen, in page px, must clear
+      // the outer card plus the arrow buttons). Otherwise show one on each
+      // side instead of a card that runs off the screen.
+      const half = window.innerWidth / pageZoom() / 2;
+      const vis = phone ? 1 : (half >= 560 ? 2 : 1);
       M = { sx: Math.round(w * (phone ? 0.86 : 0.8)), sz: phone ? -110 : -150,
-            ry: phone ? 9 : 11, step: phone ? 0.1 : 0.13, vis: phone ? 1 : 2 };
+            ry: phone ? 9 : 11, step: phone ? 0.1 : 0.13, vis: vis };
+    }
+    function pageZoom(){
+      const z = parseFloat(getComputedStyle(document.documentElement).zoom);
+      return (z && !isNaN(z)) ? z : 1;
+    }
+
+    // Puts the two arrow buttons at the true left/right edges of the screen.
+    // Measured, not calculated: it moves each button by a known amount,
+    // sees how far it really moved on screen (that ratio IS the page zoom,
+    // whatever the browser's zoom semantics), then solves for the offset.
+    function placeNavs(){
+      if (!prevBtn || !nextBtn || window.innerWidth < 900) return;
+      const gutter = 22; // screen px between the button and the screen edge
+      const vv = window.visualViewport;
+      const vw = vv && vv.width ? Math.min(window.innerWidth, vv.width) : window.innerWidth;
+      const measure = (btn, side, edge) => {
+        const keep = btn.style.transition;
+        btn.style.transition = 'none'; btn.style.transform = 'none';
+        btn.style[side === 'left' ? 'right' : 'left'] = 'auto';
+        btn.style[side] = '0px';
+        const a = btn.getBoundingClientRect();
+        if (!a.width) { btn.style.transform = ''; btn.style.transition = keep; return null; }
+        const p0 = a[edge];
+        btn.style[side] = '100px';
+        const p1 = btn.getBoundingClientRect()[edge];
+        btn.style.transform = ''; btn.style.transition = keep;
+        const k = Math.abs(p1 - p0) / 100 || 1;
+        return { p0: p0, k: k };
+      };
+      const l = measure(prevBtn, 'left', 'left');
+      if (l) prevBtn.style.left = ((gutter - l.p0) / l.k) + 'px';
+      const r = measure(nextBtn, 'right', 'right');
+      if (r) nextBtn.style.right = ((r.p0 - (vw - gutter)) / r.k) + 'px';
     }
 
     function build(){
@@ -17495,6 +17715,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if (snap) snapped.push(slide);
         s.transform = 'translate3d(calc(-50% + ' + (po * m.sx) + 'px),0,' + (c * m.sz) + 'px) rotateY(' + (-dir * c * m.ry) + 'deg) scale(' + Math.max(1 - c * m.step, 0.6) + ')';
         s.opacity = hide ? '0' : '1';
+        // A parked (invisible) card must not swallow clicks now that the
+        // track no longer clips it.
+        s.pointerEvents = hide ? 'none' : '';
         s.zIndex = String(100 - abs);
         if (slide._dim) {
           slide._dim.style.opacity = off === 0 ? '0' : String(Math.min(0.28 + 0.14 * (abs - 1), 0.6));
@@ -17525,7 +17748,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       container.classList.add('pc-carousel-mode');
       calcMetrics();
       position();
-      requestAnimationFrame(measureHeight);
+      requestAnimationFrame(() => { measureHeight(); placeNavs(); });
     }
 
     // Phones fire "resize" whenever the URL bar slides in/out while
@@ -17538,8 +17761,16 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(sync, 150);
     });
-    window.addEventListener('load', measureHeight);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureHeight);
+    window.addEventListener('load', () => { measureHeight(); placeNavs(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measureHeight(); placeNavs(); });
+    // The menu drawer hides the buttons (display:none); re-place them when
+    // it closes, and after any scrollbar appearing/disappearing.
+    let menuWasOpen = false;
+    new MutationObserver(() => {
+      const open = document.body.classList.contains('site-menu-open');
+      if (menuWasOpen && !open) placeNavs();
+      menuWasOpen = open;
+    }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     sync();
   }
