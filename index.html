@@ -6037,6 +6037,19 @@
     .pc-phone-dots button::after{ content:''; position:absolute; inset:-10px -5px; }
     .pc-phone-dots button.on{ width:24px; border-radius:6px; background:#fff; }
   }
+
+  /* ============================================================
+     Order shell: constant size on desktop/tablet.
+     Every wizard order panel (single / weekly / monthly / cheap) keeps
+     ONE fixed height for the whole flow (drop zone -> upload -> quality ->
+     link -> send). Content taller than that scrolls inside the shell.
+     ============================================================ */
+  @media (min-width:701px){
+    .pc-modal-scroll:has(#videoScannerPanel, #scanResultWp, #scanResultMp, #scanResultCp, #scanResultCpm){
+      --pc-shell-fixed:1;
+      height:min(80vh, 460px);
+    }
+  }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -7812,6 +7825,24 @@
     }
 
     if (reduce || !container) { instantSwap(); return; }
+
+    // Desktop/tablet: the order shell has ONE fixed height (see
+    // .pc-modal-scroll:has(...) in the CSS), so steps swap inside it without
+    // any height animation -> the shell never grows/shrinks between steps.
+    if (window.matchMedia && window.matchMedia('(min-width:701px)').matches &&
+        getComputedStyle(container).getPropertyValue('--pc-shell-fixed').trim() === '1') {
+      hideEls.forEach(el => el.classList.add('wiz-step-exit'));
+      window.setTimeout(function(){
+        hideEls.forEach(el => {
+          el.classList.remove('wiz-step-exit');
+          el.classList.add('wizard-step-hidden');
+        });
+        if (midCallback) midCallback();
+        showEls.forEach(el => el.classList.remove('wizard-step-hidden'));
+        container.scrollTop = 0;
+      }, 190);
+      return;
+    }
 
     const startH = container.getBoundingClientRect().height;
     container.style.height = startH + 'px';
