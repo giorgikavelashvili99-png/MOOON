@@ -12214,8 +12214,16 @@
       // chat bubble, even if the server hasn't finished deleting the
       // session yet -- the leftover clean-up is retried in the
       // background (see flushCancelQueue).
-      const sessions = Array.isArray(allSessions) ? allSessions.filter(x => !isOrderCancelled(x.orderId)) : [];
+      const sessions = Array.isArray(allSessions) ? allSessions.filter(x => !isOrderCancelled(x && (x.orderId ?? x.id ?? x._id))) : [];
       if (Array.isArray(allSessions) && sessions.length < allSessions.length) flushCancelQueue();
+      if (Array.isArray(allSessions) && sessions.length === allSessions.length && allSessions.length > 0){
+        // Every session from the server is about to be shown as "active" --
+        // if one of these was actually just cancelled, this log is how to
+        // tell whether it's a match-key mismatch (compare against
+        // moon_cancel_queue_v1 in localStorage) or the server genuinely
+        // never received/finished the cancellation.
+        console.debug('[MOON] checkForActiveChat: none filtered as cancelled', allSessions.map(x => x && (x.orderId ?? x.id ?? x._id)));
+      }
       if (sessions.length > 0){
         bubble.dataset.orderId = sessions[0].orderId;
         const isOpenAlready = messengerCurrentOrderId === sessions[0].orderId;
@@ -12493,8 +12501,23 @@
   function writeCancelQueue(q){
     try{ localStorage.setItem('moon_cancel_queue_v1', JSON.stringify(q)); }catch(e){}
   }
+  // orderId is generated client-side as a zero-padded string (e.g.
+  // "0919042"). If the chat server stores/returns it as a number
+  // anywhere along the way, the leading zero is silently lost
+  // ("919042") and a plain String() comparison against our queue key
+  // ("0919042") never matches -- so a cancelled order's bubble keeps
+  // reappearing even though it's correctly recorded as cancelled
+  // locally. Checking both the raw and the number-stripped form covers
+  // that mismatch either direction without needing to know which side
+  // did the coercion.
+  function orderIdKeyVariants(orderId){
+    const raw = String(orderId);
+    const stripped = String(Number(orderId));
+    return (stripped !== 'NaN' && stripped !== raw) ? [raw, stripped] : [raw];
+  }
   function isOrderCancelled(orderId){
-    return !!readCancelQueue()[String(orderId)];
+    const q = readCancelQueue();
+    return orderIdKeyVariants(orderId).some(k => !!q[k]);
   }
   function updateCancelEntry(id, patch){
     const q = readCancelQueue();
