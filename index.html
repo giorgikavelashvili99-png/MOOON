@@ -17790,7 +17790,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // was a big part of the stutter. Only a WIDTH change matters here.
     let resizeTimer = null;
     window.addEventListener('resize', () => {
-      if (window.innerWidth === lastW) return;
+      // A vertical scrollbar toggling on/off (e.g. because the newly
+      // centred card is taller) shifts window.innerWidth by ~15-17px on
+      // desktop without the window actually being resized. That was
+      // enough to occasionally cross the `half >= 560` breakpoint above
+      // and re-run calcMetrics()/position() mid-scroll, which is what
+      // made a side card that should have stayed hidden flash into view
+      // and back out again. A real resize is never this small.
+      if (Math.abs(window.innerWidth - lastW) < 24) return;
       lastW = window.innerWidth;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(sync, 150);
