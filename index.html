@@ -4086,7 +4086,7 @@
     height:auto;
   }
 
-  /* --- Desktop 110% zoom ---
+  /* --- Desktop 125% zoom ---
      Re-added per explicit request (was removed entirely after 115%/125%
      both caused visibly blurry text — CSS zoom re-rasterizes the whole
      page at the scaled size, and the custom display font never renders
@@ -4095,7 +4095,7 @@
      some degree — if it's noticeable again at this size, the reliable
      fix is still full removal, not a further reduction. */
   @media (min-width:901px){
-    html{ zoom:1.10; }
+    html{ zoom:1.25; }
   }
 
   /* --- Direct contact panel --- */
@@ -4429,24 +4429,21 @@
     touch-action:pan-y; -webkit-user-select:none; user-select:none;
   }
   .pricing-cards.pc-carousel-mode .pc-slide{
-    display:block; position:absolute; top:0; left:50%; width:var(--pc-w); cursor:pointer;
+    display:block; position:absolute; top:0; left:50%; width:var(--pc-w);
     transform:translate3d(-50%,0,0);
-    will-change:transform;
+    will-change:transform, opacity;
   }
+  /* Dark veil on side cards. It also catches taps on them (=> "bring to
+     centre"), so buttons under a side card can never be hit by accident. */
   .pc-dim{
     position:absolute; inset:0; border-radius:28px; z-index:5;
-    background:#05060c; opacity:0; pointer-events:none;
+    background:#05060c; opacity:0; pointer-events:none; cursor:pointer;
     transition:opacity .35s ease; will-change:opacity;
   }
-  .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--active{ cursor:default; }
-  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *,
-  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *::before,
-  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *::after{ animation-play-state:paused !important; }
-  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide{ pointer-events:none; }
-  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide *:not(.pc-dim),
-  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide *::before,
-  .pricing-cards.pc-carousel-mode.pc-moving .pc-slide *::after{ animation-play-state:paused !important; transition:none !important; }
-  .pricing-cards.pc-carousel-mode.pc-moving .pc-card--monthly::after{ visibility:hidden; }
+  /* Only the centred card runs its decorative loops. Targeted selectors
+     (no universal "*") so switching cards restyles almost nothing. */
+  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) :is(.price sup, .urgency-badge, .mec-colon, .moon-glow-card),
+  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) .pc-card--monthly::after{ animation-play-state:paused; }
   .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
   .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
 
@@ -4479,9 +4476,6 @@
     .pricing-cards.pc-carousel-mode .pc-nav{ display:flex; }
     .pricing-cards.pc-carousel-mode .pc-dots{ order:2; margin:0; }
     .pc-nav:hover{ border-color:var(--cyan,#22c3ff); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .pricing-cards.pc-carousel-mode .pc-slide{ transition:opacity .2s ease; }
   }
 
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
@@ -6016,10 +6010,10 @@
 
   /* Desktop: the SAME phone design, just scaled up uniformly so it
      fills the screen the way the phone version does (every step and
-     every package scales together). Change the 1.5 to resize all. */
+     every package scales together). Change the 1.2 to resize all (site zoom is 1.25, so the total is 1.5). */
   @media (min-width:901px){
-    .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1.5; }
-    .pc-modal-scrim .pc-modal-scroll{ max-height:calc(90vh / 1.65); }
+    .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1.2; }
+    .pc-modal-scrim .pc-modal-scroll{ max-height:calc(90vh / 1.5); }
   }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -17357,11 +17351,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     let prevBtn = null, nextBtn = null, suppressClick = false;
     let lastW = window.innerWidth, raf = 0;
 
-    function metrics(){
+    // Measured ONCE (and on width change) — never inside position(), because
+    // reading offsetWidth there forced a full synchronous layout on every tap.
+    let M = { sx: 236, sz: -150, ry: 11, step: 0.13, vis: 2 };
+    function calcMetrics(){
       const phone = window.innerWidth < 900;
       const w = slides[0] ? slides[0].offsetWidth : 296;
-      return { sx: Math.round(w * (phone ? 0.86 : 0.8)), sz: phone ? -110 : -150,
-               ry: phone ? 9 : 11, step: phone ? 0.1 : 0.13, vis: phone ? 1 : 2 };
+      M = { sx: Math.round(w * (phone ? 0.86 : 0.8)), sz: phone ? -110 : -150,
+            ry: phone ? 9 : 11, step: phone ? 0.1 : 0.13, vis: phone ? 1 : 2 };
     }
 
     function build(){
@@ -17472,46 +17469,48 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     // Circular: after the last card comes the first, and vice-versa.
-    let moveTimer = 0;
     function goTo(i){
       const n = slides.length;
       activeIndex = ((i % n) + n) % n;
-      container.classList.add('pc-moving');
-      clearTimeout(moveTimer);
-      moveTimer = setTimeout(() => container.classList.remove('pc-moving'), 480);
       position();
     }
 
-    function trans(hide){
+    // Only compositor-friendly properties (transform, opacity) are animated.
+    // No visibility/pointer-events transitions: those are inherited, so they
+    // forced the whole card subtree to be restyled on every frame.
+    function trans(){
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduce) return 'opacity .2s ease';
-      return 'transform .42s cubic-bezier(.22,.8,.28,1), opacity .3s ease, visibility 0s linear ' + (hide ? '.42s' : '0s');
+      return reduce ? 'transform .28s ease-out, opacity .2s ease'
+                    : 'transform .42s cubic-bezier(.22,.8,.28,1), opacity .3s ease';
     }
 
     function position(){
-      const n = slides.length, m = metrics(), snapped = [];
+      const n = slides.length, m = M, snapped = [];
       slides.forEach((slide, i) => {
         let off = i - activeIndex;
         if (off > n / 2) off -= n; else if (off < -n / 2) off += n;
-        const abs = Math.abs(off), dir = off === 0 ? 0 : (off > 0 ? 1 : -1);
-        const c = Math.min(abs, 3), hide = abs > m.vis, s = slide.style;
+        const abs = Math.abs(off), hide = abs > m.vis;
+        // Hidden cards wait just outside the visible fan (invisible, and
+        // clipped by the container), ready to glide in.
+        const po = hide ? (off > 0 ? m.vis + 1 : -(m.vis + 1)) : off;
+        const dir = po === 0 ? 0 : (po > 0 ? 1 : -1), c = Math.min(Math.abs(po), 3), s = slide.style;
         const first = slide._off === undefined;
-        // first paint, or a card wrapping round the ring while invisible:
-        // don't fly across the stage — snap (fade only).
         const snap = first || Math.abs(off - slide._off) > 2;
         slide._off = off;
-        s.transition = first ? 'none' : (snap ? 'opacity .3s ease' : trans(hide));
+        s.transition = first ? 'none' : (snap ? 'opacity .3s ease' : trans());
         if (snap) snapped.push(slide);
-        s.transform = 'translate3d(calc(-50% + ' + (off * m.sx) + 'px),0,' + (c * m.sz) + 'px) rotateY(' + (-dir * c * m.ry) + 'deg) scale(' + Math.max(1 - c * m.step, 0.6) + ')';
+        s.transform = 'translate3d(calc(-50% + ' + (po * m.sx) + 'px),0,' + (c * m.sz) + 'px) rotateY(' + (-dir * c * m.ry) + 'deg) scale(' + Math.max(1 - c * m.step, 0.6) + ')';
         s.opacity = hide ? '0' : '1';
-        s.visibility = hide ? 'hidden' : 'visible';
         s.zIndex = String(100 - abs);
-        if (slide._dim) slide._dim.style.opacity = off === 0 ? '0' : String(Math.min(0.28 + 0.14 * (abs - 1), 0.6));
+        if (slide._dim) {
+          slide._dim.style.opacity = off === 0 ? '0' : String(Math.min(0.28 + 0.14 * (abs - 1), 0.6));
+          slide._dim.style.pointerEvents = (off === 0 || hide) ? 'none' : 'auto';
+        }
         slide.classList.toggle('pc-slide--active', off === 0);
       });
       if (snapped.length) {
         void track.offsetWidth;
-        snapped.forEach(sl => { sl.style.transition = trans(Math.abs(sl._off) > m.vis); });
+        snapped.forEach(sl => { sl.style.transition = trans(); });
       }
       dots.forEach((d, i) => d.classList.toggle('is-active', i === activeIndex));
     }
@@ -17530,6 +17529,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       build();
       if (!built) return;
       container.classList.add('pc-carousel-mode');
+      calcMetrics();
       position();
       requestAnimationFrame(measureHeight);
     }
