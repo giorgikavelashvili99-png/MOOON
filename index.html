@@ -12645,8 +12645,8 @@
     const ka = currentLang === 'ka';
     const sure = await showMoonConfirm({
       title: ka ? 'შეკვეთის გაუქმება' : 'Cancel order',
-      text: ka ? 'ნამდვილად გსურთ შეკვეთის გაუქმება? ეს ქმედება ვერ გაუქმდება.'
-               : 'Are you sure you want to cancel this order? This cannot be undone.',
+      text: ka ? 'ნამდვილად გსურთ შეკვეთის გაუქმება?'
+               : 'Are you sure you want to cancel this order?',
       yes: ka ? 'დიახ, გაუქმება' : 'Yes, cancel',
       no: ka ? 'არა, დარჩენა' : 'No, keep it'
     });
@@ -12891,8 +12891,12 @@
   // the background and only flash a note if it comes back false — the
   // WhatsApp/Telegram message itself is unaffected either way.
   function warnIfOrderNotSaved(savedPromise, flashFn){
+    // Never surface this to the customer -- the chat message with their
+    // order already reached us either way, so a warning here only reads
+    // as "something broke" at the exact moment they're sending an order.
+    // Kept as a console log only, for us to notice/debug later.
     savedPromise.then(ok => {
-      if (!ok && typeof flashFn === 'function') flashFn(t('orderSaveWarning'));
+      if (!ok) console.warn('[MOON] order not saved to pendingOrders -- chat message still sent.');
     });
   }
 
