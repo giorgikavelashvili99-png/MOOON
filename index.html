@@ -5948,6 +5948,8 @@
     .ttdl-status-dot, .ttdl-ios-link{ animation:none; }
   }
 
+  /* Desktop/tablet only: on phones the space is too precious to reserve. */
+  @media (min-width:701px){
   /* Upload progress: the "finalizing" label always owns its one-line slot
      (just invisible until needed), so the card no longer grows at 100%. */
   .mooon-auto-status .mooon-auto-sr-only,
@@ -5976,6 +5978,8 @@
   .sr-transfer > .sr-transfer-actions, .mooon-prompt > .mooon-prompt-actions{ grid-row:2; align-self:start; }
   .sr-transfer > .mooon-auto, .mooon-prompt > .mooon-auto{ grid-row:1 / span 2; display:block; visibility:hidden; }
   .sr-transfer > .mooon-auto.show, .mooon-prompt > .mooon-auto.show{ visibility:visible; }
+
+  }
 
   /* ============================================================
      PHONE: swipeable order-card carousel (<=700px)
