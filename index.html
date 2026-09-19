@@ -5976,6 +5976,61 @@
   .sr-transfer > .sr-transfer-actions, .mooon-prompt > .mooon-prompt-actions{ grid-row:2; align-self:start; }
   .sr-transfer > .mooon-auto, .mooon-prompt > .mooon-auto{ grid-row:1 / span 2; display:block; visibility:hidden; }
   .sr-transfer > .mooon-auto.show, .mooon-prompt > .mooon-auto.show{ visibility:visible; }
+
+  /* ============================================================
+     PHONE: swipeable order-card carousel (<=700px)
+     Pure CSS scroll-snap — no JS drag code, native momentum.
+     ============================================================ */
+  .pc-phone-dots{ display:none; }
+  @media (max-width:700px){
+    .pricing-cards{
+      grid-template-columns:none;
+      grid-auto-flow:column;
+      grid-auto-columns:calc(100% - 40px);
+      gap:12px;
+      overflow-x:auto; overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      /* room for the corner badge (top) and the "1 spot left" tag (bottom) */
+      padding:18px 8px 30px;
+      margin:0 -8px 4px;
+      scroll-padding-inline:8px;
+    }
+    .pricing-cards::-webkit-scrollbar{ display:none; }
+    .pricing-cards > .pc-card-wrap,
+    .pricing-cards > .pc-card{
+      grid-row:1;
+      scroll-snap-align:start;
+      scroll-snap-stop:always;
+      /* scroll-reveal is pointless in a horizontal strip */
+      opacity:1 !important; transform:none !important; filter:none !important;
+    }
+    /* TikTok downloader row lives under the cards: pinned to the viewport
+       edge so it does not slide away while swiping cards. */
+    .pricing-cards > .pc-ttdl-row{
+      grid-row:2; grid-column:1;
+      position:sticky; left:8px;
+      width:var(--pc-row-w, calc(100vw - 42px));
+      align-self:start;
+      touch-action:pan-y;
+      opacity:1 !important; transform:none !important; filter:none !important;
+    }
+    .pc-phone-dots{
+      display:flex; justify-content:center; align-items:center; gap:9px;
+      margin:4px 0 -6px;
+    }
+    .pc-phone-dots button{
+      width:9px; height:9px; padding:0; border:0; border-radius:50%;
+      background:rgba(255,255,255,.28);
+      transition:width .2s ease, background .2s ease;
+      /* bigger invisible tap area */
+      position:relative;
+    }
+    .pc-phone-dots button::after{ content:''; position:absolute; inset:-10px -5px; }
+    .pc-phone-dots button.on{ width:24px; border-radius:6px; background:#fff; }
+  }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -17520,6 +17575,46 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   ttdlSafeInit(initTiktokDownloader);
   ttdlSafeInit(initScrollReveal);
   ttdlSafeInit(initPricingCarousel);
+
+  // Phone (<=700px): dots for the scroll-snap card strip.
+  function initPhoneCardDots(){
+    const container = document.querySelector('.pricing-cards');
+    if (!container) return;
+    const cards = Array.from(container.children).filter(c => c.classList.contains('pc-card-wrap') || c.classList.contains('pc-card'));
+    if (cards.length < 2) return;
+    const dots = document.createElement('div');
+    dots.className = 'pc-phone-dots';
+    dots.setAttribute('aria-hidden', 'true');
+    const btns = cards.map((c, i) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.tabIndex = -1;
+      b.addEventListener('click', () => {
+        const step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : container.clientWidth;
+        container.scrollTo({ left: i * step, behavior: 'smooth' });
+      });
+      dots.appendChild(b);
+      return b;
+    });
+    container.insertAdjacentElement('beforebegin', dots);  // above the strip: the TikTok row lives inside the same scroller
+    let cur = -1, ticking = false;
+    function update(){
+      ticking = false;
+      const step = cards[1].offsetLeft - cards[0].offsetLeft;
+      if (!step) return;
+      const i = Math.max(0, Math.min(cards.length - 1, Math.round(container.scrollLeft / step)));
+      if (i === cur) return;
+      cur = i;
+      btns.forEach((b, k) => b.classList.toggle('on', k === i));
+    }
+    container.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    function sizeRow(){ container.style.setProperty('--pc-row-w', Math.max(0, container.clientWidth - 16) + 'px'); }
+    let lastW = window.innerWidth;
+    window.addEventListener('resize', () => { if (window.innerWidth !== lastW) { lastW = window.innerWidth; sizeRow(); update(); } });
+    sizeRow(); update();
+  }
+  ttdlSafeInit(initPhoneCardDots);
 
   // Wake the backing servers up as soon as the page loads.
   //
