@@ -2407,6 +2407,7 @@
     transition: transform .15s, box-shadow .2s;
   }
   .wizard-confirm-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(124,143,255,0.5); }
+  .wizard-confirm-btn:focus, .wizard-confirm-btn:focus-visible{ outline:none; }
   .wizard-question{
     display:flex; flex-direction:column; align-items:center; text-align:center;
     gap:16px; padding:22px 20px; border-radius:20px;
@@ -3085,6 +3086,7 @@
   }
   .order-btn:active{ transform:translateY(0) scale(0.97); transition:transform .1s ease; }
   .order-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .order-btn:focus, .order-btn:focus-visible{ outline:none; }
   .order-btn .ico{ font-size:18px; line-height:1; display:flex; align-items:center; }
   .order-btn .ico svg{ width:24px; height:24px; }
 
@@ -4421,10 +4423,11 @@
      of the hundreds of elements inside each card). While a move runs
      (.pc-moving) everything inside the cards is frozen and ignores the
      pointer, so nothing repaints mid-flight. */
-  .pricing-cards.pc-carousel-mode{ display:block; overflow-x:clip; --pc-w:min(296px, calc(100vw - 96px)); }
+  .pricing-cards.pc-carousel-mode{ display:block; --pc-w:min(296px, calc(100vw - 96px)); }
   .pricing-cards.pc-carousel-mode > .pc-carousel-shell{ display:flex; flex-direction:column; position:relative; padding:0; margin-bottom:6px; }
   .pricing-cards.pc-carousel-mode .pc-carousel-track{
     display:block; position:relative; width:100%; max-width:940px; margin:0 auto 22px;
+    overflow-x:clip;
     perspective:1600px; perspective-origin:50% 42%;
     touch-action:pan-y; -webkit-user-select:none; user-select:none;
   }
@@ -4448,19 +4451,32 @@
   .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
 
   .pc-nav{
-    position:absolute; top:50%; margin-top:-26px;
-    width:52px; height:52px; border-radius:50%;
+    position:absolute; top:50%; margin-top:-22px;
+    width:44px; height:44px; border-radius:50%;
     align-items:center; justify-content:center;
-    background:linear-gradient(160deg, #232c46, #12172a);
-    border:1px solid rgba(255,255,255,0.25);
-    color:#fff; cursor:pointer; z-index:80;
-    box-shadow:0 12px 28px rgba(0,0,0,0.5);
-    transition:transform .2s ease, border-color .2s ease;
+    background:rgba(19,19,26,0.55);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.16);
+    color:#eef3ff; cursor:pointer; z-index:80;
+    box-shadow:0 8px 20px rgba(0,0,0,0.35);
+    transition:transform .2s ease, border-color .2s ease, background .2s ease;
   }
+  .pc-nav:hover{ background:rgba(28,28,36,0.7); }
   .pc-nav:active{ transform:scale(0.94); }
-  .pc-nav--prev{ left:0; }
-  .pc-nav--next{ right:0; }
-  .pc-nav svg{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+  /* Anchored past the card track to the true edges of the screen (not the
+     track's own edges), using the standard "full-bleed" calc trick: it
+     offsets from the container's center out to the viewport edge, plus a
+     fixed gutter, regardless of how wide the track/container is. This is
+     what keeps the buttons clear of every card at any screen size, instead
+     of sitting flush against the track where a peeking side-card can reach
+     them. Needs the track's own overflow-x:clip (above) so it no longer
+     clips these buttons, which live outside it as its siblings. */
+  .pc-nav--prev{ left:calc(-50vw + 50% + 14px); }
+  .pc-nav--next{ right:calc(-50vw + 50% + 14px); }
+  .pc-nav svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+  /* Hidden whenever the hamburger drawer is open — see .site-menu-open
+     toggle in JS — so they never float on top of the menu. */
+  body.site-menu-open .pc-nav{ display:none !important; }
 
   .pricing-cards.pc-carousel-mode .pc-dots{ display:flex; justify-content:center; align-items:center; gap:9px; order:-1; margin:0 0 16px; }
   .pc-dot{
@@ -8876,6 +8892,7 @@
     siteMenu.setAttribute('aria-hidden', 'false');
     if (siteMenuScrim) siteMenuScrim.classList.add('open');
     if (menuToggle) menuToggle.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('site-menu-open');
   }
   function closeSiteMenu(){
     if (!siteMenu) return;
@@ -8883,6 +8900,7 @@
     siteMenu.setAttribute('aria-hidden', 'true');
     if (siteMenuScrim) siteMenuScrim.classList.remove('open');
     if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('site-menu-open');
     if (typeof closeQnDrop === 'function') closeQnDrop();
   }
   if (menuToggle) {
