@@ -4415,63 +4415,69 @@
   .pc-carousel-shell, .pc-carousel-track, .pc-slide{ display:contents; }
   .pc-nav, .pc-dots{ display:none; }
 
-  @media (min-width:701px){
-    .pricing-cards.pc-carousel-mode{ display:block; }
-    .pricing-cards.pc-carousel-mode > .pc-carousel-shell{
-      display:block; position:relative; padding:0 60px; margin-bottom:6px;
-    }
-    .pricing-cards.pc-carousel-mode .pc-carousel-track{
-      display:block; position:relative;
-      perspective:1900px; perspective-origin:50% 42%;
-      margin:0 auto 22px; max-width:940px;
-    }
-    .pricing-cards.pc-carousel-mode .pc-slide{
-      display:block; position:absolute; top:0; left:50%;
-      width:296px; cursor:pointer;
-      transform-style:preserve-3d;
-      transition:transform .55s cubic-bezier(.16,1,.3,1), opacity .45s ease, filter .4s ease;
-      transform:translate3d(calc(-50% + var(--pc-x,0px)), 0, var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
-      opacity:var(--pc-op,1);
-      filter:var(--pc-filter,none);
-      z-index:var(--pc-zi,1);
-      pointer-events:var(--pc-pe,auto);
-    }
-    .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--active{ cursor:default; }
-    .pricing-cards.pc-carousel-mode .pc-carousel-track.pc-dragging .pc-slide{ transition:none; }
-    .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
-    .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
-    /* touch swipe (phone/tablet in "desktop site" mode) */
-    .pricing-cards.pc-carousel-mode .pc-carousel-track{ touch-action:pan-y; }
-
-    .pc-nav{
-      position:absolute; top:50%; margin-top:-26px;
-      width:52px; height:52px; border-radius:50%;
-      align-items:center; justify-content:center;
-      background:linear-gradient(160deg, #232c46, #12172a);
-      border:1px solid rgba(255,255,255,0.25);
-      color:#fff; cursor:pointer; z-index:80;
-      box-shadow:0 12px 28px rgba(0,0,0,0.5);
-      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease, opacity .2s ease;
-    }
-    .pricing-cards.pc-carousel-mode .pc-nav{ display:flex; }
-    .pc-nav:hover:not(:disabled){ transform:translateY(-50%) scale(1.08); border-color:var(--cyan,#22c3ff); box-shadow:0 14px 32px rgba(34,195,255,0.3); }
-    .pc-nav:active:not(:disabled){ transform:translateY(-50%) scale(0.94); }
-    .pc-nav:disabled{ opacity:0.28; cursor:default; }
-    .pc-nav--prev{ left:0; }
-    .pc-nav--next{ right:0; }
-    .pc-nav svg{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
-
-    .pc-dots{ justify-content:center; align-items:center; gap:9px; }
-    .pricing-cards.pc-carousel-mode .pc-dots{ display:flex; }
-    .pc-dot{
-      width:8px; height:8px; border-radius:50%; padding:0; border:none;
-      background:rgba(255,255,255,0.25); cursor:pointer;
-      transition:background .2s ease, transform .2s ease;
-    }
-    .pc-dot:hover{ background:rgba(255,255,255,0.5); }
-    .pc-dot.is-active{ background:#fff; transform:scale(1.35); }
+  /* Looping 3D carousel on EVERY screen size. Only transform + opacity
+     are animated (GPU-only); the old brightness/saturate filter on six
+     huge cards is replaced by a cheap dark overlay (--pc-dim). */
+  .pricing-cards.pc-carousel-mode{ display:block; overflow-x:clip; --pc-w:min(296px, calc(100vw - 96px)); }
+  .pricing-cards.pc-carousel-mode > .pc-carousel-shell{ display:flex; flex-direction:column; position:relative; padding:0; margin-bottom:6px; }
+  .pricing-cards.pc-carousel-mode .pc-carousel-track{
+    display:block; position:relative; width:100%; max-width:940px; margin:0 auto 22px;
+    perspective:1600px; perspective-origin:50% 42%;
+    touch-action:pan-y; -webkit-user-select:none; user-select:none;
   }
-  @media (min-width:701px) and (prefers-reduced-motion: reduce){
+  .pricing-cards.pc-carousel-mode .pc-slide{
+    display:block; position:absolute; top:0; left:50%; width:var(--pc-w); cursor:pointer;
+    transform:translate3d(calc(-50% + var(--pc-x,0px)), 0, var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
+    opacity:var(--pc-op,1); z-index:var(--pc-zi,1);
+    visibility:var(--pc-vis,visible); pointer-events:var(--pc-pe,auto);
+    transition:transform .42s cubic-bezier(.22,.8,.28,1), opacity .35s ease, visibility 0s linear var(--pc-vd,0s);
+    will-change:transform, opacity;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  }
+  .pricing-cards.pc-carousel-mode .pc-slide::after{
+    content:''; position:absolute; inset:0; border-radius:28px; z-index:5;
+    background:#05060c; opacity:var(--pc-dim,0); pointer-events:none;
+    transition:opacity .35s ease;
+  }
+  .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--active{ cursor:default; }
+  /* Only the centered card runs its ambient animations. */
+  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *,
+  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *::before,
+  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) *::after{ animation-play-state:paused !important; }
+  .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
+  .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
+
+  .pc-nav{
+    position:absolute; top:50%; margin-top:-26px;
+    width:52px; height:52px; border-radius:50%;
+    align-items:center; justify-content:center;
+    background:linear-gradient(160deg, #232c46, #12172a);
+    border:1px solid rgba(255,255,255,0.25);
+    color:#fff; cursor:pointer; z-index:80;
+    box-shadow:0 12px 28px rgba(0,0,0,0.5);
+    transition:transform .2s ease, border-color .2s ease;
+  }
+  .pc-nav:active{ transform:scale(0.94); }
+  .pc-nav--prev{ left:0; }
+  .pc-nav--next{ right:0; }
+  .pc-nav svg{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+
+  .pricing-cards.pc-carousel-mode .pc-dots{ display:flex; justify-content:center; align-items:center; gap:9px; order:-1; margin:0 0 16px; }
+  .pc-dot{
+    width:10px; height:10px; border-radius:99px; padding:0; border:none;
+    background:rgba(255,255,255,0.25); cursor:pointer;
+    transition:background .2s ease, width .25s ease;
+  }
+  .pc-dot.is-active{ background:#fff; width:28px; }
+
+  @media (min-width:900px){
+    .pricing-cards.pc-carousel-mode{ --pc-w:296px; }
+    .pricing-cards.pc-carousel-mode > .pc-carousel-shell{ padding:0 60px; }
+    .pricing-cards.pc-carousel-mode .pc-nav{ display:flex; }
+    .pricing-cards.pc-carousel-mode .pc-dots{ order:2; margin:0; }
+    .pc-nav:hover{ border-color:var(--cyan,#22c3ff); }
+  }
+  @media (prefers-reduced-motion: reduce){
     .pricing-cards.pc-carousel-mode .pc-slide{ transition:opacity .2s ease; }
   }
 
@@ -5870,18 +5876,18 @@
     .comments-panel .c-item .c-body,
     .c-reply-item .c-author,
     .c-reply-item .c-body,
-    .wp-note, .mp-note,
-    .simple-scan-ok, .simple-scan-ok-name,
-    .simple-scan-reject,
-    .sub-active-text,
-    .mooon-auto-status, #mooonAutoStatusText,
-    .mooon-auto-stay,
-    .tt-auto-note,
-    .field-top label,
+    .wp-note:not(.pc-modal-scrim *), .mp-note:not(.pc-modal-scrim *),
+    .simple-scan-ok:not(.pc-modal-scrim *), .simple-scan-ok-name:not(.pc-modal-scrim *),
+    .simple-scan-reject:not(.pc-modal-scrim *),
+    .sub-active-text:not(.pc-modal-scrim *),
+    .mooon-auto-status:not(.pc-modal-scrim *), #mooonAutoStatusText:not(.pc-modal-scrim *),
+    .mooon-auto-stay:not(.pc-modal-scrim *),
+    .tt-auto-note:not(.pc-modal-scrim *),
+    .field-top label:not(.pc-modal-scrim *),
     .c-empty,
     .comments-panel textarea.c-text,
     .c-name,
-    .step-title, .step-desc{
+    .step-title:not(.pc-modal-scrim *), .step-desc:not(.pc-modal-scrim *){
       font-size:16px !important;
       line-height:1.5 !important;
     }
@@ -5897,18 +5903,18 @@
        staying on its intended 2. */
     /* Numbers / prices — slightly larger since these are the most
        important thing on a pricing card */
-    .wp-box-q, .mp-box-q, .quality-btn .q-res,
-    .wp-box-price, .mp-box-price,
-    .pc-price-line b{
+    .wp-box-q:not(.pc-modal-scrim *), .mp-box-q:not(.pc-modal-scrim *), .quality-btn .q-res:not(.pc-modal-scrim *),
+    .wp-box-price:not(.pc-modal-scrim *), .mp-box-price:not(.pc-modal-scrim *),
+    .pc-price-line b:not(.pc-modal-scrim *){
       font-size:18px !important;
     }
     /* FPS pills and other tight badges: bump text to 16px AND enlarge
        the pill itself so the text isn't cramped/clipped inside it. */
-    .wp-box-fps, .mp-box-fps, .quality-btn .q-fps{
+    .wp-box-fps:not(.pc-modal-scrim *), .mp-box-fps:not(.pc-modal-scrim *), .quality-btn .q-fps:not(.pc-modal-scrim *){
       font-size:13px !important;
       padding:4px 10px !important;
     }
-    .wp-old-price, .mp-old-price{ font-size:13px !important; }
+    .wp-old-price:not(.pc-modal-scrim *), .mp-old-price:not(.pc-modal-scrim *){ font-size:13px !important; }
     .c-date{ font-size:13px !important; }
     .c-more-btn{ font-size:13px !important; }
     /* .acb-label deliberately excluded -- same reasoning as
@@ -5918,7 +5924,7 @@
        completely invisible text, not just clipped. */
     /* Give the now-bigger square tiles a bit more room so 16px+ text
        inside them isn't tight against the edges. */
-    .wp-grid-two, .mp-grid-two, .quality-grid-two{
+    .wp-grid-two:not(.pc-modal-scrim *), .mp-grid-two:not(.pc-modal-scrim *), .quality-grid-two:not(.pc-modal-scrim *){
       grid-template-columns:repeat(2, minmax(0, 160px)) !important;
       max-width:336px !important;
     }
@@ -5950,8 +5956,6 @@
     .ttdl-status-dot, .ttdl-ios-link{ animation:none; }
   }
 
-  /* Desktop/tablet only: on phones the space is too precious to reserve. */
-  @media (min-width:701px){
   /* Upload progress: the "finalizing" label always owns its one-line slot
      (just invisible until needed), so the card no longer grows at 100%. */
   .mooon-auto-status .mooon-auto-sr-only,
@@ -5981,56 +5985,19 @@
   .sr-transfer > .mooon-auto, .mooon-prompt > .mooon-auto{ grid-row:1 / span 2; display:block; visibility:hidden; }
   .sr-transfer > .mooon-auto.show, .mooon-prompt > .mooon-auto.show{ visibility:visible; }
 
-  }
-
   /* ============================================================
-     PHONE: swipeable order-card carousel (<=700px)
-     Pure CSS scroll-snap — no JS drag code, native momentum.
+     ORDER MODAL — same phone-style size/design on every screen and
+     for every package. Change --wz-w to make it wider/narrower.
      ============================================================ */
-  .pc-phone-dots{ display:none; }
-  @media (max-width:700px){
-    .pricing-cards{
-      grid-template-columns:none;
-      grid-auto-flow:column;
-      grid-auto-columns:calc(100% - 40px);
-      gap:12px;
-      overflow-x:auto; overflow-y:hidden;
-      scroll-snap-type:x mandatory;
-      overscroll-behavior-x:contain;
-      -webkit-overflow-scrolling:touch;
-      scrollbar-width:none;
-      /* room for the corner badge (top) and the "1 spot left" tag (bottom) */
-      padding:18px 8px 30px;
-      margin:0 -8px 4px;
-      scroll-padding-inline:8px;
-    }
-    .pricing-cards::-webkit-scrollbar{ display:none; }
-    .pricing-cards > .pc-card-wrap,
-    .pricing-cards > .pc-card{
-      grid-row:1;
-      scroll-snap-align:start;
-      scroll-snap-stop:always;
-      /* scroll-reveal is pointless in a horizontal strip */
-      opacity:1 !important; transform:none !important; filter:none !important;
-    }
-    /* Each card is its own compositor layer: it is painted once and then only
-       moved while swiping, instead of being re-rasterised as it scrolls in. */
-    .pricing-cards > .pc-card-wrap,
-    .pricing-cards > .pc-card{ will-change:transform; }
-    .pc-phone-dots{
-      display:flex; justify-content:center; align-items:center; gap:9px;
-      margin:4px 0 -6px;
-    }
-    .pc-phone-dots button{
-      width:9px; height:9px; padding:0; border:0; border-radius:50%;
-      background:rgba(255,255,255,.28);
-      transition:width .2s ease, background .2s ease;
-      /* bigger invisible tap area */
-      position:relative;
-    }
-    .pc-phone-dots button::after{ content:''; position:absolute; inset:-10px -5px; }
-    .pc-phone-dots button.on{ width:24px; border-radius:6px; background:#fff; }
-  }
+  .pc-modal-scrim > .pc-accordion-body.panel{ --wz-w:460px; max-width:var(--wz-w); border-radius:24px; }
+  .pc-modal-scrim .pc-modal-scroll{ max-height:88vh; }
+  .pc-modal-scrim .wizard-steps{ gap:0; margin:0 0 18px; }
+  .pc-modal-scrim .wizard-step-label{ display:none; }
+  .pc-modal-scrim .wizard-step-dot{ width:34px; height:34px; font-size:15px; }
+  .pc-modal-scrim .wizard-step-line{ margin-top:16px; }
+  .pc-modal-scrim .drop-zone{ padding:30px 18px; border-radius:22px; min-height:150px; }
+  .pc-modal-scrim .drop-zone .dz-icon{ width:46px; height:46px; margin-bottom:12px; }
+  .pc-modal-scrim .drop-zone .dz-title{ font-size:15px; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -9098,42 +9065,6 @@
     document.removeEventListener('touchmove', blockScrollOutsideModal, { passive: false });
   }
 
-  // Desktop/tablet: while an order is open, its shell may only GROW (never
-  // shrink back) so it no longer jumps big -> small -> big between steps.
-  // It starts at its natural compact size, so there is no empty space at
-  // step 1. Phones keep their normal behaviour.
-  let shellRatchet = null;
-  function startShellRatchet(panel){
-    stopShellRatchet();
-    if (!panel || !window.ResizeObserver || !window.matchMedia || !window.matchMedia('(min-width:701px)').matches) return;
-    const sc = panel.querySelector('.pc-modal-scroll');
-    if (!sc) return;
-    sc.style.minHeight = '';
-    let maxH = 0;
-    const ro = new ResizeObserver(() => {
-      // offsetHeight (layout px) — NOT getBoundingClientRect, which includes
-      // transforms/zoom and made this feed back on itself.
-      const h = sc.offsetHeight;
-      if (h > maxH + 0.5) {
-        maxH = h;
-        // min-height applies to the content box unless box-sizing is border-box
-        const cs = getComputedStyle(sc);
-        const extra = cs.boxSizing === 'border-box' ? 0 :
-          (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) +
-          (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
-        sc.style.minHeight = (h - extra) + 'px';
-      }
-    });
-    ro.observe(sc);
-    shellRatchet = { ro, sc };
-  }
-  function stopShellRatchet(){
-    if (!shellRatchet) return;
-    shellRatchet.ro.disconnect();
-    shellRatchet.sc.style.minHeight = '';
-    shellRatchet = null;
-  }
-
   function openPricingCard(card){
     if (!card || card.classList.contains('pc-open')) return;
     // Only one card open at a time.
@@ -9160,7 +9091,6 @@
     if (panel && pcModalScrim) {
       panel._pcHomeCard = card;
       pcModalScrim.appendChild(panel);
-      startShellRatchet(panel);
     }
     if (pcModalScrim) pcModalScrim.classList.add('open');
     lockBodyScroll();
@@ -9171,7 +9101,6 @@
     const btn = card.querySelector('.pc-toggle-btn');
     // Move the panel back to its original spot in the card markup.
     const panel = pcModalScrim ? pcModalScrim.querySelector('.pc-accordion-body') : null;
-    stopShellRatchet();
     if (panel && panel._pcHomeCard === card) {
       if (btn && btn.parentNode === card) card.insertBefore(panel, btn.nextSibling);
       else card.appendChild(panel);
@@ -17401,27 +17330,16 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const container = document.querySelector('.pricing-cards');
     if (!container) return;
 
-    // "Desktop site" on a phone/tablet: desktop UA (no "Mobi") + touch screen.
-    // Those show a ~980px-wide page, so give them the real desktop carousel
-    // too instead of waiting for a 1100px window.
-    const DESKTOP_SITE_TOUCH = navigator.maxTouchPoints > 0 && !/Mobi/i.test(navigator.userAgent);
-    const BREAKPOINT = DESKTOP_SITE_TOUCH ? 701 : 1100;
-    const SPACING_X = 236;
-    const SPACING_Z = -150;
-    const ROTATE_Y = 11;
-    const SCALE_STEP = 0.13;
-    const MIN_SCALE = 0.6;
-    const MAX_VISIBLE_OFFSET = 2;
+    let built = false, activeIndex = 0, slides = [], track = null, dots = [];
+    let prevBtn = null, nextBtn = null, suppressClick = false;
+    let lastW = window.innerWidth, raf = 0;
 
-    let built = false;
-    let active = false;
-    let activeIndex = 0;
-    let slides = [];
-    let track = null;
-    let dots = [];
-    let prevBtn = null;
-    let nextBtn = null;
-    let suppressClick = false;
+    function metrics(){
+      const phone = window.innerWidth < 900;
+      const w = slides[0] ? slides[0].offsetWidth : 296;
+      return { sx: Math.round(w * (phone ? 0.86 : 0.8)), sz: phone ? -110 : -150,
+               ry: phone ? 9 : 11, step: phone ? 0.1 : 0.13, vis: phone ? 1 : 2 };
+    }
 
     function build(){
       if (built) return;
@@ -17429,11 +17347,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const cardEls = Array.from(container.children).filter(el => el !== ttdlRow);
       if (cardEls.length < 2) return;
 
+      // The scroll-reveal helper hides off-screen cards until they scroll into
+      // view; inside a carousel they are never "scrolled to", so show them now.
+      cardEls.forEach(el => { el.style.transition = 'none'; el.style.opacity = '1'; el.style.transform = 'none'; el.style.filter = 'none'; });
+
       const shell = document.createElement('div');
       shell.className = 'pc-carousel-shell';
       track = document.createElement('div');
       track.className = 'pc-carousel-track';
-
       slides = cardEls.map(el => {
         const slide = document.createElement('div');
         slide.className = 'pc-slide';
@@ -17441,130 +17362,121 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         slide.appendChild(el);
         return slide;
       });
-      shell.appendChild(track);
 
       prevBtn = document.createElement('button');
-      prevBtn.type = 'button';
-      prevBtn.className = 'pc-nav pc-nav--prev';
+      prevBtn.type = 'button'; prevBtn.className = 'pc-nav pc-nav--prev';
       prevBtn.setAttribute('aria-label', 'წინა პაკეტი');
       prevBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
       nextBtn = document.createElement('button');
-      nextBtn.type = 'button';
-      nextBtn.className = 'pc-nav pc-nav--next';
+      nextBtn.type = 'button'; nextBtn.className = 'pc-nav pc-nav--next';
       nextBtn.setAttribute('aria-label', 'შემდეგი პაკეტი');
       nextBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
-      shell.appendChild(prevBtn);
-      shell.appendChild(nextBtn);
 
       const dotsWrap = document.createElement('div');
       dotsWrap.className = 'pc-dots';
       dots = slides.map((_, i) => {
         const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'pc-dot';
+        dot.type = 'button'; dot.className = 'pc-dot';
         dot.setAttribute('aria-label', 'პაკეტი ' + (i + 1));
         dot.addEventListener('click', () => goTo(i));
         dotsWrap.appendChild(dot);
         return dot;
       });
-      shell.appendChild(dotsWrap);
 
+      shell.appendChild(track);
+      shell.appendChild(prevBtn);
+      shell.appendChild(nextBtn);
+      shell.appendChild(dotsWrap);
       container.insertBefore(shell, container.firstChild);
 
       prevBtn.addEventListener('click', () => goTo(activeIndex - 1));
       nextBtn.addEventListener('click', () => goTo(activeIndex + 1));
 
-      // Click a side card to bring it to focus. A capture-phase
-      // listener on the track fires before the card's own button
-      // click handler, so a click on an off-center card is redirected
-      // into navigation instead of ever reaching that card's "შეკვეთა"
-      // button underneath. A click on the already-active card passes
-      // straight through untouched.
+      // A tap on a side card brings it to the centre instead of pressing
+      // whatever button is under the finger.
       track.addEventListener('click', (e) => {
         if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopPropagation(); return; }
         const slide = e.target.closest('.pc-slide');
-        if (!slide) return;
-        const i = slides.indexOf(slide);
-        if (i !== -1 && i !== activeIndex) {
-          e.preventDefault(); e.stopPropagation();
-          goTo(i);
-        }
+        const i = slide ? slides.indexOf(slide) : -1;
+        if (i !== -1 && i !== activeIndex) { e.preventDefault(); e.stopPropagation(); goTo(i); }
       }, true);
 
-      // Mouse-drag swipe (desktop only — this whole feature is gated
-      // to the >=1100px breakpoint already, so touch input never
-      // reaches this code path in the first place).
-      let dragging = false, moved = false, startX = 0;
+      // Swipe (finger or mouse). touch-action:pan-y keeps vertical page
+      // scrolling native; only a clearly horizontal drag changes the card.
+      let tracking = false, moved = false, sx = 0, sy = 0;
       track.addEventListener('pointerdown', (e) => {
-        if (!active || (e.pointerType === 'touch' && !DESKTOP_SITE_TOUCH)) return;
-        dragging = true; moved = false; startX = e.clientX;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        tracking = true; moved = false; sx = e.clientX; sy = e.clientY;
       });
       track.addEventListener('pointermove', (e) => {
-        if (!dragging) return;
-        // Capture only once it is really a drag. Capturing on pointerdown
-        // retargets the following click to the track, so the card's own
-        // "შეკვეთა" button never received real mouse clicks.
-        if (!moved && Math.abs(e.clientX - startX) > 6) {
+        if (!tracking || moved) return;
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
           moved = true;
-          track.classList.add('pc-dragging');
-          try{ track.setPointerCapture(e.pointerId); }catch(err){}
+          if (e.pointerType === 'mouse') { try{ track.setPointerCapture(e.pointerId); }catch(err){} }
         }
       });
-      function endDrag(e){
-        if (!dragging) return;
-        dragging = false;
-        track.classList.remove('pc-dragging');
-        if (moved) {
-          suppressClick = true;
-          // a touch swipe produces no click afterwards, which used to leave
-          // this flag stuck and swallow the next real tap
-          setTimeout(() => { suppressClick = false; }, 350);
-          const dx = e.clientX - startX;
-          if (dx > 55) goTo(activeIndex - 1);
-          else if (dx < -55) goTo(activeIndex + 1);
-        }
-      }
-      track.addEventListener('pointerup', endDrag);
-      track.addEventListener('pointercancel', endDrag);
+      track.addEventListener('pointerup', (e) => {
+        if (!tracking) return;
+        tracking = false;
+        if (!moved) return;
+        suppressClick = true;
+        setTimeout(() => { suppressClick = false; }, 80);
+        const dx = e.clientX - sx;
+        if (dx > 45) goTo(activeIndex - 1);
+        else if (dx < -45) goTo(activeIndex + 1);
+      });
+      track.addEventListener('pointercancel', () => { tracking = false; });
 
-      // Arrow-key navigation while the cursor is over the carousel.
       let hovering = false;
       shell.addEventListener('mouseenter', () => hovering = true);
       shell.addEventListener('mouseleave', () => hovering = false);
       document.addEventListener('keydown', (e) => {
-        if (!active || !hovering) return;
+        if (!hovering) return;
         if (e.key === 'ArrowLeft') goTo(activeIndex - 1);
         else if (e.key === 'ArrowRight') goTo(activeIndex + 1);
       });
 
+      if ('ResizeObserver' in window) {
+        const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(measureHeight); });
+        slides.forEach(s => { if (s.firstElementChild) ro.observe(s.firstElementChild); });
+      }
       built = true;
     }
 
+    // Circular: after the last card comes the first, and vice-versa.
     function goTo(i){
-      activeIndex = Math.max(0, Math.min(slides.length - 1, i));
+      const n = slides.length;
+      activeIndex = ((i % n) + n) % n;
       position();
     }
 
     function position(){
+      const n = slides.length, m = metrics(), jumped = [];
       slides.forEach((slide, i) => {
-        const offset = i - activeIndex;
-        const abs = Math.abs(offset);
-        const dir = offset === 0 ? 0 : (offset > 0 ? 1 : -1);
-        const clampedAbs = Math.min(abs, 3);
-        const hide = abs > MAX_VISIBLE_OFFSET;
-        slide.style.setProperty('--pc-x', (offset * SPACING_X) + 'px');
-        slide.style.setProperty('--pc-z', (clampedAbs * SPACING_Z) + 'px');
-        slide.style.setProperty('--pc-ry', (-dir * clampedAbs * ROTATE_Y) + 'deg');
-        slide.style.setProperty('--pc-scale', Math.max(1 - clampedAbs * SCALE_STEP, MIN_SCALE));
-        slide.style.setProperty('--pc-op', hide ? 0 : Math.max(1 - abs * 0.28, 0.4));
-        slide.style.setProperty('--pc-zi', String(100 - abs));
-        slide.style.setProperty('--pc-filter', offset === 0 ? 'brightness(1) saturate(1)' : 'brightness(.72) saturate(.85)');
-        slide.style.setProperty('--pc-pe', hide ? 'none' : 'auto');
-        slide.classList.toggle('pc-slide--active', offset === 0);
+        let off = i - activeIndex;
+        if (off > n / 2) off -= n; else if (off < -n / 2) off += n;
+        const abs = Math.abs(off), dir = off === 0 ? 0 : (off > 0 ? 1 : -1);
+        const c = Math.min(abs, 3), hide = abs > m.vis, s = slide.style;
+        // A card that wraps around the ring while invisible must not fly
+        // across the stage — snap it, fade only.
+        const jump = slide._off !== undefined && Math.abs(off - slide._off) > 2;
+        if (jump) { s.transition = 'opacity .35s ease'; jumped.push(s); }
+        slide._off = off;
+        s.setProperty('--pc-x', (off * m.sx) + 'px');
+        s.setProperty('--pc-z', (c * m.sz) + 'px');
+        s.setProperty('--pc-ry', (-dir * c * m.ry) + 'deg');
+        s.setProperty('--pc-scale', Math.max(1 - c * m.step, 0.6));
+        s.setProperty('--pc-op', hide ? 0 : Math.max(1 - abs * 0.28, 0.45));
+        s.setProperty('--pc-zi', String(100 - abs));
+        s.setProperty('--pc-dim', off === 0 ? 0 : 0.32);
+        s.setProperty('--pc-vis', hide ? 'hidden' : 'visible');
+        s.setProperty('--pc-vd', hide ? '.42s' : '0s');
+        s.setProperty('--pc-pe', hide ? 'none' : 'auto');
+        slide.classList.toggle('pc-slide--active', off === 0);
       });
+      if (jumped.length) { void track.offsetWidth; jumped.forEach(s => { s.transition = ''; }); }
       dots.forEach((d, i) => d.classList.toggle('is-active', i === activeIndex));
-      if (prevBtn) prevBtn.disabled = activeIndex <= 0;
-      if (nextBtn) nextBtn.disabled = activeIndex >= slides.length - 1;
     }
 
     function measureHeight(){
@@ -17577,33 +17489,26 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (maxH) track.style.height = (maxH + 34) + 'px';
     }
 
-    function activate(){
+    function sync(){
       build();
-      if (!built || active) return;
-      active = true;
+      if (!built) return;
       container.classList.add('pc-carousel-mode');
-      goTo(activeIndex);
+      position();
       requestAnimationFrame(measureHeight);
     }
 
-    function deactivate(){
-      if (!active) return;
-      active = false;
-      container.classList.remove('pc-carousel-mode');
-      if (track) track.style.height = '';
-    }
-
-    function sync(){
-      if (window.innerWidth >= BREAKPOINT) activate();
-      else deactivate();
-    }
-
+    // Phones fire "resize" whenever the URL bar slides in/out while
+    // scrolling (height only) — that used to re-layout everything and
+    // was a big part of the stutter. Only a WIDTH change matters here.
     let resizeTimer = null;
     window.addEventListener('resize', () => {
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { sync(); if (active) measureHeight(); }, 150);
+      resizeTimer = setTimeout(sync, 150);
     });
-    window.addEventListener('load', () => { if (active) measureHeight(); });
+    window.addEventListener('load', measureHeight);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureHeight);
 
     sync();
   }
@@ -17620,113 +17525,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   ttdlSafeInit(initTiktokDownloader);
   ttdlSafeInit(initScrollReveal);
   ttdlSafeInit(initPricingCarousel);
-
-  // Phone (<=700px): endless swipe + dots for the scroll-snap card strip.
-  // Endless = the cards are re-ORDERED with CSS `order` while the strip is
-  // idle (no DOM moves -> no re-created layers / re-paints -> no hitch),
-  // with scrollLeft compensated so nothing visibly moves. A card therefore
-  // always exists on both sides of the current one.
-  function initPhoneCardDots(){
-    const container = document.querySelector('.pricing-cards');
-    if (!container) return;
-    const isCard = c => c.classList && (c.classList.contains('pc-card-wrap') || c.classList.contains('pc-card'));
-    const orig = Array.from(container.children).filter(isCard);
-    const N = orig.length;
-    if (N < 2) return;
-    let seq = orig.slice();                       // current logical order
-    const ttdl = container.querySelector(':scope > .pc-ttdl-row');
-    const isPhone = () => window.innerWidth <= 700;
-    container.style.overflowAnchor = 'none';
-
-    const dots = document.createElement('div');
-    dots.className = 'pc-phone-dots';
-    dots.setAttribute('aria-hidden', 'true');
-    const btns = orig.map(c => {
-      const b = document.createElement('button');
-      b.type = 'button'; b.tabIndex = -1;
-      b.addEventListener('click', () => {
-        const st = stepPx(), j = seq.indexOf(c);
-        if (st && j !== -1) container.scrollTo({ left: j * st, behavior: 'smooth' });
-      });
-      dots.appendChild(b);
-      return b;
-    });
-    container.insertAdjacentElement('beforebegin', dots);
-
-    function applyOrder(){ seq.forEach((c, i) => { c.style.order = String(i); }); }
-    function stepPx(){ return seq[1].offsetLeft - seq[0].offsetLeft; }
-    function currentIndex(){
-      const st = stepPx();
-      if (!st) return 0;
-      return Math.max(0, Math.min(N - 1, Math.round(container.scrollLeft / st)));
-    }
-    let cur = -1;
-    function updateDots(){
-      const k = orig.indexOf(seq[currentIndex()]);
-      if (k === cur || k === -1) return;
-      cur = k;
-      btns.forEach((b, i) => b.classList.toggle('on', i === k));
-    }
-
-    // keep the current card in the middle band (positions 2..N-3)
-    function recenter(){
-      if (!isPhone()) return;
-      const st = stepPx();
-      if (!st) return;
-      let i = currentIndex();
-      const lo = 2, hi = N - 3;
-      if (i >= lo && i <= hi) return;
-      const ref = seq[i];
-      const x0 = ref.getBoundingClientRect().left;
-      let guard = 0;
-      while (i < lo && guard++ < N)       { seq.unshift(seq.pop());   i++; }
-      while (i > hi && guard++ < 2 * N)   { seq.push(seq.shift());    i--; }
-      applyOrder();
-      container.scrollLeft += ref.getBoundingClientRect().left - x0;
-    }
-
-    // The TikTok row must not live inside the horizontal scroller
-    // (a sticky heavy widget is re-composited on every scroll frame).
-    function moveTtdlOut(){ if (ttdl && ttdl.parentNode === container) container.insertAdjacentElement('afterend', ttdl); }
-    function moveTtdlIn(){ if (ttdl && ttdl.parentNode !== container) container.appendChild(ttdl); }
-    // leaving the phone layout: desktop carousel wants the original order/DOM
-    function restore(){
-      seq = orig.slice();
-      orig.forEach(c => { c.style.order = ''; });
-      moveTtdlIn();
-      container.scrollLeft = 0;
-    }
-
-    let touching = false, settleTimer = null;
-    function armSettle(){
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => { if (touching) { armSettle(); return; } recenter(); updateDots(); }, 140);
-    }
-    container.addEventListener('touchstart', () => { touching = true; }, { passive: true });
-    container.addEventListener('touchend', () => { touching = false; armSettle(); }, { passive: true });
-    container.addEventListener('touchcancel', () => { touching = false; armSettle(); }, { passive: true });
-    let ticking = false;
-    container.addEventListener('scroll', () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; updateDots(); }); }
-      armSettle();
-    }, { passive: true });
-
-    let lastW = window.innerWidth;
-    window.addEventListener('resize', () => {
-      if (window.innerWidth === lastW) return;
-      lastW = window.innerWidth;
-      if (isPhone()) { moveTtdlOut(); recenter(); } else { restore(); }
-      updateDots();
-    });
-    if (isPhone()) {
-      moveTtdlOut();
-      applyOrder();
-      requestAnimationFrame(() => { recenter(); updateDots(); });
-      window.addEventListener('load', () => { if (isPhone() && container.scrollLeft < 1) recenter(); updateDots(); }, { once: true });
-    }
-    updateDots();
-  }
-  ttdlSafeInit(initPhoneCardDots);
 
   // Wake the backing servers up as soon as the page loads.
   //
