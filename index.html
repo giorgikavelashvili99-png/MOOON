@@ -153,11 +153,18 @@
     background-size: 3px 3px;
     opacity:0.5;
   }
-  /* The vertical "ruler" pinstripes are gone by request — they showed
-     up as faint white columns over the whole background. Kept as a
-     no-op rule rather than deleting the element so nothing that
-     queries .ruler breaks. */
-  .ruler{ display:none !important; }
+  .ruler{
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.028) 0px,
+      rgba(255,255,255,0.028) 1px,
+      transparent 1px,
+      transparent 80px
+    );
+    opacity:0.6;
+    mask-image: linear-gradient(180deg, transparent, black 15%, black 85%, transparent);
+  }
   .orb{
     position:absolute; border-radius:50%;
     filter:blur(50px);
@@ -253,22 +260,7 @@
      exactly what looked unfinished/"stretched onto a big monitor"
      rather than like an actual desktop site. */
   @media (min-width:900px){
-    .wrap{ max-width:1180px; padding:32px 32px 40px; }
-  }
-  /* Wide-screen ladder. A single hard cap (the old 1100px) meant a
-     1920px monitor showed ~800px of dead margin on each side, which is
-     exactly the "everything is squeezed into the middle" look. Each
-     step below hands the extra pixels back to the content instead,
-     while min() keeps a breathing gutter so nothing ever touches the
-     edge of the viewport. */
-  @media (min-width:1280px){
-    .wrap{ max-width:min(1480px, 94vw); padding:34px 40px 44px; }
-  }
-  @media (min-width:1600px){
-    .wrap{ max-width:min(1760px, 93vw); padding:38px 56px 52px; }
-  }
-  @media (min-width:1900px){
-    .wrap{ max-width:min(2080px, 92vw); padding:42px 72px 58px; }
+    .wrap{ max-width:1100px; padding:32px 32px 40px; }
   }
 
   .topbar{
@@ -276,13 +268,7 @@
     padding:6px 4px; margin-bottom:28px;
   }
   .topbar-left{
-    display:flex; align-items:flex-start; flex-wrap:nowrap; gap:clamp(18px, 3vw, 46px); min-width:0;
-    /* Allowed to grow so the guide links can be centred in the space
-       between the logo and the right-hand actions. Previously this was
-       a fixed-size block, which parked both guide buttons hard against
-       the logo and left one large empty stretch across the middle of
-       the bar. */
-    flex:1 1 auto;
+    display:flex; align-items:flex-start; flex-wrap:nowrap; gap:30px; min-width:0;
   }
   /* Desktop-only PDF guide links, shown next to the logo. Hidden by
      default (mobile keeps its existing layout, with the guide links
@@ -290,11 +276,7 @@
      900px breakpoint the rest of the desktop layout switches on. */
   .topbar-guide-links{
     display:none;
-    align-items:center; flex-wrap:nowrap; gap:clamp(10px, 1.4vw, 22px);
-    /* Takes the leftover width and centres itself inside it, so the
-       two buttons sit in the middle of the bar rather than crowding
-       the logo with a large empty area to their right. */
-    flex:1 1 auto; justify-content:center;
+    align-items:center; flex-wrap:nowrap; gap:12px; flex:0 0 auto;
     /* The logo image is a tall 98px box that includes a decorative
        swash tail below the wordmark, so align-items:center on the row
        would center this against that whole box and land the buttons
@@ -303,18 +285,12 @@
        itself instead. */
     margin-top:5px;
   }
-  /* Dropped from 900px to 760px so tablets get the same topbar as
-     desktop instead of the separate mobile arrangement. */
-  @media (min-width:760px){
+  @media (min-width:900px){
     .topbar-guide-links{ display:flex; }
   }
-  @media (min-width:760px) and (max-width:1023px){
-    .topbar-guide-link{ padding:10px 16px; font-size:14px; }
-    .topbar-guide-ico{ font-size:15px; }
-  }
   .topbar-guide-link{
-    display:inline-flex; align-items:center; justify-content:center; gap:9px;
-    padding:13px clamp(20px, 2.2vw, 40px); border-radius:14px;
+    display:inline-flex; align-items:center; gap:9px;
+    padding:13px 24px; border-radius:14px;
     background:#050508;
     border:1px solid rgba(59,109,255,0.42);
     box-shadow:
@@ -1562,24 +1538,6 @@
     cursor:pointer; transition:.15s;
   }
   .comments-panel .c-page-btn:hover{ border-color:rgba(124,143,255,0.5); color:var(--text); transform:translateY(-1px); }
-
-  /* ---- Compact comments panel ----------------------------------
-     Requested: the block was noticeably taller than it needed to be.
-     Nothing is removed — every element is still there, the vertical
-     rhythm is just tightened. The numbers below add up to roughly
-     100px (~2.6cm at 96dpi) off the total height. */
-  .comments-panel .c-form{ gap:7px; margin-bottom:10px; }
-  .comments-panel textarea.c-text{ height:54px; max-height:110px; }
-  .comments-panel .c-list{ gap:8px; }
-  .comments-panel .c-item{ padding:9px 13px; }
-  .comments-panel .c-item .c-top{ margin-bottom:5px; }
-  .comments-panel .c-item .c-avatar{ width:29px; height:29px; font-size:13px; }
-  .comments-panel .c-empty{ padding:16px 0; }
-  .comments-panel .c-pagination{ margin-top:10px; }
-  .comments-panel .c-page-btn{ min-width:30px; height:30px; }
-  .comments-panel .c-submit{ padding-top:10px; padding-bottom:10px; }
-  .comments-panel .panel-head{ margin-bottom:6px !important; }
-  .comments-panel .rating-picker{ margin:0; }
   .comments-panel .c-page-btn.active{
     background:linear-gradient(180deg, var(--purple), #29337a);
     border-color:var(--purple); color:#fff;
@@ -2720,25 +2678,16 @@
      finalizing: that wait can take up to a minute (the transfer
      service's free hosting tier has to cold-start), and a silent
      pulsing number with no explanation for that long reads as frozen —
-     so the label reappears just for that phase.
-
-     IMPORTANT: this element's box is reserved from the very start
-     (real height, just invisible via opacity) rather than collapsed to
-     1x1px and then switched to position:static/display:block only once
-     finalizing begins. That switch used to insert a real block of text
-     — with real height — into the card with no transition, so the
-     whole upload card visibly grew and "resettled" at a taller size
-     right as finalizing kicked in. Reserving the space up front means
-     the card is the same size for the entire upload, start to finish;
-     only the text's opacity changes. */
+     so the label reappears just for that phase. */
   .mooon-auto-sr-only{
-    display:block; text-align:center; margin-top:10px;
-    font-size:12px; font-weight:600; color:var(--upload-accent);
-    line-height:1.4;
-    opacity:0; transition:opacity .25s ease;
+    position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+    overflow:hidden; white-space:nowrap; border:0; clip:rect(0,0,0,0);
   }
   .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only{
-    opacity:1;
+    position:static; width:auto; height:auto; margin:10px 0 0; padding:0;
+    overflow:visible; white-space:normal; clip:auto;
+    display:block; text-align:center;
+    font-size:12px; font-weight:600; color:var(--upload-accent);
     animation: moonFinalizingFade 1.6s ease-in-out infinite;
   }
   @keyframes moonFinalizingFade{ 0%,100%{ opacity:1; } 50%{ opacity:0.55; } }
@@ -3131,8 +3080,10 @@
     .order-btn{ gap:6px; padding:15px 8px; }
     .order-btn .ico svg{ width:17px; height:17px; }
   }
-  .order-btn:hover{ transform:translateY(-2px); }
-  .order-btn:active{ transform:translateY(0) scale(0.94); transition:transform .1s ease; }
+  @media (hover:hover) and (pointer:fine){
+    .order-btn:hover{ transform:translateY(-2px); }
+  }
+  .order-btn:active{ transform:translateY(0) scale(0.97); transition:transform .1s ease; }
   .order-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
   .order-btn .ico{ font-size:18px; line-height:1; display:flex; align-items:center; }
   .order-btn .ico svg{ width:24px; height:24px; }
@@ -4405,7 +4356,7 @@
   /* On desktop these two links now live in the topbar next to the logo
      (see .topbar-guide-links), so the inline copy here is hidden to
      avoid showing the same two buttons twice. Mobile is untouched. */
-  @media (min-width:760px){
+  @media (min-width:900px){
     .pc-guide-row{ display:none; }
   }
   .pc-heading{
@@ -4464,77 +4415,28 @@
   .pc-carousel-shell, .pc-carousel-track, .pc-slide{ display:contents; }
   .pc-nav, .pc-dots{ display:none; }
 
-  /* Lowered from 1100px: phones and tablets used to fall back to a
-     plain stacked grid, which is the single biggest way the mobile
-     layout diverged from desktop. They now get the same 3D package
-     carousel, sized down rather than replaced. */
-  @media (min-width:360px){
+  @media (min-width:1100px){
     .pricing-cards.pc-carousel-mode{ display:block; }
     .pricing-cards.pc-carousel-mode > .pc-carousel-shell{
-      display:block; position:relative;
-      /* Shrinks to almost nothing on a phone so the card itself gets
-         the width, and opens back up to the original 60px gutters on
-         a desktop monitor where the arrows sit beside the cards. */
-      padding:0 clamp(6px, 6vw, 60px); margin-bottom:6px;
+      display:block; position:relative; padding:0 60px; margin-bottom:6px;
     }
-    /* pan-y lets the page still scroll vertically under the carousel
-       while horizontal swipes are handed to the drag handler. */
-    .pricing-cards.pc-carousel-mode .pc-carousel-track{ touch-action:pan-y; }
     .pricing-cards.pc-carousel-mode .pc-carousel-track{
       display:block; position:relative;
-      perspective:2200px; perspective-origin:50% 44%;
-      margin:0 auto 22px; max-width:100%;
+      perspective:1900px; perspective-origin:50% 42%;
+      margin:0 auto 22px; max-width:940px;
     }
     .pricing-cards.pc-carousel-mode .pc-slide{
       display:block; position:absolute; top:0; left:50%;
-      width:var(--pc-card-w, 296px); cursor:pointer;
+      width:296px; cursor:pointer;
       transform-style:preserve-3d;
-      /* Transform runs on a springier curve than opacity/filter so the
-         card lands first and the depth cues settle a beat later — that
-         small stagger is what reads as "smooth" rather than everything
-         snapping at once. will-change keeps it on the compositor so a
-         fast double-click doesn't stutter mid-flight. */
-      transition:
-        transform .72s cubic-bezier(.22,1.02,.24,1),
-        opacity .5s cubic-bezier(.4,0,.2,1),
-        filter .55s cubic-bezier(.4,0,.2,1),
-        visibility 0s linear 0s;
-      will-change:transform;
-      transform:translate3d(calc(-50% + var(--pc-x,0px)), var(--pc-y,0px), var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
+      transition:transform .55s cubic-bezier(.16,1,.3,1), opacity .45s ease, filter .4s ease;
+      transform:translate3d(calc(-50% + var(--pc-x,0px)), 0, var(--pc-z,0px)) rotateY(var(--pc-ry,0deg)) scale(var(--pc-scale,1));
       opacity:var(--pc-op,1);
       filter:var(--pc-filter,none);
       z-index:var(--pc-zi,1);
       pointer-events:var(--pc-pe,auto);
     }
     .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--active{ cursor:default; }
-    /* Slides beyond maxVisible are already invisible (--pc-op:0 below),
-       but without this they still fully participate in layout, paint
-       and GPU compositing (3D transform, box-shadow, gradients) on
-       every frame of every swipe -- on weaker Android phones, with up
-       to 4-5 such slides transitioning at once alongside the visible
-       ones, that's exactly what made switching between packages feel
-       like it freezes for a moment. Cutting them to visibility:hidden
-       the instant they're marked hidden costs nothing visually (they
-       were already faded to zero opacity by that point) but lets the
-       browser skip rendering them completely. */
-    .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--offscreen{
-      visibility:hidden;
-      transition:
-        transform .72s cubic-bezier(.22,1.02,.24,1),
-        opacity .5s cubic-bezier(.4,0,.2,1),
-        filter .55s cubic-bezier(.4,0,.2,1),
-        visibility 0s linear .5s;
-    }
-    /* Soft pool of light under whichever card currently holds focus.
-       It lives on a pseudo-element so it fades on its own timing and
-       never inherits the slide's 3D transform. */
-    .pricing-cards.pc-carousel-mode .pc-slide::after{
-      content:''; position:absolute; left:8%; right:8%; bottom:-26px; height:40px;
-      border-radius:50%; pointer-events:none;
-      background:radial-gradient(ellipse at center, rgba(124,143,255,0.34), rgba(124,143,255,0) 70%);
-      opacity:0; transition:opacity .55s ease; z-index:-1;
-    }
-    .pricing-cards.pc-carousel-mode .pc-slide--active::after{ opacity:1; }
     .pricing-cards.pc-carousel-mode .pc-carousel-track.pc-dragging .pc-slide{ transition:none; }
     .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
     .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
@@ -4550,24 +4452,11 @@
       transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease, opacity .2s ease;
     }
     .pricing-cards.pc-carousel-mode .pc-nav{ display:flex; }
-    /* The arrows used to jump 26px upward the moment you hovered them:
-       the base rule positions with margin-top:-26px, but the hover and
-       active rules re-declared transform with a translateY(-50%) the
-       base state never had, so the button shifted position instead of
-       just scaling. Scale only — they now stay exactly where they are. */
-    .pc-nav:hover:not(:disabled){ transform:scale(1.08); border-color:var(--cyan,#22c3ff); box-shadow:0 14px 32px rgba(34,195,255,0.3); }
-    .pc-nav:active:not(:disabled){ transform:scale(0.94); }
+    .pc-nav:hover:not(:disabled){ transform:translateY(-50%) scale(1.08); border-color:var(--cyan,#22c3ff); box-shadow:0 14px 32px rgba(34,195,255,0.3); }
+    .pc-nav:active:not(:disabled){ transform:translateY(-50%) scale(0.94); }
     .pc-nav:disabled{ opacity:0.28; cursor:default; }
     .pc-nav--prev{ left:0; }
     .pc-nav--next{ right:0; }
-    /* Below tablet width the arrows would sit on top of the card, so
-       they drop their opacity and move to the very edge instead. */
-    @media (max-width:700px){
-      .pc-nav{ width:40px; height:40px; margin-top:-20px; opacity:0.82; }
-      .pc-nav svg{ width:18px; height:18px; }
-      .pc-nav--prev{ left:-4px; }
-      .pc-nav--next{ right:-4px; }
-    }
     .pc-nav svg{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
 
     .pc-dots{ justify-content:center; align-items:center; gap:9px; }
@@ -4580,22 +4469,7 @@
     .pc-dot:hover{ background:rgba(255,255,255,0.5); }
     .pc-dot.is-active{ background:#fff; transform:scale(1.35); }
   }
-  /* A real-time blur filter on moving cards is the most expensive
-     effect on the page. Phones and tablets get the same depth read
-     from scale + brightness alone, at a fraction of the GPU cost —
-     this is what keeps the swipe at full frame rate on mobile. */
-  @media (max-width:899px){
-    .pricing-cards.pc-carousel-mode .pc-slide{
-      filter:var(--pc-filter-lite, none) !important;
-      /* Shorter than desktop's .72s — a swipe should land under the
-         finger, not drift on after it. */
-      transition:transform .5s cubic-bezier(.22,1,.3,1), opacity .34s ease, filter .34s ease, visibility 0s linear 0s;
-    }
-    .pricing-cards.pc-carousel-mode .pc-slide.pc-slide--offscreen{
-      transition:transform .5s cubic-bezier(.22,1,.3,1), opacity .34s ease, filter .34s ease, visibility 0s linear .34s;
-    }
-  }
-  @media (min-width:360px) and (prefers-reduced-motion: reduce){
+  @media (min-width:1100px) and (prefers-reduced-motion: reduce){
     .pricing-cards.pc-carousel-mode .pc-slide{ transition:opacity .2s ease; }
   }
 
@@ -5783,8 +5657,10 @@
     box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5));
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease, gap .2s ease;
   }
-  .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px rgba(0,0,0,0.55); }
-  .pc-toggle-btn:active{ transform:scale(0.95); box-shadow:0 6px 16px -8px rgba(0,0,0,0.5); transition:transform .1s ease, box-shadow .1s ease; }
+  @media (hover:hover) and (pointer:fine){
+    .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px rgba(0,0,0,0.55); }
+  }
+  .pc-toggle-btn:active{ transform:scale(0.98); box-shadow:0 6px 16px -8px rgba(0,0,0,0.5); transition:transform .1s ease, box-shadow .1s ease; }
 
   /* Opens directly on top of the page — the exact same mechanism as the
      menu drawer (fixed overlay + scrim), not an inline reveal — so opening
@@ -5804,14 +5680,7 @@
      made the modal seem to stutter/fight before landing in place. */
   .pc-modal-scrim{
     display:none;
-    /* z-index was 64 — but the pricing carousel gives its active slide
-       z-index:100 and its arrows z-index:80, and both live in the same
-       stacking context (.wrap) as this scrim. So on desktop the modal
-       DID open, it just painted *underneath* the very cards it was
-       launched from, which looked exactly like "the order button does
-       nothing". 600 clears the whole carousel while still staying
-       below the messenger overlay (10000) and the Discord gate. */
-    position:fixed; inset:0; z-index:620;
+    position:fixed; inset:0; z-index:64;
     background:rgba(6,6,7,0.88);
     padding:16px; box-sizing:border-box;
   }
@@ -5844,7 +5713,7 @@
   }
   .pc-modal-scrim > .pc-accordion-body.panel{
     display:block;
-    position:relative; z-index:621;
+    position:relative; z-index:65;
     margin:auto;
     /* No overflow/max-height here anymore -- that now lives on the
        .pc-modal-scroll wrapper below, so this outer box stays
@@ -5975,15 +5844,6 @@
      ornament -- hiding them on weak devices removes a large number of
      independently animated layers (plus one more backdrop-filter, on
      the badge) at zero cost to functionality. */
-  /* The package carousel joins the same treatment: no live blur, no
-     glow pool, and a shorter slide so weak hardware never has to hold
-     a long animation it can't keep up with. */
-  html.low-power .pricing-cards.pc-carousel-mode .pc-slide{
-    filter:var(--pc-filter-lite, none) !important;
-    transition:transform .42s cubic-bezier(.22,1,.3,1), opacity .3s linear !important;
-  }
-  html.low-power .pricing-cards.pc-carousel-mode .pc-slide::after{ display:none !important; }
-
   html.low-power .qn-stars{ display:none !important; }
   html.low-power .orb{ display:none !important; }
   html.low-power .badge-float{ display:none !important; }
@@ -6069,6 +5929,53 @@
      property-driven transition-delay, which turned out to silently
      fail to fire on some devices. See that function for the full
      rationale. */
+
+  /* ============================================================
+     FIXES: phone lag / tap reliability / upload box jumping
+     ============================================================ */
+  .pc-toggle-btn, .order-btn, .quality-btn, .pc-modal-close, .wp-box, .mp-box,
+  .st-btn, .mooon-prompt-yes, .mooon-prompt-no, .pc-nav, .pc-dot{
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  /* Decorative infinite animations that repaint every frame — off on
+     phones / low-power (gold-card glint, status-dot box-shadow pulse). */
+  html.low-power .pc-card--monthly::after{ animation:none; display:none; }
+  html.low-power .ttdl-status-dot,
+  html.low-power .ttdl-ios-link{ animation:none; }
+  @media (hover:none){
+    .pc-card--monthly::after{ animation:none; display:none; }
+    .ttdl-status-dot, .ttdl-ios-link{ animation:none; }
+  }
+
+  /* Upload progress: the "finalizing" label always owns its one-line slot
+     (just invisible until needed), so the card no longer grows at 100%. */
+  .mooon-auto-status .mooon-auto-sr-only,
+  .mooon-auto-status .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only{
+    position:static; width:auto; max-width:100%; height:1.5em; margin:10px 0 0; padding:0;
+    overflow:hidden; clip:auto; border:0;
+    white-space:nowrap; text-overflow:ellipsis;
+    display:block; text-align:center;
+    font-size:12px; line-height:1.5; font-weight:600;
+    color:var(--upload-accent);
+  }
+  .mooon-auto-status .mooon-auto-sr-only{ opacity:0; animation:none; }
+  .mooon-auto-status .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only{
+    opacity:1; animation: moonFinalizingFade 1.6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .mooon-auto-status .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only{ animation:none; }
+  }
+
+  /* Question (Yes/No) and progress card share one grid cell, and the card
+     is laid out (invisible) from the start, so the box has the same height
+     before, during and after the upload — no grow/shrink jumps. */
+  .sr-transfer.show, .mooon-prompt.show{ display:grid; grid-template-columns:minmax(0,1fr); }
+  .sr-transfer > *, .mooon-prompt > *{ grid-column:1; min-width:0; }
+  .sr-transfer > .sr-transfer-q, .mooon-prompt > .mooon-prompt-q{ grid-row:1; align-self:end; }
+  .sr-transfer > .sr-transfer-actions, .mooon-prompt > .mooon-prompt-actions{ grid-row:2; align-self:start; }
+  .sr-transfer > .mooon-auto, .mooon-prompt > .mooon-auto{ grid-row:1 / span 2; display:block; visibility:hidden; }
+  .sr-transfer > .mooon-auto.show, .mooon-prompt > .mooon-auto.show{ visibility:visible; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -6132,6 +6039,7 @@
 
 <div class="discord-gate" id="discordGate" role="dialog" aria-modal="true" aria-labelledby="discordGateTitle">
   <div class="discord-gate-card">
+    <button type="button" class="discord-gate-close" id="discordGateClose" aria-label="დახურვა">✕</button>
     <div class="discord-gate-logo" aria-hidden="true">🌙</div>
     <div class="discord-gate-title" id="discordGateTitle" data-i18n="authGateTitle">შედი Discord ანგარიშით</div>
     <div class="discord-gate-sub" data-i18n="authGateSub">დაუკავშირდი შენს Discord ანგარიშს, რომ თვალი ადევნო შენს შეკვეთებს და პირველმა მიიღო სიახლეები.</div>
@@ -6143,6 +6051,7 @@
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authJoinBtn">შემოუერთდი ჩვენს Discord სერვერს</span>
     </a>
+    <div class="discord-gate-skip" id="discordGateSkip" data-i18n="authGateSkip">გაგრძელება სტუმრად</div>
   </div>
 </div>
 
@@ -7596,7 +7505,7 @@
   </div>
 
   <!-- Comments -->
-  <div class="panel comments-panel" style="padding:14px 16px;">
+  <div class="panel comments-panel" style="padding:22px;">
     <div class="panel-head" style="margin-bottom:10px;">
       <div class="label" data-i18n="commentsLabel">კომენტარები</div>
     </div>
@@ -8077,8 +7986,6 @@
       videoLinkError: '⚠️ შეკვეთის გასაგზავნად ატვირთული ვიდეოს ლინკის მითითება აუცილებელია!',
       tiktokConfirmPrompt: 'დააჭირეთ დასადასტურებლად',
       tiktokConfirmDone: '✓ დადასტურებულია',
-      tiktokMissingAlert: 'შეკვეთის გასაგზავნად ჯერ მიუთითეთ თქვენი TikTok პროფილის ლინკი და დააჭირეთ „დადასტურებას“.',
-      tiktokUnconfirmedAlert: 'თქვენი TikTok ლინკი ჯერ არ არის დადასტურებული. დაბრუნდით ლინკის ველთან და დააჭირეთ „დადასტურებას“.',
       videoScanner: 'VIDEO SCANNER',
       dzTitle: 'ატვირთეთ ვიდეო ფასის გამოსათვლელად',
       dzSub: 'გადმოიტანე ან დააკლიკე — ხანგრძლივობა ავტომატურად ჩაისმება კალკულატორში',
@@ -8512,8 +8419,6 @@
       videoLinkError: '⚠️ A link to your uploaded video is required to send the order!',
       tiktokConfirmPrompt: 'Click to confirm',
       tiktokConfirmDone: '✓ Confirmed',
-      tiktokMissingAlert: 'Before sending the order, enter your TikTok profile link and press “Confirm”.',
-      tiktokUnconfirmedAlert: 'Your TikTok link has not been confirmed yet. Go back to the link field and press “Confirm”.',
       videoScanner: 'VIDEO SCANNER',
       dzTitle: 'Upload a video for automatic measurement',
       dzSub: 'Drag it here or click — duration will be filled in automatically',
@@ -8814,7 +8719,13 @@
     clearTimeout(priceNoteFitTimer);
     priceNoteFitTimer = setTimeout(fitNowrapText, 120);
   }
-  window.addEventListener('resize', scheduleFitPriceNotes);
+  let priceNoteFitLastW = window.innerWidth;
+  window.addEventListener('resize', () => {
+    // Phone URL bar show/hide only changes the height — skip those.
+    if (window.innerWidth === priceNoteFitLastW) return;
+    priceNoteFitLastW = window.innerWidth;
+    scheduleFitPriceNotes();
+  });
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(fitNowrapText);
   }
@@ -9057,6 +8968,39 @@
   const pcModalScrim = document.getElementById('pcModalScrim');
   let pcBodyScrollLockCount = 0;
 
+  function lockBodyScroll(){
+    pcBodyScrollLockCount++;
+    if (pcBodyScrollLockCount === 1) {
+      // Hiding overflow makes the scrollbar disappear, which frees up
+      // whatever width it was taking and shifts the whole page right
+      // by that amount -- very noticeable on desktop browsers with a
+      // classic, space-taking scrollbar (a no-op on mobile/overlay
+      // scrollbars, which never took up layout space to begin with).
+      // Adding that same width back as padding on the body cancels the
+      // shift out. Measured only on this first, outermost lock call --
+      // by the time a second nested lock happens the scrollbar is
+      // already hidden, so measuring again would just read back 0.
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = scrollbarWidth + 'px';
+      }
+    }
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'contain';
+    attachScrollGuard();
+  }
+  function unlockBodyScroll(){
+    pcBodyScrollLockCount = Math.max(0, pcBodyScrollLockCount - 1);
+    if (pcBodyScrollLockCount === 0) {
+      detachScrollGuard();
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.overscrollBehavior = '';
+      document.body.style.paddingRight = '';
+    }
+  }
+
   // Hard guarantee, independent of the CSS overflow/overscroll-behavior
   // lock above: while any pricing-card modal is open, block every wheel
   // or touch-drag scroll gesture that isn't happening *inside* the open
@@ -9082,57 +9026,21 @@
     if (modalBody && modalBody.contains(e.target)) return;
     e.preventDefault();
   }
-
-  // NOTE: these used to be bound once, globally, for the entire page's
-  // lifetime. A document-level touchmove listener registered with
-  // { passive: false } forces the browser to hold off scrolling and wait
-  // for this handler to finish on the main thread on EVERY touch-move
-  // event anywhere on the page -- even though blockScrollOutsideModal()
-  // is a no-op almost all the time (no modal open). That's what made
-  // ordinary scrolling on phones feel like it kept "catching"/stuttering
-  // on transitions. They're now attached only while a modal is actually
-  // open (see lockBodyScroll/unlockBodyScroll below), so normal page
-  // scrolling is never intercepted by them at all.
-  function addModalScrollBlockers(){
+  // These two are NON-passive, which forces the browser to wait for the
+  // main thread on every touch-move/wheel tick (= scroll jank on phones).
+  // So they are attached only while a pricing modal is actually open.
+  let pcScrollGuardOn = false;
+  function attachScrollGuard(){
+    if (pcScrollGuardOn) return;
+    pcScrollGuardOn = true;
     document.addEventListener('wheel', blockScrollOutsideModal, { passive: false });
     document.addEventListener('touchmove', blockScrollOutsideModal, { passive: false });
   }
-  function removeModalScrollBlockers(){
+  function detachScrollGuard(){
+    if (!pcScrollGuardOn) return;
+    pcScrollGuardOn = false;
     document.removeEventListener('wheel', blockScrollOutsideModal, { passive: false });
     document.removeEventListener('touchmove', blockScrollOutsideModal, { passive: false });
-  }
-
-  function lockBodyScroll(){
-    pcBodyScrollLockCount++;
-    if (pcBodyScrollLockCount === 1) {
-      // Hiding overflow makes the scrollbar disappear, which frees up
-      // whatever width it was taking and shifts the whole page right
-      // by that amount -- very noticeable on desktop browsers with a
-      // classic, space-taking scrollbar (a no-op on mobile/overlay
-      // scrollbars, which never took up layout space to begin with).
-      // Adding that same width back as padding on the body cancels the
-      // shift out. Measured only on this first, outermost lock call --
-      // by the time a second nested lock happens the scrollbar is
-      // already hidden, so measuring again would just read back 0.
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      if (scrollbarWidth > 0) {
-        document.body.style.paddingRight = scrollbarWidth + 'px';
-      }
-      addModalScrollBlockers();
-    }
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.overscrollBehavior = 'contain';
-  }
-  function unlockBodyScroll(){
-    pcBodyScrollLockCount = Math.max(0, pcBodyScrollLockCount - 1);
-    if (pcBodyScrollLockCount === 0) {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-      document.body.style.overscrollBehavior = '';
-      document.body.style.paddingRight = '';
-      removeModalScrollBlockers();
-    }
   }
 
   function openPricingCard(card){
@@ -9209,7 +9117,9 @@
   document.querySelectorAll('.pc-toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const card = btn.closest('.pc-card');
-      togglePricingCard(card);
+      // Open-only: closing happens via ✕ / scrim / Esc. A toggle here let a
+      // delayed first tap + a second tap open and immediately close the modal.
+      if (card && !card.classList.contains('pc-open')) openPricingCard(card);
     });
   });
   document.querySelectorAll('.pc-modal-close').forEach(btn => {
@@ -10487,6 +10397,12 @@
   // selected — well before the actual upload begins — lets that wake-up
   // happen in parallel with scanning/reviewing the video instead of
   // being stacked onto the end of the wait, after 100%.
+  // Keeps the scanner box from collapsing when the dropzone is hidden
+  // (file picked -> "processing" line), which made the modal jump.
+  function lockScannerStageHeight(zoneEl){
+    const stage = zoneEl && zoneEl.closest ? zoneEl.closest('.scanner-stage') : null;
+    if (stage && !stage.style.minHeight) stage.style.minHeight = stage.offsetHeight + 'px';
+  }
   let transferServiceWoken = false;
   function wakeTransferService(){
     if (transferServiceWoken) return;
@@ -10704,6 +10620,7 @@
 
   function resetTransferPrompt(){
     srTransfer.classList.remove('show');
+    srTransfer.style.minHeight = '';
     srTransferQ.style.display = '';
     srTransferActions.style.display = '';
     srTransferYes.disabled = false;
@@ -10716,6 +10633,7 @@
   srRejectRetry.addEventListener('click', resetScanner);
 
   srTransferYes.addEventListener('click', () => {
+    srTransfer.style.minHeight = srTransfer.offsetHeight + 'px';
     srTransferYes.disabled = true;
     srTransferNo.disabled = true;
     srTransferQ.style.display = 'none';
@@ -10753,6 +10671,7 @@
     // "two things visible at once" bug the rest of this wizard was
     // built to avoid. dropZone is restored in resetScanner() (cancel,
     // reject-retry, or re-upload after success all route through it).
+    lockScannerStageHeight(dropZone);
     dropZone.classList.add('dz-scanning-hidden');
 
     const videoEl = document.createElement('video');
@@ -11032,6 +10951,7 @@
     function resetPrompt(){
       if (!prompt) return;
       prompt.classList.remove('show');
+      prompt.style.minHeight = '';
       if (promptQ) promptQ.style.display = '';
       if (promptActions) promptActions.style.display = '';
       if (promptYes) promptYes.disabled = false;
@@ -11129,6 +11049,7 @@
 
     if (promptYes) {
       promptYes.addEventListener('click', () => {
+        if (prompt) prompt.style.minHeight = prompt.offsetHeight + 'px';
         promptYes.disabled = true;
         if (promptNo) promptNo.disabled = true;
         if (promptQ) promptQ.style.display = 'none';
@@ -11156,6 +11077,7 @@
       // "two things visible at once" fix already used by the main
       // calculator's scanner, now applied here too. showIdle() (reset
       // button, or picking a new file) is what brings it back.
+      lockScannerStageHeight(zone);
       zone.classList.add('dz-scanning-hidden');
       readVideoFileMeta(file).then(meta => {
         zone.classList.remove('scanning');
@@ -12592,11 +12514,15 @@
       startDiscordLogin();
       return;
     }
-    // Being a member of the Discord server is deliberately NOT required
-    // anymore -- a plain Discord login (currentDiscordUser, checked just
-    // above) is enough on its own to send an order. showGuildJoinGate()
-    // below is kept only because savePendingOrder()/resumePendingOrderIfAny
-    // still reference it defensively; it is no longer called from here.
+    // isMember comes from the auth worker's own guild-membership check
+    // (Discord's /users/@me/guilds, using the access token that never
+    // reaches this page) — not something set or trusted from the
+    // frontend, so this can't be bypassed by editing local state.
+    if (currentDiscordUser.isMember === false){
+      savePendingOrder(orderData, firstMessageText, idleKey);
+      showGuildJoinGate();
+      return;
+    }
     if (btn) btn.disabled = true;
     if (textEl) textEl.textContent = t('orderProcessing') || '…';
 
@@ -12822,27 +12748,15 @@ TikTok პროფილი: ${getTiktokValue('main')}
     // already on file from the original order, so skip the field entirely
     // (it's hidden in the UI too, see applySubscriptionUIFor()).
     if (!activeSub && g.link) {
-      // Same trap the video-link branch below already guards against:
-      // by the time someone reaches the final "send" step, the TikTok
-      // field from an earlier step is usually hidden. focus(),
-      // scrollIntoView() and the shake animation are all completely
-      // invisible on a display:none element, so the send was silently
-      // refused and the button genuinely looked dead. offsetParent is
-      // null for anything hidden that way, so fall back to a message
-      // the visitor cannot miss.
-      const ttVisible = g.link.offsetParent !== null;
       const linkVal = g.link.value.trim();
       if (!linkVal) {
         g.link.classList.add('error');
         if (g.error) g.error.style.display = 'block';
-        if (!ttVisible) { alert(t('tiktokMissingAlert') || t('tiktokError')); return false; }
         g.link.focus();
-        g.link.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return false;
       }
       if (!tiktokLinkConfirmed[panelKey]) {
         if (g.error) g.error.style.display = 'none';
-        if (!ttVisible) { alert(t('tiktokUnconfirmedAlert')); return false; }
         g.link.classList.remove('tt-shake', 'tt-error-flash');
         void g.link.offsetWidth;
         g.link.classList.add('tt-shake', 'tt-error-flash');
@@ -13848,7 +13762,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
   let commentsCache = [];
   let commentsPage = 1;
-  const COMMENTS_PER_PAGE = 2;  // was 3 — the section was asked to be shorter
+  const COMMENTS_PER_PAGE = 3;
   let commentsListMinHeight = 0;
 
   function renderCommentsPagination(totalItems){
@@ -16004,8 +15918,15 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     let raw;
     try{ raw = sessionStorage.getItem(PENDING_ORDER_KEY); }catch(e){ return; }
     if (!raw) return;
-    // Guild membership is no longer required to resume/send a pending
-    // order either (see the matching change in startOrderChat).
+    if (user.isMember === false){
+      // Deliberately NOT removed here -- this needs to survive the
+      // "join the server, then retry" full-page navigation too, not just
+      // the first OAuth round trip. The one-shot guard above already
+      // stops this from re-firing repeatedly within this same page load;
+      // removal only happens once an attempt actually completes (below).
+      showGuildJoinGate();
+      return;
+    }
     try{ sessionStorage.removeItem(PENDING_ORDER_KEY); }catch(e){}
     let pending;
     try{ pending = JSON.parse(raw); }catch(e){ return; }
@@ -16050,9 +15971,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const loginBtn = document.getElementById('discordLoginBtn');
         const titleEl = document.getElementById('discordGateTitle');
         const subEl = gate.querySelector('.discord-gate-sub');
+        const skipEl = document.getElementById('discordGateSkip');
         if (loginBtn) loginBtn.style.display = '';
         if (titleEl) titleEl.textContent = t('authGateTitle');
         if (subEl) subEl.textContent = t('authGateSub');
+        if (skipEl) { skipEl.textContent = t('authGateSkip'); skipEl.onclick = null; }
         gate.classList.add('open');
       }
     }
@@ -16162,6 +16085,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const logoutBtn = document.getElementById('discordLogoutBtn');
     const refreshBtn = document.getElementById('discordRefreshBtn');
     const gate = document.getElementById('discordGate');
+    const gateClose = document.getElementById('discordGateClose');
+    const gateSkip = document.getElementById('discordGateSkip');
     const joinBtn = document.getElementById('discordJoinBtn');
     if (joinBtn) joinBtn.href = DISCORD_INVITE_URL;
 
@@ -16212,10 +16137,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       await checkDiscordSession();
       refreshBtn.disabled = false;
     });
-    // Login is mandatory now: the close (✕) and "continue as guest"
-    // controls have been removed from the markup entirely, so there is
-    // deliberately no way left to dismiss this gate without completing
-    // Discord login.
+    if (gateClose) gateClose.addEventListener('click', () => gate && gate.classList.remove('open'));
+    if (gateSkip) gateSkip.addEventListener('click', () => gate && gate.classList.remove('open'));
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
@@ -17385,36 +17308,13 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const container = document.querySelector('.pricing-cards');
     if (!container) return;
 
-    // Matches the CSS media query above — the carousel is now the
-    // layout on phones and tablets too, not a desktop-only extra.
-    const BREAKPOINT = 360;
+    const BREAKPOINT = 1100;
+    const SPACING_X = 236;
     const SPACING_Z = -150;
     const ROTATE_Y = 11;
     const SCALE_STEP = 0.13;
     const MIN_SCALE = 0.6;
-
-    // Everything below used to be fixed pixel constants tuned for a
-    // ~1100px shell. Now that .wrap keeps widening past that, they're
-    // derived from the actual shell width instead, so a 1920px monitor
-    // shows bigger cards and one more card per side rather than the
-    // same small cluster floating in the middle of empty space.
-    function metrics(){
-      const w = (track && track.parentElement ? track.parentElement.clientWidth : 0) || window.innerWidth;
-      // Narrow screens get one big readable card with its neighbours
-      // just peeking in at the edges; wide screens keep the full fan of
-      // two cards per side. A third per side would have to be clipped
-      // (body is overflow-x:hidden), which looks worse than hiding it.
-      if (w < 620){
-        const cardW = Math.round(Math.min(330, Math.max(210, w * 0.8)));
-        return { cardW, spacingX: Math.round(cardW * 0.62), maxVisible: 1 };
-      }
-      if (w < 900){
-        const cardW = Math.round(Math.min(330, w * 0.42));
-        return { cardW, spacingX: Math.round(cardW * 0.72), maxVisible: 2 };
-      }
-      const cardW = Math.round(Math.max(296, Math.min(380, w * 0.235)));
-      return { cardW, spacingX: Math.round(cardW * 0.78), maxVisible: 2 };
-    }
+    const MAX_VISIBLE_OFFSET = 2;
 
     let built = false;
     let active = false;
@@ -17498,75 +17398,30 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // to the >=1100px breakpoint already, so touch input never
       // reaches this code path in the first place).
       let dragging = false, moved = false, startX = 0;
-      // Touch is no longer excluded: the carousel is the phone layout
-      // now, so a finger swipe has to move it the same way a mouse drag
-      // does. Vertical page scrolling still works because the track is
-      // touch-action:pan-y.
-      let startY = 0, axisLocked = '';
-      let capturedPointerId = null;
       track.addEventListener('pointerdown', (e) => {
-        if (!active) return;
-        dragging = true; moved = false; axisLocked = '';
-        startX = e.clientX; startY = e.clientY;
-        capturedPointerId = e.pointerId;
-        // NOTE: pointer capture is deliberately NOT taken here on every
-        // press anymore. Chrome retargets the click event that follows a
-        // captured pointer to the CAPTURING element (this track) instead
-        // of whatever was actually under the cursor -- so with capture
-        // taken on every single pointerdown, EVERY click on the centre
-        // card's "შეკვეთა" button (even a perfectly still one, zero
-        // movement) was silently retargeted to the track div and never
-        // reached the button's own click handler at all. This is the
-        // real root cause of "the order button does nothing on desktop"
-        // (confirmed by instrumenting real mouse-driven pointerdown/
-        // pointerup/click events end-to-end -- the earlier fix below,
-        // which only guarded the suppressClick flag, did not address
-        // this and left the bug fully in place). Capture is now only
-        // claimed once we KNOW a real horizontal swipe is happening
-        // (see pointermove below), so a plain click never captures the
-        // pointer and its click event keeps its natural target.
+        if (!active || e.pointerType === 'touch') return;
+        dragging = true; moved = false; startX = e.clientX;
       });
       track.addEventListener('pointermove', (e) => {
         if (!dragging) return;
-        const dx = Math.abs(e.clientX - startX);
-        const dy = Math.abs(e.clientY - startY);
-        // Decide once whether this gesture is a horizontal swipe or a
-        // vertical scroll, then stick with it — otherwise a finger
-        // scrolling down the page drifts sideways and flips the card.
-        if (!axisLocked && (dx > 8 || dy > 8)) {
-          axisLocked = dx > dy ? 'x' : 'y';
-          if (axisLocked === 'x') {
-            track.classList.add('pc-dragging');
-            try{ track.setPointerCapture(capturedPointerId); }catch(err){}
-          }
+        // Capture only once it is really a drag. Capturing on pointerdown
+        // retargets the following click to the track, so the card's own
+        // "შეკვეთა" button never received real mouse clicks.
+        if (!moved && Math.abs(e.clientX - startX) > 6) {
+          moved = true;
+          track.classList.add('pc-dragging');
+          try{ track.setPointerCapture(e.pointerId); }catch(err){}
         }
-        if (axisLocked === 'y') { dragging = false; track.classList.remove('pc-dragging'); return; }
-        // 6px was low enough that ordinary hand-tremor while clicking
-        // counted as a drag — and a "drag" swallows the click that ends
-        // it, so pressing the order button on the centre card could do
-        // nothing at all. A real swipe easily clears 14px.
-        if (dx > 14) moved = true;
       });
       function endDrag(e){
         if (!dragging) return;
         dragging = false;
         track.classList.remove('pc-dragging');
-        // THE ACTUAL BUG behind "the order button does nothing on
-        // desktop": suppressClick used to be set to true for ANY
-        // movement past 14px, whether or not that movement was big
-        // enough to actually change slides. A normal mouse click
-        // almost always drifts more than 14px between mousedown and
-        // mouseup — that's just hand tremor, not an intentional swipe.
-        // So the click that followed nearly every real click was
-        // classified as "the end of a drag" and swallowed by the
-        // capture-phase listener above before it ever reached the
-        // "შეკვეთა" button underneath. Now suppression only happens
-        // when a slide change genuinely fires.
         if (moved) {
+          suppressClick = true;
           const dx = e.clientX - startX;
-          const threshold = window.innerWidth < 620 ? 34 : 55;
-          if (dx > threshold) { suppressClick = true; goTo(activeIndex - 1); }
-          else if (dx < -threshold) { suppressClick = true; goTo(activeIndex + 1); }
+          if (dx > 55) goTo(activeIndex - 1);
+          else if (dx < -55) goTo(activeIndex + 1);
         }
       }
       track.addEventListener('pointerup', endDrag);
@@ -17591,45 +17446,21 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     function position(){
-      const m = metrics();
-      if (track) track.style.setProperty('--pc-card-w', m.cardW + 'px');
       slides.forEach((slide, i) => {
         const offset = i - activeIndex;
         const abs = Math.abs(offset);
         const dir = offset === 0 ? 0 : (offset > 0 ? 1 : -1);
         const clampedAbs = Math.min(abs, 3);
-        const hide = abs > m.maxVisible;
-        slide.style.setProperty('--pc-x', (offset * m.spacingX) + 'px');
+        const hide = abs > MAX_VISIBLE_OFFSET;
+        slide.style.setProperty('--pc-x', (offset * SPACING_X) + 'px');
         slide.style.setProperty('--pc-z', (clampedAbs * SPACING_Z) + 'px');
-        // Side cards drop a few pixels so the centre one visibly rises
-        // out of the row instead of only growing in place.
-        slide.style.setProperty('--pc-y', (offset === 0 ? -6 : clampedAbs * 10) + 'px');
         slide.style.setProperty('--pc-ry', (-dir * clampedAbs * ROTATE_Y) + 'deg');
         slide.style.setProperty('--pc-scale', Math.max(1 - clampedAbs * SCALE_STEP, MIN_SCALE));
-        slide.style.setProperty('--pc-op', hide ? 0 : Math.max(1 - abs * 0.24, 0.38));
+        slide.style.setProperty('--pc-op', hide ? 0 : Math.max(1 - abs * 0.28, 0.4));
         slide.style.setProperty('--pc-zi', String(100 - abs));
-        // A touch of blur on the off-centre cards reads as real depth
-        // and makes the card you're actually choosing unmistakable.
-        const bright = offset === 0 ? 1 : Math.max(0.58, 0.78 - (clampedAbs - 1) * 0.1);
-        slide.style.setProperty(
-          '--pc-filter',
-          offset === 0
-            ? 'brightness(1) saturate(1.04)'
-            : 'brightness(' + bright.toFixed(2) + ') saturate(.85) blur(' + (clampedAbs * 1.1).toFixed(1) + 'px)'
-        );
-        // Blur-free twin used on phones/tablets — see the max-width:899px
-        // rule in the stylesheet.
-        slide.style.setProperty(
-          '--pc-filter-lite',
-          offset === 0 ? 'brightness(1) saturate(1.04)' : 'brightness(' + bright.toFixed(2) + ') saturate(.85)'
-        );
+        slide.style.setProperty('--pc-filter', offset === 0 ? 'brightness(1) saturate(1)' : 'brightness(.72) saturate(.85)');
         slide.style.setProperty('--pc-pe', hide ? 'none' : 'auto');
         slide.classList.toggle('pc-slide--active', offset === 0);
-        // See the .pc-slide--offscreen CSS rule above: skips paint/
-        // compositing entirely for slides that are already invisible,
-        // instead of leaving 4-5 fully-styled 3D-transformed cards
-        // silently animating behind the visible ones on every swipe.
-        slide.classList.toggle('pc-slide--offscreen', hide);
       });
       dots.forEach((d, i) => d.classList.toggle('is-active', i === activeIndex));
       if (prevBtn) prevBtn.disabled = activeIndex <= 0;
@@ -17643,7 +17474,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const card = slide.firstElementChild;
         if (card) maxH = Math.max(maxH, card.offsetHeight);
       });
-      if (maxH) track.style.height = (maxH + 64) + 'px';
+      if (maxH) track.style.height = (maxH + 34) + 'px';
     }
 
     function activate(){
@@ -17670,12 +17501,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     let resizeTimer = null;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        sync();
-        // position() has to re-run too now that card width and spacing
-        // are derived from the shell width rather than fixed constants.
-        if (active) { position(); measureHeight(); }
-      }, 150);
+      resizeTimer = setTimeout(() => { sync(); if (active) measureHeight(); }, 150);
     });
     window.addEventListener('load', () => { if (active) measureHeight(); });
 
@@ -17692,29 +17518,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   ttdlSafeInit(initTilt3D);
   ttdlSafeInit(initDiscordAuth);
   ttdlSafeInit(initTiktokDownloader);
-  // NOTE: initPricingCarousel MUST run before initScrollReveal. The
-  // carousel moves each individual .pricing-cards > * card into its own
-  // .pc-slide wrapper (which owns the card's position/opacity via CSS,
-  // driven by --pc-x/--pc-z/--pc-op custom properties). If scroll-reveal
-  // ran first, it would grab those same individual cards, stamp its own
-  // inline opacity/transform/filter on each one (staggered per card,
-  // independent of which slide is active), and THEN the carousel would
-  // wrap them -- leaving two unrelated animation systems fighting on the
-  // same nested elements. Visually that looked like the pricing cards
-  // "opening" two or three times with janky, out-of-order frames, since
-  // every card (including ones parked off to the side of the carousel)
-  // kept doing its own separate fade/slide-up on its own timer.
-  //
-  // Running the carousel first means that by the time scroll-reveal
-  // queries '.pricing-cards > *', the individual cards are already
-  // inside .pc-slide wrappers and are no longer direct children -- so
-  // scroll-reveal naturally picks up the single carousel shell instead
-  // and fades it in as one piece. Below the carousel's own breakpoint
-  // (very narrow screens where it never builds), the cards are still
-  // plain direct children at this point, so the original per-card
-  // reveal behavior is preserved exactly as before.
-  ttdlSafeInit(initPricingCarousel);
   ttdlSafeInit(initScrollReveal);
+  ttdlSafeInit(initPricingCarousel);
 
   // Wake the backing servers up as soon as the page loads.
   //
