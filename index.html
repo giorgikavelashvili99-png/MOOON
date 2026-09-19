@@ -17494,13 +17494,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
     const allManaged = [];
 
-    const pricingCards = Array.from(document.querySelectorAll('.pricing-cards > *'));
-    const immediateCards = isPhoneLayout ? pricingCards.slice(0, 1) : pricingCards;
-    const laterCards = isPhoneLayout ? pricingCards.slice(1) : [];
-
     const loadTargets = [document.querySelector('.topbar'), document.querySelector('.pc-intro')]
-      .filter(Boolean)
-      .concat(immediateCards);
+      .filter(Boolean);
     loadTargets.forEach((el, i) => {
       hide(el);
       allManaged.push(el);
@@ -17512,7 +17507,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       setTimeout(() => reveal(el), 200 + i * 60);
     });
 
-    const scrollTargets = laterCards.concat(Array.from(document.querySelectorAll('.comments-panel')));
+    const scrollTargets = Array.from(document.querySelectorAll('.comments-panel'));
     if (!('IntersectionObserver' in window)) {
       scrollTargets.forEach(reveal);
     } else {
