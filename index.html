@@ -4051,6 +4051,25 @@
     scroll-behavior:auto;
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
+    /* Always reserve the vertical scrollbar's space, whether or not it's
+       currently needed (and even on Safari/WebKit's overlay scrollbars,
+       where scrollbar-gutter doesn't yet change anything -- overflow-y:
+       scroll is the fallback there). Without this, the page's own height
+       occasionally crossing the "needs a scrollbar" line -- which can
+       happen just from switching between pricing cards of slightly
+       different heights -- silently changed the *available* viewport
+       width by the scrollbar's width. The pricing carousel above uses
+       that width to decide how many cards fit on screen (see
+       initPricingCarousel/calcMetrics), so that invisible width change
+       was flipping its answer back and forth and made whichever card
+       sat right at that boundary flicker in and out in place instead of
+       gliding -- reported as specific cards "jamming"/flashing at the
+       right edge while scrolling. Reserving the gutter up front means
+       the scrollbar appearing or disappearing never changes the
+       viewport width in the first place, so that recalculation can't be
+       triggered by it anymore.  */
+    overflow-y:scroll;
+    scrollbar-gutter:stable;
   }
   body{
     -webkit-overflow-scrolling: touch;
