@@ -4259,21 +4259,17 @@
   }
 
   /* --- Edit Order panel (fixed-price character edit) --- */
+  /* No gold frame / glow / stripes any more — this wrapper is invisible so
+     the upload area sits directly in the panel, exactly like the main
+     order panel does. */
   .eo-box{
-    padding:16px;
-    background:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 8px),
-      radial-gradient(ellipse 110% 75% at 50% -10%, rgba(255,210,63,0.14), transparent 65%),
-      linear-gradient(180deg, #14120a, #08080f) !important;
-    border:1.5px solid rgba(255,210,63,0.3) !important;
+    padding:0;
+    background:none !important;
+    border:none !important;
     animation:none !important;
     position:relative;
   }
-  .eo-box::before{
-    content:''; position:absolute; top:0; left:16%; right:16%; height:2px;
-    background:linear-gradient(90deg, transparent, var(--gold), #fff3d1, var(--gold), transparent);
-    opacity:0.85; z-index:2;
-  }
+  .eo-box::before{ display:none; }
   .eo-content{
     display:flex; flex-direction:column; align-items:center;
     margin-bottom:14px; text-align:center;
@@ -4317,7 +4313,7 @@
     text-align:center; color:#fff; margin:0; line-height:1.35; max-width:320px;
   }
   @media (max-width:480px){
-    .eo-box{ padding:13px; }
+    .eo-box{ padding:0; }
     .eo-video-wrap{ width:140px; }
     .eo-caption{ font-size:13px; }
   }
