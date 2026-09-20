@@ -4058,16 +4058,11 @@
        occasionally crossing the "needs a scrollbar" line -- which can
        happen just from switching between pricing cards of slightly
        different heights -- silently changed the *available* viewport
-       width by the scrollbar's width. The pricing carousel above uses
-       that width to decide how many cards fit on screen (see
-       initPricingCarousel/calcMetrics), so that invisible width change
-       was flipping its answer back and forth and made whichever card
-       sat right at that boundary flicker in and out in place instead of
-       gliding -- reported as specific cards "jamming"/flashing at the
-       right edge while scrolling. Reserving the gutter up front means
-       the scrollbar appearing or disappearing never changes the
-       viewport width in the first place, so that recalculation can't be
-       triggered by it anymore.  */
+       width by the scrollbar's width whenever that happened. Keeping the
+       gutter reserved up front means the scrollbar appearing or
+       disappearing never changes the viewport width in the first place,
+       which is one less thing any width-based layout code on the page
+       (now or later) has to defend against. */
     overflow-y:scroll;
     scrollbar-gutter:stable;
   }
@@ -4402,48 +4397,55 @@
   }
 
   /* ============================================================
-     PRICING CARDS — desktop 3D swipe carousel (progressive
+     PRICING CARDS — horizontal snap-scroll carousel (progressive
      enhancement on top of the grid above, not a replacement for
-     it). JS only builds this at >=1100px (see initPricingCarousel).
-     Every wrapper it adds (.pc-carousel-shell/-track, .pc-slide) is
-     display:contents by default, so the plain grid above sees
-     straight through them to the real cards -- phones/tablets keep
-     the exact original grid markup and behavior, untouched. */
-  .pc-carousel-shell, .pc-carousel-track, .pc-slide{ display:contents; }
+     it; every wrapper it adds is display:contents until JS adds
+     .pc-scroll-mode, so if that JS never runs the plain grid above
+     renders exactly as it always has).
+
+     This replaces an earlier hand-rolled 3D "coverflow" that
+     computed each card's own screen position from the viewport
+     width -- how many cards fit, which ones count as hidden, etc.
+     -- and recomputed that on every resize. Any small, incidental
+     width change (even the page's own scrollbar appearing or
+     disappearing) could retrigger that arithmetic and get one
+     specific card's visibility wrong for a frame. This version
+     leans on the browser's own native horizontal scrolling with
+     CSS scroll-snap instead: the browser -- not this code --
+     decides what's actually on screen and handles the
+     dragging/swiping/momentum itself, so there's no "how many
+     cards fit" bookkeeping here that can fall out of sync with
+     reality. See initPricingScrollCarousel in the JS for the (much
+     shorter) logic that just reads back which card ended up
+     centred, to keep the dots and the active-card styling in sync. */
+  .pc-scroll-shell, .pc-scroll-track{ display:contents; }
   .pc-nav, .pc-dots{ display:none; }
 
-  /* Looping 3D carousel on every screen size. Smoothness rules: each card
-     is ONE stable GPU layer; only transform/opacity change and they are
-     written inline (no inherited CSS variables -> no style recalculation
-     of the hundreds of elements inside each card). While a move runs
-     (.pc-moving) everything inside the cards is frozen and ignores the
-     pointer, so nothing repaints mid-flight. */
-  .pricing-cards.pc-carousel-mode{ display:block; --pc-w:min(296px, calc(100vw - 96px)); }
-  .pricing-cards.pc-carousel-mode > .pc-carousel-shell{ display:flex; flex-direction:column; position:relative; padding:0; margin-bottom:6px; }
-  .pricing-cards.pc-carousel-mode .pc-carousel-track{
-    display:block; position:relative; width:100%; max-width:940px; margin:0 auto 22px;
-    overflow-x:clip;
-    perspective:1600px; perspective-origin:50% 42%;
-    touch-action:pan-y; -webkit-user-select:none; user-select:none;
+  .pricing-cards.pc-scroll-mode{ display:block; }
+  .pricing-cards.pc-scroll-mode > .pc-scroll-shell{ display:flex; flex-direction:column; position:relative; margin-bottom:6px; }
+  .pricing-cards.pc-scroll-mode .pc-scroll-track{
+    display:flex; align-items:stretch; gap:16px;
+    overflow-x:auto; overflow-y:visible;
+    scroll-snap-type:x mandatory;
+    scroll-padding-inline:calc(50% - min(296px, 86vw) / 2);
+    -webkit-overflow-scrolling:touch; touch-action:pan-x;
+    padding:20px calc(50% - min(296px, 86vw) / 2) 26px;
+    scrollbar-width:none; -ms-overflow-style:none;
   }
-  .pricing-cards.pc-carousel-mode .pc-slide{
-    display:block; position:absolute; top:0; left:50%; width:var(--pc-w);
-    transform:translate3d(-50%,0,0);
-    will-change:transform, opacity;
+  .pricing-cards.pc-scroll-mode .pc-scroll-track::-webkit-scrollbar{ display:none; height:0; }
+  .pricing-cards.pc-scroll-mode .pc-slide{
+    flex:0 0 auto; width:min(296px, 86vw);
+    scroll-snap-align:center; scroll-snap-stop:always;
+    display:flex; cursor:pointer;
+    opacity:.5; transform:scale(.92); filter:saturate(.7);
+    transition:opacity .35s ease, transform .35s ease, filter .35s ease;
   }
-  /* Dark veil on side cards. It also catches taps on them (=> "bring to
-     centre"), so buttons under a side card can never be hit by accident. */
-  .pc-dim{
-    position:absolute; inset:0; border-radius:28px; z-index:5;
-    background:#05060c; opacity:0; pointer-events:none; cursor:pointer;
-    transition:opacity .35s ease; will-change:opacity;
-  }
+  .pricing-cards.pc-scroll-mode .pc-slide--active{ opacity:1; transform:scale(1); filter:none; cursor:default; }
+  .pricing-cards.pc-scroll-mode .pc-slide > *{ width:100%; min-width:0; }
   /* Only the centred card runs its decorative loops. Targeted selectors
      (no universal "*") so switching cards restyles almost nothing. */
-  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) :is(.price sup, .urgency-badge, .mec-colon, .moon-glow-card),
-  .pricing-cards.pc-carousel-mode .pc-slide:not(.pc-slide--active) .pc-card--monthly::after{ animation-play-state:paused; }
-  .pricing-cards.pc-carousel-mode .pc-slide .pc-card-wrap,
-  .pricing-cards.pc-carousel-mode .pc-slide > .pc-card{ width:100%; }
+  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) :is(.price sup, .urgency-badge, .mec-colon, .moon-glow-card),
+  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-card--monthly::after{ animation-play-state:paused; }
 
   .pc-nav{
     position:absolute; top:calc(50% - 16px); margin-top:-30px; padding:0;
@@ -4456,19 +4458,16 @@
     backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
     border:1.5px solid rgba(255,255,255,0.28);
     box-shadow:0 12px 32px rgba(0,0,0,0.5), 0 0 0 7px rgba(34,195,255,0.07), inset 0 1px 0 rgba(255,255,255,0.35);
-    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease, opacity .22s ease;
   }
   .pc-nav:hover{
     transform:scale(1.1); border-color:var(--cyan,#22c3ff);
     box-shadow:0 14px 36px rgba(0,0,0,0.55), 0 0 0 9px rgba(34,195,255,0.13), 0 0 28px rgba(34,195,255,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
   }
   .pc-nav:active{ transform:scale(0.94); }
-  /* Fallback position (inside the section). On desktop the JS in
-     initPricingCarousel (placeNavs) then moves them to the true left and
-     right edges of the SCREEN. That is done by measurement instead of the
-     old `calc(-50vw + 50% ...)` trick, because the desktop `html{zoom:1.25}`
-     rule makes `vw` inside the page 25% too wide -- which pushed both
-     buttons completely off-screen on desktop (they were "gone"). */
+  /* Reached the first/last card -- disabled instead of wrapping around,
+     see the "not circular on purpose" note in initPricingScrollCarousel. */
+  .pc-nav:disabled{ opacity:.32; cursor:default; pointer-events:none; transform:none; }
   .pc-nav--prev{ left:8px; }
   .pc-nav--next{ right:8px; }
   .pc-nav svg{ width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; transition:transform .22s ease; }
@@ -4478,7 +4477,7 @@
      toggle in JS — so they never float on top of the menu. */
   body.site-menu-open .pc-nav{ display:none !important; }
 
-  .pricing-cards.pc-carousel-mode .pc-dots{ display:flex; justify-content:center; align-items:center; gap:9px; order:-1; margin:0 0 10px; }
+  .pricing-cards.pc-scroll-mode .pc-dots{ display:flex; justify-content:center; align-items:center; gap:9px; order:-1; margin:0 0 10px; }
   .pc-dot{
     width:10px; height:10px; border-radius:99px; padding:0; border:none;
     background:rgba(255,255,255,0.25); cursor:pointer;
@@ -4487,16 +4486,11 @@
   .pc-dot.is-active{ background:#fff; width:28px; }
 
   @media (min-width:900px){
-    .pricing-cards.pc-carousel-mode{ --pc-w:296px; }
-    .pricing-cards.pc-carousel-mode > .pc-carousel-shell{ padding:0 60px; }
-    .pricing-cards.pc-carousel-mode .pc-nav{ display:flex; }
-    .pricing-cards.pc-carousel-mode .pc-dots{ order:2; margin:0; }
-    /* The side cards used to be sliced off by a straight vertical line at
-       the edge of the track (overflow-x:clip) while there was still empty
-       screen next to them. On desktop they now fan out freely; the page's
-       own overflow-x:hidden is the only edge, i.e. the screen edge. */
-    .pricing-cards.pc-carousel-mode .pc-carousel-track{ overflow:visible; }
+    .pricing-cards.pc-scroll-mode > .pc-scroll-shell{ padding:0 60px; }
+    .pricing-cards.pc-scroll-mode .pc-nav{ display:flex; }
+    .pricing-cards.pc-scroll-mode .pc-dots{ order:2; margin:0; }
   }
+
 
   /* Wraps any card that carries a floating .pc-badge. The badge needs to
      sit OUTSIDE the card's own clipped box (poking above its top edge),
@@ -17548,85 +17542,47 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   }
 
   // ============================================================
-  // PRICING CARDS — desktop 3D swipe carousel
+  // PRICING CARDS — horizontal snap-scroll carousel
   //
-  // Pure progressive enhancement: below the 1100px breakpoint this
-  // never builds anything and the original .pricing-cards grid (see
-  // the CSS above) renders exactly as it always has. At >=1100px it
-  // wraps the 6 real package cards (the free TikTok-checker row,
-  // .pc-ttdl-row, is deliberately excluded — it's a bonus tool, not
-  // a package to swipe through) in a coverflow-style 3D track: one
-  // card centered and in focus, the rest fanning away to either
-  // side, navigable with the arrow buttons, the dot rail, a card
-  // click, or a mouse-drag swipe.
+  // This replaces an earlier hand-rolled 3D "coverflow" that computed
+  // every card's own screen position from the viewport width -- how
+  // many cards fit, which ones count as hidden, etc. -- and recomputed
+  // that on every resize. Any small, incidental width change (even the
+  // page's own scrollbar appearing or disappearing as a taller card
+  // got centred) could retrigger that arithmetic and get one specific
+  // card's visibility wrong for a frame, which is what customers were
+  // seeing as certain cards flashing/jamming while scrolling.
   //
-  // Every element this builds (.pc-carousel-shell/-track, .pc-slide)
+  // This version leans on the browser's own native horizontal
+  // scrolling with CSS scroll-snap instead: the browser -- not this
+  // code -- decides what's actually on screen and handles the
+  // dragging/swiping/momentum itself, so there's no "how many cards
+  // fit" bookkeeping here that can fall out of sync with reality.
+  // This code only reads back, after the user stops scrolling, which
+  // card the browser ended up centring, so the dots and the
+  // active-card styling can catch up, and drives goTo()'s smooth
+  // scroll for the buttons/dots. Progressive enhancement, same as
+  // before: below the breakpoint that shows .pc-scroll-mode (see the
+  // CSS above) nothing here runs and the original .pricing-cards grid
+  // renders exactly as it always has.
+  //
+  // Every element this builds (.pc-scroll-shell/-track, .pc-slide)
   // moves the ORIGINAL card nodes rather than cloning them, so every
-  // id, data-i18n hook and click handler already wired to those
-  // cards (openPricingCard/closePricingCard, the order-flow modal,
+  // id, data-i18n hook and click handler already wired to those cards
+  // (openPricingCard/closePricingCard, the order-flow modal,
   // translations, etc.) keeps working completely untouched.
+  //
+  // Navigation is deliberately NOT circular (prev/next just disable at
+  // the ends): with only 6 cards there's little to gain from wrapping,
+  // and it removes every bit of "which card is directly opposite the
+  // active one" arithmetic that caused the previous version's bugs.
   // ============================================================
-  function initPricingCarousel(){
+  function initPricingScrollCarousel(){
     const container = document.querySelector('.pricing-cards');
     if (!container) return;
 
-    let built = false, activeIndex = 0, slides = [], track = null, dots = [];
-    // Tracks the activeIndex position() last ran with, so it can compute a
-    // single, consistent "how far did the carousel actually move" delta for
-    // this call (see position() below) instead of re-deriving each card's
-    // offset from scratch and independently guessing which way it wrapped.
-    let lastActiveIndex = null;
-    let prevBtn = null, nextBtn = null, suppressClick = false;
-    let lastW = window.innerWidth, raf = 0;
-
-    // Measured ONCE (and on width change) — never inside position(), because
-    // reading offsetWidth there forced a full synchronous layout on every tap.
-    let M = { sx: 236, sz: -150, ry: 11, step: 0.13, vis: 2 };
-    function calcMetrics(){
-      const phone = window.innerWidth < 900;
-      const w = slides[0] ? slides[0].offsetWidth : 296;
-      // Desktop: show the 2nd-level side cards only when the screen is wide
-      // enough to show them whole (half the screen, in page px, must clear
-      // the outer card plus the arrow buttons). Otherwise show one on each
-      // side instead of a card that runs off the screen.
-      const half = window.innerWidth / pageZoom() / 2;
-      const vis = phone ? 1 : (half >= 560 ? 2 : 1);
-      M = { sx: Math.round(w * (phone ? 0.86 : 0.8)), sz: phone ? -110 : -150,
-            ry: phone ? 9 : 11, step: phone ? 0.1 : 0.13, vis: vis };
-    }
-    function pageZoom(){
-      const z = parseFloat(getComputedStyle(document.documentElement).zoom);
-      return (z && !isNaN(z)) ? z : 1;
-    }
-
-    // Puts the two arrow buttons at the true left/right edges of the screen.
-    // Measured, not calculated: it moves each button by a known amount,
-    // sees how far it really moved on screen (that ratio IS the page zoom,
-    // whatever the browser's zoom semantics), then solves for the offset.
-    function placeNavs(){
-      if (!prevBtn || !nextBtn || window.innerWidth < 900) return;
-      const gutter = 22; // screen px between the button and the screen edge
-      const vv = window.visualViewport;
-      const vw = vv && vv.width ? Math.min(window.innerWidth, vv.width) : window.innerWidth;
-      const measure = (btn, side, edge) => {
-        const keep = btn.style.transition;
-        btn.style.transition = 'none'; btn.style.transform = 'none';
-        btn.style[side === 'left' ? 'right' : 'left'] = 'auto';
-        btn.style[side] = '0px';
-        const a = btn.getBoundingClientRect();
-        if (!a.width) { btn.style.transform = ''; btn.style.transition = keep; return null; }
-        const p0 = a[edge];
-        btn.style[side] = '100px';
-        const p1 = btn.getBoundingClientRect()[edge];
-        btn.style.transform = ''; btn.style.transition = keep;
-        const k = Math.abs(p1 - p0) / 100 || 1;
-        return { p0: p0, k: k };
-      };
-      const l = measure(prevBtn, 'left', 'left');
-      if (l) prevBtn.style.left = ((gutter - l.p0) / l.k) + 'px';
-      const r = measure(nextBtn, 'right', 'right');
-      if (r) nextBtn.style.right = ((r.p0 - (vw - gutter)) / r.k) + 'px';
-    }
+    let built = false, activeIndex = 0, slides = [], dots = [], track = null;
+    let prevBtn = null, nextBtn = null, programmatic = false, releaseTimer = null;
 
     function build(){
       if (built) return;
@@ -17634,23 +17590,20 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const cardEls = Array.from(container.children).filter(el => el !== ttdlRow);
       if (cardEls.length < 2) return;
 
-      // The scroll-reveal helper hides off-screen cards until they scroll into
-      // view; inside a carousel they are never "scrolled to", so show them now.
+      // The scroll-reveal helper hides off-screen cards until they scroll
+      // into view; inside a carousel they are never "scrolled to" in that
+      // sense, so show them now.
       cardEls.forEach(el => { el.style.transition = 'none'; el.style.opacity = '1'; el.style.transform = 'none'; el.style.filter = 'none'; });
 
       const shell = document.createElement('div');
-      shell.className = 'pc-carousel-shell';
+      shell.className = 'pc-scroll-shell';
       track = document.createElement('div');
-      track.className = 'pc-carousel-track';
+      track.className = 'pc-scroll-track';
       slides = cardEls.map(el => {
         const slide = document.createElement('div');
         slide.className = 'pc-slide';
         track.appendChild(slide);
         slide.appendChild(el);
-        const dim = document.createElement('i');
-        dim.className = 'pc-dim';
-        slide.appendChild(dim);
-        slide._dim = dim;
         return slide;
       });
 
@@ -17683,41 +17636,28 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       prevBtn.addEventListener('click', () => goTo(activeIndex - 1));
       nextBtn.addEventListener('click', () => goTo(activeIndex + 1));
 
-      // A tap on a side card brings it to the centre instead of pressing
-      // whatever button is under the finger.
+      // A tap on a peeking (non-active) card brings it to centre instead
+      // of activating whatever's under the finger inside it. A real
+      // drag-scroll never reaches here: browsers don't fire a click on
+      // content after a pointer gesture that actually scrolled it.
       track.addEventListener('click', (e) => {
-        if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopPropagation(); return; }
         const slide = e.target.closest('.pc-slide');
         const i = slide ? slides.indexOf(slide) : -1;
         if (i !== -1 && i !== activeIndex) { e.preventDefault(); e.stopPropagation(); goTo(i); }
       }, true);
 
-      // Swipe (finger or mouse). touch-action:pan-y keeps vertical page
-      // scrolling native; only a clearly horizontal drag changes the card.
-      let tracking = false, moved = false, sx = 0, sy = 0;
-      track.addEventListener('pointerdown', (e) => {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        tracking = true; moved = false; sx = e.clientX; sy = e.clientY;
-      });
-      track.addEventListener('pointermove', (e) => {
-        if (!tracking || moved) return;
-        const dx = e.clientX - sx, dy = e.clientY - sy;
-        if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
-          moved = true;
-          if (e.pointerType === 'mouse') { try{ track.setPointerCapture(e.pointerId); }catch(err){} }
-        }
-      });
-      track.addEventListener('pointerup', (e) => {
-        if (!tracking) return;
-        tracking = false;
-        if (!moved) return;
-        suppressClick = true;
-        setTimeout(() => { suppressClick = false; }, 80);
-        const dx = e.clientX - sx;
-        if (dx > 45) goTo(activeIndex - 1);
-        else if (dx < -45) goTo(activeIndex + 1);
-      });
-      track.addEventListener('pointercancel', () => { tracking = false; });
+      // The browser drives the actual dragging/swiping/momentum natively
+      // here (this is a plain scrollable element) -- all that's needed is
+      // to notice, once the user stops scrolling, which card ended up
+      // centred, so the dots/active-styling/paused-decorative-animation
+      // state can catch up. Ignored while a goTo() is driving the scroll
+      // itself, so it can't fight with that animation.
+      let ticking = false;
+      track.addEventListener('scroll', () => {
+        if (programmatic || ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { ticking = false; syncActiveFromScroll(); });
+      }, { passive: true });
 
       let hovering = false;
       shell.addEventListener('mouseenter', () => hovering = true);
@@ -17728,131 +17668,67 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         else if (e.key === 'ArrowRight') goTo(activeIndex + 1);
       });
 
+      // Re-centre the active card whenever the track's own size changes --
+      // orientation change, window resize, a card's content loading in,
+      // the page's scrollbar appearing/disappearing, etc. This never
+      // changes WHICH card is active (there's no viewport-width-dependent
+      // "how many cards fit" state here at all), it only recomputes the
+      // pixel target for that same card -- so unlike the old carousel, it
+      // is harmless to fire often and can't make anything flash.
       if ('ResizeObserver' in window) {
-        const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(measureHeight); });
-        slides.forEach(s => { if (s.firstElementChild) ro.observe(s.firstElementChild); });
+        const ro = new ResizeObserver(() => { scrollToIndex(activeIndex, false); });
+        ro.observe(track);
       }
+
       built = true;
     }
 
-    // Circular: after the last card comes the first, and vice-versa.
-    function goTo(i){
-      const n = slides.length;
-      activeIndex = ((i % n) + n) % n;
-      position();
-    }
-
-    // Only compositor-friendly properties (transform, opacity) are animated.
-    // No visibility/pointer-events transitions: those are inherited, so they
-    // forced the whole card subtree to be restyled on every frame.
-    function trans(){
-      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      return reduce ? 'transform .28s ease-out, opacity .2s ease'
-                    : 'transform .42s cubic-bezier(.22,.8,.28,1), opacity .3s ease';
-    }
-
-    function position(){
-      const n = slides.length, m = M, snapped = [];
-      // How far the carousel itself actually moved since the last call,
-      // wrapped to the shortest direction (e.g. prevBtn from the first
-      // card to the last is a real navigation of -1, not +5, even though
-      // that's a jump of +5 in raw array-index terms). This used to be
-      // decided PER CARD below, by comparing each card's own freshly
-      // wrapped offset against its stored previous one -- but that
-      // comparison is only reliable for cards on the "near" side of the
-      // fan. For whichever card sits exactly opposite the active one, an
-      // ordinary single next/prev step can flip its wrapped offset from
-      // e.g. +3 straight to -3 (a raw difference of 6, not 1), even
-      // though the carousel only moved one real step. That false "big
-      // jump" reading made just that one card skip its glide and pop
-      // instantly into or out of view once per lap. Deciding smooth-vs-
-      // instant ONCE here, from the real navigation distance, and
-      // applying it the same way to every card fixes that: the antipodal
-      // card still ends up on the opposite side of the fan when the wrap
-      // falls its way, but it now glides there like everything else
-      // instead of popping.
-      let activeDelta = lastActiveIndex === null ? 0 : activeIndex - lastActiveIndex;
-      if (activeDelta > n / 2) activeDelta -= n; else if (activeDelta < -n / 2) activeDelta += n;
-      const globalSnap = lastActiveIndex !== null && Math.abs(activeDelta) > 2;
-      lastActiveIndex = activeIndex;
+    function syncActiveFromScroll(){
+      if (!track || !slides.length) return;
+      const trackRect = track.getBoundingClientRect();
+      const centerX = trackRect.left + trackRect.width / 2;
+      let closest = 0, closestDist = Infinity;
       slides.forEach((slide, i) => {
-        let off = i - activeIndex;
-        if (off > n / 2) off -= n; else if (off < -n / 2) off += n;
-        const abs = Math.abs(off), hide = abs > m.vis;
-        // Hidden cards wait just outside the visible fan (invisible, and
-        // clipped by the container), ready to glide in.
-        const po = hide ? (off > 0 ? m.vis + 1 : -(m.vis + 1)) : off;
-        const dir = po === 0 ? 0 : (po > 0 ? 1 : -1), c = Math.min(Math.abs(po), 3), s = slide.style;
-        const first = slide._off === undefined;
-        const snap = first || globalSnap;
-        slide._off = off;
-        s.transition = first ? 'none' : (snap ? 'opacity .3s ease' : trans());
-        if (snap) snapped.push(slide);
-        s.transform = 'translate3d(calc(-50% + ' + (po * m.sx) + 'px),0,' + (c * m.sz) + 'px) rotateY(' + (-dir * c * m.ry) + 'deg) scale(' + Math.max(1 - c * m.step, 0.6) + ')';
-        s.opacity = hide ? '0' : '1';
-        // A parked (invisible) card must not swallow clicks now that the
-        // track no longer clips it.
-        s.pointerEvents = hide ? 'none' : '';
-        s.zIndex = String(100 - abs);
-        if (slide._dim) {
-          slide._dim.style.opacity = off === 0 ? '0' : String(Math.min(0.28 + 0.14 * (abs - 1), 0.6));
-          slide._dim.style.pointerEvents = (off === 0 || hide) ? 'none' : 'auto';
-        }
-        slide.classList.toggle('pc-slide--active', off === 0);
+        const r = slide.getBoundingClientRect();
+        const dist = Math.abs((r.left + r.width / 2) - centerX);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
       });
-      if (snapped.length) {
-        void track.offsetWidth;
-        snapped.forEach(sl => { sl.style.transition = trans(); });
-      }
-      dots.forEach((d, i) => d.classList.toggle('is-active', i === activeIndex));
+      if (closest !== activeIndex) setActive(closest);
     }
 
-    function measureHeight(){
-      if (!track) return;
-      let maxH = 0;
-      slides.forEach(slide => {
-        const card = slide.firstElementChild;
-        if (card) maxH = Math.max(maxH, card.offsetHeight);
-      });
-      if (maxH) track.style.height = (maxH + 34) + 'px';
+    function setActive(i){
+      activeIndex = i;
+      slides.forEach((slide, idx) => slide.classList.toggle('pc-slide--active', idx === i));
+      dots.forEach((d, idx) => d.classList.toggle('is-active', idx === i));
+      if (prevBtn) prevBtn.disabled = i === 0;
+      if (nextBtn) nextBtn.disabled = i === slides.length - 1;
+    }
+
+    function scrollToIndex(i, smooth){
+      const slide = slides[i];
+      if (!slide || !track) return;
+      programmatic = true;
+      const target = slide.offsetLeft - (track.clientWidth - slide.clientWidth) / 2;
+      track.scrollTo({ left: Math.max(0, target), behavior: smooth === false ? 'auto' : 'smooth' });
+      const release = () => { programmatic = false; };
+      clearTimeout(releaseTimer);
+      if ('onscrollend' in window) track.addEventListener('scrollend', release, { once: true });
+      releaseTimer = setTimeout(release, smooth === false ? 60 : 700);
+    }
+
+    function goTo(i){
+      const idx = Math.max(0, Math.min(slides.length - 1, i));
+      setActive(idx);
+      scrollToIndex(idx, true);
     }
 
     function sync(){
       build();
       if (!built) return;
-      container.classList.add('pc-carousel-mode');
-      calcMetrics();
-      position();
-      requestAnimationFrame(() => { measureHeight(); placeNavs(); });
+      container.classList.add('pc-scroll-mode');
+      setActive(activeIndex);
+      scrollToIndex(activeIndex, false);
     }
-
-    // Phones fire "resize" whenever the URL bar slides in/out while
-    // scrolling (height only) — that used to re-layout everything and
-    // was a big part of the stutter. Only a WIDTH change matters here.
-    let resizeTimer = null;
-    window.addEventListener('resize', () => {
-      // A vertical scrollbar toggling on/off (e.g. because the newly
-      // centred card is taller) shifts window.innerWidth by ~15-17px on
-      // desktop without the window actually being resized. That was
-      // enough to occasionally cross the `half >= 560` breakpoint above
-      // and re-run calcMetrics()/position() mid-scroll, which is what
-      // made a side card that should have stayed hidden flash into view
-      // and back out again. A real resize is never this small.
-      if (Math.abs(window.innerWidth - lastW) < 24) return;
-      lastW = window.innerWidth;
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(sync, 150);
-    });
-    window.addEventListener('load', () => { measureHeight(); placeNavs(); });
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measureHeight(); placeNavs(); });
-    // The menu drawer hides the buttons (display:none); re-place them when
-    // it closes, and after any scrollbar appearing/disappearing.
-    let menuWasOpen = false;
-    new MutationObserver(() => {
-      const open = document.body.classList.contains('site-menu-open');
-      if (menuWasOpen && !open) placeNavs();
-      menuWasOpen = open;
-    }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     sync();
   }
@@ -17868,7 +17744,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   ttdlSafeInit(initDiscordAuth);
   ttdlSafeInit(initTiktokDownloader);
   ttdlSafeInit(initScrollReveal);
-  ttdlSafeInit(initPricingCarousel);
+  ttdlSafeInit(initPricingScrollCarousel);
 
   // Wake the backing servers up as soon as the page loads.
   //
