@@ -172,7 +172,18 @@
     background-size: 3px 3px;
     opacity:0.5;
   }
+  /* All box shadows removed site-wide (drop shadows, glows, inner shadows).
+     Only the thin coloured ring on the stat icons is kept, since it works
+     as their outline. Delete this block to bring the shadows back. */
+  *:not(.ttdl-stat-ico),
+  *:not(.ttdl-stat-ico)::before,
+  *:not(.ttdl-stat-ico)::after{ box-shadow:none !important; }
+  input[type=range]::-webkit-slider-thumb{ box-shadow:none !important; }
+  input[type=range]::-moz-range-thumb{ box-shadow:none !important; }
+
+  /* Vertical white background lines removed — page background is plain black. */
   .ruler{
+    display:none;
     position:absolute; inset:0;
     background-image: repeating-linear-gradient(
       90deg,
@@ -5592,6 +5603,7 @@
     text-shadow: 0 0 2px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.55);
     overflow-wrap:break-word; word-break:break-word;
   }
+  .pc-desc-nw{ white-space:nowrap; }
   .pc-desc-spec{
     display:inline-block; font-size:clamp(9px, 2.5vw, 10.5px); white-space:nowrap;
     letter-spacing:normal;
@@ -6839,7 +6851,7 @@
         <div class="pc-icon" aria-hidden="true">☀️</div>
           <div class="pc-head-text">
           <div class="pc-title" data-i18n="aoTitle">ცალობითი შეკვეთა</div>
-          <div class="pc-desc" data-i18n="aoDesc">ნებისმიერი ფორმატის ვიდეო — 1 ვიდეოს დამუშავება</div>
+          <div class="pc-desc" data-i18n="aoDesc">ნებისმიერი ფორმატის ვიდეო<br><span class="pc-desc-nw">1 ვიდეოს დამუშავება</span></div>
           </div>
         </div>
         <div class="pc-price-line"><b>2.99<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
@@ -8084,7 +8096,7 @@
       pc1Feature2: 'ჩაბარდება არაუმეტეს 24 საათში',
       pc1Feature3: '4K • 60FPS',
       aoTitle: 'ცალობითი შეკვეთა',
-      aoDesc: 'ნებისმიერი ფორმატის ვიდეო — 1 ვიდეოს დამუშავება',
+      aoDesc: 'ნებისმიერი ფორმატის ვიდეო<br><span class="pc-desc-nw">1 ვიდეოს დამუშავება</span>',
       aoSendChat: 'გაგზავნე შეკვეთა',
       pc2Title: 'კვირის პაკეტი',
       pc2Desc: 'კვირაში 5 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span>',
@@ -9414,7 +9426,7 @@
 
   let currentQuality = '1080_60';
 
-  function calculateExactPrice(seconds, milliseconds, isSubscriber, quality) {
+  function calculateExactPrice(seconds, milliseconds, isSubscriber, quality, forAnyOrder) {
     const s = Math.max(0, Math.min(59, parseFloat(seconds || 0)));
     const ms = Math.max(0, Math.min(59, parseFloat(milliseconds || 0)));
     const totalSeconds = s + (ms / 100);
@@ -9439,11 +9451,14 @@
       billedSeconds = totalSeconds;
     }
 
-    // From 6 whole seconds up, the price is 15% higher. Everything below 6s
-    // (the 5-second minimum included) keeps the base price, so a 5s video
-    // still costs exactly 1.49 ₾ at 1080p·60fps.
+    // From 6 whole seconds up, the price is 15% higher, plus 5% on top
+    // (1.49 ₾ calculator). The any-format 2.99 ₾ order (forAnyOrder = true)
+    // is more labour-intensive (any resolution/fps, extra conversion work),
+    // so from 6s it costs a further 10% more than the 1.49 ₾ calculator's
+    // 4K tier — never less. Everything below 6s (the 5-second minimum
+    // included) keeps the base price on both cards.
     const LONG_VIDEO_FROM_SECONDS = 6;
-    const LONG_VIDEO_SURCHARGE = 1.15;
+    const LONG_VIDEO_SURCHARGE = 1.15 * 1.05 * (forAnyOrder ? 1.10 : 1);
     const lengthFactor = (s >= LONG_VIDEO_FROM_SECONDS) ? LONG_VIDEO_SURCHARGE : 1;
 
     const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE * lengthFactor;
@@ -13822,7 +13837,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const overLimit = s > 59;
     const sForCalc = Math.min(s, 59);
     const msForCalc = overLimit ? 59 : ms;
-    return { price: calculateExactPrice(sForCalc, msForCalc, false, AO_QUALITY), overLimit, s: sForCalc, ms: msForCalc };
+    return { price: calculateExactPrice(sForCalc, msForCalc, false, AO_QUALITY, true), overLimit, s: sForCalc, ms: msForCalc };
   }
 
   initSimpleScanner({
