@@ -4625,6 +4625,20 @@
   }
   #cheapOrderPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
+  /* ---------- Any-format single order — teal, sampled directly from
+     the reference photo, same treatment as monthly's gold. ---------- */
+  .pc-card--any, #anyOrderPanel{
+    --pc-accent: #007D99;
+    --pc-teal-shine: linear-gradient(90deg, #006A82 0%, #00A9CF 10%, #0097B9 20%, #007791 30%, #006177 40%, #004D5F 50%, #003C49 60%, #002F3A 70%, #00232B 80%, #00161C 90%, #000C0F 100%);
+    --pc-bg: radial-gradient(ellipse 120% 60% at 15% 0%, rgba(255,255,255,0.22), transparent 55%), linear-gradient(180deg, rgba(1,10,13,0.4), rgba(1,10,13,0.6)), var(--pc-teal-shine);
+    --pc-border: rgba(0, 125, 153, 0.55);
+    --pc-icon-bg: var(--pc-teal-shine);
+    --pc-price-grad: linear-gradient(180deg, #00A9CF, #000C0F);
+    --pc-cta-bg: var(--pc-teal-shine);
+    --pc-cta-text: #fff;
+  }
+  #anyOrderPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
+
   /* "Cheap Package (Unlimited Monthly)" — premium brushed-carbon/metal
      identity per the reference swatch image, deliberately grayscale
      instead of a bright hue like every other package, so it reads as a
@@ -6797,6 +6811,143 @@
         </div>
       </div>
 
+      <!-- Card 1b — any-format single order (no quality picker, accepts
+           any resolution/fps, priced purely from duration via the same
+           calculateExactPrice() formula as Card 1, fixed to the 4K tier) -->
+      <div class="pc-card-wrap pc-card-wrap--any">
+      <div class="pc-card pc-card--any">
+        <div class="pc-head">
+        <div class="pc-icon" aria-hidden="true">🎞️</div>
+          <div class="pc-head-text">
+          <div class="pc-title" data-i18n="aoTitle">ცალობითი შეკვეთა</div>
+          <div class="pc-desc" data-i18n="aoDesc">ნებისმიერი ფორმატის<br>ვიდეო — პირდაპირ ატვირთვა</div>
+          </div>
+        </div>
+        <div class="pc-price-line"><b>2.99<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
+        <div class="pc-price-note pc-price-note--nowrap" data-i18n="pc1PriceNote">ფასი დამოკიდებულია ხანგრძლივობაზე</div>
+        <div class="pc-features">
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature1">1080P • 60FPS</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature3">4K • 60FPS</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc1Feature2">ჩაბარდება არაუმეტეს 24 საათში</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="featTopaz">ხარისხის ამატება TOPAZ‑ით</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="featEffects">ეფექტების დადება</span></div>
+          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="featTiktokLossless">ტიკტოკზე ხარისხის დანაკარგის გარეშე ატვირთვა</span></div>
+        </div>
+        <button type="button" class="pc-toggle-btn" id="pcToggleAny" aria-expanded="false" aria-controls="anyOrderPanel">
+          <span data-i18n="pcCalcBtn">შეკვეთა</span>
+        </button>
+
+        <div class="panel pc-accordion-body" id="anyOrderPanel">
+    <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
+    <div class="pc-modal-scroll">
+    <div class="wizard-steps" id="wizardStepsAo">
+      <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="2"><span class="wizard-step-dot">2</span><span class="wizard-step-label">TikTok</span></div>
+      <div class="wizard-step-line"></div>
+      <div class="wizard-step" data-step="3"><span class="wizard-step-dot">3</span><span class="wizard-step-label" data-i18n="wizStepConfirm">დადასტურება</span></div>
+    </div>
+    <div class="eo-box moon-glow-card">
+      <div class="qn-stars" aria-hidden="true">
+        <span style="top:10%;left:8%;animation-delay:0s;"></span>
+        <span style="top:70%;left:14%;animation-delay:.6s;"></span>
+        <span style="top:18%;left:88%;animation-delay:1.2s;"></span>
+        <span style="top:82%;left:80%;animation-delay:.3s;"></span>
+        <span style="top:46%;left:6%;animation-delay:1.6s;"></span>
+      </div>
+      <div class="field" id="aoScannerField" style="margin-top:14px;">
+        <div class="scanner-stage">
+          <div class="drop-zone simple-drop-zone" id="dropZoneAo">
+            <input type="file" id="videoInputAo" accept="video/*">
+            <div class="dz-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path class="dz-plus" d="M12 5v14M5 12h14"/>
+              </svg>
+            </div>
+            <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
+            <div class="dz-sub" data-i18n="dzSubSimple">გადმოაგდეთ ან დააჭირეთ ასარჩევად</div>
+          </div>
+          <div class="simple-scan-result" id="scanResultAo">
+            <button type="button" class="sr-reset-btn" id="scanResetAo" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
+              <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+            <div class="simple-scan-ok" id="scanOkAo">
+              <span class="simple-scan-ok-check">✓</span>
+              <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
+              <span class="simple-scan-ok-name" id="scanOkNameAo"></span>
+            </div>
+            <div class="wc-price-row" style="margin-top:10px;">
+              <span class="wc-price-label" data-i18n="srDuration">ხანგრძლივობა</span>
+              <span class="wc-price-value" id="scanDurationAo">—</span>
+            </div>
+            <div class="wc-price-row">
+              <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
+              <span class="wc-price-value" id="scanPriceAo">—</span>
+            </div>
+            <div class="sr-warn" id="scanWarnOverAo" style="display:none;" data-i18n="srWarnOver">⚠️ ვიდეო აღემატება 59.59 წამს — ფასდება ინდივიდუალურად, კალკულატორმა აჩვენა 59.59-ის ტარიფი.</div>
+            <div class="mooon-prompt" id="mooonPromptAo">
+              <div class="mooon-prompt-q" id="mooonPromptQAo" data-i18n="mooonPromptQ">გსურთ, ატვირთული ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს შესამოწმებლად?</div>
+              <div class="mooon-prompt-actions" id="mooonPromptActionsAo">
+                <button type="button" class="mooon-prompt-yes" id="mooonPromptYesAo" data-i18n="mooonPromptYes">დიახ</button>
+                <button type="button" class="mooon-prompt-no" id="mooonPromptNoAo" data-i18n="mooonPromptNo">არა</button>
+              </div>
+              <div class="mt-upload-head">
+                <span class="mt-upload-head-badge">☁️</span>
+                <span class="mt-upload-head-text" data-i18n="mtUploadHeadline">ავტომატური ატვირთვა</span>
+              </div>
+              <div class="mooon-auto" id="mooonAutoAo">
+                <div class="mooon-auto-status" id="mooonAutoStatusAo">
+                  <div class="mooon-auto-ring-box" id="mooonAutoRingBoxAo">
+                    <span class="mooon-auto-ring-percent" id="mooonAutoPercentAo">0%</span>
+                  </div>
+                  <span id="mooonAutoStatusTextAo" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
+                </div>
+                <div class="mooon-auto-stay" data-i18n="mooonAutoStayHint">📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება</div>
+                <div class="mooon-auto-error" id="mooonAutoErrorAo"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field field-tiktok" id="tiktokFieldAo" style="margin-bottom:6px;">
+        <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
+        <div class="link-input-wrap">
+          <span class="icon">@</span>
+          <input type="text" class="num-input" id="tiktokLinkAo" placeholder="tiktok.com/@username">
+        </div>
+        <button type="button" class="tt-auto-btn" id="tiktokAutoBtnAo">
+          <span class="tt-auto-ico">🔗</span>
+          <span data-i18n="tiktokAutoBtn">TikTok-ის გახსნა</span>
+        </button>
+        <div class="tt-auto-note" id="tiktokAutoNoteAo"></div>
+        <div class="error-msg" id="tiktokErrorAo" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
+        <button type="button" class="wizard-confirm-btn" id="aoTiktokConfirmBtn" data-i18n="wizardConfirmLink">დადასტურება</button>
+      </div>
+
+      <div class="field" id="aoSendConfirmFieldWrap">
+        <div class="wizard-question">
+          <div class="wc-price-row">
+            <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
+            <span class="wc-price-value" id="aoWizardFinalPrice">—</span>
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" id="videoLinkAo">
+
+      <div class="order-grid" id="aoOrderChannelsPanel" style="margin-top:14px;">
+        <button class="order-btn chat" id="aoOrderBtnChat">
+          <span data-i18n="aoSendChat" id="aoOrderBtnChatText">გაგზავნე შეკვეთა</span>
+        </button>
+      </div>
+      <div class="copy-note" id="aoCopyNote"></div>
+    </div>
+        </div>
+    </div>
+      </div>
+      </div>
+
       <!-- Card 2 — weekly subscription package -->
       <div class="pc-card-wrap">
       <span class="pc-badge pc-badge--urgency" id="wpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">დარჩა</span></span>
@@ -7913,6 +8064,9 @@
       pc1Feature1: '1080P • 60FPS',
       pc1Feature2: 'ჩაბარდება არაუმეტეს 24 საათში',
       pc1Feature3: '4K • 60FPS',
+      aoTitle: 'ცალობითი შეკვეთა',
+      aoDesc: 'ნებისმიერი ფორმატის<br>ვიდეო — პირდაპირ ატვირთვა',
+      aoSendChat: 'გაგზავნე შეკვეთა',
       pc2Title: 'კვირის პაკეტი',
       pc2Desc: 'კვირაში 5 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span>',
       pc2PriceNote: '1080p/4K — არჩევანი ატვირთვისას',
@@ -8346,6 +8500,9 @@
       pc1Feature1: '1080P • 60FPS',
       pc1Feature2: 'Delivered within 24 hours',
       pc1Feature3: '4K • 60FPS',
+      aoTitle: 'Single Order',
+      aoDesc: 'Any video format<br>— upload directly',
+      aoSendChat: 'Send order',
       pc2Title: 'Weekly Package',
       pc2Desc: '5 videos / week<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span>',
       pc2PriceNote: '1080p/4K — choose after upload',
@@ -10426,6 +10583,7 @@
         const ids = (panelKey === 'wp') ? { wrap: 'mooonAutoWp', statusRow: 'mooonAutoStatusWp', fill: 'mooonAutoFillWp', percent: 'mooonAutoPercentWp', error: 'mooonAutoErrorWp' }
           : (panelKey === 'mp') ? { wrap: 'mooonAutoMp', statusRow: 'mooonAutoStatusMp', fill: 'mooonAutoFillMp', percent: 'mooonAutoPercentMp', error: 'mooonAutoErrorMp' }
           : (panelKey === 'cp') ? { wrap: 'mooonAutoCp', statusRow: 'mooonAutoStatusCp', fill: 'mooonAutoFillCp', percent: 'mooonAutoPercentCp', error: 'mooonAutoErrorCp' }
+          : (panelKey === 'ao') ? { wrap: 'mooonAutoAo', statusRow: 'mooonAutoStatusAo', fill: 'mooonAutoFillAo', percent: 'mooonAutoPercentAo', error: 'mooonAutoErrorAo' }
           : { wrap: 'srAuto', statusRow: 'srAutoStatus', fill: 'srAutoFill', percent: 'srAutoPercent', error: 'srAutoError' };
         const wrap = document.getElementById(ids.wrap);
         if (wrap) {
@@ -12980,7 +13138,8 @@ TikTok პროფილი: ${getTiktokValue('main')}
       main: { wrap: 'srAuto', zone: 'dropZone' },
       wp: { wrap: 'mooonAutoWp', zone: 'dropZoneWp' },
       mp: { wrap: 'mooonAutoMp', zone: 'dropZoneMp' },
-      cp: { wrap: 'mooonAutoCp', zone: 'dropZoneCp' }
+      cp: { wrap: 'mooonAutoCp', zone: 'dropZoneCp' },
+      ao: { wrap: 'mooonAutoAo', zone: 'dropZoneAo' }
     };
     const m = map[panelKey] || map.main;
     const wrap = document.getElementById(m.wrap);
@@ -13619,6 +13778,136 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     rememberTiktokForUser(orderData.tiktok);
     const firstMessage = buildCheapMonthlyOrderMessage();
     startOrderChat(orderData, firstMessage, btn, textEl, 'cpmSendChat', flashCpmCopyNote);
+  });
+
+  // ============================================================
+  // "ANY-FORMAT SINGLE ORDER" (ცალობითი შეკვეთა) — a simplified sibling
+  // of the individual-package calculator above (#orderFlowPanel): no
+  // strict-1080p-only upload gate, and no quality tile to pick. The
+  // visitor just drops in a video of any resolution/fps and the price
+  // is computed automatically from its duration, using the exact same
+  // calculateExactPrice() formula the main calculator uses (see
+  // aoPriceFromDuration below, copied from finishScan's own
+  // duration -> seconds/hundredths conversion so the two can never
+  // disagree on price for the same file), fixed to the 4K/60fps rate
+  // tier since this package always delivers up to 4K regardless of
+  // what was uploaded.
+  // ============================================================
+  const AO_QUALITY = '4k_120';
+  let aoCurrentPrice = null;
+  const aoCopyNote = document.getElementById('aoCopyNote');
+
+  function flashAoCopyNote(text){
+    if (!aoCopyNote) return;
+    aoCopyNote.textContent = text;
+    aoCopyNote.classList.add('active');
+    setTimeout(() => aoCopyNote.classList.remove('active'), 4000);
+  }
+
+  function aoPriceFromDuration(duration){
+    let s = Math.floor(duration);
+    let frac = duration - s;
+    if (frac >= 0.999999) { frac = 0; s += 1; }
+    let ms = Math.min(59, Math.floor(frac * 100));
+    const overLimit = s > 59;
+    const sForCalc = Math.min(s, 59);
+    const msForCalc = overLimit ? 59 : ms;
+    return { price: calculateExactPrice(sForCalc, msForCalc, false, AO_QUALITY), overLimit, s: sForCalc, ms: msForCalc };
+  }
+
+  initSimpleScanner({
+    zoneId: 'dropZoneAo', inputId: 'videoInputAo', resultId: 'scanResultAo', okId: 'scanOkAo', okNameId: 'scanOkNameAo',
+    resetId: 'scanResetAo',
+    acceptAny: true,
+    promptId: 'mooonPromptAo', promptQId: 'mooonPromptQAo', promptActionsId: 'mooonPromptActionsAo', promptYesId: 'mooonPromptYesAo', promptNoId: 'mooonPromptNoAo',
+    panelKey: 'ao',
+    autoIds: { wrap: 'mooonAutoAo', statusRow: 'mooonAutoStatusAo', statusText: 'mooonAutoStatusTextAo', fill: 'mooonAutoFillAo', percent: 'mooonAutoPercentAo', error: 'mooonAutoErrorAo' },
+    onAccepted: (file, meta) => {
+      const durationKnown = typeof meta.duration === 'number' && isFinite(meta.duration) && meta.duration > 0;
+      const r = aoPriceFromDuration(durationKnown ? meta.duration : 5);
+      aoCurrentPrice = r.price;
+      const priceEl = document.getElementById('scanPriceAo');
+      if (priceEl) priceEl.textContent = r.price + ' ₾';
+      const durEl = document.getElementById('scanDurationAo');
+      if (durEl) durEl.textContent = durationKnown ? (r.s + '.' + String(r.ms).padStart(2, '0') + ' ' + t('srUnit')) : '—';
+      const warnEl = document.getElementById('scanWarnOverAo');
+      if (warnEl) warnEl.style.display = r.overLimit ? 'block' : 'none';
+    }
+  });
+
+  (function initAnyOrderWizard(){
+    const tiktokWrap = document.getElementById('tiktokFieldAo');
+    const sendConfirmWrap = document.getElementById('aoSendConfirmFieldWrap');
+    const channelsPanel = document.getElementById('aoOrderChannelsPanel');
+    const scannerFieldEl = document.getElementById('aoScannerField');
+    const tiktokConfirmBtn = document.getElementById('aoTiktokConfirmBtn');
+    if (!tiktokWrap) return;
+
+    [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => { if (el) el.classList.add('wizard-step-hidden'); });
+    setWizardStage('wizardStepsAo', 1);
+
+    const autoWrapEl = document.getElementById('mooonAutoAo');
+    if (autoWrapEl) {
+      const autoObserver = new MutationObserver(() => {
+        if (autoWrapEl.querySelector('.mooon-auto-done')) {
+          const scanResultEl = document.getElementById('scanResultAo');
+          wizStepSwap([scanResultEl, scannerFieldEl], [tiktokWrap]);
+          setWizardStage('wizardStepsAo', 2);
+        }
+      });
+      autoObserver.observe(autoWrapEl, { childList: true });
+    }
+
+    const scanResultEl2 = document.getElementById('scanResultAo');
+    if (scanResultEl2) {
+      const resetObserver = new MutationObserver(() => {
+        if (!scanResultEl2.classList.contains('show')) {
+          wizStepSwap([tiktokWrap, sendConfirmWrap], [scannerFieldEl]);
+          setWizardStage('wizardStepsAo', 1);
+        }
+      });
+      resetObserver.observe(scanResultEl2, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
+      const linkEl = document.getElementById('tiktokLinkAo');
+      const errorEl = document.getElementById('tiktokErrorAo');
+      if (!linkEl || !linkEl.value.trim()) {
+        if (errorEl) errorEl.classList.add('show');
+        return;
+      }
+      if (errorEl) errorEl.classList.remove('show');
+      tiktokLinkConfirmed['ao'] = true;
+      const priceEl = document.getElementById('aoWizardFinalPrice');
+      if (priceEl) priceEl.textContent = (aoCurrentPrice != null ? aoCurrentPrice : '—') + ' ₾';
+      wizStepSwap([tiktokWrap], [sendConfirmWrap, channelsPanel]);
+      setWizardStage('wizardStepsAo', 3);
+    });
+  })();
+
+  function buildAoOrderMessage(){
+    return '🎬 ახალი შეკვეთა — MOON (ცალობითი შეკვეთა, ნებისმიერი ფორმატი)\n' +
+      'პაკეტი: ცალობითი შეკვეთა — ნებისმიერი ფორმატის ვიდეო\n' +
+      'ღირებულება: ' + (aoCurrentPrice != null ? aoCurrentPrice : '—') + ' ₾\n' +
+      'TikTok პროფილი: ' + getTiktokValue('ao') + '\n' +
+      'ვიდეო ლინკი: ' + getVideoLinkValue('ao') + '\n\n' +
+      'ვადასტურებ რომ ვეთანხმები წესებს✅\n' +
+      'ვიდეო ჩაბარდეს არაუმეტეს 24 საათში';
+  }
+
+  const aoOrderBtnChat = document.getElementById('aoOrderBtnChat');
+
+  if (aoOrderBtnChat) aoOrderBtnChat.addEventListener('click', () => {
+    if (!validateBeforeSend('ao')) return;
+    const btn = aoOrderBtnChat;
+    const textEl = document.getElementById('aoOrderBtnChatText');
+    const orderData = {
+      type: 'singleAnyFormat', price: aoCurrentPrice,
+      tiktok: getTiktokValue('ao'), videoLink: getVideoLinkValue('ao')
+    };
+    rememberTiktokForUser(orderData.tiktok);
+    const firstMessage = buildAoOrderMessage();
+    startOrderChat(orderData, firstMessage, btn, textEl, 'aoSendChat', flashAoCopyNote);
   });
 
   // ============================================================
