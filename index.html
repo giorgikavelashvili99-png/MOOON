@@ -4387,6 +4387,41 @@
   }
   .pc-guide-ico{ font-size:12px; flex:0 0 auto; }
 
+  /* ---------- Guide links ("როგორ შევუკვეთოთ?" / "როგორ ავტვირთოთ?") —
+     redesigned to match the site: dark glass pill, blue->cyan->violet
+     gradient outline, round icon chip that lights up on hover. Applies to
+     both the phone row and the desktop topbar copy. ---------- */
+  .pc-guide-link, .topbar-guide-link{
+    position:relative; display:inline-flex; align-items:center; justify-content:center;
+    gap:8px; border:1px solid transparent; border-radius:999px;
+    background:
+      linear-gradient(180deg, #0d1322, #070a13) padding-box,
+      linear-gradient(120deg, rgba(34,195,255,0.8), rgba(59,109,255,0.35) 50%, rgba(139,92,246,0.75)) border-box;
+    color:#eaf1ff; font-weight:700; text-decoration:none;
+    transition:transform .2s ease, filter .2s ease, color .2s ease;
+  }
+  .pc-guide-link:hover, .topbar-guide-link:hover{
+    transform:translateY(-1px); filter:brightness(1.2); border-color:transparent; color:#fff;
+  }
+  .pc-guide-link:active, .topbar-guide-link:active{ transform:scale(0.97); }
+  .pc-guide-ico, .topbar-guide-ico{
+    width:24px; height:24px; border-radius:50%; flex:0 0 auto; font-size:0;
+    display:inline-flex; align-items:center; justify-content:center;
+    color:#22c3ff; background:rgba(34,195,255,0.14); border:1px solid rgba(34,195,255,0.4);
+    transition:background .2s ease, color .2s ease;
+  }
+  .pc-guide-ico svg, .topbar-guide-ico svg{ width:13px; height:13px; display:block; }
+  .pc-guide-link:hover .pc-guide-ico, .topbar-guide-link:hover .topbar-guide-ico{
+    background:#22c3ff; color:#04141a;
+  }
+  /* Phone row: two equal pills side by side, centered. */
+  .pc-guide-link{ padding:6px 12px 6px 7px; gap:7px; }
+  .pc-guide-row .pc-guide-link{ flex:1 1 0; max-width:230px; }
+  /* Desktop topbar: a bit bigger. */
+  .topbar-guide-link{ padding:9px 22px 9px 11px; gap:10px; font-size:15px; letter-spacing:normal; }
+  .topbar-guide-ico{ width:30px; height:30px; }
+  .topbar-guide-ico svg{ width:16px; height:16px; }
+
   .pricing-cards{
     display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px;
     margin-bottom:22px;
@@ -5611,6 +5646,31 @@
     border:1px solid rgba(37,244,238,0.18);
   }
 
+  /* ---------- Smooth outlines ----------
+     A 1px semi-transparent outline renders unevenly on curves (bright on the
+     straight parts, broken up on the rounded ends -- the "pixels"), especially
+     under the desktop zoom. So: opaque colours instead of transparent ones,
+     a slightly thicker line so the curve has enough pixels to stay smooth,
+     and no outline at all on the small round icon chips (a plain filled
+     circle is always smooth). */
+  .pc-guide-link, .topbar-guide-link{
+    border:1.5px solid #0f6a8a;
+    background:linear-gradient(180deg, #0d1322, #070a13);
+  }
+  @media (min-width:900px){ .topbar-guide-link{ border-width:2px; } }
+  .pc-guide-link:hover, .topbar-guide-link:hover{ border-color:#22c3ff; filter:none; }
+  .pc-guide-ico, .topbar-guide-ico{ border:0; background:#0c2a3e; }
+  .pc-guide-link:hover .pc-guide-ico, .topbar-guide-link:hover .topbar-guide-ico{ background:#22c3ff; color:#04141a; }
+  .ttdl-shell{
+    border:1.5px solid #124e52;
+    background:linear-gradient(180deg, #0b1119, #05080e);
+  }
+  @media (hover:hover) and (pointer:fine){ .ttdl-shell:hover{ border-color:#1a7f83; } }
+  /* Keep the animated accent line clear of the rounded corners so it is
+     never cut diagonally by them. */
+  .ttdl-shell::before{ left:18px; right:18px; border-radius:2px; }
+  .ttdl-icon{ border:2px solid #1ca4a2; background:#0a0f16; }
+
   .pc-badge{
     position:absolute; top:-11px; right:16px; z-index:6;
     display:inline-flex; align-items:center; gap:4px;
@@ -6248,11 +6308,11 @@
     </a>
     <div class="topbar-guide-links" id="topbarGuideLinks">
       <a class="topbar-guide-link" href="rogor-shevukvetot-gzamkvlevi.pdf?v=2" target="_blank" rel="noopener">
-        <span class="topbar-guide-ico" aria-hidden="true">📄</span>
+        <span class="topbar-guide-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 13h5M10 17h5"/></svg></span>
         <span data-i18n="pcGuideLinkText">როგორ შევუკვეთოთ?</span>
       </a>
       <a class="topbar-guide-link" href="rogor-avtvirtot-gzamkvlevi.pdf?v=2" target="_blank" rel="noopener">
-        <span class="topbar-guide-ico" aria-hidden="true">⬆️</span>
+        <span class="topbar-guide-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5"/><path d="M7.5 9.5L12 5l4.5 4.5"/><path d="M5 19h14"/></svg></span>
         <span data-i18n="pcGuideLinkText2">როგორ ავტვირთოთ?</span>
       </a>
     </div>
@@ -6668,11 +6728,11 @@
     <div class="pc-intro">
       <div class="pc-guide-row">
         <a class="pc-guide-link" href="rogor-shevukvetot-gzamkvlevi.pdf?v=2" target="_blank" rel="noopener">
-          <span class="pc-guide-ico" aria-hidden="true">📄</span>
+          <span class="pc-guide-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 13h5M10 17h5"/></svg></span>
           <span data-i18n="pcGuideLinkText">როგორ შევუკვეთოთ?</span>
         </a>
         <a class="pc-guide-link" href="rogor-avtvirtot-gzamkvlevi.pdf?v=2" target="_blank" rel="noopener">
-          <span class="pc-guide-ico" aria-hidden="true">⬆️</span>
+          <span class="pc-guide-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5"/><path d="M7.5 9.5L12 5l4.5 4.5"/><path d="M5 19h14"/></svg></span>
           <span data-i18n="pcGuideLinkText2">როგორ ავტვირთოთ?</span>
         </a>
       </div>
