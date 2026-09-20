@@ -17953,7 +17953,18 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // of activating whatever's under the finger inside it. A real
       // drag-scroll never reaches here: browsers don't fire a click on
       // content after a pointer gesture that actually scrolled it.
+      //
+      // Real buttons the visitor is clearly trying to press -- "შეკვეთა"
+      // above all -- are let through untouched even on a peeking card.
+      // Without this exception, tapping "order" on a card that wasn't
+      // already dead-centre got silently swallowed here: the tap never
+      // reached the button at all, and instead the whole carousel slid
+      // to re-centre that card first, which is exactly what customers
+      // were reporting as "the site jerks/shifts when I press order" --
+      // it wasn't the order flow shifting anything, it was this recentre
+      // animation firing instead of the click they actually made.
       track.addEventListener('click', (e) => {
+        if (e.target.closest('.pc-toggle-btn, button, a')) return;
         const slide = e.target.closest('.pc-slide');
         const i = slide ? slides.indexOf(slide) : -1;
         if (i !== -1 && i !== activeIndex) { e.preventDefault(); e.stopPropagation(); goTo(i); }
