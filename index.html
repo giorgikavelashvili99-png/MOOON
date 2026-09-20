@@ -123,11 +123,15 @@
      necessary -- and its sudden appearance narrows the viewport,
      shoving the whole centered layout left. Reserving the gutter up
      front means that first scrollbar appearing never changes the
-     available width, so nothing shifts. Support is broad now
+     available width, so nothing shifts. `overflow-y:auto` alongside
+     it is required, not decorative -- some engines only honor
+     scrollbar-gutter once overflow is explicitly non-`visible`, and
+     without it the reservation silently no-ops. Support is broad now
      (Chromium/Firefox for a while, Safari 18.2+); browsers that don't
      know the property just ignore it and fall back to the previous
      behavior. */
   html{
+    overflow-y: auto;
     scrollbar-gutter: stable;
   }
 
@@ -9211,21 +9215,13 @@
 
   function lockBodyScroll(){
     pcBodyScrollLockCount++;
-    if (pcBodyScrollLockCount === 1) {
-      // Hiding overflow makes the scrollbar disappear, which frees up
-      // whatever width it was taking and shifts the whole page right
-      // by that amount -- very noticeable on desktop browsers with a
-      // classic, space-taking scrollbar (a no-op on mobile/overlay
-      // scrollbars, which never took up layout space to begin with).
-      // Adding that same width back as padding on the body cancels the
-      // shift out. Measured only on this first, outermost lock call --
-      // by the time a second nested lock happens the scrollbar is
-      // already hidden, so measuring again would just read back 0.
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      if (scrollbarWidth > 0) {
-        document.body.style.paddingRight = scrollbarWidth + 'px';
-      }
-    }
+    // Scrollbar-width compensation used to be done by hand here (measure
+    // the gap, add it back as body padding). That math is gone now that
+    // `html{ scrollbar-gutter: stable }` above reserves the same space
+    // permanently, whether or not a scrollbar is actually drawn --
+    // keeping both would have meant the width gets compensated twice,
+    // shoving the page the opposite direction instead of leaving it
+    // still.
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     document.body.style.overscrollBehavior = 'contain';
@@ -9238,7 +9234,6 @@
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
       document.body.style.overscrollBehavior = '';
-      document.body.style.paddingRight = '';
     }
   }
 
