@@ -17791,7 +17791,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (hdBtnLabel) { hdBtnLabel.textContent = 'MOBILE QUALITY'; delete hdBtnLabel.dataset.originalText; }
       if (logEl) logEl.innerHTML = '';
       ttdlLog(ttdlDict('logReady'));
-      urlInput.focus();
+      // Hide the phone keyboard instead of re-focusing the field -- it should
+      // only come back when the visitor taps the link field themselves.
+      urlInput.blur();
+      if (document.activeElement && document.activeElement !== document.body && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
     }
 
     analyzeBtn.addEventListener('click', ttdlAnalyze);
