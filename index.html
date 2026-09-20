@@ -4680,6 +4680,10 @@
     --pc-cta-text: #14161b;
   }
   #cheapMonthlyPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
+  /* Cheap package (unlimited monthly): no coloured top line and no bright
+     metal streak across the card -- just a calm dark background. */
+  .pc-card--cheapmonthly{ --pc-bg: linear-gradient(180deg, #1b1d22, #0e0f12); }
+  .pc-card--cheapmonthly::before{ display:none; }
 
   /* ---------- Free TikTok Downloader — deliberately NOT another foil
      pricing card. It's a free utility sitting among paid packages, so it
@@ -5572,7 +5576,8 @@
       linear-gradient(135deg, #25F4EE, #FE2C55) border-box;
   }
   .ttdl-heading{
-    font-size:clamp(14px, 3.8vw, 16px);
+    font-size:clamp(11px, 3.6vw, 16px);
+    white-space:nowrap; overflow:hidden; line-height:1.4; /* one line; JS below shrinks it if a phone is still too narrow */
     background:linear-gradient(90deg, #ffffff, #b6fffb 55%, #ffc4d1);
     -webkit-background-clip:text; background-clip:text;
     -webkit-text-fill-color:transparent; color:transparent; text-shadow:none;
@@ -9015,7 +9020,7 @@
      only until it truly fits — then stops. If there's room, it stays
      at full size; nothing is pre-guessed. */
   function fitNowrapText(){
-    document.querySelectorAll('.pc-price-note--nowrap').forEach(el => {
+    document.querySelectorAll('.pc-price-note--nowrap, .ttdl-heading').forEach(el => {
       el.style.fontSize = ''; // reset to CSS baseline before measuring
       let size = parseFloat(getComputedStyle(el).fontSize);
       const minSize = 7; // floor so it never shrinks into illegibility
@@ -16846,6 +16851,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
   function initTiktokDownloader(){
     const urlInput = document.getElementById('ttdlUrlInput');
+    // The link that was in the field when the visitor last pressed the clear
+    // button. The clipboard auto-fill below skips it, otherwise clearing
+    // (which re-focuses the field) instantly pasted the same link back in.
+    let ttdlClearedLink = '';
     // Auto-fills from the clipboard the instant this field is focused —
     // covers the single most common path (TikTok app -> Share -> Copy
     // link -> switch to this site) without an extra "paste" tap, and
@@ -16868,6 +16877,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         navigator.clipboard.readText().then(text => {
           const trimmed = (text || '').trim();
           if (urlInput.value.trim()) return; // re-check: focus can race a fast manual paste
+          if (trimmed === ttdlClearedLink) return; // just cleared this exact link -- keep the field empty
           if (/^https?:\/\/(?:www\.|vt\.|vm\.|m\.)?tiktok\.com\/\S+$/i.test(trimmed)) {
             urlInput.value = trimmed;
           }
@@ -17757,6 +17767,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
 
     function ttdlClear(){
+      const clearedNow = (urlInput.value || '').trim();
+      if (clearedNow) ttdlClearedLink = clearedNow;
       urlInput.value = '';
       lastData = null;
       ttdlAnalysisToken++; // invalidate any in-flight background quality probe
