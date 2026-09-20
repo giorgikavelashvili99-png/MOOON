@@ -4051,20 +4051,6 @@
     scroll-behavior:auto;
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
-    /* Always reserve the vertical scrollbar's space, whether or not it's
-       currently needed (and even on Safari/WebKit's overlay scrollbars,
-       where scrollbar-gutter doesn't yet change anything -- overflow-y:
-       scroll is the fallback there). Without this, the page's own height
-       occasionally crossing the "needs a scrollbar" line -- which can
-       happen just from switching between pricing cards of slightly
-       different heights -- silently changed the *available* viewport
-       width by the scrollbar's width whenever that happened. Keeping the
-       gutter reserved up front means the scrollbar appearing or
-       disappearing never changes the viewport width in the first place,
-       which is one less thing any width-based layout code on the page
-       (now or later) has to defend against. */
-    overflow-y:scroll;
-    scrollbar-gutter:stable;
   }
   body{
     -webkit-overflow-scrolling: touch;
@@ -4428,7 +4414,7 @@
     overflow-x:auto; overflow-y:visible;
     scroll-snap-type:x mandatory;
     scroll-padding-inline:calc(50% - min(296px, 86vw) / 2);
-    -webkit-overflow-scrolling:touch; touch-action:pan-x;
+    -webkit-overflow-scrolling:touch;
     padding:20px calc(50% - min(296px, 86vw) / 2) 26px;
     scrollbar-width:none; -ms-overflow-style:none;
   }
@@ -10003,12 +9989,20 @@
       error: document.getElementById('tiktokErrorCpm'),
       autoBtn: document.getElementById('tiktokAutoBtnCpm'),
       autoNote: document.getElementById('tiktokAutoNoteCpm')
+    },
+    ao: {
+      link: document.getElementById('tiktokLinkAo'),
+      confirm: document.getElementById('tiktokConfirmAo'),
+      confirmText: document.getElementById('tiktokConfirmTextAo'),
+      error: document.getElementById('tiktokErrorAo'),
+      autoBtn: document.getElementById('tiktokAutoBtnAo'),
+      autoNote: document.getElementById('tiktokAutoNoteAo')
     }
   };
 
   // Each package's TikTok link field is fully independent now — its own
   // value, and its own "confirmed" state, not shared with the others.
-  const tiktokLinkConfirmed = { main: false, wp: false, mp: false, cp: false, cpm: false };
+  const tiktokLinkConfirmed = { main: false, wp: false, mp: false, cp: false, cpm: false, ao: false };
 
   // ============================================================
   // DISCORD SUBSCRIPTION STATE (1-week / 1-month package already active) —
@@ -10330,10 +10324,17 @@
       confirmText: document.getElementById('videoLinkConfirmTextCpm'),
       error: document.getElementById('videoLinkErrorCpm'),
       field: document.getElementById('videoLinkFieldCpm')
+    },
+    ao: {
+      link: document.getElementById('videoLinkAo'),
+      confirm: document.getElementById('videoLinkConfirmAo'),
+      confirmText: document.getElementById('videoLinkConfirmTextAo'),
+      error: document.getElementById('videoLinkErrorAo'),
+      field: document.getElementById('videoLinkFieldAo')
     }
   };
 
-  const videoLinkConfirmed = { main: false, wp: false, mp: false, cp: false, cpm: false };
+  const videoLinkConfirmed = { main: false, wp: false, mp: false, cp: false, cpm: false, ao: false };
 
   function getVideoLinkValue(panelKey){
     const g = videoLinkGroups[panelKey] || videoLinkGroups.main;
@@ -11053,7 +11054,7 @@
 
     const resetBtn = cfg.resetId ? document.getElementById(cfg.resetId) : null;
 
-    function showOk(file){
+    function showOk(file, meta){
       currentFile = file;
       result.classList.add('show');
       if (rejectEl) rejectEl.classList.remove('show');
@@ -11062,6 +11063,9 @@
       if (okName) okName.textContent = file.name;
       resetPrompt();
       if (prompt) prompt.classList.add('show');
+      // Only the any-format single order currently uses this — every
+      // other panel sells a flat/fixed price and has no need for it.
+      if (cfg.onAccepted) cfg.onAccepted(file, meta || {});
     }
     function showReject(acceptability, meta){
       currentFile = null;
@@ -11171,7 +11175,12 @@
       zone.classList.add('dz-scanning-hidden');
       readVideoFileMeta(file).then(meta => {
         zone.classList.remove('scanning');
-        const acceptability = checkUploadAcceptable(meta.width, meta.height, meta.fps, cfg.allowFourK);
+        // acceptAny panels (the any-format single order) skip resolution/
+        // fps validation entirely -- every upload is accepted, priced
+        // purely from its duration instead of gated on its quality.
+        const acceptability = cfg.acceptAny
+          ? { rejected: false, resOk: true, fpsOk: true, is4k: false, matchedTier: null }
+          : checkUploadAcceptable(meta.width, meta.height, meta.fps, cfg.allowFourK);
         if (acceptability.rejected) {
           showReject(acceptability, meta);
         } else {
@@ -11186,7 +11195,7 @@
           if (cfg.allowFourK && acceptability.matchedTier && typeof cpUploadedTier !== 'undefined') {
             cpUploadedTier = acceptability.matchedTier;
           }
-          showOk(file);
+          showOk(file, meta);
         }
       }).catch(() => {
         zone.classList.remove('scanning');
