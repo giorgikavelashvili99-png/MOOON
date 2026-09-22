@@ -8,6 +8,10 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://discord.com">
+<link rel="dns-prefetch" href="https://discord.com">
+<link rel="preconnect" href="https://moon-discord-auth.giorgikavelashvili99.workers.dev">
+<link rel="dns-prefetch" href="https://moon-discord-auth.giorgikavelashvili99.workers.dev">
 <style>
   :root{
     --bg: #09090a;
@@ -3268,9 +3272,11 @@
       radial-gradient(circle at 24.7% 24.9%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
       radial-gradient(circle at 9.8% 48.6%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
       radial-gradient(circle at 96.4% 53.2%, rgba(200,208,235,.45) 0 0.8px, transparent 1.4px);
+    animation: dgTwinkleSlow 7s ease-in-out infinite alternate;
   }
   .dg-stars-b{
-    animation: dgTwinkle 5s ease-in-out infinite alternate;
+    animation: dgTwinkle 4s ease-in-out infinite alternate;
+    animation-delay: -1.6s;
     background-image:
       radial-gradient(circle at 14.0% 47.6%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
       radial-gradient(circle at 17.5% 52.7%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
@@ -3285,9 +3291,35 @@
       radial-gradient(circle at 84.9% 8.4%, rgba(255,255,255,.9) 0 1.2px, transparent 1.7999999999999998px),
       radial-gradient(circle at 28.5% 48.6%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px);
   }
-  @keyframes dgTwinkle{ from{ opacity:.35; } to{ opacity:1; } }
-  @media (prefers-reduced-motion: reduce){ .dg-stars-b{ animation:none; } }
-  html.low-power .dg-stars-b{ animation:none !important; }
+  @keyframes dgTwinkle{ from{ opacity:.3; } to{ opacity:1; } }
+  @keyframes dgTwinkleSlow{ from{ opacity:.62; } to{ opacity:1; } }
+
+  /* Entrance: each block fades and rises in, staggered, every time the
+     gate opens (including re-opens later in the same visit). */
+  @keyframes dgRise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  .discord-gate.open .dg-top{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) both; }
+  .discord-gate.open .dg-logo-wrap{ animation: dgRise .6s cubic-bezier(.22,.9,.32,1) .06s both; }
+  .discord-gate.open .discord-gate-title{ animation: dgRise .55s cubic-bezier(.22,.9,.32,1) .16s both; }
+  .discord-gate.open .discord-gate-sub{ animation: dgRise .55s cubic-bezier(.22,.9,.32,1) .24s both; }
+  .discord-gate.open .discord-btn.primary{ animation: dgRise .55s cubic-bezier(.22,.9,.32,1) .32s both; }
+  .discord-gate.open .discord-btn.outline{ animation: dgRise .55s cubic-bezier(.22,.9,.32,1) .4s both; }
+  .discord-gate.open .discord-gate-skip{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) .48s both; }
+
+  /* Reduced-motion only -- deliberately NOT gated behind the site's
+     existing html.low-power flag: that flag also fires on ordinary
+     phones (anything <=820px wide counts as "low-power" there), which
+     would silently turn every one of these off -- stars included -- on
+     the exact screen size this gate is designed for. These are cheap
+     opacity/transform animations, so leaving them on for that case is
+     fine. */
+  @media (prefers-reduced-motion: reduce){
+    .dg-stars, .dg-stars-b, .dg-logo, .dg-dot, .discord-btn.primary::after{ animation:none !important; }
+    .discord-gate.open .dg-top, .discord-gate.open .dg-logo-wrap, .discord-gate.open .discord-gate-title,
+    .discord-gate.open .discord-gate-sub, .discord-gate.open .discord-btn.primary,
+    .discord-gate.open .discord-btn.outline, .discord-gate.open .discord-gate-skip{
+      animation:none !important; opacity:1; transform:none;
+    }
+  }
 
   /* Top row: brand pill on the left, flag switch on the right.
      A real flex row with a gap — the two can never overlap. */
@@ -3308,7 +3340,9 @@
   .dg-dot{
     flex:0 0 auto; width:9px; height:9px; border-radius:50%;
     background:#22b8ff; filter:drop-shadow(0 0 6px rgba(34,184,255,.95));
+    animation: dgDotPulse 2.4s ease-in-out infinite;
   }
+  @keyframes dgDotPulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:.55; transform:scale(.78); } }
   .lang-switch.dg-lang{
     padding:5px 6px; gap:8px; border-radius:18px;
     background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.05);
@@ -3324,11 +3358,14 @@
     padding:clamp(6px, 2vh, 28px) 22px calc(22px + env(safe-area-inset-bottom, 0px));
     text-align:center;
   }
+  .dg-logo-wrap{ display:block; margin:0 0 clamp(10px, 3vh, 34px); }
   .dg-logo{
-    display:block; width:min(84vw, 440px, 56vh); height:auto; margin:0 0 clamp(10px, 3vh, 34px);
+    display:block; width:min(84vw, 440px, 56vh); height:auto; margin:0;
     filter:brightness(1.16) saturate(1.08) drop-shadow(0 6px 34px rgba(120,140,255,.16));
     -webkit-user-drag:none; user-select:none;
+    animation: dgFloat 6s ease-in-out infinite;
   }
+  @keyframes dgFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
   .discord-gate-title{
     margin:0 0 clamp(10px, 2vh, 22px);
     font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif; font-weight:700;
@@ -3360,13 +3397,20 @@
   .discord-btn:hover{ transform:translateY(-2px); }
   .discord-btn:active{ transform:translateY(0) scale(0.98); }
   .discord-btn.primary{
-    color:#fff;
+    position:relative; overflow:hidden; color:#fff;
     background:
       linear-gradient(180deg, rgba(255,255,255,.28) 0, rgba(255,255,255,0) 1.5px),
       linear-gradient(180deg, #7383ff 0%, #5865F2 100%);
     /* drop-shadow (not box-shadow): the site-wide reset would remove that */
     filter:drop-shadow(0 10px 22px rgba(88,101,242,.42));
   }
+  .discord-btn.primary::after{
+    content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.35) 50%, transparent 60%);
+    background-size:220% 100%; background-position:140% 0;
+    animation: dgSheen 3.6s ease-in-out infinite;
+  }
+  @keyframes dgSheen{ 0%,55%{ background-position:140% 0; } 100%{ background-position:-40% 0; } }
   .discord-btn.primary svg{ fill:#fff; }
   .discord-btn.outline{
     margin-top:14px; color:#eef1ff;
@@ -6471,9 +6515,9 @@
   </div>
 
   <div class="dg-main">
-    <img class="dg-logo" id="discordGateLogo" alt="MOONFULL 4K" width="639" height="220" decoding="async" draggable="false">
+    <div class="dg-logo-wrap"><img class="dg-logo" id="discordGateLogo" alt="MOONFULL 4K" width="639" height="220" decoding="async" draggable="false"></div>
     <h1 class="discord-gate-title" id="discordGateTitle">შენ იმსახურებ საუკეთესო ხარისხს.</h1>
-    <div class="discord-gate-sub" id="discordGateSub"><span class="dg-spec"><b>TOPAZ</b>-ით გაუმჯობესებული <b>1080p / 4K • 60FPS</b></span><span class="dg-note">TikTok-ზე ატვირთვა დანაკარგის გარეშე</span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span></div>
+    <div class="discord-gate-sub" id="discordGateSub"><span class="dg-spec"><b>1080p / 4K • 60FPS</b></span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span></div>
     <button type="button" class="discord-btn primary" id="discordLoginBtn">
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authLoginBtn">შესვლა Discord-ით</span>
@@ -6486,6 +6530,57 @@
     <button type="button" class="discord-gate-close" id="discordGateClose" data-i18n="authGateClose">დახურვა</button>
   </div>
 </div>
+
+<script>
+(function(){
+  var CLIENT_ID = '1539515656020688927';
+  var WORKER_URL = 'https://moon-discord-auth.giorgikavelashvili99.workers.dev';
+  var REDIRECT_URI = window.location.origin + window.location.pathname;
+  var STATE_KEY = 'moon_discord_oauth_state';
+
+  function buildAuthorizeUrl(){
+    var state = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (String(Date.now()) + Math.random().toString(36).slice(2));
+    try{ sessionStorage.setItem(STATE_KEY, state); }catch(e){}
+    var params = new URLSearchParams({ client_id: CLIENT_ID, redirect_uri: REDIRECT_URI, response_type: 'code', scope: 'identify guilds', state: state });
+    return 'https://discord.com/api/oauth2/authorize?' + params.toString();
+  }
+
+  window.__moonStartDiscordLogin = function(){
+    var url = buildAuthorizeUrl();
+    var a = document.createElement('a');
+    a.href = url; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  var earlyBtn = document.getElementById('discordLoginBtn');
+  if (earlyBtn) earlyBtn.addEventListener('click', window.__moonStartDiscordLogin);
+
+  try{
+    var qs = new URLSearchParams(window.location.search);
+    var code = qs.get('code');
+    var state = qs.get('state');
+    var saved = null;
+    try{ saved = sessionStorage.getItem(STATE_KEY); }catch(e){}
+    if (code && state && state === saved){
+      window.__moonEarlyExchange = fetch(WORKER_URL + '/exchange', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code, redirect_uri: REDIRECT_URI })
+      }).then(function(res){ return res.ok ? res.json() : Promise.reject(new Error('exchange failed')); });
+    } else {
+      // No return-from-Discord code: if nobody's logged in yet, show the
+      // gate right here -- same thing the main script does further down
+      // once it boots, just without a flash of the ungated site first
+      // while the rest of this large page is still loading.
+      var cachedRaw = null;
+      try{ cachedRaw = localStorage.getItem('moon_discord_user_cache'); }catch(e){}
+      if (!cachedRaw){
+        var gateEl = document.getElementById('discordGate');
+        if (gateEl){ gateEl.setAttribute('data-mode', 'login'); gateEl.classList.add('open'); }
+      }
+    }
+  }catch(e){}
+})();
+</script>
 
 <div class="bg-layer">
   <div class="ruler"></div>
@@ -8387,7 +8482,7 @@
       visitorsLabel: 'სულ ვიზიტორი საიტზე:',
       topbarTagline: 'შენ იმსახურებ საუკეთესო ხარისხს',
       authGateTitle: 'შენ იმსახურებ საუკეთესო ხარისხს.',
-      authGateSub: '<span class="dg-spec"><b>TOPAZ</b>-ით გაუმჯობესებული <b>1080p / 4K • 60FPS</b></span><span class="dg-note">TikTok-ზე ატვირთვა დანაკარგის გარეშე</span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span>',
+      authGateSub: '<span class="dg-spec"><b>1080p / 4K • 60FPS</b></span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span>',
       authGateClose: 'დახურვა',
       authLoginBtn: 'შესვლა Discord-ით',
       authJoinBtn: 'შემოუერთდი ჩვენს Discord სერვერს',
@@ -8824,7 +8919,7 @@
       visitorsLabel: 'Total visitors:',
       topbarTagline: 'You deserve the best quality',
       authGateTitle: 'You deserve the best quality.',
-      authGateSub: '<span class="dg-spec"><b>TOPAZ</b>-enhanced <b>1080p / 4K • 60FPS</b></span><span class="dg-note">Lossless upload to TikTok</span><span class="dg-cta">Log in with Discord to continue</span>',
+      authGateSub: '<span class="dg-spec"><b>1080p / 4K • 60FPS</b></span><span class="dg-cta">Log in with Discord to continue</span>',
       authGateClose: 'Close',
       authLoginBtn: 'Log in with Discord',
       authJoinBtn: 'Join our Discord server',
@@ -16709,6 +16804,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   }
 
   function startDiscordLogin(){
+    // The early script (right after the gate markup) already builds and
+    // follows this same URL the instant the button exists — long before
+    // this ~500KB script has finished loading. Defer to it when present;
+    // this copy is only the fallback for the few callers that don't go
+    // through the early-bound button (the chip, the comment box).
+    if (window.__moonStartDiscordLogin){ window.__moonStartDiscordLogin(); return; }
     const url = discordAuthorizeUrl();
     // A real anchor-element click (rather than a raw location.href
     // assignment) is what gives mobile OSes a fair chance to hand this
@@ -16964,14 +17065,23 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       return;
     }
     try{
-      const res = await fetch(DISCORD_AUTH_WORKER_URL + '/exchange', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code, redirect_uri: DISCORD_REDIRECT_URI })
-      });
-      if (!res.ok) throw new Error('exchange failed');
-      const data = await res.json();
+      // window.__moonEarlyExchange, if present, was already fired by the
+      // early script the moment this page loaded — well before this
+      // function got a chance to run — so by the time we get here the
+      // network round trip is often already done. That's the whole fix
+      // for the gate sitting there for a second or two after a real
+      // login: the slow part now starts as early as physically possible
+      // instead of waiting for the rest of the page to boot first.
+      const data = await (window.__moonEarlyExchange || (async () => {
+        const res = await fetch(DISCORD_AUTH_WORKER_URL + '/exchange', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: code, redirect_uri: DISCORD_REDIRECT_URI })
+        });
+        if (!res.ok) throw new Error('exchange failed');
+        return res.json();
+      })());
       // Trust this response directly — it's the exchange's own JSON body,
       // not something read back off the cookie, so it's reliable even on
       // iOS. Cache it and do NOT immediately re-verify via checkDiscordSession()
@@ -17054,7 +17164,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     document.addEventListener('click', (e) => {
       if (chip && popover && !chip.contains(e.target) && !popover.contains(e.target)) popover.classList.remove('open');
     });
-    if (loginBtn) loginBtn.addEventListener('click', startDiscordLogin);
+    // Already bound by the early script above — skip the duplicate.
+    if (loginBtn && !window.__moonStartDiscordLogin) loginBtn.addEventListener('click', startDiscordLogin);
     if (commentLoginBtn) commentLoginBtn.addEventListener('click', startDiscordLogin);
     if (logoutBtn) logoutBtn.addEventListener('click', discordLogout);
     if (refreshBtn) refreshBtn.addEventListener('click', async () => {
