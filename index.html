@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MOON — ვიდეო მონტაჟის კალკულატორი</title>
-<script>(function(){try{if(!localStorage.getItem('moon_discord_user_cache'))document.documentElement.classList.add('login-first');}catch(e){document.documentElement.classList.add('login-first');}})();</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -744,28 +743,33 @@
   }
 
   .lang-switch{
-    flex-shrink:0; display:flex; align-items:center; gap:3px;
-    padding:3px; border-radius:12px;
+    flex-shrink:0; display:flex; align-items:center; gap:8px;
+    padding:4px 6px; border-radius:14px;
     background:rgba(10,12,20,0.6);
     border:1px solid var(--border-soft);
   }
+  /* Language buttons are flags (Georgia / UK) instead of GEO / ENG text.
+     Fixed-size tap targets + a real gap between them, so they can never
+     touch each other or the neighbouring elements. */
   .lang-btn{
-    min-width:38px; height:28px; padding:0 4px; border-radius:9px;
+    width:40px; height:32px; padding:0; border-radius:10px;
     flex-shrink:0; box-sizing:border-box;
-    background:transparent; border:none;
-    font-family:'BPGAcademiuriU', sans-serif;
-    font-size:11.5px; font-weight:800; letter-spacing:normal;
-    line-height:1; cursor:pointer; white-space:nowrap;
-    color:var(--text-dim);
+    background:transparent; border:1px solid transparent;
+    line-height:0; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    opacity:0.75; transition: opacity .2s, color .2s, background .25s, transform .15s, box-shadow .2s;
+    opacity:0.55; -webkit-tap-highlight-color:transparent;
+    transition: opacity .2s, background .25s, transform .15s, border-color .2s;
   }
-  .lang-btn:hover{ opacity:1; color:#fff; transform:translateY(-1px); }
+  .lang-btn:hover{ opacity:1; transform:translateY(-1px); }
   .lang-btn.active{
-    opacity:1; color:#04101a;
-    background: linear-gradient(120deg, var(--purple), var(--cyan));
-    box-shadow:none;
-    text-shadow:none;
+    opacity:1;
+    background:rgba(255,255,255,0.10);
+    border-color:rgba(255,255,255,0.30);
+  }
+  .lang-flag{
+    display:block; width:27px; height:18px; border-radius:3px; box-sizing:border-box;
+    border:1px solid rgba(255,255,255,0.18);
+    pointer-events:none;
   }
 
   /* ---------- Hamburger drawer menu ---------- */
@@ -852,10 +856,14 @@
 
   @media (max-width: 640px){
     .topbar{ padding:4px 2px; }
-    .brand-logo-img{ height:74px; }
+    .topbar-left{ flex:1 1 0; min-width:0; }
+    .brand-logo{ flex:0 1 auto; min-width:0; max-width:100%; }
+    .brand-logo-img{ height:auto; width:215px; max-width:100%; min-width:0; }
     .topbar-actions{ transform: translateY(-16px); gap:8px; }
     .rating-topbar-badge{ font-size:10px; padding:4px 8px; gap:3px; }
-    .lang-btn{ width:36px; height:30px; font-size:10px; }
+    .lang-btn{ width:34px; height:30px; }
+    .lang-flag{ width:25px; height:16.5px; }
+    .lang-switch{ gap:4px; padding:3px 4px; }
     .discord-chip{ width:30px; height:30px; }
     .menu-toggle{ width:38px; height:38px; }
     .site-menu-panel{ padding:58px 16px 22px; }
@@ -873,9 +881,10 @@
     .brand .name{ font-size:12.5px; }
     .visitors-badge{ font-size:9px; padding:2px 5px; }
     .rating-topbar-badge{ font-size:9px; padding:3px 6px; }
-    .lang-btn{ width:32px; height:28px; font-size:9px; }
+    .lang-btn{ width:32px; height:28px; }
+    .lang-flag{ width:23px; height:15.5px; }
     .topbar{ padding:4px 2px; }
-    .brand-logo-img{ height:56px; }
+    .brand-logo-img{ width:163px; }
     .topbar-actions{ transform: translateY(-13px); gap:5px; }
     .discord-chip{ width:26px; height:26px; }
     .menu-toggle{ width:34px; height:34px; }
@@ -885,22 +894,8 @@
      off-screen (this page has overflow-x:hidden, so clipped = unreachable). */
   @media (max-width: 340px){
     .topbar{ flex-wrap:wrap; row-gap:6px; justify-content:center; }
+    .topbar-left{ flex:0 1 auto; }
     .topbar-actions{ transform:none; }
-  }
-
-  /* Header: logo / guide links / actions must never overlap or touch. The row
-     wraps instead of overflowing, the logo can shrink, and the guide buttons
-     get tighter between 900 and 1099px where everything used to collide. */
-  .topbar{ flex-wrap:wrap; row-gap:10px; }
-  .topbar-left{ flex:1 1 0; min-width:0; flex-wrap:wrap; row-gap:8px; column-gap:22px; }
-  .brand-logo{ flex:0 1 auto; min-width:0; }
-  .brand-logo-img{ max-width:100%; }
-  .topbar-guide-links{ flex:0 1 auto; flex-wrap:wrap; }
-  .topbar-actions{ margin-left:auto; }
-  @media (min-width:900px) and (max-width:1099px){
-    .brand-logo-img{ height:82px; }
-    .topbar-left{ column-gap:16px; }
-    .topbar-guide-link{ padding:11px 15px; font-size:14px; gap:7px; }
   }
 
   .hero{ text-align:center; margin-bottom:38px; }
@@ -3201,152 +3196,222 @@
   @keyframes dpSpin{ to{ transform:rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .dp-icon-btn.is-spinning svg{ animation:none; } }
 
+  /* ============================================================
+     DISCORD LOGIN GATE — full-screen landing (starry, centred)
+     ============================================================ */
   .discord-gate{
     position:fixed; inset:0; z-index:99999;
-    display:flex; align-items:center; justify-content:center; padding:20px;
-    background:rgba(9,9,10,0.92); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    display:flex; flex-direction:column;
+    overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    background:
+      radial-gradient(ellipse 85% 34% at 50% 30%, rgba(74,84,150,0.20), transparent 72%),
+      radial-gradient(ellipse 110% 45% at 50% 110%, rgba(59,109,255,0.08), transparent 70%),
+      #010103;
     opacity:0; visibility:hidden; transition: opacity .25s ease, visibility 0s linear .25s;
   }
   .discord-gate.open{ opacity:1; visibility:visible; transition: opacity .25s ease, visibility 0s; }
-  .discord-gate-card{
-    position:relative; width:100%; max-width:380px;
-    padding:36px 26px 28px; text-align:center; border-radius:22px;
-    border:1px solid var(--border);
-    background:
-      radial-gradient(ellipse at 50% 0%, rgba(34,195,255,0.14), transparent 60%),
-      #0b0b13;
-    box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  /* Page behind the gate must not scroll while it is open. The site
+     reserves a scrollbar gutter on <html>; drop it (and match the gate's
+     colour) while the gate is up, otherwise a lighter strip shows along
+     the right edge on desktop. */
+  html:has(.discord-gate.open){ overflow:hidden; scrollbar-gutter:auto; background:#010103; }
+
+  /* Stars: pure-CSS dots (two layers), pinned to the viewport.
+     Built from radial-gradients on purpose — the site has a global
+     "box-shadow:none !important" reset, so box-shadow dots would vanish. */
+  .dg-stars{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-repeat:no-repeat; background-size:100% 100%;
+    background-image:
+      radial-gradient(circle at 63.5% 3.9%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 25.3% 15.0%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 67.1% 88.0%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 58.8% 4.6%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 22.7% 50.5%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 55.9% 71.0%, rgba(150,160,190,.5) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 22.9% 58.7%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 75.1% 17.0%, rgba(150,160,190,.5) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 34.5% 16.6%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 11.4% 38.4%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 83.7% 60.1%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 72.3% 53.5%, rgba(150,160,190,.5) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 9.1% 29.9%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 57.5% 69.8%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 65.6% 76.5%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 84.5% 85.5%, rgba(150,160,190,.5) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 28.5% 63.2%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 17.3% 36.0%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 69.6% 67.8%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 60.6% 18.1%, rgba(200,208,235,.45) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 17.4% 38.3%, rgba(200,208,235,.45) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 67.9% 83.3%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 23.7% 4.6%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 40.4% 7.9%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 22.1% 49.9%, rgba(150,160,190,.5) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 15.4% 15.0%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 74.0% 43.1%, rgba(150,160,190,.5) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 36.6% 98.2%, rgba(200,208,235,.45) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 50.9% 10.3%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 85.0% 16.3%, rgba(200,208,235,.45) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 78.3% 42.4%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 38.8% 59.3%, rgba(150,160,190,.5) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 52.8% 95.7%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 67.5% 12.6%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 76.1% 34.5%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 43.7% 45.5%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 95.8% 75.4%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 85.9% 30.4%, rgba(200,208,235,.45) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 16.3% 75.5%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 59.6% 48.9%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 91.6% 86.7%, rgba(255,255,255,.75) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 24.7% 24.9%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 9.8% 48.6%, rgba(255,255,255,.55) 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 96.4% 53.2%, rgba(200,208,235,.45) 0 0.8px, transparent 1.4px);
   }
-  .discord-gate-close{
-    position:absolute; top:14px; right:14px;
-    width:30px; height:30px; border-radius:9px;
-    background:rgba(255,255,255,0.05); border:1px solid var(--border);
-    color:var(--text-dim); font-size:13px; line-height:1;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; transition: color .2s, border-color .2s, background .2s;
+  .dg-stars-b{
+    animation: dgTwinkle 5s ease-in-out infinite alternate;
+    background-image:
+      radial-gradient(circle at 14.0% 47.6%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 17.5% 52.7%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 42.5% 22.0%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 74.8% 68.4%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 31.7% 98.0%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 37.7% 88.8%, rgba(190,205,255,.85) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 13.2% 23.3%, rgba(190,205,255,.85) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 3.5% 55.2%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 22.9% 8.4%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 7.2% 8.0%, rgba(255,255,255,.9) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 84.9% 8.4%, rgba(255,255,255,.9) 0 1.2px, transparent 1.7999999999999998px),
+      radial-gradient(circle at 28.5% 48.6%, rgba(255,255,255,.7) 0 1.2px, transparent 1.7999999999999998px);
   }
-  .discord-gate-close:hover{ color:#fff; border-color:var(--purple-soft); background:rgba(124,143,255,0.1); }
-  .discord-gate-logo{
-    width:64px; height:64px; margin:0 auto 18px; border-radius:18px;
-    display:flex; align-items:center; justify-content:center; font-size:30px;
-    background:#0a0a16; border:1px solid var(--moon-line);
-    box-shadow:none;
+  @keyframes dgTwinkle{ from{ opacity:.35; } to{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .dg-stars-b{ animation:none; } }
+  html.low-power .dg-stars-b{ animation:none !important; }
+
+  /* Top row: brand pill on the left, flag switch on the right.
+     A real flex row with a gap — the two can never overlap. */
+  .dg-top{
+    position:relative; z-index:2; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    width:100%; max-width:1100px; margin:0 auto; box-sizing:border-box;
+    padding:calc(16px + env(safe-area-inset-top, 0px)) clamp(16px, 4vw, 40px) 0;
+  }
+  .dg-pill{
+    display:inline-flex; align-items:center; gap:12px; min-width:0;
+    padding:11px 20px; border-radius:999px;
+    background:rgba(255,255,255,0.055); border:1px solid rgba(255,255,255,0.06);
+    font-family:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight:700; font-size:13px; letter-spacing:.2em; line-height:1;
+    color:#c9d1f5; white-space:nowrap;
+  }
+  .dg-dot{
+    flex:0 0 auto; width:9px; height:9px; border-radius:50%;
+    background:#22b8ff; filter:drop-shadow(0 0 6px rgba(34,184,255,.95));
+  }
+  .lang-switch.dg-lang{
+    padding:5px 6px; gap:8px; border-radius:18px;
+    background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.05);
+  }
+  .dg-lang .lang-btn{ width:44px; height:36px; border-radius:13px; }
+  .dg-lang .lang-flag{ width:28px; height:19px; }
+
+  /* Centre column */
+  .dg-main{
+    position:relative; z-index:1; flex:1 0 auto;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    width:100%; max-width:520px; margin:0 auto; box-sizing:border-box;
+    padding:clamp(6px, 2vh, 28px) 22px calc(22px + env(safe-area-inset-bottom, 0px));
+    text-align:center;
+  }
+  .dg-logo{
+    display:block; width:min(84vw, 440px, 56vh); height:auto; margin:0 0 clamp(10px, 3vh, 34px);
+    filter:brightness(1.16) saturate(1.08) drop-shadow(0 6px 34px rgba(120,140,255,.16));
+    -webkit-user-drag:none; user-select:none;
   }
   .discord-gate-title{
+    margin:0 0 clamp(10px, 2vh, 22px);
     font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif; font-weight:700;
-    font-size:clamp(18px, 5vw, 21px); color:var(--text); margin-bottom:8px;
+    font-size:clamp(18px, min(5.1vw, 4vh), 30px); line-height:1.3; color:#fff;
+    text-wrap:balance;
   }
   .discord-gate-sub{
-    font-size:13px; line-height:1.55; color:var(--text-dim);
-    max-width:300px; margin:0 auto 24px;
+    width:100%; margin:0 0 clamp(16px, 3vh, 32px);
+    font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
+    font-size:clamp(14px, min(4.2vw, 2.5vh), 19px); line-height:1.5; color:#a9b4de;
   }
+  .discord-gate-sub b{ color:#fff; font-weight:700; }
+  .discord-gate-sub .dg-spec,
+  .discord-gate-sub .dg-note,
+  .discord-gate-sub .dg-cta{ display:block; text-wrap:balance; }
+  .discord-gate-sub .dg-note{ margin-top:6px; color:#6f7aa6; }
+  .discord-gate-sub .dg-cta{ margin-top:clamp(12px, 2.4vh, 26px); color:#fff; font-weight:600; }
+
   .discord-btn{
-    width:100%; padding:14px 12px; border-radius:13px; border:none;
-    font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif; font-weight:700; font-size:14px;
-    display:flex; align-items:center; justify-content:center; gap:9px;
+    width:100%; min-height:clamp(48px, 7.4vh, 64px); padding:0 12px; border-radius:20px; border:none;
+    font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif; font-weight:700;
+    font-size:clamp(13.5px, min(3.9vw, 2.4vh), 17px); line-height:1.25;
+    display:flex; align-items:center; justify-content:center; gap:10px;
     cursor:pointer; text-decoration:none; box-sizing:border-box;
-    transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    -webkit-tap-highlight-color:transparent;
+    transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease, border-color .15s ease;
   }
-  .discord-btn svg{ width:19px; height:19px; flex:0 0 auto; }
+  .discord-btn svg{ width:24px; height:24px; flex:0 0 auto; }
   .discord-btn:hover{ transform:translateY(-2px); }
   .discord-btn:active{ transform:translateY(0) scale(0.98); }
-  .discord-btn.primary{ background:#5865F2; color:#fff; box-shadow:none; }
-  .discord-btn.primary:hover{ box-shadow:none; }
+  .discord-btn.primary{
+    color:#fff;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.28) 0, rgba(255,255,255,0) 1.5px),
+      linear-gradient(180deg, #7383ff 0%, #5865F2 100%);
+    /* drop-shadow (not box-shadow): the site-wide reset would remove that */
+    filter:drop-shadow(0 10px 22px rgba(88,101,242,.42));
+  }
   .discord-btn.primary svg{ fill:#fff; }
-  .discord-btn.outline{ margin-top:10px; background:transparent; color:var(--text-dim); border:1.5px solid var(--border); }
-  .discord-btn.outline:hover{ border-color:rgba(88,101,242,0.55); color:#fff; }
+  .discord-btn.outline{
+    margin-top:14px; color:#eef1ff;
+    background:rgba(255,255,255,0.055); border:1px solid rgba(255,255,255,0.07);
+  }
+  .discord-btn.outline:hover{ border-color:rgba(88,101,242,0.6); color:#fff; }
   .discord-btn.outline svg{ fill:currentColor; }
-  .discord-gate-skip{
-    display:inline-block; margin-top:16px; font-size:11.5px; color:var(--text-faint);
-    cursor:pointer; border-bottom:1px dashed transparent; transition:color .15s ease, border-color .15s ease;
+
+  .discord-gate-skip,
+  .discord-gate-close{
+    appearance:none; -webkit-appearance:none; background:none; border:none;
+    font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
+    font-size:13px; color:#5f6a94; cursor:pointer; padding:8px 12px;
+    border-bottom:1px dashed transparent;
+    transition:color .15s ease, border-color .15s ease;
   }
-  .discord-gate-skip:hover{ color:var(--text-dim); border-color:var(--text-faint); }
-  @media (max-width:420px){
-    .discord-gate-card{ padding:30px 18px 22px; }
+  .discord-gate-skip{ margin-top:clamp(6px, 1.6vh, 14px); }
+  .discord-gate-skip:hover, .discord-gate-close:hover{ color:#a9b4de; }
+  /* "Close" only exists in the "please join our server" mode, where
+     the gate was opened over a page the person is already using. */
+  .discord-gate-close{ display:none; margin-top:2px; }
+  .discord-gate[data-mode="guild"] .discord-gate-close{ display:inline-block; }
+  .discord-gate[data-mode="guild"] .discord-gate-sub{ font-size:clamp(14px, 3.9vw, 16px); color:#a9b4de; }
+  .discord-gate[data-mode="guild"] .discord-gate-title{ font-size:clamp(18px, 5.2vw, 24px); }
+  .discord-gate[data-mode="guild"] .discord-gate-skip{
+    margin-top:18px; padding:13px 18px; border-radius:14px;
+    color:#e8ecff; font-weight:700; font-size:14px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09);
   }
 
-  /* ---------- Full-page login (Discord gate) ---------- */
-  html.login-first, html.login-first body{ overflow:hidden; }
-  html.login-first .discord-gate{ opacity:1; visibility:visible; transition:none; }
-  .discord-gate{
-    flex-direction:column; align-items:stretch; justify-content:flex-start;
-    padding:0 0 24px; overflow-y:auto; -webkit-overflow-scrolling:touch;
-    background:
-      radial-gradient(ellipse 70% 55% at 50% 0%, rgba(59,109,255,0.24), transparent 70%),
-      radial-gradient(ellipse 60% 45% at 88% 100%, rgba(34,195,255,0.13), transparent 70%),
-      #050810;
-    backdrop-filter:none; -webkit-backdrop-filter:none;
+  /* Desktop / tablet: a bit wider column, sizes driven by height so the
+     whole screen fits without scrolling on ordinary laptop screens. */
+  @media (min-width:700px){
+    .dg-main{ max-width:600px; }
+    .dg-logo{ width:min(420px, 44vh); }
+    .discord-gate-title{ font-size:clamp(20px, 3.1vh, 26px); }
+    .discord-gate-sub{ font-size:clamp(14px, 2.2vh, 18px); }
+    .discord-btn{ max-width:440px; }
   }
-  .lp-stars{
-    position:fixed; inset:0; pointer-events:none;
-    background:
-      radial-gradient(1.5px 1.5px at 12% 22%, #fff, transparent),
-      radial-gradient(1px 1px at 28% 68%, #cfd8ff, transparent),
-      radial-gradient(1.5px 1.5px at 44% 14%, #fff, transparent),
-      radial-gradient(1px 1px at 63% 78%, #9fb4ff, transparent),
-      radial-gradient(1.5px 1.5px at 78% 30%, #fff, transparent),
-      radial-gradient(1px 1px at 90% 62%, #cfd8ff, transparent),
-      radial-gradient(1px 1px at 8% 86%, #9fb4ff, transparent),
-      radial-gradient(1.5px 1.5px at 55% 46%, #fff, transparent);
-    animation:lpTwinkle 5s ease-in-out infinite alternate;
+  @media (max-width:360px){
+    .dg-top{ gap:10px; }
+    .dg-pill{ padding:10px 14px; gap:9px; font-size:12px; letter-spacing:.14em; }
+    .dg-lang .lang-btn{ width:40px; height:34px; }
+    .dg-lang .lang-flag{ width:26px; height:17px; }
   }
-  @keyframes lpTwinkle{ from{ opacity:.45; } to{ opacity:.95; } }
-  /* Top row: badge on the left, flags on the right. It wraps (never overlaps)
-     when the screen is too narrow for both on one line. */
-  .lp-top{
-    position:relative; z-index:1; width:100%; max-width:1100px; margin:0 auto;
-    padding:18px 20px 0; box-sizing:border-box;
-    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px 16px;
-  }
-  .lp-lang{ margin-left:auto; }
-  .lp-pill{
-    display:inline-flex; align-items:center; gap:12px; max-width:100%; box-sizing:border-box;
-    padding:11px 20px; border-radius:999px;
-    background:#0d0d0f; border:1px solid rgba(255,255,255,0.06);
-    font-family:'JetBrains Mono', ui-monospace, monospace; font-weight:700;
-    font-size:clamp(11px, 3.3vw, 14px); letter-spacing:.14em; color:#c9cff0; white-space:nowrap;
-  }
-  .lp-pill--sm{ padding:8px 16px; font-size:12px; letter-spacing:.06em; font-weight:600; }
-  .lp-dot{
-    width:9px; height:9px; flex:0 0 auto; border-radius:50%;
-    background:var(--cyan); box-shadow:0 0 10px 2px rgba(34,195,255,0.65);
-  }
-  .lp-specs{ display:flex; justify-content:center; margin-top:22px; }
-  .discord-gate-card{
-    z-index:1; margin:auto; max-width:420px; padding:38px 28px 28px; border-radius:26px;
-    border:1px solid rgba(59,109,255,0.3);
-    background:
-      radial-gradient(ellipse at 50% 0%, rgba(34,195,255,0.16), transparent 62%),
-      linear-gradient(165deg, rgba(20,24,44,0.9), rgba(8,10,20,0.95));
-    box-shadow:0 40px 100px rgba(0,0,0,0.65), 0 0 80px rgba(59,109,255,0.12);
-    animation:lpRise .6s cubic-bezier(.16,1,.3,1) both;
-  }
-  @keyframes lpRise{ from{ opacity:0; transform:translateY(18px) scale(.98); } to{ opacity:1; transform:none; } }
-  .lp-moon{
-    position:relative; width:84px; height:84px; margin:0 auto 22px; border-radius:50%;
-    background:radial-gradient(circle at 34% 28%, #fff 0%, #e8ecff 45%, #7c8fff 100%);
-    box-shadow:0 0 34px rgba(124,143,255,0.5), 0 0 90px rgba(34,195,255,0.22);
-    animation:lpFloat 6s ease-in-out infinite;
-  }
-  .lp-moon::before, .lp-moon::after{ content:''; position:absolute; border-radius:50%; background:rgba(20,22,50,0.13); }
-  .lp-moon::before{ width:20px; height:20px; right:18px; bottom:24px; }
-  .lp-moon::after{ width:12px; height:12px; left:20px; bottom:16px; }
-  @keyframes lpFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
-  .discord-gate-title{ font-size:clamp(22px, 6vw, 27px); margin-bottom:10px; }
-  .discord-gate-sub{ max-width:320px; font-size:13.5px; }
-  .discord-btn.primary{ padding:16px 14px; font-size:15px; border-radius:14px; box-shadow:0 10px 30px rgba(88,101,242,0.35); }
-  .discord-btn.primary:hover{ box-shadow:0 14px 36px rgba(88,101,242,0.5); }
-  .discord-btn.is-loading{ opacity:.65; pointer-events:none; cursor:progress; }
-  .discord-gate-skip{ margin-top:18px; font-size:12.5px; }
-  .discord-gate-close{ display:none; z-index:2; }
-  .discord-gate.is-guild .discord-gate-close{ display:flex; }
-  @media (prefers-reduced-motion: reduce){ .lp-stars, .lp-moon, .discord-gate-card{ animation:none; } }
-  html.low-power .lp-stars, html.low-power .lp-moon{ animation:none; }
-
-  /* Flags in the language switch (inline SVG — flag emoji don't render on Windows) */
-  .flag{ display:block; width:26px; height:18px; border-radius:4px; box-shadow:0 0 0 1px rgba(255,255,255,0.16); }
-  .lang-btn{ min-width:40px; height:32px; }
-  @media (max-width:480px){ .flag{ width:22px; height:15px; } .lang-btn{ min-width:34px; } }
 
   .copy-note{
     text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:0; min-height:0;
@@ -6371,21 +6436,44 @@
   <span class="acb-dot" id="activeChatBubbleDot" style="display:none;"></span>
 </button>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="flag-ge" viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice"><rect width="30" height="20" fill="#fff"/><path fill="#e8112d" d="M13 0h4v8h13v4H17v8h-4v-8H0V8h13zM6 2h1v1.5h1.5v1h-1.5v1.5h-1v-1.5h-1.5v-1h1.5zM23 2h1v1.5h1.5v1h-1.5v1.5h-1v-1.5h-1.5v-1h1.5zM6 14h1v1.5h1.5v1h-1.5v1.5h-1v-1.5h-1.5v-1h1.5zM23 14h1v1.5h1.5v1h-1.5v1.5h-1v-1.5h-1.5v-1h1.5z"/></symbol><symbol id="flag-gb" viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice"><clipPath id="gb-s"><path d="M0,0 v30 h60 v-30 z"/></clipPath><clipPath id="gb-t"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><g clip-path="url(#gb-s)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#gb-t)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></symbol></defs></svg>
-<div class="discord-gate" id="discordGate" role="dialog" aria-modal="true" aria-labelledby="discordGateTitle">
-  <div class="lp-stars" aria-hidden="true"></div>
-  <div class="lp-top">
-    <div class="lp-pill"><span class="lp-dot"></span><span>MOON FULL 4K</span></div>
-    <div class="lang-switch lp-lang" role="group" aria-label="Language">
-      <button type="button" class="lang-btn active" id="gLangKa" data-lang="ka" aria-label="ქართული" title="ქართული"><svg class="flag" aria-hidden="true"><use href="#flag-ge"/></svg></button>
-      <button type="button" class="lang-btn" id="gLangEn" data-lang="en" aria-label="English" title="English"><svg class="flag" aria-hidden="true"><use href="#flag-gb"/></svg></button>
+<!-- Flag sprite (Georgia / United Kingdom) used by both language switches -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id="flagGbClipA"><rect width="30" height="20"/></clipPath>
+    <clipPath id="flagGbClipB"><path d="M15,10 h15 v10 z v10 h-15 z h-15 v-10 z v-10 h15 z"/></clipPath>
+    <symbol id="flag-ge" viewBox="0 0 30 20">
+      <rect width="30" height="20" fill="#fff"/>
+      <path fill="#e8112d" d="M12.6 0h4.8v20h-4.8z M0 7.6h30v4.8H0z"/>
+      <path fill="#e8112d" d="M6.6 2.2h1.6v1.9h1.9v1.6H8.2v1.9H6.6V5.7H4.7V4.1h1.9z M21.8 2.2h1.6v1.9h1.9v1.6h-1.9v1.9h-1.6V5.7h-1.9V4.1h1.9z M6.6 14h1.6v1.9h1.9v1.6H8.2v1.9H6.6v-1.9H4.7v-1.6h1.9z M21.8 14h1.6v1.9h1.9v1.6h-1.9v1.9h-1.6v-1.9h-1.9v-1.6h1.9z"/>
+    </symbol>
+    <symbol id="flag-gb" viewBox="0 0 30 20">
+      <g clip-path="url(#flagGbClipA)">
+        <rect width="30" height="20" fill="#012169"/>
+        <path d="M0,0 L30,20 M30,0 L0,20" stroke="#fff" stroke-width="4"/>
+        <path d="M0,0 L30,20 M30,0 L0,20" clip-path="url(#flagGbClipB)" stroke="#c8102e" stroke-width="2.4"/>
+        <path d="M15,0 V20 M0,10 H30" stroke="#fff" stroke-width="6.6"/>
+        <path d="M15,0 V20 M0,10 H30" stroke="#c8102e" stroke-width="4"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="discord-gate" id="discordGate" data-mode="login" role="dialog" aria-modal="true" aria-labelledby="discordGateTitle">
+  <div class="dg-stars" aria-hidden="true"></div>
+  <div class="dg-stars dg-stars-b" aria-hidden="true"></div>
+
+  <div class="dg-top">
+    <div class="dg-pill"><span class="dg-dot" aria-hidden="true"></span><span>MOON FULL 4K</span></div>
+    <div class="lang-switch dg-lang" role="group" aria-label="Language">
+      <button type="button" class="lang-btn active" data-lang="ka" aria-label="ქართული" title="ქართული"><svg class="lang-flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false"><use href="#flag-ge"/></svg></button>
+      <button type="button" class="lang-btn" data-lang="en" aria-label="English" title="English"><svg class="lang-flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false"><use href="#flag-gb"/></svg></button>
     </div>
   </div>
-  <div class="discord-gate-card">
-    <button type="button" class="discord-gate-close" id="discordGateClose" aria-label="დახურვა">✕</button>
-    <div class="lp-moon" aria-hidden="true"></div>
-    <div class="discord-gate-title" id="discordGateTitle" data-i18n="authGateTitle">შედი Discord ანგარიშით</div>
-    <div class="discord-gate-sub" data-i18n="authGateSub">დაუკავშირდი შენს Discord ანგარიშს, რომ თვალი ადევნო შენს შეკვეთებს და პირველმა მიიღო სიახლეები.</div>
+
+  <div class="dg-main">
+    <img class="dg-logo" id="discordGateLogo" alt="MOONFULL 4K" width="639" height="220" decoding="async" draggable="false">
+    <h1 class="discord-gate-title" id="discordGateTitle">შენ იმსახურებ საუკეთესო ხარისხს.</h1>
+    <div class="discord-gate-sub" id="discordGateSub"><span class="dg-spec"><b>TOPAZ</b>-ით გაუმჯობესებული <b>1080p / 4K • 60FPS</b></span><span class="dg-note">TikTok-ზე ატვირთვა დანაკარგის გარეშე</span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span></div>
     <button type="button" class="discord-btn primary" id="discordLoginBtn">
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authLoginBtn">შესვლა Discord-ით</span>
@@ -6394,8 +6482,8 @@
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authJoinBtn">შემოუერთდი ჩვენს Discord სერვერს</span>
     </a>
-    <div class="lp-specs"><span class="lp-pill lp-pill--sm"><span class="lp-dot"></span><span>1080p / 4K • 60FPS</span></span></div>
-    <div class="discord-gate-skip" id="discordGateSkip" data-i18n="authGateSkip">გაგრძელება სტუმრად</div>
+    <button type="button" class="discord-gate-skip" id="discordGateSkip">გაგრძელება სტუმრად</button>
+    <button type="button" class="discord-gate-close" id="discordGateClose" data-i18n="authGateClose">დახურვა</button>
   </div>
 </div>
 
@@ -6449,8 +6537,8 @@
         </div>
       </div>
       <div class="lang-switch" id="langSwitch">
-        <button class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული" title="ქართული"><svg class="flag" aria-hidden="true"><use href="#flag-ge"/></svg></button>
-        <button class="lang-btn" id="langEn" data-lang="en" aria-label="English" title="English"><svg class="flag" aria-hidden="true"><use href="#flag-gb"/></svg></button>
+        <button type="button" class="lang-btn active" id="langKa" data-lang="ka" aria-label="ქართული" title="ქართული"><svg class="lang-flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false"><use href="#flag-ge"/></svg></button>
+        <button type="button" class="lang-btn" id="langEn" data-lang="en" aria-label="English" title="English"><svg class="lang-flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false"><use href="#flag-gb"/></svg></button>
       </div>
       <button type="button" class="menu-toggle" id="menuToggle" aria-label="მენიუ" aria-expanded="false" aria-controls="siteMenu">
         <span class="menu-toggle-bar"></span>
@@ -8298,8 +8386,9 @@
     ka: {
       visitorsLabel: 'სულ ვიზიტორი საიტზე:',
       topbarTagline: 'შენ იმსახურებ საუკეთესო ხარისხს',
-      authGateTitle: 'შედი Discord ანგარიშით',
-      authGateSub: 'დაუკავშირდი შენს Discord ანგარიშს, რომ თვალი ადევნო შენს შეკვეთებს და პირველმა მიიღო სიახლეები.',
+      authGateTitle: 'შენ იმსახურებ საუკეთესო ხარისხს.',
+      authGateSub: '<span class="dg-spec"><b>TOPAZ</b>-ით გაუმჯობესებული <b>1080p / 4K • 60FPS</b></span><span class="dg-note">TikTok-ზე ატვირთვა დანაკარგის გარეშე</span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span>',
+      authGateClose: 'დახურვა',
       authLoginBtn: 'შესვლა Discord-ით',
       authJoinBtn: 'შემოუერთდი ჩვენს Discord სერვერს',
       authGateSkip: 'გაგრძელება სტუმრად',
@@ -8532,7 +8621,6 @@
       sendOrder: 'გაგზავნე შეკვეთა',
       sendChat: 'გაგზავნე შეკვეთა',
       messengerTitle: 'შეკვეთის ჩატი',
-      messengerCompleteBtn: 'დასრულება',
       messengerOrderLabel: 'შეკვეთა #',
       messengerInputPh: 'დაწერე შეტყობინება...',
       messengerNeedsLogin: 'შეკვეთის ჩატისთვის საჭიროა Discord-ით შესვლა.',
@@ -8735,8 +8823,9 @@
     en: {
       visitorsLabel: 'Total visitors:',
       topbarTagline: 'You deserve the best quality',
-      authGateTitle: 'Sign in with Discord',
-      authGateSub: 'Connect your Discord account to track your orders and be the first to hear about updates.',
+      authGateTitle: 'You deserve the best quality.',
+      authGateSub: '<span class="dg-spec"><b>TOPAZ</b>-enhanced <b>1080p / 4K • 60FPS</b></span><span class="dg-note">Lossless upload to TikTok</span><span class="dg-cta">Log in with Discord to continue</span>',
+      authGateClose: 'Close',
       authLoginBtn: 'Log in with Discord',
       authJoinBtn: 'Join our Discord server',
       authGateSkip: 'Continue as guest',
@@ -8969,7 +9058,6 @@
       sendOrder: 'Send order',
       sendChat: 'Send order',
       messengerTitle: 'Order chat',
-      messengerCompleteBtn: 'Complete',
       messengerOrderLabel: 'Order #',
       messengerInputPh: 'Write a message...',
       messengerNeedsLogin: 'Please log in with Discord to open the order chat.',
@@ -9233,7 +9321,12 @@
         el.placeholder = TRANSLATIONS[currentLang][key];
       }
     });
-    document.querySelectorAll('.lang-btn[data-lang]').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+    document.querySelectorAll('.lang-btn[data-lang]').forEach(b => {
+      const on = b.getAttribute('data-lang') === currentLang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (typeof renderGateCopy === 'function') renderGateCopy();
     if (typeof applyBaTabContent === 'function') applyBaTabContent();
     if (typeof refresh === 'function') refresh();
     if (typeof renderComments === 'function') renderComments();
@@ -9252,7 +9345,9 @@
     applyTranslations();
   }
 
-  document.querySelectorAll('.lang-btn[data-lang]').forEach(b => b.addEventListener('click', () => setLanguage(b.dataset.lang)));
+  document.querySelectorAll('.lang-btn[data-lang]').forEach(btn => {
+    btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang')));
+  });
 
   document.addEventListener('click', (e) => {
     const link = e.target.closest('.scanner-jump-link');
@@ -13146,21 +13241,33 @@
   // window.open() it". Requires a Discord login first (same account
   // system comments already use), since a session needs a real
   // identity to notify and to let the admin panel say who's ordering.
+  // Fills the gate's title / sub-copy / skip button for the current mode
+  // ("login" = normal landing, "guild" = please-join-the-server) and the
+  // current language. Called on every language switch too, so switching
+  // language inside the gate can't leave stale or mixed-mode text behind.
+  function renderGateCopy(){
+    const gate = document.getElementById('discordGate');
+    if (!gate) return;
+    const guild = gate.getAttribute('data-mode') === 'guild';
+    const titleEl = document.getElementById('discordGateTitle');
+    const subEl = document.getElementById('discordGateSub');
+    const skipEl = document.getElementById('discordGateSkip');
+    if (titleEl) titleEl.textContent = t(guild ? 'guildGateTitle' : 'authGateTitle');
+    if (subEl) subEl.innerHTML = t(guild ? 'guildGateSub' : 'authGateSub');
+    if (skipEl) skipEl.textContent = t(guild ? 'guildGateRetry' : 'authGateSkip');
+  }
+
   function showGuildJoinGate(){
     const gate = document.getElementById('discordGate');
-    const titleEl = document.getElementById('discordGateTitle');
-    const subEl = gate ? gate.querySelector('.discord-gate-sub') : null;
     const loginBtn = document.getElementById('discordLoginBtn');
     const skipEl = document.getElementById('discordGateSkip');
     if (!gate) return;
-    if (titleEl){ titleEl.textContent = t('guildGateTitle'); titleEl.setAttribute('data-i18n', 'guildGateTitle'); }
-    if (subEl){ subEl.textContent = t('guildGateSub'); subEl.setAttribute('data-i18n', 'guildGateSub'); }
+    gate.setAttribute('data-mode', 'guild');
+    renderGateCopy();
     // Already logged in at this point -- the login button has nothing left
     // to do here, only the join link (already in the markup) is relevant.
     if (loginBtn) loginBtn.style.display = 'none';
     if (skipEl){
-      skipEl.textContent = t('guildGateRetry');
-      skipEl.setAttribute('data-i18n', 'guildGateRetry');
       skipEl.onclick = () => {
         // Re-running the full OAuth flow (rather than just re-checking the
         // existing session) is deliberate: the signed session cookie was
@@ -13170,7 +13277,7 @@
         startDiscordLogin();
       };
     }
-    gate.classList.add('is-guild', 'open');
+    gate.classList.add('open');
   }
 
   const PENDING_ORDER_KEY = 'moon_pending_order';
@@ -16776,10 +16883,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (avatarImg){ avatarImg.src = user.avatarUrl || ''; avatarImg.alt = user.username || ''; }
       if (dpAvatarImg){ dpAvatarImg.src = user.avatarUrl || ''; dpAvatarImg.alt = user.username || ''; }
       if (dpName) dpName.textContent = user.username || '';
-      const wasOnLogin = document.documentElement.classList.contains('login-first') || (gate && gate.classList.contains('open'));
-      document.documentElement.classList.remove('login-first');
-      if (gate) gate.classList.remove('open', 'is-guild');
-      if (wasOnLogin) window.scrollTo(0, 0); // cards page, from the top
+      if (gate) gate.classList.remove('open');
       syncDiscordUserWithBackend(user);
       resumePendingOrderIfAny(user);
     } else {
@@ -16789,17 +16893,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         // logged-out visitor always sees the normal login prompt here,
         // never leftover "please join" copy from an earlier session.
         const loginBtn = document.getElementById('discordLoginBtn');
-        const titleEl = document.getElementById('discordGateTitle');
-        const subEl = gate.querySelector('.discord-gate-sub');
         const skipEl = document.getElementById('discordGateSkip');
         if (loginBtn) loginBtn.style.display = '';
-        if (titleEl) titleEl.textContent = t('authGateTitle');
-        if (subEl) subEl.textContent = t('authGateSub');
-        if (skipEl) { skipEl.textContent = t('authGateSkip'); skipEl.onclick = null; }
-        if (titleEl) titleEl.setAttribute('data-i18n', 'authGateTitle');
-        if (subEl) subEl.setAttribute('data-i18n', 'authGateSub');
-        if (skipEl) skipEl.setAttribute('data-i18n', 'authGateSkip');
-        gate.classList.remove('is-guild');
+        if (skipEl) skipEl.onclick = null;
+        gate.setAttribute('data-mode', 'login');
+        renderGateCopy();
         gate.classList.add('open');
       }
     }
@@ -16885,7 +16983,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }catch(e){
       alert(t('authError'));
     }finally{
-      const lb = document.getElementById('discordLoginBtn'); if (lb) lb.classList.remove('is-loading');
       try{ sessionStorage.removeItem(DISCORD_STATE_KEY); }catch(e){}
       const url = new URL(window.location.href);
       url.searchParams.delete('code');
@@ -16914,6 +17011,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     const gateSkip = document.getElementById('discordGateSkip');
     const joinBtn = document.getElementById('discordJoinBtn');
     if (joinBtn) joinBtn.href = DISCORD_INVITE_URL;
+
+    // Gate logo re-uses the header logo image (avoids embedding the same
+    // ~84 KB base64 picture a third time).
+    const gateLogo = document.getElementById('discordGateLogo');
+    const headerLogo = document.querySelector('.brand-logo-img');
+    if (gateLogo && headerLogo && !gateLogo.getAttribute('src')) gateLogo.src = headerLogo.getAttribute('src');
 
     // The chip sits inside .topbar-actions, which carries its own
     // transform for layout purposes — and per the CSS spec, a transform
@@ -16962,9 +17065,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       await checkDiscordSession();
       refreshBtn.disabled = false;
     });
-    const leaveGate = () => { document.documentElement.classList.remove('login-first'); if (gate) gate.classList.remove('open'); window.scrollTo(0, 0); };
-    if (gateClose) gateClose.addEventListener('click', leaveGate);
-    if (gateSkip) gateSkip.addEventListener('click', leaveGate);
+    if (gateClose) gateClose.addEventListener('click', () => gate && gate.classList.remove('open'));
+    if (gateSkip) gateSkip.addEventListener('click', () => gate && gate.classList.remove('open'));
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
@@ -16975,9 +17077,17 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // follow-up cookie check can only make things worse on iOS (see
       // notes above) by overwriting a good login with a false logged-out
       // state the moment the cookie fails to come back.
-      if (loginBtn) loginBtn.classList.add('is-loading');
       finishDiscordLogin(code, state);
     } else {
+      // First-time visitor (nothing cached): show the login screen right
+      // away instead of letting the whole site flash for the duration of
+      // the /me network call. setDiscordUI() closes it again if that call
+      // turns out to find a valid session.
+      if (gate && !readCachedDiscordUser()){
+        gate.setAttribute('data-mode', 'login');
+        renderGateCopy();
+        gate.classList.add('open');
+      }
       checkDiscordSession();
     }
   }
