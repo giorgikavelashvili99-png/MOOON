@@ -3441,6 +3441,87 @@
     background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09);
   }
 
+  /* ============================================================
+     BANNED MODE — a dedicated full block-screen for a Discord
+     account an admin has blocked. Same starfield/branding, red
+     accent instead of blue, no way past it except switching account.
+     ============================================================ */
+  .discord-gate[data-mode="banned"]{
+    background:
+      radial-gradient(ellipse 85% 34% at 50% 26%, rgba(255,70,90,.16), transparent 72%),
+      radial-gradient(ellipse 110% 45% at 50% 110%, rgba(255,40,60,.06), transparent 70%),
+      #010103;
+  }
+  .discord-gate[data-mode="banned"] .dg-dot{
+    background:#ff4d5e; filter:drop-shadow(0 0 6px rgba(255,77,94,.95));
+  }
+  .discord-gate[data-mode="banned"] .discord-gate-title,
+  .discord-gate[data-mode="banned"] .discord-gate-sub,
+  .discord-gate[data-mode="banned"] .discord-btn.primary,
+  .discord-gate[data-mode="banned"] .discord-btn.outline,
+  .discord-gate[data-mode="banned"] .discord-gate-skip{ display:none; }
+
+  .dg-banned{ display:none; flex-direction:column; align-items:center; width:100%; }
+  .discord-gate[data-mode="banned"] .dg-banned{ display:flex; }
+
+  .dg-ban-icon-wrap{ display:flex; justify-content:center; margin:0 0 14px; }
+  .dg-ban-icon{
+    width:62px; height:62px; border-radius:50%; box-sizing:border-box;
+    display:flex; align-items:center; justify-content:center;
+    color:#ff5c6c; background:rgba(255,70,90,0.10); border:1px solid rgba(255,92,108,0.35);
+    filter:drop-shadow(0 0 16px rgba(255,60,80,.35));
+    animation: dgBanPulse 2.6s ease-in-out infinite;
+  }
+  @keyframes dgBanPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.07); } }
+
+  .dg-ban-badge{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:7px 16px; margin:0 0 16px; border-radius:999px;
+    font-family:'JetBrains Mono', ui-monospace, monospace; font-weight:700; font-size:11.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:#ffb3ba;
+    background:rgba(255,60,80,.12); border:1px solid rgba(255,92,108,.4);
+  }
+  .dg-ban-title{
+    margin:0 0 14px; font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif; font-weight:700;
+    font-size:clamp(19px, 5vw, 25px); line-height:1.3; color:#fff; text-wrap:balance;
+  }
+  .dg-ban-body{ margin:0 0 14px; width:100%; }
+  .dg-ban-body p{
+    margin:0 0 12px; font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
+    font-size:clamp(14px, 3.9vw, 16px); line-height:1.65; color:#c3c9e8;
+  }
+  .dg-ban-body p:last-child{ margin-bottom:0; }
+  .dg-ban-body b{ color:#ff8791; }
+  .dg-ban-footer{
+    margin:0 0 22px; padding:14px 18px; border-radius:16px; width:100%; box-sizing:border-box;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+    font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif; font-weight:600;
+    font-size:clamp(14px, 3.9vw, 16px); line-height:1.55; color:#e7eaff; text-align:center;
+  }
+  .dg-ban-footer b{ color:#fff; }
+  .dg-ban-switch{
+    appearance:none; -webkit-appearance:none; background:none; border:none; padding:8px 12px;
+    font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif; font-size:13px; color:#5f6a94;
+    cursor:pointer; border-bottom:1px dashed transparent; transition:color .15s ease;
+  }
+  .dg-ban-switch:hover{ color:#a9b4de; }
+
+  .discord-gate.open[data-mode="banned"] .dg-ban-icon-wrap{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) both; }
+  .discord-gate.open[data-mode="banned"] .dg-ban-badge{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) .08s both; }
+  .discord-gate.open[data-mode="banned"] .dg-ban-title{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) .16s both; }
+  .discord-gate.open[data-mode="banned"] .dg-ban-body{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) .24s both; }
+  .discord-gate.open[data-mode="banned"] .dg-ban-footer{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) .32s both; }
+  .discord-gate.open[data-mode="banned"] .dg-ban-switch{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) .4s both; }
+  @media (prefers-reduced-motion: reduce){
+    .dg-ban-icon{ animation:none !important; }
+    .discord-gate.open[data-mode="banned"] .dg-ban-icon-wrap,
+    .discord-gate.open[data-mode="banned"] .dg-ban-badge,
+    .discord-gate.open[data-mode="banned"] .dg-ban-title,
+    .discord-gate.open[data-mode="banned"] .dg-ban-body,
+    .discord-gate.open[data-mode="banned"] .dg-ban-footer,
+    .discord-gate.open[data-mode="banned"] .dg-ban-switch{ animation:none !important; opacity:1; transform:none; }
+  }
+
   /* Desktop / tablet: a bit wider column, sizes driven by height so the
      whole screen fits without scrolling on ordinary laptop screens. */
   @media (min-width:700px){
@@ -3449,6 +3530,8 @@
     .discord-gate-title{ font-size:clamp(20px, 3.1vh, 26px); }
     .discord-gate-sub{ font-size:clamp(14px, 2.2vh, 18px); }
     .discord-btn{ max-width:440px; }
+    .dg-ban-title{ font-size:clamp(20px, 3.1vh, 26px); }
+    .dg-ban-body p, .dg-ban-footer{ font-size:clamp(14px, 2.2vh, 17px); }
   }
   @media (max-width:360px){
     .dg-top{ gap:10px; }
@@ -6528,6 +6611,18 @@
     </a>
     <button type="button" class="discord-gate-skip" id="discordGateSkip">გაგრძელება სტუმრად</button>
     <button type="button" class="discord-gate-close" id="discordGateClose" data-i18n="authGateClose">დახურვა</button>
+
+    <div class="dg-banned" id="dgBanned">
+      <div class="dg-ban-icon-wrap"><div class="dg-ban-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9.3"/><line x1="5.7" y1="5.7" x2="18.3" y2="18.3"/></svg></div></div>
+      <div class="dg-ban-badge" data-i18n="banBadge">100 წლიანი აკრძალვა</div>
+      <h1 class="dg-ban-title" data-i18n="banGreeting">ძვირფასო ყოფილო მომხმარებელო</h1>
+      <div class="dg-ban-body">
+        <p data-i18n="banBody1">თქვენ დაგედოთ <b>100 წლიანი ბანი</b>❗ რადგან სისტემამ დააფიქსირა, რომ იყენებთ არალეგალურ მეთოდს TikTok ვიდეოების ასატვირთად. ყველა იმ უცხოურ მეთოდს, რასაც იყენებთ, სამომავლოდ თითქმის 100%-იანი შანსი აქვს, რომ თქვენი TikTok ვიდეოები დაიბლოკოს და აღარავისთვის იყოს ხილვადი.</p>
+        <p data-i18n="banBody2">მხოლოდ თქვენ შეძლებთ იმ ვიდეოების ყურებას — ისიც ჭედვა-ჭედვით.</p>
+      </div>
+      <div class="dg-ban-footer" data-i18n="banFooter">ასე რომ <b>MOONFULL4K</b>-ის ვებსაიტის გამოყენებას სულ რაღაც <b>100 წლის</b> შემდეგ შეძლებთ.</div>
+      <button type="button" class="dg-ban-switch" id="dgBanSwitch" data-i18n="banSwitch">სხვა ანგარიშით შესვლა</button>
+    </div>
   </div>
 </div>
 
@@ -8484,6 +8579,12 @@
       authGateTitle: 'შენ იმსახურებ საუკეთესო ხარისხს.',
       authGateSub: '<span class="dg-spec"><b>1080p / 4K • 60FPS</b></span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span>',
       authGateClose: 'დახურვა',
+      banBadge: '100 წლიანი აკრძალვა',
+      banGreeting: 'ძვირფასო ყოფილო მომხმარებელო',
+      banBody1: 'თქვენ დაგედოთ <b>100 წლიანი ბანი</b>❗ რადგან სისტემამ დააფიქსირა, რომ იყენებთ არალეგალურ მეთოდს TikTok ვიდეოების ასატვირთად. ყველა იმ უცხოურ მეთოდს, რასაც იყენებთ, სამომავლოდ თითქმის 100%-იანი შანსი აქვს, რომ თქვენი TikTok ვიდეოები დაიბლოკოს და აღარავისთვის იყოს ხილვადი.',
+      banBody2: 'მხოლოდ თქვენ შეძლებთ იმ ვიდეოების ყურებას — ისიც ჭედვა-ჭედვით.',
+      banFooter: 'ასე რომ <b>MOONFULL4K</b>-ის ვებსაიტის გამოყენებას სულ რაღაც <b>100 წლის</b> შემდეგ შეძლებთ.',
+      banSwitch: 'სხვა ანგარიშით შესვლა',
       authLoginBtn: 'შესვლა Discord-ით',
       authJoinBtn: 'შემოუერთდი ჩვენს Discord სერვერს',
       authGateSkip: 'გაგრძელება სტუმრად',
@@ -8921,6 +9022,12 @@
       authGateTitle: 'You deserve the best quality.',
       authGateSub: '<span class="dg-spec"><b>1080p / 4K • 60FPS</b></span><span class="dg-cta">Log in with Discord to continue</span>',
       authGateClose: 'Close',
+      banBadge: '100-Year Ban',
+      banGreeting: 'Dear former user',
+      banBody1: 'You have been given a <b>100-year ban</b>❗ because our system detected that you are using an illegal method to upload TikTok videos. Every one of those third-party methods you use has close to a 100% chance of getting your TikTok videos blocked, invisible to everyone else.',
+      banBody2: 'Only you will still be able to watch them — and even then, buffering the whole way.',
+      banFooter: 'So you will be able to use <b>MOONFULL4K</b> again in just <b>100 years</b>.',
+      banSwitch: 'Log in with a different account',
       authLoginBtn: 'Log in with Discord',
       authJoinBtn: 'Join our Discord server',
       authGateSkip: 'Continue as guest',
@@ -13352,6 +13459,27 @@
     if (skipEl) skipEl.textContent = t(guild ? 'guildGateRetry' : 'authGateSkip');
   }
 
+  // Full block-screen for a Discord account an admin has blocked (see
+  // syncDiscordUserWithBackend() below). Deliberately does NOT call the
+  // full discordLogout() -- that would clear the Discord session cookie
+  // too, so a re-visit would show the plain login screen again instead
+  // of immediately re-showing the ban. This only clears the local
+  // "am I logged in" UI state; the explicit "log in with a different
+  // account" button inside the ban screen is the one path that does a
+  // real logout, for someone who wants to try another account.
+  function showBannedGate(){
+    const chip = document.getElementById('discordChip');
+    if (chip) chip.classList.remove('is-authed');
+    currentDiscordUser = null;
+    cacheDiscordUser(null);
+    const pop = document.getElementById('discordPopover');
+    if (pop) pop.classList.remove('open');
+    const gate = document.getElementById('discordGate');
+    if (!gate) return;
+    gate.setAttribute('data-mode', 'banned');
+    gate.classList.add('open');
+  }
+
   function showGuildJoinGate(){
     const gate = document.getElementById('discordGate');
     const loginBtn = document.getElementById('discordLoginBtn');
@@ -16895,8 +17023,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           mdbWrite('discordForceLogout', { list: remaining }).catch(() => {});
         }
         if (currentDiscordUser && String(currentDiscordUser.id) === String(user.id)){
-          alert(isBlocked ? t('authBlockedError') : t('authKickedNotice'));
-          discordLogout();
+          if (isBlocked){
+            showBannedGate();
+          } else {
+            alert(t('authKickedNotice'));
+            discordLogout();
+          }
         }
         return;
       }
@@ -17178,6 +17310,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     });
     if (gateClose) gateClose.addEventListener('click', () => gate && gate.classList.remove('open'));
     if (gateSkip) gateSkip.addEventListener('click', () => gate && gate.classList.remove('open'));
+    const banSwitchBtn = document.getElementById('dgBanSwitch');
+    if (banSwitchBtn) banSwitchBtn.addEventListener('click', () => discordLogout());
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
