@@ -6685,11 +6685,41 @@
       // exchange as early as physically possible. finishDiscordLogin()
       // further down awaits this same promise instead of starting its
       // own fetch after the rest of this ~500KB page has parsed.
+      //
+      // Also keep the (already-showing, since they just came from it)
+      // login gate up for now, rather than letting the real site show
+      // through underneath while this resolves -- otherwise a blocked
+      // account logging in sees the real site for as long as the
+      // exchange + ban check take, right after actually logging in.
+      // Once the exchange resolves, check ban status the same way as the
+      // no-code branch below and only THEN either reveal the site (not
+      // blocked) or switch straight to the ban screen (blocked) -- as
+      // early as this fetch allows, rather than waiting for the rest of
+      // this large page to finish parsing.
+      openLoginGate();
       window.__moonEarlyExchange = fetch(WORKER_URL + '/exchange', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: code, redirect_uri: REDIRECT_URI })
       }).then(function(res){ return res.ok ? res.json() : Promise.reject(new Error('exchange failed')); });
+
+      window.__moonEarlyExchange.then(function(data){
+        var user = data && data.user;
+        if (!user) return;
+        return earlyIsBlocked(user).then(function(blocked){
+          var gateEl = document.getElementById('discordGate');
+          if (blocked){
+            if (gateEl){ gateEl.setAttribute('data-mode', 'banned'); gateEl.classList.add('open'); }
+            try{ localStorage.removeItem(CACHE_KEY); }catch(e){}
+          } else if (gateEl){
+            gateEl.classList.remove('open');
+          }
+        });
+      }).catch(function(){
+        // Exchange or ban check failed -- leave the login gate up;
+        // finishDiscordLogin() further down shows the actual error
+        // (or a successful retry) once it boots.
+      });
     } else {
       var cachedRaw = null;
       try{ cachedRaw = localStorage.getItem(CACHE_KEY); }catch(e){}
