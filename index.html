@@ -13610,15 +13610,8 @@
       startDiscordLogin();
       return;
     }
-    // isMember comes from the auth worker's own guild-membership check
-    // (Discord's /users/@me/guilds, using the access token that never
-    // reaches this page) — not something set or trusted from the
-    // frontend, so this can't be bypassed by editing local state.
-    if (currentDiscordUser.isMember === false){
-      savePendingOrder(orderData, firstMessageText, idleKey);
-      showGuildJoinGate();
-      return;
-    }
+    // Guild-membership ("must join our Discord server") is no longer
+    // required to send an order -- Discord login alone is enough.
     if (btn) btn.disabled = true;
     if (textEl) textEl.textContent = t('orderProcessing') || '…';
 
@@ -17131,26 +17124,13 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // Only ever act once per page load. setDiscordUI (which calls this)
     // runs repeatedly during normal use -- on the initial session check,
     // after every background subscription refresh, etc. -- not just once
-    // right after an OAuth redirect. Without this guard, a pending order
-    // that couldn't be resumed (e.g. isMember still reads false) got
-    // re-checked, and the join-gate re-opened, on every single one of
-    // those unrelated re-checks -- which is exactly what looked like the
-    // gate reappearing "every second no matter what button I press".
+    // right after an OAuth redirect.
     if (pendingOrderResumeAttempted) return;
     pendingOrderResumeAttempted = true;
 
     let raw;
     try{ raw = sessionStorage.getItem(PENDING_ORDER_KEY); }catch(e){ return; }
     if (!raw) return;
-    if (user.isMember === false){
-      // Deliberately NOT removed here -- this needs to survive the
-      // "join the server, then retry" full-page navigation too, not just
-      // the first OAuth round trip. The one-shot guard above already
-      // stops this from re-firing repeatedly within this same page load;
-      // removal only happens once an attempt actually completes (below).
-      showGuildJoinGate();
-      return;
-    }
     try{ sessionStorage.removeItem(PENDING_ORDER_KEY); }catch(e){}
     let pending;
     try{ pending = JSON.parse(raw); }catch(e){ return; }
