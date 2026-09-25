@@ -4854,10 +4854,10 @@
     position:relative;
     min-width:0;
     max-width:100%;
-    border-radius:26px;
+    border-radius:28px;
     border:1.5px solid var(--pc-accent);
     background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
-    box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45)), inset 0 1px 0 rgba(255,255,255,0.10);
+    box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45)), 0 25px 60px -20px color-mix(in srgb, var(--pc-accent) 45%, transparent), inset 0 1px 0 rgba(255,255,255,0.10);
     padding:30px 26px 26px;
     display:flex; flex-direction:column;
     overflow:hidden;
@@ -4873,9 +4873,9 @@
        the card while its modal was open was the literal trigger. Once a
        card is open, it must never transform again, full stop. */
     .pc-card:not(.pc-open):hover{
-      transform:translateY(-4px);
-      border-color: color-mix(in srgb, var(--pc-accent) 65%, var(--pc-border, var(--border)));
-      box-shadow: 0 26px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.14);
+      transform:translateY(-8px) scale(1.015);
+      border-color: color-mix(in srgb, var(--pc-accent) 75%, var(--pc-border, var(--border)));
+      box-shadow: 0 20px 45px -8px color-mix(in srgb, var(--pc-accent) 55%, transparent), 0 30px 65px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.18);
     }
   }
   .pc-card::before{
@@ -4885,15 +4885,18 @@
     opacity:0.9;
   }
 
-  /* ---------- Individual / single order — green, sampled directly from
-     the reference photo, same treatment as monthly's gold. ---------- */
+  /* ---------- Individual / single order — green. Was a single flat
+     solid color (#14D011) with none of the light/dark variation every
+     other package's foil gradient has, so the whole card rendered as one
+     harsh, uniformly saturated block instead of a foil — now a real
+     multi-stop gradient, same treatment as the rest. ---------- */
   .pc-card--indiv, #orderFlowPanel{
     --pc-accent: #14D011;
-    --pc-green-shine: #14D011;
+    --pc-green-shine: linear-gradient(90deg, #063D06 0%, #0A6B09 10%, #0D960B 20%, #14D011 30%, #4CFF48 40%, #8CFFA0 50%, #4CFF48 60%, #14D011 70%, #0D960B 80%, #0A6B09 90%, #063D06 100%);
     --pc-bg: radial-gradient(ellipse 120% 60% at 15% 0%, rgba(255,255,255,0.22), transparent 55%), linear-gradient(180deg, rgba(3,10,3,0.4), rgba(3,10,3,0.6)), var(--pc-green-shine);
     --pc-border: rgba(20, 208, 17, 0.5);
     --pc-icon-bg: var(--pc-green-shine);
-    --pc-price-grad: linear-gradient(180deg, #15CE10, #048403);
+    --pc-price-grad: linear-gradient(180deg, #baffb0, #15CE10 45%, #048403);
     --pc-cta-bg: var(--pc-green-shine);
     --pc-cta-text: #042b04;
   }
@@ -5963,16 +5966,23 @@
   .ttdl-icon{ border:2px solid #1ca4a2; background:#0a0f16; }
 
   .pc-badge{
-    position:absolute; top:-12px; right:16px; z-index:6;
-    display:inline-flex; align-items:center; gap:4px;
-    padding:6px 13px 6px 11px; border-radius:100px;
+    position:absolute; top:-14px; right:16px; z-index:6;
+    display:inline-flex; align-items:center; gap:5px;
+    padding:8px 16px 8px 13px; border-radius:100px;
     background: linear-gradient(135deg, #ffffff, #eef3ff);
     color:#0b0f1c; font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
-    font-size:9.5px; font-weight:800; letter-spacing:normal; text-transform:uppercase;
+    font-size:10.5px; font-weight:800; letter-spacing:normal; text-transform:uppercase;
     white-space:nowrap;
     border:1px solid rgba(255,255,255,0.9);
     box-shadow:0 8px 18px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3);
+    animation: pcBadgePulse 2.4s ease-in-out infinite;
   }
+  @keyframes pcBadgePulse{
+    0%, 100%{ box-shadow:0 8px 18px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3), 0 0 0 0 rgba(255,255,255,0.5); }
+    50%{ box-shadow:0 8px 18px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3), 0 0 0 6px rgba(255,255,255,0); }
+  }
+  html.low-power .pc-badge{ animation:none !important; }
+  @media (prefers-reduced-motion: reduce){ .pc-badge{ animation:none; } }
   .pc-badge::before{
     content:'★'; font-size:9px; color:#f5a623; line-height:1;
   }
@@ -5998,17 +6008,17 @@
   }
   .pc-head-text{ min-width:0; flex:1 1 auto; }
   .pc-icon{
-    width:56px; height:56px; border-radius:50%; flex:0 0 auto;
+    width:64px; height:64px; border-radius:50%; flex:0 0 auto;
     position:relative;
     display:flex; align-items:center; justify-content:center;
-    font-size:25px; line-height:1;
+    font-size:29px; line-height:1;
     background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
     border:1.5px solid var(--pc-accent);
-    box-shadow:0 10px 22px -6px rgba(0,0,0,0.45), inset 0 -8px 12px -6px rgba(0,0,0,0.4), 0 0 0 4px rgba(255,255,255,0.05);
+    box-shadow:0 10px 22px -6px rgba(0,0,0,0.45), inset 0 -8px 12px -6px rgba(0,0,0,0.4), 0 0 0 5px rgba(255,255,255,0.06), 0 0 22px -2px var(--pc-accent);
   }
 
   .pc-title{
-    font-size:clamp(12px, 3.4vw, 13px); font-weight:800; letter-spacing:normal; text-transform:uppercase;
+    font-size:clamp(14.5px, 4vw, 16.5px); font-weight:800; letter-spacing:0.01em; text-transform:uppercase;
     color:#fff; margin-bottom:3px;
     text-shadow: 0 0 2px rgba(0,0,0,0.9), 0 2px 5px rgba(0,0,0,0.6);
     overflow-wrap:break-word; word-break:break-word;
@@ -6037,23 +6047,67 @@
     background-image:url('data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAuODAgMTAwLjAwVjg2LjIyTDIzLjEyIDg0LjkyVjg0LjQ1UTE3LjA2IDgwLjY3IDEzLjI1IDc1LjQwUTkuNDQgNzAuMTQgNy42MyA2My43MVE1LjgzIDU3LjI4IDUuODMgNTAuMjZRNS44MyAzOC4wMyAxMC45MCAyOC41M1ExNS45NyAxOS4wMyAyNS44NiAxMy41NVEzNS43NSA4LjA3IDUwLjEzIDguMDdRNjUuMDcgOC4wNyA3NC44MiAxMy44OVE4NC41NiAxOS43MSA4OS4zNiAzMC4xNlE5NC4xNyA0MC42MCA5NC4xNyA1NC41N0g3NC4wOVE3NC4wOSA0My45OCA3MS43OSAzNi44NlE2OS40OSAyOS43MyA2NC4yNCAyNi4xNFE1OC45OSAyMi41NSA1MC4xMyAyMi41NVE0MS4zOCAyMi41NSAzNi4wNiAyNS45OFEzMC43NCAyOS40MiAyOC4zMyAzNS45N1EyNS45MSA0Mi41MiAyNS45MSA1MS45NlEyNS45MSA2MS44NCAyOS4zNyA2OS4wMlEzMi44MyA3Ni4yMSAzOS4wMiA4MC4wOFE0NS4yMSA4My45NSA1My4zOSA4My45NUg4OC42NFYxMDAuMDBaTTM2LjczIDU0LjUyVjAuMDBINDYuNDdWNTQuNTJaTTUzLjYzIDU0LjUyVjAuMDBINjMuMzdWNTQuNTJaIiBmaWxsPSIjZmZmZmZmIi8+PC9zdmc+');
     background-size:contain; background-repeat:no-repeat; background-position:center;
   }
+  /* .price sup (the coin-medallion badge) and .scan-result's tile-accent
+     sup both deliberately give the ₾ character its own real, visible
+     color instead of the plain white icon above -- but that global
+     ::after was still stamping the flat white icon graphic on top of
+     BOTH of them regardless, so the coin's embossed dark mark and the
+     tile-colored mark were each fighting with an unrelated white icon
+     sitting right over them: sometimes the white icon dominated,
+     sometimes the real colored glyph showed through around its edges,
+     depending on exact sizing -- that inconsistent, overlapping look was
+     the "sometimes white, sometimes green, stuck together" bug. Turning
+     the icon off in just these two spots lets each one's own intended
+     colored mark render cleanly by itself. */
+  .price sup::after,
+  .scan-result .sr-price-value sup::after{ content:none; }
 
   .pc-price-line{
     font-family:'BPGAcademiuriU', sans-serif;
-    display:inline-flex; align-items:baseline; gap:8px; flex-wrap:wrap;
-    margin:0 0 10px;
+    display:inline-flex; align-items:baseline; gap:9px; flex-wrap:wrap;
+    margin:4px 0 10px;
     width:fit-content; max-width:100%;
-    padding:8px 16px; border-radius:16px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.18));
-    border:1.5px solid var(--pc-accent);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 4px 12px rgba(0,0,0,0.3);
   }
   .pc-price-line b{
-    font-size:clamp(21px, 6vw, 26px); font-weight:800;
-    text-shadow:0 0 4px rgba(0,0,0,0.9), 0 2px 6px rgba(0,0,0,0.65);
+    font-size:clamp(36px, 10.5vw, 50px); font-weight:900; letter-spacing:-0.01em;
     color:#fff;
+    /* A same-hue gradient fill (the accent color, clipped to the text)
+       used to sit here -- on a card whose whole background is already
+       that same accent color, colored text on a colored background is
+       exactly the low-contrast combination to avoid, so the number never
+       actually stood out. A plain white fill plus a glow IN the accent
+       color pops on every variant regardless of how light or dark that
+       card's own accent is, and still visibly "belongs" to that card. */
+    text-shadow:
+      0 0 10px rgba(255,255,255,0.55),
+      0 0 24px var(--pc-accent),
+      0 0 48px color-mix(in srgb, var(--pc-accent) 80%, transparent),
+      0 3px 8px rgba(0,0,0,0.6);
+    animation: pcPriceGlow 2.8s ease-in-out infinite;
   }
-  .pc-price-line .pc-price-sep{ color:#fff; opacity:0.85; font-size:clamp(13px, 3.6vw, 16px); text-shadow:0 0 3px rgba(0,0,0,0.8); }
+  @keyframes pcPriceGlow{
+    0%, 100%{
+      text-shadow:
+        0 0 10px rgba(255,255,255,0.55),
+        0 0 24px var(--pc-accent),
+        0 0 48px color-mix(in srgb, var(--pc-accent) 80%, transparent),
+        0 3px 8px rgba(0,0,0,0.6);
+    }
+    50%{
+      text-shadow:
+        0 0 14px rgba(255,255,255,0.75),
+        0 0 32px var(--pc-accent),
+        0 0 62px color-mix(in srgb, var(--pc-accent) 90%, transparent),
+        0 3px 8px rgba(0,0,0,0.6);
+    }
+  }
+  html.low-power .pc-price-line b{ animation:none !important; }
+  @media (prefers-reduced-motion: reduce){ .pc-price-line b{ animation:none; } }
+  .pc-price-line .pc-price-sep{
+    color:#fff; opacity:0.75; font-size:clamp(11px, 3vw, 12.5px); font-weight:700;
+    text-transform:uppercase; letter-spacing:0.03em;
+    text-shadow:0 0 3px rgba(0,0,0,0.8);
+  }
   /* Two-price display (weekly/monthly: "24.99₾ / 35.99₾") — always one
      line. Deliberately NOT vw-scaled like the rest: vw only knows the
      screen is wide, not that this card's own column is narrow, which is
@@ -6061,10 +6115,10 @@
      wide multi-column desktop layouts. Fixed sizes here are what
      actually guarantee it fits the column it's really in. */
   .pc-price-line--dual{ flex-wrap:nowrap; white-space:nowrap; }
-  .pc-price-line--dual b{ font-size:19px; }
+  .pc-price-line--dual b{ font-size:23px; }
   .pc-price-line--dual .pc-price-sep{ font-size:13px; }
   @media (max-width:480px){
-    .pc-price-line--dual b{ font-size:15px; }
+    .pc-price-line--dual b{ font-size:18px; }
     .pc-price-line--dual .pc-price-sep{ font-size:11px; }
   }
   .pc-price-note{
@@ -6117,8 +6171,8 @@
   }
   .pc-feature span:last-child{ overflow-wrap:break-word; word-break:break-word; min-width:0; }
   .pc-feature .pc-check{
-    flex:0 0 auto; width:20px; height:20px; border-radius:50%; margin-top:1px;
-    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;
+    flex:0 0 auto; width:23px; height:23px; border-radius:50%; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
     background: linear-gradient(150deg, #22c55e, #15803d);
     color:#052e12;
     border:none;
@@ -6135,9 +6189,9 @@
   .pc-toggle-btn{
     appearance:none; border:none; cursor:pointer; width:100%;
     display:flex; align-items:center; justify-content:center; gap:8px;
-    padding:17px 10px; border-radius:16px;
+    padding:18px 10px; border-radius:999px;
     font-family:'BPGAcademiuriU', 'Space Grotesk', sans-serif;
-    font-size:clamp(11.5px, 3.6vw, 14.5px); font-weight:800; letter-spacing:0.02em; text-transform:uppercase;
+    font-size:clamp(12px, 3.8vw, 15px); font-weight:800; letter-spacing:0.02em; text-transform:uppercase;
     color: var(--pc-cta-text, #04101a);
     white-space:nowrap;
     /* A small top-left gloss highlight, not a wash over the whole button —
@@ -6150,7 +6204,14 @@
     border: 1.5px solid var(--pc-accent);
     box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.25);
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease, gap .2s ease;
+    animation: pcCtaPulse 2.6s ease-in-out infinite;
   }
+  @keyframes pcCtaPulse{
+    0%, 100%{ box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.25), 0 0 0 0 color-mix(in srgb, var(--pc-accent) 55%, transparent); }
+    50%{ box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.25), 0 0 16px 3px color-mix(in srgb, var(--pc-accent) 55%, transparent); }
+  }
+  html.low-power .pc-toggle-btn{ animation:none !important; }
+  @media (prefers-reduced-motion: reduce){ .pc-toggle-btn{ animation:none; } }
   @media (hover:hover) and (pointer:fine){
     .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px rgba(0,0,0,0.55); }
   }
@@ -6388,10 +6449,13 @@
        far larger than designed and wrapped onto a 3rd line instead of
        staying on its intended 2. */
     /* Numbers / prices — slightly larger since these are the most
-       important thing on a pricing card */
+       important thing on a pricing card. .pc-price-line b is
+       deliberately NOT included here anymore — it now has its own much
+       larger, intentional "hero price" clamp() sizing (see .pc-price-line
+       b above), and this 18px !important override was completely
+       canceling that out on every desktop width ≥901px. */
     .wp-box-q:not(.pc-modal-scrim *), .mp-box-q:not(.pc-modal-scrim *), .quality-btn .q-res:not(.pc-modal-scrim *),
-    .wp-box-price:not(.pc-modal-scrim *), .mp-box-price:not(.pc-modal-scrim *),
-    .pc-price-line b:not(.pc-modal-scrim *){
+    .wp-box-price:not(.pc-modal-scrim *), .mp-box-price:not(.pc-modal-scrim *){
       font-size:18px !important;
     }
     /* FPS pills and other tight badges: bump text to 16px AND enlarge
