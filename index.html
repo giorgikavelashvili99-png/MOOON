@@ -4857,7 +4857,13 @@
     border-radius:28px;
     border:1.5px solid var(--pc-accent);
     background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
-    box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45)), 0 25px 60px -20px color-mix(in srgb, var(--pc-accent) 45%, transparent), inset 0 1px 0 rgba(255,255,255,0.10);
+    /* A third box-shadow layer (a large-blur color-mix() ambient glow)
+       used to sit here permanently on every one of the 7 cards. A big
+       blur radius is expensive to paint even when nothing is animating,
+       and with 7 of them on screen the browser has to redo that work on
+       every scroll-triggered repaint — that compounding cost is what was
+       behind the low-FPS feeling. Two layers, no color-mix, is plenty. */
+    box-shadow: var(--pc-shadow, 0 20px 50px rgba(0,0,0,0.45)), inset 0 1px 0 rgba(255,255,255,0.10);
     padding:30px 26px 26px;
     display:flex; flex-direction:column;
     overflow:hidden;
@@ -4871,7 +4877,10 @@
        still transforming under the cursor, the fixed modal would fight
        with the hover state for its own position every frame — hovering
        the card while its modal was open was the literal trigger. Once a
-       card is open, it must never transform again, full stop. */
+       card is open, it must never transform again, full stop. This hover
+       glow only costs anything while a mouse is actually over one card
+       at a time (never on touch devices at all), so it can stay richer
+       than the resting state above. */
     .pc-card:not(.pc-open):hover{
       transform:translateY(-8px) scale(1.015);
       border-color: color-mix(in srgb, var(--pc-accent) 75%, var(--pc-border, var(--border)));
@@ -5974,15 +5983,14 @@
     font-size:10.5px; font-weight:800; letter-spacing:normal; text-transform:uppercase;
     white-space:nowrap;
     border:1px solid rgba(255,255,255,0.9);
-    box-shadow:0 8px 18px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3);
-    animation: pcBadgePulse 2.4s ease-in-out infinite;
+    /* A pulsing box-shadow animation used to run here -- animating
+       box-shadow forces a full repaint of the badge on every single
+       frame, and doing that continuously while the page is also being
+       scrolled (its own repaint/compositing work) is exactly what was
+       causing the bad flicker while scrolling. A static shadow looks
+       fine and costs nothing. */
+    box-shadow:0 8px 18px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,255,255,0.15);
   }
-  @keyframes pcBadgePulse{
-    0%, 100%{ box-shadow:0 8px 18px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3), 0 0 0 0 rgba(255,255,255,0.5); }
-    50%{ box-shadow:0 8px 18px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3), 0 0 0 6px rgba(255,255,255,0); }
-  }
-  html.low-power .pc-badge{ animation:none !important; }
-  @media (prefers-reduced-motion: reduce){ .pc-badge{ animation:none; } }
   .pc-badge::before{
     content:'★'; font-size:9px; color:#f5a623; line-height:1;
   }
@@ -6014,7 +6022,7 @@
     font-size:29px; line-height:1;
     background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
     border:1.5px solid var(--pc-accent);
-    box-shadow:0 10px 22px -6px rgba(0,0,0,0.45), inset 0 -8px 12px -6px rgba(0,0,0,0.4), 0 0 0 5px rgba(255,255,255,0.06), 0 0 22px -2px var(--pc-accent);
+    box-shadow:0 10px 22px -6px rgba(0,0,0,0.45), inset 0 -8px 12px -6px rgba(0,0,0,0.4), 0 0 0 5px rgba(255,255,255,0.06);
   }
 
   .pc-title{
@@ -6077,32 +6085,16 @@
        exactly the low-contrast combination to avoid, so the number never
        actually stood out. A plain white fill plus a glow IN the accent
        color pops on every variant regardless of how light or dark that
-       card's own accent is, and still visibly "belongs" to that card. */
-    text-shadow:
-      0 0 10px rgba(255,255,255,0.55),
-      0 0 24px var(--pc-accent),
-      0 0 48px color-mix(in srgb, var(--pc-accent) 80%, transparent),
-      0 3px 8px rgba(0,0,0,0.6);
-    animation: pcPriceGlow 2.8s ease-in-out infinite;
+       card's own accent is, and still visibly "belongs" to that card.
+       This used to be 4 shadow layers (two with a 28-55px blur, one
+       using color-mix()) and briefly an infinite pulse animation on top
+       of that -- text-shadow is more expensive to paint than box-shadow
+       to begin with, and stacking that much of it across 7 large price
+       numbers, all repainted on every scroll frame, is exactly what was
+       behind the low-FPS feeling on the page as a whole. Two small,
+       cheap layers still read as "glowing" without the cost. */
+    text-shadow: 0 0 8px var(--pc-accent), 0 2px 6px rgba(0,0,0,0.55);
   }
-  @keyframes pcPriceGlow{
-    0%, 100%{
-      text-shadow:
-        0 0 10px rgba(255,255,255,0.55),
-        0 0 24px var(--pc-accent),
-        0 0 48px color-mix(in srgb, var(--pc-accent) 80%, transparent),
-        0 3px 8px rgba(0,0,0,0.6);
-    }
-    50%{
-      text-shadow:
-        0 0 14px rgba(255,255,255,0.75),
-        0 0 32px var(--pc-accent),
-        0 0 62px color-mix(in srgb, var(--pc-accent) 90%, transparent),
-        0 3px 8px rgba(0,0,0,0.6);
-    }
-  }
-  html.low-power .pc-price-line b{ animation:none !important; }
-  @media (prefers-reduced-motion: reduce){ .pc-price-line b{ animation:none; } }
   .pc-price-line .pc-price-sep{
     color:#fff; opacity:0.75; font-size:clamp(11px, 3vw, 12.5px); font-weight:700;
     text-transform:uppercase; letter-spacing:0.03em;
@@ -6204,14 +6196,7 @@
     border: 1.5px solid var(--pc-accent);
     box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.25);
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease, gap .2s ease;
-    animation: pcCtaPulse 2.6s ease-in-out infinite;
   }
-  @keyframes pcCtaPulse{
-    0%, 100%{ box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.25), 0 0 0 0 color-mix(in srgb, var(--pc-accent) 55%, transparent); }
-    50%{ box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.25), 0 0 16px 3px color-mix(in srgb, var(--pc-accent) 55%, transparent); }
-  }
-  html.low-power .pc-toggle-btn{ animation:none !important; }
-  @media (prefers-reduced-motion: reduce){ .pc-toggle-btn{ animation:none; } }
   @media (hover:hover) and (pointer:fine){
     .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px rgba(0,0,0,0.55); }
   }
