@@ -4867,26 +4867,11 @@
     padding:30px 26px 26px;
     display:flex; flex-direction:column;
     overflow:hidden;
-    transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s ease, border-color .25s ease;
   }
-  @media (hover:hover) and (pointer:fine){
-    /* Scoped to :not(.pc-open) — a `transform` here is what actually
-       causes the flicker bug: CSS makes a transformed ancestor the new
-       positioning context for any `position:fixed` descendant, and the
-       accordion body becomes exactly that once opened. With the card
-       still transforming under the cursor, the fixed modal would fight
-       with the hover state for its own position every frame — hovering
-       the card while its modal was open was the literal trigger. Once a
-       card is open, it must never transform again, full stop. This hover
-       glow only costs anything while a mouse is actually over one card
-       at a time (never on touch devices at all), so it can stay richer
-       than the resting state above. */
-    .pc-card:not(.pc-open):hover{
-      transform:translateY(-8px) scale(1.015);
-      border-color: color-mix(in srgb, var(--pc-accent) 75%, var(--pc-border, var(--border)));
-      box-shadow: 0 20px 45px -8px color-mix(in srgb, var(--pc-accent) 55%, transparent), 0 30px 65px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.18);
-    }
-  }
+  /* A hover effect (lift + scale + glow) used to live here. Changing
+     transform, box-shadow and border-color together on hover was
+     causing a visible flicker on mouseover, so the whole thing is gone
+     now — the card simply doesn't change on hover at all. */
   .pc-card::before{
     content:''; position:absolute; top:0; left:0; right:0; height:3px;
     background:linear-gradient(90deg, transparent, var(--pc-accent), transparent);
@@ -6197,9 +6182,9 @@
     box-shadow: var(--pc-cta-shadow, 0 10px 26px -8px rgba(0,0,0,0.5)), inset 0 1px 0 rgba(255,255,255,0.25);
     transition:transform .15s ease, box-shadow .2s ease, background .2s ease, gap .2s ease;
   }
-  @media (hover:hover) and (pointer:fine){
-    .pc-toggle-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px rgba(0,0,0,0.55); }
-  }
+  /* A hover lift (translateY + shadow) used to live here too, same as
+     the card -- removed for the same reason: it's the kind of thing
+     that was causing the flicker on mouseover. */
   .pc-toggle-btn:active{ transform:scale(0.98); box-shadow:0 6px 16px -8px rgba(0,0,0,0.5); transition:transform .1s ease, box-shadow .1s ease; }
 
   /* Opens directly on top of the page — the exact same mechanism as the
