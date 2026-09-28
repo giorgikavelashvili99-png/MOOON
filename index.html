@@ -3313,7 +3313,7 @@
      opacity/transform animations, so leaving them on for that case is
      fine. */
   @media (prefers-reduced-motion: reduce){
-    .dg-stars, .dg-stars-b, .dg-logo, .dg-dot, .discord-btn.primary::after{ animation:none !important; }
+    .dg-stars, .dg-stars-b, .dg-logo, .dg-dot, .dg-logo-wrap::before, .discord-btn.primary::after{ animation:none !important; }
     .discord-gate.open .dg-top, .discord-gate.open .dg-logo-wrap, .discord-gate.open .discord-gate-title,
     .discord-gate.open .discord-gate-sub, .discord-gate.open .discord-btn.primary,
     .discord-gate.open .discord-btn.outline, .discord-gate.open .discord-gate-skip{
@@ -3332,7 +3332,8 @@
   .dg-pill{
     display:inline-flex; align-items:center; gap:12px; min-width:0;
     padding:11px 20px; border-radius:999px;
-    background:rgba(255,255,255,0.055); border:1px solid rgba(255,255,255,0.06);
+    background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+    border:1px solid rgba(120,138,255,0.22);
     font-family:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-weight:700; font-size:13px; letter-spacing:.2em; line-height:1;
     color:#c9d1f5; white-space:nowrap;
@@ -3358,7 +3359,22 @@
     padding:clamp(6px, 2vh, 28px) 22px calc(22px + env(safe-area-inset-bottom, 0px));
     text-align:center;
   }
-  .dg-logo-wrap{ display:block; margin:0 0 clamp(10px, 3vh, 34px); }
+  .dg-logo-wrap{
+    position:relative; display:block; margin:0 0 clamp(10px, 3vh, 34px);
+  }
+  /* Soft ambient halo behind the logo -- pure background blur (never
+     box-shadow, so it survives the site-wide shadow reset), gives the
+     otherwise flat black gate a single soft focal point instead of the
+     logo just floating on plain black. */
+  .dg-logo-wrap::before{
+    content:''; position:absolute; z-index:-1;
+    left:50%; top:50%; transform:translate(-50%,-50%);
+    width:min(78vw, 420px); height:min(78vw, 420px);
+    background:radial-gradient(circle, rgba(88,101,242,0.28), rgba(88,101,242,0.08) 45%, transparent 72%);
+    filter:blur(22px);
+    animation: dgHaloPulse 6s ease-in-out infinite;
+  }
+  @keyframes dgHaloPulse{ 0%,100%{ opacity:.75; } 50%{ opacity:1; } }
   .dg-logo{
     display:block; width:min(84vw, 440px, 56vh); height:auto; margin:0;
     filter:brightness(1.16) saturate(1.08) drop-shadow(0 6px 34px rgba(120,140,255,.16));
@@ -3378,6 +3394,21 @@
     font-size:clamp(14px, min(4.2vw, 2.5vh), 19px); line-height:1.5; color:#a9b4de;
   }
   .discord-gate-sub b{ color:#fff; font-weight:700; }
+  /* Turns the "1080p / 4K • 60FPS" line from plain bold text into a
+     small pill-shaped feature chip, matching the visual language the
+     rest of the site already uses for its own badges/tags, instead of
+     being the one plain-text line in an otherwise graphical screen. */
+  .discord-gate-sub .dg-spec b{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:7px 16px; border-radius:999px;
+    background:linear-gradient(180deg, rgba(88,101,242,0.22), rgba(88,101,242,0.08));
+    border:1px solid rgba(120,138,255,0.35);
+    color:#eef1ff; font-weight:700; letter-spacing:.02em;
+  }
+  .discord-gate-sub .dg-spec b::before{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:#7dd3ff; filter:drop-shadow(0 0 5px rgba(125,211,255,.9));
+  }
   .discord-gate-sub .dg-spec,
   .discord-gate-sub .dg-note,
   .discord-gate-sub .dg-cta{ display:block; text-wrap:balance; }
@@ -6537,6 +6568,65 @@
   @media (min-width:901px){
     .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1.2; }
     .pc-modal-scrim .pc-modal-scroll{ max-height:calc(90vh / 1.5); }
+  }
+
+  /* ============================================================
+     Global refinement layer
+     Works WITH the existing flat/no-shadow system above (the
+     `*:not(.ttdl-stat-ico){box-shadow:none !important}` reset near
+     the top of this stylesheet stays authoritative) rather than
+     against it — every touch here reads through color, border,
+     opacity and transform, never shadow, so it can't fight that
+     earlier decision.
+     ============================================================ */
+  :root{
+    --ease-smooth: cubic-bezier(.22,1,.36,1);
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    html{ scroll-behavior:smooth; }
+  }
+
+  ::selection{
+    background: color-mix(in srgb, var(--purple) 55%, transparent);
+    color:#fff;
+  }
+
+  /* Unifies the hover/active timing curve across the site's main
+     clickable surfaces. Colors, sizes and each component's own
+     hover rules are left exactly as they are — this only swaps the
+     easing function so motion feels consistent from panel to
+     panel instead of a mix of default linear/ease curves. */
+  .order-btn, .discord-btn, .contact-btn, .quality-btn,
+  .portfolio-card, .moon-glow-card, .qn-tab, .hero-cta-btn,
+  .pc-nav, .tutorial-link, .scanner-jump-link, .drop-zone{
+    transition-timing-function: var(--ease-smooth);
+  }
+
+  /* moon-glow-card variants other than .portfolio-card (which
+     already has its own full hover treatment earlier in this file)
+     had no hover feedback at all — a subtle border brighten fixes
+     that without touching layout or introducing shadow. */
+  .moon-glow-card:not(.portfolio-card):hover,
+  .moon-glow-card:not(.portfolio-card):focus-within{
+    border-color: color-mix(in srgb, var(--border) 55%, #ffffff 22%);
+  }
+
+  /* Safety net below the site's existing 360/380px breakpoints, for
+     the narrowest real devices still in use (iPhone SE-class,
+     ~320-340px), so nothing edge-to-edge crowds on them. */
+  @media (max-width:340px){
+    .wrap{ padding-left:14px; padding-right:14px; }
+    .hero-cta-btn{ padding-left:26px; padding-right:26px; }
+  }
+
+  /* Ultra-wide monitors: the 1100px .wrap already centers content
+     correctly, so nothing needs to stretch — just keeps the fixed
+     background orbs from reading as two sparse dots on a huge
+     canvas instead of an ambient glow. */
+  @media (min-width:1800px){
+    .orb.o1{ width:520px; height:520px; }
+    .orb.o2{ width:460px; height:460px; }
   }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -16952,9 +17042,17 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   // ============================================================
   // 11) 3D TILT / DEPTH-HOVER FOR CARDS (desktop, mouse-tracking)
   // ============================================================
-  const TILT_SELECTOR = '.trust-item, .portfolio-card, .howto-step, .quality-btn, .wp-box, .mp-box, .contact-btn, .order-btn, .c-item, .c-reply-item';
-  const TILT_MAX_DEG = 7;
-  const TILT_LIFT_PX = 6;
+  // Buttons and small selectable chips (.quality-btn, .wp-box, .mp-box,
+  // .contact-btn, .order-btn) used to be in this list too. On something
+  // that small, a cursor-tracked rotateX/rotateY makes the label text
+  // visibly rise/shift as the pointer approaches from different sides
+  // (worst right where people aim before clicking) instead of reading
+  // as depth -- it just looks unstable. Tilt now only runs on the large
+  // showcase-style cards it actually suits; buttons/chips keep their
+  // own plain CSS :hover (translateY only, no rotation).
+  const TILT_SELECTOR = '.trust-item, .portfolio-card, .howto-step, .c-item, .c-reply-item';
+  const TILT_MAX_DEG = 4;
+  const TILT_LIFT_PX = 5;
 
   function tiltCanRun(){
     return !!(window.matchMedia &&
@@ -16988,7 +17086,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const rotateX = (0.5 - y) * TILT_MAX_DEG * 2;
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {
-          el.style.transform = `perspective(700px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-${TILT_LIFT_PX}px) scale(1.015)`;
+          el.style.transform = `perspective(1100px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-${TILT_LIFT_PX}px) scale(1.015)`;
           el.style.setProperty('--tilt-x', (x * 100).toFixed(1) + '%');
           el.style.setProperty('--tilt-y', (y * 100).toFixed(1) + '%');
         });
