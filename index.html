@@ -200,7 +200,6 @@
     mask-image: linear-gradient(180deg, transparent, black 15%, black 85%, transparent);
   }
   .orb{
-    display:none;
     position:absolute; border-radius:50%;
     filter:blur(50px);
     opacity:0.32;
@@ -213,6 +212,7 @@
        stretched streak mid-animation and can leave it stuck there. */
     contain:layout paint size;
     backface-visibility:hidden;
+    pointer-events:none;
   }
   .orb.o1{ width:400px; height:400px; top:-160px; left:-120px; background:radial-gradient(circle, var(--purple), transparent 70%); animation: drift1 26s ease-in-out infinite; }
   .orb.o2{ width:360px; height:360px; bottom:-140px; right:-100px; background:radial-gradient(circle, var(--cyan), transparent 70%); animation: drift2 30s ease-in-out infinite; }
@@ -3370,7 +3370,10 @@
     content:''; position:absolute; z-index:-1;
     left:50%; top:50%; transform:translate(-50%,-50%);
     width:min(78vw, 420px); height:min(78vw, 420px);
-    background:radial-gradient(circle, rgba(88,101,242,0.28), rgba(88,101,242,0.08) 45%, transparent 72%);
+    background:
+      radial-gradient(circle at 35% 30%, rgba(139,92,246,0.24), transparent 55%),
+      radial-gradient(circle at 65% 70%, rgba(125,211,255,0.18), transparent 55%),
+      radial-gradient(circle, rgba(88,101,242,0.16), transparent 70%);
     filter:blur(22px);
     animation: dgHaloPulse 6s ease-in-out infinite;
   }
@@ -3431,23 +3434,32 @@
     position:relative; overflow:hidden; color:#fff;
     background:
       linear-gradient(180deg, rgba(255,255,255,.28) 0, rgba(255,255,255,0) 1.5px),
-      linear-gradient(180deg, #7383ff 0%, #5865F2 100%);
+      linear-gradient(120deg, #5865F2 0%, #8B5CF6 45%, #C084FC 75%, #7dd3ff 100%);
     /* drop-shadow (not box-shadow): the site-wide reset would remove that */
-    filter:drop-shadow(0 10px 22px rgba(88,101,242,.42));
+    filter:drop-shadow(0 10px 26px rgba(139,92,246,.38));
   }
   .discord-btn.primary::after{
     content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.35) 50%, transparent 60%);
+    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.4) 50%, transparent 60%);
     background-size:220% 100%; background-position:140% 0;
     animation: dgSheen 3.6s ease-in-out infinite;
   }
   @keyframes dgSheen{ 0%,55%{ background-position:140% 0; } 100%{ background-position:-40% 0; } }
   .discord-btn.primary svg{ fill:#fff; }
   .discord-btn.outline{
-    margin-top:14px; color:#eef1ff;
-    background:rgba(255,255,255,0.055); border:1px solid rgba(255,255,255,0.07);
+    margin-top:14px; color:#eef1ff; position:relative;
+    background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border:1px solid transparent;
+    background-clip:padding-box;
   }
-  .discord-btn.outline:hover{ border-color:rgba(88,101,242,0.6); color:#fff; }
+  .discord-btn.outline::before{
+    content:''; position:absolute; inset:0; z-index:-1; border-radius:inherit; padding:1px;
+    background:linear-gradient(120deg, rgba(125,211,255,.5), rgba(167,139,250,.5), rgba(192,132,252,.35));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+  }
+  .discord-btn.outline:hover{ color:#fff; }
+  .discord-btn.outline:hover::before{ padding:1.5px; }
   .discord-btn.outline svg{ fill:currentColor; }
 
   .discord-gate-skip,
@@ -4686,9 +4698,21 @@
     .pc-guide-row{ display:none; }
   }
   .pc-heading{
+    position:relative;
     margin:0 0 4px; font-size:clamp(20px, 5.5vw, 30px); font-weight:800; letter-spacing:normal;
-    color:#fff; text-shadow:none;
+    background:linear-gradient(180deg, #ffffff, #c7cff5);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:none;
     overflow-wrap:break-word;
+  }
+  /* Small centred accent rule under the heading -- the section used to
+     jump straight from plain white text into the cards' bright foil
+     colors with nothing in between; this gives that transition a single
+     quiet focal point instead. */
+  .pc-heading::after{
+    content:''; display:block; margin:10px auto 0;
+    width:46px; height:3px; border-radius:2px;
+    background:linear-gradient(90deg, transparent, #7dd3ff, #a78bfa, transparent);
   }
   .pc-subheading{
     margin:0 auto; max-width:520px; font-size:clamp(12px, 3.4vw, 13.5px); line-height:1.6; color:var(--text-dim);
@@ -4806,10 +4830,18 @@
     flex:0 0 auto; width:min(296px, 86vw);
     scroll-snap-align:center; scroll-snap-stop:always;
     display:flex; cursor:pointer;
-    opacity:.5; transform:scale(.92); filter:saturate(.7);
-    transition:opacity .35s ease, transform .35s ease, filter .35s ease;
+    /* This used to also carry transform:scale(.92)/scale(1) between
+       inactive/active, scaling around the card's center. Growing a card
+       from 92% to 100% on becoming active pushes everything inside it
+       outward from that center as it grows -- the price and title (both
+       near the top) visibly rise each time you swipe to a new card. The
+       dim + desaturate alone already reads clearly as "not the focused
+       card", so the scale (and the text motion it caused) is dropped;
+       text now stays put and only fades/brightens between cards. */
+    opacity:.5; filter:saturate(.7);
+    transition:opacity .35s ease, filter .35s ease;
   }
-  .pricing-cards.pc-scroll-mode .pc-slide--active{ opacity:1; transform:scale(1); filter:none; cursor:default; }
+  .pricing-cards.pc-scroll-mode .pc-slide--active{ opacity:1; filter:none; cursor:default; }
   .pricing-cards.pc-scroll-mode .pc-slide > *{ width:100%; min-width:0; }
   /* Only the centred card runs its decorative loops. Targeted selectors
      (no universal "*") so switching cards restyles almost nothing. */
@@ -4887,7 +4919,14 @@
     max-width:100%;
     border-radius:28px;
     border:1.5px solid var(--pc-accent);
-    background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
+    /* A faint dot-grid layered under each card's own foil gradient --
+       one extra static background-image, no extra paint cost on scroll
+       (unlike a shadow layer, a plain background doesn't get repainted
+       per-frame), but it gives every card a bit of structure/texture
+       instead of a flat gradient wash. */
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.07) 1px, transparent 0) 0 0/16px 16px,
+      var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2)));
     /* A third box-shadow layer (a large-blur color-mix() ambient glow)
        used to sit here permanently on every one of the 7 cards. A big
        blur radius is expensive to paint even when nothing is animating,
@@ -5057,10 +5096,24 @@
     min-width:0;
     border-radius:18px;
     border:1px solid rgba(255,255,255,0.10);
-    background:linear-gradient(180deg, #0a1018, #05080f);
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0) 0 0/18px 18px,
+      linear-gradient(180deg, #0a1018, #05080f);
     box-shadow:0 22px 54px rgba(0,0,0,0.55);
     overflow:hidden;
     transition:border-color .25s ease, box-shadow .25s ease;
+  }
+  /* Soft ambient glow behind the whole card, in the same TikTok cyan/pink
+     the trace-line and buttons already use -- the card used to sit on
+     plain black with nothing tying it visually to its own accent
+     colors until you looked at its edges. */
+  .ttdl-shell::after{
+    content:''; position:absolute; z-index:-1; left:50%; top:-10%;
+    transform:translateX(-50%); width:130%; height:60%;
+    background:
+      radial-gradient(ellipse 45% 100% at 30% 0%, rgba(37,244,238,0.14), transparent 70%),
+      radial-gradient(ellipse 45% 100% at 70% 0%, rgba(254,44,85,0.12), transparent 70%);
+    filter:blur(20px); pointer-events:none;
   }
   @media (hover:hover) and (pointer:fine){
     .ttdl-shell:hover{
@@ -6027,15 +6080,20 @@
   .pc-badge--urgency::before{ content:none; }
   .pc-badge--urgency svg{ width:10px; height:10px; fill:#ffe27a; flex:0 0 auto; }
 
+  /* Structural: icon used to sit beside the title in one row. Stacking
+     it above instead (own line, left-aligned) plus the squircle shape
+     below gives the card a visibly different header rhythm -- same
+     icon, same title/desc text, same accent colors, just arranged
+     differently. */
   .pc-head{
-    display:flex; align-items:center; gap:16px; margin-bottom:16px;
+    display:flex; flex-direction:column; align-items:flex-start; gap:12px; margin-bottom:16px;
   }
-  .pc-head-text{ min-width:0; flex:1 1 auto; }
+  .pc-head-text{ min-width:0; flex:1 1 auto; width:100%; }
   .pc-icon{
-    width:64px; height:64px; border-radius:50%; flex:0 0 auto;
+    width:56px; height:56px; border-radius:18px; flex:0 0 auto;
     position:relative;
     display:flex; align-items:center; justify-content:center;
-    font-size:29px; line-height:1;
+    font-size:26px; line-height:1;
     background: var(--pc-icon-bg, linear-gradient(150deg, color-mix(in srgb, var(--pc-accent) 60%, transparent), color-mix(in srgb, var(--pc-accent) 15%, transparent)));
     border:1.5px solid var(--pc-accent);
     box-shadow:0 10px 22px -6px rgba(0,0,0,0.45), inset 0 -8px 12px -6px rgba(0,0,0,0.4), 0 0 0 5px rgba(255,255,255,0.06);
@@ -6171,7 +6229,18 @@
     .pc-price-note-line{ font-size:9px; }
   }
 
-  .pc-features{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; flex:1; min-width:0; }
+  /* Structural change, not a color one: the checklist used to be one
+     long single-column list (6+ rows stacked top to bottom). On any
+     card wide enough to fit two, it now lays out as a short 2-column
+     grid instead -- same items, same icons, same accent colors, just a
+     visibly different shape. auto-fit/minmax means a narrow mobile
+     card (~260-290px) still only fits one column on its own (nothing
+     forced, nothing overflows); this only kicks in where there's
+     actually room. */
+  .pc-features{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(128px, 1fr));
+    gap:8px 14px; margin-bottom:16px; flex:1; min-width:0;
+  }
   .pc-feature{
     display:flex; align-items:center; gap:10px; font-size:clamp(12px, 3.2vw, 13px); font-weight:700; line-height:1.4; color:var(--text);
     text-shadow: 0 0 2px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.45);
