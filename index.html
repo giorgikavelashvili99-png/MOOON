@@ -18494,6 +18494,61 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       logEl.scrollTop = logEl.scrollHeight;
     }
 
+    // ---- Auto-glide to the log after Analyze --------------------------
+    // Smoothly scrolls the nearest scrollable ancestor (or the window) so
+    // the log box ends up exactly at the bottom of the visible area:
+    // no overshoot, no undershoot. Eased animation; any manual
+    // wheel/touch/key input cancels it immediately.
+    let ttdlGlideRaf = 0;
+    let ttdlGlideTimer = 0;
+    let ttdlUserScrolled = false;
+    ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){
+      window.addEventListener(ev, function(){
+        ttdlUserScrolled = true;
+        if (ttdlGlideRaf){ cancelAnimationFrame(ttdlGlideRaf); ttdlGlideRaf = 0; }
+      }, { passive:true, capture:true });
+    });
+    function ttdlScrollParent(el){
+      let n = el && el.parentElement;
+      while (n && n !== document.body && n !== document.documentElement){
+        const oy = getComputedStyle(n).overflowY;
+        if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 1) return n;
+        n = n.parentElement;
+      }
+      return null; // use the window
+    }
+    function ttdlGlideToLog(delay){
+      if (!logEl) return;
+      clearTimeout(ttdlGlideTimer);
+      ttdlGlideTimer = setTimeout(function(){
+        if (ttdlUserScrolled) return;
+        const sc = ttdlScrollParent(logEl);
+        const lr = logEl.getBoundingClientRect();
+        const MARGIN = 14;
+        const viewBottom = sc ? sc.getBoundingClientRect().bottom : window.innerHeight;
+        const delta = lr.bottom - (viewBottom - MARGIN);
+        if (delta <= 2) return;                       // already fully visible
+        const startTop = sc ? sc.scrollTop : (window.pageYOffset || document.documentElement.scrollTop);
+        const maxTop = sc ? (sc.scrollHeight - sc.clientHeight)
+                          : (document.documentElement.scrollHeight - window.innerHeight);
+        const endTop = Math.min(startTop + delta, maxTop);
+        const dist = endTop - startTop;
+        if (dist <= 1) return;
+        const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const dur = reduce ? 200 : Math.max(650, Math.min(1200, 450 + dist * 0.9));
+        const ease = function(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2; }; // easeInOutCubic
+        const t0 = performance.now();
+        if (ttdlGlideRaf) cancelAnimationFrame(ttdlGlideRaf);
+        (function step(now){
+          const k = Math.min(1, (now - t0) / dur);
+          const y = startTop + dist * ease(k);
+          if (sc) sc.scrollTo({ top: y, behavior: 'instant' });
+          else window.scrollTo({ top: y, behavior: 'instant' });
+          ttdlGlideRaf = k < 1 ? requestAnimationFrame(step) : 0;
+        })(t0);
+      }, delay == null ? 160 : delay);
+    }
+
     function ttdlFormatCount(n){
       n = Number(n) || 0;
       if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
@@ -18807,6 +18862,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     async function ttdlAnalyze(){
       const url = (urlInput.value || '').trim();
       if (!url){ ttdlLog(ttdlDict('needLink')); return; }
+      ttdlUserScrolled = false;
       setBtnBusy(analyzeBtn, true, ttdlDict('analyzing'));
       resultBox.style.display = 'none';
       if (detailsBox) detailsBox.style.display = 'none';
@@ -18877,6 +18933,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             if (musicRow) musicRow.style.display = music ? 'block' : 'none';
             if (clearBtn) clearBtn.style.display = 'flex';
             ttdlLog(ttdlDict('logFoundPhotos').replace('{n}', d.images.length));
+            ttdlGlideToLog(220);
             setBtnBusy(analyzeBtn, false);
             return;
           }
@@ -18958,6 +19015,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           sdBtn.disabled = !lastData.sd;
           hdBtn.disabled = !lastData.hd;
           ttdlLog(ttdlDict('logFound'));
+          ttdlGlideToLog(220);
 
           // ---- Phase 2 (background): the slow per-tier resolution/fps
           // probe. Deliberately NOT awaited before the code above runs --
@@ -19045,6 +19103,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const r = ttdlResLabel(hdTier.width, hdTier.height);
               if (r) hdBtnLabel.textContent = r + (hdTier.fps != null ? '/' + Math.round(hdTier.fps) : '');
             }
+            ttdlGlideToLog(120);
           });
         } else {
           ttdlLog(ttdlDict('logFail'));
