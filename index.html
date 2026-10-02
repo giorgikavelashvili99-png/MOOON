@@ -7378,6 +7378,18 @@
   html body .ttdl-shell::before{
     background:conic-gradient(from 0deg, #25F4EE 0deg, #2f8fff 70deg, rgba(37,244,238,.14) 130deg, rgba(47,143,255,.14) 230deg, #2f8fff 290deg, #25F4EE 360deg);  opacity:.28;
   }
+
+  /* quality block: the real numbers arrive a moment after the placeholder rows.
+     Swap them in with a soft fade only (no slide replay), and reserve the space of the
+     "original" pill from the start so the download buttons below never jump. */
+  html body .ttdl-quality-original{ min-height:36px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; }
+  html body .ttdl-quality-block.tt-probing::after{ content:''; display:block; height:36px; margin-top:8px; border-radius:999px; background:rgba(255,255,255,.04); }
+  @media (prefers-reduced-motion:no-preference){
+    html body .ttdl-shell .ttdl-quality-block.tt-probed .ttdl-quality-tier{ animation:none !important; }
+    html body .ttdl-shell .ttdl-quality-block.tt-probed .ttdl-quality-tier::before{ animation:none !important; }
+    html body .ttdl-shell .ttdl-quality-block.tt-probed .tqt-top > span:last-child, html body .ttdl-shell .ttdl-quality-block.tt-probed .tqt-sub{ animation:ttFadeOnly .45s ease-out backwards !important; }
+    html body .ttdl-shell .ttdl-quality-block.tt-probed .ttdl-quality-original{ animation:ttFadeOnly .45s ease-out backwards !important; }
+  }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -18843,7 +18855,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
                 ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?');
             }
             if (detailsBox) detailsBox.style.display = 'block';
-            if (qualityBlock) qualityBlock.innerHTML = '';
+            if (qualityBlock) { qualityBlock.innerHTML = ''; qualityBlock.classList.remove('tt-probing','tt-probed'); }
             if (photoGrid) {
               photoGrid.style.display = 'grid';
               photoGrid.innerHTML = d.images.map((imgUrl, i) =>
@@ -18926,6 +18938,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           // Placeholder quality box -- swapped for the real numbers once
           // the background probe (phase 2, below) finishes.
           if (qualityBlock) {
+            qualityBlock.classList.remove('tt-probed'); qualityBlock.classList.add('tt-probing');
             qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' +
               urls.map(u => '<div class="ttdl-quality-tier' + ttdlQualityTierClass(labelsByUrl[u].join(' / ')) + '"><div class="tqt-top"><span>' + ttdlQualityIcons(labelsByUrl[u].join(' / ')) + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div></div>').join('') +
               '</div>';
@@ -19005,6 +19018,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
                      '</div>';
             }).join('');
             const origRes = original ? ((original.width || '?') + 'x' + (original.height || '?')) : '?';
+            qualityBlock.classList.remove('tt-probing'); qualityBlock.classList.add('tt-probed');
             qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' + tierLines + '</div>' +
               '<div class="ttdl-quality-original">' + escapeHtml(ttdlDict('statOriginal')) + ': ' + origRes + ' · VQ ' + (vq != null ? vq : '?') + '</div>';
 
@@ -19325,7 +19339,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       resultBox.style.display = 'none';
       if (detailsBox) detailsBox.style.display = 'none';
       if (statsGrid) statsGrid.innerHTML = '';
-      if (qualityBlock) qualityBlock.innerHTML = '';
+      if (qualityBlock) { qualityBlock.innerHTML = ''; qualityBlock.classList.remove('tt-probing','tt-probed'); }
       if (photoGrid) { photoGrid.style.display = 'none'; photoGrid.innerHTML = ''; }
       if (bodyEl) bodyEl.classList.remove('ttdl-expanded');
       dlRow.style.display = 'none';
