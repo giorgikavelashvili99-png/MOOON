@@ -18495,18 +18495,15 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }
 
     // ---- Auto-glide to the log after Analyze --------------------------
-    // Smoothly scrolls the nearest scrollable ancestor (or the window) so
-    // the log box ends up exactly at the bottom of the visible area:
-    // no overshoot, no undershoot. Eased animation; any manual
-    // wheel/touch/key input cancels it immediately.
-    let ttdlGlideRaf = 0;
+    // Uses the browser's NATIVE smooth scrolling (runs on the compositor,
+    // so it stays fluid on phones even when the page is busy) instead of
+    // moving the page by hand on every JS frame. After it lands, it
+    // re-checks once or twice in case the layout shifted meanwhile.
+    let ttdlGliding = false;
     let ttdlGlideTimer = 0;
     let ttdlUserScrolled = false;
     ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){
-      window.addEventListener(ev, function(){
-        ttdlUserScrolled = true;
-        if (ttdlGlideRaf){ cancelAnimationFrame(ttdlGlideRaf); ttdlGlideRaf = 0; }
-      }, { passive:true, capture:true });
+      window.addEventListener(ev, function(){ ttdlUserScrolled = true; }, { passive:true, capture:true });
     });
     function ttdlScrollParent(el){
       let n = el && el.parentElement;
@@ -18515,38 +18512,58 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 1) return n;
         n = n.parentElement;
       }
-      return null; // use the window
+      return null; // window
     }
-    function ttdlGlideToLog(delay){
+    function ttdlScrollPos(sc){ return sc ? sc.scrollTop : (window.pageYOffset || document.documentElement.scrollTop); }
+    function ttdlLogDelta(sc){
+      const lr = logEl.getBoundingClientRect();
+      const viewBottom = sc ? sc.getBoundingClientRect().bottom
+                            : (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+      return lr.bottom - (viewBottom - 14);
+    }
+    function ttdlTargetDelta(sc, mode){
+      if (mode === 'photos' && photoGrid && photoGrid.offsetParent !== null){
+        const viewTop = sc ? sc.getBoundingClientRect().top : 0;
+        return photoGrid.getBoundingClientRect().top - (viewTop + 14);
+      }
+      return ttdlLogDelta(sc);
+    }
+    function ttdlGlideToLog(delay, pass, mode){
       if (!logEl) return;
       clearTimeout(ttdlGlideTimer);
       ttdlGlideTimer = setTimeout(function(){
         if (ttdlUserScrolled) return;
         const sc = ttdlScrollParent(logEl);
-        const lr = logEl.getBoundingClientRect();
-        const MARGIN = 14;
-        const viewBottom = sc ? sc.getBoundingClientRect().bottom : window.innerHeight;
-        const delta = lr.bottom - (viewBottom - MARGIN);
-        if (delta <= 2) return;                       // already fully visible
-        const startTop = sc ? sc.scrollTop : (window.pageYOffset || document.documentElement.scrollTop);
-        const maxTop = sc ? (sc.scrollHeight - sc.clientHeight)
-                          : (document.documentElement.scrollHeight - window.innerHeight);
-        const endTop = Math.min(startTop + delta, maxTop);
-        const dist = endTop - startTop;
-        if (dist <= 1) return;
-        const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const dur = reduce ? 200 : Math.max(650, Math.min(1200, 450 + dist * 0.9));
-        const ease = function(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2; }; // easeInOutCubic
-        const t0 = performance.now();
-        if (ttdlGlideRaf) cancelAnimationFrame(ttdlGlideRaf);
-        (function step(now){
-          const k = Math.min(1, (now - t0) / dur);
-          const y = startTop + dist * ease(k);
-          if (sc) sc.scrollTo({ top: y, behavior: 'instant' });
-          else window.scrollTo({ top: y, behavior: 'instant' });
-          ttdlGlideRaf = k < 1 ? requestAnimationFrame(step) : 0;
-        })(t0);
-      }, delay == null ? 160 : delay);
+        const need = function(){ const d = ttdlTargetDelta(sc, mode); return mode === 'photos' ? Math.abs(d) : d; };
+        if (need() <= 2) return;
+        const top = Math.max(0, ttdlScrollPos(sc) + ttdlTargetDelta(sc, mode));
+        ttdlGliding = true;
+        if (sc) sc.scrollTo({ top: top, behavior: 'smooth' });
+        else window.scrollTo({ top: top, behavior: 'smooth' });
+        let last = ttdlScrollPos(sc), still = 0, t0 = performance.now();
+        (function watch(){
+          const cur = ttdlScrollPos(sc);
+          still = Math.abs(cur - last) < 0.5 ? still + 1 : 0;
+          last = cur;
+          if (ttdlUserScrolled){ ttdlGliding = false; return; }
+          if (still >= 6 || performance.now() - t0 > 2500){
+            ttdlGliding = false;
+            if ((pass || 0) < 2 && need() > 3) ttdlGlideToLog(0, (pass || 0) + 1, mode);
+            return;
+          }
+          requestAnimationFrame(watch);
+        })();
+      }, delay == null ? 200 : delay);
+    }
+    // Keeps the log exactly where it is on screen when content above it
+    // changes height (e.g. the quality box filling in) -- no jump up/down.
+    function ttdlHoldLog(beforeTop){
+      if (ttdlGliding || ttdlUserScrolled || beforeTop == null) return;
+      const diff = logEl.getBoundingClientRect().top - beforeTop;
+      if (Math.abs(diff) < 0.5) return;
+      const sc = ttdlScrollParent(logEl);
+      if (sc) sc.scrollTo({ top: sc.scrollTop + diff, behavior: 'instant' });
+      else window.scrollTo({ top: ttdlScrollPos(null) + diff, behavior: 'instant' });
     }
 
     function ttdlFormatCount(n){
@@ -18925,7 +18942,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
                 '<div class="ttdl-photo-item">' +
                   '<img src="' + escapeHtml(imgUrl) + '" alt="' + (i+1) + '" loading="lazy">' +
                   '<span class="ttdl-photo-num">' + (i+1) + '/' + d.images.length + '</span>' +
-                  '<a class="ttdl-photo-dl" href="' + escapeHtml(imgUrl) + '" download="tiktok-photo-' + (i+1) + '.jpg" target="_blank" rel="noopener" aria-label="' + escapeHtml(ttdlDict('downloadPhoto')) + '">⬇</a>' +
+                  '<a class="ttdl-photo-dl" href="' + escapeHtml(imgUrl) + '" download="tiktok-photo-' + (i+1) + '.jpg" target="_blank" rel="noopener" aria-label="' + escapeHtml(ttdlDict('downloadPhoto')) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M5.5 19.5h13"/></svg></a>' +
                 '</div>'
               ).join('');
             }
@@ -18933,7 +18950,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             if (musicRow) musicRow.style.display = music ? 'block' : 'none';
             if (clearBtn) clearBtn.style.display = 'flex';
             ttdlLog(ttdlDict('logFoundPhotos').replace('{n}', d.images.length));
-            ttdlGlideToLog(220);
+            ttdlGlideToLog(260, 0, 'photos');
             setBtnBusy(analyzeBtn, false);
             return;
           }
@@ -19039,6 +19056,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             return info;
           })).then((metas) => {
             if (myToken !== ttdlAnalysisToken || !qualityBlock) return; // a newer analyze() superseded this one
+            const ttdlHoldTop = logEl ? logEl.getBoundingClientRect().top : null;
 
             const tiers = urls.map((tierUrl, i) => {
               let sizeBytes = null;
@@ -19103,7 +19121,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const r = ttdlResLabel(hdTier.width, hdTier.height);
               if (r) hdBtnLabel.textContent = r + (hdTier.fps != null ? '/' + Math.round(hdTier.fps) : '');
             }
-            ttdlGlideToLog(120);
+            ttdlHoldLog(ttdlHoldTop);
+            if (ttdlGliding) ttdlGlideToLog(400);
           });
         } else {
           ttdlLog(ttdlDict('logFail'));
@@ -19996,3 +20015,37 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 </script>
 </body>
 </html>
+  /* ---- Photo posts: refined download button, tidy grids ---- */
+  html body .ttdl-photo-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  html body .ttdl-photo-item:last-child:nth-child(odd){ grid-column:1 / -1; justify-self:center; width:calc(50% - 4px); }
+  html body .ttdl-photo-item:only-child{ width:min(72%,280px); }
+  html body .ttdl-photo-item{ border-radius:16px; border:1px solid rgba(255,255,255,.1); }
+  html body .ttdl-photo-item::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:42%;
+    background:linear-gradient(to top, rgba(4,8,12,.7), rgba(4,8,12,0)); pointer-events:none; z-index:1;
+  }
+  html body .ttdl-photo-num{
+    z-index:2; left:8px; top:8px; padding:3px 9px; letter-spacing:.04em;
+    background:rgba(8,12,18,.62); border:1px solid rgba(255,255,255,.14);
+  }
+  html body .ttdl-photo-dl{
+    z-index:2; right:9px; bottom:9px; width:38px; height:38px; border-radius:50%;
+    font-size:0; line-height:0; color:#fff; -webkit-tap-highlight-color:transparent;
+    background:linear-gradient(#0b1117,#0b1117) padding-box, linear-gradient(135deg,#25F4EE,#FE2C55) border-box;
+    border:1.5px solid transparent;
+    transition:transform .18s ease, filter .2s ease;
+  }
+  html body .ttdl-photo-dl svg{ width:17px; height:17px; display:block; transition:transform .2s ease; }
+  html body .ttdl-photo-dl:hover{
+    color:#fff; filter:brightness(1.12); transform:translateY(-1px);
+    background:linear-gradient(#0b1117,#0b1117) padding-box, linear-gradient(135deg,#25F4EE,#FE2C55) border-box;
+  }
+  html body .ttdl-photo-dl:hover svg{ transform:translateY(1.5px); }
+  html body .ttdl-photo-dl:active{
+    transform:scale(.9);
+    background:linear-gradient(135deg,#25F4EE,#FE2C55) border-box; color:#04141a;
+  }
+  /* ---- Stats: a lone leftover tile fills the whole row (no empty cell) ---- */
+  html body .ttdl-stats-grid > .ttdl-stat-item:not(.ttdl-stat--id):nth-child(odd):last-child,
+  html body .ttdl-stats-grid > .ttdl-stat-item:not(.ttdl-stat--id):nth-child(odd):has(+ .ttdl-stat--id){ grid-column:1 / -1; }
+
