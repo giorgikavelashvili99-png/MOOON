@@ -18578,13 +18578,13 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       return ttdlLogDelta(sc);
     }
     function ttdlGlideToLog(delay, pass, mode){
-      if (!logEl) return;
+      if (!logEl){ ttdlGlideRelease(); return; }
       clearTimeout(ttdlGlideTimer);
       ttdlGlideTimer = setTimeout(function(){
-        if (ttdlUserScrolled) return;
+        if (ttdlUserScrolled){ ttdlGlideRelease(); return; }
         const sc = ttdlScrollParent(logEl);
         const need = function(){ const d = ttdlTargetDelta(sc, mode); return mode === 'photos' ? Math.abs(d) : d; };
-        if (need() <= 2) return;
+        if (need() <= 2){ ttdlGlideRelease(); return; }
         const top = Math.max(0, ttdlScrollPos(sc) + ttdlTargetDelta(sc, mode));
         ttdlGliding = true; document.documentElement.classList.add('ttdl-gliding');
         if (sc) sc.scrollTo({ top: top, behavior: 'smooth' });
@@ -18594,15 +18594,58 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           const cur = ttdlScrollPos(sc);
           still = Math.abs(cur - last) < 0.5 ? still + 1 : 0;
           last = cur;
-          if (ttdlUserScrolled){ ttdlGliding = false; document.documentElement.classList.remove('ttdl-gliding'); return; }
+          if (ttdlUserScrolled){ ttdlGliding = false; document.documentElement.classList.remove('ttdl-gliding'); ttdlGlideRelease(); return; }
           if (still >= 6 || performance.now() - t0 > 2500){
             ttdlGliding = false; document.documentElement.classList.remove('ttdl-gliding');
             if ((pass || 0) < 2 && need() > 3) ttdlGlideToLog(0, (pass || 0) + 1, mode);
+            else ttdlGlideRelease();
             return;
           }
           requestAnimationFrame(watch);
         })();
       }, delay == null ? 200 : delay);
+    }
+
+
+    // Heavy background work (the quality probe) must not run while the page is
+    // gliding, and the glide itself waits until the result's entrance
+    // animations are done -- so the browser only ever does ONE thing at a time.
+    let ttdlGlideBusy = false;
+    let ttdlGateResolvers = [];
+    function ttdlGlideGate(){
+      if (!ttdlGlideBusy) return Promise.resolve();
+      return new Promise(function(r){ ttdlGateResolvers.push(r); setTimeout(r, 4500); });
+    }
+    function ttdlGlideRelease(){
+      ttdlGlideBusy = false;
+      const rs = ttdlGateResolvers; ttdlGateResolvers = [];
+      rs.forEach(function(r){ r(); });
+    }
+    function ttdlWhenCalm(capMs){
+      return new Promise(function(resolve){
+        let done = false;
+        const fin = function(){ if (done) return; done = true; resolve(); };
+        setTimeout(fin, capMs);
+        requestAnimationFrame(function(){
+          let anims = [];
+          try {
+            const root = (logEl && logEl.closest('.ttdl-shell')) || document.body;
+            anims = root.getAnimations({ subtree:true }).filter(function(a){
+              const t = a.effect && a.effect.getComputedTiming && a.effect.getComputedTiming();
+              return t && isFinite(t.endTime) && a.playState !== 'finished';
+            });
+          } catch(e){}
+          Promise.all(anims.map(function(a){ return a.finished.catch(function(){}); })).then(function(){
+            if (window.requestIdleCallback) requestIdleCallback(fin, { timeout:200 }); else setTimeout(fin, 60);
+          });
+        });
+      });
+    }
+    function ttdlScheduleGlide(mode, extraReady){
+      ttdlGlideBusy = true;
+      Promise.all([ttdlWhenCalm(1200), extraReady || Promise.resolve()]).then(function(){
+        ttdlGlideToLog(0, 0, mode);
+      });
     }
 
     // Resolves once the first few photos are decoded (or after a short cap), so the
@@ -19074,7 +19117,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             if (musicRow) musicRow.style.display = music ? 'block' : 'none';
             if (clearBtn) clearBtn.style.display = 'flex';
             ttdlLog(ttdlDict('logFoundPhotos').replace('{n}', d.images.length));
-            ttdlWhenImagesReady(photoGrid, 4, 1300).then(function(){ ttdlGlideToLog(60, 0, 'photos'); });
+            ttdlScheduleGlide('photos', ttdlWhenImagesReady(photoGrid, 4, 1300));
             setBtnBusy(analyzeBtn, false);
             return;
           }
@@ -19156,7 +19199,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           sdBtn.disabled = !lastData.sd;
           hdBtn.disabled = !lastData.hd;
           ttdlLog(ttdlDict('logFound'));
-          ttdlGlideToLog(140);
+          ttdlScheduleGlide('log');
 
           // ---- Phase 2 (background): the slow per-tier resolution/fps
           // probe. Deliberately NOT awaited before the code above runs --
@@ -19166,6 +19209,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           // have this stale probe overwrite the newer result. ----
           const myToken = ++ttdlAnalysisToken;
           Promise.all(urls.map(async (u) => {
+            await ttdlGlideGate();
             const info = await probeMp4Info(u);
             // Rare fallback: if the box-parser above didn't find tkhd
             // dimensions (some non-standard MP4 structure), try the
