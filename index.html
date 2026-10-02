@@ -7096,6 +7096,58 @@
   body .ttdl-dl-ico{ width:28px; height:28px; }
   body .ttdl-music-btn, body .ttdl-photo-dl-all{ min-height:42px; border-radius:14px; }
   body .ttdl-log{ min-height:64px; padding:9px 11px; font-size:10.5px; line-height:1.55; border-radius:13px; }
+
+  /* =====================================================================
+     ORDER CARDS — TikTok-checker "shell" look (comet of light travelling
+     around a hairline border), recoloured per card from its own
+     --pc-accent instead of TikTok cyan/pink. Visual layer only: layout,
+     content and JS are untouched. Replaces the old flat top accent bar.
+     ===================================================================== */
+  @property --pc-ang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+
+  body .pc-card{ border:0; border-radius:22px; isolation:isolate; }
+  body .pc-card::before,
+  body .pc-card--cheapmonthly::before{
+    content:''; display:block; position:absolute; inset:0; z-index:6; pointer-events:none;
+    width:auto; height:auto; padding:1.5px; border-radius:inherit; opacity:1; box-shadow:none;
+    background:conic-gradient(from var(--pc-ang),
+      color-mix(in srgb, var(--pc-accent) 35%, #fff) 0deg,
+      var(--pc-accent) 70deg,
+      rgba(0,0,0,.42) 130deg,
+      rgba(0,0,0,.42) 230deg,
+      var(--pc-accent) 290deg,
+      color-mix(in srgb, var(--pc-accent) 35%, #fff) 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation:pcShellSpin 10s linear infinite;
+  }
+  @keyframes pcShellSpin{ to{ --pc-ang:360deg; } }
+
+  /* Same restraint the site already applies to the monthly glint:
+     off-screen slides, low-power mode and reduced-motion get a still ring. */
+  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-card::before{ animation-play-state:paused; }
+  html.low-power body .pc-card::before{ animation:none; }
+  @media (prefers-reduced-motion:reduce){ body .pc-card::before{ animation:none; } }
+
+  /* Order cards: no dot texture any more — a few sparkling stars instead
+     (spans are injected by the small script at the end of the page). */
+  body .pc-card{ background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2))); }
+  body .pc-card > .pc-stars{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; border-radius:inherit; }
+  .pc-stars i{
+    position:absolute; display:block; width:var(--s,9px); height:var(--s,9px);
+    background:#fff; opacity:0; transform:scale(.2) rotate(0deg);
+    clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+    filter:drop-shadow(0 0 3px rgba(255,255,255,.9));
+    animation:pcTwinkle var(--d,3.6s) ease-in-out var(--dl,0s) infinite;
+  }
+  @keyframes pcTwinkle{
+    0%,100%{ opacity:0; transform:scale(.2) rotate(0deg); }
+    30%,70%{ opacity:.95; transform:scale(1) rotate(45deg); }
+  }
+  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-stars i{ animation-play-state:paused; }
+  html.low-power .pc-stars i{ animation:none; opacity:.5; transform:scale(.8); }
+  @media (prefers-reduced-motion:reduce){ .pc-stars i{ animation:none; opacity:.5; transform:scale(.8); } }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -19615,5 +19667,32 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   })();
   </script>
 
+
+<script>
+(function(){
+  /* Same 6 stars on every card (mirrored on every second one), evenly
+     phased on one shared cycle, so each card always shows the same number
+     of sparkles at any moment. */
+  var POS=[[14,10,10],[74,16,8],[40,38,12],[86,52,8],[18,66,9],[58,86,11]];
+  var ORDER=[0,3,1,4,2,5], CYCLE=4;
+  function addStars(){
+    document.querySelectorAll('.pc-card').forEach(function(card, ci){
+      if (card.querySelector(':scope > .pc-stars')) return;
+      var box=document.createElement('div'); box.className='pc-stars'; box.setAttribute('aria-hidden','true');
+      POS.forEach(function(p, k){
+        var st=document.createElement('i');
+        st.style.left=(ci%2 ? 100-p[0] : p[0])+'%'; st.style.top=p[1]+'%';
+        st.style.setProperty('--s',p[2]+'px');
+        st.style.setProperty('--d',CYCLE+'s');
+        st.style.setProperty('--dl',(-ORDER[k]*CYCLE/POS.length).toFixed(2)+'s');
+        box.appendChild(st);
+      });
+      card.insertBefore(box, card.firstChild);
+    });
+  }
+  addStars();
+  window.addEventListener('load', addStars);
+})();
+</script>
 </body>
 </html>
