@@ -6764,16 +6764,27 @@
   @media (prefers-reduced-motion:no-preference){
     .pricing-cards.pc-wait .pc-slide{ visibility:hidden; }
     .pricing-cards.pc-play .pc-slide{ animation:pcRise .8s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--i,0) * 90ms); }
-    @keyframes pcRise{ from{ opacity:0; transform:translateY(34px) scale(.97); filter:blur(6px); } }
+    @keyframes pcRise{ from{ opacity:0; transform:translateY(34px) scale(.97); } }
 
-    .pc-slide.pc-first .pc-top > *{ animation:pcFade .5s ease backwards; }
-    .pc-slide.pc-first .pc-top > *:nth-child(2){ animation-delay:.06s; }
-    .pc-slide.pc-first .pc-feature{ animation:pcFeat .5s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--n,1) * 55ms + 120ms); }
-    .pc-slide.pc-first .pc-feature .pc-check{ animation:pcPop .45s cubic-bezier(.3,1.6,.5,1) backwards; animation-delay:calc(var(--n,1) * 55ms + 220ms); }
-    .pc-slide.pc-first .pc-toggle-btn{ animation:pcFade .5s ease .5s backwards; }
-    @keyframes pcFade{ from{ opacity:0; transform:translateY(8px); } }
-    @keyframes pcFeat{ from{ opacity:0; transform:translateX(-10px); } }
-    @keyframes pcPop{ from{ transform:scale(0); } }
+    @keyframes pcFade{ from{ opacity:0; transform:translateY(10px); } }
+    @keyframes pcFeat{ from{ opacity:0; transform:translateX(-12px); } }
+    @keyframes pcPop{ from{ opacity:0; transform:scale(.3); } }
+    @keyframes pcIcon{ from{ opacity:0; transform:scale(.6) rotate(-8deg); } }
+    @keyframes pcPriceFade{ from{ opacity:0; } }
+
+    /* Card content: hidden until the card is on its way into view, then a calm stagger.
+       (.pc-pre is removed and .pc-in added in the same frame, so nothing flashes.) */
+    .pc-slide.pc-pre :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-toggle-btn){ opacity:0; }
+    .pc-slide.pc-in{ --base:calc(var(--o,0) * 90ms); }
+    .pc-slide.pc-in .pc-icon{ animation:pcIcon .6s cubic-bezier(.2,.8,.2,1) backwards; animation-delay:calc(var(--base) + .05s); }
+    .pc-slide.pc-in .pc-title{ animation:pcFade .55s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--base) + .12s); }
+    .pc-slide.pc-in .pc-desc{ animation:pcFade .55s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--base) + .18s); }
+    /* price: plain fade in -- no movement, no counting */
+    .pc-slide.pc-in .pc-price-line{ animation:pcPriceFade .8s ease-out backwards; animation-delay:calc(var(--base) + .26s); }
+    .pc-slide.pc-in :is(.pc-price-note,.pc-price-note-line){ animation:pcFade .55s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--base) + .36s); }
+    .pc-slide.pc-in .pc-feature{ animation:pcFeat .5s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--base) + .42s + var(--n,1) * 65ms); }
+    .pc-slide.pc-in .pc-feature .pc-check{ animation:pcPop .4s cubic-bezier(.2,.9,.3,1.3) backwards; animation-delay:calc(var(--base) + .5s + var(--n,1) * 65ms); }
+    .pc-slide.pc-in .pc-toggle-btn{ animation:pcFade .55s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--base) + .95s); }
   }
   .pc-feature:nth-child(1){--n:1}.pc-feature:nth-child(2){--n:2}.pc-feature:nth-child(3){--n:3}.pc-feature:nth-child(4){--n:4}
   .pc-feature:nth-child(5){--n:5}.pc-feature:nth-child(6){--n:6}.pc-feature:nth-child(7){--n:7}.pc-feature:nth-child(8){--n:8}
@@ -7098,56 +7109,173 @@
   body .ttdl-log{ min-height:64px; padding:9px 11px; font-size:10.5px; line-height:1.55; border-radius:13px; }
 
   /* =====================================================================
-     ORDER CARDS — TikTok-checker "shell" look (comet of light travelling
-     around a hairline border), recoloured per card from its own
-     --pc-accent instead of TikTok cyan/pink. Visual layer only: layout,
-     content and JS are untouched. Replaces the old flat top accent bar.
+     ORDER CARDS — TikTok "shell" ring + sparkles, GPU-only animation.
+     Only transform/opacity are animated (no per-frame repaint, no filter,
+     no @property), off-screen cards are paused, low-power gets a still ring.
      ===================================================================== */
-  @property --pc-ang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+  body .pc-card{ border:0; border-radius:22px; isolation:isolate; background:var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2))); }
+  body .pc-card::before, body .pc-card--cheapmonthly::before{ display:none; }
 
-  body .pc-card{ border:0; border-radius:22px; isolation:isolate; }
-  body .pc-card::before,
-  body .pc-card--cheapmonthly::before{
-    content:''; display:block; position:absolute; inset:0; z-index:6; pointer-events:none;
-    width:auto; height:auto; padding:1.5px; border-radius:inherit; opacity:1; box-shadow:none;
-    background:conic-gradient(from var(--pc-ang),
+  body .pc-card > .pc-ring{
+    position:absolute; inset:0; z-index:6; pointer-events:none;
+    border-radius:inherit; padding:1.5px; overflow:hidden; contain:strict;
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  }
+  .pc-ring-spin{
+    position:absolute; left:50%; top:50%; width:260%; aspect-ratio:1; margin:-130% 0 0 -130%;
+    background:conic-gradient(
       color-mix(in srgb, var(--pc-accent) 35%, #fff) 0deg,
       var(--pc-accent) 70deg,
       rgba(0,0,0,.42) 130deg,
       rgba(0,0,0,.42) 230deg,
       var(--pc-accent) 290deg,
       color-mix(in srgb, var(--pc-accent) 35%, #fff) 360deg);
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor;
-    mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-    animation:pcShellSpin 10s linear infinite;
+    will-change:transform; animation:pcRingSpin 10s linear infinite;
   }
-  @keyframes pcShellSpin{ to{ --pc-ang:360deg; } }
+  @keyframes pcRingSpin{ to{ transform:rotate(360deg); } }
 
-  /* Same restraint the site already applies to the monthly glint:
-     off-screen slides, low-power mode and reduced-motion get a still ring. */
-  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-card::before{ animation-play-state:paused; }
-  html.low-power body .pc-card::before{ animation:none; }
-  @media (prefers-reduced-motion:reduce){ body .pc-card::before{ animation:none; } }
-
-  /* Order cards: no dot texture any more — a few sparkling stars instead
-     (spans are injected by the small script at the end of the page). */
-  body .pc-card{ background: var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2))); }
-  body .pc-card > .pc-stars{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; border-radius:inherit; }
+  body .pc-card > .pc-stars{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; border-radius:inherit; contain:strict; }
   .pc-stars i{
     position:absolute; display:block; width:var(--s,9px); height:var(--s,9px);
-    background:#fff; opacity:0; transform:scale(.2) rotate(0deg);
+    background:#fff; opacity:0; transform:scale(.2) rotate(0deg); will-change:transform,opacity;
     clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
-    filter:drop-shadow(0 0 3px rgba(255,255,255,.9));
-    animation:pcTwinkle var(--d,3.6s) ease-in-out var(--dl,0s) infinite;
+    animation:pcTwinkle var(--d,4s) ease-in-out var(--dl,0s) infinite;
   }
   @keyframes pcTwinkle{
     0%,100%{ opacity:0; transform:scale(.2) rotate(0deg); }
     30%,70%{ opacity:.95; transform:scale(1) rotate(45deg); }
   }
+
+  /* pause whatever isn't on screen */
+  .pricing-cards.pc-wait .pc-ring-spin, .pricing-cards.pc-wait .pc-stars i{ animation-play-state:paused; }
+  .pc-card.pc-off .pc-ring-spin, .pc-card.pc-off .pc-stars i{ animation-play-state:paused; }
+  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-ring-spin,
   .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-stars i{ animation-play-state:paused; }
-  html.low-power .pc-stars i{ animation:none; opacity:.5; transform:scale(.8); }
-  @media (prefers-reduced-motion:reduce){ .pc-stars i{ animation:none; opacity:.5; transform:scale(.8); } }
+  html.low-power .pc-ring-spin{ animation:none; will-change:auto; }
+  html.low-power .pc-stars i{ animation:none; will-change:auto; opacity:.5; transform:scale(.8); }
+  @media (prefers-reduced-motion:reduce){
+    .pc-ring-spin{ animation:none; will-change:auto; }
+    .pc-stars i{ animation:none; will-change:auto; opacity:.5; transform:scale(.8); }
+  }
+
+
+  /* =====================================================================
+     TikTok block — smoother sequenced entrance + calmer idle motion.
+     Only transform/opacity animations (cheap on phones). No glitch effects.
+     ===================================================================== */
+  @media (prefers-reduced-motion:no-preference){
+    @keyframes ttRise{ from{ opacity:0; transform:translateY(18px); } }
+    @keyframes ttDrop{ from{ opacity:0; transform:translateY(-10px); } }
+    @keyframes ttPop{ from{ opacity:0; transform:scale(.55); } }
+    @keyframes ttLogoIn{ from{ opacity:0; transform:scale(.35) rotate(-24deg); } }
+    @keyframes ttFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+    @keyframes ttGrow{ from{ transform:scaleX(0); } }
+    @keyframes ttBorderFlow{ to{ background-position:0 0, -250% 0; } }
+    @keyframes ttLine{ from{ opacity:0; transform:translateX(-8px); } }
+
+    .ttdl-shell.tt-wait{ opacity:0; transform:translateY(42px) scale(.97); }
+    .ttdl-shell.tt-in{ transition:opacity .8s ease, transform .9s cubic-bezier(.16,1,.3,1); }
+
+    /* sequence: bar -> logo -> heading -> text -> steps light up one by one -> panel */
+    body .ttdl-shell.tt-in .ttdl-titlebar{ animation:ttDrop .6s cubic-bezier(.2,.7,.2,1) .1s backwards; }
+    body .ttdl-shell.tt-in .ttdl-icon{ animation:ttLogoIn .85s cubic-bezier(.2,1.25,.35,1) .2s backwards, ttFloat 5s ease-in-out 1.3s infinite; }
+    body .ttdl-shell.tt-in .ttdl-header-text{ animation:none; }
+    body .ttdl-shell.tt-in .ttdl-heading{ animation:ttRise .7s cubic-bezier(.2,.7,.2,1) .38s backwards, ttShimmer 6s linear 1.1s infinite; }
+    body .ttdl-shell.tt-in .ttdl-subtext{ animation:ttRise .7s cubic-bezier(.2,.7,.2,1) .48s backwards; }
+    body .ttdl-shell.tt-in .ttdl-steps{ animation:none; }
+    body .ttdl-shell.tt-in .ttdl-step{ animation:ttPop .5s cubic-bezier(.2,1.2,.4,1) backwards; }
+    body .ttdl-shell.tt-in .ttdl-steps > :nth-child(1){ animation-delay:.6s; }
+    body .ttdl-shell.tt-in .ttdl-steps > :nth-child(3){ animation-delay:.95s; }
+    body .ttdl-shell.tt-in .ttdl-steps > :nth-child(5){ animation-delay:1.3s; }
+    body .ttdl-shell.tt-in .ttdl-step-line{ transform-origin:left center; animation:ttGrow .4s ease-out backwards; }
+    body .ttdl-shell.tt-in .ttdl-steps > :nth-child(2){ animation-delay:.72s; }
+    body .ttdl-shell.tt-in .ttdl-steps > :nth-child(4){ animation-delay:1.07s; }
+    body .ttdl-shell.tt-in .ttdl-glass{ animation:ttRise .8s cubic-bezier(.2,.7,.2,1) .7s backwards; }
+
+    /* input: border becomes a flowing cyan -> pink line while focused */
+    body .ttdl-input:focus{
+      border-color:transparent;
+      background:linear-gradient(rgba(4,9,15,.94),rgba(4,9,15,.94)) padding-box, linear-gradient(110deg,#25F4EE,#FE2C55,#25F4EE) border-box;
+      background-size:100% 100%, 250% 100%; animation:ttBorderFlow 3.2s linear infinite;
+    }
+
+    /* results: everything slides in one after another when it appears */
+    body .ttdl-result{ animation:ttRise .55s cubic-bezier(.2,.7,.2,1) backwards; }
+    body .ttdl-stat-item{ animation:ttPop .45s cubic-bezier(.2,1.1,.4,1) backwards; }
+    body .ttdl-stat-item:nth-child(1){ animation-delay:.05s; } body .ttdl-stat-item:nth-child(2){ animation-delay:.1s; }
+    body .ttdl-stat-item:nth-child(3){ animation-delay:.15s; } body .ttdl-stat-item:nth-child(4){ animation-delay:.2s; }
+    body .ttdl-stat-item:nth-child(5){ animation-delay:.25s; } body .ttdl-stat-item:nth-child(6){ animation-delay:.3s; }
+    body .ttdl-quality-block{ animation:ttRise .55s cubic-bezier(.2,.7,.2,1) .2s backwards; }
+    body .ttdl-dl-btn{ animation:ttRise .5s cubic-bezier(.2,.7,.2,1) backwards; }
+    body .ttdl-dl-btn:nth-child(1){ animation-delay:.3s; } body .ttdl-dl-btn:nth-child(2){ animation-delay:.4s; }
+    body .ttdl-log > div{ animation:ttLine .35s ease-out backwards; }
+  }
+
+  /* touch feedback + a bit more depth on the glass panel */
+  body .ttdl-glass{ transition:border-color .3s ease; }
+  body .ttdl-glass:focus-within{ border-color:rgba(37,244,238,.35); }
+  body .ttdl-analyze-btn:active, body .ttdl-dl-btn:not(:disabled):active{ transform:scale(.97); }
+  body .ttdl-step{ transition:transform .25s ease; }
+  body .ttdl-step:active{ transform:scale(.92); }
+
+  /* =====================================================================
+     TikTok block — design polish (static look; motion is defined above).
+     ===================================================================== */
+  /* faint grid + stronger cyan/pink light so the block reads as "TikTok" at a glance */
+  body .ttdl-content{
+    background:
+      linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px) 0 0/100% 26px,
+      linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px) 0 0/26px 100%;
+    -webkit-mask-image:none; mask-image:none;
+  }
+  .ttdl-aurora i:nth-child(1){ background:radial-gradient(circle, rgba(37,244,238,.34), transparent 62%); }
+  .ttdl-aurora i:nth-child(2){ background:radial-gradient(circle, rgba(254,44,85,.32), transparent 62%); }
+
+  /* logo: bigger, with the cyan / pink "echo" of the TikTok mark */
+  body .ttdl-icon{ width:58px; height:58px; filter:drop-shadow(-2px 0 0 rgba(37,244,238,.75)) drop-shadow(2px 0 0 rgba(254,44,85,.75)); }
+  body .ttdl-icon img{ border-radius:inherit; }
+
+  /* heading + subtext */
+  body .ttdl-heading{ font-size:clamp(13px,3.9vw,18px); letter-spacing:.07em; margin-bottom:5px; }
+  body .ttdl-subtext{ font-size:clamp(11px,3vw,12.5px); line-height:1.6; color:#a3b0c6; }
+
+  /* step rail: bigger, filled gradient rings */
+  .ttdl-step{ width:34px; height:34px; }
+  .ttdl-step svg{ width:15px; height:15px; }
+  .ttdl-step-line{ flex-basis:clamp(30px,9vw,50px); height:2px; border-radius:2px; }
+
+  /* glass panel: back to the original soft look */
+  body .ttdl-glass{ padding:14px; border-radius:18px; }
+  @media (min-width:600px){ body .ttdl-glass{ padding:16px; } }
+
+  /* input */
+  body .ttdl-input{ height:50px; border-radius:16px; font-size:13.5px; background:rgba(0,0,0,.5); border:1.5px solid rgba(255,255,255,.12); }
+  body .ttdl-input::placeholder{ color:#6c7b92; }
+  body .ttdl-input-icon{ width:34px; height:34px; border-radius:12px; }
+  .ttdl-paste-btn{ width:36px; height:36px; border-radius:12px; }
+
+  /* result card + thumbnail */
+  body .ttdl-result{ padding:10px 12px; border-radius:16px; background:linear-gradient(120deg,rgba(37,244,238,.13),rgba(254,44,85,.11)); border:1px solid rgba(255,255,255,.16); }
+  body .ttdl-thumb-wrap{ width:44px; height:58px; border-radius:11px; border:1.5px solid transparent;
+    background:linear-gradient(#000,#000) padding-box, linear-gradient(135deg,#25F4EE,#FE2C55) border-box; overflow:hidden; }
+
+  /* stat chips: tinted glass with a cyan accent edge */
+  body .ttdl-stat-item{ border-radius:14px; background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.025)); border:1px solid rgba(255,255,255,.1); border-left:3px solid rgba(37,244,238,.7); }
+  body .ttdl-stat-item:nth-child(even){ border-left-color:rgba(254,44,85,.75); }
+
+  /* quality block */
+  body .ttdl-quality-block{ border-radius:18px; background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.09); }
+
+  /* download buttons: cyan (SD) and pink (HD) with a soft top gloss */
+  body .ttdl-dl-btn{ border-radius:18px; border:1px solid rgba(255,255,255,.28);
+    background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%), linear-gradient(135deg,#25F4EE,#27b3e6); }
+  body .ttdl-dl-btn--hd{ background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,0) 55%), linear-gradient(135deg,#FE2C55,#ff6a3d); }
+  body .ttdl-music-btn, body .ttdl-photo-dl-all{ border-radius:16px; min-height:48px; }
+
+  /* terminal log: darker, with a cyan edge */
+  body .ttdl-log{ border-radius:16px; border:1px solid rgba(37,244,238,.28); border-left:3px solid #25F4EE; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -7863,7 +7991,7 @@
       <!-- Card 1 — individual / single-video package -->
       <div class="pc-card-wrap">
       <div class="pc-badge" data-i18n="pcRibbon">პოპულარული</div>
-      <div class="pc-card pc-card--indiv">
+      <div class="pc-card pc-card--indiv"><div class="pc-stars" aria-hidden="true"><i style="left:14%;top:10%;--s:10px;--d:4s;--dl:-0.00s"></i><i style="left:74%;top:16%;--s:8px;--d:4s;--dl:-2.00s"></i><i style="left:40%;top:38%;--s:12px;--d:4s;--dl:-0.67s"></i><i style="left:86%;top:52%;--s:8px;--d:4s;--dl:-2.67s"></i><i style="left:18%;top:66%;--s:9px;--d:4s;--dl:-1.33s"></i><i style="left:58%;top:86%;--s:11px;--d:4s;--dl:-3.33s"></i></div><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
         <div class="pc-top"><div class="pc-head">
         <div class="pc-icon" aria-hidden="true">🎬</div>
           <div class="pc-head-text">
@@ -8089,7 +8217,7 @@
            any resolution/fps, priced purely from duration via the same
            calculateExactPrice() formula as Card 1, fixed to the 4K tier) -->
       <div class="pc-card-wrap pc-card-wrap--any">
-      <div class="pc-card pc-card--any">
+      <div class="pc-card pc-card--any"><div class="pc-stars" aria-hidden="true"><i style="left:86%;top:10%;--s:10px;--d:4s;--dl:-0.00s"></i><i style="left:26%;top:16%;--s:8px;--d:4s;--dl:-2.00s"></i><i style="left:60%;top:38%;--s:12px;--d:4s;--dl:-0.67s"></i><i style="left:14%;top:52%;--s:8px;--d:4s;--dl:-2.67s"></i><i style="left:82%;top:66%;--s:9px;--d:4s;--dl:-1.33s"></i><i style="left:42%;top:86%;--s:11px;--d:4s;--dl:-3.33s"></i></div><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
         <div class="pc-top"><div class="pc-head">
         <div class="pc-icon" aria-hidden="true">☀️</div>
           <div class="pc-head-text">
@@ -8226,7 +8354,7 @@
       <!-- Card 2 — weekly subscription package -->
       <div class="pc-card-wrap">
       <span class="pc-badge pc-badge--urgency" id="wpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="wpSpotsLeft">4</b> <span data-i18n="spotsLeftWeek">დარჩა</span></span>
-      <div class="pc-card pc-card--weekly">
+      <div class="pc-card pc-card--weekly"><div class="pc-stars" aria-hidden="true"><i style="left:14%;top:10%;--s:10px;--d:4s;--dl:-0.00s"></i><i style="left:74%;top:16%;--s:8px;--d:4s;--dl:-2.00s"></i><i style="left:40%;top:38%;--s:12px;--d:4s;--dl:-0.67s"></i><i style="left:86%;top:52%;--s:8px;--d:4s;--dl:-2.67s"></i><i style="left:18%;top:66%;--s:9px;--d:4s;--dl:-1.33s"></i><i style="left:58%;top:86%;--s:11px;--d:4s;--dl:-3.33s"></i></div><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
         <div class="pc-top"><div class="pc-head">
         <div class="pc-icon" aria-hidden="true">📅</div>
           <div class="pc-head-text">
@@ -8383,7 +8511,7 @@
       <!-- Card 3 — monthly subscription package -->
       <div class="pc-card-wrap">
       <span class="pc-badge pc-badge--urgency" id="mpUrgencyBadge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 1.6c.8 3.3-1 4.7-2.3 6.3C8.7 9.7 7.5 11.6 7.5 14a4.5 4.5 0 009 0c0-1.3-.4-2.2-.9-3 .1 1.7-1 2.6-1.9 2.6-1.4 0-1.7-1.5-.8-2.6 1.6-1.9 1.4-4.6-.4-9.4z"/></svg> <b id="mpSpotsLeft">8</b> <span data-i18n="spotsLeftMonth">დარჩა</span></span>
-      <div class="pc-card pc-card--monthly">
+      <div class="pc-card pc-card--monthly"><div class="pc-stars" aria-hidden="true"><i style="left:86%;top:10%;--s:10px;--d:4s;--dl:-0.00s"></i><i style="left:26%;top:16%;--s:8px;--d:4s;--dl:-2.00s"></i><i style="left:60%;top:38%;--s:12px;--d:4s;--dl:-0.67s"></i><i style="left:14%;top:52%;--s:8px;--d:4s;--dl:-2.67s"></i><i style="left:82%;top:66%;--s:9px;--d:4s;--dl:-1.33s"></i><i style="left:42%;top:86%;--s:11px;--d:4s;--dl:-3.33s"></i></div><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
         <div class="pc-top"><div class="pc-head">
         <div class="pc-icon" aria-hidden="true">👑</div>
           <div class="pc-head-text">
@@ -8528,7 +8656,7 @@
 
       <!-- Card 4 — edit order (character edit) -->
       
-      <div class="pc-card pc-card--edit">
+      <div class="pc-card pc-card--edit"><div class="pc-stars" aria-hidden="true"><i style="left:14%;top:10%;--s:10px;--d:4s;--dl:-0.00s"></i><i style="left:74%;top:16%;--s:8px;--d:4s;--dl:-2.00s"></i><i style="left:40%;top:38%;--s:12px;--d:4s;--dl:-0.67s"></i><i style="left:86%;top:52%;--s:8px;--d:4s;--dl:-2.67s"></i><i style="left:18%;top:66%;--s:9px;--d:4s;--dl:-1.33s"></i><i style="left:58%;top:86%;--s:11px;--d:4s;--dl:-3.33s"></i></div><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
         <div class="pc-top"><div class="pc-head">
         <div class="pc-icon" aria-hidden="true">✨</div>
           <div class="pc-head-text">
@@ -8537,7 +8665,7 @@
           </div>
         </div>
         <div class="pc-price-line"><b>9.99<sup>₾</sup></b><span class="pc-price-sep" data-i18n="pcFrom">დან</span></div>
-        <div class="pc-price-note" data-i18n="pc4PriceNote"><span class="pc-price-note-line">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე</span><span class="pc-price-note-line">(1080p / 4K)</span></div>
+        <div class="pc-price-note" data-i18n="pc4PriceNote"><span class="pc-price-note-line">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე</span></div>
         </div>
         <div class="pc-features">
           <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="pc4Feature1">1080P • 60FPS</span></div>
@@ -8601,7 +8729,7 @@
       <!-- Card 5 — cheap package (fixed price, no Topaz/effects) -->
       <div class="pc-card-wrap pc-card-wrap--cheap">
       <div class="pc-badge" data-i18n="pcRibbon">პოპულარული</div>
-      <div class="pc-card pc-card--cheap">
+      <div class="pc-card pc-card--cheap"><div class="pc-stars" aria-hidden="true"><i style="left:86%;top:10%;--s:10px;--d:4s;--dl:-0.00s"></i><i style="left:26%;top:16%;--s:8px;--d:4s;--dl:-2.00s"></i><i style="left:60%;top:38%;--s:12px;--d:4s;--dl:-0.67s"></i><i style="left:14%;top:52%;--s:8px;--d:4s;--dl:-2.67s"></i><i style="left:82%;top:66%;--s:9px;--d:4s;--dl:-1.33s"></i><i style="left:42%;top:86%;--s:11px;--d:4s;--dl:-3.33s"></i></div><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
         <div class="pc-top"><div class="pc-head">
         <div class="pc-icon" aria-hidden="true">⚡</div>
           <div class="pc-head-text">
@@ -8745,7 +8873,7 @@
       <!-- Card 5b — cheap package (unlimited monthly variant) -->
 <!-- Card 5 — cheap package (fixed price, no Topaz/effects) -->
       <div class="pc-card-wrap pc-card-wrap--cheapmonthly">
-      <div class="pc-card pc-card--cheapmonthly">
+      <div class="pc-card pc-card--cheapmonthly"><div class="pc-stars" aria-hidden="true"><i style="left:14%;top:10%;--s:10px;--d:4s;--dl:-0.00s"></i><i style="left:74%;top:16%;--s:8px;--d:4s;--dl:-2.00s"></i><i style="left:40%;top:38%;--s:12px;--d:4s;--dl:-0.67s"></i><i style="left:86%;top:52%;--s:8px;--d:4s;--dl:-2.67s"></i><i style="left:18%;top:66%;--s:9px;--d:4s;--dl:-1.33s"></i><i style="left:58%;top:86%;--s:11px;--d:4s;--dl:-3.33s"></i></div><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
         <div class="pc-top"><div class="pc-head">
         <div class="pc-icon" aria-hidden="true">🌙</div>
           <div class="pc-head-text">
@@ -9376,7 +9504,7 @@
       pc3Feature1: '1 თვის განმავლობაში<br>სრული შეკვეთა',
       pc3Feature2: '4K • 60FPS',
       pc4Desc: 'მსგავსი ედითი<br>თქვენი პერსონაჟით',
-      pc4PriceNote: '<span class="pc-price-note-line">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე</span><span class="pc-price-note-line">(1080p / 4K)</span>',
+      pc4PriceNote: '<span class="pc-price-note-line">ფასი დამოკიდებულია არჩეულ სტილსა და ხარისხზე</span>',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
       pc4Feature3: 'ჩაბარდება არაუმეტეს 24 საათის განმავლობაში',
@@ -9819,7 +9947,7 @@
       pc3Feature1: 'Within 1 month<br>full order',
       pc3Feature2: '4K • 60FPS',
       pc4Desc: 'A similar edit<br>with your character',
-      pc4PriceNote: '<span class="pc-price-note-line">Price depends on the chosen style and quality</span><span class="pc-price-note-line">(1080p / 4K)</span>',
+      pc4PriceNote: '<span class="pc-price-note-line">Price depends on the chosen style and quality</span>',
       pc4Feature1: '1080P • 60FPS',
       pc4Feature2: '4K • 60FPS',
       pc4Feature3: 'Delivered within 24 hours',
@@ -19511,52 +19639,59 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     });
     if (reduce) return;
 
-    const seen = new Set();
-    const ease = t => 1 - Math.pow(1 - t, 3);
-    function countUp(slide){
-      slide.querySelectorAll('.pc-price-line b').forEach(b => {
-        const node = Array.from(b.childNodes).find(n => n.nodeType === 3);
-        if (!node) return;
-        if (!b.dataset.final) b.dataset.final = node.nodeValue;
-        const final = b.dataset.final, target = parseFloat(final);
-        if (!isFinite(target)) return;
-        const dec = (final.split('.')[1] || '').length, t0 = performance.now(), dur = 750;
-        cancelAnimationFrame(b._raf);
-        (function tick(now){
-          const k = Math.min(1, (now - t0) / dur);
-          node.nodeValue = k < 1 ? (target * ease(k)).toFixed(dec) : final;
-          if (k < 1) b._raf = requestAnimationFrame(tick);
-        })(t0);
+    // Every card's content starts hidden (.pc-pre) and plays its entrance the moment the
+    // card is actually coming into view -- so there is never a frame where the card is
+    // fully drawn first and the animation only starts afterwards. Plays once per card.
+    const track = container.querySelector('.pc-scroll-track') || container;
+    const pending = new Set(slides);
+    let armed = false, ticking = false;
+    slides.forEach(sl => sl.classList.add('pc-pre'));
+
+    function play(sl, order){
+      if (!pending.has(sl)) return;
+      pending.delete(sl);
+      sl.style.setProperty('--o', order || 0);
+      sl.classList.remove('pc-pre');
+      sl.classList.add('pc-in');
+      setTimeout(() => sl.classList.remove('pc-in'), 2200);
+    }
+    function check(){
+      ticking = false;
+      if (!armed || !pending.size) return;
+      const t = track.getBoundingClientRect();
+      let k = 0;
+      Array.from(pending).forEach(sl => {
+        const r = sl.getBoundingClientRect();
+        const visX = Math.min(r.right, t.right) - Math.max(r.left, t.left);
+        const visY = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+        if (visX >= r.width * 0.3 && visY > 40) play(sl, k++);
       });
     }
-    function playFirst(slide){
-      if (!slide || seen.has(slide)) return;
-      seen.add(slide);
-      slide.classList.add('pc-first');
-      countUp(slide);
-      setTimeout(() => slide.classList.remove('pc-first'), 1600);
-    }
+    function queueCheck(){ if (!ticking){ ticking = true; requestAnimationFrame(check); } }
+    track.addEventListener('scroll', queueCheck, { passive:true });
+    window.addEventListener('resize', queueCheck);
 
     // entrance when the section first scrolls into view
+    function arm(){
+      armed = true;
+      container.classList.remove('pc-wait'); container.classList.add('pc-play');
+      setTimeout(() => container.classList.remove('pc-play'), 1800);
+      check();
+    }
     if ('IntersectionObserver' in window){
       container.classList.add('pc-wait');
       const io = new IntersectionObserver((es) => {
-        if (es.some(e => e.isIntersecting)){
-          io.disconnect();
-          container.classList.remove('pc-wait'); container.classList.add('pc-play');
-          setTimeout(() => container.classList.remove('pc-play'), 1800);
-          playFirst(container.querySelector('.pc-slide--active'));
-        }
+        if (es.some(e => e.isIntersecting)){ io.disconnect(); arm(); }
       }, { threshold: 0.15 });
       io.observe(container);
     } else {
-      playFirst(container.querySelector('.pc-slide--active'));
+      armed = true; check();
     }
 
-    // later cards: first activation only
+    // safety net: a card that becomes the active one always plays
     const mo = new MutationObserver(muts => muts.forEach(m => {
       const el = m.target;
-      if (el.classList.contains('pc-slide--active') && !(m.oldValue || '').includes('pc-slide--active') && !container.classList.contains('pc-wait')) playFirst(el);
+      if (armed && el.classList.contains('pc-slide--active') && !(m.oldValue || '').includes('pc-slide--active')) play(el, 0);
     }));
     slides.forEach(sl => mo.observe(sl, { attributes:true, attributeFilter:['class'], attributeOldValue:true }));
 
@@ -19575,7 +19710,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       });
     }
   }
-  setTimeout(() => ttdlSafeInit(initPricingMotion), 0);
+  ttdlSafeInit(initPricingMotion);
 
   // ---------- TikTok block: one-time entrance + paste button ----------
   function initTtdlDeck(){
@@ -19670,28 +19805,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
 <script>
 (function(){
-  /* Same 6 stars on every card (mirrored on every second one), evenly
-     phased on one shared cycle, so each card always shows the same number
-     of sparkles at any moment. */
-  var POS=[[14,10,10],[74,16,8],[40,38,12],[86,52,8],[18,66,9],[58,86,11]];
-  var ORDER=[0,3,1,4,2,5], CYCLE=4;
-  function addStars(){
-    document.querySelectorAll('.pc-card').forEach(function(card, ci){
-      if (card.querySelector(':scope > .pc-stars')) return;
-      var box=document.createElement('div'); box.className='pc-stars'; box.setAttribute('aria-hidden','true');
-      POS.forEach(function(p, k){
-        var st=document.createElement('i');
-        st.style.left=(ci%2 ? 100-p[0] : p[0])+'%'; st.style.top=p[1]+'%';
-        st.style.setProperty('--s',p[2]+'px');
-        st.style.setProperty('--d',CYCLE+'s');
-        st.style.setProperty('--dl',(-ORDER[k]*CYCLE/POS.length).toFixed(2)+'s');
-        box.appendChild(st);
-      });
-      card.insertBefore(box, card.firstChild);
-    });
-  }
-  addStars();
-  window.addEventListener('load', addStars);
+  if (!('IntersectionObserver' in window)) return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ e.target.classList.toggle('pc-off', !e.isIntersecting); });
+  }, {rootMargin:'80px'});
+  document.querySelectorAll('.pc-card').forEach(function(c){ io.observe(c); });
 })();
 </script>
 </body>
