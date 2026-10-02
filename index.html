@@ -7397,6 +7397,48 @@
   html body .ttdl-quality-block.tt-probing .tqt-top{ flex-wrap:nowrap; }
   html body .ttdl-quality-block.tt-probing .tqt-top > span:first-child{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   html body .ttdl-quality-block.tt-probing .tqt-top > span:last-child{ flex:0 0 auto; white-space:nowrap; }
+  /* ---- Photo posts: refined download button, tidy grids ---- */
+  html body .ttdl-photo-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  html body .ttdl-photo-item:last-child:nth-child(odd){ grid-column:1 / -1; justify-self:center; width:calc(50% - 4px); }
+  html body .ttdl-photo-item:only-child{ width:min(72%,280px); }
+  html body .ttdl-photo-item{ border-radius:16px; border:1px solid rgba(255,255,255,.1); }
+  html body .ttdl-photo-item::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:42%;
+    background:linear-gradient(to top, rgba(4,8,12,.7), rgba(4,8,12,0)); pointer-events:none; z-index:1;
+  }
+  html body .ttdl-photo-num{
+    z-index:2; left:8px; top:8px; padding:3px 9px; letter-spacing:.04em;
+    background:rgba(8,12,18,.62); border:1px solid rgba(255,255,255,.14);
+  }
+  html body .ttdl-photo-dl{
+    z-index:2; right:9px; bottom:9px; width:38px; height:38px; border-radius:50%;
+    font-size:0; line-height:0; color:#fff; -webkit-tap-highlight-color:transparent;
+    background:linear-gradient(#0b1117,#0b1117) padding-box, linear-gradient(135deg,#25F4EE,#FE2C55) border-box;
+    border:1.5px solid transparent;
+    transition:transform .18s ease, filter .2s ease;
+  }
+  html body .ttdl-photo-dl svg{ width:17px; height:17px; display:block; transition:transform .2s ease; }
+  html body .ttdl-photo-dl:hover{
+    color:#fff; filter:brightness(1.12); transform:translateY(-1px);
+    background:linear-gradient(#0b1117,#0b1117) padding-box, linear-gradient(135deg,#25F4EE,#FE2C55) border-box;
+  }
+  html body .ttdl-photo-dl:hover svg{ transform:translateY(1.5px); }
+  html body .ttdl-photo-dl:active{
+    transform:scale(.9);
+    background:linear-gradient(135deg,#25F4EE,#FE2C55) border-box; color:#04141a;
+  }
+  /* ---- Stats gap filler: a real button tile ---- */
+  html body .ttdl-stat--action{
+    --stat-c:#25F4EE; --stat-c-soft:rgba(37,244,238,.16); --stat-c-ring:rgba(37,244,238,.45);
+    cursor:pointer; font:inherit; font-size:10px; color:inherit; text-align:left; width:100%;
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    background:linear-gradient(135deg,rgba(37,244,238,.16),rgba(254,44,85,.14));
+    border:1px solid rgba(37,244,238,.4); border-left:3px solid #25F4EE;
+    transition:transform .15s ease, filter .2s ease;
+  }
+  html body .ttdl-stat--action:hover{ filter:brightness(1.12); }
+  html body .ttdl-stat--action:active{ transform:scale(.97); }
+  html body .ttdl-stat--action.is-done{ --stat-c:#3ddc84; border-color:rgba(61,220,132,.55); border-left-color:#3ddc84; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -18522,7 +18564,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       return lr.bottom - (viewBottom - 14);
     }
     function ttdlTargetDelta(sc, mode){
-      if (mode === 'photos' && photoGrid && photoGrid.offsetParent !== null){
+      if (mode === 'photos' && photoGrid && photoGrid.getClientRects().length){
         const viewTop = sc ? sc.getBoundingClientRect().top : 0;
         return photoGrid.getBoundingClientRect().top - (viewTop + 14);
       }
@@ -18564,6 +18606,46 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const sc = ttdlScrollParent(logEl);
       if (sc) sc.scrollTo({ top: sc.scrollTop + diff, behavior: 'instant' });
       else window.scrollTo({ top: ttdlScrollPos(null) + diff, behavior: 'instant' });
+    }
+
+
+    // ---- If the stat tiles come out odd, fill the empty cell with a
+    // "copy link" button tile instead of leaving a hole. ----
+    function ttdlFillStatGap(){
+      if (!statsGrid || statsGrid.querySelector('.ttdl-stat--action')) return;
+      const tiles = Array.prototype.filter.call(statsGrid.children, function(n){
+        return n.classList.contains('ttdl-stat-item') && !n.classList.contains('ttdl-stat--id');
+      });
+      if (!tiles.length || tiles.length % 2 === 0) return;
+      const en = (document.documentElement.lang === 'en') || (localStorage.getItem('moon_lang') === 'en');
+      const T = en ? ['Link','Copy','Copied \u2713'] : ['\u10d1\u10db\u10e3\u10da\u10d8','\u10d9\u10dd\u10de\u10d8\u10e0\u10d4\u10d1\u10d0','\u10d3\u10d0\u10d9\u10dd\u10de\u10d8\u10e0\u10d3\u10d0 \u2713'];
+      const link = (urlInput.value || '').trim();
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ttdl-stat-item ttdl-stat--action';
+      btn.innerHTML = '<span class="ttdl-stat-ico">\U0001f517</span>' + T[0] + ': <b>' + T[1] + '</b>';
+      btn.addEventListener('click', function(){
+        const done = function(){
+          const b = btn.querySelector('b'); if (!b) return;
+          b.textContent = T[2]; btn.classList.add('is-done');
+          setTimeout(function(){ b.textContent = T[1]; btn.classList.remove('is-done'); }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(link).then(done, function(){ ttdlLegacyCopy(link); done(); });
+        } else { ttdlLegacyCopy(link); done(); }
+      });
+      const idTile = statsGrid.querySelector('.ttdl-stat--id');
+      statsGrid.insertBefore(btn, idTile || null);
+    }
+    function ttdlLegacyCopy(text){
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly',''); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      }catch(e){}
+    }
+    if (statsGrid && window.MutationObserver){
+      new MutationObserver(ttdlFillStatGap).observe(statsGrid, { childList:true });
     }
 
     function ttdlFormatCount(n){
@@ -19032,7 +19114,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           sdBtn.disabled = !lastData.sd;
           hdBtn.disabled = !lastData.hd;
           ttdlLog(ttdlDict('logFound'));
-          ttdlGlideToLog(220);
+          ttdlGlideToLog(2400); // fallback only; normally the probe-finish call below replaces this
 
           // ---- Phase 2 (background): the slow per-tier resolution/fps
           // probe. Deliberately NOT awaited before the code above runs --
@@ -19056,7 +19138,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             return info;
           })).then((metas) => {
             if (myToken !== ttdlAnalysisToken || !qualityBlock) return; // a newer analyze() superseded this one
-            const ttdlHoldTop = logEl ? logEl.getBoundingClientRect().top : null;
 
             const tiers = urls.map((tierUrl, i) => {
               let sizeBytes = null;
@@ -19121,8 +19202,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const r = ttdlResLabel(hdTier.width, hdTier.height);
               if (r) hdBtnLabel.textContent = r + (hdTier.fps != null ? '/' + Math.round(hdTier.fps) : '');
             }
-            ttdlHoldLog(ttdlHoldTop);
-            if (ttdlGliding) ttdlGlideToLog(400);
+            ttdlGlideToLog(180); // layout is final now -> one single, clean glide
           });
         } else {
           ttdlLog(ttdlDict('logFail'));
@@ -20015,37 +20095,4 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 </script>
 </body>
 </html>
-  /* ---- Photo posts: refined download button, tidy grids ---- */
-  html body .ttdl-photo-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-  html body .ttdl-photo-item:last-child:nth-child(odd){ grid-column:1 / -1; justify-self:center; width:calc(50% - 4px); }
-  html body .ttdl-photo-item:only-child{ width:min(72%,280px); }
-  html body .ttdl-photo-item{ border-radius:16px; border:1px solid rgba(255,255,255,.1); }
-  html body .ttdl-photo-item::after{
-    content:''; position:absolute; left:0; right:0; bottom:0; height:42%;
-    background:linear-gradient(to top, rgba(4,8,12,.7), rgba(4,8,12,0)); pointer-events:none; z-index:1;
-  }
-  html body .ttdl-photo-num{
-    z-index:2; left:8px; top:8px; padding:3px 9px; letter-spacing:.04em;
-    background:rgba(8,12,18,.62); border:1px solid rgba(255,255,255,.14);
-  }
-  html body .ttdl-photo-dl{
-    z-index:2; right:9px; bottom:9px; width:38px; height:38px; border-radius:50%;
-    font-size:0; line-height:0; color:#fff; -webkit-tap-highlight-color:transparent;
-    background:linear-gradient(#0b1117,#0b1117) padding-box, linear-gradient(135deg,#25F4EE,#FE2C55) border-box;
-    border:1.5px solid transparent;
-    transition:transform .18s ease, filter .2s ease;
-  }
-  html body .ttdl-photo-dl svg{ width:17px; height:17px; display:block; transition:transform .2s ease; }
-  html body .ttdl-photo-dl:hover{
-    color:#fff; filter:brightness(1.12); transform:translateY(-1px);
-    background:linear-gradient(#0b1117,#0b1117) padding-box, linear-gradient(135deg,#25F4EE,#FE2C55) border-box;
-  }
-  html body .ttdl-photo-dl:hover svg{ transform:translateY(1.5px); }
-  html body .ttdl-photo-dl:active{
-    transform:scale(.9);
-    background:linear-gradient(135deg,#25F4EE,#FE2C55) border-box; color:#04141a;
-  }
-  /* ---- Stats: a lone leftover tile fills the whole row (no empty cell) ---- */
-  html body .ttdl-stats-grid > .ttdl-stat-item:not(.ttdl-stat--id):nth-child(odd):last-child,
-  html body .ttdl-stats-grid > .ttdl-stat-item:not(.ttdl-stat--id):nth-child(odd):has(+ .ttdl-stat--id){ grid-column:1 / -1; }
 
