@@ -7004,10 +7004,11 @@
 
   /* ---- Analyze button: small, calm, tactile ---- */
   body .ttdl-action-row{ margin-bottom:10px; justify-content:center; }
-  .ttdl-clear-btn, body .ttdl-clear-btn{ display:none !important; }
+  body .ttdl-clear-btn{ width:46px; min-height:42px; border-radius:13px; flex:0 0 auto; align-items:center; justify-content:center; }
+  body .ttdl-action-row{ gap:8px; width:100%; }
   body .ttdl-analyze-btn{
-    flex:0 1 auto; width:auto; min-width:168px; max-width:100%;
-    min-height:42px; padding:0 26px; border-radius:13px; gap:8px;
+    flex:1 1 0; width:auto; min-width:0; max-width:100%;
+    min-height:42px; padding:0 20px; border-radius:13px; gap:8px;
     font-size:13px; font-weight:800; letter-spacing:.02em; color:#07181d;
     background:linear-gradient(135deg,#5db5b4 0%,#7f94d0 100%);
     background-size:100% 100%; animation:none;
@@ -8888,6 +8889,7 @@
             </div>
             <div class="ttdl-action-row">
               <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
+              <button type="button" class="ttdl-clear-btn" id="ttdlClearBtn" style="display:none" aria-label="გასუფთავება" title="გასუფთავება"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
             </div>
 
             <div class="ttdl-result" id="ttdlResult" style="display:none;">
@@ -19074,7 +19076,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const b = analyzeBtn;
       if (!b) return;
       const down = () => {
-        try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+        
         b.classList.add('is-down');
       };
       const up = () => b.classList.remove('is-down');
