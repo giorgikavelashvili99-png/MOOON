@@ -6958,6 +6958,142 @@
   @media (prefers-reduced-motion:reduce){ .ttdl-shell *, .ttdl-shell::before, .ttdl-aurora i{ animation:none !important; } }
   html.low-power .ttdl-shell *, html.low-power .ttdl-shell::before, html.low-power .ttdl-aurora i{ animation:none !important; }
 
+
+  /* =====================================================================
+     TikTok checker — compact + calm pass (appended last on purpose so it
+     wins over the earlier ttdl rules at equal specificity).
+     - whole block smaller
+     - stat chips: fixed 2-col grid, label over value, never overflow;
+       ID chip gets its own full-width row
+     - Analyze: smaller, soft muted colours, no moving gradient / shine,
+       clear "pressed" feedback (scale + flash; box-shadow is globally
+       disabled on this site so none is used)
+     - the ✕ clear button next to Analyze is hidden
+     ===================================================================== */
+  .pc-ttdl-row{ max-width:500px; }
+  @media (min-width:900px){ .pc-ttdl-row{ max-width:540px; } }
+
+  body .ttdl-shell{ border-radius:22px; }
+  body .ttdl-shell::after{ border-radius:20.5px; }
+  .ttdl-aurora{ border-radius:20.5px; }
+  body .ttdl-titlebar{ padding:8px 14px; }
+  body .ttdl-titlebar-path{ font-size:10px; }
+  body .ttdl-content{ padding:14px 12px 12px; }
+  @media (min-width:600px){ body .ttdl-content{ padding:16px 16px 14px; } }
+  body .ttdl-body{ gap:12px; }
+
+  body .ttdl-header{ gap:8px; }
+  body .ttdl-icon{ width:46px; height:46px; }
+  body .ttdl-icon::after{ inset:-6px; }
+  body .ttdl-heading{ font-size:clamp(11px,3.3vw,16px); margin-bottom:3px; }
+  body .ttdl-subtext{ font-size:clamp(10px,2.8vw,11.5px); line-height:1.5; }
+
+  .ttdl-step{ width:28px; height:28px; }
+  .ttdl-step svg{ width:13px; height:13px; }
+  .ttdl-step-line{ flex-basis:clamp(26px,8vw,44px); }
+  .ttdl-steps{ margin:0 auto; }
+
+  body .ttdl-glass{ padding:12px; border-radius:18px; }
+  @media (min-width:600px){ body .ttdl-glass{ padding:14px; } }
+
+  body .ttdl-input-wrap{ margin-bottom:10px; }
+  body .ttdl-input{ height:46px; padding:0 46px; border-radius:14px; font-size:13px; }
+  body .ttdl-input-icon{ left:7px; width:32px; height:32px; border-radius:11px; }
+  body .ttdl-input-icon svg{ width:15px; height:15px; }
+  .ttdl-paste-btn{ right:6px; width:34px; height:34px; border-radius:11px; }
+
+  /* ---- Analyze button: small, calm, tactile ---- */
+  body .ttdl-action-row{ margin-bottom:10px; justify-content:center; }
+  .ttdl-clear-btn, body .ttdl-clear-btn{ display:none !important; }
+  body .ttdl-analyze-btn{
+    flex:0 1 auto; width:auto; min-width:168px; max-width:100%;
+    min-height:42px; padding:0 26px; border-radius:13px; gap:8px;
+    font-size:13px; font-weight:800; letter-spacing:.02em; color:#07181d;
+    background:linear-gradient(135deg,#5db5b4 0%,#7f94d0 100%);
+    background-size:100% 100%; animation:none;
+    transition:transform .12s ease, filter .12s ease, opacity .25s ease;
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    -webkit-user-select:none; user-select:none;
+  }
+  body .ttdl-analyze-btn::after, body .ttdl-analyze-btn:hover::after{ content:none !important; display:none !important; }
+  body .ttdl-analyze-btn::before{
+    content:""; position:absolute; inset:0; left:0; top:0; width:auto; height:auto;
+    transform:none; background:rgba(255,255,255,.38); opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  body .ttdl-analyze-btn:hover{ transform:none; filter:none; }
+  body .ttdl-analyze-btn:hover::after{ transform:none; }
+  body .ttdl-analyze-btn:hover::before{ opacity:0; left:0; transition:opacity .3s ease; }
+  @media (hover:hover) and (pointer:fine){ body .ttdl-analyze-btn:hover{ filter:brightness(1.06); } }
+  /* pressed: visibly shrinks, darkens, flashes */
+  body .ttdl-analyze-btn:active, body .ttdl-analyze-btn.is-down{
+    transform:scale(.94); filter:brightness(.86); transition-duration:.05s;
+  }
+  body .ttdl-analyze-btn:active::before, body .ttdl-analyze-btn.is-down::before{ opacity:1; transition:none; }
+  /* busy: slow gentle breathing instead of the fast moving gradient */
+  body .ttdl-analyze-btn:disabled{
+    opacity:.85; filter:saturate(.8); cursor:progress;
+    animation:ttCalmPulse 2.6s ease-in-out infinite;
+  }
+  body .ttdl-analyze-btn:disabled::after{ display:none; }
+  @keyframes ttCalmPulse{ 0%,100%{ opacity:.6; } 50%{ opacity:.95; } }
+  /* one-shot "I got your tap" bounce, triggered from JS on click */
+  body .ttdl-analyze-btn.tt-tap, body .ttdl-analyze-btn.tt-tap:disabled{ animation:ttTap .38s ease-out; }
+  body .ttdl-analyze-btn.tt-tap::before{ animation:ttTapFlash .45s ease-out; }
+  @keyframes ttTap{ 0%{ transform:scale(.92); } 55%{ transform:scale(1.03); } 100%{ transform:scale(1); } }
+  @keyframes ttTapFlash{ 0%{ opacity:.85; } 100%{ opacity:0; } }
+
+  /* ---- result card ---- */
+  body .ttdl-result{ gap:10px; padding:8px 10px; border-radius:14px; margin-bottom:8px; }
+  body .ttdl-thumb-wrap{ width:40px; height:52px; border-radius:9px; }
+  body .ttdl-thumb-play{ width:16px; height:16px; line-height:16px; font-size:7px; }
+  body .ttdl-result-title{ font-size:12px; }
+  body .ttdl-result-meta{ font-size:10px; }
+
+  /* ---- stat chips: stable sizes, nothing can overflow ---- */
+  body .ttdl-details{ margin-bottom:8px; }
+  body .ttdl-stats-grid{
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px; justify-content:stretch; margin-bottom:8px;
+  }
+  body .ttdl-stat-item{
+    display:grid; grid-template-columns:22px minmax(0,1fr); align-content:center; align-items:center;
+    column-gap:8px; row-gap:1px; min-width:0; min-height:44px; overflow:hidden;
+    padding:6px 10px 6px 7px; border-radius:12px;
+    font-size:10px; line-height:1.2; white-space:nowrap;
+  }
+  body .ttdl-stat-ico{ grid-column:1; grid-row:1 / span 2; width:22px; height:22px; align-self:center; }
+  body .ttdl-stat-item b,
+  body .ttdl-stat-item .ttdl-shadow-yes,
+  body .ttdl-stat-item .ttdl-shadow-no,
+  body .ttdl-stat-item .ttdl-shadow-unknown{
+    grid-column:2; margin:0; min-width:0; overflow:hidden; text-overflow:ellipsis;
+    font-size:13px; line-height:1.2; font-variant-numeric:tabular-nums;
+  }
+  /* ID: long number -> its own full-width, single-line row */
+  body .ttdl-stat--id{ grid-column:1 / -1; grid-template-columns:22px auto minmax(0,1fr); column-gap:8px; min-height:38px; }
+  body .ttdl-stat--id .ttdl-stat-ico{ grid-row:auto; }
+  body .ttdl-stat--id b{ grid-column:3; text-align:right; font-size:12px; letter-spacing:.02em; }
+  @media (max-width:480px){
+    body .ttdl-stat-item{ padding:6px 8px 6px 6px; font-size:10px; gap:0; column-gap:7px; }
+    body .ttdl-stat-item b{ font-size:13px; }
+    body .ttdl-stat--id b{ font-size:11.5px; }
+  }
+
+  /* ---- quality block: always stacked, wraps instead of overflowing ---- */
+  body .ttdl-quality-block{ border-radius:14px; padding:8px; margin-bottom:8px; }
+  .ttdl-quality-tiers{ grid-template-columns:minmax(0,1fr); gap:6px; }
+  body .ttdl-quality-tier{ border-radius:10px; padding:7px 10px 7px 13px; }
+  .tqt-top{ flex-wrap:wrap; row-gap:1px; font-size:10.5px; }
+  .tqt-sub{ margin-top:2px; font-size:9.5px; }
+  body .ttdl-quality-original{ margin-top:6px; padding:7px 10px; border-radius:10px; font-size:10.5px; overflow-wrap:anywhere; }
+
+  /* ---- download buttons / music / log ---- */
+  body .ttdl-dl-row{ gap:8px; margin-bottom:8px; }
+  body .ttdl-dl-btn{ min-height:46px; padding:6px 10px; border-radius:14px; font-size:12.5px; }
+  body .ttdl-dl-ico{ width:28px; height:28px; }
+  body .ttdl-music-btn, body .ttdl-photo-dl-all{ min-height:42px; border-radius:14px; }
+  body .ttdl-log{ min-height:64px; padding:9px 11px; font-size:10.5px; line-height:1.55; border-radius:13px; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -8752,7 +8888,6 @@
             </div>
             <div class="ttdl-action-row">
               <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
-              <button type="button" class="ttdl-clear-btn" id="ttdlClearBtn" title="გასუფთავება" aria-label="გასუფთავება" style="display:none;">✕</button>
             </div>
 
             <div class="ttdl-result" id="ttdlResult" style="display:none;">
@@ -18932,6 +19067,26 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     hdBtn.addEventListener('click', () => ttdlDownload('hd'));
     if (musicBtn) musicBtn.addEventListener('click', ttdlDownloadMusic);
     if (clearBtn) clearBtn.addEventListener('click', ttdlClear);
+
+    // Tactile feedback for "Analyze": short vibration on touch + visible
+    // press (CSS .is-down / .tt-tap) so a tap never feels like nothing happened.
+    (function(){
+      const b = analyzeBtn;
+      if (!b) return;
+      const down = () => {
+        try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+        b.classList.add('is-down');
+      };
+      const up = () => b.classList.remove('is-down');
+      b.addEventListener('pointerdown', down);
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => b.addEventListener(ev, up));
+      b.addEventListener('click', () => {
+        b.classList.remove('tt-tap');
+        void b.offsetWidth; // restart the animation on rapid taps
+        b.classList.add('tt-tap');
+        setTimeout(() => b.classList.remove('tt-tap'), 460);
+      });
+    })();
 
     ttdlLog(ttdlDict('logReady'));
   }
