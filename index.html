@@ -7446,6 +7446,11 @@
   html.ttdl-gliding body *:not(.ttdl-shell):not(.ttdl-shell *),
   html.ttdl-gliding body *:not(.ttdl-shell):not(.ttdl-shell *)::before,
   html.ttdl-gliding body *:not(.ttdl-shell):not(.ttdl-shell *)::after{ animation-play-state:paused !important; }
+  /* Quality box skeleton uses the exact same markup as the final result, so its height
+     never changes when the real numbers arrive. The old filler pieces are switched off. */
+  html body .ttdl-quality-block.tt-probing::after,
+  html body .ttdl-quality-block.tt-probing .ttdl-quality-tier::after{ display:none !important; content:none !important; }
+  html body .ttdl-quality-block.tt-probing .ttdl-quality-original{ color:transparent; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -19188,8 +19193,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           if (qualityBlock) {
             qualityBlock.classList.remove('tt-probed'); qualityBlock.classList.add('tt-probing');
             qualityBlock.innerHTML = '<div class="ttdl-quality-tiers">' +
-              urls.map(u => '<div class="ttdl-quality-tier' + ttdlQualityTierClass(labelsByUrl[u].join(' / ')) + '"><div class="tqt-top"><span>' + ttdlQualityIcons(labelsByUrl[u].join(' / ')) + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div></div>').join('') +
-              '</div>';
+              urls.map(u => '<div class="ttdl-quality-tier' + ttdlQualityTierClass(labelsByUrl[u].join(' / ')) + '"><div class="tqt-top"><span>' + ttdlQualityIcons(labelsByUrl[u].join(' / ')) + escapeHtml(labelsByUrl[u].join(' / ')) + '</span><span>' + escapeHtml(ttdlDict('checkingQuality')) + '</span></div>' +
+                '<div class="tqt-sub">↳ …</div></div>').join('') +
+              '</div>' +
+              '<div class="ttdl-quality-original">' + escapeHtml(ttdlDict('statOriginal')) + ': …</div>';
           }
 
           if (bodyEl) bodyEl.classList.add('ttdl-expanded');
