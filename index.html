@@ -7436,9 +7436,16 @@
     border:1px solid rgba(37,244,238,.4); border-left:3px solid #25F4EE;
     transition:transform .15s ease, filter .2s ease;
   }
+  html body .ttdl-stat--action{ display:flex; align-items:center; justify-content:center; text-align:center; }
+  html body .ttdl-stat--action .ttdl-stat-lbl{ font-size:14px; font-weight:800; letter-spacing:.02em; color:var(--stat-c); }
   html body .ttdl-stat--action:hover{ filter:brightness(1.12); }
   html body .ttdl-stat--action:active{ transform:scale(.97); }
   html body .ttdl-stat--action.is-done{ --stat-c:#3ddc84; border-color:rgba(61,220,132,.55); border-left-color:#3ddc84; }
+  /* While the auto-glide runs, freeze looping decorative animations outside the
+     downloader card so the browser only has to move pixels (no extra paint work). */
+  html.ttdl-gliding body *:not(.ttdl-shell):not(.ttdl-shell *),
+  html.ttdl-gliding body *:not(.ttdl-shell):not(.ttdl-shell *)::before,
+  html.ttdl-gliding body *:not(.ttdl-shell):not(.ttdl-shell *)::after{ animation-play-state:paused !important; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -18579,7 +18586,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         const need = function(){ const d = ttdlTargetDelta(sc, mode); return mode === 'photos' ? Math.abs(d) : d; };
         if (need() <= 2) return;
         const top = Math.max(0, ttdlScrollPos(sc) + ttdlTargetDelta(sc, mode));
-        ttdlGliding = true;
+        ttdlGliding = true; document.documentElement.classList.add('ttdl-gliding');
         if (sc) sc.scrollTo({ top: top, behavior: 'smooth' });
         else window.scrollTo({ top: top, behavior: 'smooth' });
         let last = ttdlScrollPos(sc), still = 0, t0 = performance.now();
@@ -18587,9 +18594,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           const cur = ttdlScrollPos(sc);
           still = Math.abs(cur - last) < 0.5 ? still + 1 : 0;
           last = cur;
-          if (ttdlUserScrolled){ ttdlGliding = false; return; }
+          if (ttdlUserScrolled){ ttdlGliding = false; document.documentElement.classList.remove('ttdl-gliding'); return; }
           if (still >= 6 || performance.now() - t0 > 2500){
-            ttdlGliding = false;
+            ttdlGliding = false; document.documentElement.classList.remove('ttdl-gliding');
             if ((pass || 0) < 2 && need() > 3) ttdlGlideToLog(0, (pass || 0) + 1, mode);
             return;
           }
@@ -18597,6 +18604,41 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         })();
       }, delay == null ? 200 : delay);
     }
+
+    // Resolves once the first few photos are decoded (or after a short cap), so the
+    // glide never has to decode big images while it is animating.
+    function ttdlWhenImagesReady(container, n, capMs){
+      const imgs = Array.prototype.slice.call(container.querySelectorAll('img'), 0, n);
+      const jobs = imgs.map(function(im){
+        if (im.complete && im.naturalWidth) return Promise.resolve();
+        if (im.decode) return im.decode().catch(function(){});
+        return new Promise(function(r){ im.addEventListener('load', r, { once:true }); im.addEventListener('error', r, { once:true }); });
+      });
+      return Promise.race([Promise.all(jobs), new Promise(function(r){ setTimeout(r, capMs); })]);
+    }
+    // The quality box changes height when the background probe fills it in. Animate that
+    // change and keep the log visually still, so nothing ever jumps.
+    function ttdlBeginQualitySwap(){
+      return { h0: qualityBlock.getBoundingClientRect().height, logTop: logEl ? logEl.getBoundingClientRect().top : null };
+    }
+    function ttdlEndQualitySwap(st){
+      const qb = qualityBlock;
+      qb.style.height = 'auto';
+      const h1 = qb.getBoundingClientRect().height;
+      const clean = function(){ qb.style.height = ''; qb.style.overflow = ''; qb.style.transition = ''; };
+      if (!st || Math.abs(h1 - st.h0) < 1 || ttdlUserScrolled){ clean(); return; }
+      qb.style.overflow = 'hidden';
+      qb.style.height = st.h0 + 'px';
+      void qb.offsetHeight;
+      qb.style.transition = 'height .35s cubic-bezier(.2,.7,.2,1)';
+      qb.style.height = h1 + 'px';
+      const t0 = performance.now();
+      (function tick(now){
+        ttdlHoldLog(st.logTop);
+        if (now - t0 < 400 && !ttdlUserScrolled) requestAnimationFrame(tick); else clean();
+      })(t0);
+    }
+
     // Keeps the log exactly where it is on screen when content above it
     // changes height (e.g. the quality box filling in) -- no jump up/down.
     function ttdlHoldLog(beforeTop){
@@ -18618,17 +18660,17 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       });
       if (!tiles.length || tiles.length % 2 === 0) return;
       const en = (document.documentElement.lang === 'en') || (localStorage.getItem('moon_lang') === 'en');
-      const T = en ? ['Link','Copy','Copied \u2713'] : ['\u10d1\u10db\u10e3\u10da\u10d8','\u10d9\u10dd\u10de\u10d8\u10e0\u10d4\u10d1\u10d0','\u10d3\u10d0\u10d9\u10dd\u10de\u10d8\u10e0\u10d3\u10d0 \u2713'];
+      const T = en ? ['Link','Copied \u2713'] : ['\u10d1\u10db\u10e3\u10da\u10d8','\u10d3\u10d0\u10d9\u10dd\u10de\u10d8\u10e0\u10d3\u10d0 \u2713'];
       const link = (urlInput.value || '').trim();
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ttdl-stat-item ttdl-stat--action';
-      btn.innerHTML = '<span class="ttdl-stat-ico">\U0001f517</span>' + T[0] + ': <b>' + T[1] + '</b>';
+      btn.innerHTML = '<span class="ttdl-stat-lbl">' + T[0] + '</span>';
       btn.addEventListener('click', function(){
         const done = function(){
-          const b = btn.querySelector('b'); if (!b) return;
-          b.textContent = T[2]; btn.classList.add('is-done');
-          setTimeout(function(){ b.textContent = T[1]; btn.classList.remove('is-done'); }, 1600);
+          const b = btn.querySelector('.ttdl-stat-lbl'); if (!b) return;
+          b.textContent = T[1]; btn.classList.add('is-done');
+          setTimeout(function(){ b.textContent = T[0]; btn.classList.remove('is-done'); }, 1600);
         };
         if (navigator.clipboard && navigator.clipboard.writeText){
           navigator.clipboard.writeText(link).then(done, function(){ ttdlLegacyCopy(link); done(); });
@@ -19022,7 +19064,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               photoGrid.style.display = 'grid';
               photoGrid.innerHTML = d.images.map((imgUrl, i) =>
                 '<div class="ttdl-photo-item">' +
-                  '<img src="' + escapeHtml(imgUrl) + '" alt="' + (i+1) + '" loading="lazy">' +
+                  '<img src="' + escapeHtml(imgUrl) + '" alt="' + (i+1) + '" loading="eager" decoding="async">' +
                   '<span class="ttdl-photo-num">' + (i+1) + '/' + d.images.length + '</span>' +
                   '<a class="ttdl-photo-dl" href="' + escapeHtml(imgUrl) + '" download="tiktok-photo-' + (i+1) + '.jpg" target="_blank" rel="noopener" aria-label="' + escapeHtml(ttdlDict('downloadPhoto')) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M5.5 19.5h13"/></svg></a>' +
                 '</div>'
@@ -19032,7 +19074,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             if (musicRow) musicRow.style.display = music ? 'block' : 'none';
             if (clearBtn) clearBtn.style.display = 'flex';
             ttdlLog(ttdlDict('logFoundPhotos').replace('{n}', d.images.length));
-            ttdlGlideToLog(260, 0, 'photos');
+            ttdlWhenImagesReady(photoGrid, 4, 1300).then(function(){ ttdlGlideToLog(60, 0, 'photos'); });
             setBtnBusy(analyzeBtn, false);
             return;
           }
@@ -19114,7 +19156,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
           sdBtn.disabled = !lastData.sd;
           hdBtn.disabled = !lastData.hd;
           ttdlLog(ttdlDict('logFound'));
-          ttdlGlideToLog(2400); // fallback only; normally the probe-finish call below replaces this
+          ttdlGlideToLog(140);
 
           // ---- Phase 2 (background): the slow per-tier resolution/fps
           // probe. Deliberately NOT awaited before the code above runs --
@@ -19138,6 +19180,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             return info;
           })).then((metas) => {
             if (myToken !== ttdlAnalysisToken || !qualityBlock) return; // a newer analyze() superseded this one
+            const ttdlSwapState = ttdlBeginQualitySwap();
 
             const tiers = urls.map((tierUrl, i) => {
               let sizeBytes = null;
@@ -19202,7 +19245,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
               const r = ttdlResLabel(hdTier.width, hdTier.height);
               if (r) hdBtnLabel.textContent = r + (hdTier.fps != null ? '/' + Math.round(hdTier.fps) : '');
             }
-            ttdlGlideToLog(180); // layout is final now -> one single, clean glide
+            ttdlEndQualitySwap(ttdlSwapState);
           });
         } else {
           ttdlLog(ttdlDict('logFail'));
