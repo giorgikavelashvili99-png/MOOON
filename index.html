@@ -7390,6 +7390,13 @@
     html body .ttdl-shell .ttdl-quality-block.tt-probed .tqt-top > span:last-child, html body .ttdl-shell .ttdl-quality-block.tt-probed .tqt-sub{ animation:ttFadeOnly .45s ease-out backwards !important; }
     html body .ttdl-shell .ttdl-quality-block.tt-probed .ttdl-quality-original{ animation:ttFadeOnly .45s ease-out backwards !important; }
   }
+
+  /* placeholder rows get the same height as the final rows (they only lacked the
+     "Mbps · MB" sub-line and could wrap), so nothing below moves when the numbers arrive */
+  html body .ttdl-quality-block.tt-probing .ttdl-quality-tier::after{ content:'\00a0'; display:block; margin-top:2px; font-size:9.5px; }
+  html body .ttdl-quality-block.tt-probing .tqt-top{ flex-wrap:nowrap; }
+  html body .ttdl-quality-block.tt-probing .tqt-top > span:first-child{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  html body .ttdl-quality-block.tt-probing .tqt-top > span:last-child{ flex:0 0 auto; white-space:nowrap; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
