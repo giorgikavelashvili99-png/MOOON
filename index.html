@@ -4335,26 +4335,24 @@
   }
 
   @media (max-width: 820px){
-    .orb{ animation:none !important; filter:blur(36px); }
-    .qn-tab{ animation:none !important; }
-    .order-btn.chat{ animation:none !important; }
-    .moon-glow-card{ animation:none !important; }
-    .tt-confirm.tt-red, .tt-confirm.tt-green{ animation:none !important; }
-    .qn-stars span{ animation:none !important; opacity:0.45 !important; transform:none !important; }
-    .vb-moon{ animation:none !important; }
-    .topbar-moon{ animation:none !important; }
-    .hero-cta-btn{ animation:none !important; }
-    .moon-badge, [class*="moon-badge"]{ animation:none !important; }
-    .warn-panel, .warnPanel, #warnPanel{ animation:none !important; }
-    .tt-border-flow, [class*="tt-confirm"]{ animation-duration:0s !important; }
-    .fab, [class*="fab"]{ animation:none !important; }
+    html:not(.is-ios) .orb{ animation:none !important; filter:blur(36px); }
+    html:not(.is-ios) .qn-tab{ animation:none !important; }
+    html:not(.is-ios) .order-btn.chat{ animation:none !important; }
+    html:not(.is-ios) .moon-glow-card{ animation:none !important; }
+    html:not(.is-ios) .tt-confirm.tt-red, html:not(.is-ios) .tt-confirm.tt-green{ animation:none !important; }
+    html:not(.is-ios) .qn-stars span{ animation:none !important; opacity:0.45 !important; transform:none !important; }
+    html:not(.is-ios) .vb-moon{ animation:none !important; }
+    html:not(.is-ios) .topbar-moon{ animation:none !important; }
+    html:not(.is-ios) .hero-cta-btn{ animation:none !important; }
+    html:not(.is-ios) .moon-badge, html:not(.is-ios) [class*="moon-badge"]{ animation:none !important; }
+    html:not(.is-ios) .warn-panel, html:not(.is-ios) .warnPanel, html:not(.is-ios) #warnPanel{ animation:none !important; }
+    html:not(.is-ios) .tt-border-flow, html:not(.is-ios) [class*="tt-confirm"]{ animation-duration:0s !important; }
+    html:not(.is-ios) .fab, html:not(.is-ios) [class*="fab"]{ animation:none !important; }
   }
-  @media (prefers-reduced-motion: reduce), (max-width: 480px){
-    .orb{ animation:none !important; }
-  }
+  @media (prefers-reduced-motion: reduce){ .orb{ animation:none !important; } }
+  @media (max-width: 480px){ html:not(.is-ios) .orb{ animation:none !important; } }
   body.anims-paused *{
     animation-play-state: paused !important;
-    transition-duration: 0s !important;
   }
   html.low-power .orb{ animation:none !important; filter:blur(30px); opacity:0.2; }
   html.low-power .qn-tab,
@@ -7451,6 +7449,13 @@
   html body .ttdl-quality-block.tt-probing::after,
   html body .ttdl-quality-block.tt-probing .ttdl-quality-tier::after{ display:none !important; content:none !important; }
   html body .ttdl-quality-block.tt-probing .ttdl-quality-original{ color:transparent; }
+
+  /* iOS-safe: the 3 step circles + connector lines are always visible once the
+     entrance has had time to play (or if animations were frozen by the OS). */
+  html body .ttdl-shell.tt-done .ttdl-step,
+  html body .ttdl-shell.tt-done .ttdl-step-line{ animation:none !important; opacity:1 !important; transform:none !important; }
+  html body .ttdl-shell.tt-done .ttdl-step svg{ opacity:1 !important; }
+  .ttdl-step{ -webkit-transform:translateZ(0); flex:0 0 auto; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -9599,11 +9604,25 @@
   //     reduce sustained CPU/GPU load (device heating).
   // ============================================================
   (function(){
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (isIOS) document.documentElement.classList.add('is-ios');
     function applyPauseState(){
-      document.body.classList.toggle('anims-paused', document.hidden === true);
+      document.body.classList.toggle('anims-paused', document.visibilityState === 'hidden');
     }
     document.addEventListener('visibilitychange', applyPauseState);
+    // iOS Safari doesn't always fire visibilitychange when coming back
+    // (app switcher, bfcache, new tab) -> the pause class could get stuck
+    // and freeze every animation. Re-sync on every sign of life.
+    window.addEventListener('pageshow', applyPauseState);
+    window.addEventListener('focus', applyPauseState);
+    ['touchstart','pointerdown','scroll'].forEach(function(ev){
+      window.addEventListener(ev, function(){
+        if (document.body.classList.contains('anims-paused')) applyPauseState();
+      }, { passive:true, capture:true });
+    });
     applyPauseState();
+    if (isIOS) return;
     try {
       const dm = navigator.deviceMemory; // undefined on unsupported browsers
       const cores = navigator.hardwareConcurrency;
@@ -20098,7 +20117,10 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if (es.some(e => e.isIntersecting)){ io.disconnect(); shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }
       }, { threshold: 0.12 });
       io.observe(shell);
+      // safety net (iOS): if the observer/animations never fire, show everything anyway
+      setTimeout(function(){ shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }, 2500);
     }
+    setTimeout(function(){ shell.classList.add('tt-done'); }, 4500);
     const refit = () => { try{ if (typeof fitNowrapText === 'function') fitNowrapText(); }catch(e){} };
     setTimeout(refit, 150); setTimeout(refit, 900);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
