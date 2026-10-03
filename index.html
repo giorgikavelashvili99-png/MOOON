@@ -6570,8 +6570,8 @@
   html.low-power .ttdl-status-dot,
   html.low-power .ttdl-ios-link{ animation:none; }
   @media (hover:none){
-    .pc-card--monthly::after{ animation:none; display:none; }
-    .ttdl-status-dot, .ttdl-ios-link{ animation:none; }
+    html:not(.is-ios) .pc-card--monthly::after{ animation:none; display:none; }
+    html:not(.is-ios) .ttdl-status-dot, html:not(.is-ios) .ttdl-ios-link{ animation:none; }
   }
 
   /* Upload progress: the "finalizing" label always owns its one-line slot
@@ -7133,6 +7133,21 @@
     will-change:transform; animation:pcRingSpin 10s linear infinite;
   }
   @keyframes pcRingSpin{ to{ transform:rotate(360deg); } }
+  /* iOS/Safari: no color-mix on old versions, centering via transform (margin % + aspect-ratio
+     is unreliable), ring gets its own GPU layer so the rotation actually repaints inside the mask. */
+  .pc-ring-spin{
+    background:conic-gradient(var(--pc-accent) 0deg, var(--pc-accent) 70deg, rgba(0,0,0,.42) 130deg, rgba(0,0,0,.42) 230deg, var(--pc-accent) 290deg, var(--pc-accent) 360deg);
+    background:conic-gradient(color-mix(in srgb, var(--pc-accent) 35%, #fff) 0deg, var(--pc-accent) 70deg, rgba(0,0,0,.42) 130deg, rgba(0,0,0,.42) 230deg, var(--pc-accent) 290deg, color-mix(in srgb, var(--pc-accent) 35%, #fff) 360deg);
+    margin:0; width:260%; height:0; padding-bottom:260%; aspect-ratio:auto;
+    transform:translate3d(-50%,-50%,0) rotate(0deg); -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    animation-name:pcRingSpin2;
+  }
+  html.is-ios body .pc-card > .pc-ring{ contain:none; -webkit-transform:translateZ(0); transform:translateZ(0); }
+  html.is-ios body .pc-card > .pc-stars{ contain:none; }
+  @keyframes pcRingSpin2{
+    from{ transform:translate3d(-50%,-50%,0) rotate(0deg); }
+    to{ transform:translate3d(-50%,-50%,0) rotate(360deg); }
+  }
 
   body .pc-card > .pc-stars{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; border-radius:inherit; contain:strict; }
   .pc-stars i{
@@ -20078,6 +20093,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if (es.some(e => e.isIntersecting)){ io.disconnect(); arm(); }
       }, { threshold: 0.15 });
       io.observe(container);
+      // safety net (iOS): never leave cards hidden / content at opacity:0
+      setTimeout(() => { if (!armed){ try{ io.disconnect(); }catch(e){} arm(); } }, 3500);
+      setTimeout(() => { slides.forEach(sl => { if (pending.has(sl)) play(sl, 0); }); }, 6000);
     } else {
       armed = true; check();
     }
