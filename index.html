@@ -4338,6 +4338,7 @@
     html:not(.is-ios) .orb{ animation:none !important; filter:blur(36px); }
     html:not(.is-ios) .qn-tab{ animation:none !important; }
     html:not(.is-ios) .order-btn.chat{ animation:none !important; }
+    html:not(.is-ios) .moon-glow-card{ animation:none !important; }
     html:not(.is-ios) .tt-confirm.tt-red, html:not(.is-ios) .tt-confirm.tt-green{ animation:none !important; }
     html:not(.is-ios) .qn-stars span{ animation:none !important; opacity:0.45 !important; transform:none !important; }
     html:not(.is-ios) .vb-moon{ animation:none !important; }
@@ -4358,6 +4359,7 @@
   html.low-power .hero-cta-btn,
   html.low-power .vb-moon,
   html.low-power .topbar-moon,
+  html.low-power .moon-glow-card,
   html.low-power .qn-stars span{ animation:none !important; }
   html.low-power .mec-colon,
   html.low-power .urgency-badge,
@@ -4834,10 +4836,10 @@
        dim + desaturate alone already reads clearly as "not the focused
        card", so the scale (and the text motion it caused) is dropped;
        text now stays put and only fades/brightens between cards. */
-    opacity:.55;
-    transition:opacity .25s ease;
+    opacity:.5; filter:saturate(.7);
+    transition:opacity .35s ease, filter .35s ease;
   }
-  .pricing-cards.pc-scroll-mode .pc-slide--active{ opacity:1; cursor:default; }
+  .pricing-cards.pc-scroll-mode .pc-slide--active{ opacity:1; filter:none; cursor:default; }
   .pricing-cards.pc-scroll-mode .pc-slide > *{ width:100%; min-width:0; }
   /* Only the centred card runs its decorative loops. Targeted selectors
      (no universal "*") so switching cards restyles almost nothing. */
@@ -6564,10 +6566,12 @@
   }
   /* Decorative infinite animations that repaint every frame — off on
      phones / low-power (gold-card glint, status-dot box-shadow pulse). */
+  html.low-power .pc-card--monthly::after{ animation:none; display:none; }
   html.low-power .ttdl-status-dot,
   html.low-power .ttdl-ios-link{ animation:none; }
   @media (hover:none){
-    html:not(.is-ios) .ttdl-status-dot, html:not(.is-ios) .ttdl-ios-link{ animation:none; }
+    .pc-card--monthly::after{ animation:none; display:none; }
+    .ttdl-status-dot, .ttdl-ios-link{ animation:none; }
   }
 
   /* Upload progress: the "finalizing" label always owns its one-line slot
@@ -7129,21 +7133,6 @@
     will-change:transform; animation:pcRingSpin 10s linear infinite;
   }
   @keyframes pcRingSpin{ to{ transform:rotate(360deg); } }
-  /* iOS/Safari: no color-mix on old versions, centering via transform (margin % + aspect-ratio
-     is unreliable), ring gets its own GPU layer so the rotation actually repaints inside the mask. */
-  .pc-ring-spin{
-    background:conic-gradient(var(--pc-accent) 0deg, var(--pc-accent) 70deg, rgba(0,0,0,.42) 130deg, rgba(0,0,0,.42) 230deg, var(--pc-accent) 290deg, var(--pc-accent) 360deg);
-    background:conic-gradient(color-mix(in srgb, var(--pc-accent) 35%, #fff) 0deg, var(--pc-accent) 70deg, rgba(0,0,0,.42) 130deg, rgba(0,0,0,.42) 230deg, var(--pc-accent) 290deg, color-mix(in srgb, var(--pc-accent) 35%, #fff) 360deg);
-    margin:0; width:260%; height:0; padding-bottom:260%; aspect-ratio:auto;
-    transform:translate3d(-50%,-50%,0) rotate(0deg); -webkit-backface-visibility:hidden; backface-visibility:hidden;
-    animation-name:pcRingSpin2;
-  }
-  html.is-ios body .pc-card > .pc-ring{ contain:none; -webkit-transform:translateZ(0); transform:translateZ(0); }
-  html.is-ios body .pc-card > .pc-stars{ contain:none; }
-  @keyframes pcRingSpin2{
-    from{ transform:translate3d(-50%,-50%,0) rotate(0deg); }
-    to{ transform:translate3d(-50%,-50%,0) rotate(360deg); }
-  }
 
   body .pc-card > .pc-stars{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; border-radius:inherit; contain:strict; }
   .pc-stars i{
@@ -7162,6 +7151,8 @@
   .pc-card.pc-off .pc-ring-spin, .pc-card.pc-off .pc-stars i{ animation-play-state:paused; }
   .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-ring-spin,
   .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-stars i{ animation-play-state:paused; }
+  html.low-power .pc-ring-spin{ animation:none; will-change:auto; }
+  html.low-power .pc-stars i{ animation:none; will-change:auto; opacity:.5; transform:scale(.8); }
   @media (prefers-reduced-motion:reduce){
     .pc-ring-spin{ animation:none; will-change:auto; }
     .pc-stars i{ animation:none; will-change:auto; opacity:.5; transform:scale(.8); }
@@ -7459,40 +7450,10 @@
   html body .ttdl-quality-block.tt-probing .ttdl-quality-tier::after{ display:none !important; content:none !important; }
   html body .ttdl-quality-block.tt-probing .ttdl-quality-original{ color:transparent; }
 
-  /* iOS-safe: the 3 step circles + connector lines are always visible once the
-     entrance has had time to play (or if animations were frozen by the OS). */
   html body .ttdl-shell.tt-done .ttdl-step,
   html body .ttdl-shell.tt-done .ttdl-step-line{ animation:none !important; opacity:1 !important; transform:none !important; }
   html body .ttdl-shell.tt-done .ttdl-step svg{ opacity:1 !important; }
   .ttdl-step{ -webkit-transform:translateZ(0); flex:0 0 auto; }
-
-  /* ---- clean badges: no synthetic-bold smear on Georgian, no halo ring, never covers the title ---- */
-  html body .pc-badge{
-    font-weight:400 !important; font-synthesis:none; text-transform:none !important;
-    font-size:12px; letter-spacing:.01em; line-height:1.2;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    background:#ffffff; border:0; color:#10131f;
-    box-shadow:0 6px 14px rgba(0,0,0,.45);
-    isolation:isolate; -webkit-transform:translateZ(0); transform:translateZ(0);
-    top:-17px; z-index:30;
-  }
-  html body .pc-badge::before{ color:#f5a623; font-size:11px; }
-  html body .pc-badge--urgency{ background:#ff3b5c; color:#fff; }
-  html body .pc-badge--urgency svg{ width:12px; height:12px; fill:#ffd95a; }
-  .pc-card-wrap:has(> .pc-badge) .pc-head, .pc-slide:has(.pc-badge) .pc-head{ margin-top:10px; }
-
-  /* ---- smoothness: nothing decorative animates while swiping between cards or while an order modal opens ---- */
-  .pricing-cards.pc-scrolling .pc-ring-spin,
-  .pricing-cards.pc-scrolling .pc-stars i,
-  .pricing-cards.pc-scrolling .pc-card--monthly::after,
-  .pricing-cards.pc-scrolling .pc-slide :is(.price sup,.urgency-badge,.mec-colon){ animation-play-state:paused !important; }
-  html.pc-modal-on body :is(.orb,.pc-ring-spin,.pc-stars i,.qn-stars span,.moon-glow-card,.pc-card--monthly::after,.urgency-badge,.hero-cta-btn,.topbar-moon,.vb-moon,.badge-float,.ttdl-shell *){ animation-play-state:paused !important; }
-  html.pc-modal-on .pc-slide{ transition:none !important; }
-  /* inactive cards: static ring, no sparkles -> far fewer live GPU layers */
-  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-stars{ display:none; }
-  .pc-slide{ -webkit-tap-highlight-color:transparent; }
-  .pc-modal-scrim.open{ animation-duration:.16s; }
-  .pc-modal-scrim.open > .pc-accordion-body.panel{ animation-duration:.28s; will-change:transform,opacity; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -9648,9 +9609,6 @@
       document.body.classList.toggle('anims-paused', document.visibilityState === 'hidden');
     }
     document.addEventListener('visibilitychange', applyPauseState);
-    // iOS Safari doesn't always fire visibilitychange when coming back
-    // (app switcher, bfcache, new tab) -> the pause class could get stuck
-    // and freeze every animation. Re-sync on every sign of life.
     window.addEventListener('pageshow', applyPauseState);
     window.addEventListener('focus', applyPauseState);
     ['touchstart','pointerdown','scroll'].forEach(function(ev){
@@ -10957,7 +10915,6 @@
       pcModalScrim.appendChild(panel);
     }
     if (pcModalScrim) pcModalScrim.classList.add('open');
-    document.documentElement.classList.add('pc-modal-on');
     lockBodyScroll();
   }
 
@@ -10974,7 +10931,6 @@
     card.classList.remove('pc-open');
     if (btn) btn.setAttribute('aria-expanded', 'false');
     if (pcModalScrim) pcModalScrim.classList.remove('open');
-    document.documentElement.classList.remove('pc-modal-on');
     unlockBodyScroll();
     // Jump straight back to wherever the page was before this modal
     // opened — no animation, so it reads as "closing returned me to
@@ -19960,11 +19916,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // state can catch up. Ignored while a goTo() is driving the scroll
       // itself, so it can't fight with that animation.
       let ticking = false;
-      let scrollIdle = 0;
       track.addEventListener('scroll', () => {
-        container.classList.add('pc-scrolling');
-        clearTimeout(scrollIdle);
-        scrollIdle = setTimeout(() => container.classList.remove('pc-scrolling'), 160);
         if (programmatic || ticking) return;
         ticking = true;
         requestAnimationFrame(() => { ticking = false; syncActiveFromScroll(); });
@@ -20121,9 +20073,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if (es.some(e => e.isIntersecting)){ io.disconnect(); arm(); }
       }, { threshold: 0.15 });
       io.observe(container);
-      // safety net (iOS): never leave cards hidden / content at opacity:0
-      setTimeout(() => { if (!armed){ try{ io.disconnect(); }catch(e){} arm(); } }, 3500);
-      setTimeout(() => { slides.forEach(sl => { if (pending.has(sl)) play(sl, 0); }); }, 6000);
     } else {
       armed = true; check();
     }
@@ -20163,7 +20112,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if (es.some(e => e.isIntersecting)){ io.disconnect(); shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }
       }, { threshold: 0.12 });
       io.observe(shell);
-      // safety net (iOS): if the observer/animations never fire, show everything anyway
       setTimeout(function(){ shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }, 2500);
     }
     setTimeout(function(){ shell.classList.add('tt-done'); }, 4500);
