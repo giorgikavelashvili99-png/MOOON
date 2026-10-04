@@ -7455,6 +7455,7 @@
   html body .ttdl-shell.tt-done .ttdl-step svg{ opacity:1 !important; }
   .ttdl-step{ -webkit-transform:translateZ(0); flex:0 0 auto; }
 
+@media (max-width:599px){
 /* ==========================================================
    ENHANCED LAYER — flat, crisp, detailed. No drop shadows, no glow.
    Depth is built from borders, tonal layers and spacing only.
@@ -7511,7 +7512,6 @@ input,select,textarea{ font-size:max(16px,1em); border-radius:12px; transition:b
 input:focus,select:focus,textarea:focus{ border-color:var(--cyan); }
 
 /* 6 — scroll progress bar + reveal-on-scroll (flat, no glow) */
-#enhProgress{ position:fixed; left:0; top:0; height:3px; width:0; z-index:9999; background:linear-gradient(90deg,var(--purple),var(--cyan)); pointer-events:none; transition:width .08s linear; }
 .js-reveal .enh-rv{ opacity:0; transform:translateY(18px); transition:opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1); }
 .js-reveal .enh-rv.enh-in{ opacity:1; transform:none; }
 
@@ -7526,7 +7526,6 @@ table{ max-width:100%; }
 @media (prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto; }
   .js-reveal .enh-rv{ opacity:1; transform:none; transition:none; }
-  #enhProgress{ transition:none; }
 }
 
 /* Guide pills: ONE line, full label */
@@ -7534,6 +7533,7 @@ table{ max-width:100%; }
 .pc-guide-row .pc-guide-link{ flex:1 1 0; max-width:none; min-width:0; min-height:0; border-radius:999px; padding:5px 8px 5px 5px; gap:5px; justify-content:flex-start; }
 .pc-guide-row .pc-guide-ico{ width:22px; height:22px; }
 .pc-guide-row .pc-guide-link span:last-child{ overflow:visible; text-overflow:clip; white-space:nowrap; line-height:1.2; font-size:clamp(9px,2.9vw,14px); word-spacing:-.12em; letter-spacing:0; }
+}
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -20286,12 +20286,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 <script>
 (function(){
   try{
+    if(!matchMedia('(max-width:599px)').matches) return;
     var d=document, root=d.documentElement;
-    var bar=d.createElement('div'); bar.id='enhProgress'; bar.setAttribute('aria-hidden','true'); d.body.appendChild(bar);
-    var tick=false;
-    function upd(){ var h=root.scrollHeight-root.clientHeight; bar.style.width=(h>0?Math.min(100,root.scrollTop/h*100):0)+'%'; tick=false; }
-    addEventListener('scroll',function(){ if(!tick){ tick=true; requestAnimationFrame(upd); } },{passive:true});
-    upd();
     if(!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
     var els=d.querySelectorAll('.wrap > .hero, .wrap > .panel, .wrap > .panel-section, .wrap > .panel-divider, .wrap > .comments-panel');
     if(!els.length) return;
@@ -20305,6 +20301,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 <script>
 (function(){
   function fit(){
+    if(!matchMedia('(max-width:599px)').matches) return;
     document.querySelectorAll('.pc-guide-row .pc-guide-link').forEach(function(a){
       var t=a.querySelector('span:last-child'); if(!t) return;
       t.style.fontSize='';
