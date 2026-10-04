@@ -7454,6 +7454,86 @@
   html body .ttdl-shell.tt-done .ttdl-step-line{ animation:none !important; opacity:1 !important; transform:none !important; }
   html body .ttdl-shell.tt-done .ttdl-step svg{ opacity:1 !important; }
   .ttdl-step{ -webkit-transform:translateZ(0); flex:0 0 auto; }
+
+/* ==========================================================
+   ENHANCED LAYER — flat, crisp, detailed. No drop shadows, no glow.
+   Depth is built from borders, tonal layers and spacing only.
+   ========================================================== */
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; text-rendering:optimizeLegibility; }
+body{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+::selection{ background:rgba(59,109,255,.45); color:#fff; }
+
+/* 1 — remove needless shadows & deep glows everywhere */
+*,*::before,*::after{ box-shadow:none !important; text-shadow:none !important; }
+[class*="glow"],[class*="halo"],[class*="aura"],[class*="shadow"]{ filter:none !important; }
+img,svg,canvas{ filter:none; }
+:focus-visible{ outline:2px solid var(--cyan) !important; outline-offset:2px; }
+
+/* 2 — fluid layout: comfortable on phone, tablet, laptop, ultrawide */
+.wrap{ width:100%; max-width:760px; padding:clamp(16px,4vw,32px) clamp(14px,4vw,24px) clamp(28px,6vw,56px); }
+@media (min-width:900px){ .wrap{ max-width:880px; } }
+@media (min-width:1280px){ .wrap{ max-width:960px; } }
+@media (min-width:1700px){ .wrap{ max-width:1040px; } }
+
+/* 3 — typography rhythm */
+.hero{ margin-bottom:clamp(28px,5vw,52px); }
+.hero h1,h1{ font-size:clamp(28px,6.2vw,52px); line-height:1.12; letter-spacing:-.01em; text-wrap:balance; }
+h2{ font-size:clamp(20px,3.4vw,28px); line-height:1.2; text-wrap:balance; }
+p,li{ line-height:1.6; text-wrap:pretty; }
+.eyebrow{ display:inline-block; padding:6px 14px; border:1px solid var(--border-soft); border-radius:999px; background:rgba(59,109,255,.08); }
+
+/* 4 — panels: flat tonal cards with a fine top highlight line */
+.panel,.panel-section{ position:relative; }
+.panel{
+  border-radius:clamp(16px,2.4vw,24px);
+  padding:clamp(16px,3.6vw,32px);
+  margin-bottom:clamp(14px,2.6vw,26px);
+  background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);
+  border:1px solid var(--border-soft);
+  transition:border-color .25s ease, transform .25s ease, background-color .25s ease;
+}
+.panel::before{
+  content:""; position:absolute; left:clamp(16px,3vw,28px); right:clamp(16px,3vw,28px); top:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(120,150,255,.55),transparent); pointer-events:none;
+}
+.panel-head{ gap:12px; flex-wrap:wrap; }
+.panel-divider{ margin:clamp(18px,3vw,30px) 0; }
+
+/* 5 — buttons & interactive tiles: crisp, tactile, 44px+ tap targets */
+button,.hero-cta-btn,[role="button"]{ -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+button,.hero-cta-btn{ transition:transform .18s ease, border-color .2s ease, background-color .2s ease, color .2s ease, opacity .2s ease; }
+button:active,.hero-cta-btn:active{ transform:scale(.98); }
+@media (hover:hover) and (pointer:fine){
+  .panel:hover{ border-color:var(--border); }
+  button:not(:disabled):hover,.hero-cta-btn:hover{ transform:translateY(-1px); }
+}
+input,select,textarea{ font-size:max(16px,1em); border-radius:12px; transition:border-color .2s ease, background-color .2s ease; }
+input:focus,select:focus,textarea:focus{ border-color:var(--cyan); }
+
+/* 6 — scroll progress bar + reveal-on-scroll (flat, no glow) */
+#enhProgress{ position:fixed; left:0; top:0; height:3px; width:0; z-index:9999; background:linear-gradient(90deg,var(--purple),var(--cyan)); pointer-events:none; transition:width .08s linear; }
+.js-reveal .enh-rv{ opacity:0; transform:translateY(18px); transition:opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1); }
+.js-reveal .enh-rv.enh-in{ opacity:1; transform:none; }
+
+/* 7 — details: scrollbars, safe areas, small screens */
+*{ scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-thumb{ background:var(--border); border-radius:10px; border:2px solid var(--bg); }
+::-webkit-scrollbar-track{ background:transparent; }
+@supports(padding:max(0px)){ .wrap{ padding-left:max(clamp(14px,4vw,24px),env(safe-area-inset-left)); padding-right:max(clamp(14px,4vw,24px),env(safe-area-inset-right)); padding-bottom:max(28px,env(safe-area-inset-bottom)); } }
+table{ max-width:100%; }
+@media (max-width:420px){ .panel{ border-radius:16px; } }
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  .js-reveal .enh-rv{ opacity:1; transform:none; transition:none; }
+  #enhProgress{ transition:none; }
+}
+
+/* Guide pills: ONE line, full label */
+.pc-guide-row{ gap:6px; align-items:center; }
+.pc-guide-row .pc-guide-link{ flex:1 1 0; max-width:none; min-width:0; min-height:0; border-radius:999px; padding:5px 8px 5px 5px; gap:5px; justify-content:flex-start; }
+.pc-guide-row .pc-guide-ico{ width:22px; height:22px; }
+.pc-guide-row .pc-guide-link span:last-child{ overflow:visible; text-overflow:clip; white-space:nowrap; line-height:1.2; font-size:clamp(9px,2.9vw,14px); word-spacing:-.12em; letter-spacing:0; }
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -20201,6 +20281,40 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     es.forEach(function(e){ e.target.classList.toggle('pc-off', !e.isIntersecting); });
   }, {rootMargin:'80px'});
   document.querySelectorAll('.pc-card').forEach(function(c){ io.observe(c); });
+})();
+</script>
+<script>
+(function(){
+  try{
+    var d=document, root=d.documentElement;
+    var bar=d.createElement('div'); bar.id='enhProgress'; bar.setAttribute('aria-hidden','true'); d.body.appendChild(bar);
+    var tick=false;
+    function upd(){ var h=root.scrollHeight-root.clientHeight; bar.style.width=(h>0?Math.min(100,root.scrollTop/h*100):0)+'%'; tick=false; }
+    addEventListener('scroll',function(){ if(!tick){ tick=true; requestAnimationFrame(upd); } },{passive:true});
+    upd();
+    if(!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var els=d.querySelectorAll('.wrap > .hero, .wrap > .panel, .wrap > .panel-section, .wrap > .panel-divider, .wrap > .comments-panel');
+    if(!els.length) return;
+    root.classList.add('js-reveal');
+    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('enh-in'); io.unobserve(e.target);} }); },{threshold:.06,rootMargin:'0px 0px -6% 0px'});
+    els.forEach(function(el){ el.classList.add('enh-rv'); io.observe(el); });
+    setTimeout(function(){ els.forEach(function(el){ el.classList.add('enh-in'); }); },3500);
+  }catch(e){}
+})();
+</script>
+<script>
+(function(){
+  function fit(){
+    document.querySelectorAll('.pc-guide-row .pc-guide-link').forEach(function(a){
+      var t=a.querySelector('span:last-child'); if(!t) return;
+      t.style.fontSize='';
+      var fs=parseFloat(getComputedStyle(t).fontSize), n=0;
+      while(n++<20 && fs>7 && a.scrollWidth>a.clientWidth+1){ fs-=.5; t.style.fontSize=fs+'px'; }
+    });
+  }
+  addEventListener('load',fit); addEventListener('resize',fit);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit);
+  new MutationObserver(fit).observe(document.body,{subtree:true,characterData:true,childList:true});
 })();
 </script>
 </body>
