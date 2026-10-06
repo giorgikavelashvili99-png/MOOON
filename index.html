@@ -7541,6 +7541,144 @@ table{ max-width:100%; }
   .pc-badge::before{ font-size:8px; }
   .pc-badge--urgency svg{ width:9px; height:9px; }
 }
+
+/* =====================================================================
+   CINEMATIC MOTION — order cards + order modal
+   Purely additive layer. Respects prefers-reduced-motion.
+   ===================================================================== */
+.pc-card > .pc-cine-glint{
+  position:absolute !important; top:0; bottom:0; left:0; width:46%;
+  z-index:3 !important; pointer-events:none; opacity:0;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,0) 28%, rgba(255,255,255,.20) 48%, rgba(255,255,255,.34) 52%, rgba(255,255,255,0) 72%, transparent 100%);
+  transform:translateX(-160%) skewX(-18deg);
+}
+.pc-toggle-btn{ overflow:hidden; }
+.pc-cine-ripple{
+  position:absolute; width:30px; height:30px; border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, rgba(255,255,255,.8), rgba(255,255,255,0) 70%);
+  transform:translate(-50%,-50%) scale(0);
+  animation:pcCineRipple .7s ease-out forwards;
+}
+@keyframes pcCineRipple{ to{ transform:translate(-50%,-50%) scale(14); opacity:0; } }
+
+.pc-accordion-body > .pc-cine-sweep{
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  overflow:hidden; z-index:66;
+}
+.pc-accordion-body > .pc-cine-sweep::before{
+  content:""; position:absolute; top:-10%; bottom:-10%; left:0; width:55%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.14) 44%, rgba(255,255,255,.32) 50%, rgba(255,255,255,.14) 56%, transparent);
+  transform:translateX(-120%) skewX(-16deg);
+}
+
+@media (prefers-reduced-motion:no-preference){
+
+  /* ---------- 1. Cards: entrance (blur -> sharp, 3D tilt, rise) ---------- */
+  .pricing-cards.pc-play .pc-slide{
+    animation:pcCineIn 1.1s cubic-bezier(.16,1,.3,1) backwards;
+    animation-delay:calc(var(--i,0) * 140ms);
+  }
+  @keyframes pcCineIn{
+    0%{ opacity:0; transform:perspective(900px) translateY(70px) rotateX(14deg) scale(.9); filter:blur(14px) brightness(.6); }
+    60%{ filter:blur(0) brightness(1.12); }
+  }
+
+  /* ---------- 2. Cards: light glint (once on intro, then every ~7s) ---------- */
+  .pc-slide--active .pc-card > .pc-cine-glint,
+  .pricing-cards:not(.pc-scroll-mode) .pc-card > .pc-cine-glint{
+    animation:pcCineGlintLoop 7s ease-in-out 2.5s infinite;
+  }
+  .pricing-cards.pc-play .pc-card > .pc-cine-glint{
+    animation:pcCineGlint 1.5s ease-out calc(var(--i,0) * 140ms + .55s) 1 both;
+  }
+  @keyframes pcCineGlint{
+    0%{ opacity:0; transform:translateX(-160%) skewX(-18deg); }
+    15%{ opacity:1; }
+    80%{ opacity:1; }
+    100%{ opacity:0; transform:translateX(340%) skewX(-18deg); }
+  }
+  @keyframes pcCineGlintLoop{
+    0%,70%{ opacity:0; transform:translateX(-160%) skewX(-18deg); }
+    74%{ opacity:1; }
+    92%{ opacity:1; }
+    100%{ opacity:0; transform:translateX(340%) skewX(-18deg); }
+  }
+  body:has(.pc-modal-scrim.open) .pc-cine-glint{ animation-play-state:paused; }
+
+  /* CTA button: periodic shine */
+  .pc-slide--active .pc-toggle-btn::before,
+  .pricing-cards:not(.pc-scroll-mode) .pc-toggle-btn::before{
+    animation:pcCineBtnShine 5s ease-in-out 3s infinite;
+  }
+  @keyframes pcCineBtnShine{
+    0%,70%{ left:-60%; opacity:0; }
+    74%{ opacity:1; }
+    92%{ opacity:1; }
+    100%{ left:130%; opacity:0; }
+  }
+
+  /* ---------- 3. Cards: press feedback ---------- */
+  body .pc-card{ transition:transform .25s ease-out, filter .25s ease-out; }
+  body .pc-card.pc-cine-press{ transform:scale(.972); filter:brightness(1.12); transition:transform .12s ease-out, filter .12s ease-out; }
+
+  /* ---------- 4. Modal: scrim ---------- */
+  html .pc-modal-scrim.open{
+    animation:pcCineScrimIn .55s cubic-bezier(.2,.7,.2,1) backwards;
+    background:radial-gradient(ellipse 85% 65% at 50% 45%, rgba(22,28,52,.82), rgba(3,3,5,.95) 78%);
+    -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+  }
+  @keyframes pcCineScrimIn{ from{ opacity:0; } }
+
+  /* ---------- 5. Modal: panel flies out of the tapped card, light bloom ---------- */
+  html .pc-modal-scrim.open > .pc-accordion-body.panel{
+    animation:
+      pcCinePanelIn .85s cubic-bezier(.19,1,.22,1) backwards,
+      pcCineBloom 1.4s ease-out backwards;
+  }
+  @keyframes pcCinePanelIn{
+    0%{ opacity:0; transform:translate3d(var(--cine-dx,0px), var(--cine-dy,70px), 0) scale(.45); filter:blur(18px) brightness(1.7) saturate(1.4); }
+    60%{ opacity:1; transform:translate3d(0,0,0) scale(1.02); filter:blur(0) brightness(1.08); }
+    100%{ transform:none; filter:none; }
+  }
+  @keyframes pcCineBloom{
+    0%{ box-shadow:0 0 0 0 transparent; }
+    35%{ box-shadow:0 0 90px 12px color-mix(in srgb, var(--pc-accent, #7c8fff) 55%, transparent); }
+  }
+  .pc-modal-scrim.open > .pc-accordion-body > .pc-cine-sweep::before{
+    animation:pcCineSweep 1.15s cubic-bezier(.4,0,.2,1) .3s both;
+  }
+  @keyframes pcCineSweep{ to{ transform:translateX(260%) skewX(-16deg); } }
+
+  /* ---------- 6. Modal: content stagger + ✕ pop ---------- */
+  html .pc-modal-scrim.open .pc-modal-scroll > :is(.wizard-steps, .panel-section, .panel-head){
+    animation:pcCineKid .7s cubic-bezier(.2,.8,.2,1) backwards;
+    animation-delay:.6s;
+  }
+  html .pc-modal-scrim.open .pc-modal-scroll > :nth-child(1){ animation-delay:.28s; }
+  html .pc-modal-scrim.open .pc-modal-scroll > :nth-child(2){ animation-delay:.38s; }
+  html .pc-modal-scrim.open .pc-modal-scroll > :nth-child(3){ animation-delay:.48s; }
+  @keyframes pcCineKid{ from{ opacity:0; transform:translateY(22px); filter:blur(6px); } }
+  .pc-modal-scrim.open .pc-modal-close{
+    animation:pcCineClose .6s cubic-bezier(.2,.9,.3,1.5) .45s backwards;
+  }
+  @keyframes pcCineClose{ from{ opacity:0; transform:scale(.2) rotate(-120deg); } }
+
+  /* ---------- 7. Modal: exit (ghost copy flies back toward the card) ---------- */
+  .pc-modal-scrim.pc-cine-exit{
+    display:flex; pointer-events:none;
+    background:radial-gradient(ellipse 85% 65% at 50% 45%, rgba(22,28,52,.82), rgba(3,3,5,.95) 78%);
+    animation:pcCineScrimOut .34s ease-in forwards;
+  }
+  .pc-modal-scrim.pc-cine-exit > .pc-accordion-body.panel{
+    animation:pcCinePanelOut .36s cubic-bezier(.55,0,.8,.3) forwards;
+  }
+  .pc-modal-scrim.pc-cine-exit .pc-modal-close,
+  .pc-modal-scrim.pc-cine-exit > .pc-accordion-body > .pc-cine-sweep{ display:none; }
+  @keyframes pcCineScrimOut{ to{ opacity:0; } }
+  @keyframes pcCinePanelOut{
+    to{ opacity:0; transform:translate3d(var(--cine-dx,0px), var(--cine-dy,40px), 0) scale(.5); filter:blur(12px) brightness(1.4); }
+  }
+}
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -11010,6 +11148,7 @@ table{ max-width:100%; }
     const btn = card.querySelector('.pc-toggle-btn');
     // Move the panel back to its original spot in the card markup.
     const panel = pcModalScrim ? pcModalScrim.querySelector('.pc-accordion-body') : null;
+    if (panel && window.pcCineExit) window.pcCineExit(panel);
     if (panel && panel._pcHomeCard === card) {
       if (btn && btn.parentNode === card) card.insertBefore(panel, btn.nextSibling);
       else card.appendChild(panel);
@@ -20319,6 +20458,100 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   addEventListener('load',fit); addEventListener('resize',fit);
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit);
   new MutationObserver(fit).observe(document.body,{subtree:true,characterData:true,childList:true});
+})();
+</script>
+<script>
+/* Cinematic motion helpers — order cards + order modal (additive). */
+(function(){
+  if (window.__pcCine) return; window.__pcCine = true;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+  var clearT = null;
+
+  function clamp(v, m){ return Math.max(-m, Math.min(m, v)); }
+  function vecFrom(el){
+    var r = el.getBoundingClientRect();
+    return [
+      clamp(r.left + r.width/2 - window.innerWidth/2,  window.innerWidth  * 0.45),
+      clamp(r.top  + r.height/2 - window.innerHeight/2, window.innerHeight * 0.45)
+    ];
+  }
+
+  function init(){
+    document.querySelectorAll('.pc-card').forEach(function(card){
+      if (!card.querySelector(':scope > .pc-cine-glint')){
+        var g = document.createElement('i');
+        g.className = 'pc-cine-glint'; g.setAttribute('aria-hidden', 'true');
+        card.appendChild(g);
+      }
+    });
+    document.querySelectorAll('.pc-accordion-body').forEach(function(p){
+      if (!p.querySelector(':scope > .pc-cine-sweep')){
+        var s = document.createElement('i');
+        s.className = 'pc-cine-sweep'; s.setAttribute('aria-hidden', 'true');
+        p.appendChild(s);
+      }
+    });
+  }
+  init();
+  window.addEventListener('load', function(){ init(); setTimeout(init, 1500); });
+
+  // Tap: remember where the card is, so the modal flies out of it.
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.pc-toggle-btn');
+    if (!b) return;
+    var v = vecFrom(b);
+    root.style.setProperty('--cine-dx', v[0] + 'px');
+    root.style.setProperty('--cine-dy', v[1] + 'px');
+    clearTimeout(clearT);
+    clearT = setTimeout(function(){
+      root.style.removeProperty('--cine-dx'); root.style.removeProperty('--cine-dy');
+    }, 1500);
+  }, true);
+
+  // Press feedback + ripple on the card's order button.
+  var pressed = null;
+  document.addEventListener('pointerdown', function(e){
+    var b = e.target.closest && e.target.closest('.pc-toggle-btn');
+    if (!b || reduce) return;
+    var card = b.closest('.pc-card');
+    if (card){ card.classList.add('pc-cine-press'); pressed = card; }
+    var r = b.getBoundingClientRect();
+    var rip = document.createElement('span');
+    rip.className = 'pc-cine-ripple';
+    rip.style.left = (e.clientX - r.left) + 'px';
+    rip.style.top  = (e.clientY - r.top) + 'px';
+    b.appendChild(rip);
+    setTimeout(function(){ rip.remove(); }, 750);
+  }, true);
+  function release(){ if (pressed){ pressed.classList.remove('pc-cine-press'); pressed = null; } }
+  ['pointerup', 'pointercancel', 'dragstart'].forEach(function(t){ document.addEventListener(t, release, true); });
+
+  // Exit animation: a non-interactive copy of the panel flies back toward its card.
+  window.pcCineExit = function(panel){
+    if (reduce || !panel) return;
+    try {
+      var scrim = document.getElementById('pcModalScrim');
+      if (!scrim || !scrim.classList.contains('open')) return;
+      var ghost = document.createElement('div');
+      ghost.className = 'pc-modal-scrim pc-cine-exit';
+      ghost.setAttribute('aria-hidden', 'true');
+      ghost.setAttribute('inert', '');
+      var home = panel._pcHomeCard;
+      if (home){
+        var v = vecFrom(home);
+        ghost.style.setProperty('--cine-dx', v[0] + 'px');
+        ghost.style.setProperty('--cine-dy', v[1] + 'px');
+      }
+      var clone = panel.cloneNode(true);
+      clone.querySelectorAll('video, audio').forEach(function(m){ try { m.pause(); } catch(_){} m.removeAttribute('autoplay'); });
+      ghost.appendChild(clone);
+      document.body.appendChild(ghost);
+      var src = panel.querySelector('.pc-modal-scroll'), dst = clone.querySelector('.pc-modal-scroll');
+      if (src && dst) dst.scrollTop = src.scrollTop;
+      setTimeout(function(){ ghost.remove(); }, 450);
+    } catch(err){}
+  };
 })();
 </script>
 </body>
