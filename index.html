@@ -9008,7 +9008,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     <input type="hidden" id="msRange" value="0">
 
     <div class="field" id="qualityFieldWrap">
-      <div class="field-top"><label data-i18n="qualityLabel">ვიდეოს ხარისხი</label></div>
+      <div class="field-top"><label data-i18n="qualityLabel">აირჩიეთ ვიდეოს ხარისხი:</label></div>
       <div class="quality-grid quality-grid-two" id="qualityGrid">
         <button type="button" class="quality-btn" data-quality="1080_60">
           <span class="q-rec" data-i18n="qualityBadgeStandard">სტანდარტული</span>
@@ -9029,7 +9029,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       <div class="toggle-row">
         <div class="toggle-copy">
           <div class="t1" data-i18n="subscriberT1">ვარ არხის გამომწერი</div>
-          <div class="t2" data-i18n="subscriberT2">✓ დაბალი ტარიფი აქტიურდება</div>
+          <div class="t2" data-i18n="subscriberT2">10%-იანი ფასდაკლება</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="subToggle">
@@ -10496,7 +10496,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       secondsPlaceholder: 'შეიყვანე წამი (0–59)',
       msLabel: 'წამის მეასედები (00–59)',
       msHint: 'მაქსიმალური სრული ხანგრძლივობაა 59.59. ამ ფარგლებში ფასი ერთნაირად ითვლება 59-ე წამის ტარიფით.',
-      qualityLabel: 'ვიდეოს ხარისხი',
+      qualityLabel: 'აირჩიეთ ვიდეოს ხარისხი:',
       wizStepUpload: 'ატვირთვა',
       wizStepQuality: 'ხარისხი',
       wizStepConfirm: 'დადასტურება',
@@ -10516,7 +10516,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       srRejectTextCp: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps, ან ნებისმიერი 2K/4K ვიდეო',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
-      subscriberT2: '✓ დაბალი ტარიფი აქტიურდება',
+      subscriberT2: '10%-იანი ფასდაკლება',
       wizardConfirmLink: 'დადასტურება',
       sendOrderWizardQ: 'გსურთ გააგზავნოთ შეკვეთა?',
       wizardYes: 'დიახ',
@@ -10939,7 +10939,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       secondsPlaceholder: 'Enter seconds (0–59)',
       msLabel: 'Hundredths of a second (00–59)',
       msHint: 'Maximum total duration is 59.59. Within this range the price is calculated at the 59-second rate.',
-      qualityLabel: 'Video quality',
+      qualityLabel: 'Choose video quality:',
       wizStepUpload: 'Upload',
       wizStepQuality: 'Quality',
       wizStepConfirm: 'Confirm',
@@ -10959,7 +10959,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       srRejectTextCp: 'Format doesn\'t match — must be exactly 1080p / 60fps, or any 2K/4K video',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
-      subscriberT2: '✓ Lower rate activates',
+      subscriberT2: '10% discount',
       wizardConfirmLink: 'Confirm',
       sendOrderWizardQ: 'Would you like to send the order?',
       wizardYes: 'Yes',
@@ -11749,12 +11749,10 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 
     const PRICE_SCALE = QUALITY_SCALES[quality] || QUALITY_SCALES['1080_60'];
 
-    let ratePerSecond;
-    if (isSubscriber) {
-      ratePerSecond = 0.20 - ((billedSecondsForRate - 5) / 54) * (0.20 - 0.1525);
-    } else {
-      ratePerSecond = 0.24 - ((billedSecondsForRate - 5) / 54) * (0.24 - 0.2033);
-    }
+    // Subscribers no longer get a separate low tariff: they pay the normal
+    // rate with a flat 10% discount applied to the total below.
+    const ratePerSecond = 0.24 - ((billedSecondsForRate - 5) / 54) * (0.24 - 0.2033);
+    const SUBSCRIBER_DISCOUNT = 0.10;
 
     let billedSeconds;
     if (totalSeconds < 5) {
@@ -11775,7 +11773,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     const LONG_VIDEO_SURCHARGE = 1.15 * 1.05 * (forAnyOrder ? 1.10 : 1);
     const lengthFactor = (s >= LONG_VIDEO_FROM_SECONDS) ? LONG_VIDEO_SURCHARGE : 1;
 
-    const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE * lengthFactor;
+    const totalPrice = billedSeconds * ratePerSecond * PRICE_SCALE * lengthFactor * (isSubscriber ? (1 - SUBSCRIBER_DISCOUNT) : 1);
     const discounted = (typeof promoApplied !== 'undefined' && promoApplied && currentPromo && currentPromo.singleDiscountPercent)
       ? totalPrice * (1 - currentPromo.singleDiscountPercent / 100)
       : totalPrice;
@@ -21464,5 +21462,129 @@ html:not(.pc-opening) .pc-modal-scrim .drop-zone .dz-icon{ animation:moonFloat 3
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
+<style id="moon-modal-v3">
+/* ============================================================
+   MOON order modal v3 — calm & simple.
+   No decorative motion inside the modal (the loading spinner stays),
+   flatter upload states, plain subscriber row, redesigned last step.
+   ============================================================ */
+
+/* 1. no animations inside the modal (the panel's own opening is untouched) */
+html .pc-modal-scrim .pc-accordion-body *:not(.spin),
+html .pc-modal-scrim .pc-accordion-body *::before,
+html .pc-modal-scrim .pc-accordion-body *::after{ animation:none !important; }
+
+/* 2. stepper — static ring, never clipped at the edges */
+html .pc-modal-scrim .wizard-steps{ padding:5px 5px 0; margin:0 0 16px !important; }
+html .pc-modal-scrim .wizard-step-dot{ overflow:visible; }
+html .pc-modal-scrim .wizard-step.is-active .wizard-step-dot{
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--pc-accent, var(--cyan)) 30%, transparent);
+}
+html .pc-modal-scrim .wizard-step-line::after{ transition:none; }
+
+/* 3. "video accepted" — one slim line, no file name */
+html .pc-modal-scrim .simple-scan-ok.show{
+  display:flex; align-items:center; flex-wrap:nowrap; gap:10px;
+  min-height:48px; padding:0 52px 0 12px; border-radius:999px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(37,211,102,.5);
+  color:var(--text); font-size:14px; font-weight:700; white-space:nowrap;
+}
+html .pc-modal-scrim .simple-scan-ok-check{
+  width:24px; height:24px; flex:0 0 24px; border-radius:50%;
+  font-size:13px; background:#25D366; color:#06210f;
+}
+html .pc-modal-scrim .simple-scan-ok-name{ display:none !important; }
+html .pc-modal-scrim .sr-reset-btn{ top:8px; right:8px; width:32px; height:32px; }
+
+/* once the upload percentage starts, the "accepted" line (and its ✕) disappear */
+html .pc-modal-scrim :is(.scan-result, .simple-scan-result):has(.mooon-auto.show) :is(.simple-scan-ok, .sr-reset-btn){
+  display:none !important;
+}
+
+/* 3b. "send to our team?" — no box, just text and two buttons */
+html .pc-modal-scrim .sr-transfer,
+html .pc-modal-scrim .mooon-prompt{
+  background:none; border:0; border-radius:0; padding:0; margin:16px 0 0;
+}
+html .pc-modal-scrim .sr-transfer-q,
+html .pc-modal-scrim .mooon-prompt-q{
+  font-size:14.5px; font-weight:600; line-height:1.55; color:var(--text);
+  text-align:center; margin-bottom:16px;
+}
+html .pc-modal-scrim .sr-transfer-actions{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+html .pc-modal-scrim .st-btn.st-yes,
+html .pc-modal-scrim .mooon-prompt-yes{
+  background:#fff !important; color:#0b0b0e !important; border:0 !important;
+  font-weight:800; box-shadow:none !important;
+}
+html .pc-modal-scrim .st-btn.st-no,
+html .pc-modal-scrim .mooon-prompt-no{
+  background:transparent !important; color:var(--text-dim) !important;
+  border:1px solid rgba(255,255,255,.2) !important; font-weight:600; box-shadow:none !important;
+}
+
+/* 3c. upload percentage — one card only */
+html .pc-modal-scrim .mooon-auto{
+  margin-top:0; padding:22px 16px 16px; border-radius:18px;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1);
+}
+html .pc-modal-scrim .mooon-auto-ring-percent{ font-size:46px; }
+html .pc-modal-scrim .mooon-auto-status::after{ height:6px; margin-top:16px; border-radius:6px; }
+html .pc-modal-scrim .mooon-auto-stay{
+  background:none; border:0; padding:0; margin-top:14px;
+  font-size:12.5px; line-height:1.5; color:var(--text-dim); text-align:center;
+}
+
+/* 4. field labels (e.g. "აირჩიეთ ვიდეოს ხარისხი:") */
+html .pc-modal-scrim .field-top label{ font-size:15px; font-weight:700; color:var(--text); }
+
+/* 5. subscriber toggle — plain text + switch */
+html .pc-modal-scrim .toggle-row,
+html .pc-modal-scrim .toggle-row:has(input:checked){
+  background:none !important; border:0 !important; box-shadow:none !important;
+  border-radius:0; padding:2px 0;
+}
+html .pc-modal-scrim .toggle-copy .t1{ font-size:15px; font-weight:600; color:var(--text); }
+html .pc-modal-scrim .toggle-copy .t2{ font-size:13px; font-weight:500; color:var(--text-dim); margin-top:3px; }
+
+/* primary buttons share one look */
+html .pc-modal-scrim .wizard-confirm-btn{
+  background:#fff; color:#0b0b0e; border-radius:14px; font-weight:800; font-size:15px;
+}
+
+/* 6. last step — big price, one clear button, quiet warning */
+html .pc-modal-scrim .panel-divider{ display:none; }
+html .pc-modal-scrim .wizard-question{
+  background:none !important; border:0 !important; border-radius:0;
+  padding:8px 0 4px !important; gap:0 !important; margin-bottom:20px;
+}
+html .pc-modal-scrim .wc-price-row{ gap:8px; margin:0; }
+html .pc-modal-scrim .wc-price-label{ font-size:13.5px; color:var(--text-dim); }
+html .pc-modal-scrim .wc-price-value{
+  font-size:54px; line-height:1; font-weight:800; color:var(--text);
+  font-variant-numeric:tabular-nums; text-shadow:none;
+}
+html .pc-modal-scrim .panel-section[id$="rderChannelsPanel"] > .panel-head{ display:none !important; }
+html .pc-modal-scrim .order-btn.chat:not(.processing){
+  background:#fff !important; color:#0b0b0e !important; border:0 !important;
+  border-radius:14px; min-height:56px; font-size:16px; font-weight:800; box-shadow:none;
+}
+html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ background:#f0f0f3 !important; transform:none; }
+html .pc-modal-scrim .order-btn.chat:not(.processing) .ico svg{ stroke:#0b0b0e; }
+
+html .pc-modal-scrim .warn-panel,
+html .pc-modal-scrim .warn-panel.warn-starry{
+  background:none; border:0; border-top:1px solid rgba(255,255,255,.1);
+  border-radius:0; padding:14px 0 0; margin-top:20px !important;
+}
+html .pc-modal-scrim .warn-panel .w-head{ justify-content:flex-start; padding:0 34px 0 0; }
+html .pc-modal-scrim .warn-panel .w-head-left{ justify-content:flex-start; }
+html .pc-modal-scrim .warn-panel .w-head span.title{ color:var(--text-dim); font-weight:600; font-size:13.5px; }
+html .pc-modal-scrim .warn-panel .w-head .ico{ background:none; border-color:rgba(255,255,255,.28); color:var(--text-dim); }
+html .pc-modal-scrim .warn-toggle{ border-color:rgba(255,255,255,.2); color:var(--text-dim); }
+html .pc-modal-scrim .warn-panel p{ color:var(--text-dim); font-size:13px; }
+html .pc-modal-scrim .warn-panel b{ color:var(--text); }
+</style>
 </body>
 </html>
