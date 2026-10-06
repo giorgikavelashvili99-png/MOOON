@@ -4464,7 +4464,7 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
      some degree — if it's noticeable again at this size, the reliable
      fix is still full removal, not a further reduction. */
   @media (min-width:901px){
-    html{ zoom:1; }
+    html{ zoom:1.12; }
   }
 
   /* --- Direct contact panel --- */
@@ -20592,8 +20592,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // opacity+translateY-only version from before: a blur transition is
     // extra GPU work, and the phone reveal is deliberately tuned to
     // feel instant/snappy rather than a showcase moment.
-    const hiddenTransform = isPhoneLayout ? 'translateY(26px)' : 'translateY(34px) scale(0.96)';
-    const hiddenFilter = isPhoneLayout ? 'none' : 'blur(7px)';
+    const hiddenTransform = 'none';
+    const hiddenFilter = 'none';
     const duration = isPhoneLayout ? '.3s' : '.6s';
     const easing = isPhoneLayout ? 'cubic-bezier(.25,1,.5,1)' : 'cubic-bezier(.16,1,.3,1)';
     const hiddenStyle = `opacity ${duration} ${easing}, transform ${duration} ${easing}, filter ${duration} ${easing}`;
@@ -22028,6 +22028,60 @@ html body .pc-card, html body .pc-card *{ -webkit-backface-visibility:visible; b
 @media (max-resolution:1.49dppx){
   html{ -webkit-text-stroke:.22px currentColor; }
 }
+
+/* ===== calm entrance: everything fades in IN PLACE (no rising / sliding text or cards) ===== */
+@keyframes pcRise{from{opacity:0}}
+@keyframes pcFade{from{opacity:0}}
+@keyframes pcFeat{from{opacity:0}}
+@keyframes ttUp{from{opacity:0}}
+@keyframes ttRise{from{opacity:0}}
+@keyframes ttDrop{from{opacity:0}}
+@keyframes dgRise{from{opacity:0}to{opacity:1}}
+@keyframes pcCineKid{from{opacity:0}}
+.js-reveal .enh-rv{transform:none!important}
+@media (min-width:900px){
+  .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active){transform:scale(.96)}
+}
+/* ===== feature ticks: clean white disc + dark tick, readable on every card colour (green ring looked muddy on the gold card) ===== */
+body .pc-feature .pc-check{
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11.5' fill='%23ffffff'/%3E%3Cpath d='M7.3 12.5l3.1 3.1 6.3-6.7' fill='none' stroke='%23161208' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;
+  opacity:.95;
+}
+body .pc-feature--no .pc-check{
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23ffffff' fill-opacity='.14' stroke='%23ffffff' stroke-opacity='.45' stroke-width='1.3'/%3E%3Cpath d='M8.7 8.7l6.6 6.6M15.3 8.7l-6.6 6.6' fill='none' stroke='%23ffffff' stroke-opacity='.7' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;
+  opacity:.8;
+}
+/* ===== desktop is shown at 112% (html zoom) -> keep viewport-height based boxes inside the screen ===== */
+@media (min-width:901px){
+  .pc-modal-scroll,.pc-modal-scrim .pc-modal-scroll{max-height:calc((100vh - 100px) / 1.12);max-height:calc((100dvh - 100px) / 1.12)}
+  .pc-modal-scrim>.pc-accordion-body.panel{max-height:calc(100dvh / 1.12)}
+}
+
+/* ===== carousel arrows: vertically centred on the card row (var set by script below), not on the whole block incl. dots ===== */
+@media (min-width:900px){
+  html body .pricing-cards.pc-scroll-mode .pc-nav{top:var(--pc-nav-top, calc(50% - 16px))!important;margin-top:-32px!important}
+}
 </style>
+<script>
+(function(){
+  var ro=null,watched=null;
+  function fit(){
+    var sh=document.querySelector('.pc-scroll-shell'); if(!sh) return;
+    var tr=sh.querySelector('.pc-scroll-track'); if(!tr) return;
+    var a=sh.getBoundingClientRect(), b=tr.getBoundingClientRect();
+    var k=sh.offsetHeight? a.height/sh.offsetHeight : 1; if(!k||!isFinite(k)) k=1;
+    sh.style.setProperty('--pc-nav-top', ((b.top-a.top+b.height/2)/k)+'px');
+    if(window.ResizeObserver && watched!==sh){
+      watched=sh; if(ro) ro.disconnect();
+      ro=new ResizeObserver(fit); ro.observe(sh); ro.observe(tr);
+    }
+  }
+  window.addEventListener('resize',fit);
+  window.addEventListener('load',function(){fit();setTimeout(fit,400);setTimeout(fit,1500);});
+  new MutationObserver(function(){ if(document.querySelector('.pc-scroll-shell') && watched!==document.querySelector('.pc-scroll-shell')) fit(); })
+    .observe(document.documentElement,{childList:true,subtree:true});
+  fit();
+})();
+</script>
 </body>
 </html>
