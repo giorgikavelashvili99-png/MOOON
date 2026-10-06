@@ -7970,34 +7970,26 @@ body .pc-card .pc-title,body .pc-card .pc-desc,body .pc-card .pc-feature,body .p
 body .pc-card .pc-feature{font-size:13.5px}
 </style>
 <style id="moonSmooth">
-/* ===== 1. guide pills: raised, with real breathing room above the "choose a package" heading ===== */
+/* 1. guide pills raised, with room above the heading */
 .pc-intro{padding:0 6px 14px}
 .pc-guide-row{margin-top:-8px;margin-bottom:24px;gap:10px}
-@media (min-width:900px){.pc-heading{margin-top:0}}
 
-/* ===== 2. card switching: compositor-only (opacity). The old saturate() filter transition re-rasterised a whole
-   card (text + 50px shadow) on every swipe and left the text soft for a moment — that was the stutter + the "smudge". ===== */
+/* 2. inactive-card dim/desaturate: SAME look, but done with a cheap opacity-faded overlay on the compositor
+   instead of transitioning filter:saturate() (which re-painted the whole card every frame) */
 html body .pricing-cards.pc-scroll-mode .pc-slide,
 html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active){
   filter:none!important;
-  transition:opacity .28s ease-out!important;
+  transition:opacity .45s ease!important;
+  position:relative;
 }
-html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active){opacity:.55}
-html body .pricing-cards.pc-scroll-mode .pc-slide--active{opacity:1}
+.pricing-cards.pc-scroll-mode .pc-slide::after{
+  content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;z-index:50;
+  background:rgba(70,74,92,.32);opacity:1;transition:opacity .45s ease;
+}
+.pricing-cards.pc-scroll-mode .pc-slide--active::after{opacity:0}
 
-/* ===== 3. entrance animations: opacity / translate3d only — no blur, no perspective, no per-icon pop ===== */
-@keyframes pcCineIn{from{opacity:0;transform:translate3d(0,40px,0)}}
-@keyframes pcRise{from{opacity:0;transform:translate3d(0,24px,0)}}
+/* 3. CTA shine: identical look, moved from animating `left` (layout every frame) to transform */
 @media (prefers-reduced-motion:no-preference){
-  .pricing-cards.pc-play .pc-slide{animation:pcRise .6s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0) * 70ms)}
-  .pricing-cards.pc-play .pc-card>.pc-cine-glint{animation:none}
-  /* a card that becomes active for the first time: short calm stagger, finished in ~0.6s */
-  .pc-slide.pc-in{--base:0s}
-  .pc-slide.pc-in :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-toggle-btn){
-    animation:pcFade .32s ease-out backwards;animation-delay:.04s}
-  .pc-slide.pc-in .pc-feature{animation:pcFeat .32s ease-out backwards;animation-delay:calc(.08s + var(--n,1) * 40ms)}
-  .pc-slide.pc-in .pc-feature .pc-check{animation:none}
-  /* CTA shine moved from animating `left` (layout every frame) to transform */
   .pc-slide--active .pc-toggle-btn::before,
   .pricing-cards:not(.pc-scroll-mode) .pc-toggle-btn::before{animation:pcBtnShineT 5s ease-in-out 3s infinite}
 }
@@ -8006,13 +7998,15 @@ html body .pricing-cards.pc-scroll-mode .pc-slide--active{opacity:1}
   74%{opacity:1}92%{opacity:1}
   100%{transform:translate3d(475%,0,0) skewX(-20deg);opacity:0}
 }
-body .pc-slide--active .pc-toggle-btn:hover::before{left:-60%!important;transition:none!important}
 
-/* ===== 4. while the carousel is moving, everything decorative holds still so the GPU only moves the cards ===== */
+/* 4. while the carousel is moving, the decorative loops hold still (they resume right after) */
 html.pc-moving :is(.orb,.topbar-moon,.vb-moon,.hero-cta-btn,.qn-tab,.moon-glow-card,.qn-stars span,.pc-cine-glint,.pc-ring-spin,.mec-colon,.urgency-badge,.price sup,.order-btn.chat),
 html.pc-moving .pc-toggle-btn::before,
 html.pc-moving .pc-card--monthly::after{animation-play-state:paused!important}
-.pricing-cards.pc-scroll-mode .pc-scroll-track{scroll-behavior:auto;contain:layout paint style}
+.pricing-cards.pc-scroll-mode .pc-scroll-track{contain:layout paint style}
+/* 5. pre-build the GPU layers of each card's intro pieces while they are still hidden (.pc-pre), so the moment a card
+   first becomes active nothing has to be created mid-swipe; released again once the intro has played */
+html body .pc-slide:is(.pc-pre,.pc-in) :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-feature .pc-check,.pc-toggle-btn){will-change:opacity,transform!important}
 </style>
 </head>
 <body>
