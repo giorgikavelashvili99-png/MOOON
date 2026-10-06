@@ -7684,33 +7684,13 @@ table{ max-width:100%; }
   }
 }
 
-/* ===== PERF + FIT PATCH ===== */
-/* 1. No blur/filter in any keyframes (the main cause of lag) */
-@keyframes pcCineIn{0%{opacity:0;transform:translate3d(0,40px,0) scale(.96)}100%{opacity:1;transform:none}}
-@keyframes pcCinePanelIn{0%{opacity:0;transform:translate3d(0,40px,0) scale(.94)}100%{opacity:1;transform:none}}
-@keyframes pcCinePanelOut{to{opacity:0;transform:translate3d(0,24px,0) scale(.94)}}
-@keyframes pcCineKid{from{opacity:0;transform:translate3d(0,14px,0)}}
-@keyframes pcCineBloom{0%,100%{opacity:1}}
-@keyframes pcCineClose{from{opacity:0;transform:scale(.4)}}
-.pricing-cards.pc-play .pc-slide{animation-duration:.6s!important;animation-delay:calc(var(--i,0)*70ms)!important}
-html .pc-modal-scrim.open>.pc-accordion-body.panel{animation:pcCinePanelIn .38s cubic-bezier(.16,1,.3,1) backwards!important;will-change:transform,opacity}
-html .pc-modal-scrim.open{animation-duration:.25s!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(3,3,8,.94)!important}
-html .pc-modal-scrim.open .pc-modal-scroll>:is(.wizard-steps,.panel-section,.panel-head){animation-duration:.3s!important}
-html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(n){animation-delay:.08s!important}
-.pc-modal-scrim.pc-cine-exit{animation-duration:.2s!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-.pc-modal-scrim.pc-cine-exit>.pc-accordion-body.panel{animation-duration:.22s!important}
-/* 2. Kill endless decorative animations & heavy effects */
-.orb{display:none!important}
-.badge-float,.pc-card--monthly::after,.pc-cine-glint,.pc-cine-sweep,.pc-toggle-btn::before,.topbar-moon,.topbar-moon::after,.hero-cta-btn,.vb-moon,.qn-tab,.moon-glow-card,.logo,[class*="logo"]{animation:none!important}
-.pc-card--monthly::after,.pc-cine-glint,.pc-cine-sweep{display:none!important}
-*{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-.pc-card,.pc-slide{will-change:auto!important}
-/* 3. Stray line removed (top hairline / glow rule on panels & cards) */
+/* ===== FIT + STRAY LINE + SMOOTHNESS PATCH (all animations kept as original) ===== */
+/* stray top line */
 .panel::before,.pc-card::before,.pc-card--monthly::before,#monthlySubPanel::before,.pc-accordion-body::before{display:none!important;content:none!important}
-/* 4. Order modal always fits the screen */
-.pc-modal-scrim{padding:10px!important;align-items:center!important;overflow:hidden!important}
+/* order modal always fits the screen */
+.pc-modal-scrim{padding:10px!important;align-items:center!important}
 .pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(440px,94vw);width:var(--wz-w);max-width:94vw;margin:auto!important;padding:clamp(12px,2.4vh,20px) clamp(12px,3.4vw,18px)!important}
-.pc-modal-scrim .pc-modal-scroll,.pc-modal-scrim .pc-modal-scroll{max-height:calc(100vh - 36px);max-height:calc(100dvh - 36px);overflow-y:auto}
+.pc-modal-scrim .pc-modal-scroll{max-height:calc(100vh - 36px);max-height:calc(100dvh - 36px);overflow-y:auto}
 @media (max-height:760px){
  .pc-modal-scrim .wizard-steps{margin:0 0 10px!important}
  .pc-modal-scrim .wizard-step-dot{width:28px!important;height:28px!important;font-size:13px!important}
@@ -7718,8 +7698,35 @@ html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(n){animation-delay:.08s!im
  .pc-modal-scrim .drop-zone{padding:14px 10px!important}
  .pc-modal-scrim .wizard-question{padding:10px!important;gap:8px!important}
 }
-@media (max-height:600px){.pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(400px,94vw)}}
-@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+/* smoother card swiping WITHOUT changing how anything looks: own GPU layers, isolated layout */
+.pricing-cards.pc-scroll-mode .pc-slide{will-change:opacity,transform;contain:layout style;transform:translateZ(0);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+@media (min-width:900px){.pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active){transform:translateY(10px) scale(.96)}}
+.pricing-cards.pc-scroll-mode .pc-scroll-track{overscroll-behavior-x:contain}
+
+/* ===== STABILITY PATCH: every animation kept, same look, but GPU-cheap ===== */
+@keyframes pcCineIn{
+ 0%{opacity:0;transform:perspective(900px) translateY(70px) rotateX(14deg) scale(.9);filter:blur(5px) brightness(.6)}
+ 60%{filter:blur(0) brightness(1.12)}}
+@keyframes pcCinePanelIn{
+ 0%{opacity:0;transform:translate3d(var(--cine-dx,0px),var(--cine-dy,70px),0) scale(.45);filter:blur(6px) brightness(1.7) saturate(1.4)}
+ 60%{opacity:1;transform:translate3d(0,0,0) scale(1.02);filter:blur(0) brightness(1.08)}
+ 100%{transform:none;filter:none}}
+@keyframes pcCineBloom{0%{box-shadow:0 0 0 0 transparent}35%{box-shadow:0 0 50px 8px color-mix(in srgb,var(--pc-accent,#7c8fff) 55%,transparent)}}
+@keyframes pcCineKid{from{opacity:0;transform:translateY(22px);filter:blur(2px)}}
+@keyframes pcCinePanelOut{to{opacity:0;transform:translate3d(var(--cine-dx,0px),var(--cine-dy,40px),0) scale(.5);filter:blur(4px) brightness(1.4)}}
+html .pc-modal-scrim.open{-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+/* animated pieces get their own GPU layer */
+.pc-modal-scrim>.pc-accordion-body.panel,.pc-modal-scrim .pc-modal-close,.pc-cine-glint,.pc-cine-sweep::before,.orb{will-change:transform,opacity}
+.pricing-cards.pc-scroll-mode .pc-slide{will-change:opacity,filter,transform}
+/* anything running behind the order window / intro is invisible, so pause it (resumes on close) */
+body:has(.pc-modal-scrim.open) :is(.orb,.pc-cine-glint,.topbar-moon,.vb-moon,.hero-cta-btn,.qn-tab,.moon-glow-card,.pc-card--monthly::after,.pc-toggle-btn::before,.pc-ring-spin,.pc-stars i){animation-play-state:paused!important}
+html.mi-lock :is(.orb,.pc-cine-glint,.topbar-moon,.vb-moon,.hero-cta-btn,.qn-tab,.moon-glow-card){animation-play-state:paused!important}
+
+/* ✕ button always fully visible: panel leaves room for the corner button */
+.pc-modal-scrim{padding:18px 22px!important;box-sizing:border-box}
+.pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(440px,calc(100vw - 52px));width:var(--wz-w)!important;max-width:calc(100vw - 52px)!important}
+.pc-modal-scrim .pc-modal-close{top:-12px!important;right:-12px!important}
+@media (max-width:360px){.pc-modal-scrim>.pc-accordion-body.panel{--wz-w:calc(100vw - 56px);max-width:calc(100vw - 56px)!important}}
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style id="moonIntroCss">
