@@ -10267,46 +10267,60 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
   function wizStepSwap(hideEls, showEls, midCallback){
     hideEls = (hideEls || []).filter(Boolean);
     showEls = (showEls || []).filter(Boolean);
-    const reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
-      document.documentElement.classList.contains('low-power');
+    const HID = 'wizard-step-hidden';
+    const toHide = hideEls.filter(el => !el.classList.contains(HID));
+    const toShow = showEls.filter(el => el.classList.contains(HID));
     const anchor = hideEls[0] || showEls[0];
     const container = anchor ? anchor.closest('.pc-modal-scroll') : null;
 
-    function instantSwap(){
-      hideEls.forEach(el => el.classList.add('wizard-step-hidden'));
+    // Already in the requested state (observers can fire several times
+    // for one upload) -> nothing to animate. Re-running the swap was what
+    // made the tiles blink and the panel jump.
+    if (!toHide.length && !toShow.length) { if (midCallback) midCallback(); return; }
+
+    // A swap that is still in flight gets finished instantly first.
+    if (container && container._wizSwapDone) container._wizSwapDone();
+
+    const reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+      document.documentElement.classList.contains('low-power');
+
+    function applySwap(){
+      toHide.forEach(el => { el.classList.remove('wiz-step-exit'); el.classList.add(HID); });
       if (midCallback) midCallback();
-      showEls.forEach(el => el.classList.remove('wizard-step-hidden'));
+      toShow.forEach(el => el.classList.remove(HID));
     }
 
-    if (reduce || !container) { instantSwap(); return; }
+    if (reduce || !container) { applySwap(); return; }
 
     const startH = container.offsetHeight;
     container.style.height = startH + 'px';
     container.style.overflowY = 'hidden';
+    toHide.forEach(el => el.classList.add('wiz-step-exit'));
 
-    hideEls.forEach(el => el.classList.add('wiz-step-exit'));
+    let applied = false, finished = false, tA = null, tB = null;
+    function apply(){ if (applied) return; applied = true; applySwap(); }
+    function finish(){
+      if (finished) return; finished = true;
+      clearTimeout(tA); clearTimeout(tB);
+      apply();
+      container.style.transition = '';
+      container.style.height = '';
+      container.style.overflowY = '';
+      container._wizSwapDone = null;
+    }
+    container._wizSwapDone = finish;
 
-    window.setTimeout(function(){
-      hideEls.forEach(el => {
-        el.classList.remove('wiz-step-exit');
-        el.classList.add('wizard-step-hidden');
-      });
-      if (midCallback) midCallback();
-      showEls.forEach(el => el.classList.remove('wizard-step-hidden'));
-
+    tA = window.setTimeout(function(){
+      apply();
       container.style.height = 'auto';
       const endH = container.offsetHeight;
       container.style.height = startH + 'px';
       void container.offsetHeight;
-      container.style.transition = 'height .38s cubic-bezier(.2,.7,.3,1)';
+      if (Math.abs(endH - startH) < 2) { finish(); return; }
+      container.style.transition = 'height .32s cubic-bezier(.22,1,.36,1)';
       container.style.height = endH + 'px';
-
-      window.setTimeout(function(){
-        container.style.transition = '';
-        container.style.height = '';
-        container.style.overflowY = '';
-      }, 400);
-    }, 190);
+      tB = window.setTimeout(finish, 340);
+    }, 140);
   }
 
   // ============================================================
@@ -21875,6 +21889,73 @@ html .discord-gate .discord-btn.primary:hover{ background:#6b77f5; }
 html .discord-gate .discord-gate-skip,
 html .discord-gate .discord-gate-close{ color:#aebce6; border-bottom:0; text-decoration:underline; text-underline-offset:4px; margin-top:16px; }
 html .discord-gate .dg-intro-btn{ margin-top:18px; color:#c9d6f5; background:transparent; border-color:rgba(255,255,255,.22); }
+</style>
+<style id="moon-fix-v8">
+/* v8 — (1) send button never turns white, (2) one single calm fade per step
+   (no parent+child double animation = no blinking tiles), (3) no vertical
+   slide, (4) lighter, quicker animations after the video is accepted. */
+
+/* (1) the old rule  .order-btn.chat:not(.processing):hover{background:#f0f0f3 !important}
+   won over the gradient — pin the gradient in every state */
+html .pc-modal-scrim .order-btn.chat:not(.processing),
+html .pc-modal-scrim .order-btn.chat:not(.processing):hover,
+html .pc-modal-scrim .order-btn.chat:not(.processing):focus,
+html .pc-modal-scrim .order-btn.chat:not(.processing):focus-visible,
+html .pc-modal-scrim .order-btn.chat:not(.processing):active{
+  background:linear-gradient(135deg, color-mix(in srgb, var(--pc-accent, #22c55e) 78%, #000), color-mix(in srgb, var(--pc-accent, #22c55e) 52%, #1f3dff)) !important;
+  color:#fff !important;
+  border:1px solid color-mix(in srgb, var(--pc-accent, #22c55e) 70%, #fff) !important;
+  outline:none;
+}
+html .pc-modal-scrim .order-btn.chat:not(.processing) .ico svg,
+html .pc-modal-scrim .order-btn.chat:not(.processing):hover .ico svg{ stroke:#fff; }
+@media (hover:hover) and (pointer:fine){
+  html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ filter:brightness(1.12); transform:none; }
+}
+/* touch screens keep :hover after a tap — don't let it stick */
+@media (hover:none){
+  html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ filter:none; }
+  html .pc-modal-scrim .quality-btn:hover, html .pc-modal-scrim .wp-box:hover, html .pc-modal-scrim .mp-box:hover{ transform:none; }
+}
+
+/* (2)+(3) step change = opacity only, grid fades as ONE piece */
+@keyframes wizardStepIn{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes wizardStepOut{ from{ opacity:1; } to{ opacity:0; } }
+@keyframes moonRise{ from{ opacity:0; transform:translate3d(0,6px,0); } to{ opacity:1; transform:none; } }
+.wiz-step-exit{ animation:wizardStepOut .14s ease-out forwards !important; pointer-events:none; }
+.field:not(.wizard-step-hidden),
+.wp-grid:not(.wizard-step-hidden),
+.mp-grid:not(.wizard-step-hidden),
+.quality-grid:not(.wizard-step-hidden),
+.order-grid:not(.wizard-step-hidden){ animation:wizardStepIn .26s ease-out both; }
+
+/* tiles no longer animate on their own on top of the grid */
+html .pc-modal-scrim .quality-btn,
+html .pc-modal-scrim .mp-box,
+html .pc-modal-scrim .wp-box,
+html .pc-modal-scrim .wizard-question{ animation:none !important; }
+html .pc-modal-scrim .quality-btn:nth-child(n),
+html .pc-modal-scrim .mp-box:nth-child(n),
+html .pc-modal-scrim .wp-box:nth-child(n){ animation-delay:0s !important; }
+
+/* (4) upload accepted screen: the result box doesn't animate, only its
+   pieces do — shorter and without the overshooting check pop */
+.scan-result:not(.wizard-step-hidden),
+.simple-scan-result:not(.wizard-step-hidden){ animation:none !important; }
+html .pc-modal-scrim .simple-scan-ok.show,
+html .pc-modal-scrim .simple-scan-reject.show,
+html .pc-modal-scrim .sr-reject.show{ animation:moonRise .26s ease-out backwards !important; }
+html .pc-modal-scrim .sr-transfer.show,
+html .pc-modal-scrim .mooon-prompt.show,
+html .pc-modal-scrim .mooon-auto.show,
+html .pc-modal-scrim .scan-progress.show{ animation:moonRise .28s ease-out .06s backwards !important; }
+html .pc-modal-scrim .simple-scan-ok-check{ animation:none !important; }
+html .pc-modal-scrim .order-btn.chat{ animation:wizardStepIn .26s ease-out backwards !important; }
+html .pc-modal-scrim .wizard-step.is-done .wizard-step-dot{ animation:none !important; }
+
+@media (prefers-reduced-motion: reduce){
+  .field, .wp-grid, .mp-grid, .quality-grid, .order-grid, .wiz-step-exit{ animation:none !important; }
+}
 </style>
 </body>
 </html>
