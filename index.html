@@ -21983,5 +21983,51 @@ html body .pc-slide.pc-in .pc-feature .pc-check{
   -webkit-backface-visibility:visible; backface-visibility:visible;
 }
 </style>
+<style id="moon-fix-v11">
+/* v11 — global crispness.
+   1) check / cross icons are drawn with a real CSS border + tick (snaps to the
+      device pixel grid, so it stays sharp at any screen scale),
+   2) no leftover GPU layers / fractional scaling on cards and the order window
+      (a layer rasterised at a small size and then enlarged is what looks pixelated),
+   3) on ordinary-density screens the very thin Georgian font gets a hair of weight. */
+
+/* 1) icons */
+html body .pc-feature .pc-check,
+html body .pc-card .pc-feature .pc-check{
+  width:18px; height:18px; flex:0 0 18px; box-sizing:border-box; position:relative;
+  border:1.5px solid #4ade80 !important; border-radius:50%;
+  background:rgba(34,197,94,.18) !important; background-image:none !important;
+  font-size:0 !important; color:transparent !important;
+}
+html body .pc-feature .pc-check::after{
+  content:''; position:absolute; left:50%; top:46%; width:4.5px; height:8.5px;
+  border:solid #4ade80; border-width:0 2px 2px 0; border-radius:0 0 1px 0;
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+html body .pc-feature--no .pc-check,
+html body .pc-card .pc-feature--no .pc-check{ border-color:#fb7185 !important; background:rgba(244,63,94,.16) !important; background-image:none !important; }
+html body .pc-feature--no .pc-check::before,
+html body .pc-feature--no .pc-check::after{
+  content:''; position:absolute; left:50%; top:50%; width:9px; height:2px; border:0; border-radius:1px;
+  background:#fb7185; transform:translate(-50%,-50%) rotate(45deg);
+}
+html body .pc-feature--no .pc-check::after{ transform:translate(-50%,-50%) rotate(-45deg); }
+
+/* 2) layers */
+html body .pc-modal-scrim > .pc-accordion-body.panel,
+html body .pc-modal-scrim .pc-modal-close,
+html body .pc-modal-scrim .pc-modal-scroll,
+html body .pc-modal-scrim .pc-modal-scroll *{ will-change:auto !important; }
+html body .pricing-cards.pc-scroll-mode .pc-slide{
+  will-change:auto !important; backface-visibility:visible !important; -webkit-backface-visibility:visible !important;
+}
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active):not(.pc-in):not(.pc-pre){ transform:none; }
+html body .pc-card, html body .pc-card *{ -webkit-backface-visibility:visible; backface-visibility:visible; }
+
+/* 3) a little weight for the hairline font on normal-density screens */
+@media (max-resolution:1.49dppx){
+  html{ -webkit-text-stroke:.22px currentColor; }
+}
+</style>
 </body>
 </html>
