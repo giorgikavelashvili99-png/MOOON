@@ -2877,61 +2877,7 @@
      breaking from the site's own dark theme so it reads as an urgent system
      notice, the same way the referenced address-change notice does. The HTML
      for this lives at the top level of <body>
-<!-- ===== MOON intro overlay ===== -->
-<div id="moonIntro" role="dialog" aria-label="MOON intro"><div class="mi-stage"></div><div class="mi-bar t"></div><div class="mi-bar b"></div><div class="mi-dots"></div><div class="mi-prog"><i></i></div><button type="button" class="mi-skip" id="miSkip" aria-label="გამოტოვება / Skip">გამოტოვება <small>Skip</small> <span aria-hidden="true">›</span></button></div>
-<script>
-(function(){
-var STANDALONE=false, LOGO="";
-var el=document.getElementById('moonIntro'),stage=el.querySelector('.mi-stage'),dots=el.querySelector('.mi-dots'),root=document.documentElement,timers=[],done=false;
-var C=[
-{e:'⚡',n:'იაფი პაკეტი',t:'ბიუჯეტური ვარიანტი',p:.99,o:1.99,u:'',c:'#ffb020',f:['ჩაბარდება მაქსიმუმ 30 წუთში','1080P / 4K • 60FPS','ტიკტოკზე ატვირთვა ხარისხის დანაკარგის გარეშე']},
-{e:'🌙',n:'იაფი თვიური პაკეტი',t:'თვეში 20 ვიდეო — ულიმიტო',p:9.99,o:19.99,u:'',c:'#8b7bff',f:['20 ვიდეო ერთ თვეში','1080P / 4K • 60FPS','ტიკტოკზე ატვირთვა ხარისხის დანაკარგის გარეშე']},
-{e:'🎬',n:'ცალობითი პაკეტი',t:'1 ვიდეოს დამუშავება',p:1.49,o:0,u:'დან',c:'#22d36b',f:['ხარისხის ამატება TOPAZ‑ით','ეფექტების დადება','ჩაბარდება არაუმეტეს 24 საათში']},
-{e:'☀️',n:'ცალობითი შეკვეთა',t:'ნებისმიერი ფორმატის ვიდეო',p:2.99,o:0,u:'დან',c:'#ffd23f',f:['1080P / 4K • 60FPS','ხარისხის ამატება TOPAZ‑ით','ეფექტები + ჩაბარდება 24 საათში']},
-{e:'📅',n:'კვირის პაკეტი',t:'კვირაში 5 ვიდეო',p:24.99,o:35.99,u:'',c:'#22c3ff',f:['5 ვიდეო 1 კვირის განმავლობაში','1080p/4K არჩევანი ატვირთვისას','TOPAZ‑ით ხარისხი + ეფექტები']},
-{e:'👑',n:'თვის პაკეტი',t:'თვეში 20 ვიდეო',p:49.99,o:69.99,u:'',c:'#ffc94d',f:['20 ვიდეო 1 თვის განმავლობაში','1080p/4K არჩევანი ატვირთვისას','TOPAZ‑ით ხარისხი + ეფექტები']},
-{e:'✨',n:'ედითის შეკვეთა',t:'მსგავსი ედითი შენი პერსონაჟით',p:9.99,o:0,u:'დან',c:'#ff5fa2',f:['სტილისა და ხარისხის არჩევანი','ეფექტების დადება','ჩაბარდება არაუმეტეს 24 საათში']}
-];
-var T0=3500,CARD=2500,END=T0+CARD*C.length+3300;
-el.style.setProperty('--dur',(END/1000)+'s');
-function w(txt,d,cls){return '<span class="mi-w '+(cls||'')+'" style="--d:'+d+'s">'+txt+'</span>';}
-function title(){stage.innerHTML='<div class="mi-sc" style="--len:'+(T0/1000)+'s"><div class="mi-line">'+w('გინდა',.1,'dim')+w('ვიდეო',.35)+w('მონტაჟი',.6)+'</div><div class="mi-line" style="margin-top:.1em">'+w('ყველაზე',1.1,'dim')+w('ხელმისაწვდომ',1.4,'hl')+w('ფასებში?',1.75,'hl')+'</div><div class="mi-sub" style="--d:2.4s">გაიცანი ჩვენი '+C.length+' პაკეტი</div></div>';}
-function setDots(a){dots.querySelectorAll('i').forEach(function(d,k){d.className=k<a?'d':(k===a?'a':'');});}
-function card(i){
- var d=C[i];el.style.setProperty('--c',d.c);setDots(i);
- var fs=d.f.map(function(x,k){return '<div class="mi-ft" style="--d:'+(1.0+k*.35)+'s"><i>✓</i><span>'+x+'</span></div>';}).join('');
- stage.innerHTML='<div class="mi-sc" style="--c:'+d.c+';--len:'+(CARD/1000)+'s"><div class="mi-glow"></div><div class="mi-cam"><div class="mi-card"><div class="mi-top"><div class="mi-ico">'+d.e+'</div><div><div class="mi-name">'+d.n+'</div><div class="mi-tag">'+d.t+'</div></div></div><div class="mi-price"><span class="mi-num">0.00</span><span class="mi-cur">₾</span>'+(d.o?'<span class="mi-old">'+d.o.toFixed(2)+' ₾</span>':'')+(d.u?'<span class="mi-unit">'+d.u+'</span>':'')+'</div>'+fs+'</div></div></div>';
- var n=stage.querySelector('.mi-num'),t0=null,dur=900,del=450;
- function step(ts){if(done)return;if(t0===null)t0=ts;var k=Math.min(Math.max((ts-t0-del)/dur,0),1);n.textContent=(d.p*(1-Math.pow(1-k,3))).toFixed(2);if(k<1)requestAnimationFrame(step);}
- requestAnimationFrame(step);
-}
-function finale(){
- el.style.setProperty('--c','#3b6dff');setDots(C.length);
- var chips=C.map(function(d,k){return '<span style="--d:'+(.9+k*.12)+'s">'+d.e+'</span>';}).join('');
- var src=LOGO||(document.querySelector('.brand-logo-img,.brand-name-logo')||{}).src||'';
- stage.innerHTML='<div class="mi-sc"><div class="mi-glow"></div>'+(src?'<img class="mi-logo" alt="MOON" src="'+src+'">':'')+'<div class="mi-sub" style="--d:.7s">აირჩიე შენი პაკეტი</div><div class="mi-chips">'+chips+'</div></div>';
-}
-function finish(){
- if(done)return;done=true;timers.forEach(clearTimeout);el.classList.add('mi-out');
- setTimeout(function(){if(STANDALONE){document.getElementById('replay').classList.add('show');}else{el.remove();root.classList.remove('mi-lock');}},520);
-}
-function play(){
- done=false;timers.forEach(clearTimeout);timers=[];
- if(!STANDALONE)root.classList.add('mi-lock');
- dots.innerHTML=C.map(function(){return '<i></i>';}).join('');
- el.classList.remove('run','mi-out');void el.offsetWidth;el.classList.add('run');
- title();setDots(-1);
- C.forEach(function(_,i){timers.push(setTimeout(function(){card(i);},T0+CARD*i));});
- timers.push(setTimeout(finale,T0+CARD*C.length));
- timers.push(setTimeout(finish,END));
-}
-document.getElementById('miSkip').addEventListener('click',finish);
-document.addEventListener('keydown',function(e){if(e.key==='Escape')finish();});
-if(STANDALONE){document.getElementById('replayBtn').addEventListener('click',play);}
-play();
-})();
-</script>
-<!-- ===== /MOON intro overlay ===== -->
+
  (see near the closing </body>),
      NOT inside any .moon-glow-card — those cards set `contain: layout paint
      style`, which turns them into the containing block for any
@@ -4493,7 +4439,7 @@ play();
      some degree — if it's noticeable again at this size, the reliable
      fix is still full removal, not a further reduction. */
   @media (min-width:901px){
-    html{ zoom:1.25; }
+    html{ zoom:1; }
   }
 
   /* --- Direct contact panel --- */
@@ -6692,8 +6638,7 @@ play();
      fills the screen the way the phone version does (every step and
      every package scales together). Change the 1.2 to resize all (site zoom is 1.25, so the total is 1.5). */
   @media (min-width:901px){
-    .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1.2; }
-    .pc-modal-scrim .pc-modal-scroll{ max-height:calc(90vh / 1.5); }
+    .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1; }
   }
 
   /* ============================================================
@@ -7738,6 +7683,43 @@ table{ max-width:100%; }
     to{ opacity:0; transform:translate3d(var(--cine-dx,0px), var(--cine-dy,40px), 0) scale(.5); filter:blur(12px) brightness(1.4); }
   }
 }
+
+/* ===== PERF + FIT PATCH ===== */
+/* 1. No blur/filter in any keyframes (the main cause of lag) */
+@keyframes pcCineIn{0%{opacity:0;transform:translate3d(0,40px,0) scale(.96)}100%{opacity:1;transform:none}}
+@keyframes pcCinePanelIn{0%{opacity:0;transform:translate3d(0,40px,0) scale(.94)}100%{opacity:1;transform:none}}
+@keyframes pcCinePanelOut{to{opacity:0;transform:translate3d(0,24px,0) scale(.94)}}
+@keyframes pcCineKid{from{opacity:0;transform:translate3d(0,14px,0)}}
+@keyframes pcCineBloom{0%,100%{opacity:1}}
+@keyframes pcCineClose{from{opacity:0;transform:scale(.4)}}
+.pricing-cards.pc-play .pc-slide{animation-duration:.6s!important;animation-delay:calc(var(--i,0)*70ms)!important}
+html .pc-modal-scrim.open>.pc-accordion-body.panel{animation:pcCinePanelIn .38s cubic-bezier(.16,1,.3,1) backwards!important;will-change:transform,opacity}
+html .pc-modal-scrim.open{animation-duration:.25s!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(3,3,8,.94)!important}
+html .pc-modal-scrim.open .pc-modal-scroll>:is(.wizard-steps,.panel-section,.panel-head){animation-duration:.3s!important}
+html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(n){animation-delay:.08s!important}
+.pc-modal-scrim.pc-cine-exit{animation-duration:.2s!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.pc-modal-scrim.pc-cine-exit>.pc-accordion-body.panel{animation-duration:.22s!important}
+/* 2. Kill endless decorative animations & heavy effects */
+.orb{display:none!important}
+.badge-float,.pc-card--monthly::after,.pc-cine-glint,.pc-cine-sweep,.pc-toggle-btn::before,.topbar-moon,.topbar-moon::after,.hero-cta-btn,.vb-moon,.qn-tab,.moon-glow-card,.logo,[class*="logo"]{animation:none!important}
+.pc-card--monthly::after,.pc-cine-glint,.pc-cine-sweep{display:none!important}
+*{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.pc-card,.pc-slide{will-change:auto!important}
+/* 3. Stray line removed (top hairline / glow rule on panels & cards) */
+.panel::before,.pc-card::before,.pc-card--monthly::before,#monthlySubPanel::before,.pc-accordion-body::before{display:none!important;content:none!important}
+/* 4. Order modal always fits the screen */
+.pc-modal-scrim{padding:10px!important;align-items:center!important;overflow:hidden!important}
+.pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(440px,94vw);width:var(--wz-w);max-width:94vw;margin:auto!important;padding:clamp(12px,2.4vh,20px) clamp(12px,3.4vw,18px)!important}
+.pc-modal-scrim .pc-modal-scroll,.pc-modal-scrim .pc-modal-scroll{max-height:calc(100vh - 36px);max-height:calc(100dvh - 36px);overflow-y:auto}
+@media (max-height:760px){
+ .pc-modal-scrim .wizard-steps{margin:0 0 10px!important}
+ .pc-modal-scrim .wizard-step-dot{width:28px!important;height:28px!important;font-size:13px!important}
+ .pc-modal-scrim .wizard-step-line{margin-top:13px!important}
+ .pc-modal-scrim .drop-zone{padding:14px 10px!important}
+ .pc-modal-scrim .wizard-question{padding:10px!important;gap:8px!important}
+}
+@media (max-height:600px){.pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(400px,94vw)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style id="moonIntroCss">
@@ -20661,6 +20643,61 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   };
 })();
 </script>
+<!-- ===== MOON intro overlay ===== -->
+<div id="moonIntro" role="dialog" aria-label="MOON intro"><div class="mi-stage"></div><div class="mi-bar t"></div><div class="mi-bar b"></div><div class="mi-dots"></div><div class="mi-prog"><i></i></div><button type="button" class="mi-skip" id="miSkip" aria-label="გამოტოვება / Skip">გამოტოვება <small>Skip</small> <span aria-hidden="true">›</span></button></div>
+<script>
+(function(){
+var STANDALONE=false, LOGO="";
+var el=document.getElementById('moonIntro'),stage=el.querySelector('.mi-stage'),dots=el.querySelector('.mi-dots'),root=document.documentElement,timers=[],done=false;
+var C=[
+{e:'⚡',n:'იაფი პაკეტი',t:'ბიუჯეტური ვარიანტი',p:.99,o:1.99,u:'',c:'#ffb020',f:['ჩაბარდება მაქსიმუმ 30 წუთში','1080P / 4K • 60FPS','ტიკტოკზე ატვირთვა ხარისხის დანაკარგის გარეშე']},
+{e:'🌙',n:'იაფი თვიური პაკეტი',t:'თვეში 20 ვიდეო — ულიმიტო',p:9.99,o:19.99,u:'',c:'#8b7bff',f:['20 ვიდეო ერთ თვეში','1080P / 4K • 60FPS','ტიკტოკზე ატვირთვა ხარისხის დანაკარგის გარეშე']},
+{e:'🎬',n:'ცალობითი პაკეტი',t:'1 ვიდეოს დამუშავება',p:1.49,o:0,u:'დან',c:'#22d36b',f:['ხარისხის ამატება TOPAZ‑ით','ეფექტების დადება','ჩაბარდება არაუმეტეს 24 საათში']},
+{e:'☀️',n:'ცალობითი შეკვეთა',t:'ნებისმიერი ფორმატის ვიდეო',p:2.99,o:0,u:'დან',c:'#ffd23f',f:['1080P / 4K • 60FPS','ხარისხის ამატება TOPAZ‑ით','ეფექტები + ჩაბარდება 24 საათში']},
+{e:'📅',n:'კვირის პაკეტი',t:'კვირაში 5 ვიდეო',p:24.99,o:35.99,u:'',c:'#22c3ff',f:['5 ვიდეო 1 კვირის განმავლობაში','1080p/4K არჩევანი ატვირთვისას','TOPAZ‑ით ხარისხი + ეფექტები']},
+{e:'👑',n:'თვის პაკეტი',t:'თვეში 20 ვიდეო',p:49.99,o:69.99,u:'',c:'#ffc94d',f:['20 ვიდეო 1 თვის განმავლობაში','1080p/4K არჩევანი ატვირთვისას','TOPAZ‑ით ხარისხი + ეფექტები']},
+{e:'✨',n:'ედითის შეკვეთა',t:'მსგავსი ედითი შენი პერსონაჟით',p:9.99,o:0,u:'დან',c:'#ff5fa2',f:['სტილისა და ხარისხის არჩევანი','ეფექტების დადება','ჩაბარდება არაუმეტეს 24 საათში']}
+];
+var T0=3500,CARD=2500,END=T0+CARD*C.length+3300;
+el.style.setProperty('--dur',(END/1000)+'s');
+function w(txt,d,cls){return '<span class="mi-w '+(cls||'')+'" style="--d:'+d+'s">'+txt+'</span>';}
+function title(){stage.innerHTML='<div class="mi-sc" style="--len:'+(T0/1000)+'s"><div class="mi-line">'+w('გინდა',.1,'dim')+w('ვიდეო',.35)+w('მონტაჟი',.6)+'</div><div class="mi-line" style="margin-top:.1em">'+w('ყველაზე',1.1,'dim')+w('ხელმისაწვდომ',1.4,'hl')+w('ფასებში?',1.75,'hl')+'</div><div class="mi-sub" style="--d:2.4s">გაიცანი ჩვენი '+C.length+' პაკეტი</div></div>';}
+function setDots(a){dots.querySelectorAll('i').forEach(function(d,k){d.className=k<a?'d':(k===a?'a':'');});}
+function card(i){
+ var d=C[i];el.style.setProperty('--c',d.c);setDots(i);
+ var fs=d.f.map(function(x,k){return '<div class="mi-ft" style="--d:'+(1.0+k*.35)+'s"><i>✓</i><span>'+x+'</span></div>';}).join('');
+ stage.innerHTML='<div class="mi-sc" style="--c:'+d.c+';--len:'+(CARD/1000)+'s"><div class="mi-glow"></div><div class="mi-cam"><div class="mi-card"><div class="mi-top"><div class="mi-ico">'+d.e+'</div><div><div class="mi-name">'+d.n+'</div><div class="mi-tag">'+d.t+'</div></div></div><div class="mi-price"><span class="mi-num">0.00</span><span class="mi-cur">₾</span>'+(d.o?'<span class="mi-old">'+d.o.toFixed(2)+' ₾</span>':'')+(d.u?'<span class="mi-unit">'+d.u+'</span>':'')+'</div>'+fs+'</div></div></div>';
+ var n=stage.querySelector('.mi-num'),t0=null,dur=900,del=450;
+ function step(ts){if(done)return;if(t0===null)t0=ts;var k=Math.min(Math.max((ts-t0-del)/dur,0),1);n.textContent=(d.p*(1-Math.pow(1-k,3))).toFixed(2);if(k<1)requestAnimationFrame(step);}
+ requestAnimationFrame(step);
+}
+function finale(){
+ el.style.setProperty('--c','#3b6dff');setDots(C.length);
+ var chips=C.map(function(d,k){return '<span style="--d:'+(.9+k*.12)+'s">'+d.e+'</span>';}).join('');
+ var src=LOGO||(document.querySelector('.brand-logo-img,.brand-name-logo')||{}).src||'';
+ stage.innerHTML='<div class="mi-sc"><div class="mi-glow"></div>'+(src?'<img class="mi-logo" alt="MOON" src="'+src+'">':'')+'<div class="mi-sub" style="--d:.7s">აირჩიე შენი პაკეტი</div><div class="mi-chips">'+chips+'</div></div>';
+}
+function finish(){
+ if(done)return;done=true;timers.forEach(clearTimeout);el.classList.add('mi-out');
+ setTimeout(function(){if(STANDALONE){document.getElementById('replay').classList.add('show');}else{el.remove();root.classList.remove('mi-lock');}},520);
+}
+function play(){
+ done=false;timers.forEach(clearTimeout);timers=[];
+ if(!STANDALONE)root.classList.add('mi-lock');
+ dots.innerHTML=C.map(function(){return '<i></i>';}).join('');
+ el.classList.remove('run','mi-out');void el.offsetWidth;el.classList.add('run');
+ title();setDots(-1);
+ C.forEach(function(_,i){timers.push(setTimeout(function(){card(i);},T0+CARD*i));});
+ timers.push(setTimeout(finale,T0+CARD*C.length));
+ timers.push(setTimeout(finish,END));
+}
+document.getElementById('miSkip').addEventListener('click',finish);
+document.addEventListener('keydown',function(e){if(e.key==='Escape')finish();});
+if(STANDALONE){document.getElementById('replayBtn').addEventListener('click',play);}
+play();
+})();
+</script>
+<!-- ===== /MOON intro overlay ===== -->
 </body>
 </html>
 
