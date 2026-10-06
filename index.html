@@ -3,6 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- Boot cover: this page is ~1.5 MB and its design is layered over several <style> blocks.
+     Browsers paint while it is still downloading, which showed a half-styled "old" version
+     for a moment on every refresh. Keep the page invisible until everything is parsed. -->
+<style id="moon-boot-css">
+html.moon-boot{ background:#09090a; }
+html.moon-boot body{ opacity:0; }
+html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
+</style>
+<script>
+(function(){
+  var d = document.documentElement, shown = false;
+  d.classList.add('moon-boot');
+  function reveal(){
+    if (shown) return; shown = true;
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      d.classList.add('moon-boot-ready'); d.classList.remove('moon-boot');
+      setTimeout(function(){ d.classList.remove('moon-boot-ready'); }, 600);
+    }); });
+  }
+  function ready(){
+    // if the login check is still in flight, wait for it (max 1.5s) so the site never flashes under the login screen
+    var waits = [window.__moonEarlySessionCheck, window.__moonEarlyExchange].filter(function(p){ return p && p.then; });
+    if (!waits.length) { reveal(); return; }
+    Promise.race([Promise.all(waits.map(function(p){ return p.catch(function(){}); })), new Promise(function(r){ setTimeout(r, 1500); })]).then(reveal, reveal);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
+  setTimeout(reveal, 5000);                                  // safety net: never leave the page hidden
+  window.addEventListener('pageshow', function(e){ if (e.persisted) reveal(); });
+})();
+</script>
 <title>MOON — ვიდეო მონტაჟის კალკულატორი</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22m%22%20cx%3D%2235%25%22%20cy%3D%2230%25%22%20r%3D%2275%25%22%3E%0A%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23e8ecff%22/%3E%0A%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c8fff%22/%3E%0A%3C/radialGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2214%22%20fill%3D%22url%28%23m%29%22/%3E%0A%3Ccircle%20cx%3D%2221%22%20cy%3D%2220%22%20r%3D%223%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.14%29%22/%3E%0A%3Ccircle%20cx%3D%2211%22%20cy%3D%2222%22%20r%3D%222%22%20fill%3D%22rgba%2820%2C22%2C50%2C0.10%29%22/%3E%0A%3C/svg%3E">
@@ -13251,18 +13281,32 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     // trick below) never resolves on some mobile browser/video codec,
     // don't leave the scanner stuck spinning forever — surface an error
     // and let the visitor try again.
-    let watchdogTimer = setTimeout(() => {
-      cleanup();
-      if (myToken === scanToken) alert(t('alertReadError'));
-    }, 20000);
-
-    const proceed = (duration) => {
+    let failed = false;
+    const fail = () => {
+      if (failed) return; failed = true;
       if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
-      const width = videoEl.videoWidth;
-      const height = videoEl.videoHeight;
-      detectFrameRate(videoEl).then(fps => {
-        if (myToken === scanToken) finishScan(duration, file, width, height, fps);
-        cleanup();
+      readContainerMeta(file).then(m => {
+        if (m && m.duration > 0 && myToken === scanToken) {
+          finishScan(m.duration, file, m.width, m.height, null);
+          cleanup();
+        } else {
+          cleanup();
+          if (myToken === scanToken) alert(t('alertReadError'));
+        }
+      });
+    };
+    let watchdogTimer = setTimeout(fail, 7000);
+
+    const proceed = (duration0) => {
+      failed = true;
+      if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
+      resolveVideoDims(videoEl, file, duration0, (duration, width, height) => {
+        const FPS_DETECT_MAX_BYTES = 250 * 1024 * 1024; // huge files: skip the decode-based fps probe (never blocks an upload)
+        const fpsPromise = file.size > FPS_DETECT_MAX_BYTES ? Promise.resolve(null) : detectFrameRate(videoEl);
+        fpsPromise.then(fps => {
+          if (myToken === scanToken) finishScan(duration, file, width, height, fps);
+          cleanup();
+        });
       });
     };
 
@@ -13270,6 +13314,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     const onMeta = function(){
       if (metaHandled || videoEl.readyState < 1) return;
       metaHandled = true;
+      if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
       if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
         videoEl.currentTime = 1e101;
         // Some mobile browsers never fire ontimeupdate after this seek —
@@ -13290,10 +13335,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       }
     };
     ['loadedmetadata','durationchange','loadeddata','canplay'].forEach(ev => videoEl.addEventListener(ev, onMeta));
-    videoEl.onerror = function(){
-      cleanup();
-      if (myToken === scanToken) alert(t('alertReadError'));
-    };
+    videoEl.onerror = function(){ fail(); };
 
     videoEl.src = URL.createObjectURL(file);
       try { videoEl.load(); } catch(e){}
@@ -13419,6 +13461,87 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     });
   }
 
+  // ------------------------------------------------------------------
+  // Fallback reader for iPhone/iPad (and any browser whose <video> element
+  // refuses to report metadata): reads duration / width / height straight
+  // out of the MP4 / MOV (ISO-BMFF) header with a few tiny file.slice()
+  // reads -- no decoding, so it works whatever the codec and never freezes.
+  // ------------------------------------------------------------------
+  function readContainerMeta(file){
+    const fourcc = (dv,o) => String.fromCharCode(dv.getUint8(o),dv.getUint8(o+1),dv.getUint8(o+2),dv.getUint8(o+3));
+    function kids(dv,s,e){
+      const out = []; let p = s;
+      while (p + 8 <= e) {
+        let size = dv.getUint32(p); const type = fourcc(dv,p+4); let hdr = 8;
+        if (size === 1) { if (p + 16 > e) break; size = dv.getUint32(p+8)*4294967296 + dv.getUint32(p+12); hdr = 16; }
+        else if (size === 0) size = e - p;
+        if (size < hdr) break;
+        if (p + size > e) size = e - p;
+        out.push({ type, s:p+hdr, e:p+size });
+        p += size;
+      }
+      return out;
+    }
+    return (async () => {
+      try {
+        const total = file.size;
+        let pos = 0, ms = -1, msize = 0, guard = 0;
+        while (pos + 8 <= total && guard++ < 200) {
+          const head = new DataView(await file.slice(pos, Math.min(pos+16, total)).arrayBuffer());
+          if (head.byteLength < 8) break;
+          let size = head.getUint32(0); const type = fourcc(head,4); let hdr = 8;
+          if (size === 1) { if (head.byteLength < 16) break; size = head.getUint32(8)*4294967296 + head.getUint32(12); hdr = 16; }
+          else if (size === 0) size = total - pos;
+          if (size < hdr) break;
+          if (type === 'moov') { ms = pos + hdr; msize = size - hdr; break; }
+          pos += size;
+        }
+        if (ms < 0 || msize <= 0 || msize > 96*1024*1024) return null;
+        const dv = new DataView(await file.slice(ms, ms+msize).arrayBuffer());
+        let timescale = 0, dur = 0, w = 0, h = 0, found = false;
+        for (const b of kids(dv,0,dv.byteLength)) {
+          if (b.type === 'mvhd') {
+            if (dv.getUint8(b.s) === 1) { timescale = dv.getUint32(b.s+20); dur = dv.getUint32(b.s+24)*4294967296 + dv.getUint32(b.s+28); }
+            else { timescale = dv.getUint32(b.s+12); dur = dv.getUint32(b.s+16); }
+          } else if (b.type === 'trak' && !found) {
+            let isVideo = false, tkhd = null, stsd = null;
+            for (const c of kids(dv,b.s,b.e)) {
+              if (c.type === 'tkhd') tkhd = c;
+              if (c.type === 'mdia') {
+                for (const d of kids(dv,c.s,c.e)) {
+                  if (d.type === 'hdlr' && fourcc(dv,d.s+8) === 'vide') isVideo = true;
+                  if (d.type === 'minf') for (const m of kids(dv,d.s,d.e)) if (m.type === 'stbl') for (const t of kids(dv,m.s,m.e)) if (t.type === 'stsd') stsd = t;
+                }
+              }
+            }
+            if (isVideo && tkhd) {
+              const v = dv.getUint8(tkhd.s), mo = v === 1 ? 52 : 40, wo = v === 1 ? 88 : 76;
+              const a = dv.getInt32(tkhd.s+mo)/65536, bb = dv.getInt32(tkhd.s+mo+4)/65536;
+              let cw = 0, ch = 0;
+              if (stsd && stsd.s + 8 + 36 <= stsd.e) { cw = dv.getUint16(stsd.s+8+32); ch = dv.getUint16(stsd.s+8+34); }
+              if (!cw || !ch) { cw = Math.round(dv.getUint32(tkhd.s+wo)/65536); ch = Math.round(dv.getUint32(tkhd.s+wo+4)/65536); }
+              else if (Math.abs(a) < 0.01 && Math.abs(bb) > 0.5) { const t = cw; cw = ch; ch = t; } // rotated 90deg, like the browser reports it
+              w = cw; h = ch; found = true;
+            }
+          }
+        }
+        if (!timescale || !dur) return null;
+        return { duration: dur/timescale, width: w, height: h };
+      } catch (e) { return null; }
+    })();
+  }
+
+  // iOS often reports videoWidth/Height = 0 (or a NaN duration) right at
+  // loadedmetadata -- fill the gaps from the container header instead of
+  // treating the file as unreadable / wrong resolution.
+  function resolveVideoDims(videoEl, file, duration, cb){
+    const w = videoEl.videoWidth, h = videoEl.videoHeight;
+    if (w && h && isFinite(duration) && duration > 0) { cb(duration, w, h); return; }
+    readContainerMeta(file).then(m => {
+      cb((isFinite(duration) && duration > 0) ? duration : ((m && m.duration) || 0), w || (m && m.width) || 0, h || (m && m.height) || 0);
+    });
+  }
+
   // Reusable, DOM-independent video metadata reader — reads duration,
   // width/height and (best-effort) fps from a File. Used by the full
   // scanner above and by the lighter-weight scanners on the weekly/
@@ -13440,14 +13563,21 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
         URL.revokeObjectURL(videoEl.src);
         videoEl.remove();
       };
-      let watchdogTimer = setTimeout(() => {
-        cleanup();
-        reject('read-timeout');
-      }, 20000);
-      const proceed = (duration) => {
+      let failed = false;
+      const fail = () => {
+        if (failed) return; failed = true;
         if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
-        const width = videoEl.videoWidth;
-        const height = videoEl.videoHeight;
+        readContainerMeta(file).then(m => {
+          cleanup();
+          if (m && m.duration > 0) resolve({ duration: m.duration, width: m.width, height: m.height, fps: null, file });
+          else reject('read-error');
+        });
+      };
+      let watchdogTimer = setTimeout(fail, 7000);
+      const proceed = (duration0) => {
+        failed = true;
+        if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
+        resolveVideoDims(videoEl, file, duration0, (duration, width, height) => {
         // Frame-rate detection actually PLAYS the video (muted, hidden) to
         // sample real frame timestamps via requestVideoFrameCallback --
         // that's the only way to get a trustworthy fps reading, but it
@@ -13470,11 +13600,13 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
           cleanup();
           resolve({ duration, width, height, fps, file });
         });
+        });
       };
       let metaHandled = false;
     const onMeta = function(){
       if (metaHandled || videoEl.readyState < 1) return;
       metaHandled = true;
+      if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
         if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
           videoEl.currentTime = 1e101;
           const durationTimeout = setTimeout(() => {
@@ -13493,10 +13625,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
         }
     };
     ['loadedmetadata','durationchange','loadeddata','canplay'].forEach(ev => videoEl.addEventListener(ev, onMeta));
-    videoEl.onerror = function(){
-        cleanup();
-        reject('read-error');
-      };
+    videoEl.onerror = function(){ fail(); };
       videoEl.src = URL.createObjectURL(file);
       try { videoEl.load(); } catch(e){}
       // iOS/iPadOS Safari often ignores preload="metadata" — nudge it with a muted play().
@@ -21158,6 +21287,181 @@ var rb=document.getElementById('dgIntroBtn');if(rb)rb.addEventListener('click',f
   document.addEventListener('keydown',function(e){ if(e.target && e.target.id==='adminPass') e.target.dataset.typed='1'; },true);
   [0,150,500,1200,2500].forEach(function(t){ setTimeout(sweep,t); });
   window.addEventListener('pageshow',sweep);
+})();
+</script>
+
+<style id="moon-modal-v2">
+/* ============================================================
+   MOON order modal v2 — one clean card, no nested boxes, no dead space.
+   Every animation below is transform/opacity only (compositor-friendly,
+   no blur / box-shadow / height animation) so iPad stays smooth.
+   ============================================================ */
+@keyframes moonRise{ from{ opacity:0; transform:translate3d(0,14px,0) scale(.98); } }
+@keyframes moonDotPop{ 0%{ transform:scale(.7); } 100%{ transform:scale(1); } }
+@keyframes moonDotPulse{ 0%{ transform:scale(.85); opacity:.65; } 100%{ transform:scale(1.4); opacity:0; } }
+@keyframes moonFloat{ 0%,100%{ transform:translate3d(0,0,0); } 50%{ transform:translate3d(0,-5px,0); } }
+@keyframes moonSweep{ from{ transform:translate3d(0,0,0); } to{ transform:translate3d(155%,0,0); } }
+
+/* ----- panel ----- */
+.pc-modal-scrim > .pc-accordion-body.panel{
+  max-width:560px; padding:26px 20px 20px; border-radius:26px;
+  background:
+    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb, var(--pc-accent, var(--cyan)) 16%, transparent), transparent 62%),
+    linear-gradient(180deg, #17171b, #0b0b0e) !important;
+  border:1px solid color-mix(in srgb, var(--pc-accent, var(--cyan)) 38%, rgba(255,255,255,.08));
+  box-shadow:0 24px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.pc-modal-scroll{
+  max-height:calc(100vh - 110px); max-height:calc(100dvh - 110px);
+  padding:2px; -webkit-overflow-scrolling:touch;
+}
+/* no heavy GPU layers inside the modal (the main cause of iPad stutter) */
+.pc-modal-scrim .pc-accordion-body, .pc-modal-scrim .pc-accordion-body *{
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+.pc-modal-scrim .qn-stars{ display:none !important; }
+.pc-modal-scrim .moon-glow-card{ animation:none !important; }
+/* page behind the modal stops animating while it is open */
+html.pc-modal-on .orb, html.pc-modal-on .qn-stars span, html.pc-modal-on .badge-float,
+html.pc-modal-on .hero-cta-btn, html.pc-modal-on .topbar-moon, html.pc-modal-on .vb-moon,
+html.pc-modal-on .pc-ring-spin{ animation-play-state:paused !important; }
+
+/* ----- stepper ----- */
+.pc-modal-scrim .wizard-steps{ margin:0 2px 18px; align-items:flex-start; }
+.pc-modal-scrim .wizard-step-dot{ width:34px; height:34px; position:relative; }
+.pc-modal-scrim .wizard-step-label{ font-size:11px; max-width:86px; }
+@media (max-width:380px){ .pc-modal-scrim .wizard-step-label{ display:block; font-size:9.5px; max-width:60px; } }
+.pc-modal-scrim .wizard-step-line{
+  margin-top:16px; height:3px; border-radius:3px; position:relative; overflow:hidden;
+  background:rgba(255,255,255,.09) !important;
+}
+.pc-modal-scrim .wizard-step-line::after{
+  content:''; position:absolute; inset:0; background:var(--pc-accent, var(--cyan));
+  transform:scaleX(0); transform-origin:left center;
+  transition:transform .55s cubic-bezier(.16,1,.3,1);
+}
+.pc-modal-scrim .wizard-step-line.is-done::after{ transform:scaleX(1); }
+.pc-modal-scrim .wizard-step.is-done .wizard-step-dot{ animation:moonDotPop .5s cubic-bezier(.34,1.56,.64,1); }
+html:not(.pc-opening) .pc-modal-scrim .wizard-step.is-active .wizard-step-dot::after{
+  content:''; position:absolute; inset:-4px; border-radius:50%;
+  border:2px solid var(--pc-accent, var(--cyan)); opacity:0;
+  animation:moonDotPulse 1.9s ease-out infinite;
+}
+
+/* ----- flatten the nested boxes + remove the locked empty height ----- */
+.pc-modal-scrim .panel-section.scanner-primary,
+.pc-modal-scrim .scanner-primary .scanner-stage,
+.pc-modal-scrim .scanner-stage{
+  background:none !important; border:0 !important; box-shadow:none !important;
+  padding:0 !important; margin:0; min-height:0 !important; border-radius:0 !important;
+}
+
+/* ----- upload drop zone ----- */
+.pc-modal-scrim .drop-zone{
+  padding:30px 18px 26px; border-radius:22px; overflow:hidden;
+  border:1.5px dashed color-mix(in srgb, var(--pc-accent, var(--cyan)) 55%, transparent);
+  background:
+    radial-gradient(90% 120% at 50% 0%, color-mix(in srgb, var(--pc-accent, var(--cyan)) 14%, transparent), transparent 70%),
+    rgba(255,255,255,.025);
+  transition:transform .2s ease, border-color .25s ease;
+}
+.pc-modal-scrim .drop-zone:active{ transform:scale(.985); }
+.pc-modal-scrim .drop-zone .dz-icon{ width:56px; height:56px; margin:0 auto 12px; }
+.pc-modal-scrim .drop-zone .dz-title{ font-size:15px; }
+html:not(.pc-opening) .pc-modal-scrim .drop-zone .dz-icon{ animation:moonFloat 3.2s ease-in-out infinite; }
+
+/* ----- "video is being processed" ----- */
+.pc-modal-scrim .scan-progress.show{
+  position:relative; overflow:hidden; margin-top:0; gap:12px;
+  padding:18px 16px 24px; border-radius:18px; font-size:14px; font-weight:700; color:var(--text);
+  background:rgba(255,255,255,.04);
+  border:1px solid color-mix(in srgb, var(--pc-accent, var(--cyan)) 28%, transparent);
+  animation:moonRise .35s cubic-bezier(.16,1,.3,1) backwards;
+}
+.pc-modal-scrim .scan-progress .spin{ width:20px; height:20px; border-width:2.5px; }
+.pc-modal-scrim .scan-progress-cancel{ padding:7px 14px; font-size:12px; min-height:32px; }
+.pc-modal-scrim .scan-progress.show::before{
+  content:''; position:absolute; left:16px; right:16px; bottom:11px; height:4px; border-radius:4px; background:rgba(255,255,255,.08);
+}
+.pc-modal-scrim .scan-progress.show::after{
+  content:''; position:absolute; left:16px; bottom:11px; width:38%; height:4px; border-radius:4px;
+  background:linear-gradient(90deg, transparent, var(--pc-accent, var(--cyan)), transparent);
+  animation:moonSweep 1.3s ease-in-out infinite alternate;
+}
+
+/* ----- accepted / rejected banners ----- */
+.pc-modal-scrim .simple-scan-ok.show{
+  flex-wrap:nowrap; gap:10px; padding:14px 52px 14px 14px; border-radius:16px;
+  background:linear-gradient(135deg, rgba(37,211,102,.16), rgba(37,211,102,.05));
+  border:1px solid rgba(37,211,102,.45);
+  animation:moonRise .4s cubic-bezier(.16,1,.3,1) backwards;
+}
+.pc-modal-scrim .simple-scan-ok-check{
+  width:26px; height:26px; font-size:13px; background:#25D366; color:#06210f;
+  animation:moonDotPop .55s cubic-bezier(.34,1.56,.64,1) .1s backwards;
+}
+.pc-modal-scrim .simple-scan-ok-name{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:none; }
+.pc-modal-scrim .sr-reset-btn{ top:11px; right:11px; width:32px; height:32px; }
+.pc-modal-scrim .sr-reject.show, .pc-modal-scrim .simple-scan-reject.show{ animation:moonRise .4s cubic-bezier(.16,1,.3,1) backwards; }
+
+/* ----- "send to our team?" prompt ----- */
+.pc-modal-scrim .sr-transfer, .pc-modal-scrim .mooon-prompt{
+  margin:12px 0 0; padding:16px; border-radius:18px;
+  background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.1);
+}
+.pc-modal-scrim .sr-transfer.show, .pc-modal-scrim .mooon-prompt.show{ animation:moonRise .4s cubic-bezier(.16,1,.3,1) backwards; }
+.pc-modal-scrim .sr-transfer-q, .pc-modal-scrim .mooon-prompt-q{ font-size:13.5px; line-height:1.55; color:var(--text); margin-bottom:14px; text-align:center; }
+.pc-modal-scrim .st-btn, .pc-modal-scrim .mooon-prompt-yes, .pc-modal-scrim .mooon-prompt-no{
+  min-height:46px; border-radius:14px; font-size:14px; transition:transform .15s ease, opacity .2s ease;
+}
+.pc-modal-scrim .st-btn:active, .pc-modal-scrim .mooon-prompt-yes:active, .pc-modal-scrim .mooon-prompt-no:active{ transform:scale(.96); }
+.pc-modal-scrim .mt-upload-head{ display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; font-size:13px; font-weight:800; }
+
+/* ----- upload progress ----- */
+.pc-modal-scrim .mooon-auto{
+  margin-top:6px; padding:18px 14px 14px; border-radius:18px; box-shadow:none;
+  border:1px solid color-mix(in srgb, var(--upload-accent, #34d6ff) 30%, transparent);
+  background:radial-gradient(120% 90% at 50% -20%, color-mix(in srgb, var(--upload-accent, #34d6ff) 14%, transparent), transparent 65%), #101013;
+}
+.pc-modal-scrim .mooon-auto.show{ animation:moonRise .4s cubic-bezier(.16,1,.3,1) backwards; }
+.pc-modal-scrim .mooon-auto-status{ margin-bottom:0; align-items:stretch; }
+.pc-modal-scrim .mooon-auto-ring-box{ min-height:0; }
+.pc-modal-scrim .mooon-auto-ring-percent{ font-size:42px; line-height:1.1; font-variant-numeric:tabular-nums; }
+.pc-modal-scrim .mooon-auto-status::after{
+  content:''; display:block; width:100%; height:8px; margin-top:14px; border-radius:8px;
+  background:linear-gradient(90deg, var(--upload-accent, #34d6ff) var(--pp, 0%), rgba(255,255,255,.09) var(--pp, 0%));
+}
+.pc-modal-scrim .mooon-auto-stay{ margin-top:14px; font-size:12px; padding:9px 12px; border-radius:12px; }
+
+/* ----- later steps: tiles / fields / buttons rise in one after another ----- */
+.pc-modal-scrim .mp-box, .pc-modal-scrim .quality-btn, .pc-modal-scrim .wp-box{
+  animation:moonRise .42s cubic-bezier(.16,1,.3,1) backwards;
+}
+.pc-modal-scrim .mp-box:nth-child(2), .pc-modal-scrim .quality-btn:nth-child(2), .pc-modal-scrim .wp-box:nth-child(2){ animation-delay:.07s; }
+.pc-modal-scrim .mp-box:nth-child(3), .pc-modal-scrim .quality-btn:nth-child(3), .pc-modal-scrim .wp-box:nth-child(3){ animation-delay:.14s; }
+.pc-modal-scrim .mp-box:nth-child(4), .pc-modal-scrim .quality-btn:nth-child(4), .pc-modal-scrim .wp-box:nth-child(4){ animation-delay:.21s; }
+.pc-modal-scrim .wizard-confirm-btn{ min-height:50px; border-radius:16px; transition:transform .15s ease, opacity .2s ease; }
+.pc-modal-scrim .wizard-confirm-btn:active{ transform:scale(.97); }
+
+@media (prefers-reduced-motion: reduce){
+  html:not(.pc-opening) .pc-modal-scrim .wizard-step.is-active .wizard-step-dot::after,
+  html:not(.pc-opening) .pc-modal-scrim .drop-zone .dz-icon{ animation:none; }
+}
+</style>
+<script>
+/* upload progress bar: mirrors the real percentage text (no change to the upload logic) */
+(function(){
+  function bind(el){
+    var box = el.closest('.mooon-auto-status'); if (!box) return;
+    function apply(){
+      var n = parseInt(el.textContent, 10); if (isNaN(n)) n = 0;
+      box.style.setProperty('--pp', Math.max(0, Math.min(100, n)) + '%');
+    }
+    apply();
+    new MutationObserver(apply).observe(el, { childList:true, characterData:true, subtree:true });
+  }
+  function init(){ document.querySelectorAll('.mooon-auto-ring-percent').forEach(bind); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
 </body>
