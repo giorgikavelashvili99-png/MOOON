@@ -7969,6 +7969,51 @@ body .pc-stars,.pc-stars{display:none!important}
 body .pc-card .pc-title,body .pc-card .pc-desc,body .pc-card .pc-feature,body .pc-card .pc-price-note{text-shadow:none!important}
 body .pc-card .pc-feature{font-size:13.5px}
 </style>
+<style id="moonSmooth">
+/* ===== 1. guide pills: raised, with real breathing room above the "choose a package" heading ===== */
+.pc-intro{padding:0 6px 14px}
+.pc-guide-row{margin-top:-8px;margin-bottom:24px;gap:10px}
+@media (min-width:900px){.pc-heading{margin-top:0}}
+
+/* ===== 2. card switching: compositor-only (opacity). The old saturate() filter transition re-rasterised a whole
+   card (text + 50px shadow) on every swipe and left the text soft for a moment — that was the stutter + the "smudge". ===== */
+html body .pricing-cards.pc-scroll-mode .pc-slide,
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active){
+  filter:none!important;
+  transition:opacity .28s ease-out!important;
+}
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active){opacity:.55}
+html body .pricing-cards.pc-scroll-mode .pc-slide--active{opacity:1}
+
+/* ===== 3. entrance animations: opacity / translate3d only — no blur, no perspective, no per-icon pop ===== */
+@keyframes pcCineIn{from{opacity:0;transform:translate3d(0,40px,0)}}
+@keyframes pcRise{from{opacity:0;transform:translate3d(0,24px,0)}}
+@media (prefers-reduced-motion:no-preference){
+  .pricing-cards.pc-play .pc-slide{animation:pcRise .6s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0) * 70ms)}
+  .pricing-cards.pc-play .pc-card>.pc-cine-glint{animation:none}
+  /* a card that becomes active for the first time: short calm stagger, finished in ~0.6s */
+  .pc-slide.pc-in{--base:0s}
+  .pc-slide.pc-in :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-toggle-btn){
+    animation:pcFade .32s ease-out backwards;animation-delay:.04s}
+  .pc-slide.pc-in .pc-feature{animation:pcFeat .32s ease-out backwards;animation-delay:calc(.08s + var(--n,1) * 40ms)}
+  .pc-slide.pc-in .pc-feature .pc-check{animation:none}
+  /* CTA shine moved from animating `left` (layout every frame) to transform */
+  .pc-slide--active .pc-toggle-btn::before,
+  .pricing-cards:not(.pc-scroll-mode) .pc-toggle-btn::before{animation:pcBtnShineT 5s ease-in-out 3s infinite}
+}
+@keyframes pcBtnShineT{
+  0%,70%{transform:translate3d(0,0,0) skewX(-20deg);opacity:0}
+  74%{opacity:1}92%{opacity:1}
+  100%{transform:translate3d(475%,0,0) skewX(-20deg);opacity:0}
+}
+body .pc-slide--active .pc-toggle-btn:hover::before{left:-60%!important;transition:none!important}
+
+/* ===== 4. while the carousel is moving, everything decorative holds still so the GPU only moves the cards ===== */
+html.pc-moving :is(.orb,.topbar-moon,.vb-moon,.hero-cta-btn,.qn-tab,.moon-glow-card,.qn-stars span,.pc-cine-glint,.pc-ring-spin,.mec-colon,.urgency-badge,.price sup,.order-btn.chat),
+html.pc-moving .pc-toggle-btn::before,
+html.pc-moving .pc-card--monthly::after{animation-play-state:paused!important}
+.pricing-cards.pc-scroll-mode .pc-scroll-track{scroll-behavior:auto;contain:layout paint style}
+</style>
 </head>
 <body>
 
@@ -20436,8 +20481,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // centred, so the dots/active-styling/paused-decorative-animation
       // state can catch up. Ignored while a goTo() is driving the scroll
       // itself, so it can't fight with that animation.
-      let ticking = false;
+      let ticking = false, movingTimer = null;
+      const root = document.documentElement;
+      const stopMoving = () => { root.classList.remove('pc-moving'); };
       track.addEventListener('scroll', () => {
+        if (!root.classList.contains('pc-moving')) root.classList.add('pc-moving');
+        clearTimeout(movingTimer); movingTimer = setTimeout(stopMoving, 140);
         if (programmatic || ticking) return;
         ticking = true;
         requestAnimationFrame(() => { ticking = false; syncActiveFromScroll(); });
@@ -20460,26 +20509,26 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // pixel target for that same card -- so unlike the old carousel, it
       // is harmless to fire often and can't make anything flash.
       if ('ResizeObserver' in window) {
-        const ro = new ResizeObserver(() => { scrollToIndex(activeIndex, false); });
+        const ro = new ResizeObserver(() => { measure(); scrollToIndex(activeIndex, false); });
         ro.observe(track);
       }
 
       built = true;
     }
 
-    function syncActiveFromScroll(){
+    let centers = [];
+    function measure(){
       if (!track || !slides.length) return;
-      const trackRect = track.getBoundingClientRect();
-      const centerX = trackRect.left + trackRect.width / 2;
-      let closest = 0, closestDist = Infinity;
-      slides.forEach((slide, i) => {
-        const r = slide.getBoundingClientRect();
-        const dist = Math.abs((r.left + r.width / 2) - centerX);
-        if (dist < closestDist) { closestDist = dist; closest = i; }
-      });
+      const t = track.getBoundingClientRect(), sl = track.scrollLeft;
+      centers = slides.map(s => { const r = s.getBoundingClientRect(); return r.left - t.left + sl + r.width / 2; });
+    }
+    function syncActiveFromScroll(){
+      if (!track || !centers.length) return;
+      const c = track.scrollLeft + track.clientWidth / 2;
+      let closest = 0, d = Infinity;
+      for (let i = 0; i < centers.length; i++){ const k = Math.abs(centers[i] - c); if (k < d){ d = k; closest = i; } }
       if (closest !== activeIndex) setActive(closest);
     }
-
     function setActive(i){
       activeIndex = i;
       slides.forEach((slide, idx) => slide.classList.toggle('pc-slide--active', idx === i));
@@ -20510,11 +20559,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       build();
       if (!built) return;
       container.classList.add('pc-scroll-mode');
+      measure();
       setActive(activeIndex);
       scrollToIndex(activeIndex, false);
     }
 
     sync();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); });
+    window.addEventListener('load', measure);
   }
 
   function ttdlSafeInit(fn){
