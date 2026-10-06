@@ -21470,9 +21470,7 @@ html:not(.pc-opening) .pc-modal-scrim .drop-zone .dz-icon{ animation:moonFloat 3
    ============================================================ */
 
 /* 1. no animations inside the modal (the panel's own opening is untouched) */
-html .pc-modal-scrim .pc-accordion-body *:not(.spin),
-html .pc-modal-scrim .pc-accordion-body *::before,
-html .pc-modal-scrim .pc-accordion-body *::after{ animation:none !important; }
+/* (animations are curated in the v5 block below) */
 
 /* 2. stepper — static ring, never clipped at the edges */
 html .pc-modal-scrim .wizard-steps{ padding:5px 5px 0; margin:0 0 16px !important; }
@@ -21480,7 +21478,6 @@ html .pc-modal-scrim .wizard-step-dot{ overflow:visible; }
 html .pc-modal-scrim .wizard-step.is-active .wizard-step-dot{
   box-shadow:0 0 0 3px color-mix(in srgb, var(--pc-accent, var(--cyan)) 30%, transparent);
 }
-html .pc-modal-scrim .wizard-step-line::after{ transition:none; }
 
 /* 3. "video accepted" — one slim line, no file name */
 html .pc-modal-scrim .simple-scan-ok.show{
@@ -21585,6 +21582,110 @@ html .pc-modal-scrim .warn-panel .w-head .ico{ background:none; border-color:rgb
 html .pc-modal-scrim .warn-toggle{ border-color:rgba(255,255,255,.2); color:var(--text-dim); }
 html .pc-modal-scrim .warn-panel p{ color:var(--text-dim); font-size:13px; }
 html .pc-modal-scrim .warn-panel b{ color:var(--text); }
+</style>
+<style id="moon-modal-v4">
+/* v4 — remove the frozen light streak; colourful palette instead of black/white */
+html .pc-modal-scrim .pc-cine-sweep,
+html .pc-modal-scrim .pc-cine-glint,
+html .pc-modal-scrim .pc-accordion-body > i{ display:none !important; }
+
+html .pc-modal-scrim > .pc-accordion-body.panel{
+  --mm-ink:#eef4ff; --mm-dim:#a9b8d6;
+  background:
+    radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--pc-accent, #22c55e) 30%, transparent), transparent 65%),
+    linear-gradient(180deg, color-mix(in srgb, var(--pc-accent, #22c55e) 12%, #14224a), color-mix(in srgb, var(--pc-accent, #22c55e) 8%, #0b1330)) !important;
+  border:1px solid color-mix(in srgb, var(--pc-accent, #22c55e) 55%, #4f6bff) !important;
+}
+html .pc-modal-scrim .pc-accordion-body{ --text:#eef4ff; --text-dim:#a9b8d6; color:#eef4ff; }
+
+/* tinted surfaces instead of grey/black */
+html .pc-modal-scrim .drop-zone{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--pc-accent, #22c55e) 16%, #18295c), color-mix(in srgb, var(--pc-accent, #22c55e) 8%, #101c44));
+  border-color:color-mix(in srgb, var(--pc-accent, #22c55e) 70%, #fff);
+}
+html .pc-modal-scrim .drop-zone .dz-icon{ background:var(--pc-accent, #22c55e); border-color:transparent; }
+html .pc-modal-scrim .dz-plus{ stroke:#fff; }
+html .pc-modal-scrim .mooon-auto,
+html .pc-modal-scrim .quality-btn,
+html .pc-modal-scrim .link-input-wrap input{
+  background:color-mix(in srgb, var(--pc-accent, #22c55e) 10%, #16275a);
+  border-color:color-mix(in srgb, var(--pc-accent, #22c55e) 45%, #4f6bff);
+}
+html .pc-modal-scrim .simple-scan-ok.show{
+  background:color-mix(in srgb, #22c55e 18%, #14305a); border-color:#34d874;
+}
+
+/* every primary button: one saturated accent colour, white text */
+html .pc-modal-scrim .wizard-confirm-btn,
+html .pc-modal-scrim .st-btn.st-yes,
+html .pc-modal-scrim .mooon-prompt-yes,
+html .pc-modal-scrim .order-btn.chat:not(.processing){
+  background:linear-gradient(135deg, color-mix(in srgb, var(--pc-accent, #22c55e) 78%, #000), color-mix(in srgb, var(--pc-accent, #22c55e) 52%, #1f3dff)) !important;
+  color:#fff !important; border:1px solid color-mix(in srgb, var(--pc-accent, #22c55e) 70%, #fff) !important;
+  text-shadow:0 1px 1px rgba(0,0,0,.35);
+}
+html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ filter:brightness(1.1); background:inherit; }
+html .pc-modal-scrim .order-btn.chat:not(.processing) .ico svg{ stroke:#fff; }
+html .pc-modal-scrim .st-btn.st-no,
+html .pc-modal-scrim .mooon-prompt-no{
+  color:var(--mm-ink, #eef4ff) !important;
+  border:1px solid color-mix(in srgb, var(--pc-accent, #22c55e) 60%, #fff) !important;
+}
+html .pc-modal-scrim .wc-price-value{ color:color-mix(in srgb, var(--pc-accent, #22c55e) 60%, #fff); }
+html .pc-modal-scrim .warn-panel{ border-top-color:color-mix(in srgb, var(--pc-accent, #22c55e) 45%, #4f6bff); }
+</style>
+<style id="moon-modal-v5">
+/* v5 — refined motion. Only opacity/transform (GPU-cheap), short, one easing curve.
+   No blur, no shadow animation, no infinite loops except the loading spinner. */
+@property --pp{ syntax:'<percentage>'; inherits:true; initial-value:0%; }
+@keyframes moonRise{ from{ opacity:0; transform:translate3d(0,10px,0); } }
+@keyframes moonDotPop{ 0%{ transform:scale(.82); } 100%{ transform:scale(1); } }
+@keyframes wizardStepIn{ from{ opacity:0; transform:translate3d(0,10px,0); } to{ opacity:1; transform:none; } }
+@keyframes pcCineKid{ from{ opacity:0; transform:translate3d(0,10px,0); } }
+
+/* the things that felt bad: floating plus, clipped pulsing ring, frozen sweep */
+html .pc-modal-scrim .drop-zone .dz-icon,
+html .pc-modal-scrim .wizard-step.is-active .wizard-step-dot::after{ animation:none !important; }
+html .pc-modal-scrim .wizard-step-dot::after{ display:none !important; }
+
+/* smooth state changes */
+html .pc-modal-scrim .wizard-step-dot{ transition:background .35s ease, box-shadow .35s ease, color .35s ease, border-color .35s ease; }
+html .pc-modal-scrim .wizard-step-line::after{ transition:transform .6s cubic-bezier(.22,1,.36,1); }
+html .pc-modal-scrim .wizard-step.is-done .wizard-step-dot{ animation:moonDotPop .4s cubic-bezier(.22,1,.36,1); }
+
+/* entrances: one soft rise, slightly staggered */
+html .pc-modal-scrim .simple-scan-ok.show,
+html .pc-modal-scrim .sr-transfer.show,
+html .pc-modal-scrim .mooon-prompt.show,
+html .pc-modal-scrim .mooon-auto.show,
+html .pc-modal-scrim .scan-progress.show{ animation:moonRise .38s cubic-bezier(.22,1,.36,1) backwards; }
+html .pc-modal-scrim .quality-btn, html .pc-modal-scrim .mp-box, html .pc-modal-scrim .wp-box,
+html .pc-modal-scrim .wizard-question, html .pc-modal-scrim .order-btn.chat{
+  animation:moonRise .4s cubic-bezier(.22,1,.36,1) backwards;
+}
+html .pc-modal-scrim .quality-btn:nth-child(2){ animation-delay:.06s; }
+html .pc-modal-scrim .order-btn.chat{ animation-delay:.08s; }
+
+/* upload bar glides instead of jumping */
+html .pc-modal-scrim .mooon-auto-status{ transition:--pp .7s cubic-bezier(.22,1,.36,1); }
+
+/* touch feedback */
+html .pc-modal-scrim .quality-btn, html .pc-modal-scrim .st-btn, html .pc-modal-scrim .wizard-confirm-btn,
+html .pc-modal-scrim .order-btn, html .pc-modal-scrim .tt-auto-btn{
+  transition:transform .18s cubic-bezier(.22,1,.36,1), background-color .25s ease, border-color .25s ease, filter .25s ease;
+}
+html .pc-modal-scrim .quality-btn:hover{ transform:translateY(-2px); }
+html .pc-modal-scrim .quality-btn:active, html .pc-modal-scrim .st-btn:active,
+html .pc-modal-scrim .wizard-confirm-btn:active, html .pc-modal-scrim .order-btn:active{ transform:scale(.97); }
+html .pc-modal-scrim .slider-toggle, html .pc-modal-scrim .slider-toggle::before{ transition:transform .28s cubic-bezier(.22,1,.36,1), background .25s ease; }
+
+/* warning panel opens smoothly */
+html .pc-modal-scrim .warn-content-wrap{ transition:grid-template-rows .35s cubic-bezier(.22,1,.36,1); }
+html .pc-modal-scrim .warn-toggle{ transition:transform .3s cubic-bezier(.22,1,.36,1); }
+
+@media (prefers-reduced-motion: reduce){
+  html .pc-modal-scrim .pc-accordion-body *, html .pc-modal-scrim .pc-accordion-body *::after{ animation:none !important; transition:none !important; }
+}
 </style>
 </body>
 </html>
