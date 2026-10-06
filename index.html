@@ -8007,6 +8007,47 @@ html.pc-moving .pc-card--monthly::after{animation-play-state:paused!important}
 /* 5. pre-build the GPU layers of each card's intro pieces while they are still hidden (.pc-pre), so the moment a card
    first becomes active nothing has to be created mid-swipe; released again once the intro has played */
 html body .pc-slide:is(.pc-pre,.pc-in) :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-feature .pc-check,.pc-toggle-btn){will-change:opacity,transform!important}
+/* ===== carousel arrows: pushed to the very edges of the screen, site-matching glass + gradient-ring design ===== */
+@media (min-width:900px){
+  html body .pricing-cards.pc-scroll-mode .pc-nav{
+    width:64px;height:64px;margin-top:-32px;top:calc(50% - 16px);
+    border:2px solid transparent;border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 22%, rgba(255,255,255,.16), transparent 58%) padding-box,
+      linear-gradient(160deg,#141b30,#080b16) padding-box,
+      linear-gradient(135deg,#22c3ff,rgba(59,109,255,.55) 48%,#8b5cf6) border-box;
+    color:#8fe3ff;
+    -webkit-backdrop-filter:none;backdrop-filter:none;
+    box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 7px rgba(34,195,255,.06),0 0 22px rgba(34,195,255,.18);
+    transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,color .22s ease,opacity .22s ease;
+  }
+  html body .pricing-cards.pc-scroll-mode .pc-nav--prev{left:calc(50% - 50vw + 22px)}
+  html body .pricing-cards.pc-scroll-mode .pc-nav--next{right:calc(50% - 50vw + 22px)}
+  html body .pricing-cards.pc-scroll-mode .pc-nav svg{width:26px;height:26px;stroke-width:2.8}
+  html body .pricing-cards.pc-scroll-mode .pc-nav:hover{
+    transform:scale(1.08);color:#fff;
+    box-shadow:0 14px 34px rgba(0,0,0,.6),0 0 0 9px rgba(34,195,255,.11),0 0 34px rgba(34,195,255,.5);
+  }
+  html body .pricing-cards.pc-scroll-mode .pc-nav:active{transform:scale(.94)}
+  html body .pricing-cards.pc-scroll-mode .pc-nav:disabled{opacity:.28;transform:none;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+}
+
+/* ===== TikTok checker block: crisp edges, text and gradients (no jagged corner / smeared text / banding) ===== */
+body .ttdl-shell{clip-path:inset(0 round 28px);-webkit-clip-path:inset(0 round 28px)}
+body .ttdl-aurora{clip-path:inset(0 round 26.5px);-webkit-clip-path:inset(0 round 26.5px)}
+@media (max-width:600px){body .ttdl-shell{clip-path:inset(0 round 22px);-webkit-clip-path:inset(0 round 22px)}body .ttdl-aurora{clip-path:inset(0 round 20.5px);-webkit-clip-path:inset(0 round 20.5px)}}
+body .ttdl-dot{width:10px;height:10px;opacity:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+body .ttdl-titlebar-path{
+  font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,'BPGAcademiuriU',monospace;
+  font-size:12.5px;letter-spacing:.02em;color:#93a4bd;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:geometricPrecision;
+}
+/* fine grain over the soft glow so the gradient never shows stair-step bands */
+body .ttdl-aurora::after{
+  content:""!important;display:block!important;position:absolute;inset:0;pointer-events:none;opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
 </style>
 </head>
 <body>
@@ -20969,8 +21010,10 @@ document.addEventListener('keydown',function(e){if(done)return;
 var sx=0,sy=0;
 el.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
 el.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>70&&Math.abs(dy)<50)go(idx+(dx<0?1:-1));},{passive:true});
-/* auto-plays at most once per hour; the MOON INTRO button on the login page replays it any time */
-play();
+/* auto-plays at most once per 24 hours; the MOON INTRO button on the login page replays it any time */
+var KEY='moonIntroSeenAt',DAY=24*60*60*1000,skipAuto=false;
+try{var seen=+localStorage.getItem(KEY)||0;if(seen&&Date.now()-seen<DAY&&Date.now()>=seen)skipAuto=true;}catch(e){}
+if(!skipAuto){try{localStorage.setItem(KEY,String(Date.now()));}catch(e){}play();}
 window.moonIntroReplay=function(){if(done)play();};
 var rb=document.getElementById('dgIntroBtn');if(rb)rb.addEventListener('click',function(){window.moonIntroReplay();});
 })();
