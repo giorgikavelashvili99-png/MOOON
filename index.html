@@ -21957,5 +21957,14 @@ html .pc-modal-scrim .wizard-step.is-done .wizard-step-dot{ animation:none !impo
   .field, .wp-grid, .mp-grid, .quality-grid, .order-grid, .wiz-step-exit{ animation:none !important; }
 }
 </style>
+<style id="moon-fix-v9">
+/* v9 — the light "glare" passes are played ONE time, then stop for good.
+   (card glint, gold-card sweep, shine on the order button) */
+.pricing-cards:not(.pc-play) .pc-card > .pc-cine-glint,
+.pricing-cards:not(.pc-play) .pc-slide--active .pc-card > .pc-cine-glint{ animation:none !important; opacity:0; }
+.pc-card--monthly::after{ animation:pcShineSweep 3s ease-in-out 1.2s 1 both !important; }
+.pc-slide--active .pc-toggle-btn::before,
+.pricing-cards:not(.pc-scroll-mode) .pc-toggle-btn::before{ animation:pcBtnShineT 1.4s ease-in-out 1.6s 1 both !important; }
+</style>
 </body>
 </html>
