@@ -21966,5 +21966,22 @@ html .pc-modal-scrim .wizard-step.is-done .wizard-step-dot{ animation:none !impo
 .pc-slide--active .pc-toggle-btn::before,
 .pricing-cards:not(.pc-scroll-mode) .pc-toggle-btn::before{ animation:pcBtnShineT 1.4s ease-in-out 1.6s 1 both !important; }
 </style>
+<style id="moon-fix-v10">
+/* v10 — crisp ✓ icons. The pixelation came from the browser keeping the tick
+   rasterised at the tiny size it had during its "pop" entrance (will-change +
+   scale animation locks the raster scale). No scale animation, no will-change. */
+html body .pc-slide:is(.pc-pre,.pc-in) :is(.pc-feature, .pc-feature .pc-check){ will-change:auto !important; }
+html body .pc-feature .pc-check,
+html body .pc-slide.pc-in .pc-feature .pc-check{
+  animation:none !important;
+  will-change:auto !important;
+  transform:none !important;
+  background-size:100% 100% !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  image-rendering:auto;
+  -webkit-backface-visibility:visible; backface-visibility:visible;
+}
+</style>
 </body>
 </html>
