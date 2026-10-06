@@ -8261,6 +8261,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 
   <div class="dg-main">
     <div class="dg-logo-wrap"><img class="dg-logo" id="discordGateLogo" alt="MOONFULL 4K" width="639" height="220" decoding="async" draggable="false"></div>
+    <div class="dg-card">
     <h1 class="discord-gate-title" id="discordGateTitle">შენ იმსახურებ საუკეთესო ხარისხს.</h1>
     <div class="discord-gate-sub" id="discordGateSub"><span class="dg-spec"><b>1080p / 4K • 60FPS</b></span><span class="dg-cta">გასაგრძელებლად შედი Discord-ით</span></div>
     <button type="button" class="discord-btn primary" id="discordLoginBtn">
@@ -8272,8 +8273,9 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       <span data-i18n="authJoinBtn">შემოუერთდი ჩვენს Discord სერვერს</span>
     </a>
     <button type="button" class="discord-gate-skip" id="discordGateSkip">გაგრძელება სტუმრად</button>
-    <button type="button" class="dg-intro-btn" id="dgIntroBtn" aria-label="MOON INTRO"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a.6.6 0 0 0-.8-.7A9.7 9.7 0 1 0 21.2 15.4a.6.6 0 0 0-.7-.8z"/></svg><span>MOON INTRO</span></button>
     <button type="button" class="discord-gate-close" id="discordGateClose" data-i18n="authGateClose">დახურვა</button>
+    </div>
+    <button type="button" class="dg-intro-btn" id="dgIntroBtn" aria-label="MOON INTRO"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a.6.6 0 0 0-.8-.7A9.7 9.7 0 1 0 21.2 15.4a.6.6 0 0 0-.7-.8z"/></svg><span>MOON INTRO</span></button>
 
     <div class="dg-banned" id="dgBanned">
       <div class="dg-ban-icon-wrap"><div class="dg-ban-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9.3"/><line x1="5.7" y1="5.7" x2="18.3" y2="18.3"/></svg></div></div>
@@ -21712,6 +21714,167 @@ html .pc-modal-scrim #mpOrderChannelsPanel,
 html .pc-modal-scrim #cpOrderChannelsPanel,
 html .pc-modal-scrim #cpmOrderChannelsPanel{ margin-top:0 !important; }
 html .pc-modal-scrim .field:has(> .wizard-question){ margin-bottom:0; }
+</style>
+<style id="moon-gate-v1">
+/* ============================================================
+   Discord login gate — new design
+   Moonlit blue→violet sky, one big moon behind the logo, a single
+   tinted card holding everything. No starfield, no looping effects:
+   one soft entrance, then still. (Banned mode keeps its own look.)
+   ============================================================ */
+html .discord-gate{
+  background:
+    radial-gradient(70% 42% at 50% 17%, rgba(255,214,150,.20), transparent 72%),
+    radial-gradient(90% 55% at 100% 100%, rgba(40,120,255,.42), transparent 66%),
+    radial-gradient(90% 55% at 0% 100%, rgba(160,60,225,.46), transparent 66%),
+    linear-gradient(170deg, #141a5c 0%, #2b1f7a 52%, #4a1f86 100%);
+}
+html:has(.discord-gate.open[data-mode]){ background:#141a5c; }
+html .discord-gate[data-mode="banned"]{
+  background:
+    radial-gradient(80% 40% at 50% 24%, rgba(255,90,110,.28), transparent 72%),
+    linear-gradient(170deg, #3a0f24 0%, #260a1c 60%, #1b0716 100%);
+}
+html .discord-gate .dg-stars{ display:none; }
+
+/* loops off — nothing moves continuously */
+html .discord-gate .dg-logo,
+html .discord-gate .dg-logo-wrap::before,
+html .discord-gate .dg-dot,
+html .discord-gate .discord-btn.primary::after{ animation:none !important; }
+html .discord-gate .discord-btn.primary::after{ display:none; }
+
+/* top row */
+html .discord-gate .dg-pill{
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.26); color:#f3eeff;
+}
+html .discord-gate .dg-dot{ background:#ffd27a; filter:none; }
+html .discord-gate[data-mode="banned"] .dg-dot{ background:#ff6b7c; }
+html .discord-gate .lang-switch.dg-lang{ background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.2); }
+
+/* moon behind the logo: soft disc + two thin rings */
+html .discord-gate .dg-logo-wrap{ isolation:isolate; margin-bottom:clamp(14px, 3vh, 28px); }
+html .discord-gate .dg-logo-wrap::before{
+  width:min(64vw, 300px); height:min(64vw, 300px); filter:none; opacity:1;
+  border-radius:50%;
+  background:radial-gradient(circle at 36% 32%, rgba(255,240,214,.62), rgba(196,176,255,.30) 46%, rgba(90,110,255,.08) 72%, transparent 73%);
+  border:1px solid rgba(255,255,255,.18);
+}
+html .discord-gate .dg-logo-wrap::after{
+  content:''; position:absolute; z-index:-1; left:50%; top:50%;
+  width:min(86vw, 410px); height:min(86vw, 410px); transform:translate(-50%,-50%);
+  border-radius:50%; border:1px solid rgba(255,255,255,.10);
+}
+html .discord-gate .dg-logo{ filter:drop-shadow(0 6px 22px rgba(30,20,110,.55)); }
+
+/* the card */
+html .discord-gate .dg-card{
+  width:100%; box-sizing:border-box; padding:26px 20px 16px; border-radius:30px;
+  background:linear-gradient(180deg, rgba(48,38,140,.66), rgba(26,22,92,.78));
+  border:1px solid rgba(176,166,255,.40);
+  display:flex; flex-direction:column; align-items:center;
+}
+html .discord-gate.open .dg-card{ animation:dgRise .55s cubic-bezier(.22,.9,.32,1) .08s both; }
+html .discord-gate.open .dg-card > *{ animation:none; }
+html .discord-gate[data-mode="banned"] .dg-card{ display:none; }
+
+html .discord-gate .discord-gate-title{ color:#fff1d6; margin-bottom:14px; }
+html .discord-gate .discord-gate-sub{ color:#cfc8ff; margin-bottom:22px; }
+html .discord-gate .discord-gate-sub .dg-spec b{
+  background:linear-gradient(90deg, #46e0ff, #b497ff); border:0; color:#140f4a; font-weight:800; padding:7px 16px;
+}
+html .discord-gate .discord-gate-sub .dg-spec b::before{ background:#140f4a; filter:none; }
+html .discord-gate .discord-gate-sub .dg-cta{ color:#f1ecff; margin-top:16px; }
+
+/* buttons: icon chip on the left, label centred */
+html .discord-gate .discord-btn{
+  position:relative; min-height:58px; border-radius:18px; padding:0 56px;
+  justify-content:center; text-align:center; max-width:none;
+}
+html .discord-gate .discord-btn svg{
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  width:38px; height:38px; padding:9px; box-sizing:border-box; border-radius:12px;
+  background:rgba(255,255,255,.18);
+}
+html .discord-gate .discord-btn.primary{
+  background:linear-gradient(180deg, #6f7bff, #4b58e6);
+  border:1px solid rgba(206,210,255,.55); filter:none; color:#fff;
+}
+html .discord-gate .discord-btn.outline{
+  margin-top:12px; color:#c4f3ff;
+  background:rgba(70,224,255,.12); border:1px solid rgba(70,224,255,.50); background-clip:border-box;
+}
+html .discord-gate .discord-btn.outline::before{ display:none; }
+html .discord-gate .discord-btn.outline:hover{ background:rgba(70,224,255,.20); color:#fff; }
+html .discord-gate .discord-btn:hover{ transform:none; filter:brightness(1.08); }
+html .discord-gate .discord-btn:active{ transform:scale(.98); }
+html .discord-gate .discord-btn svg{ transition:none; }
+
+html .discord-gate .discord-gate-skip,
+html .discord-gate .discord-gate-close{ color:#d6d0ff; border-bottom:1px solid rgba(214,208,255,.35); margin-top:14px; padding:6px 4px; }
+html .discord-gate .discord-gate-skip:hover,
+html .discord-gate .discord-gate-close:hover{ color:#fff; border-bottom-color:#fff; }
+html .discord-gate[data-mode="guild"] .discord-gate-skip{
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.24); color:#fff; border-radius:14px; padding:13px 18px;
+}
+
+html .discord-gate .dg-intro-btn{
+  color:#e6e0ff; background:rgba(255,255,255,.10); border-color:rgba(255,255,255,.24);
+}
+html .discord-gate .dg-intro-btn:hover{ color:#fff; background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.4); }
+html .discord-gate[data-mode="banned"] .dg-intro-btn{ display:none; }
+</style>
+<style id="moon-gate-v2">
+/* Discord gate v2 — clean & simple, one blue. No moon/rings, nothing overlaps. */
+html .discord-gate{ background:linear-gradient(180deg, #0f1c52 0%, #172c78 100%); }
+html:has(.discord-gate.open[data-mode]){ background:#0f1c52; }
+html .discord-gate[data-mode="banned"]{ background:linear-gradient(180deg,#34101f,#1f0a15); }
+
+/* remove the moon + rings completely */
+html .discord-gate .dg-logo-wrap::before,
+html .discord-gate .dg-logo-wrap::after{ display:none !important; }
+
+/* top row: quieter */
+html .discord-gate .dg-pill{
+  padding:9px 14px; gap:9px; font-size:12px; letter-spacing:.14em;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); color:#dbe6ff;
+}
+html .discord-gate .dg-dot{ background:#46c8ff; }
+
+/* logo: smaller, clear space around it */
+html .discord-gate .dg-main{ justify-content:flex-start; padding-top:clamp(18px, 6vh, 56px); }
+html .discord-gate .dg-logo-wrap{ margin:0 0 clamp(18px, 4vh, 32px); }
+html .discord-gate .dg-logo{ width:min(80vw, 380px, 34vh); filter:none; }
+
+/* no card — content sits directly on the background */
+html .discord-gate .dg-card{ background:none; border:0; border-radius:0; padding:0; }
+html .discord-gate .discord-gate-title{
+  color:#fff; font-size:clamp(20px, 5.4vw, 26px); font-weight:700; line-height:1.3; margin:0 0 14px;
+}
+html .discord-gate .discord-gate-sub{ color:#b9c8f0; margin:0 0 24px; }
+html .discord-gate .discord-gate-sub .dg-spec b{
+  background:rgba(70,200,255,.14); border:1px solid rgba(70,200,255,.45);
+  color:#bfeaff; font-weight:700; padding:6px 14px; font-size:14px;
+}
+html .discord-gate .discord-gate-sub .dg-spec b::before{ background:#46c8ff; }
+html .discord-gate .discord-gate-sub .dg-cta{ color:#dbe6ff; font-weight:500; margin-top:14px; font-size:14px; }
+
+/* buttons: icon + label centred together, two clear levels */
+html .discord-gate .discord-btn{ min-height:56px; border-radius:16px; padding:0 18px; gap:12px; }
+html .discord-gate .discord-btn svg{
+  position:static; transform:none; width:24px; height:24px; padding:0; border-radius:0; background:none;
+}
+html .discord-gate .discord-btn.primary{ background:#5865F2; border:0; color:#fff; }
+html .discord-gate .discord-btn.outline{
+  margin-top:12px; background:transparent; border:1.5px solid rgba(255,255,255,.35); color:#e6eeff; font-weight:600;
+}
+html .discord-gate .discord-btn.outline:hover{ background:rgba(255,255,255,.08); }
+html .discord-gate .discord-btn:hover{ filter:none; }
+html .discord-gate .discord-btn.primary:hover{ background:#6b77f5; }
+
+html .discord-gate .discord-gate-skip,
+html .discord-gate .discord-gate-close{ color:#aebce6; border-bottom:0; text-decoration:underline; text-underline-offset:4px; margin-top:16px; }
+html .discord-gate .dg-intro-btn{ margin-top:18px; color:#c9d6f5; background:transparent; border-color:rgba(255,255,255,.22); }
 </style>
 </body>
 </html>
