@@ -7730,8 +7730,8 @@ html.mi-lock :is(.orb,.pc-cine-glint,.topbar-moon,.vb-moon,.hero-cta-btn,.qn-tab
 
 /* ===== FINAL PATCH: ✕ higher up + clean, GPU-only modal motion (transform/opacity only) ===== */
 /* ✕ sits higher so it no longer touches the step "4" */
-.pc-modal-scrim{padding:36px 22px 22px!important}
-.pc-modal-scrim .pc-modal-close{top:-27px!important;right:-12px!important}
+.pc-modal-scrim{padding:30px 22px 22px!important}
+.pc-modal-scrim .pc-modal-close{top:-19px!important;right:-12px!important}
 .pc-modal-scrim .pc-modal-scroll{max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px)}
 
 /* open: no blur / backdrop-filter / filter / box-shadow animation -> no frame drops */
@@ -7750,13 +7750,18 @@ html .pc-modal-scrim.open>.pc-accordion-body.panel{
 }
 @keyframes pcCineKid{from{opacity:0;transform:translate3d(0,14px,0)}}
 html .pc-modal-scrim.open .pc-modal-scroll>:is(.wizard-steps,.panel-section,.panel-head){
-  animation:pcCineKid .36s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:.16s;
+  animation:none;
 }
 html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(1){animation-delay:.08s}
 html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(2){animation-delay:.14s}
 html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(3){animation-delay:.2s}
 .pc-modal-scrim.open .pc-modal-close{animation:pcFinX .28s cubic-bezier(.2,.8,.3,1) .1s backwards}
 @keyframes pcFinX{from{opacity:0;transform:scale(.6)}}
+/* no flicker: while the window opens, only the panel itself animates (inner fields/grids/steps stay still) */
+html.pc-opening .pc-modal-scrim .pc-modal-scroll *,
+html.pc-opening .pc-modal-scrim .pc-modal-scroll *::before,
+html.pc-opening .pc-modal-scrim .pc-modal-scroll *::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important}
+
 .pc-modal-scrim.open>.pc-accordion-body>.pc-cine-sweep::before{animation-duration:.9s;animation-delay:.2s}
 
 /* close: one fast, clean fade — the ✕ and every inner element leave together with the panel */
@@ -7781,6 +7786,18 @@ html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(3){animation-delay:.2s}
 @media (hover:none),(pointer:coarse){
   .pc-nav,.moon-confirm,.badge-float{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   .moon-confirm{background:rgba(6,4,14,.88)}
+}
+/* ===== no hover motion: cards stay still, order button shows nothing extra on hover ===== */
+@media (hover:hover) and (pointer:fine){
+  .pc-slide--active .pc-card:hover .pc-fx{opacity:0!important}
+  body .pc-slide--active .pc-toggle-btn:hover{transform:none;filter:none}
+  body .pc-slide--active .pc-toggle-btn:hover::after{transform:translateX(-6px);opacity:0;width:0}
+  body .pc-slide--active .pc-toggle-btn:hover::before{left:-60%;opacity:0;transition:none}
+  body .pc-slide--active .pc-toggle-btn:active{transform:none}
+  .portfolio-card:hover{transform:none;box-shadow:none}
+  .portfolio-card:hover .portfolio-icon::before{opacity:0;transform:scale(.85)}
+  .portfolio-card:hover .portfolio-icon svg{transform:none}
+  .order-btn:hover{transform:none}
 }
 @media (prefers-reduced-motion:reduce){
   html .pc-modal-scrim.open,html .pc-modal-scrim.open>.pc-accordion-body.panel,
@@ -11277,6 +11294,7 @@ html.mi-lock{overflow:hidden!important}
     const panel = card.querySelector('.pc-accordion-body');
     card.classList.add('pc-open');
     if (btn) btn.setAttribute('aria-expanded', 'true');
+    document.documentElement.classList.add('pc-opening');
     // Remember exactly where the page was scrolled to before this modal
     // opened, so closing it (✕, scrim click, or Escape) can put the
     // visitor back at that same spot instead of wherever the page
@@ -11296,6 +11314,9 @@ html.mi-lock{overflow:hidden!important}
     }
     if (pcModalScrim) pcModalScrim.classList.add('open');
     document.documentElement.classList.add('pc-modal-on');
+    document.documentElement.classList.add('pc-opening');
+    clearTimeout(window._pcOpeningT);
+    window._pcOpeningT = setTimeout(function(){ document.documentElement.classList.remove('pc-opening'); }, 520);
     lockBodyScroll();
   }
 
@@ -20467,20 +20488,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     }));
     slides.forEach(sl => mo.observe(sl, { attributes:true, attributeFilter:['class'], attributeOldValue:true }));
 
-    // cursor spotlight + soft tilt (mouse only)
-    if (matchMedia('(hover: hover) and (pointer: fine)').matches){
-      slides.forEach(sl => {
-        const card = sl.querySelector('.pc-card'); if (!card) return;
-        const fx = card.querySelector(':scope > .pc-fx');
-        card.addEventListener('pointermove', e => {
-          if (!sl.classList.contains('pc-slide--active')) return;
-          const r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-          fx.style.setProperty('--mx', (x * 100) + '%'); fx.style.setProperty('--my', (y * 100) + '%');
-          card.style.transform = 'perspective(900px) rotateX(' + ((0.5 - y) * 5).toFixed(2) + 'deg) rotateY(' + ((x - 0.5) * 6).toFixed(2) + 'deg) translateY(-3px)';
-        });
-        card.addEventListener('pointerleave', () => { card.style.transform = ''; });
-      });
-    }
+    // (cursor spotlight + tilt removed: cards stay still on hover)
   }
   ttdlSafeInit(initPricingMotion);
 
@@ -20686,6 +20694,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
 
   // Exit animation: a non-interactive copy of the panel flies back toward its card.
   window.pcCineExit = function(panel){
+    return; // closing is instant & clean: no ghost copy, no exit animation
     if (reduce || !panel) return;
     try {
       var scrim = document.getElementById('pcModalScrim');
@@ -20768,4 +20777,3 @@ play();
 <!-- ===== /MOON intro overlay ===== -->
 </body>
 </html>
-
