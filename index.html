@@ -13236,7 +13236,8 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     videoEl.preload = 'metadata';
     videoEl.muted = true;
     videoEl.playsInline = true;
-    videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
+    videoEl.style.cssText = 'position:fixed; left:0; bottom:0; width:2px; height:2px; opacity:0.01; pointer-events:none; z-index:-1;';
+    videoEl.setAttribute('playsinline',''); videoEl.setAttribute('webkit-playsinline',''); videoEl.setAttribute('muted',''); videoEl.defaultMuted = true;
     document.body.appendChild(videoEl);
 
     const cleanup = () => {
@@ -13253,9 +13254,10 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     let watchdogTimer = setTimeout(() => {
       cleanup();
       if (myToken === scanToken) alert(t('alertReadError'));
-    }, 9000);
+    }, 20000);
 
     const proceed = (duration) => {
+      if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
       const width = videoEl.videoWidth;
       const height = videoEl.videoHeight;
       detectFrameRate(videoEl).then(fps => {
@@ -13264,7 +13266,10 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       });
     };
 
-    videoEl.onloadedmetadata = function(){
+    let metaHandled = false;
+    const onMeta = function(){
+      if (metaHandled || videoEl.readyState < 1) return;
+      metaHandled = true;
       if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
         videoEl.currentTime = 1e101;
         // Some mobile browsers never fire ontimeupdate after this seek —
@@ -13284,13 +13289,21 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
         proceed(videoEl.duration);
       }
     };
-
+    ['loadedmetadata','durationchange','loadeddata','canplay'].forEach(ev => videoEl.addEventListener(ev, onMeta));
     videoEl.onerror = function(){
       cleanup();
       if (myToken === scanToken) alert(t('alertReadError'));
     };
 
     videoEl.src = URL.createObjectURL(file);
+      try { videoEl.load(); } catch(e){}
+      // iOS/iPadOS Safari often ignores preload="metadata" — nudge it with a muted play().
+      setTimeout(() => {
+        if (videoEl.readyState < 1) {
+          const pr = videoEl.play();
+          if (pr && pr.then) pr.then(() => { if (videoEl.readyState >= 1) { try{ videoEl.pause(); }catch(e){} } }).catch(()=>{});
+        }
+      }, 1200);
   }
 
   function detectFrameRate(videoEl){
@@ -13418,7 +13431,8 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       videoEl.preload = 'metadata';
       videoEl.muted = true;
       videoEl.playsInline = true;
-      videoEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0; pointer-events:none;';
+      videoEl.style.cssText = 'position:fixed; left:0; bottom:0; width:2px; height:2px; opacity:0.01; pointer-events:none; z-index:-1;';
+    videoEl.setAttribute('playsinline',''); videoEl.setAttribute('webkit-playsinline',''); videoEl.setAttribute('muted',''); videoEl.defaultMuted = true;
       document.body.appendChild(videoEl);
 
       const cleanup = () => {
@@ -13429,8 +13443,9 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       let watchdogTimer = setTimeout(() => {
         cleanup();
         reject('read-timeout');
-      }, 9000);
+      }, 20000);
       const proceed = (duration) => {
+        if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
         const width = videoEl.videoWidth;
         const height = videoEl.videoHeight;
         // Frame-rate detection actually PLAYS the video (muted, hidden) to
@@ -13456,7 +13471,10 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
           resolve({ duration, width, height, fps, file });
         });
       };
-      videoEl.onloadedmetadata = function(){
+      let metaHandled = false;
+    const onMeta = function(){
+      if (metaHandled || videoEl.readyState < 1) return;
+      metaHandled = true;
         if (videoEl.duration === Infinity || isNaN(videoEl.duration)) {
           videoEl.currentTime = 1e101;
           const durationTimeout = setTimeout(() => {
@@ -13473,12 +13491,21 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
         } else {
           proceed(videoEl.duration);
         }
-      };
-      videoEl.onerror = function(){
+    };
+    ['loadedmetadata','durationchange','loadeddata','canplay'].forEach(ev => videoEl.addEventListener(ev, onMeta));
+    videoEl.onerror = function(){
         cleanup();
         reject('read-error');
       };
       videoEl.src = URL.createObjectURL(file);
+      try { videoEl.load(); } catch(e){}
+      // iOS/iPadOS Safari often ignores preload="metadata" — nudge it with a muted play().
+      setTimeout(() => {
+        if (videoEl.readyState < 1) {
+          const pr = videoEl.play();
+          if (pr && pr.then) pr.then(() => { if (videoEl.readyState >= 1) { try{ videoEl.pause(); }catch(e){} } }).catch(()=>{});
+        }
+      }, 1200);
     });
   }
 
