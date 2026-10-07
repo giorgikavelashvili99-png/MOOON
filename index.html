@@ -22061,6 +22061,21 @@ body .pc-feature--no .pc-check{
 @media (min-width:900px){
   html body .pricing-cards.pc-scroll-mode .pc-nav{top:var(--pc-nav-top, calc(50% - 16px))!important;margin-top:-32px!important}
 }
+
+/* ===== arrows were pushed off-screen by the 112% zoom (50vw is scaled too) -> compensate ===== */
+@media (min-width:900px){
+  html body .pricing-cards.pc-scroll-mode .pc-nav--prev{left:calc(50% - 50vw / 1.12 + 22px)!important}
+  html body .pricing-cards.pc-scroll-mode .pc-nav--next{right:calc(50% - 50vw / 1.12 + 22px)!important;left:auto!important}
+}
+
+/* ===== cards: no outer drop shadow (edge ring kept) ===== */
+body .pc-card{
+  box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pc-accent,#7c8fff) 62%,#fff)!important;
+}
+
+/* ===== no white light sweep across the whole card (order button keeps its own shine) ===== */
+body .pc-card>.pc-cine-glint,
+body .pc-card--monthly::after{display:none!important;animation:none!important;opacity:0!important}
 </style>
 <script>
 (function(){
