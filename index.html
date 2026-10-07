@@ -22105,6 +22105,139 @@ html body .pc-modal-scrim :is(input:not([type]),input[type=text],input[type=url]
 html body .pc-modal-scrim :is(input:not([type]),input[type=text],input[type=url],input[type=email],input[type=tel],input[type=number],select,textarea):focus{
   box-shadow:0 0 0 3px color-mix(in srgb, var(--pc-accent,#22c3ff) 28%, transparent);
 }
+
+/* ===== crisp text / icons (no pixel stair-steps): unhinted, sub-pixel positioned glyphs, smooth vector edges ===== */
+html,html body{text-rendering:geometricPrecision}
+html body .pc-modal-scrim svg,html body .pc-modal-scrim svg *{shape-rendering:geometricPrecision}
+
+/* ===== order window: animations on every detail (opacity / transform / scale only -> smooth, no lag) ===== */
+@media (prefers-reduced-motion:no-preference){
+  @keyframes ofBreath{0%,100%{scale:1}50%{scale:1.1}}
+  @keyframes ofDotDone{0%{scale:.6}60%{scale:1.18}100%{scale:1}}
+  @keyframes ofRing{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.55);opacity:0}}
+
+  /* stepper: the current step gently breathes, a finished step pops */
+  html:not(.low-power) body .pc-modal-scrim .wizard-step.is-active .wizard-step-dot{animation:ofBreath 2.6s ease-in-out infinite!important}
+  html:not(.low-power) body .pc-modal-scrim .wizard-step.is-done .wizard-step-dot{animation:ofDotDone .45s cubic-bezier(.2,1.2,.4,1)!important}
+  html body .pc-modal-scrim .wizard-step-label{transition:color .3s ease,opacity .3s ease}
+
+  /* upload zone: soft ring spreads from the + icon, zone eases up on hover, + turns on hover */
+  html:not(.low-power) body .pc-modal-scrim .drop-zone .dz-icon::before{
+    content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
+    border:2px solid var(--pc-accent,#22c55e);opacity:0;
+    animation:ofRing 2.6s ease-out infinite;
+  }
+  /* hover = colour glow only (no size change -> no jump when the mouse leaves) */
+  html body .pc-modal-scrim .drop-zone{
+    box-shadow:inset 0 0 30px -8px transparent;
+    transition:transform .2s ease,border-color .25s ease,box-shadow .3s ease;
+  }
+  html body .pc-modal-scrim .drop-zone:hover{
+    box-shadow:inset 0 0 30px -8px color-mix(in srgb,var(--pc-accent,#22c55e) 50%,transparent);
+  }
+  html body .pc-modal-scrim .drop-zone .dz-plus{transform-box:fill-box;transform-origin:center;transition:transform .35s cubic-bezier(.2,.8,.3,1)}
+  html body .pc-modal-scrim .drop-zone:hover .dz-plus{transform:rotate(90deg)}
+  html body .pc-modal-scrim .drop-zone.dragover{box-shadow:inset 0 0 36px -6px color-mix(in srgb,var(--pc-accent,#22c55e) 65%,transparent)}
+
+  /* close button turns a quarter on hover */
+  html body .pc-modal-scrim .pc-modal-close{transition:transform .2s ease,background .2s ease,border-color .2s ease,color .2s ease,rotate .3s cubic-bezier(.2,.8,.3,1)}
+  html body .pc-modal-scrim .pc-modal-close:hover{rotate:90deg}
+
+  /* main buttons grow a touch on hover */
+  html body .pc-modal-scrim .wizard-confirm-btn{transition:transform .15s ease,opacity .2s ease,scale .2s cubic-bezier(.2,.8,.3,1)}
+  html body .pc-modal-scrim .wizard-confirm-btn:hover{scale:1.02}
+
+  /* toggle rows & dim-text chips react smoothly when checked */
+  html body .pc-modal-scrim .toggle-row{transition:background-color .25s ease,border-color .25s ease}
+}
+
+/* ===== site menu: light-based animations, nothing slides, spins or jumps ===== */
+@keyframes mnFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes mnScan{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+@keyframes mnGlowIn{from{opacity:0;filter:brightness(2.4)}to{opacity:1;filter:brightness(1)}}
+@keyframes mnLineOpen{from{opacity:0;clip-path:inset(0 50% 0 50%)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+/* every row gets a light layer under its content */
+html body .site-menu .qn-tab::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--qn-accent) 30%,transparent),color-mix(in srgb,var(--qn-accent) 6%,transparent) 70%,transparent);
+  transition:opacity .3s ease;
+}
+html body .site-menu .qn-tab .qn-tile-icon,
+html body .site-menu .qn-tab .qn-label,
+html body .site-menu .qn-tab::after{position:relative;z-index:1}
+@media (prefers-reduced-motion:no-preference){
+  .site-menu .quick-nav .qn-tab:nth-child(1){--mn-i:0}
+  .site-menu .quick-nav .qn-tab:nth-child(2){--mn-i:1}
+  .site-menu .quick-nav .qn-tab:nth-child(3){--mn-i:2}
+  .site-menu .quick-nav .qn-tab:nth-child(4){--mn-i:3}
+  .site-menu .quick-nav .qn-tab:nth-child(5){--mn-i:4}
+  .site-menu .quick-nav .qn-tab:nth-child(6){--mn-i:5}
+  .site-menu .quick-nav .qn-tab:nth-child(7){--mn-i:6}
+  .site-menu .quick-nav .qn-tab:nth-child(n+8){--mn-i:7}
+
+  /* opening: everything fades in place, then a soft light runs down the list row by row */
+  html:not(.low-power) body .site-menu.open .site-menu-top{animation:mnFadeIn .5s ease-out .05s backwards}
+  html:not(.low-power) body .site-menu.open .site-menu-tagline{animation:mnFadeIn .5s ease-out .15s backwards}
+  html:not(.low-power) body .site-menu.open .qn-tab{animation:mnFadeIn .5s ease-out calc(.1s + var(--mn-i,0) * .06s) backwards}
+  html:not(.low-power) body .site-menu.open .qn-tab::before{animation:mnScan .9s ease-out calc(.2s + var(--mn-i,0) * .08s) backwards}
+  html:not(.low-power) body .site-menu.open .qn-tab .qn-tile-icon{animation:mnGlowIn .6s ease-out calc(.2s + var(--mn-i,0) * .08s) backwards}
+  html:not(.low-power) body .site-menu.open .site-menu-panel::before,
+  html:not(.low-power) body .site-menu.open .site-menu-divider{animation:mnLineOpen .8s cubic-bezier(.16,1,.3,1) .12s backwards}
+
+  /* hover / press: colour and glow only, content stays exactly where it is */
+  html body .site-menu .qn-tab:hover::before,
+  html body .site-menu .qn-tab:focus-visible::before{opacity:1}
+  html body .site-menu .qn-tab .qn-tile-icon{transition:box-shadow .3s ease,filter .25s ease}
+  html body .site-menu .qn-tab:hover .qn-tile-icon{box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 16px color-mix(in srgb,var(--qn-accent) 70%,transparent)}
+  html body .site-menu .qn-tab:active .qn-tile-icon{filter:brightness(1.3)}
+  html body .site-menu .qn-tab:active::before{opacity:1;filter:brightness(1.4)}
+
+  /* close + hamburger: they glow instead of moving */
+  html body .site-menu-close{transition:color .2s,border-color .2s,background .2s,box-shadow .3s ease,transform .15s}
+  html body .site-menu-close:hover{box-shadow:0 0 16px color-mix(in srgb,var(--purple) 55%,transparent)}
+  html body .menu-toggle{transition:border-color .25s ease,box-shadow .3s ease,transform .2s ease}
+  html body .menu-toggle:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 18px color-mix(in srgb,var(--cyan) 35%,transparent)}
+  html body .menu-toggle:hover .menu-toggle-bar{filter:brightness(1.5)}
+}
+
+/* ===== TikTok video-link field (analytics): same light-based animation - nothing moves ===== */
+html body .ttdl-input-wrap::before{
+  content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,rgba(37,244,238,.24),rgba(254,44,85,.10) 62%,transparent);
+  transition:opacity .35s ease;
+}
+html body .ttdl-input-wrap::after{
+  content:'';position:absolute;left:16px;right:16px;bottom:0;height:2px;border-radius:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#25F4EE 30%,#FE2C55 70%,transparent);
+  opacity:0;clip-path:inset(0 50% 0 50%);
+  transition:clip-path .55s cubic-bezier(.16,1,.3,1),opacity .3s ease;
+}
+html body .ttdl-input-wrap:hover::before{opacity:.45}
+html body .ttdl-input-wrap:focus-within::before{opacity:1}
+html body .ttdl-input-wrap:focus-within::after,
+html body .ttdl-input-wrap:has(.ttdl-input:not(:placeholder-shown))::after{opacity:1;clip-path:inset(0 0 0 0)}
+html body .ttdl-input-wrap:has(.ttdl-input:not(:placeholder-shown):not(:focus))::after{opacity:.6}
+html body .ttdl-input-icon{transition:box-shadow .35s ease,background .3s ease,color .3s ease}
+html body .ttdl-input-wrap:focus-within .ttdl-input-icon{box-shadow:0 0 18px rgba(37,244,238,.6)}
+html body .ttdl-paste-btn{transition:background .25s ease,border-color .25s ease,box-shadow .3s ease,transform .15s ease}
+html body .ttdl-paste-btn:hover{box-shadow:0 0 14px rgba(37,244,238,.5)}
+html body .ttdl-clear-btn{transition:border-color .25s ease,color .25s ease,box-shadow .3s ease,transform .15s ease}
+html body .ttdl-clear-btn:hover{box-shadow:0 0 14px rgba(254,44,85,.45)}
+html body .ttdl-paste-btn.is-done{box-shadow:0 0 16px rgba(61,220,132,.55)}
+@media (prefers-reduced-motion:no-preference){
+  @keyframes ttfScan{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+  @keyframes ttfPulse{0%,100%{opacity:.18}50%{opacity:.75}}
+  /* once, right after the block appears: a soft light passes over the field */
+  html:not(.low-power) body .ttdl-shell.tt-in .ttdl-input-wrap::before{animation:ttfScan 1.1s ease-out 1.2s backwards}
+  /* while the link is being analysed the field breathes with light */
+  html:not(.low-power) body .ttdl-glass:has(.ttdl-analyze-btn:disabled) .ttdl-input-wrap::before{animation:ttfPulse 1.4s ease-in-out infinite}
+  html body .ttdl-glass:has(.ttdl-analyze-btn:disabled) .ttdl-input-wrap::after{opacity:1;clip-path:inset(0 0 0 0)}
+  /* link pasted with the paste button: green flash */
+  html:not(.low-power) body .ttdl-input-wrap:has(.ttdl-paste-btn.is-done)::before{
+    background:linear-gradient(90deg,rgba(61,220,132,.35),rgba(61,220,132,.08) 65%,transparent);
+    animation:ttfScan .9s ease-out;
+  }
+}
 </style>
 <script>
 (function(){
