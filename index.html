@@ -22076,6 +22076,35 @@ body .pc-card{
 /* ===== no white light sweep across the whole card (order button keeps its own shine) ===== */
 body .pc-card>.pc-cine-glint,
 body .pc-card--monthly::after{display:none!important;animation:none!important;opacity:0!important}
+
+/* ===== order form inner animations (opacity / transform only -> compositor, no layout, no lag) ===== */
+@media (prefers-reduced-motion:no-preference){
+  @keyframes ofTileIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+  @keyframes ofPop{0%{transform:translateY(-2px) scale(1)}55%{transform:translateY(-2px) scale(1.07)}100%{transform:translateY(-2px) scale(1.035)}}
+  @keyframes ofCheck{from{scale:0;opacity:0}to{scale:1;opacity:1}}
+
+  /* tiles (quality / weekly / monthly) appear one after another instead of the whole grid fading as one block */
+  html:not(.low-power):not(.pc-opening) body .pc-modal-scrim :is(.quality-grid,.wp-grid,.mp-grid,.order-grid):not(.wizard-step-hidden){animation:none!important}
+  html:not(.low-power):not(.pc-opening) body .pc-modal-scrim :is(.quality-btn,.wp-box,.mp-box){
+    animation:ofTileIn .34s cubic-bezier(.2,.8,.2,1) var(--of-d,0s) backwards!important;
+  }
+  html:not(.low-power):not(.pc-opening) body .pc-modal-scrim :is(.quality-btn,.wp-box,.mp-box):nth-child(2){--of-d:.06s}
+  html:not(.low-power):not(.pc-opening) body .pc-modal-scrim :is(.quality-btn,.wp-box,.mp-box):nth-child(3){--of-d:.12s}
+  html:not(.low-power):not(.pc-opening) body .pc-modal-scrim :is(.quality-btn,.wp-box,.mp-box):nth-child(4){--of-d:.18s}
+  html:not(.low-power):not(.pc-opening) body .pc-modal-scrim :is(.quality-btn,.wp-box,.mp-box):nth-child(n+5){--of-d:.24s}
+  /* picking a tile: quick springy pop (+ the tick pops in) */
+  html:not(.low-power):not(.pc-opening) body .pc-modal-scrim :is(.quality-btn,.wp-box,.mp-box).active{
+    animation:ofTileIn .34s cubic-bezier(.2,.8,.2,1) var(--of-d,0s) backwards, ofPop .32s ease-out!important;
+  }
+  html:not(.low-power) body .pc-modal-scrim :is(.mp-box,.wp-box,.quality-btn).active::after{animation:ofCheck .28s cubic-bezier(.2,1.4,.4,1) backwards}
+}
+/* text fields / selects: soft accent ring fades in on focus */
+html body .pc-modal-scrim :is(input:not([type]),input[type=text],input[type=url],input[type=email],input[type=tel],input[type=number],select,textarea){
+  transition:border-color .2s ease, box-shadow .25s ease, background-color .2s ease;
+}
+html body .pc-modal-scrim :is(input:not([type]),input[type=text],input[type=url],input[type=email],input[type=tel],input[type=number],select,textarea):focus{
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--pc-accent,#22c3ff) 28%, transparent);
+}
 </style>
 <script>
 (function(){
