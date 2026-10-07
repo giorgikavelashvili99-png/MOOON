@@ -21088,7 +21088,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   }
   addEventListener('load',fit); addEventListener('resize',fit);
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit);
-  new MutationObserver(fit).observe(document.body,{subtree:true,characterData:true,childList:true});
+  var __fitT=null; new MutationObserver(function(ms){ if(__fitT) return; var rel=false; for(var i=0;i<ms.length&&!rel;i++){ var t=ms[i].target; var e=t&&(t.nodeType===1?t:t.parentElement); if(e&&e.closest&&e.closest('.pc-guide-row')) rel=true; else if(ms[i].addedNodes&&ms[i].addedNodes.length){ for(var j=0;j<ms[i].addedNodes.length;j++){ var n=ms[i].addedNodes[j]; if(n.nodeType===1&&(n.matches&&(n.matches('.pc-guide-row,.pc-guide-link')||n.querySelector('.pc-guide-link')))) rel=true; } } } if(!rel) return; __fitT=setTimeout(function(){ __fitT=null; (window.requestAnimationFrame||setTimeout)(fit); },250); }).observe(document.body,{subtree:true,characterData:true,childList:true});
 })();
 </script>
 <script>
@@ -22325,6 +22325,85 @@ html .pc-modal-scrim.open{-webkit-backdrop-filter:none!important;backdrop-filter
   function watch(){ document.querySelectorAll(SEL).forEach(function(el){ if(el.__aoWatched||el.closest('.site-menu,.pc-modal-scrim,.discord-gate')) return; el.__aoWatched=1; io.observe(el); }); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',watch); else watch();
   window.addEventListener('load',function(){ watch(); setTimeout(watch,1500); });
+})();
+</script>
+
+<style id="moon-perf-layer">
+/* ================= MOON PERF LAYER (additive, no animation removed) =================
+   1) logo shine: was an animated background-position on a masked + blended element
+      (repaint on the main thread every frame, forever). Now a transform-only slide of
+      the same gradient -> runs on the GPU compositor, identical look.
+   2) paint-type glows/shimmers (box-shadow / background-position / border-color) pause
+      only while the page is actively scrolling, so scroll never competes with repaints.
+   3) every looping animation pauses while it is off-screen (class set by IntersectionObserver). */
+.brand-logo-shine{ background:none!important; animation:none!important; overflow:hidden; }
+.brand-logo-shine::before{
+  content:''; position:absolute; top:0; bottom:0; left:-260%; width:520%; pointer-events:none;
+  background:linear-gradient(100deg,rgba(255,255,255,0) 35%,rgba(255,255,255,.55) 46%,rgba(255,255,255,1) 50%,rgba(255,255,255,.55) 54%,rgba(255,255,255,0) 65%);
+  background-size:50% 100%; background-repeat:repeat-x;
+  transform:translate3d(36.92%,0,0); will-change:transform;
+  animation:moonLogoShineT 4.2s ease-in-out infinite alternate;
+}
+@keyframes moonLogoShineT{ from{ transform:translate3d(36.92%,0,0); } to{ transform:translate3d(-36.92%,0,0); } }
+@media (prefers-reduced-motion:reduce){ .brand-logo-shine::before{ animation:none!important; } }
+html.low-power .brand-logo-shine::before{ animation:none!important; }
+.perf-off,.perf-off::before,.perf-off::after{ animation-play-state:paused!important; }
+html.perf-scrolling .vb-moon,
+html.perf-scrolling .hero-cta-btn,
+html.perf-scrolling .price sup,
+html.perf-scrolling .admin-box h3::before,
+html.perf-scrolling .tt-auto-btn--waiting,
+html.perf-scrolling .discord-btn.primary::after,
+html.perf-scrolling .urgency-badge,
+html.perf-scrolling .ttdl-shell::before,
+html.perf-scrolling .ttdl-status-dot,
+html.perf-scrolling .ttdl-ios-link,
+html.perf-scrolling body .ttdl-heading,
+html.perf-scrolling body .ttdl-log::after,
+html.perf-scrolling .tt-confirm.tt-green,
+html.perf-scrolling .tt-confirm.tt-red,
+html.perf-scrolling .moon-glow-card,
+html.perf-scrolling .order-btn.processing,
+html.perf-scrolling body .ttdl-analyze-btn,
+html.perf-scrolling body .ttdl-analyze-btn:disabled,
+html.perf-scrolling .pc-slide--active .pc-toggle-btn,
+html.perf-scrolling .ttdl-input-wrap,
+html.perf-scrolling .ttdl-glass{animation-play-state:paused!important}
+</style>
+
+<script id="moon-perf-js">
+(function(){
+  if (window.__moonPerf) return; window.__moonPerf = true;
+  var root = document.documentElement;
+  /* --- 1. scroll state: paint-type animations rest while the user is scrolling/swiping --- */
+  var st = null, on = false;
+  function endScroll(){ on = false; root.classList.remove('perf-scrolling'); scheduleScan(); }
+  addEventListener('scroll', function(){
+    if (!on){ on = true; root.classList.add('perf-scrolling'); }
+    clearTimeout(st); st = setTimeout(endScroll, 140);
+  }, { passive:true, capture:true });
+  /* --- 2. off-screen looping animations are paused --- */
+  var SEL = ".admin-box h3, .admin-overlay, .badge-float.ae, .badge-float.enhance, .contact-online .co-dot, .dg-ban-icon, .dg-dot, .dg-logo, .dg-logo-wrap, .dg-stars, .dg-stars-b, .discord-btn.primary, .hero-cta-btn, .mec-colon, .moon-glow-card, .mooon-auto-ring-box.is-finalizing .mooon-auto-ring-percent, .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only, .mooon-auto-status .mooon-auto-ring-box.is-finalizing ~ .mooon-auto-sr-only, .msg-typing-bubble span, .orb.o1, .orb.o2, .order-btn.processing, .pc-card--monthly, .pc-modal-scrim .scan-progress.show, .pc-ring-spin, .pc-slide--active .pc-toggle-btn, .pc-stars i, .price sup, .qn-stars span, .scan-progress .spin, .scanner-primary-badge .spb-dot, .site-menu-tagline .tc-dot, .stt-count, .topbar-moon, .tt-auto-btn--waiting, .tt-confirm.tt-green, .tt-confirm.tt-red, .ttdl-aurora i:nth-child(1), .ttdl-aurora i:nth-child(2), .ttdl-glass, .ttdl-input-wrap, .ttdl-ios-link, .ttdl-shell, .ttdl-status-dot, .ttdl-step-line, .urgency-badge, .vb-moon, body .ttdl-analyze-btn, body .ttdl-analyze-btn:disabled, body .ttdl-heading, body .ttdl-icon, body .ttdl-log, body .ttdl-shell, body .ttdl-status-dot, html:not(.pc-opening) .pc-modal-scrim .drop-zone .dz-icon, html:not(.pc-opening) .pc-modal-scrim .wizard-step.is-active .wizard-step-dot";
+  var seen = new WeakSet(), io = null;
+  if ('IntersectionObserver' in window){
+    io = new IntersectionObserver(function(es){
+      for (var i = 0; i < es.length; i++) es[i].target.classList.toggle('perf-off', !es[i].isIntersecting);
+    }, { rootMargin:'140px 140px 140px 140px' });
+  }
+  function scan(){
+    if (!io) return;
+    var list; try { list = document.querySelectorAll(SEL); } catch(e){ return; }
+    for (var i = 0; i < list.length; i++){ var el = list[i]; if (!seen.has(el)){ seen.add(el); io.observe(el); } }
+  }
+  var scanT = null, lastScan = 0;
+  function scheduleScan(){
+    if (scanT) return;
+    var wait = Math.max(0, 1500 - (Date.now() - lastScan));
+    scanT = setTimeout(function(){ scanT = null; lastScan = Date.now(); (window.requestIdleCallback || function(f){ setTimeout(f, 1); })(scan); }, wait);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan); else scan();
+  addEventListener('load', function(){ scan(); setTimeout(scan, 1200); setTimeout(scan, 4000); });
+  document.addEventListener('click', scheduleScan, { passive:true, capture:true });
 })();
 </script>
 </body>
