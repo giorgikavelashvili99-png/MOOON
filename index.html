@@ -11618,7 +11618,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     if (!card || card.classList.contains('pc-open')) return;
     // Only one card open at a time.
     document.querySelectorAll('.pc-card.pc-open').forEach(other => {
-      if (other !== card) closePricingCard(other);
+      if (other !== card) closePricingCard(other, true);
     });
     const btn = card.querySelector('.pc-toggle-btn');
     const panel = card.querySelector('.pc-accordion-body');
@@ -11650,7 +11650,17 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     lockBodyScroll();
   }
 
-  function closePricingCard(card){
+  function closePricingCard(card, instant){
+    if (!card || !card.classList.contains('pc-open')) return;
+    if (!instant && window.moAnimClose) {
+      if (card._moClosing) return;
+      card._moClosing = true;
+      window.moAnimClose(card, function(){ card._moClosing = false; doClosePricingCard(card); });
+      return;
+    }
+    doClosePricingCard(card);
+  }
+  function doClosePricingCard(card){
     if (!card || !card.classList.contains('pc-open')) return;
     const btn = card.querySelector('.pc-toggle-btn');
     // Move the panel back to its original spot in the card markup.
@@ -20806,7 +20816,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       // pixel target for that same card -- so unlike the old carousel, it
       // is harmless to fire often and can't make anything flash.
       if ('ResizeObserver' in window) {
-        const ro = new ResizeObserver(() => { measure(); scrollToIndex(activeIndex, false); });
+        let moLastW = track.clientWidth; const ro = new ResizeObserver(() => { const w = track.clientWidth; if (w === moLastW) { measure(); return; } moLastW = w; measure(); scrollToIndex(activeIndex, false); });
         ro.observe(track);
       }
 
@@ -20816,8 +20826,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     let centers = [];
     function measure(){
       if (!track || !slides.length) return;
-      const t = track.getBoundingClientRect(), sl = track.scrollLeft;
-      centers = slides.map(s => { const r = s.getBoundingClientRect(); return r.left - t.left + sl + r.width / 2; });
+      centers = slides.map(s => s.offsetLeft + s.offsetWidth / 2);
     }
     function syncActiveFromScroll(){
       if (!track || !centers.length) return;
@@ -22408,22 +22417,14 @@ html.perf-scrolling .ttdl-glass{animation-play-state:paused!important}
 </script>
 <style id="moMorphCss">
 /* ===== MOON glass-carousel morph (reference: TikTok "Glassy Carousel") =====
-   Compositor-only: transform + opacity. No filter / backdrop-filter / layout work per frame. */
+   Compositor-only: transform + opacity. No filter / backdrop-filter / per-frame layout. */
 html body .pricing-cards.pc-scroll-mode .pc-scroll-track{perspective:1100px;perspective-origin:50% 45%}
 html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide:not(.mo-n){
   transform:var(--mo-t,none)!important;opacity:var(--mo-o,1)!important;
-  transition:none!important;filter:none!important;transform-origin:50% 50%}
+  transition:none!important;filter:none!important;transform-origin:50% 50%;
+  will-change:transform,opacity!important;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide:not(.mo-n)::after{
   opacity:var(--mo-d,0)!important;transition:none!important}
-html body .pricing-cards.pc-scroll-mode .pc-scroll-track.mo-sc > .pc-slide:not(.mo-n){will-change:transform,opacity!important}
-.mo-shell,.mo-sheet{position:fixed;left:0;top:0;margin:0;pointer-events:none;transform-origin:0 0;
-  border-radius:24px;z-index:66;contain:layout paint style}
-.mo-shell{box-shadow:0 18px 44px rgba(0,0,0,.42)}
-.mo-sheet{background:linear-gradient(180deg,#17171b,#0b0b0e);
-  border:1px solid color-mix(in srgb,var(--pc-accent,#22c3ff) 38%,rgba(255,255,255,.1));
-  box-shadow:0 18px 44px rgba(0,0,0,.5)}
-.mo-dim{position:fixed;inset:0;z-index:65;pointer-events:none;background:rgba(4,5,10,.92)}
-@media (prefers-reduced-motion:reduce){.mo-shell,.mo-sheet,.mo-dim{display:none!important}}
 </style>
 <script id="moMorphJs">
 (function(){
@@ -22438,21 +22439,27 @@ function lite(){
   return !!((mq&&mq.matches)||root.classList.contains('low-power')||root.classList.contains('moon-lite')||flagged()||
     (c&&c.saveData)||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2));
 }
-/* ---------- 1. 3D glass carousel: one rAF per scroll tick, reads first, writes after ---------- */
-var raf=0,idleT=0,lastT=0,bad=0,hot=new Set();
-function poseTrack(track,L){
-  var kids=track.children,sl=[],i,s;
+/* ---------- 1. 3D glass carousel: geometry cached, one rAF per scroll tick, zero layout reads per frame ---------- */
+var raf=0,lastT=0,bad=0,idleT=0,geo=new WeakMap(),dirty=true;
+function geometry(track){
+  var kids=track.children,sl=[],i;
   for(i=0;i<kids.length;i++) if(kids[i].classList.contains('pc-slide')) sl.push(kids[i]);
-  if(!sl.length) return;
-  var cw=track.clientWidth,mid=track.scrollLeft+cw/2,off=sl[0].offsetParent===track?0:track.offsetLeft,
-      w=sl.length>1?Math.abs(sl[1].offsetLeft-sl[0].offsetLeft):sl[0].offsetWidth+16,ds=new Array(sl.length);
-  if(!w) return;
-  for(i=0;i<sl.length;i++) ds[i]=(sl[i].offsetLeft-off+sl[i].offsetWidth/2-mid)/w;
-  for(i=0;i<sl.length;i++){
-    s=sl[i];var d=ds[i],a=Math.min(Math.abs(d),2),sc=1-.09*a,
-      ry=L?0:Math.max(-48,Math.min(48,-d*34)),
-      t='rotateY('+ry.toFixed(1)+'deg) scale('+sc.toFixed(3)+')',
-      o=(1-.34*Math.min(a,1.5)).toFixed(2),dm=(Math.min(a,1)*.3).toFixed(2),k=t+o+dm;
+  if(!sl.length) return null;
+  var g=geo.get(track);
+  if(g&&!dirty&&g.n===sl.length&&g.cw===track.clientWidth) return g;
+  var off=sl[0].offsetParent===track?0:track.offsetLeft,c=[];
+  for(i=0;i<sl.length;i++) c.push(sl[i].offsetLeft-off+sl[i].offsetWidth/2);
+  g={n:sl.length,cw:track.clientWidth,sl:sl,c:c,w:sl.length>1?Math.abs(c[1]-c[0]):sl[0].offsetWidth+16};
+  geo.set(track,g);return g;
+}
+function poseTrack(track,L){
+  var g=geometry(track);if(!g||!g.w) return;
+  var mid=track.scrollLeft+g.cw/2,i,s,d,a,sc,ry,t,o,dm,k;
+  for(i=0;i<g.sl.length;i++){
+    s=g.sl[i];d=(g.c[i]-mid)/g.w;a=Math.min(Math.abs(d),2);
+    sc=1-.09*a;ry=L?0:Math.max(-48,Math.min(48,-d*34));
+    t='rotateY('+ry.toFixed(1)+'deg) scale('+sc.toFixed(3)+')';
+    o=(1-.34*Math.min(a,1.5)).toFixed(2);dm=(Math.min(a,1)*.3).toFixed(2);k=t+o+dm;
     if(s._mo!==k){s._mo=k;s.style.setProperty('--mo-t',t);s.style.setProperty('--mo-o',o);s.style.setProperty('--mo-d',dm)}
   }
 }
@@ -22462,27 +22469,26 @@ function poseAll(t){
   lastT=t||0;
   var L=lite();
   document.querySelectorAll('.pc-scroll-track').forEach(function(tr){poseTrack(tr,L)});
-  hot.forEach(function(tr){tr.classList.add('mo-sc')});
+  dirty=false;
 }
 function schedule(){if(!raf) raf=requestAnimationFrame(poseAll)}
+function invalidate(){dirty=true;schedule()}
 document.addEventListener('scroll',function(e){
   var tr=e.target;
   if(!tr||!tr.classList||!tr.classList.contains('pc-scroll-track')) return;
-  hot.add(tr);schedule();
-  clearTimeout(idleT);
-  idleT=setTimeout(function(){hot.forEach(function(x){x.classList.remove('mo-sc')});hot.clear();lastT=0;bad=0},160);
+  schedule();clearTimeout(idleT);idleT=setTimeout(function(){lastT=0;bad=0},160);
 },{capture:true,passive:true});
-window.addEventListener('resize',schedule,{passive:true});
-window.addEventListener('orientationchange',schedule,{passive:true});
-window.addEventListener('load',function(){schedule();setTimeout(schedule,600);setTimeout(schedule,1800)});
-if(document.readyState!=='loading') schedule(); else document.addEventListener('DOMContentLoaded',schedule);
+window.addEventListener('resize',invalidate,{passive:true});
+window.addEventListener('orientationchange',invalidate,{passive:true});
+window.addEventListener('load',function(){invalidate();setTimeout(invalidate,600);setTimeout(invalidate,1800)});
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(invalidate);
+if(document.readyState!=='loading') invalidate(); else document.addEventListener('DOMContentLoaded',invalidate);
 var host=document.querySelector('.pricing-cards');
 if(host&&window.MutationObserver) new MutationObserver(function(m){
-  for(var i=0;i<m.length;i++){var t=m[i].target;if(t.matches&&t.matches('.pricing-cards,.pc-scroll-shell,.pc-scroll-track')){schedule();break}}
+  for(var i=0;i<m.length;i++){var t=m[i].target;if(t.matches&&t.matches('.pricing-cards,.pc-scroll-shell,.pc-scroll-track')){invalidate();break}}
 }).observe(host,{childList:true,subtree:true});
-/* ---------- 2. Card -> panel morph (FLIP, transform/opacity only, runs on the compositor) ---------- */
+/* ---------- 2. Card <-> panel morph: the REAL panel flies out of / back into its card (uniform scale, no ghost, no flash) ---------- */
 var cardRect=null,cardEl=null;
-function clean(){document.querySelectorAll('.mo-shell,.mo-sheet,.mo-dim').forEach(function(n){n.remove()})}
 function watch(ms){
   var t0=0,last=0,n=0,b=0;
   requestAnimationFrame(function f(t){
@@ -22490,7 +22496,12 @@ function watch(ms){
     if(t-t0<ms) requestAnimationFrame(f); else if(n>6&&b/n>.3) setLite();
   });
 }
-function xf(r,b){return 'translate('+(r.left-b.left).toFixed(1)+'px,'+(r.top-b.top).toFixed(1)+'px) scale('+(r.width/b.width).toFixed(4)+','+(r.height/b.height).toFixed(4)+')'}
+function fly(panel,r){
+  var pr=panel.getBoundingClientRect();
+  if(!r||!r.width||!pr.width||!pr.height) return null;
+  var s=Math.max(.2,Math.min(1,r.width/pr.width));
+  return 'translate3d('+(r.left+r.width/2-pr.left-pr.width/2).toFixed(1)+'px,'+(r.top+r.height/2-pr.top-pr.height/2).toFixed(1)+'px,0) scale('+s.toFixed(4)+')';
+}
 document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('.pc-toggle-btn');if(!b) return;
   cardEl=b.closest('.pc-card');cardRect=cardEl?cardEl.getBoundingClientRect():null;
@@ -22500,41 +22511,34 @@ document.addEventListener('click',function(e){
   var scrim=document.getElementById('pcModalScrim');
   if(!scrim||!scrim.classList.contains('open')) return;
   var panel=scrim.querySelector('.pc-accordion-body');if(!panel) return;
-  clean();
-  var pr=panel.getBoundingClientRect(),L=lite();
-  if(!L&&cardRect&&cardRect.width>0&&pr.width>0&&pr.height>0){
-    var cs=getComputedStyle(cardEl),sh=document.createElement('div');
-    sh.className='mo-shell';sh.setAttribute('aria-hidden','true');
-    sh.style.cssText='width:'+pr.width+'px;height:'+pr.height+'px;left:'+pr.left+'px;top:'+pr.top+'px;background:'+cs.backgroundImage+','+cs.backgroundColor+';';
-    document.body.appendChild(sh);
-    var ez='cubic-bezier(.16,1,.3,1)',gone=function(){sh.remove()};
-    sh.animate([{transform:xf(cardRect,pr)},{transform:'none'}],{duration:360,easing:ez});
-    sh.animate([{opacity:1},{opacity:0}],{duration:170,delay:190,easing:'ease-out',fill:'both'}).onfinish=gone;
-    setTimeout(gone,700);
-    panel.animate([{opacity:0,transform:'translate3d(0,10px,0)'},{opacity:1,transform:'none'}],{duration:240,delay:130,easing:'ease-out',fill:'backwards'});
+  var L=lite(),T=L?null:fly(panel,cardRect);
+  if(T){
+    panel.animate([{transform:T,opacity:0,offset:0},{opacity:1,offset:.4},{transform:'none',opacity:1,offset:1}],
+      {duration:380,easing:'cubic-bezier(.16,1,.3,1)'});
+    watch(460);
   }else{
-    panel.animate([{opacity:0,transform:'translate3d(0,14px,0)'},{opacity:1,transform:'none'}],{duration:180,easing:'ease-out'});
+    panel.animate([{opacity:0},{opacity:1}],{duration:160,easing:'ease-out'});
   }
-  if(!L) watch(460);
 },false);
-/* close: panel is swapped back instantly by the page, so a light empty glass sheet flies back to the card */
-window.pcCineExit=function(panel){
-  if(!canWAAPI||!panel||lite()) return;
-  var card=panel._pcHomeCard,scrim=document.getElementById('pcModalScrim');
-  if(!card||!scrim||!scrim.classList.contains('open')) return;
-  clean();
-  var pr=panel.getBoundingClientRect(),cr=card.getBoundingClientRect();
-  if(!pr.width||!cr.width) return;
-  var dim=document.createElement('div');dim.className='mo-dim';dim.setAttribute('aria-hidden','true');
-  var sh=document.createElement('div');sh.className='mo-sheet';sh.setAttribute('aria-hidden','true');
-  var ac=getComputedStyle(panel).getPropertyValue('--pc-accent');if(ac) sh.style.setProperty('--pc-accent',ac);
-  sh.style.cssText+='width:'+pr.width+'px;height:'+pr.height+'px;left:'+pr.left+'px;top:'+pr.top+'px;';
-  document.body.appendChild(dim);document.body.appendChild(sh);
-  var gone=function(){dim.remove();sh.remove()};
-  dim.animate([{opacity:1},{opacity:0}],{duration:260,easing:'ease-out',fill:'forwards'});
-  sh.animate([{transform:'none'},{transform:xf(cr,pr)}],{duration:300,easing:'cubic-bezier(.32,.72,.2,1)',fill:'forwards'});
-  sh.animate([{opacity:1},{opacity:0}],{duration:140,delay:170,fill:'both'}).onfinish=gone;
-  setTimeout(gone,600);
+/* close: the page's own close is deferred until the real panel has flown back into its card */
+window.pcCineExit=function(){};
+window.moAnimClose=function(card,done){
+  var scrim=document.getElementById('pcModalScrim'),panel=scrim&&scrim.querySelector('.pc-accordion-body');
+  if(!canWAAPI||!scrim||!panel||lite()){done();return}
+  var r=card.getBoundingClientRect(),T=fly(panel,r);
+  if(!T){done();return}
+  scrim.style.pointerEvents='none';
+  var a=[
+    panel.animate([{transform:'none',opacity:1,offset:0},{opacity:1,offset:.25},{transform:T,opacity:0,offset:1}],
+      {duration:300,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'}),
+    scrim.animate([{opacity:1},{opacity:0}],{duration:300,easing:'ease-in',fill:'forwards'})
+  ],fin=false;
+  function end(){
+    if(fin) return;fin=true;
+    a.forEach(function(x){try{x.cancel()}catch(_){}});
+    scrim.style.pointerEvents='';done();
+  }
+  a[0].onfinish=end;setTimeout(end,360);
 };
 })();
 </script>
