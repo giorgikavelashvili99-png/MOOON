@@ -22406,5 +22406,137 @@ html.perf-scrolling .ttdl-glass{animation-play-state:paused!important}
   document.addEventListener('click', scheduleScan, { passive:true, capture:true });
 })();
 </script>
+<style id="moMorphCss">
+/* ===== MOON glass-carousel morph (reference: TikTok "Glassy Carousel") =====
+   Compositor-only: transform + opacity. No filter / backdrop-filter / layout work per frame. */
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track{perspective:1100px;perspective-origin:50% 45%}
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide:not(.mo-n){
+  transform:var(--mo-t,none)!important;opacity:var(--mo-o,1)!important;
+  transition:none!important;filter:none!important;transform-origin:50% 50%}
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide:not(.mo-n)::after{
+  opacity:var(--mo-d,0)!important;transition:none!important}
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track.mo-sc > .pc-slide:not(.mo-n){will-change:transform,opacity!important}
+.mo-shell,.mo-sheet{position:fixed;left:0;top:0;margin:0;pointer-events:none;transform-origin:0 0;
+  border-radius:24px;z-index:66;contain:layout paint style}
+.mo-shell{box-shadow:0 18px 44px rgba(0,0,0,.42)}
+.mo-sheet{background:linear-gradient(180deg,#17171b,#0b0b0e);
+  border:1px solid color-mix(in srgb,var(--pc-accent,#22c3ff) 38%,rgba(255,255,255,.1));
+  box-shadow:0 18px 44px rgba(0,0,0,.5)}
+.mo-dim{position:fixed;inset:0;z-index:65;pointer-events:none;background:rgba(4,5,10,.92)}
+@media (prefers-reduced-motion:reduce){.mo-shell,.mo-sheet,.mo-dim{display:none!important}}
+</style>
+<script id="moMorphJs">
+(function(){
+'use strict';
+if(window.__moMorph) return; window.__moMorph=1;
+var root=document.documentElement, mq=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)');
+var canWAAPI=typeof Element!=='undefined'&&!!Element.prototype.animate;
+function flagged(){try{return sessionStorage.getItem('moLite')==='1'}catch(e){return false}}
+function setLite(){root.classList.add('moon-lite');try{sessionStorage.setItem('moLite','1')}catch(e){}}
+function lite(){
+  var c=navigator.connection;
+  return !!((mq&&mq.matches)||root.classList.contains('low-power')||root.classList.contains('moon-lite')||flagged()||
+    (c&&c.saveData)||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2));
+}
+/* ---------- 1. 3D glass carousel: one rAF per scroll tick, reads first, writes after ---------- */
+var raf=0,idleT=0,lastT=0,bad=0,hot=new Set();
+function poseTrack(track,L){
+  var kids=track.children,sl=[],i,s;
+  for(i=0;i<kids.length;i++) if(kids[i].classList.contains('pc-slide')) sl.push(kids[i]);
+  if(!sl.length) return;
+  var cw=track.clientWidth,mid=track.scrollLeft+cw/2,off=sl[0].offsetParent===track?0:track.offsetLeft,
+      w=sl.length>1?Math.abs(sl[1].offsetLeft-sl[0].offsetLeft):sl[0].offsetWidth+16,ds=new Array(sl.length);
+  if(!w) return;
+  for(i=0;i<sl.length;i++) ds[i]=(sl[i].offsetLeft-off+sl[i].offsetWidth/2-mid)/w;
+  for(i=0;i<sl.length;i++){
+    s=sl[i];var d=ds[i],a=Math.min(Math.abs(d),2),sc=1-.09*a,
+      ry=L?0:Math.max(-48,Math.min(48,-d*34)),
+      t='rotateY('+ry.toFixed(1)+'deg) scale('+sc.toFixed(3)+')',
+      o=(1-.34*Math.min(a,1.5)).toFixed(2),dm=(Math.min(a,1)*.3).toFixed(2),k=t+o+dm;
+    if(s._mo!==k){s._mo=k;s.style.setProperty('--mo-t',t);s.style.setProperty('--mo-o',o);s.style.setProperty('--mo-d',dm)}
+  }
+}
+function poseAll(t){
+  raf=0;
+  if(t&&lastT&&t-lastT>40&&t-lastT<400&&++bad>=14) setLite();
+  lastT=t||0;
+  var L=lite();
+  document.querySelectorAll('.pc-scroll-track').forEach(function(tr){poseTrack(tr,L)});
+  hot.forEach(function(tr){tr.classList.add('mo-sc')});
+}
+function schedule(){if(!raf) raf=requestAnimationFrame(poseAll)}
+document.addEventListener('scroll',function(e){
+  var tr=e.target;
+  if(!tr||!tr.classList||!tr.classList.contains('pc-scroll-track')) return;
+  hot.add(tr);schedule();
+  clearTimeout(idleT);
+  idleT=setTimeout(function(){hot.forEach(function(x){x.classList.remove('mo-sc')});hot.clear();lastT=0;bad=0},160);
+},{capture:true,passive:true});
+window.addEventListener('resize',schedule,{passive:true});
+window.addEventListener('orientationchange',schedule,{passive:true});
+window.addEventListener('load',function(){schedule();setTimeout(schedule,600);setTimeout(schedule,1800)});
+if(document.readyState!=='loading') schedule(); else document.addEventListener('DOMContentLoaded',schedule);
+var host=document.querySelector('.pricing-cards');
+if(host&&window.MutationObserver) new MutationObserver(function(m){
+  for(var i=0;i<m.length;i++){var t=m[i].target;if(t.matches&&t.matches('.pricing-cards,.pc-scroll-shell,.pc-scroll-track')){schedule();break}}
+}).observe(host,{childList:true,subtree:true});
+/* ---------- 2. Card -> panel morph (FLIP, transform/opacity only, runs on the compositor) ---------- */
+var cardRect=null,cardEl=null;
+function clean(){document.querySelectorAll('.mo-shell,.mo-sheet,.mo-dim').forEach(function(n){n.remove()})}
+function watch(ms){
+  var t0=0,last=0,n=0,b=0;
+  requestAnimationFrame(function f(t){
+    if(!t0){t0=last=t}else{n++;if(t-last>34)b++;last=t}
+    if(t-t0<ms) requestAnimationFrame(f); else if(n>6&&b/n>.3) setLite();
+  });
+}
+function xf(r,b){return 'translate('+(r.left-b.left).toFixed(1)+'px,'+(r.top-b.top).toFixed(1)+'px) scale('+(r.width/b.width).toFixed(4)+','+(r.height/b.height).toFixed(4)+')'}
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.pc-toggle-btn');if(!b) return;
+  cardEl=b.closest('.pc-card');cardRect=cardEl?cardEl.getBoundingClientRect():null;
+},true);
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.pc-toggle-btn');if(!b||!canWAAPI) return;
+  var scrim=document.getElementById('pcModalScrim');
+  if(!scrim||!scrim.classList.contains('open')) return;
+  var panel=scrim.querySelector('.pc-accordion-body');if(!panel) return;
+  clean();
+  var pr=panel.getBoundingClientRect(),L=lite();
+  if(!L&&cardRect&&cardRect.width>0&&pr.width>0&&pr.height>0){
+    var cs=getComputedStyle(cardEl),sh=document.createElement('div');
+    sh.className='mo-shell';sh.setAttribute('aria-hidden','true');
+    sh.style.cssText='width:'+pr.width+'px;height:'+pr.height+'px;left:'+pr.left+'px;top:'+pr.top+'px;background:'+cs.backgroundImage+','+cs.backgroundColor+';';
+    document.body.appendChild(sh);
+    var ez='cubic-bezier(.16,1,.3,1)',gone=function(){sh.remove()};
+    sh.animate([{transform:xf(cardRect,pr)},{transform:'none'}],{duration:360,easing:ez});
+    sh.animate([{opacity:1},{opacity:0}],{duration:170,delay:190,easing:'ease-out',fill:'both'}).onfinish=gone;
+    setTimeout(gone,700);
+    panel.animate([{opacity:0,transform:'translate3d(0,10px,0)'},{opacity:1,transform:'none'}],{duration:240,delay:130,easing:'ease-out',fill:'backwards'});
+  }else{
+    panel.animate([{opacity:0,transform:'translate3d(0,14px,0)'},{opacity:1,transform:'none'}],{duration:180,easing:'ease-out'});
+  }
+  if(!L) watch(460);
+},false);
+/* close: panel is swapped back instantly by the page, so a light empty glass sheet flies back to the card */
+window.pcCineExit=function(panel){
+  if(!canWAAPI||!panel||lite()) return;
+  var card=panel._pcHomeCard,scrim=document.getElementById('pcModalScrim');
+  if(!card||!scrim||!scrim.classList.contains('open')) return;
+  clean();
+  var pr=panel.getBoundingClientRect(),cr=card.getBoundingClientRect();
+  if(!pr.width||!cr.width) return;
+  var dim=document.createElement('div');dim.className='mo-dim';dim.setAttribute('aria-hidden','true');
+  var sh=document.createElement('div');sh.className='mo-sheet';sh.setAttribute('aria-hidden','true');
+  var ac=getComputedStyle(panel).getPropertyValue('--pc-accent');if(ac) sh.style.setProperty('--pc-accent',ac);
+  sh.style.cssText+='width:'+pr.width+'px;height:'+pr.height+'px;left:'+pr.left+'px;top:'+pr.top+'px;';
+  document.body.appendChild(dim);document.body.appendChild(sh);
+  var gone=function(){dim.remove();sh.remove()};
+  dim.animate([{opacity:1},{opacity:0}],{duration:260,easing:'ease-out',fill:'forwards'});
+  sh.animate([{transform:'none'},{transform:xf(cr,pr)}],{duration:300,easing:'cubic-bezier(.32,.72,.2,1)',fill:'forwards'});
+  sh.animate([{opacity:1},{opacity:0}],{duration:140,delay:170,fill:'both'}).onfinish=gone;
+  setTimeout(gone,600);
+};
+})();
+</script>
 </body>
 </html>
