@@ -20976,8 +20976,9 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       shell.classList.add('tt-wait');
       const io = new IntersectionObserver(es => {
         if (es.some(e => e.isIntersecting)){ io.disconnect(); shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }
-      }, { threshold: 0.12 });
+      }, { threshold: 0.01, rootMargin: '0px 0px 18% 0px' });
       io.observe(shell);
+    } else if (!reduce){
       setTimeout(function(){ shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }, 2500);
     }
     setTimeout(function(){ shell.classList.add('tt-done'); }, 4500);
@@ -22562,6 +22563,12 @@ window.moAnimClose=function(card,done){
 
 .pricing-cards.pc-scroll-mode .pc-card,
 .pricing-cards.pc-scroll-mode .pc-card *{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+/* TikTok ბლოკი: overflow:clip-ს ვერ გადაწევს ვერც ტექსტის მონიშვნა, ვერც ფოკუსი (hidden-ს შეუძლია) */
+body .ttdl-shell,.ttdl-aurora{ overflow:clip !important; }
+/* TikTok intro: ფენები წინასწარ მზადაა, ამიტომ შესვლისას არაფერი იქმნება სქროლის დროს; ანიმაცია იგივეა */
+body .ttdl-shell:not(.tt-done){ will-change:transform,opacity; }
+body .ttdl-shell:not(.tt-done)::before{ will-change:transform; }
+.ttdl-aurora i{ will-change:transform; }
 </style>
 </body>
 </html>
