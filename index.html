@@ -7824,7 +7824,7 @@ body .pc-card{
 body .pc-card>.pc-stars,body .pc-card>.pc-cine-glint{border-radius:inherit}
 /* order button: no arrow (→) ever appears on hover; the button itself still lifts / shines */
 body .pc-card .pc-toggle-btn::after,
-body .pc-slide--active .pc-toggle-btn:hover::after{content:none!important;display:none!important;width:0!important;opacity:0!important}
+body .pc-slide--active .pc-toggle-btn:hover::after{content:none!important;display:none!important;width:0!important}
 /* ===== feature icons: slim ring + crisp vector tick / cross (no more flat blobs with a font glyph) ===== */
 body .pc-feature .pc-check{
   font-size:0!important;color:transparent!important;border:0!important;border-radius:50%;
@@ -23818,7 +23818,7 @@ html body .pricing-cards.pc-scroll-mode .pc-slide--active > .pc-card-wrap::after
 html body .pc-card, html body .pc-card *, html body .pc-card *::before, html body .pc-card *::after,
 html body .pc-card-wrap, html body .pc-card-wrap *,
 html body .pc-modal-scrim .pc-accordion-body, html body .pc-modal-scrim .pc-accordion-body *{text-shadow:none!important}
-html body .pc-card :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-line b,.pc-feature,.pc-check,.pc-toggle-btn),
+html body .pc-card :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-line b,.pc-feature,.pc-check),
 html body .pc-card-wrap > :not(.pc-card){filter:none!important}
 
 /* ===== MOON INTRO: the next scene ("აირჩიე პაკეტი" + package cards) was pre-warmed behind the logo at 1.2% opacity,
@@ -23933,7 +23933,7 @@ html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn,
 html body .pc-modal-scrim .order-btn.chat.chat:not(.processing){
   position:relative; isolation:isolate; display:flex!important; align-items:center; justify-content:center; gap:10px;
   box-sizing:border-box; overflow:visible!important; border-radius:999px!important;
-  scale:none!important; filter:brightness(.84) saturate(1.04)!important; text-shadow:none!important;
+  scale:none!important; filter:brightness(1) saturate(1) drop-shadow(0 0 0 transparent) drop-shadow(0 0 0 transparent); text-shadow:none!important;
   transition:box-shadow .35s ease,transform .15s ease,filter .35s ease!important;
   -webkit-tap-highlight-color:transparent;
 }
@@ -23955,7 +23955,7 @@ html body .pc-modal-scrim .order-btn.chat.chat:not(.processing):active{transform
 @media (hover:hover){
 html body .pc-slide--active .pc-toggle-btn.pc-toggle-btn:hover,
 html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn:not(:disabled):hover,
-html body .pc-modal-scrim .order-btn.chat.chat:not(.processing):not(:disabled):hover{filter:brightness(1.05) saturate(1.08)!important;box-shadow:none!important}
+html body .pc-modal-scrim .order-btn.chat.chat:not(.processing):not(:disabled):hover{box-shadow:none!important}
 html body .pc-slide--active .pc-toggle-btn.pc-toggle-btn:hover::before,
 html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn:not(:disabled):hover::before,
 html body .pc-modal-scrim .order-btn.chat.chat:not(.processing):not(:disabled):hover::before{animation:spTwinkle 1.7s ease-in-out infinite!important}
@@ -23972,7 +23972,7 @@ html body .pc-modal-scrim .order-btn.chat.chat:not(.processing)::before{animatio
 
 /* clean-up: no texture dots/stripes, no drop shadows, no glow filters, no icon animation on the card button */
 html body .grain,html body .bg-layer .grain,body .ttdl-aurora::after{display:none!important}
-html body .pc-slide .pc-toggle-btn.pc-toggle-btn::before{display:none!important;content:none!important;animation:none!important}
+
 html body :is(.dg-dot,.dg-logo,#moonIntro .mx-logo,.discord-btn){filter:none!important}
 html body .pc-slide .pc-toggle-btn.pc-toggle-btn,
 html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn,
@@ -23995,6 +23995,58 @@ html body .pc-slide.pc-pre :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-pr
    Releasing the per-piece layers when the intro ended (~2s) re-rasterized icon/title/price = the visible hop/shrink. ===== */
 html body .pricing-cards.pc-scroll-mode .pc-slide.pc-slide{will-change:opacity!important}
 html body .pc-slide.pc-slide:is(.pc-pre,.pc-in,.pc-slide--active,.pc-slide) :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-feature .pc-check,.pc-toggle-btn){will-change:auto!important}
+
+
+/* ===== "Generate Site" style: glow halo + drifting star dots + twinkling sparkle on hover (card order / confirm / send order) =====
+   original colour (not darkened). Only opacity + a short filter transition, so it never stutters. */
+@keyframes spDots{0%,100%{opacity:.35}50%{opacity:1}}
+html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn::after,
+html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn.wizard-confirm-btn::after,
+html body .pc-modal-scrim .order-btn.chat.chat.chat:not(.processing)::after{
+  content:""!important;display:block!important;position:absolute!important;inset:-12px -18px!important;width:auto!important;height:auto!important;
+  margin:0!important;border-radius:999px!important;pointer-events:none!important;z-index:3;transform:none!important;box-shadow:none!important;
+  background:
+    radial-gradient(2.6px 2.6px at 9% 30%,rgba(255,255,255,.95),transparent 70%),
+    radial-gradient(2.2px 2.2px at 21% 84%,rgba(255,255,255,.8),transparent 70%),
+    radial-gradient(2.4px 2.4px at 37% 12%,rgba(255,255,255,.85),transparent 70%),
+    radial-gradient(2.2px 2.2px at 52% 90%,rgba(255,255,255,.75),transparent 70%),
+    radial-gradient(2.6px 2.6px at 66% 8%,rgba(255,255,255,.9),transparent 70%),
+    radial-gradient(2.2px 2.2px at 80% 82%,rgba(255,255,255,.8),transparent 70%),
+    radial-gradient(2.5px 2.5px at 93% 34%,rgba(255,255,255,.9),transparent 70%)!important;
+  opacity:0;transition:opacity .4s ease!important;animation:none}
+@media (hover:hover) and (pointer:fine){
+  html body .pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:hover,
+  html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn.wizard-confirm-btn:not(:disabled):hover,
+  html body .pc-modal-scrim .order-btn.chat.chat.chat:not(.processing):not(:disabled):hover{
+    filter:brightness(1.08) saturate(1.1) drop-shadow(0 0 8px color-mix(in srgb,var(--pc-accent,#22c55e) 85%,transparent)) drop-shadow(0 0 24px color-mix(in srgb,var(--pc-accent,#22c55e) 55%,transparent));animation:spPop .42s cubic-bezier(.2,.9,.3,1)}
+  html body .pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:hover::after,
+  html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn.wizard-confirm-btn:not(:disabled):hover::after,
+  html body .pc-modal-scrim .order-btn.chat.chat.chat:not(.processing):not(:disabled):hover::after{opacity:1;animation:spDots 2.2s ease-in-out infinite!important}
+}
+@media (hover:none){
+  html body .pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn::after,
+  html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn.wizard-confirm-btn::after,
+  html body .pc-modal-scrim .order-btn.chat.chat.chat:not(.processing)::after{opacity:.8;animation:spDots 2.8s ease-in-out infinite!important}
+}
+/* switching cards must not freeze these animations */
+html.pc-moving .pc-toggle-btn::before,html.pc-moving .pc-toggle-btn::after,
+html.pc-modal-on .wizard-confirm-btn::before,html.pc-modal-on .wizard-confirm-btn::after{animation-play-state:running!important}
+
+/* instant hover response + no sparkle sign inside the order window buttons */
+html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn,
+html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn.wizard-confirm-btn,
+html body .pc-modal-scrim .order-btn.chat.chat.chat:not(.processing){transition:filter .28s ease-out,transform .12s ease!important}
+html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn::after,
+html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn.wizard-confirm-btn::after,
+html body .pc-modal-scrim .order-btn.chat.chat.chat:not(.processing)::after{transition:opacity .12s ease-out!important}
+html body .pc-modal-scrim .wizard-confirm-btn.wizard-confirm-btn.wizard-confirm-btn::before,
+html body .pc-modal-scrim .order-btn.chat.chat.chat:not(.processing)::before{display:none!important;content:none!important}
+
+@keyframes spPop{
+  0%{filter:brightness(1) saturate(1) drop-shadow(0 0 0 transparent) drop-shadow(0 0 0 transparent)}
+  40%{filter:brightness(1.32) saturate(1.2) drop-shadow(0 0 12px color-mix(in srgb,var(--pc-accent,#22c55e) 95%,transparent)) drop-shadow(0 0 36px color-mix(in srgb,var(--pc-accent,#22c55e) 70%,transparent))}
+  100%{filter:brightness(1.08) saturate(1.1) drop-shadow(0 0 8px color-mix(in srgb,var(--pc-accent,#22c55e) 85%,transparent)) drop-shadow(0 0 24px color-mix(in srgb,var(--pc-accent,#22c55e) 55%,transparent))}
+}
 /* contact window: the blurred backdrop re-drew the bar underneath (text smeared / drifted a little), and pressed links
    scaled down. Now the scrim only dims (no blur) and links never scale, so the bar stays pixel-identical. */
 html body .mn-modal .mn-modal-scrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(2,2,4,.8)!important}
