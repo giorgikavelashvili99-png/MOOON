@@ -22344,7 +22344,7 @@ html body .dg-intro-btn:hover{box-shadow:0 0 18px -2px rgba(124,143,255,.55)!imp
    4) glass blur behind overlays removed (very expensive); overlays are already ~95% opaque
    5) animations of blocks that are off screen are paused (script below)
    =================================================================== */
-@keyframes pcCineIn{0%{opacity:0}100%{opacity:1}}
+@keyframes pcCineIn{0%{opacity:0}} /* ends on each card's own opacity (dimmed side cards stay dimmed; an explicit 100%{opacity:1} lit them up, then they snapped dark) */
 @keyframes pcCinePanelIn{0%{opacity:0;transform:translate3d(var(--cine-dx,0px),var(--cine-dy,70px),0) scale(.45)}60%{opacity:1;transform:translate3d(0,0,0) scale(1.02)}100%{opacity:1;transform:none}}
 @keyframes pcCinePanelOut{to{opacity:0;transform:translate3d(var(--cine-dx,0px),var(--cine-dy,40px),0) scale(.5)}}
 @keyframes ttFlow{0%,100%{opacity:1}50%{opacity:.8}}
@@ -23825,6 +23825,11 @@ html body .pc-card-wrap > :not(.pc-card){filter:none!important}
    The bar stays hidden until the page is really on screen (boot cover, Discord gate and the MOON intro all gone),
    then drops in the same way the menu opens (same cubic-bezier), followed by its parts. Played again whenever the
    site is revealed (after the intro or the gate closes). opacity + translate/scale only -> compositor, no layout. */
+/* the bar is centred with a negative margin instead of translateX(-50%) (no transform at all), and every time the browser re-drew it - when the entrance ended, or a
+   link was pressed - the whole bar and its text shifted by a pixel. It also keeps one permanent GPU layer (and so do
+   its links, which shrink a little when pressed), so nothing is ever re-drawn at a different spot. */
+html body .mn-glass{left:50%;margin-left:calc(min(calc(100vw - 20px),820px) / -2);transform:none!important;will-change:opacity}
+html body .mn-glass .mn-link{will-change:transform}
 html.mn-nav-wait body .mn-glass{opacity:0;pointer-events:none;animation:mnNavFailsafe .01s linear 14s forwards}
 @keyframes mnNavFailsafe{to{opacity:1;pointer-events:auto}}
 /* one single, calm motion: the bar fades in while it slides down into its own place (top 8px) and stops there.
