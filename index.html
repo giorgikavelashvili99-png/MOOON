@@ -5,7 +5,7 @@ var rows=[],t0=0;function sel(n){if(!n||!n.tagName)return'?';var s=n.tagName.toL
 function r(x){return Math.round(x*10)/10}
 var po=new PerformanceObserver(function(l){l.getEntries().forEach(function(e){if(e.hadRecentInput)return;(e.sources||[]).forEach(function(s){if(s.node&&s.node.id==='moonShiftDbg')return;var a=s.previousRect,b=s.currentRect;rows.push(Math.round(e.startTime)+'ms '+sel(s.node)+'  dx='+r(b.x-a.x)+' dy='+r(b.y-a.y)+' dw='+r(b.width-a.width)+' dh='+r(b.height-a.height))})});draw()});
 po.observe({type:'layout-shift',buffered:true});
-var box;function draw(){if(!document.body)return;if(!box){box=document.createElement('pre');box.id='moonShiftDbg';box.style.setProperty('content-visibility','visible','important');box.style.setProperty('visibility','visible','important');box.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow:auto;margin:0;padding:8px;background:rgba(0,0,0,.92);color:#0f0;font:11px/1.35 monospace;z-index:2147483647;white-space:pre-wrap;visibility:visible';document.body.appendChild(box)}box.textContent='SHIFTDEBUG build 13 | EVENTS ('+rows.length+')\n'+rows.slice(-60).join('\n')}
+var box;function draw(){if(!document.body)return;if(!box){box=document.createElement('pre');box.id='moonShiftDbg';box.style.setProperty('content-visibility','visible','important');box.style.setProperty('visibility','visible','important');box.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:30vh;overflow:hidden;pointer-events:none;margin:0;padding:8px;background:rgba(0,0,0,.92);color:#0f0;font:11px/1.35 monospace;z-index:2147483647;white-space:pre-wrap;visibility:visible';document.body.appendChild(box)}box.textContent='SHIFTDEBUG build 14 | EVENTS ('+rows.length+')\n'+rows.slice(-16).join('\n')}
 document.addEventListener('DOMContentLoaded',draw);
 var T0=performance.now(),last={};
 function samp(){try{var sl=document.querySelector('.pc-slide--active');if(sl){[['card','.pc-card'],['icon','.pc-icon'],['title','.pc-title'],['desc','.pc-desc'],['price','.pc-price-line'],['note','.pc-price-note'],['btn','.pc-toggle-btn'],['wrap','.pc-card-wrap']].forEach(function(p){var e=sl.querySelector(p[1]);if(!e)return;var q=e.getBoundingClientRect(),cs=getComputedStyle(e),k=[r(q.x),r(q.y),r(q.width),r(q.height)].join(',')+'|'+cs.fontSize+'|'+cs.rotate+'|'+cs.scale+'|'+cs.transform.slice(0,30)+'|'+cs.visibility;if(last[p[0]]!==undefined&&last[p[0]]!==k&&cs.visibility==='visible'&&last[p[0]].slice(-7)==='visible')rows.push(Math.round(performance.now()-T0)+'ms MOVE '+p[0]+' '+last[p[0]]+'  ->  '+k);last[p[0]]=k})}}catch(e){}
@@ -24003,6 +24003,10 @@ html body .pc-slide--active .pc-toggle-btn.pc-toggle-btn:active{transform:scale(
 /* ===== card content: no per-item motion/size animation; content is simply there with the card ===== */
 html body .pc-slide.pc-in :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-feature .pc-check,.pc-toggle-btn){animation:none!important;transform:none!important}
 html body .pc-slide.pc-pre :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-toggle-btn){opacity:1!important}
+
+/* ===== card layer stays the same before/after its fade-in: no re-raster "hop" when the animation ends ===== */
+html body .pricing-cards .pc-slide{will-change:opacity!important;backface-visibility:hidden}
+html body .pricing-cards .pc-slide .pc-card{backface-visibility:hidden}
 /* contact window: the blurred backdrop re-drew the bar underneath (text smeared / drifted a little), and pressed links
    scaled down. Now the scrim only dims (no blur) and links never scale, so the bar stays pixel-identical. */
 html body .mn-modal .mn-modal-scrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(2,2,4,.8)!important}
@@ -24078,4 +24082,4 @@ html body .mn-links .mn-ind{transform:none;will-change:auto;
 })();
 </script>
 </body>
-</html>>
+</html>
