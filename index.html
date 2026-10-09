@@ -23358,7 +23358,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     if(!a||!a.offsetWidth){ ind.style.opacity='0'; return; }
     if(instant){ ind.style.transition='none'; }
     ind.style.width=a.offsetWidth+'px';
-    ind.style.transform='translate3d('+a.offsetLeft+'px,0,0)';
+    ind.style.left=a.offsetLeft+'px';
     ind.style.opacity='1';
     if(instant){ void ind.offsetWidth; ind.style.transition=''; }
   }
@@ -23827,26 +23827,24 @@ html body .pc-card-wrap > :not(.pc-card){filter:none!important}
    site is revealed (after the intro or the gate closes). opacity + translate/scale only -> compositor, no layout. */
 html.mn-nav-wait body .mn-glass{opacity:0;pointer-events:none;animation:mnNavFailsafe .01s linear 14s forwards}
 @keyframes mnNavFailsafe{to{opacity:1;pointer-events:auto}}
-html.mn-nav-play body .mn-glass{animation:mnNavIn .8s cubic-bezier(.16,1,.3,1) both}
-html.mn-nav-play body .mn-glass .mn-brand{animation:mnNavPart .7s cubic-bezier(.16,1,.3,1) .12s both}
-html.mn-nav-play body .mn-glass .mn-right{animation:mnNavPart .7s cubic-bezier(.16,1,.3,1) .2s both}
-html.mn-nav-play body .mn-glass .mn-links{animation:mnNavLinks .75s cubic-bezier(.16,1,.3,1) .26s both}
-html.mn-nav-play body .mn-glass .mn-links .mn-link{animation:mnNavLink .6s cubic-bezier(.16,1,.3,1) both}
-html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(1){animation-delay:.34s}
-html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(2){animation-delay:.40s}
-html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(3){animation-delay:.46s}
-html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(4){animation-delay:.52s}
-html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(n+5){animation-delay:.58s}
-html.mn-nav-play body .mn-glass .mn-ind{animation:mnNavInd .55s ease-out .42s backwards}
-@keyframes mnNavIn{from{opacity:0;translate:0 -22px;scale:.97}}
-@keyframes mnNavPart{from{opacity:0;translate:0 -10px}}
-@keyframes mnNavLinks{from{opacity:0;scale:.94}}
-@keyframes mnNavLink{from{opacity:0;translate:0 8px}}
-@keyframes mnNavInd{from{opacity:0}}
+/* one single, calm motion: the bar fades in while it slides down into its own place (top 8px) and stops there.
+   `top` is used instead of transform/translate on purpose: with the 115% page zoom some browsers draw a transformed
+   layer at a slightly different spot than the finished one, so the bar visibly jumped after the animation.
+   Its contents only fade in (no movement of their own). */
+html.mn-nav-play body .mn-glass{animation:mnNavIn .7s cubic-bezier(.16,1,.3,1) both}
+html.mn-nav-play body .mn-glass .mn-brand{animation:mnNavFade .5s ease .12s both}
+html.mn-nav-play body .mn-glass .mn-links{animation:mnNavFade .5s ease .2s both}
+html.mn-nav-play body .mn-glass .mn-right{animation:mnNavFade .5s ease .28s both}
+@keyframes mnNavIn{from{opacity:0;top:-16px}}
+@keyframes mnNavFade{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){
-  html.mn-nav-play body .mn-glass, html.mn-nav-play body .mn-glass *{animation:mnNavFade .3s ease both!important}
-  @keyframes mnNavFade{from{opacity:0}}
+  html.mn-nav-play body .mn-glass, html.mn-nav-play body .mn-glass :is(.mn-brand,.mn-links,.mn-right){animation:mnNavFade .3s ease both!important}
 }
+
+/* sliding pill under the active nav link (contact etc.): same slide, but it now stops exactly on the link
+   (the old springy curve shot past it and came back) and it moves with `left`, which stays correct under the zoom */
+html body .mn-links .mn-ind{transform:none;will-change:auto;
+  transition:left .45s cubic-bezier(.16,1,.3,1),width .45s cubic-bezier(.16,1,.3,1),opacity .2s ease}
 </style>
 <script id="moon-fix-oct-js">
 (function(){
