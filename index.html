@@ -21661,7 +21661,7 @@ html .pc-modal-scrim .order-btn.chat:not(.processing){
   background:#fff !important; color:#0b0b0e !important; border:0 !important;
   border-radius:14px; min-height:56px; font-size:16px; font-weight:800; box-shadow:none;
 }
-html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ background:#f0f0f3 !important; transform:none; }
+html .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover{ background:#f0f0f3 !important; transform:none; }
 html .pc-modal-scrim .order-btn.chat:not(.processing) .ico svg{ stroke:#0b0b0e; }
 
 html .pc-modal-scrim .warn-panel,
@@ -21718,7 +21718,7 @@ html .pc-modal-scrim .order-btn.chat:not(.processing){
   color:#fff !important; border:1px solid color-mix(in srgb, var(--pc-accent, #22c55e) 70%, #fff) !important;
   text-shadow:0 1px 1px rgba(0,0,0,.35);
 }
-html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ filter:brightness(1.1); background:inherit; }
+html .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover{ filter:brightness(1.1); background:inherit; }
 html .pc-modal-scrim .order-btn.chat:not(.processing) .ico svg{ stroke:#fff; }
 html .pc-modal-scrim .st-btn.st-no,
 html .pc-modal-scrim .mooon-prompt-no{
@@ -21973,10 +21973,10 @@ html .discord-gate .dg-intro-btn{ margin-top:18px; color:#c9d6f5; background:tra
    (no parent+child double animation = no blinking tiles), (3) no vertical
    slide, (4) lighter, quicker animations after the video is accepted. */
 
-/* (1) the old rule  .order-btn.chat:not(.processing):hover{background:#f0f0f3 !important}
+/* (1) the old rule  .order-btn.chat:not(.processing):not(:disabled):hover{background:#f0f0f3 !important}
    won over the gradient — pin the gradient in every state */
 html .pc-modal-scrim .order-btn.chat:not(.processing),
-html .pc-modal-scrim .order-btn.chat:not(.processing):hover,
+html .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover,
 html .pc-modal-scrim .order-btn.chat:not(.processing):focus,
 html .pc-modal-scrim .order-btn.chat:not(.processing):focus-visible,
 html .pc-modal-scrim .order-btn.chat:not(.processing):active{
@@ -21986,13 +21986,13 @@ html .pc-modal-scrim .order-btn.chat:not(.processing):active{
   outline:none;
 }
 html .pc-modal-scrim .order-btn.chat:not(.processing) .ico svg,
-html .pc-modal-scrim .order-btn.chat:not(.processing):hover .ico svg{ stroke:#fff; }
+html .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover .ico svg{ stroke:#fff; }
 @media (hover:hover) and (pointer:fine){
-  html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ filter:brightness(1.12); transform:none; }
+  html .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover{ filter:brightness(1.12); transform:none; }
 }
 /* touch screens keep :hover after a tap — don't let it stick */
 @media (hover:none){
-  html .pc-modal-scrim .order-btn.chat:not(.processing):hover{ filter:none; }
+  html .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover{ filter:none; }
   html .pc-modal-scrim .quality-btn:hover, html .pc-modal-scrim .wp-box:hover, html .pc-modal-scrim .mp-box:hover{ transform:none; }
 }
 
@@ -23829,6 +23829,88 @@ html body .pc-card-wrap > :not(.pc-card){filter:none!important}
    link was pressed - the whole bar and its text shifted by a pixel. It also keeps one permanent GPU layer (and so do
    its links, which shrink a little when pressed), so nothing is ever re-drawn at a different spot. */
 html body .mn-glass{left:50%;margin-left:calc(min(calc(100vw - 20px),820px) / -2);transform:translate3d(0,0,0)!important;will-change:transform,opacity}
+
+/* ===== sparkle buttons: card "order", "confirm", "send order" =====
+   idle: quiet dark pill with a dim star. hover / focus / touch: fills with the card's accent colour, a light streak
+   runs round the rim, the star twinkles and a soft glow comes up. One variable (--sp-lit 0..1) drives everything.
+   Also fixes the clipped sides: no more scale() on hover (it pushed the full-width button into its container's
+   edge) and the glow stays inside the panel padding. */
+@property --sp-lit{syntax:'<number>';inherits:false;initial-value:0}
+@property --sp-a{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes spSpin{to{--sp-a:360deg}}
+@keyframes spTwinkle{0%,100%{transform:scale(1) rotate(0deg);opacity:1}35%{transform:scale(1.28) rotate(14deg);opacity:1}65%{transform:scale(.86) rotate(-8deg);opacity:.8}}
+html body .pc-slide .pc-toggle-btn,
+html body .pc-modal-scrim .wizard-confirm-btn,
+html body .pc-modal-scrim .order-btn.chat:not(.processing){
+  --sp-c:var(--pc-accent,#8b5cf6);
+  --sp-lit:0; --sp-a:0deg;
+  position:relative; display:flex!important; align-items:center; justify-content:center; gap:10px;
+  width:100%; box-sizing:border-box; overflow:visible!important;
+  border:1.5px solid transparent!important; border-radius:999px!important;
+  color:color-mix(in srgb,#fff calc(var(--sp-lit)*100%),rgba(255,255,255,.5))!important;
+  text-shadow:none!important; filter:none!important; scale:none!important;
+  --sp-bg:
+    radial-gradient(120% 95% at 50% 135%,color-mix(in srgb,#fff calc(var(--sp-lit)*60%),transparent) 0,transparent 62%) padding-box,
+    linear-gradient(180deg,color-mix(in srgb,var(--sp-c) calc(var(--sp-lit)*100%),#2c2d31),color-mix(in srgb,var(--sp-c) calc(var(--sp-lit)*74%),#1e1f22)) padding-box,
+    conic-gradient(from var(--sp-a),
+      color-mix(in srgb,var(--sp-c) calc(var(--sp-lit)*70%),rgba(255,255,255,.1)) 0 10%,
+      rgba(255,255,255,calc(var(--sp-lit)*.95)) 22%,
+      color-mix(in srgb,var(--sp-c) calc(var(--sp-lit)*70%),rgba(255,255,255,.1)) 34% 60%,
+      rgba(255,255,255,calc(var(--sp-lit)*.95)) 72%,
+      color-mix(in srgb,var(--sp-c) calc(var(--sp-lit)*70%),rgba(255,255,255,.1)) 84% 100%) border-box;
+  background:var(--sp-bg)!important;
+  box-shadow:
+    0 0 0 calc(var(--sp-lit)*3px) color-mix(in srgb,var(--sp-c) calc(var(--sp-lit)*28%),transparent),
+    0 0 calc(var(--sp-lit)*18px) calc(var(--sp-lit)*1px) color-mix(in srgb,var(--sp-c) calc(var(--sp-lit)*60%),transparent),
+    0 10px 22px -10px rgba(0,0,0,.65)!important;
+  transition:--sp-lit .45s cubic-bezier(.22,1,.36,1),transform .15s ease!important;
+  -webkit-tap-highlight-color:transparent;
+}
+html body .pc-slide .pc-toggle-btn::before,
+html body .pc-modal-scrim .wizard-confirm-btn::before,
+html body .pc-modal-scrim .order-btn.chat:not(.processing)::before{
+  content:""!important; display:block!important; position:static!important; flex:0 0 auto;
+  width:1.25em!important; height:1.25em!important; margin:0!important; left:auto!important; top:auto!important;
+  opacity:1!important; transform:none; transition:none!important; animation:none!important;
+  background:currentColor!important; border-radius:0!important; box-shadow:none!important;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 2.5l1.9 5.6a3 3 0 0 0 1.9 1.9l5.6 1.9-5.6 1.9a3 3 0 0 0-1.9 1.9l-1.9 5.6-1.9-5.6a3 3 0 0 0-1.9-1.9L0 11.9l5.6-1.9a3 3 0 0 0 1.9-1.9z'/%3E%3Cpath d='M19 1l.8 2.2L22 4l-2.2.8L19 7l-.8-2.2L16 4l2.2-.8z'/%3E%3Cpath d='M20 15l.6 1.6 1.6.6-1.6.6L20 19.4l-.6-1.6-1.6-.6 1.6-.6z'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 2.5l1.9 5.6a3 3 0 0 0 1.9 1.9l5.6 1.9-5.6 1.9a3 3 0 0 0-1.9 1.9l-1.9 5.6-1.9-5.6a3 3 0 0 0-1.9-1.9L0 11.9l5.6-1.9a3 3 0 0 0 1.9-1.9z'/%3E%3Cpath d='M19 1l.8 2.2L22 4l-2.2.8L19 7l-.8-2.2L16 4l2.2-.8z'/%3E%3Cpath d='M20 15l.6 1.6 1.6.6-1.6.6L20 19.4l-.6-1.6-1.6-.6 1.6-.6z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+html body .pc-modal-scrim .order-btn.chat:not(.processing) .ico{display:none}
+/* lit state */
+html body .pc-slide--active .pc-toggle-btn:hover,
+html body .pc-slide--active .pc-toggle-btn:focus-visible,
+html body .pc-modal-scrim .wizard-confirm-btn:hover:not(:disabled),
+html body .pc-modal-scrim .wizard-confirm-btn:focus-visible,
+html body .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover,
+html body .pc-modal-scrim .order-btn.chat:not(.processing):focus-visible{
+  --sp-lit:1; animation:spSpin 3.2s linear infinite!important; transform:none; background:var(--sp-bg)!important;
+}
+html body .pc-slide--active .pc-toggle-btn:hover::before,
+html body .pc-slide--active .pc-toggle-btn:focus-visible::before,
+html body .pc-modal-scrim .wizard-confirm-btn:hover:not(:disabled)::before,
+html body .pc-modal-scrim .wizard-confirm-btn:focus-visible::before,
+html body .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled):hover::before,
+html body .pc-modal-scrim .order-btn.chat:not(.processing):focus-visible::before{
+  animation:spTwinkle 1.7s ease-in-out infinite!important;
+}
+html body .pc-slide--active .pc-toggle-btn:active,
+html body .pc-modal-scrim .wizard-confirm-btn:active,
+html body .pc-modal-scrim .order-btn.chat:not(.processing):active{transform:scale(.985)!important}
+html body .pc-modal-scrim .wizard-confirm-btn:disabled{--sp-lit:0;opacity:.55;cursor:not-allowed}
+/* touch screens have no hover: keep the buttons lit there */
+@media (hover:none){
+  html body .pc-slide--active .pc-toggle-btn,
+  html body .pc-modal-scrim .wizard-confirm-btn:not(:disabled),
+  html body .pc-modal-scrim .order-btn.chat:not(.processing):not(:disabled){--sp-lit:1;animation:spSpin 3.2s linear infinite!important}
+  html body .pc-slide--active .pc-toggle-btn::before,
+  html body .pc-modal-scrim .wizard-confirm-btn:not(:disabled)::before,
+  html body .pc-modal-scrim .order-btn.chat:not(.processing)::before{animation:spTwinkle 1.7s ease-in-out infinite!important}
+}
+@media (prefers-reduced-motion:reduce){
+  html body .pc-slide .pc-toggle-btn,html body .pc-modal-scrim .wizard-confirm-btn,html body .pc-modal-scrim .order-btn.chat{animation:none!important}
+  html body .pc-slide .pc-toggle-btn::before,html body .pc-modal-scrim .wizard-confirm-btn::before,html body .pc-modal-scrim .order-btn.chat::before{animation:none!important}
+}
 /* contact window: the blurred backdrop re-drew the bar underneath (text smeared / drifted a little), and pressed links
    scaled down. Now the scrim only dims (no blur) and links never scale, so the bar stays pixel-identical. */
 html body .mn-modal .mn-modal-scrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(2,2,4,.8)!important}
