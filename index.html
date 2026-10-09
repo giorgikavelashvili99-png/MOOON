@@ -3,10 +3,17 @@
 <head><script id="moon-shiftdebug">(function(){try{if(!window.PerformanceObserver)return;
 var rows=[],t0=0;function sel(n){if(!n||!n.tagName)return'?';var s=n.tagName.toLowerCase();if(n.id)s+='#'+n.id;var c=(n.className&&n.className.baseVal===undefined?n.className:'')+'';if(c)s+='.'+c.trim().split(/\s+/).slice(0,2).join('.');return s}
 function r(x){return Math.round(x*10)/10}
-var po=new PerformanceObserver(function(l){l.getEntries().forEach(function(e){if(e.hadRecentInput)return;(e.sources||[]).forEach(function(s){var a=s.previousRect,b=s.currentRect;rows.push(Math.round(e.startTime)+'ms '+sel(s.node)+'  dx='+r(b.x-a.x)+' dy='+r(b.y-a.y)+' dw='+r(b.width-a.width)+' dh='+r(b.height-a.height))})});draw()});
+var po=new PerformanceObserver(function(l){l.getEntries().forEach(function(e){if(e.hadRecentInput)return;(e.sources||[]).forEach(function(s){if(s.node&&s.node.id==='moonShiftDbg')return;var a=s.previousRect,b=s.currentRect;rows.push(Math.round(e.startTime)+'ms '+sel(s.node)+'  dx='+r(b.x-a.x)+' dy='+r(b.y-a.y)+' dw='+r(b.width-a.width)+' dh='+r(b.height-a.height))})});draw()});
 po.observe({type:'layout-shift',buffered:true});
-var box;function draw(){if(!document.body)return;if(!box){box=document.createElement('pre');box.id='moonShiftDbg';box.style.setProperty('content-visibility','visible','important');box.style.setProperty('visibility','visible','important');box.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow:auto;margin:0;padding:8px;background:rgba(0,0,0,.92);color:#0f0;font:11px/1.35 monospace;z-index:2147483647;white-space:pre-wrap;visibility:visible';document.body.appendChild(box)}box.textContent='SHIFTDEBUG build 11 | LAYOUT SHIFTS ('+rows.length+')\n'+rows.slice(-60).join('\n')}
-document.addEventListener('DOMContentLoaded',draw);}catch(e){}})();</script><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
+var box;function draw(){if(!document.body)return;if(!box){box=document.createElement('pre');box.id='moonShiftDbg';box.style.setProperty('content-visibility','visible','important');box.style.setProperty('visibility','visible','important');box.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow:auto;margin:0;padding:8px;background:rgba(0,0,0,.92);color:#0f0;font:11px/1.35 monospace;z-index:2147483647;white-space:pre-wrap;visibility:visible';document.body.appendChild(box)}box.textContent='SHIFTDEBUG build 13 | EVENTS ('+rows.length+')\n'+rows.slice(-60).join('\n')}
+document.addEventListener('DOMContentLoaded',draw);
+var T0=performance.now(),last={};
+function samp(){try{var sl=document.querySelector('.pc-slide--active');if(sl){[['card','.pc-card'],['icon','.pc-icon'],['title','.pc-title'],['desc','.pc-desc'],['price','.pc-price-line'],['note','.pc-price-note'],['btn','.pc-toggle-btn'],['wrap','.pc-card-wrap']].forEach(function(p){var e=sl.querySelector(p[1]);if(!e)return;var q=e.getBoundingClientRect(),cs=getComputedStyle(e),k=[r(q.x),r(q.y),r(q.width),r(q.height)].join(',')+'|'+cs.fontSize+'|'+cs.rotate+'|'+cs.scale+'|'+cs.transform.slice(0,30)+'|'+cs.visibility;if(last[p[0]]!==undefined&&last[p[0]]!==k&&cs.visibility==='visible'&&last[p[0]].slice(-7)==='visible')rows.push(Math.round(performance.now()-T0)+'ms MOVE '+p[0]+' '+last[p[0]]+'  ->  '+k);last[p[0]]=k})}}catch(e){}
+if(performance.now()-T0<9000)requestAnimationFrame(samp);else draw()}
+requestAnimationFrame(samp);
+setInterval(draw,700);
+try{new MutationObserver(function(m){m.forEach(function(x){var t=x.target;if(t.classList&&(t.classList.contains('pc-slide--active')||t===document.documentElement)&&performance.now()-T0<9000){rows.push(Math.round(performance.now()-T0)+'ms ATTR '+sel(t)+' '+x.attributeName+'='+String(t.getAttribute(x.attributeName)).slice(0,70))}})}).observe(document,{attributes:true,subtree:true,attributeFilter:['class','style']})}catch(e){}
+}catch(e){}})();</script><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
 function ok(){if(done)return;done=true;window.__moonFontsOk=true;r.classList.add('moon-fonts-ok');try{window.dispatchEvent(new Event('moonfontsok'))}catch(e){}}
 function go(){try{var t='Abc 0123456789 ₾€•აბგ';var L=[];['400','500','600','700'].forEach(function(w){L.push(d.fonts.load(w+' 16px BPGAcademiuriU',t));L.push(d.fonts.load(w+' 16px "Space Grotesk"',t))});['400','500','700','800'].forEach(function(w){L.push(d.fonts.load(w+' 16px "JetBrains Mono"',t))});
 Promise.all(L.map(function(p){return p.catch(function(){})})).then(function(){return d.fonts.ready}).then(ok,ok)}catch(e){ok()}}
@@ -24071,4 +24078,4 @@ html body .mn-links .mn-ind{transform:none;will-change:auto;
 })();
 </script>
 </body>
-</html>
+</html>>
