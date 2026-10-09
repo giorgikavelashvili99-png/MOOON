@@ -23828,12 +23828,16 @@ html body .pc-card-wrap > :not(.pc-card){filter:none!important}
 /* the bar is centred with a negative margin instead of translateX(-50%) (no transform at all), and every time the browser re-drew it - when the entrance ended, or a
    link was pressed - the whole bar and its text shifted by a pixel. It also keeps one permanent GPU layer (and so do
    its links, which shrink a little when pressed), so nothing is ever re-drawn at a different spot. */
-html body .mn-glass{left:50%;margin-left:calc(min(calc(100vw - 20px),820px) / -2);transform:none!important;will-change:opacity}
+html body .mn-glass{left:50%;margin-left:calc(min(calc(100vw - 20px),820px) / -2);transform:translate3d(0,0,0)!important;will-change:transform,opacity}
 /* contact window: the blurred backdrop re-drew the bar underneath (text smeared / drifted a little), and pressed links
    scaled down. Now the scrim only dims (no blur) and links never scale, so the bar stays pixel-identical. */
 html body .mn-modal .mn-modal-scrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(2,2,4,.8)!important}
 html body .mn-links .mn-link:active,html body .mn-links .mn-link{transform:none!important}
 html body .mn-glass .mn-link{will-change:auto}
+/* the contact card used to spring (scale + overshoot) and ended with transform:none, which dropped it to a different
+   pixel grid at the last frame - so it wobbled sideways. Smooth slide, no overshoot, and it keeps its layer. */
+html body .mn-modal .mn-card{transform:translate3d(0,14px,0)!important;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .3s ease!important;will-change:transform,opacity}
+html body .mn-modal.open .mn-card{transform:translate3d(0,0,0)!important}
 html.mn-nav-wait body .mn-glass{opacity:0;pointer-events:none;animation:mnNavFailsafe .01s linear 14s forwards}
 @keyframes mnNavFailsafe{to{opacity:1;pointer-events:auto}}
 /* one single, calm motion: the bar fades in while it slides down into its own place (top 8px) and stops there.
@@ -23844,7 +23848,7 @@ html.mn-nav-play body .mn-glass{animation:mnNavIn .7s cubic-bezier(.16,1,.3,1) b
 html.mn-nav-play body .mn-glass .mn-brand{animation:mnNavFade .5s ease .12s both}
 html.mn-nav-play body .mn-glass .mn-links{animation:mnNavFade .5s ease .2s both}
 html.mn-nav-play body .mn-glass .mn-right{animation:mnNavFade .5s ease .28s both}
-@keyframes mnNavIn{from{opacity:0;top:-16px}}
+@keyframes mnNavIn{from{opacity:0;transform:translate3d(0,-14px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 @keyframes mnNavFade{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){
   html.mn-nav-play body .mn-glass, html.mn-nav-play body .mn-glass :is(.mn-brand,.mn-links,.mn-right){animation:mnNavFade .3s ease both!important}
