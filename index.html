@@ -20976,9 +20976,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       shell.classList.add('tt-wait');
       const io = new IntersectionObserver(es => {
         if (es.some(e => e.isIntersecting)){ io.disconnect(); shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }
-      }, { threshold: 0.01, rootMargin: '0px 0px 18% 0px' });
+      }, { threshold: 0.12 });
       io.observe(shell);
-    } else if (!reduce){
       setTimeout(function(){ shell.classList.remove('tt-wait'); shell.classList.add('tt-in'); }, 2500);
     }
     setTimeout(function(){ shell.classList.add('tt-done'); }, 4500);
