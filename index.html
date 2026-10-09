@@ -23581,5 +23581,31 @@ html body .discord-gate[data-mode="guild"] .discord-gate-close{ display:grid; pl
 html body .discord-gate .dg-intro-btn{ margin-top:14px; }
 @media (prefers-reduced-motion:reduce){ .dg-orb, html body .discord-gate::before{ animation:none!important; } }
 </style>
+<style id="moon-fix-v4">
+/* ===== FIX 1: order/pricing modal must COVER the navigation =====
+   .topbar.mn-bar has z-index:80, the modal scrim had 64, so the card scrolled UNDER the nav.
+   250 = above nav (80), menu (70), admin overlay (100), carousel arrows (200); still below contact modal (300) and the gates. */
+html body .pc-modal-scrim{ z-index:250; }
+
+/* ===== FIX 2: black strip while scrolling =====
+   The fixed glow layer (.bg-layer) was exactly as tall as the layout viewport. When the mobile browser's
+   address bar hides during scroll the visible area grows, and the strip below the layer showed the plain
+   black page colour. The layer is now taller than any possible viewport (lvh = largest viewport). */
+html body .bg-layer{
+  top:0; left:0; right:0; bottom:auto;
+  height:calc(100vh + 220px);
+  height:calc(100lvh + 220px);
+}
+/* keep the cyan glow where it was visually (it was anchored to the old, shorter bottom edge) */
+html body .bg-layer .orb.o2{ bottom:80px; }
+
+/* ===== FIX 3: lighter nav while scrolling (no animation touched) =====
+   The bar scrolls with the page; a 20px live backdrop blur over moving content is re-computed every frame.
+   Background is already ~90% opaque, so it is raised to 96% and the blur dropped: same look, no cost. */
+html body .mn-glass{
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.015) 55%),rgba(11,12,15,.96);
+}
+</style>
 </body>
 </html>
