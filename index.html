@@ -23829,7 +23829,11 @@ html body .pc-card-wrap > :not(.pc-card){filter:none!important}
    link was pressed - the whole bar and its text shifted by a pixel. It also keeps one permanent GPU layer (and so do
    its links, which shrink a little when pressed), so nothing is ever re-drawn at a different spot. */
 html body .mn-glass{left:50%;margin-left:calc(min(calc(100vw - 20px),820px) / -2);transform:none!important;will-change:opacity}
-html body .mn-glass .mn-link{will-change:transform}
+/* contact window: the blurred backdrop re-drew the bar underneath (text smeared / drifted a little), and pressed links
+   scaled down. Now the scrim only dims (no blur) and links never scale, so the bar stays pixel-identical. */
+html body .mn-modal .mn-modal-scrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(2,2,4,.8)!important}
+html body .mn-links .mn-link:active,html body .mn-links .mn-link{transform:none!important}
+html body .mn-glass .mn-link{will-change:auto}
 html.mn-nav-wait body .mn-glass{opacity:0;pointer-events:none;animation:mnNavFailsafe .01s linear 14s forwards}
 @keyframes mnNavFailsafe{to{opacity:1;pointer-events:auto}}
 /* one single, calm motion: the bar fades in while it slides down into its own place (top 8px) and stops there.
