@@ -23863,6 +23863,61 @@ html body .mn-glass:after,html body .mn-card:after{content:"";position:absolute;
 html body img,html body canvas,html body svg{image-rendering:auto}
 html body img{-ms-interpolation-mode:bicubic}
 #moonDither{position:fixed;inset:0;z-index:2147483600;pointer-events:none;opacity:.5;background-image:var(--dither-img);background-size:128px 128px}
+
+/* ===== sign-in screen: calmer, professional look (same dark-glass style) =====
+   - clean sans-serif for Latin letters (the Georgian font drew "Discord" in a serif)
+   - Discord-blue main button that darkens when pressed (it used to flash white), quiet ghost button, small guest link
+   - smaller icon medallion, compact card that fits the screen without scrolling */
+@font-face{font-family:'GateSans';src:local('Inter'),local('Segoe UI'),local('Roboto'),local('Helvetica Neue'),local('Arial'),local('Liberation Sans'),local('DejaVu Sans');unicode-range:U+0020-007E,U+00A0-00FF,U+2013,U+2014,U+2018-201D,U+2022,U+2026}
+html body #discordGate{font-family:'GateSans','BPGAcademiuriU','Space Grotesk',sans-serif}
+html body #discordGate .dg-main{max-width:420px;padding-top:0;padding-bottom:0}
+html body #discordGate .dg-card{
+  width:min(100%,380px)!important;padding:30px 26px 22px!important;border-radius:24px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0) 40%),rgba(15,16,22,.9)!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 28px 70px -20px rgba(0,0,0,.8),0 0 0 1px rgba(0,0,0,.4)!important;
+}
+html body #discordGate .dg-orb{
+  width:60px;height:60px;margin:0 auto 18px;animation:none;overflow:visible;
+  background:linear-gradient(180deg,#232637,#161824);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 10px 24px -8px rgba(88,101,242,.55),inset 0 1px 0 rgba(255,255,255,.12);
+}
+html body #discordGate .dg-orb svg{width:30px;height:23px;fill:#8791ff}
+html body #discordGate .discord-gate-title{
+  color:#f4f5f8;font-weight:700;font-size:clamp(19px,5vw,22px);line-height:1.3;letter-spacing:0;margin:0 0 12px;text-wrap:balance}
+html body #discordGate .discord-gate-sub{margin:0 0 22px;font-size:14px;line-height:1.5;color:#9aa0b0}
+html body #discordGate .discord-gate-sub .dg-spec b{
+  display:inline-flex;align-items:center;gap:8px;padding:5px 12px;font-size:12px;font-weight:600;letter-spacing:.04em;
+  color:#c7cbd9;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:999px}
+html body #discordGate .discord-gate-sub .dg-cta{margin-top:14px;color:#9aa0b0;font-weight:400;font-size:14px}
+html body #discordGate .discord-btn{
+  position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:50px;padding:0 20px;
+  border-radius:12px;font-family:inherit;font-size:15px;font-weight:600;line-height:1.2;letter-spacing:0;white-space:nowrap;
+  text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:background-color .2s ease,border-color .2s ease,transform .12s ease,box-shadow .2s ease!important;filter:none!important}
+html body #discordGate .discord-btn svg{width:22px;height:17px;flex:0 0 auto}
+html body #discordGate .discord-btn::before,html body #discordGate .discord-btn::after{display:none!important}
+html body #discordGate .discord-btn.primary{
+  color:#fff;background:#5865f2;border:1px solid #6a76f4;
+  box-shadow:0 8px 20px -8px rgba(88,101,242,.7),inset 0 1px 0 rgba(255,255,255,.18)}
+html body #discordGate .discord-btn.primary svg{fill:#fff}
+html body #discordGate .discord-btn.primary:hover{background:#6471f6;border-color:#7a85f7}
+html body #discordGate .discord-btn.primary:active{background:#4650c9;border-color:#4650c9;transform:scale(.985);box-shadow:inset 0 2px 6px rgba(0,0,0,.28)}
+html body #discordGate .discord-btn.outline{
+  margin-top:10px;color:#d5d8e4;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);box-shadow:none!important}
+html body #discordGate .discord-btn.outline svg{fill:#8791ff}
+html body #discordGate .discord-btn.outline:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);color:#fff}
+html body #discordGate .discord-btn.outline:active{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.1);transform:scale(.985)}
+html body #discordGate .discord-gate-skip{
+  margin-top:8px;padding:10px 12px;font-family:inherit;font-size:13px;font-weight:500;color:#8a90a2;text-decoration:none;background:none;border:0;
+  -webkit-tap-highlight-color:transparent}
+html body #discordGate .discord-gate-skip:hover{color:#d5d8e4;text-decoration:underline;text-underline-offset:4px}
+html body #discordGate .discord-gate-skip:active{color:#fff}
+html body #discordGate .dg-intro-btn{margin-top:14px;font-family:inherit;font-size:12px;letter-spacing:.14em;color:#8a90a2;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);-webkit-tap-highlight-color:transparent}
+html body #discordGate .dg-intro-btn:hover{color:#fff;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);box-shadow:none!important}
+html body #discordGate .dg-intro-btn:active{background:rgba(255,255,255,.03);transform:scale(.98)}
+html body #discordGate .lang-btn{-webkit-tap-highlight-color:transparent}
+@media (max-width:360px){html body #discordGate .discord-btn{white-space:normal;font-size:14px;padding:10px 14px}}
 /* ===== sparkle buttons: card "order", "confirm", "send order" =====
    keeps each button's own colour, just a little darker at rest; on hover it brightens, glows and the star twinkles.
    Only opacity / transform / a short glow are animated, so nothing stutters, and nothing changes colour on touch screens.
