@@ -15,6 +15,7 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
 (function(){
   var d = document.documentElement, shown = false;
   d.classList.add('moon-boot');
+  d.classList.add('mn-nav-wait');
   function reveal(){
     if (shown) return; shown = true;
     requestAnimationFrame(function(){ requestAnimationFrame(function(){
@@ -4455,16 +4456,10 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
     height:auto;
   }
 
-  /* --- Desktop 125% zoom ---
-     Re-added per explicit request (was removed entirely after 115%/125%
-     both caused visibly blurry text — CSS zoom re-rasterizes the whole
-     page at the scaled size, and the custom display font never renders
-     fully crisply at a non-100% scale). 110% is lower than either
-     previous value, but the same fundamental blur risk still applies to
-     some degree — if it's noticeable again at this size, the reliable
-     fix is still full removal, not a further reduction. */
+  /* --- Desktop 115% zoom --- (every "/ 1.15" further down compensates for this value;
+     change them together) */
   @media (min-width:901px){
-    html{ zoom:1.12; }
+    html{ zoom:1.15; }
   }
 
   /* --- Direct contact panel --- */
@@ -11453,7 +11448,13 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     const g = document.querySelector('.mn-glass');
     if (!g || !siteMenu) return;
     const r = g.getBoundingClientRect();
-    siteMenu.style.setProperty('--mn-menu-top', Math.round(r.bottom + 8) + 'px');
+    // desktop html zoom: rect px != CSS px, so convert (measured ratio, works with any zoom value)
+    const pr = document.createElement('div');
+    pr.style.cssText = 'position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden;pointer-events:none';
+    document.body.appendChild(pr);
+    const D = (pr.getBoundingClientRect().width / 100) || 1;
+    document.body.removeChild(pr);
+    siteMenu.style.setProperty('--mn-menu-top', Math.round(r.bottom / D + 8) + 'px');
   }
   window.addEventListener('resize', () => { if (siteMenu && siteMenu.classList.contains('open')) placeSiteMenu(); });
   function openSiteMenu(){
@@ -22128,10 +22129,10 @@ body .pc-feature--no .pc-check{
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23ffffff' fill-opacity='.14' stroke='%23ffffff' stroke-opacity='.45' stroke-width='1.3'/%3E%3Cpath d='M8.7 8.7l6.6 6.6M15.3 8.7l-6.6 6.6' fill='none' stroke='%23ffffff' stroke-opacity='.7' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;
   opacity:.8;
 }
-/* ===== desktop is shown at 112% (html zoom) -> keep viewport-height based boxes inside the screen ===== */
+/* ===== desktop is shown at 115% (html zoom) -> keep viewport-height based boxes inside the screen ===== */
 @media (min-width:901px){
-  .pc-modal-scroll,.pc-modal-scrim .pc-modal-scroll{max-height:calc((100vh - 100px) / 1.12);max-height:calc((100dvh - 100px) / 1.12)}
-  .pc-modal-scrim>.pc-accordion-body.panel{max-height:calc(100dvh / 1.12)}
+  .pc-modal-scroll,.pc-modal-scrim .pc-modal-scroll{max-height:calc((100vh - 100px) / 1.15);max-height:calc((100dvh - 100px) / 1.15)}
+  .pc-modal-scrim>.pc-accordion-body.panel{max-height:calc(100dvh / 1.15)}
 }
 
 /* ===== carousel arrows: vertically centred on the card row (var set by script below), not on the whole block incl. dots ===== */
@@ -22139,10 +22140,10 @@ body .pc-feature--no .pc-check{
   html body .pricing-cards.pc-scroll-mode .pc-nav{top:var(--pc-nav-top, calc(50% - 16px))!important;margin-top:-32px!important}
 }
 
-/* ===== arrows were pushed off-screen by the 112% zoom (50vw is scaled too) -> compensate ===== */
+/* ===== arrows were pushed off-screen by the 115% zoom (50vw is scaled too) -> compensate ===== */
 @media (min-width:900px){
-  html body .pricing-cards.pc-scroll-mode .pc-nav--prev{left:calc(50% - 50vw / 1.12 + 22px)!important}
-  html body .pricing-cards.pc-scroll-mode .pc-nav--next{right:calc(50% - 50vw / 1.12 + 22px)!important;left:auto!important}
+  html body .pricing-cards.pc-scroll-mode .pc-nav--prev{left:calc(50% - 50vw / 1.15 + 22px)!important}
+  html body .pricing-cards.pc-scroll-mode .pc-nav--next{right:calc(50% - 50vw / 1.15 + 22px)!important;left:auto!important}
 }
 
 /* ===== cards: no outer drop shadow (edge ring kept) ===== */
@@ -22889,7 +22890,7 @@ setInterval(function(){if(open&&!muted&&ctx&&ctx.state!=='running'&&!document.hi
 /* ================= CANVAS: small spark bursts (only while particles exist) ================= */
 var D=1,VW=0,VH=0,DP=1,shards=[],W=0,H=0,parts=[],loop=false,COL=['#3b6dff','#22c3ff','#ffffff','#ffd23f','#8fb0ff'];
 function size(){
-  /* html has zoom:1.12 on desktop -> rect px and CSS px differ. D = rect px per 1 CSS px (measured, not guessed) */
+  /* html has zoom:1.15 on desktop -> rect px and CSS px differ. D = rect px per 1 CSS px (measured, not guessed) */
   var pr=document.createElement('div');pr.style.cssText='position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden;pointer-events:none';el.appendChild(pr);
   D=(pr.getBoundingClientRect().width/100)||1;el.removeChild(pr);
   var R=el.getBoundingClientRect();VW=R.width||innerWidth;VH=R.height||innerHeight;
@@ -23148,7 +23149,6 @@ html body .order-grid:not(.wizard-step-hidden){ animation:none; }
    invisibly after load so the very first opening does not have to build it. Animations are untouched. */
 html body .site-menu{ will-change:transform,opacity; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
 html body .site-menu .site-menu-panel{ backface-visibility:hidden; -webkit-backface-visibility:hidden; }
-html body .site-menu.mn-prewarm:not(.open){ visibility:visible !important; opacity:.01 !important; transition:none !important; pointer-events:none !important; }
 
 /* (C) ORDER WINDOW STEPPER / UPLOAD ICON FLICKER FIX.
    The stepper dots ("breathing" + "pop") and the upload "+" ring ran infinite / replaying animations. While the window
@@ -23172,19 +23172,6 @@ html body .pc-modal-scrim .drop-zone .dz-icon::before{ opacity:0 !important; }
     if (e.animationName === 'wizardStepIn' && t && t.classList && t.classList.contains('wiz-enter')) t.classList.remove('wiz-enter');
   }, true);
 
-  /* menu pre-warm: paint it once, invisibly, as soon as the page is idle and the intro / boot cover are gone */
-  var menu = document.getElementById('siteMenu'), done = false, tries = 0;
-  if (!menu) return;
-  function warm(){
-    if (done) return;
-    var h = document.documentElement;
-    if ((h.classList.contains('mi5-lock') || h.classList.contains('moon-boot') || menu.classList.contains('open')) && tries++ < 60) { setTimeout(warm, 700); return; }
-    done = true;
-    menu.classList.add('mn-prewarm');
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(function(){ menu.classList.remove('mn-prewarm'); }, 80); }); });
-  }
-  function start(){ (window.requestIdleCallback || function(f){ setTimeout(f, 400); })(warm, { timeout: 3000 }); }
-  if (document.readyState === 'complete') start(); else addEventListener('load', start);
 })();
 </script>
 <style id="mn-nav-css">
@@ -23811,5 +23798,94 @@ html body .pc-modal-scrim .mooon-auto-retry-btn:hover{ background:rgba(255,255,2
 })();
 </script>
 
+<style id="moon-fix-oct">
+/* ===== ORDER CARDS: no shadows at all =====
+   The grey box that showed around a tilted card was the dimming overlay of the carousel SLIDE: it stays flat while
+   the card inside is rotated / scaled by the 3D carousel, so it stuck out behind the card like a shadow.
+   The same dimming now lives on the card wrapper itself, so it turns and scales WITH the card (same look, same fade). */
+html body .pricing-cards.pc-scroll-mode .pc-slide::after{content:none!important;display:none!important}
+html body .pricing-cards.pc-scroll-mode .pc-slide > .pc-card-wrap::after{
+  content:"";position:absolute;inset:0;border-radius:24px;pointer-events:none;z-index:50;
+  background:rgba(70,74,92,.32);opacity:1;transition:opacity .45s ease;
+}
+html body .pricing-cards.pc-scroll-mode .pc-slide--active > .pc-card-wrap::after{opacity:0}
+/* text glows / drop shadows inside every order card and order window */
+html body .pc-card, html body .pc-card *, html body .pc-card *::before, html body .pc-card *::after,
+html body .pc-card-wrap, html body .pc-card-wrap *,
+html body .pc-modal-scrim .pc-accordion-body, html body .pc-modal-scrim .pc-accordion-body *{text-shadow:none!important}
+html body .pc-card :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-line b,.pc-feature,.pc-check,.pc-toggle-btn),
+html body .pc-card-wrap > :not(.pc-card){filter:none!important}
+
+/* ===== NAVIGATION: entrance animation =====
+   The bar stays hidden until the page is really on screen (boot cover, Discord gate and the MOON intro all gone),
+   then drops in the same way the menu opens (same cubic-bezier), followed by its parts. Played again whenever the
+   site is revealed (after the intro or the gate closes). opacity + translate/scale only -> compositor, no layout. */
+html.mn-nav-wait body .mn-glass{opacity:0;pointer-events:none;animation:mnNavFailsafe .01s linear 14s forwards}
+@keyframes mnNavFailsafe{to{opacity:1;pointer-events:auto}}
+html.mn-nav-play body .mn-glass{animation:mnNavIn .8s cubic-bezier(.16,1,.3,1) both}
+html.mn-nav-play body .mn-glass .mn-brand{animation:mnNavPart .7s cubic-bezier(.16,1,.3,1) .12s both}
+html.mn-nav-play body .mn-glass .mn-right{animation:mnNavPart .7s cubic-bezier(.16,1,.3,1) .2s both}
+html.mn-nav-play body .mn-glass .mn-links{animation:mnNavLinks .75s cubic-bezier(.16,1,.3,1) .26s both}
+html.mn-nav-play body .mn-glass .mn-links .mn-link{animation:mnNavLink .6s cubic-bezier(.16,1,.3,1) both}
+html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(1){animation-delay:.34s}
+html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(2){animation-delay:.40s}
+html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(3){animation-delay:.46s}
+html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(4){animation-delay:.52s}
+html.mn-nav-play body .mn-glass .mn-links .mn-link:nth-of-type(n+5){animation-delay:.58s}
+html.mn-nav-play body .mn-glass .mn-ind{animation:mnNavInd .55s ease-out .42s backwards}
+@keyframes mnNavIn{from{opacity:0;translate:0 -22px;scale:.97}}
+@keyframes mnNavPart{from{opacity:0;translate:0 -10px}}
+@keyframes mnNavLinks{from{opacity:0;scale:.94}}
+@keyframes mnNavLink{from{opacity:0;translate:0 8px}}
+@keyframes mnNavInd{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  html.mn-nav-play body .mn-glass, html.mn-nav-play body .mn-glass *{animation:mnNavFade .3s ease both!important}
+  @keyframes mnNavFade{from{opacity:0}}
+}
+</style>
+<script id="moon-fix-oct-js">
+(function(){
+  var h=document.documentElement, glass=document.querySelector('.mn-glass');
+  if(!glass){ h.classList.remove('mn-nav-wait'); return; }
+  var t0=Date.now(), loadT=0, introSeen=false, wasBlocked=true, playT=0;
+  /* the MOON intro autostarts ~0.5s after load when it was not seen in the last 24h -> wait for it instead of
+     showing the bar for a moment and covering it again */
+  var introDue=false;
+  try{ var seen=+localStorage.getItem('moonIntro7SeenAt')||0;
+       introDue=!!document.getElementById('mi5') && !(seen && Date.now()-seen<864e5 && Date.now()>=seen); }catch(e){}
+  if(document.readyState==='complete') loadT=Date.now(); else addEventListener('load',function(){ loadT=Date.now(); check(); });
+  function gateOpen(){ var g=document.getElementById('discordGate'); return !!(g && g.classList.contains('open')); }
+  function blocked(){
+    if(h.classList.contains('mi5-lock')) introSeen=true;
+    if(h.classList.contains('moon-boot') || h.classList.contains('mi5-lock') || gateOpen()) return true;
+    if(introDue && !introSeen && !(loadT && Date.now()-loadT>2200) && Date.now()-t0<9000) return true;
+    return false;
+  }
+  function play(){
+    clearTimeout(playT);
+    h.classList.remove('mn-nav-play');
+    void glass.offsetWidth;
+    h.classList.remove('mn-nav-wait');
+    h.classList.add('mn-nav-play');
+    playT=setTimeout(function(){ h.classList.remove('mn-nav-play'); },1500);
+  }
+  function check(){
+    var b=blocked();
+    if(b && !wasBlocked){ /* site got covered again (intro replay / gate) -> hide quietly, replay when it comes back */
+      clearTimeout(playT); h.classList.remove('mn-nav-play'); h.classList.add('mn-nav-wait');
+    }
+    if(!b && wasBlocked) play();
+    wasBlocked=b;
+  }
+  if(window.MutationObserver){
+    var mo=new MutationObserver(check);
+    mo.observe(h,{attributes:true,attributeFilter:['class']});
+    var g=document.getElementById('discordGate'); if(g) mo.observe(g,{attributes:true,attributeFilter:['class']});
+  }
+  (function tick(){ check(); if(Date.now()-t0<12000) setTimeout(tick,150); })();
+  /* never leave the bar hidden if something above fails */
+  setTimeout(function(){ if(h.classList.contains('mn-nav-wait') && !blocked()) play(); },12500);
+})();
+</script>
 </body>
 </html>
