@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="ka">
-<head><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
+<head><script id="moon-shiftdebug">(function(){try{if(!/[?&]shiftdebug/.test(location.search)||!window.PerformanceObserver)return;
+var rows=[],t0=0;function sel(n){if(!n||!n.tagName)return'?';var s=n.tagName.toLowerCase();if(n.id)s+='#'+n.id;var c=(n.className&&n.className.baseVal===undefined?n.className:'')+'';if(c)s+='.'+c.trim().split(/\s+/).slice(0,2).join('.');return s}
+function r(x){return Math.round(x*10)/10}
+var po=new PerformanceObserver(function(l){l.getEntries().forEach(function(e){if(e.hadRecentInput)return;(e.sources||[]).forEach(function(s){var a=s.previousRect,b=s.currentRect;rows.push(Math.round(e.startTime)+'ms '+sel(s.node)+'  dx='+r(b.x-a.x)+' dy='+r(b.y-a.y)+' dw='+r(b.width-a.width)+' dh='+r(b.height-a.height))})});draw()});
+po.observe({type:'layout-shift',buffered:true});
+var box;function draw(){if(!document.body)return;if(!box){box=document.createElement('pre');box.id='moonShiftDbg';box.style.setProperty('content-visibility','visible','important');box.style.setProperty('visibility','visible','important');box.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow:auto;margin:0;padding:8px;background:rgba(0,0,0,.92);color:#0f0;font:11px/1.35 monospace;z-index:2147483647;white-space:pre-wrap;visibility:visible';document.body.appendChild(box)}box.textContent='SHIFTDEBUG build 10 | LAYOUT SHIFTS ('+rows.length+')\n'+rows.slice(-60).join('\n')}
+document.addEventListener('DOMContentLoaded',draw);}catch(e){}})();</script><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
 function ok(){if(done)return;done=true;window.__moonFontsOk=true;r.classList.add('moon-fonts-ok');try{window.dispatchEvent(new Event('moonfontsok'))}catch(e){}}
 function go(){try{var t='Abc 0123456789 ₾€•აბგ';var L=[];['400','500','600','700'].forEach(function(w){L.push(d.fonts.load(w+' 16px BPGAcademiuriU',t));L.push(d.fonts.load(w+' 16px "Space Grotesk"',t))});['400','500','700','800'].forEach(function(w){L.push(d.fonts.load(w+' 16px "JetBrains Mono"',t))});
 Promise.all(L.map(function(p){return p.catch(function(){})})).then(function(){return d.fonts.ready}).then(ok,ok)}catch(e){ok()}}
 if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',go);else go();
 setTimeout(ok,1500)})();</script>
-<style id="moon-fontgate-css">html:not(.moon-fonts-ok) body>*:not(#mi5):not(script):not(style){visibility:hidden!important}</style>
+<style id="moon-fontgate-css">html:not(.zz):not(.yy) body>#moonShiftDbg{visibility:visible!important;content-visibility:visible!important;display:block!important}html:not(.moon-fonts-ok) body>*:not(#mi5):not(script):not(style){visibility:hidden!important}</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <!-- Boot cover: this page is ~1.5 MB and its design is layered over several <style> blocks.
