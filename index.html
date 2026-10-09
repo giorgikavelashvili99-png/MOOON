@@ -1,25 +1,12 @@
 <!DOCTYPE html>
 <html lang="ka">
-<head><script id="moon-shiftdebug">(function(){try{if(!window.PerformanceObserver)return;
-var rows=[],t0=0;function sel(n){if(!n||!n.tagName)return'?';var s=n.tagName.toLowerCase();if(n.id)s+='#'+n.id;var c=(n.className&&n.className.baseVal===undefined?n.className:'')+'';if(c)s+='.'+c.trim().split(/\s+/).slice(0,2).join('.');return s}
-function r(x){return Math.round(x*10)/10}
-var po=new PerformanceObserver(function(l){l.getEntries().forEach(function(e){if(e.hadRecentInput)return;(e.sources||[]).forEach(function(s){if(s.node&&s.node.id==='moonShiftDbg')return;var a=s.previousRect,b=s.currentRect;rows.push(Math.round(e.startTime)+'ms '+sel(s.node)+'  dx='+r(b.x-a.x)+' dy='+r(b.y-a.y)+' dw='+r(b.width-a.width)+' dh='+r(b.height-a.height))})});draw()});
-po.observe({type:'layout-shift',buffered:true});
-var box;function draw(){if(!document.body)return;if(!box){box=document.createElement('pre');box.id='moonShiftDbg';box.style.setProperty('content-visibility','visible','important');box.style.setProperty('visibility','visible','important');box.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:30vh;overflow:hidden;pointer-events:none;margin:0;padding:8px;background:rgba(0,0,0,.92);color:#0f0;font:11px/1.35 monospace;z-index:2147483647;white-space:pre-wrap;visibility:visible';document.body.appendChild(box)}box.textContent='SHIFTDEBUG build 14 | EVENTS ('+rows.length+')\n'+rows.slice(-16).join('\n')}
-document.addEventListener('DOMContentLoaded',draw);
-var T0=performance.now(),last={};
-function samp(){try{var sl=document.querySelector('.pc-slide--active');if(sl){[['card','.pc-card'],['icon','.pc-icon'],['title','.pc-title'],['desc','.pc-desc'],['price','.pc-price-line'],['note','.pc-price-note'],['btn','.pc-toggle-btn'],['wrap','.pc-card-wrap']].forEach(function(p){var e=sl.querySelector(p[1]);if(!e)return;var q=e.getBoundingClientRect(),cs=getComputedStyle(e),k=[r(q.x),r(q.y),r(q.width),r(q.height)].join(',')+'|'+cs.fontSize+'|'+cs.rotate+'|'+cs.scale+'|'+cs.transform.slice(0,30)+'|'+cs.visibility;if(last[p[0]]!==undefined&&last[p[0]]!==k&&cs.visibility==='visible'&&last[p[0]].slice(-7)==='visible')rows.push(Math.round(performance.now()-T0)+'ms MOVE '+p[0]+' '+last[p[0]]+'  ->  '+k);last[p[0]]=k})}}catch(e){}
-if(performance.now()-T0<9000)requestAnimationFrame(samp);else draw()}
-requestAnimationFrame(samp);
-setInterval(draw,700);
-try{new MutationObserver(function(m){m.forEach(function(x){var t=x.target;if(t.classList&&(t.classList.contains('pc-slide--active')||t===document.documentElement)&&performance.now()-T0<9000){rows.push(Math.round(performance.now()-T0)+'ms ATTR '+sel(t)+' '+x.attributeName+'='+String(t.getAttribute(x.attributeName)).slice(0,70))}})}).observe(document,{attributes:true,subtree:true,attributeFilter:['class','style']})}catch(e){}
-}catch(e){}})();</script><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
+<head><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
 function ok(){if(done)return;done=true;window.__moonFontsOk=true;r.classList.add('moon-fonts-ok');try{window.dispatchEvent(new Event('moonfontsok'))}catch(e){}}
 function go(){try{var t='Abc 0123456789 ₾€•აბგ';var L=[];['400','500','600','700'].forEach(function(w){L.push(d.fonts.load(w+' 16px BPGAcademiuriU',t));L.push(d.fonts.load(w+' 16px "Space Grotesk"',t))});['400','500','700','800'].forEach(function(w){L.push(d.fonts.load(w+' 16px "JetBrains Mono"',t))});
 Promise.all(L.map(function(p){return p.catch(function(){})})).then(function(){return d.fonts.ready}).then(ok,ok)}catch(e){ok()}}
 if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',go);else go();
 setTimeout(ok,1500)})();</script>
-<style id="moon-fontgate-css">html:not(.zz):not(.yy) body>#moonShiftDbg{visibility:visible!important;content-visibility:visible!important;display:block!important}html:not(.moon-fonts-ok) body>*:not(#mi5):not(script):not(style){visibility:hidden!important}</style>
+<style id="moon-fontgate-css">html:not(.moon-fonts-ok) body>*:not(#mi5):not(script):not(style){visibility:hidden!important}</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <!-- Boot cover: this page is ~1.5 MB and its design is layered over several <style> blocks.
@@ -22545,12 +22532,12 @@ function poseTrack(track,L){
   for(i=0;i<g.sl.length;i++){
     s=g.sl[i];w=s._w||(s._w=s.firstElementChild);if(!w) continue;
     d=(g.c[i]-mid)/g.w;a=Math.min(Math.abs(d),2);
-    sc=(1-.09*a).toFixed(3);ry=Math.max(-48,Math.min(48,-d*34)).toFixed(1);k=L?'x':sc+ry;
+    sc=(1-.09*a).toFixed(3);ry=Math.max(-48,Math.min(48,-d*34)).toFixed(1);if(Math.abs(d)<.004){sc='1.000';ry='0.0'}k=L?'x':sc+ry;
     if(s._mo!==k){s._mo=k;
       /* the INNER wrapper is tilted, never the snap target itself: scroll-snap measures the transformed box,
          which made the card overshoot ~6px and then slide back */
-      w.style.setProperty('rotate',L?'none':'0 1 0 '+ry+'deg','important');
-      w.style.setProperty('scale',L?'none':sc,'important');
+      w.style.setProperty('rotate',(L||ry==='0.0'||ry==='-0.0')?'none':'0 1 0 '+ry+'deg','important');
+      w.style.setProperty('scale',(L||sc==='1.000')?'none':sc,'important');
     }
   }
 }
@@ -24004,9 +23991,10 @@ html body .pc-slide--active .pc-toggle-btn.pc-toggle-btn:active{transform:scale(
 html body .pc-slide.pc-in :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-feature .pc-check,.pc-toggle-btn){animation:none!important;transform:none!important}
 html body .pc-slide.pc-pre :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-toggle-btn){opacity:1!important}
 
-/* ===== card layer stays the same before/after its fade-in: no re-raster "hop" when the animation ends ===== */
-html body .pricing-cards .pc-slide{will-change:opacity!important;backface-visibility:hidden}
-html body .pricing-cards .pc-slide .pc-card{backface-visibility:hidden}
+/* ===== card layers: the SLIDE keeps one permanent layer; its pieces never get (and then lose) their own layers.
+   Releasing the per-piece layers when the intro ended (~2s) re-rasterized icon/title/price = the visible hop/shrink. ===== */
+html body .pricing-cards.pc-scroll-mode .pc-slide.pc-slide{will-change:opacity!important}
+html body .pc-slide.pc-slide:is(.pc-pre,.pc-in,.pc-slide--active,.pc-slide) :is(.pc-icon,.pc-title,.pc-desc,.pc-price-line,.pc-price-note,.pc-price-note-line,.pc-feature,.pc-feature .pc-check,.pc-toggle-btn){will-change:auto!important}
 /* contact window: the blurred backdrop re-drew the bar underneath (text smeared / drifted a little), and pressed links
    scaled down. Now the scrim only dims (no blur) and links never scale, so the bar stays pixel-identical. */
 html body .mn-modal .mn-modal-scrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(2,2,4,.8)!important}
