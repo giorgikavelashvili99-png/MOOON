@@ -23149,6 +23149,20 @@ html body .order-grid:not(.wizard-step-hidden){ animation:none; }
 html body .site-menu{ will-change:transform,opacity; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
 html body .site-menu .site-menu-panel{ backface-visibility:hidden; -webkit-backface-visibility:hidden; }
 html body .site-menu.mn-prewarm:not(.open){ visibility:visible !important; opacity:.01 !important; transition:none !important; pointer-events:none !important; }
+
+/* (C) ORDER WINDOW STEPPER / UPLOAD ICON FLICKER FIX.
+   The stepper dots ("breathing" + "pop") and the upload "+" ring ran infinite / replaying animations. While the window
+   opens, html.pc-opening squeezes every animation to 1ms and ~0.5s later gives the real duration back, which restarts them
+   -> a visible blink on every step of every order window. Now these are static: state changes use the colour transitions. */
+html body .pc-modal-scrim .wizard-step .wizard-step-dot,
+html body .pc-modal-scrim .wizard-step.is-active .wizard-step-dot,
+html body .pc-modal-scrim .wizard-step.is-done .wizard-step-dot{ animation:none !important; scale:1; }
+html body .pc-modal-scrim .wizard-step-dot::after,
+html body .pc-modal-scrim .wizard-step.is-active .wizard-step-dot::after{ animation:none !important; display:none !important; }
+html body .pc-modal-scrim .drop-zone .dz-icon,
+html body .pc-modal-scrim .drop-zone .dz-icon::before,
+html body .pc-modal-scrim .drop-zone .dz-icon::after{ animation:none !important; }
+html body .pc-modal-scrim .drop-zone .dz-icon::before{ opacity:0 !important; }
 </style>
 <script id="moon-noflicker-js">
 (function(){
