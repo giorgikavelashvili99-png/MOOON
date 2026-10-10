@@ -23287,6 +23287,9 @@ html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-m
 @supports (content-visibility:hidden){html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style){display:block!important;content-visibility:hidden!important;contain-intrinsic-size:0 0!important;height:0!important;min-height:0!important;max-height:0!important;margin-block:0!important;padding-block:0!important;border-block-width:0!important;overflow:hidden!important}}
 html body .mn-view{display:none;max-width:760px;margin:6px auto 30px;padding:0 4px}
 html body .mn-view.show{display:block;animation:mnViewIn .55s cubic-bezier(.22,.9,.32,1) both}
+/* the next page is built invisibly, off to the side, while the old one is still fading out - so the swap itself has almost nothing left to compute */
+html body .mn-views.mn-warming{display:contents}
+html body .mn-views .mn-view.mn-warm{display:block;position:fixed;left:0;right:0;top:0;opacity:0;pointer-events:none;contain:layout}
 @keyframes mnViewIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 html body .mn-view h2{margin:6px 0 6px;font-size:clamp(26px,6.4vw,38px);line-height:1.15;font-weight:800;letter-spacing:.2px;color:#f2f3f6;text-shadow:0 2px 18px rgba(160,180,255,.25)}
 html body .mn-view .mn-sub{margin:0 0 26px;color:#9ea3af;font-size:15px;line-height:1.5}
@@ -23420,6 +23423,21 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     });
     return out.slice(0,7);
   }
+  /* pre-build the page that is about to be shown (style + layout) invisibly, a few frames into the fade-out, so that the heavy part
+     of the swap happens while the compositor is busy playing the fade and not in the gap between fade-out and fade-in */
+  var vhost=document.getElementById('mnViews'), warmEl=null, warmT=0;
+  function unwarm(){
+    clearTimeout(warmT);
+    if(warmEl){ warmEl.classList.remove('mn-warm'); warmEl=null; }
+    if(vhost) vhost.classList.remove('mn-warming');
+  }
+  function warm(tab){
+    if(!vhost||reduce||!tab||tab===view||warmEl) return;
+    var t=null; views.forEach(function(v){ if(v.getAttribute('data-view')===tab) t=v; });
+    if(!t) return;
+    warmEl=t; t.classList.add('mn-warm');
+    if(!view) vhost.classList.add('mn-warming');
+  }
   function stagger(list,cls,gap){ list.forEach(function(el,i){ el.style.animationDelay=(i*gap)+'ms'; el.classList.add(cls); }); }
   function unstagger(list,cls){ list.forEach(function(el){ el.classList.remove(cls); el.style.animationDelay=''; }); }
   /* Page change. Rules that keep it stable no matter how fast the person taps:
@@ -23444,12 +23462,15 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     if(req.tab && req.tab===shown){ pending=null; busy=false; return; }   /* already showing what was asked for */
     var outs=view ? [document.querySelector('.mn-view.show')].filter(Boolean) : blocks();
     stagger(outs,'mn-out',12);
+    if(outs.length){ var wt=req.tab; warmT=setTimeout(function(){ warm(wt); },70); }
     setTimeout(function(){ swap(outs); }, outs.length ? 130+outs.length*12 : 0);
   }
   function swap(outs){
     unstagger(outs,'mn-out');
     var req=pending; pending=null;                                       /* newest request wins */
+    if(warmEl && !(req && req.tab && warmEl.getAttribute('data-view')===req.tab)) unwarm();   /* built the wrong page (newer tap) - throw it away */
     if(req && !(req.tab && req.tab===shown)){ try{ req.fn(); }catch(e){} }
+    unwarm();
     requestAnimationFrame(function(){
       if(!view){ var ins=blocks(); stagger(ins,'mn-in',75); setTimeout(function(){ unstagger(ins,'mn-in'); },1100); }
     });
@@ -23558,10 +23579,10 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
 html body .site-menu{
   top:var(--mn-menu-top,92px)!important; left:50%!important; right:auto!important;
   width:min(calc(100vw - 20px),820px); max-height:calc(100vh - var(--mn-menu-top,92px) - 10px)!important;
-  transform:translate(-50%,-14px) scale(.98)!important; border-radius:24px; z-index:70;
+  transform:translate(-50%,-14px) scale(.98); border-radius:24px; z-index:70;
   overscroll-behavior:contain;
 }
-html body .site-menu.open{ transform:translate(-50%,0) scale(1)!important; }
+html body .site-menu.open{ transform:translate(-50%,0) scale(1); }
 html body .site-menu-panel{ padding:14px 14px 16px!important; border-radius:24px; border:1px solid rgba(255,255,255,.14); }
 html body .site-menu-panel::before{ display:none; }
 html body .site-menu-divider{ display:none; }
@@ -24124,7 +24145,7 @@ html body .mn-wordmark .brand-logo-img{filter:none!important;content:url("data:i
 
 /* ===== sliding pill: all four links are the same width, so the pill keeps ONE size and only slides (no stretching, no overshoot) ===== */
 html body .mn-links .mn-link{flex:1 1 0!important;min-width:0!important;padding-left:4px!important;padding-right:4px!important;overflow:visible}
-html body .mn-links .mn-ind{transition:left .36s cubic-bezier(.4,0,.2,1),opacity .2s ease!important;transform:none!important;will-change:auto!important}
+html body .mn-links .mn-ind{transition:left .36s cubic-bezier(.4,0,.2,1),opacity .2s ease;transform:none;will-change:auto}
 
 /* ===== no dark shadows on panels / popups ===== */
 html body :is(.panel,.pc-accordion-body,.pc-modal-scrim .panel,.mn-card,.discord-popover,.site-menu,.admin-box,.cp-upscale-modal){box-shadow:none!important}
@@ -24243,9 +24264,11 @@ html body .mn-emblem img{transform:scale(1.1);transform-origin:center}
 /* ===== sliding pill: moved by the GPU (transform) instead of `left`, so it keeps gliding smoothly even while the page
    is busy switching content. Same size, same easing, same animation - just no main-thread layout per frame. ===== */
 html body .mn-links .mn-ind:not(#_a):not(#_b){
-  left:0!important;transform:translate3d(var(--ix,0px),0,0)!important;will-change:transform!important;
+  left:0!important;transform:translate3d(var(--ix,0px),0,0);will-change:transform;
   backface-visibility:hidden;contain:layout paint style;
-  transition:transform .36s cubic-bezier(.4,0,.2,1),opacity .2s ease!important}
+  transition:transform .36s cubic-bezier(.4,0,.2,1),opacity .2s ease}
+/* NOTE: transform / transition above are deliberately NOT !important - the browser refuses to run an animation on the GPU
+   compositor for a property that is declared !important, which silently put the pill's slide back on the main thread. */
 
 /* ===== nav v2: top row = brand | flag + Discord (with presence dot) + menu ; bottom row = 5 equal links (… Contact, Rules) ===== */
 html body .mn-right{gap:8px!important}
@@ -24274,8 +24297,8 @@ html body .mn-links .mn-link:active,html body .mn-links .mn-link{transform:none!
 html body .mn-glass .mn-link{will-change:auto}
 /* the contact card used to spring (scale + overshoot) and ended with transform:none, which dropped it to a different
    pixel grid at the last frame - so it wobbled sideways. Smooth slide, no overshoot, and it keeps its layer. */
-html body .mn-modal .mn-card{transform:translate3d(0,14px,0)!important;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .3s ease!important;will-change:transform,opacity}
-html body .mn-modal.open .mn-card{transform:translate3d(0,0,0)!important}
+html body .mn-modal .mn-card{transform:translate3d(0,14px,0);transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .3s ease!important;will-change:transform,opacity}
+html body .mn-modal.open .mn-card{transform:translate3d(0,0,0)}
 html.mn-nav-wait body .mn-glass{opacity:0;pointer-events:none;animation:mnNavFailsafe .01s linear 14s forwards}
 @keyframes mnNavFailsafe{to{opacity:1;pointer-events:auto}}
 /* one single, calm motion: the bar fades in while it slides down into its own place (top 8px) and stops there.
