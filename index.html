@@ -24436,5 +24436,32 @@ html body .mn-links .mn-ind{transform:none;will-change:auto;
   setTimeout(function(){ if(h.classList.contains('mn-nav-wait') && !blocked()) play(); },12500);
 })();
 </script>
+
+<!-- ===== MONTHLY card: rich gold face (deep enough for the white text) with a flowing gold light + an occasional glint. Compositor-only (transform), nothing is repainted per frame. ===== -->
+<style id="moon-gold-card">
+html body .pc-card--monthly{--pc-bg:radial-gradient(ellipse 120% 60% at 15% 0%,rgba(255,255,255,.12),transparent 55%),linear-gradient(115deg,#8F5700 0%,#B97A08 30%,#C8890A 50%,#B5740A 72%,#8A5200 100%)}
+/* soft living gold: two big feathered glows drift slowly under the text (no hard edges, text never gets lighter) */
+html body .pc-card.pc-card--monthly::before{
+  content:''!important;display:block!important;position:absolute;left:-12%;top:-18%;right:auto;bottom:auto;width:84%;height:136%!important;min-height:0!important;max-height:none!important;border-radius:0!important;box-shadow:none!important;filter:none!important;opacity:1!important;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,216,116,.56) 0%,rgba(255,200,80,.26) 48%,rgba(255,188,60,.06) 78%,rgba(255,188,60,0) 100%);
+  transform:translate3d(-8%,0,0);will-change:transform;animation:mgDriftA 9s cubic-bezier(.45,.05,.55,.95) infinite alternate}
+html body .pc-card.pc-card--monthly::after{
+  content:''!important;display:block!important;position:absolute;left:auto;right:-16%;top:30%;bottom:auto;width:66%;height:90%!important;min-height:0!important;max-height:none!important;border-radius:0!important;box-shadow:none!important;filter:none!important;opacity:1!important;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,238,184,.4) 0%,rgba(255,216,124,.16) 52%,rgba(255,206,100,0) 100%);
+  transform:translate3d(10%,0,0);will-change:transform;animation:mgDriftB 13s cubic-bezier(.45,.05,.55,.95) -4s infinite alternate!important}
+@keyframes mgDriftA{0%{transform:translate3d(-6%,2%,0)}100%{transform:translate3d(112%,-2%,0)}}
+@keyframes mgDriftB{0%{transform:translate3d(8%,-6%,0)}100%{transform:translate3d(-112%,10%,0)}}
+html body .pc-card--monthly > .pc-top :is(.pc-title,.pc-desc,.pc-price-line b,.pc-price-note),html body .pc-card--monthly > .pc-features .pc-feature{text-shadow:0 1px 2px rgba(64,32,0,.5)!important}
+/* pause whatever is not on screen / while a window is opening or the track is moving; still for low-power and reduced motion */
+html body .pc-card.pc-card--monthly.pc-off::before,html body .pc-card.pc-card--monthly.pc-off::after,
+html body .pc-card.pc-card--monthly.perf-off::before,html body .pc-card.pc-card--monthly.perf-off::after,
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-card--monthly::before,
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) .pc-card--monthly::after,
+html.pc-modal-on body .pc-card--monthly::before,html.pc-moving body .pc-card--monthly::before,html.pc-moving body .pc-card--monthly::after{animation-play-state:paused!important}
+html.low-power body .pc-card.pc-card--monthly::before,html.low-power body .pc-card.pc-card--monthly::after{animation:none!important;display:none!important}
+@media (prefers-reduced-motion:reduce){html body .pc-card.pc-card--monthly::before,html body .pc-card.pc-card--monthly::after{animation:none!important;display:none!important}}
+/* the little card copies in the intro stay still (they only get the colour) */
+#mi5 .deck .dc .pc-card--monthly::before,#mi5 .deck .dc .pc-card--monthly::after{display:none!important}
+</style>
 </body>
 </html>
