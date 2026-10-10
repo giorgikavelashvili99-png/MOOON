@@ -7784,9 +7784,11 @@ html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(3){animation-delay:.2s}
 .pc-modal-scrim.open .pc-modal-close{animation:pcFinX .28s cubic-bezier(.2,.8,.3,1) .1s backwards}
 @keyframes pcFinX{from{opacity:0;transform:scale(.6)}}
 /* no flicker: while the window opens, only the panel itself animates (inner fields/grids/steps stay still) */
-html.pc-opening .pc-modal-scrim .pc-modal-scroll *,
-html.pc-opening .pc-modal-scrim .pc-modal-scroll *::before,
-html.pc-opening .pc-modal-scrim .pc-modal-scroll *::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important}
+/* keyed on the scrim (class pc-sq), not on <html>: a rule that ends in "*" and starts from a class on <html> makes the browser
+   restyle the entire page every time that class is added/removed (twice per order tap) */
+html .pc-modal-scrim.pc-sq .pc-modal-scroll *,
+html .pc-modal-scrim.pc-sq .pc-modal-scroll *::before,
+html .pc-modal-scrim.pc-sq .pc-modal-scroll *::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important}
 
 .pc-modal-scrim.open>.pc-accordion-body>.pc-cine-sweep::before{animation-duration:.9s;animation-delay:.2s}
 
@@ -11696,15 +11698,18 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     });
     const btn = card.querySelector('.pc-toggle-btn');
     const panel = card.querySelector('.pc-accordion-body');
+    /* measured first, before any class changes, so it does not force an extra full style/layout pass in the middle of the tap */
+    const __scrollY0 = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     card.classList.add('pc-open');
     if (btn) btn.setAttribute('aria-expanded', 'true');
     document.documentElement.classList.add('pc-opening');
+    if (pcModalScrim) pcModalScrim.classList.add('pc-sq');
     // Remember exactly where the page was scrolled to before this modal
     // opened, so closing it (✕, scrim click, or Escape) can put the
     // visitor back at that same spot instead of wherever the page
     // happens to land once the panel's returned to its normal position
     // in the document flow.
-    card._pcScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    card._pcScrollY = __scrollY0;
     // Move the panel out of the card and into the scrim, which centers it.
     // This is what keeps it safe from the card's own desktop-only hover
     // transform — while the panel lived inside .pc-card permanently, that
@@ -11719,8 +11724,9 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     if (pcModalScrim) pcModalScrim.classList.add('open');
     document.documentElement.classList.add('pc-modal-on');
     document.documentElement.classList.add('pc-opening');
+    if (pcModalScrim) pcModalScrim.classList.add('pc-sq');
     clearTimeout(window._pcOpeningT);
-    window._pcOpeningT = setTimeout(function(){ document.documentElement.classList.remove('pc-opening'); }, 520);
+    window._pcOpeningT = setTimeout(function(){ document.documentElement.classList.remove('pc-opening'); if (pcModalScrim) pcModalScrim.classList.remove('pc-sq'); }, 520);
     lockBodyScroll();
   }
 
@@ -21228,11 +21234,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     var b = e.target.closest && e.target.closest('.pc-toggle-btn');
     if (!b) return;
     var v = vecFrom(b);
-    root.style.setProperty('--cine-dx', v[0] + 'px');
-    root.style.setProperty('--cine-dy', v[1] + 'px');
+    /* set on the modal scrim (the only thing that reads them), NOT on <html>: a custom property changed on the root
+       made the browser restyle the whole page, once now and once more 1.5 s later (that was the stutter on every order tap) */
+    var host = document.getElementById('pcModalScrim') || root;
+    host.style.setProperty('--cine-dx', v[0] + 'px');
+    host.style.setProperty('--cine-dy', v[1] + 'px');
     clearTimeout(clearT);
     clearT = setTimeout(function(){
-      root.style.removeProperty('--cine-dx'); root.style.removeProperty('--cine-dy');
+      host.style.removeProperty('--cine-dx'); host.style.removeProperty('--cine-dy');
     }, 1500);
   }, true);
 
@@ -23543,6 +23552,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
   window.addEventListener('load',fit);
 })();
 </script>
+
 <style id="moon-final-v3">
 /* ===== MENU: opens directly under the nav bar, X replaces the burger ===== */
 html body .site-menu{
