@@ -23274,6 +23274,8 @@ html body .mn-right .menu-toggle{width:38px!important;height:38px!important;bord
 html body .mn-views{display:none}
 html body.mn-view-on .mn-views{display:block}
 html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style){display:none!important}
+/* browsers with content-visibility: the page is skipped (kept in memory) instead of display:none, so coming back to it costs ~half the style/layout work */
+@supports (content-visibility:hidden){html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style){display:block!important;content-visibility:hidden!important;contain-intrinsic-size:0 0!important;height:0!important;min-height:0!important;max-height:0!important;margin-block:0!important;padding-block:0!important;border-block-width:0!important;overflow:hidden!important}}
 html body .mn-view{display:none;max-width:760px;margin:6px auto 30px;padding:0 4px}
 html body .mn-view.show{display:block;animation:mnViewIn .55s cubic-bezier(.22,.9,.32,1) both}
 @keyframes mnViewIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -23399,7 +23401,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
 
   /* ---- page change: current content steps out, new content builds in piece by piece ---- */
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var busy=false, pending=null;
+  var busy=false, pending=null, shown='home';
   var BLK='.wrap>*:not(.topbar):not(.mn-views):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style)';
   function blocks(){
     var out=[], vh=window.innerHeight;
@@ -23409,26 +23411,40 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     });
     return out.slice(0,7);
   }
-  function transit(fn){
+  function stagger(list,cls,gap){ list.forEach(function(el,i){ el.style.animationDelay=(i*gap)+'ms'; el.classList.add(cls); }); }
+  function unstagger(list,cls){ list.forEach(function(el){ el.classList.remove(cls); el.style.animationDelay=''; }); }
+  /* Page change. Rules that keep it stable no matter how fast the person taps:
+     - the pill is moved by the click handler itself (setActive) and nothing queued ever moves it again, so it always follows the LAST tap;
+     - only the newest request is kept; an older one that has not run yet is dropped, and one that is already fading out is replaced
+       by the newest target before the swap, so the page never flashes through tabs the person has already left;
+     - the heavy part (swapping the page) waits until the browser has actually drawn two frames of the pill sliding
+       (a plain timer fires even when the browser was too busy to draw, which is what made the slide stall). */
+  function transit(fn,tab){
     if(reduce){ fn(); return; }
-    if(busy){ pending=fn; return; }
+    pending={fn:fn,tab:tab};
+    if(busy) return;
     busy=true; closeLang();
-    /* the white pill gets the first moments completely to itself (nothing else is animating or being rebuilt), then the page
-       fades out / swaps / builds in. Same animations, just not on top of each other -> the slide never stalls. */
-    setTimeout(function(){
+    kick();
+  }
+  function kick(){
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(fadeOut,60); }); });
+  }
+  function fadeOut(){
+    var req=pending;
+    if(!req){ busy=false; return; }
+    if(req.tab && req.tab===shown){ pending=null; busy=false; return; }   /* already showing what was asked for */
     var outs=view ? [document.querySelector('.mn-view.show')].filter(Boolean) : blocks();
-    outs.forEach(function(el,i){ el.style.setProperty('--o',i); el.classList.add('mn-out'); });
-    setTimeout(function(){
-      outs.forEach(function(el){ el.classList.remove('mn-out'); el.style.removeProperty('--o'); });
-      try{ fn(); }catch(e){}
-      if(!view){
-        var ins=blocks();
-        ins.forEach(function(el,i){ el.style.setProperty('--o',i); el.classList.add('mn-in'); });
-        setTimeout(function(){ ins.forEach(function(el){ el.classList.remove('mn-in'); el.style.removeProperty('--o'); }); },1200);
-      }
-      setTimeout(function(){ busy=false; if(pending){ var f=pending; pending=null; transit(f); } },260);
-    }, outs.length ? 150+outs.length*12 : 0);
-    },230);
+    stagger(outs,'mn-out',12);
+    setTimeout(function(){ swap(outs); }, outs.length ? 130+outs.length*12 : 0);
+  }
+  function swap(outs){
+    unstagger(outs,'mn-out');
+    var req=pending; pending=null;                                       /* newest request wins */
+    if(req && !(req.tab && req.tab===shown)){ try{ req.fn(); }catch(e){} }
+    requestAnimationFrame(function(){
+      if(!view){ var ins=blocks(); stagger(ins,'mn-in',75); setTimeout(function(){ unstagger(ins,'mn-in'); },1100); }
+    });
+    setTimeout(function(){ busy=false; if(pending){ busy=true; kick(); } },220);
   }
   var view=null;
   function closeMenus(){
@@ -23437,12 +23453,12 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
   function openView(n){
     closeLang(); closeContact(true); closeMenus();
     views.forEach(function(v){ v.classList.toggle('show', v.getAttribute('data-view')===n); });
-    body.classList.add('mn-view-on'); view=n; setActive(n);
+    body.classList.add('mn-view-on'); view=n; shown=n;
     window.scrollTo(0,0);
   }
   function closeView(){
     body.classList.remove('mn-view-on'); views.forEach(function(v){ v.classList.remove('show'); });
-    view=null; setActive('home');
+    view=null; shown='home';
   }
   function goHome(){ window.location.reload(); }
 
@@ -23472,7 +23488,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
   function closeContact(silent){
     if(!modal || !modal.classList.contains('open')) return;
     modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
-    if(!silent) setActive(view||'home');
+    if(!silent) setActive(shown);
   }
   modal.addEventListener('click',function(e){ if(e.target.closest('[data-mn-close]')) closeContact(); });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeLang(); closeContact(); } });
@@ -23480,16 +23496,15 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
   /* ---- clicks ---- */
   links.forEach(function(b){
     b.addEventListener('click',function(){
-      var n=b.getAttribute('data-mn'), lab=(b.textContent||'').trim();
-      if(n==='home'){
-        if(view||busy){ setActive('home'); transit(function(){ closeView(); window.scrollTo(0,0); }); }
-        else { setActive('home'); window.scrollTo({top:0,behavior:'smooth'}); }
+      var n=b.getAttribute('data-mn');
+      if(n==='contact'){ openContact(); return; }
+      closeContact(true);
+      setActive(n);                                   /* the pill answers the tap immediately and is never moved by anything else */
+      if(n===shown && !busy){
+        if(n==='home') window.scrollTo({top:0,behavior:'smooth'});
+        return;
       }
-      else if(n==='order'||n==='upload'||n==='rules'){
-        if(view===n&&!busy) return;
-        closeContact(true); setActive(n); transit(function(){ openView(n); });
-      }
-      else if(n==='contact') openContact();
+      transit(n==='home' ? function(){ closeView(); window.scrollTo(0,0); } : function(){ openView(n); }, n);
     });
   });
   ['mnEmblem','mnWordmark'].forEach(function(id){
@@ -23503,7 +23518,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     transit(function(){
       closeView();
       var s=document.querySelector('.pc-section'); if(s) s.scrollIntoView({behavior:'instant',block:'start'});
-    });
+    },'home');
   });
   var ruCta=document.getElementById('mnRuCta');
   if(ruCta) ruCta.addEventListener('click',function(){
@@ -23511,14 +23526,14 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     transit(function(){
       closeView();
       var s=document.querySelector('.pc-section'); if(s) s.scrollIntoView({behavior:'instant',block:'start'});
-    });
+    },'home');
   });
   if(upCta) upCta.addEventListener('click',function(){
     setActive('home');
     transit(function(){ closeView(); setTimeout(function(){
       var j=document.createElement('button'); j.className='scanner-jump-link'; j.setAttribute('data-jump','videoScannerPanel'); j.style.display='none';
       document.body.appendChild(j); j.click(); j.remove();
-    },60); });
+    },60); },'home');
   });
 
   /* ---- keep the placeholder as tall as the fixed glass bar ---- */
