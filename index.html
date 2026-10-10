@@ -24476,5 +24476,36 @@ html body :is(.pc-card--cheap,#cheapOrderPanel){--pc-cta-bg:linear-gradient(120d
 html body :is(.pc-card--any,#anyOrderPanel){--pc-cta-bg:linear-gradient(120deg,#02829E 0%,#0897B8 50%,#02829E 100%)}
 html body :is(.pc-card--cheapmonthly,#cheapMonthlyPanel){--pc-cta-bg:linear-gradient(120deg,#9AA3B0 0%,#C2C8D1 50%,#9AA3B0 100%)}
 </style>
+<style id="moon-polish">
+/* ===== order button light: it switches on slowly and softly, then breathes (opacity/transform only = runs on the GPU) ===== */
+html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::before{transition:opacity .85s cubic-bezier(.4,0,.2,1)!important}
+html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::after{transform:scale(.965)!important;transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)!important}
+@media (hover:hover) and (pointer:fine){
+  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d):hover::before{opacity:1!important;transition:opacity 1.3s cubic-bezier(.42,0,.2,1)!important}
+  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d):hover::after{opacity:1!important;transform:scale(1)!important;
+    transition:opacity 1.4s cubic-bezier(.42,0,.2,1),transform 1.4s cubic-bezier(.42,0,.2,1)!important;
+    animation:none!important}
+}
+@media (hover:none){
+  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d):active::before{opacity:1!important;transition:opacity .5s ease-out!important}
+  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d):active::after{opacity:1!important;transform:scale(1)!important;transition:opacity .6s ease-out,transform .6s ease-out!important}
+}
+/* the same soft ignition in the intro (card glow + button turning white) */
+#mi5 .deck .dc .pc-card{transition:box-shadow 1.1s cubic-bezier(.22,.7,.2,1)!important}
+#mi5 .deck .dc .pc-toggle-btn{transition:background-color .7s ease,color .7s ease,border-color .7s ease,transform .15s ease!important}
+
+/* ===== clean shell edges: a hair-thin feather in the ring's own colour smooths the stair-steps on curves (no extra visible line) ===== */
+html body .pc-card.pc-card{--moon-ring:color-mix(in srgb,var(--pc-accent,#7c8fff) 62%,#fff);
+  box-shadow:inset 0 0 0 2px var(--moon-ring),0 0 0 .5px color-mix(in srgb,var(--moon-ring) 50%,transparent),0 0 1.5px 0 color-mix(in srgb,var(--moon-ring) 35%,transparent)!important}
+html body .mn-glass.mn-glass,html body .site-menu-panel.site-menu-panel,html body .lang-switch.lang-switch,html body .menu-toggle.menu-toggle{
+  box-shadow:0 0 0 .5px rgba(255,255,255,.1),0 0 1.5px 0 rgba(255,255,255,.07)!important}
+html body .comments-panel.comments-panel{box-shadow:0 0 0 .5px rgba(60,82,140,.38),0 0 1.5px 0 rgba(60,82,140,.22)!important}
+html body .c-discord-gate.c-discord-gate{box-shadow:0 0 0 .5px rgba(88,101,242,.28),0 0 1.5px 0 rgba(88,101,242,.2)!important}
+html body .ttdl-input.ttdl-input{box-shadow:0 0 0 .5px rgba(255,255,255,.1),0 0 1.5px 0 rgba(255,255,255,.06)!important}
+html body .pc-card .pc-feature.pc-feature:nth-child(-n+2):not(#_a):not(#_b){box-shadow:0 0 0 .5px rgba(255,255,255,.14),0 0 1.5px 0 rgba(255,255,255,.08)!important}
+html body .mn-right .menu-toggle.menu-toggle:not(#_a):not(#_b){box-shadow:0 0 0 .5px rgba(255,255,255,.1),0 0 1.5px 0 rgba(255,255,255,.07)!important}
+/* gate + contact cards: the blur behind them showed nothing (solid dark page) but made the rounded corners ragged on some phones */
+html body .dg-card.dg-card,html body .mn-card.mn-card{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+</style>
 </body>
 </html>
