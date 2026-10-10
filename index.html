@@ -24481,7 +24481,7 @@ html body :is(.pc-card--cheapmonthly,#cheapMonthlyPanel){--pc-cta-bg:linear-grad
 html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::before{transition:opacity .85s cubic-bezier(.4,0,.2,1)!important}
 html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::after{transform:scale(.965)!important;transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)!important}
 @media (hover:hover) and (pointer:fine){
-  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d):hover::before{opacity:1!important;transition:opacity 1.3s cubic-bezier(.42,0,.2,1)!important}
+  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d):hover::before{opacity:1!important;transition:opacity 1.4s cubic-bezier(.42,0,.2,1)!important}
   html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d):hover::after{opacity:1!important;transform:scale(1)!important;
     transition:opacity 1.4s cubic-bezier(.42,0,.2,1),transform 1.4s cubic-bezier(.42,0,.2,1)!important;
     animation:none!important}
@@ -24495,17 +24495,275 @@ html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggl
 #mi5 .deck .dc .pc-toggle-btn{transition:background-color .7s ease,color .7s ease,border-color .7s ease,transform .15s ease!important}
 
 /* ===== clean shell edges: a hair-thin feather in the ring's own colour smooths the stair-steps on curves (no extra visible line) ===== */
-html body .pc-card.pc-card{--moon-ring:color-mix(in srgb,var(--pc-accent,#7c8fff) 62%,#fff);
-  box-shadow:inset 0 0 0 2px var(--moon-ring),0 0 0 .5px color-mix(in srgb,var(--moon-ring) 50%,transparent),0 0 1.5px 0 color-mix(in srgb,var(--moon-ring) 35%,transparent)!important}
-html body .mn-glass.mn-glass,html body .site-menu-panel.site-menu-panel,html body .lang-switch.lang-switch,html body .menu-toggle.menu-toggle{
-  box-shadow:0 0 0 .5px rgba(255,255,255,.1),0 0 1.5px 0 rgba(255,255,255,.07)!important}
-html body .comments-panel.comments-panel{box-shadow:0 0 0 .5px rgba(60,82,140,.38),0 0 1.5px 0 rgba(60,82,140,.22)!important}
-html body .c-discord-gate.c-discord-gate{box-shadow:0 0 0 .5px rgba(88,101,242,.28),0 0 1.5px 0 rgba(88,101,242,.2)!important}
-html body .ttdl-input.ttdl-input{box-shadow:0 0 0 .5px rgba(255,255,255,.1),0 0 1.5px 0 rgba(255,255,255,.06)!important}
-html body .pc-card .pc-feature.pc-feature:nth-child(-n+2):not(#_a):not(#_b){box-shadow:0 0 0 .5px rgba(255,255,255,.14),0 0 1.5px 0 rgba(255,255,255,.08)!important}
-html body .mn-right .menu-toggle.menu-toggle:not(#_a):not(#_b){box-shadow:0 0 0 .5px rgba(255,255,255,.1),0 0 1.5px 0 rgba(255,255,255,.07)!important}
+html body .pc-card.pc-card{--moon-ring:color-mix(in srgb,var(--pc-accent,#7c8fff) 54%,#fff);--mrw:3px;
+  box-shadow:inset 0 0 0 var(--mrw) var(--moon-ring)!important}
+/* ring = ONE solid colour, crisp on both sides; 3px thick, always a whole number of device pixels */
+@media (min-width:901px){html body .pc-card.pc-card{--mrw:calc(3px / 1.15)}}
+@media (min-width:901px) and (min-resolution:1.2dppx) and (max-resolution:1.39dppx){html body .pc-card.pc-card{--mrw:calc(4px / (1.15 * 1.25))}}
+@media (min-width:901px) and (min-resolution:1.4dppx) and (max-resolution:1.59dppx){html body .pc-card.pc-card{--mrw:calc(5px / (1.15 * 1.5))}}
+@media (min-width:901px) and (min-resolution:1.6dppx) and (max-resolution:1.89dppx){html body .pc-card.pc-card{--mrw:calc(6px / (1.15 * 1.75))}}
+@media (min-width:901px) and (min-resolution:1.9dppx) and (max-resolution:2.19dppx){html body .pc-card.pc-card{--mrw:calc(7px / (1.15 * 2))}}
+@media (max-width:900px) and (min-resolution:1.2dppx) and (max-resolution:1.3dppx){html body .pc-card.pc-card{--mrw:calc(4px / 1.25)}}
+@media (max-width:900px) and (min-resolution:1.7dppx) and (max-resolution:1.8dppx){html body .pc-card.pc-card{--mrw:calc(5px / 1.75)}}
+@media (max-width:900px) and (min-resolution:2.15dppx) and (max-resolution:2.35dppx){html body .pc-card.pc-card{--mrw:calc(7px / 2.25)}}
+@media (max-width:900px) and (min-resolution:2.4dppx) and (max-resolution:2.55dppx){html body .pc-card.pc-card{--mrw:calc(8px / 2.5)}}
+@media (max-width:900px) and (min-resolution:2.58dppx) and (max-resolution:2.68dppx){html body .pc-card.pc-card{--mrw:calc(8px / 2.625)}}
+@media (max-width:900px) and (min-resolution:2.7dppx) and (max-resolution:2.8dppx){html body .pc-card.pc-card{--mrw:calc(8px / 2.75)}}
+@media (max-width:900px) and (min-resolution:3.4dppx) and (max-resolution:3.6dppx){html body .pc-card.pc-card{--mrw:calc(11px / 3.5)}}
 /* gate + contact cards: the blur behind them showed nothing (solid dark page) but made the rounded corners ragged on some phones */
 html body .dg-card.dg-card,html body .mn-card.mn-card{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+
+/* ===== the card shell lights up together with the order button: same curve, same time (1.4s in / .85s out, opacity + scale only = GPU) ===== */
+/* inner light + brighter ring: the (idle-hidden) .pc-fx layer inside the card */
+html body .pc-card.pc-card > .pc-fx.pc-fx:not(#_a):not(#_b):not(#_c):not(#_d){background:none!important;border-radius:inherit;
+  box-shadow:inset 0 0 0 var(--mrw,2px) color-mix(in srgb,var(--pc-accent,#7c8fff) 30%,#fff),inset 0 0 20px 2px color-mix(in srgb,var(--pc-accent,#7c8fff) 55%,#fff)!important;
+  opacity:0!important;transition:opacity .85s cubic-bezier(.4,0,.2,1)!important}
+/* soft halo outside the card (kept inside the 16px the carousel leaves above/below, so nothing is ever cut) */
+html body .pc-slide:has(.pc-card--indiv){--moon-gl:#14D011}
+html body .pc-slide:has(.pc-card--any){--moon-gl:#007D99}
+html body .pc-slide:has(.pc-card--weekly){--moon-gl:#B501E7}
+html body .pc-slide:has(.pc-card--monthly){--moon-gl:#F2BB06}
+html body .pc-slide:has(.pc-card--edit){--moon-gl:#F70000}
+html body .pc-slide:has(.pc-card--cheap){--moon-gl:#0048E5}
+html body .pc-slide:has(.pc-card--cheapmonthly){--moon-gl:#9aa3b0}
+html body .pc-slide.pc-slide--active:not(#_a):not(#_b)::before{content:"";position:absolute;inset:0;border-radius:22px;z-index:-1;pointer-events:none;
+  box-shadow:0 0 8px 1px color-mix(in srgb,var(--moon-gl,#7c8fff) 70%,transparent),0 0 14px 2px color-mix(in srgb,var(--moon-gl,#7c8fff) 38%,transparent);
+  opacity:0;transform:scale(.985);transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)}
+@media (hover:hover) and (pointer:fine){
+  html body .pc-slide.pc-slide--active:has(.pc-toggle-btn:hover):not(#_a):not(#_b)::before{opacity:1;transform:none;
+    transition:opacity 1.4s cubic-bezier(.42,0,.2,1),transform 1.4s cubic-bezier(.42,0,.2,1)}
+  html body .pc-slide.pc-slide--active:has(.pc-toggle-btn:hover) .pc-card.pc-card > .pc-fx.pc-fx:not(#_a):not(#_b):not(#_c):not(#_d){opacity:1!important;
+    transition:opacity 1.4s cubic-bezier(.42,0,.2,1)!important}
+}
+@media (prefers-reduced-motion:reduce){
+  html body .pc-slide.pc-slide--active:not(#_a):not(#_b)::before,html body .pc-slide.pc-slide--active:has(.pc-toggle-btn) .pc-card.pc-card > .pc-fx.pc-fx:not(#_a):not(#_b):not(#_c):not(#_d){transition-duration:.01s!important}
+}
+</style>
+<style id="moon-flat">
+/* ===== flat fills: every panel that has a shell is filled with ONE even colour (no gradient, so no grain / banding inside) ===== */
+html body .pc-card--indiv{--pc-bg:#277928}
+html body .pc-card--any{--pc-bg:#065F75}
+html body .pc-card--weekly{--pc-bg:#5313A5}
+html body .pc-card--monthly{--pc-bg:#C0800A}
+html body .pc-card--edit{--pc-bg:#7D0101}
+html body .pc-card--cheap{--pc-bg:#0A38BB}
+html body .pc-card--cheapmonthly{--pc-bg:#131418}
+html body .comments-panel.comments-panel{background-image:none!important;background-color:rgb(24,24,25)!important}
+html body .mn-glass.mn-glass{background-image:none!important;background-color:rgb(44,47,57)!important}
+html body .ttdl-shell.ttdl-shell::after{background-image:none!important;background-color:rgb(7,11,18)!important}
+html body .ttdl-glass.ttdl-glass{background-image:none!important;background-color:rgba(255,255,255,.047)!important}
+html body .ttdl-log.ttdl-log{background-image:none!important;background-color:rgb(3,6,10)!important}
+html body .site-menu-panel.site-menu-panel{background-image:none!important;background-color:rgb(11,11,19)!important}
+html body .dg-card.dg-card{background-image:none!important;background-color:rgba(18,19,25,.94)!important}
+html body .mn-card.mn-card{background-image:none!important;background-color:rgba(20,21,26,.95)!important}
+</style>
+<style id="moon-shells">
+/* ===== EVERY shell gets the same ring as the order cards: ONE solid colour, crisp, thick (big shells 3px, small controls 2px).
+   Ring = inset box-shadow (the old thin border is made invisible), so it is always an exact whole number of device pixels (no half-lit row), sits inside the border box
+   (no layout shift) and never touches the shell's other effects. ===== */
+:root{--rw3:3px;--rw2:2px;--ow3:3px;--ow2:2px}
+@media (min-width:901px){:root{--rw3:calc(3px / 1.15);--rw2:calc(2px / 1.15);--ow3:calc(3.02px / 1.15);--ow2:calc(2.02px / 1.15)}}
+@media (min-width:901px) and (min-resolution:1.2dppx) and (max-resolution:1.39dppx){:root{--rw3:calc(4px / (1.15 * 1.25));--rw2:calc(3px / (1.15 * 1.25))}}
+@media (min-width:901px) and (min-resolution:1.4dppx) and (max-resolution:1.59dppx){:root{--rw3:calc(5px / (1.15 * 1.5));--rw2:calc(3px / (1.15 * 1.5))}}
+@media (min-width:901px) and (min-resolution:1.6dppx) and (max-resolution:1.89dppx){:root{--rw3:calc(6px / (1.15 * 1.75));--rw2:calc(4px / (1.15 * 1.75))}}
+@media (min-width:901px) and (min-resolution:1.9dppx) and (max-resolution:2.19dppx){:root{--rw3:calc(7px / (1.15 * 2));--rw2:calc(5px / (1.15 * 2))}}
+@media (max-width:900px) and (min-resolution:1.2dppx) and (max-resolution:1.3dppx){:root{--rw3:calc(4px / 1.25);--rw2:calc(3px / 1.25)}}
+@media (max-width:900px) and (min-resolution:1.7dppx) and (max-resolution:1.8dppx){:root{--rw3:calc(5px / 1.75);--rw2:calc(4px / 1.75)}}
+@media (max-width:900px) and (min-resolution:2.15dppx) and (max-resolution:2.35dppx){:root{--rw3:calc(7px / 2.25);--rw2:calc(5px / 2.25)}}
+@media (max-width:900px) and (min-resolution:2.4dppx) and (max-resolution:2.55dppx){:root{--rw3:calc(8px / 2.5);--rw2:calc(5px / 2.5)}}
+@media (max-width:900px) and (min-resolution:2.58dppx) and (max-resolution:2.68dppx){:root{--rw3:calc(8px / 2.625);--rw2:calc(5px / 2.625)}}
+@media (max-width:900px) and (min-resolution:2.7dppx) and (max-resolution:2.8dppx){:root{--rw3:calc(8px / 2.75);--rw2:calc(6px / 2.75)}}
+@media (max-width:900px) and (min-resolution:3.4dppx) and (max-resolution:3.6dppx){:root{--rw3:calc(11px / 3.5);--rw2:calc(7px / 3.5)}}
+html body .promo-box-inline:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(108,148,255)!important}
+html body #mooonPromptAo:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptWp:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptMp:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptCp:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(71,98,168)!important}
+html body #cDiscordLoggedOut:not(#_a):not(#_b):not(#_c),
+html body #commentEmojiPanel:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(130,141,248)!important}
+html body .wizard-question:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(86,93,164)!important}
+html body #ordersDonutCard:not(#_a):not(#_b):not(#_c),
+html body #analyticsSummaryCard:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(96,208,255)!important}
+html body #srAuto:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoAo:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoWp:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoMp:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoCp:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(63,137,168)!important}
+html body .toggle-row:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(73,148,99)!important}
+html body #socialProofBar:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(226,250,110)!important}
+html body #discordPopover:not(#_a):not(#_b):not(#_c),
+html body #quickNav:not(#_a):not(#_b):not(#_c),
+html body .qn-drop-body:not(#_a):not(#_b):not(#_c),
+html body #baSlider:not(#_a):not(#_b):not(#_c),
+html body .panel.comments-panel:not(#_a):not(#_b):not(#_c),
+html body .panel.comments-panel.enh-rv:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(78,104,170)!important}
+html body .scanner-stage:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(51,69,112)!important}
+html body #messengerReplyPreview:not(#_a):not(#_b):not(#_c),
+html body .dg-card:not(#_a):not(#_b):not(#_c),
+html body .dg-ban-footer:not(#_a):not(#_b):not(#_c),
+html body .mn-glass:not(#_a):not(#_b):not(#_c),
+html body .site-menu-panel:not(#_a):not(#_b):not(#_c),
+html body .ttdl-glass:not(#_a):not(#_b):not(#_c),
+html body #commentsRatingRow:not(#_a):not(#_b):not(#_c),
+html body .mn-card:not(#_a):not(#_b):not(#_c),
+html body .mn-note:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(112,120,146)!important}
+html body .sr-price-hero.sr-details-hidden:not(#_a):not(#_b):not(#_c),
+html body #srTransfer:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
+html body #srReject:not(#_a):not(#_b):not(#_c),
+html body #warnPanel:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(168,82,92)!important}
+html body #discordLoginBtn:not(#_a):not(#_b):not(#_c),
+html body #cDiscordLoggedIn:not(#_a):not(#_b):not(#_c),
+html body #commentName:not(#_a):not(#_b):not(#_c),
+html body #commentText:not(#_a):not(#_b):not(#_c),
+html body #commentEmojiBtn:not(#_a):not(#_b):not(#_c),
+html body #adminModeRow:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(130,141,248)!important}
+html body #adminCloseLogin:not(#_a):not(#_b):not(#_c),
+html body #adminCloseDash:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(96,208,255)!important}
+html body .mooon-auto-stay:not(#_a):not(#_b):not(#_c),
+html body #tiktokAutoBtn:not(#_a):not(#_b):not(#_c),
+html body #tiktokAutoBtnAo:not(#_a):not(#_b):not(#_c),
+html body #tiktokAutoBtnWp:not(#_a):not(#_b):not(#_c),
+html body #tiktokAutoBtnMp:not(#_a):not(#_b):not(#_c),
+html body #tiktokAutoBtnCp:not(#_a):not(#_b):not(#_c),
+html body #tiktokAutoBtnCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(63,137,168)!important}
+html body .ttdl-status-chip:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(110,225,150)!important}
+html body #srSuccess:not(#_a):not(#_b):not(#_c),
+html body #scanOkAo:not(#_a):not(#_b):not(#_c),
+html body #scanOkWp:not(#_a):not(#_b):not(#_c),
+html body #scanOkMp:not(#_a):not(#_b):not(#_c),
+html body #scanOkCp:not(#_a):not(#_b):not(#_c),
+html body #scanOkCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(73,148,99)!important}
+html body #siteMenuClose:not(#_a):not(#_b):not(#_c),
+html body #qnDropClose:not(#_a):not(#_b):not(#_c),
+html body .dp-icon-btn:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(78,104,170)!important}
+html body #scanProgressCancel:not(#_a):not(#_b):not(#_c),
+html body .sr-row:not(#_a):not(#_b):not(#_c),
+html body #srQualityRow:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptNoAo:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptNoWp:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptNoMp:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptNoCp:not(#_a):not(#_b):not(#_c),
+html body #mooonPromptNoCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(51,69,112)!important}
+html body #messengerBackBtn:not(#_a):not(#_b):not(#_c),
+html body .lang-switch.dg-lang:not(#_a):not(#_b):not(#_c),
+html body #discordJoinBtn:not(#_a):not(#_b):not(#_c),
+html body #discordGateClose:not(#_a):not(#_b):not(#_c),
+html body #dgIntroBtn:not(#_a):not(#_b):not(#_c),
+html body #mnLangCur:not(#_a):not(#_b):not(#_c),
+html body #mnLangPop:not(#_a):not(#_b):not(#_c),
+html body #menuToggle:not(#_a):not(#_b):not(#_c),
+html body #visitorBadge:not(#_a):not(#_b):not(#_c),
+html body #viewsBadge:not(#_a):not(#_b):not(#_c),
+html body #ttdlUrlInput:not(#_a):not(#_b):not(#_c),
+html body #ttdlPasteBtn:not(#_a):not(#_b):not(#_c),
+html body #ttdlClearBtn:not(#_a):not(#_b):not(#_c),
+html body #mxCnt:not(#_a):not(#_b):not(#_c),
+html body #mxPrev:not(#_a):not(#_b):not(#_c),
+html body #mxPlay:not(#_a):not(#_b):not(#_c),
+html body #miSkip:not(#_a):not(#_b):not(#_c),
+html body #mi5Snd:not(#_a):not(#_b):not(#_c),
+html body #mi5Skip:not(#_a):not(#_b):not(#_c),
+html body .mn-card-x:not(#_a):not(#_b):not(#_c),
+html body .dg-spec b:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(112,120,146)!important}
+html body #srResetBtn:not(#_a):not(#_b):not(#_c),
+html body .sr-reject-detected-row:not(#_a):not(#_b):not(#_c),
+html body #scanResetAo:not(#_a):not(#_b):not(#_c),
+html body #scanResetWp:not(#_a):not(#_b):not(#_c),
+html body #scanResetMp:not(#_a):not(#_b):not(#_c),
+html body #scanResetCp:not(#_a):not(#_b):not(#_c),
+html body #scanResetCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(74,79,96)!important}
+html body #srTransferNo:not(#_a):not(#_b):not(#_c),
+html body #srAutoError:not(#_a):not(#_b):not(#_c),
+html body #srRejectRetry:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoErrorAo:not(#_a):not(#_b):not(#_c),
+html body #scanRejectWp:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoErrorWp:not(#_a):not(#_b):not(#_c),
+html body #scanRejectMp:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoErrorMp:not(#_a):not(#_b):not(#_c),
+html body #scanRejectCp:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoErrorCp:not(#_a):not(#_b):not(#_c),
+html body #scanRejectCpm:not(#_a):not(#_b):not(#_c),
+html body #mooonAutoErrorCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(168,82,92)!important}
+html body .tnf-note:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(96,224,204)!important}
+/* the two quality chips on each card (1080P / 4K): ring in the card colour, lightened */
+html body .pc-card--indiv .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
+html body .pc-card--any .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
+html body .pc-card--edit .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
+html body .pc-card--weekly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
+html body .pc-card--monthly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
+html body .pc-card--cheapmonthly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
+html body .pc-card--cheap .pc-feature:nth-child(2):not(#_a):not(#_b):not(#_c),
+html body .pc-card--cheap .pc-feature:nth-child(3):not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--pc-accent,#7c8fff) 40%,#fff)!important}
+/* shells that carry their own glow / shadow / focus effects keep those: their ring is an outline instead (inside the border box) */
+html body .trust-item.moon-glow-card.tilt-3d:not(:focus-visible){outline:var(--ow3) solid rgb(108,148,255)!important;outline-offset:calc(-1 * var(--ow3))!important}
+html body .howto-step.moon-glow-card.tilt-3d:not(:focus-visible){outline:var(--ow3) solid rgb(70,150,170)!important;outline-offset:calc(-1 * var(--ow3))!important}
+html body #orderFlowPanel:not(:focus-visible),
+html body #anyOrderPanel:not(:focus-visible),
+html body #weeklySubPanel:not(:focus-visible),
+html body #editOrderPanel:not(:focus-visible),
+html body .eo-video-wrap:not(:focus-visible),
+html body #cheapOrderPanel:not(:focus-visible),
+html body #cheapMonthlyPanel:not(:focus-visible){outline:var(--ow3) solid rgb(51,69,112)!important;outline-offset:calc(-1 * var(--ow3))!important}
+html body #portfolioCard1:not(:focus-visible),
+html body #portfolioCard2:not(:focus-visible),
+html body .a-tabs:not(:focus-visible){outline:var(--ow3) solid rgb(112,120,146)!important;outline-offset:calc(-1 * var(--ow3))!important}
+html body #monthlySubPanel:not(:focus-visible){outline:var(--ow3) solid rgb(74,79,96)!important;outline-offset:calc(-1 * var(--ow3))!important}
+html body .contact-btn.discord:not(:focus-visible){outline:var(--ow2) solid rgb(130,141,248)!important;outline-offset:calc(-1 * var(--ow2))!important}
+html body #promoInput:not(:focus-visible),
+html body #ordersTotalInput:not(:focus-visible),
+html body #ordersSuccessInput:not(:focus-visible),
+html body #ordersFailInput:not(:focus-visible),
+html body #pendingOrdersSearch:not(:focus-visible),
+html body #confirmedOrdersSearch:not(:focus-visible),
+html body #discordUsersSearch:not(:focus-visible),
+html body #activeSubsSearch:not(:focus-visible),
+html body #tiktokNotifySearch:not(:focus-visible),
+html body #analyticsTiktokInput:not(:focus-visible),
+html body #analyticsTypeInput:not(:focus-visible),
+html body #analyticsPriceInput:not(:focus-visible),
+html body #urgencyWeekInput:not(:focus-visible),
+html body #urgencyMonthInput:not(:focus-visible),
+html body #promoCodeInput:not(:focus-visible),
+html body #promoWeekDiscountInput:not(:focus-visible),
+html body #promoMonthDiscountInput:not(:focus-visible),
+html body #promoSingleDiscountInput:not(:focus-visible){outline:var(--ow2) solid rgb(78,104,170)!important;outline-offset:calc(-1 * var(--ow2))!important}
+html body #tiktokLink:not(:focus-visible),
+html body #tiktokLinkAo:not(:focus-visible),
+html body #tiktokLinkWp:not(:focus-visible),
+html body #tiktokLinkMp:not(:focus-visible),
+html body #tiktokLinkCp:not(:focus-visible),
+html body #tiktokLinkCpm:not(:focus-visible){outline:var(--ow2) solid rgb(51,69,112)!important;outline-offset:calc(-1 * var(--ow2))!important}
+html body .messenger-input-row:not(:focus-visible),
+html body .lang-btn.active:not(:focus-visible),
+html body #adminPass:not(:focus-visible),
+html body .pc-nav.pc-nav--prev:not(:focus-visible),
+html body .pc-nav.pc-nav--next:not(:focus-visible){outline:var(--ow2) solid rgb(112,120,146)!important;outline-offset:calc(-1 * var(--ow2))!important}
+html body .pc-modal-close:not(:focus-visible){outline:var(--ow2) solid rgb(74,79,96)!important;outline-offset:calc(-1 * var(--ow2))!important}
+/* intro scenes: the inner shells (modal replica, steps, chips, frame, stats, summary...) get the same ring, in the darker order-panel tones */
+html body #mi5 .mdl:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(51,69,112)!important}
+html body #mi5 .sm:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
+html body #mi5 .hintp:not(#_a):not(#_b),html body #mi5 .gf:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(74,79,96)!important}
+html body #mi5 .stp b:not(.on):not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(74,79,96)!important}
+html body #mi5 .stp b.ok:not(#_a):not(#_b){box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--a) 62%,#262d3a)!important}
+html body #mi5 .stp b:not(#_a):not(#_b){transition:background .2s,color .2s,border-color .2s,box-shadow .2s!important}
+html body #mi5 .chips span:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--a) 62%,#262d3a)!important}
+html body #mi5 .tg:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(74,79,96)!important;transition:opacity .4s,color .4s,border-color .4s,box-shadow .4s!important}
+html body #mi5 .tg.r.lit:not(#_a):not(#_b){box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--a) 62%,#262d3a)!important}
+html body #mi5 .dz.done:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--a) 62%,#262d3a)!important}
+html body #mi5 .frame:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;isolation:isolate}
+html body #mi5 .frame::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:2;pointer-events:none;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
+html body #mi5 .stats:not(#_a):not(#_b){position:relative;border-color:transparent!important}
+html body #mi5 .stats::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
+html body .wp-box:not(:focus-visible),html body .mp-box:not(:focus-visible),html body .quality-btn:not(:focus-visible){outline:var(--ow3) solid rgb(74,79,96)!important;outline-offset:calc(-1 * var(--ow3))!important}
+html body .wp-box:hover:not(:focus-visible),html body .mp-box:hover:not(:focus-visible),html body .quality-btn:hover:not(:focus-visible){outline-color:rgb(126,134,160)!important}
+html body .wp-box.active.active:not(:focus-visible),html body .mp-box.active.active:not(:focus-visible),html body .quality-btn.active.active:not(:focus-visible){outline-color:#fff!important}
+html body .ba-tab:not(:focus-visible){outline:var(--ow2) solid rgb(78,104,170)!important;outline-offset:calc(-1 * var(--ow2))!important}
+html body .ba-tab.active.active:not(:focus-visible){outline-color:rgb(207,216,255)!important}
+html body .eo-style-tab:not(:focus-visible){outline:var(--ow2) solid rgb(74,79,96)!important;outline-offset:calc(-1 * var(--ow2))!important}
+html body .eo-style-tab:hover:not(:focus-visible){outline-color:rgb(150,125,66)!important}
+html body .eo-style-tab.active.active:not(:focus-visible){outline:none!important}
 </style>
 </body>
 </html>
