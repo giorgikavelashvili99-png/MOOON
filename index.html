@@ -22689,15 +22689,9 @@ position:fixed;inset:0;z-index:100001;color:var(--ink);font-family:'BPGAcademiur
 #mi5 :where(*:not(.deck *)){box-sizing:border-box}
 #mi5 :where(h2,p,button,div,span,b,small,section,i):where(:not(.deck *)){margin:0}
 
-/* backdrop: fine grid + giant outlined 4K, painted once, never animated */
-#mi5 .bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:48px 48px;background-position:-1px -1px}
+/* backdrop: giant outlined 4K, painted once, never animated */
+#mi5 .bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 #mi5 .bg:after{content:"4K";position:absolute;right:-6vw;bottom:-13vw;font:400 66vw/1 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.08)}
-/* viewfinder corners */
-#mi5 .fm{position:absolute;width:18px;height:18px;border:0 solid rgba(255,255,255,.5);pointer-events:none;z-index:2}
-#mi5 .fm.tl{left:14px;top:62px;border-width:1.5px 0 0 1.5px}
-#mi5 .fm.tr{right:14px;top:62px;border-width:1.5px 1.5px 0 0}
-#mi5 .fm.bl{left:14px;bottom:max(14px,env(safe-area-inset-bottom));border-width:0 0 1.5px 1.5px}
-#mi5 .fm.br{right:14px;bottom:max(14px,env(safe-area-inset-bottom));border-width:0 1.5px 1.5px 0}
 
 #mi5 .fx{position:absolute;inset:0;pointer-events:none;z-index:28}
 #mi5 .fx .pt{position:absolute;left:0;top:0;opacity:0}
@@ -22722,30 +22716,21 @@ position:fixed;inset:0;z-index:100001;color:var(--ink);font-family:'BPGAcademiur
 #mi5 .s.on .sub{animation:mi5Up .42s .16s cubic-bezier(.16,1,.3,1) both}
 @keyframes mi5Up{from{opacity:0;transform:translate3d(0,14px,0)}}
 
-/* 0 logo plate + focus brackets */
+/* 0 glass logo plate */
 #mi5 .lw{position:relative;width:min(80vw,420px)}
-#mi5 .gl{position:relative;padding:30px 24px 26px;border-radius:6px;overflow:hidden;opacity:0;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.3)}
+#mi5 .gl{position:relative;container-type:inline-size;padding:34px 26px;border-radius:28px;overflow:hidden;opacity:0;border:0;will-change:transform,opacity;
+  background:radial-gradient(130% 80% at 50% -10%,rgba(255,255,255,.17),rgba(255,255,255,0) 62%),linear-gradient(145deg,rgba(255,255,255,.17),rgba(255,255,255,.045) 36%,rgba(150,185,255,.07) 66%,rgba(255,255,255,.13)),rgba(16,24,58,.38);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -34px 54px -26px rgba(110,150,255,.2),0 32px 60px -26px rgba(0,0,0,.75),0 0 64px -14px rgba(80,130,255,.42)}
+#mi5 .gl:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(150deg,rgba(255,255,255,.78),rgba(255,255,255,.2) 28%,rgba(255,255,255,.06) 55%,rgba(255,255,255,.22) 82%,rgba(255,255,255,.5));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 #mi5 .s.on .gl{animation:mi5Gi .55s .06s cubic-bezier(.16,1,.3,1) forwards}
 @keyframes mi5Gi{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:none}}
 #mi5 .gl:before{content:"";position:absolute;left:-30%;top:-60%;width:50%;height:220%;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.16) 48%,rgba(255,255,255,.03) 56%,transparent 70%);transform:translate3d(-60%,0,0) rotate(12deg);pointer-events:none}
 #mi5 .s.on .gl:before{animation:mi5Gs 4.2s 1.6s ease-in-out infinite}
 @keyframes mi5Gs{0%{transform:translate3d(-60%,0,0) rotate(12deg)}55%,100%{transform:translate3d(520%,0,0) rotate(12deg)}}
-#mi5 .gl img{position:relative;display:block;width:100%;height:auto;filter:brightness(1.12)}
+#mi5 .gl img{position:relative;display:block;width:100%;height:auto;margin-top:calc(-26 / 588 * 100cqw);margin-bottom:calc(-2 / 588 * 100cqw)}
 #mi5 .gl.prs:before{animation:none!important}
-#mi5 .fb{position:absolute;width:22px;height:22px;border:0 solid #fff;opacity:0;pointer-events:none}
-#mi5 .fb.tl{left:-14px;top:-14px;border-width:2px 0 0 2px;--fx:-26px;--fy:-26px}
-#mi5 .fb.tr{right:-14px;top:-14px;border-width:2px 2px 0 0;--fx:26px;--fy:-26px}
-#mi5 .fb.bl{left:-14px;bottom:-14px;border-width:0 0 2px 2px;--fx:-26px;--fy:26px}
-#mi5 .fb.br{right:-14px;bottom:-14px;border-width:0 2px 2px 0;--fx:26px;--fy:26px}
-#mi5 .s.on .fb{animation:mi5Fb .7s .14s cubic-bezier(.16,1,.3,1) forwards}
-@keyframes mi5Fb{from{opacity:0;transform:translate3d(var(--fx),var(--fy),0)}to{opacity:1;transform:none}}
-#mi5 .lw.hit .fb{border-color:var(--a)}
-#mi5 .lw.gone .fb{animation:none;opacity:0}
 #mi5 .flash{position:absolute;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.9),rgba(255,255,255,.22) 50%,transparent);pointer-events:none;opacity:0}
-#mi5 .tag{margin-top:28px;font-size:12.5px;letter-spacing:.26em;color:var(--dim);padding-left:.26em;opacity:0;white-space:nowrap}
-#mi5 .s.on .tag{animation:mi5Tg .5s .5s cubic-bezier(.16,1,.3,1) both}
-@keyframes mi5Tg{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:none}}
-#mi5 .tag.gone{opacity:0!important;animation:none}
 
 /* 1 deck of REAL site cards */
 #mi5 .deck{position:relative;display:block!important;width:100%;height:var(--dh,440px);margin:10px 0 0!important;padding:0!important;gap:0!important;overflow:visible}
@@ -22857,16 +22842,15 @@ position:fixed;inset:0;z-index:100001;color:var(--ink);font-family:'BPGAcademiur
  #mi5 .frame{width:340px;max-height:52vh}
  #mi5 .stats{width:340px}
  #mi5 .okc{width:132px;height:132px}
- #mi5 .bg:after{font-size:min(66vw,820px);right:-3vw;bottom:-10vw}
+ #mi5 .bg:after{font-size:min(46vw,600px);right:-1vw;bottom:-7vw}
 }
 </style>
 <div id="mi5" class="out" role="dialog" aria-label="MOON intro" hidden>
   <div class="bg"></div>
-  <i class="fm tl"></i><i class="fm tr"></i><i class="fm bl"></i><i class="fm br"></i>
   <div class="top"><button class="tb snd" id="mi5Snd" type="button" aria-label="ხმა"><svg viewBox="0 0 24 24"><path class="w" d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M4 9v6h4l5 4V5L8 9zM17 9l5 6M22 9l-5 6"/></svg></button><button class="tb" id="mi5Skip" type="button">გამოტოვება</button></div>
   <div class="hintp">🔊 შეეხე ლოგოს — ხმით დასაწყებად</div>
 
-  <section class="s" data-s="0"><div class="lw" id="mi5Lw"><div class="gl" id="mi5Gl"><img id="mi5Logo" alt=""></div><i class="fb tl"></i><i class="fb tr"></i><i class="fb bl"></i><i class="fb br"></i></div><div class="tag" id="mi5Tag">ვიდეო მონტაჟი · 4K · 60FPS</div></section>
+  <section class="s" data-s="0"><div class="lw" id="mi5Lw"><div class="gl" id="mi5Gl"><img id="mi5Logo" alt=""></div></div></section>
 
   <section class="s" data-s="1"><h2>აირჩიე პაკეტი</h2><p class="sub">ყველა ბიუჯეტისთვის — ერთი შეხებით</p><div class="deck pricing-cards" id="mi5Deck"></div></section>
 
@@ -23097,9 +23081,11 @@ function reveal(rv,hi,fw,ms,cb){var N=18,k1=[],k2=[];
 function rrPath(x,a,b,w,h,r){r=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
 var logoBmp=null;
 function plateSprite(w,h,R){var sp=document.createElement('canvas');sp.width=Math.ceil(w*DP);sp.height=Math.ceil(h*DP);var x=sp.getContext('2d');x.scale(DP,DP);
-  var rad=6*D;rrPath(x,0,0,w,h,rad);x.fillStyle='rgba(255,255,255,.07)';x.fill();
+  var rad=28*D;rrPath(x,0,0,w,h,rad);x.fillStyle='rgba(16,24,58,.38)';x.fill();
+  var g1=x.createLinearGradient(0,0,w,h);g1.addColorStop(0,'rgba(255,255,255,.17)');g1.addColorStop(.36,'rgba(255,255,255,.045)');g1.addColorStop(.66,'rgba(150,185,255,.07)');g1.addColorStop(1,'rgba(255,255,255,.13)');x.fillStyle=g1;x.fill();
+  var g2=x.createRadialGradient(w*.5,-h*.1,0,w*.5,-h*.1,w*.62);g2.addColorStop(0,'rgba(255,255,255,.17)');g2.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g2;x.fill();
   var im=$('mi5Logo');if(im&&!im.hidden&&im.complete&&im.naturalWidth){var ir=im.getBoundingClientRect();try{var di=logoBmp||im;x.drawImage(di,ir.left-R.left,ir.top-R.top,ir.width,ir.height);x.globalCompositeOperation='lighter';x.globalAlpha=.12;x.drawImage(di,ir.left-R.left,ir.top-R.top,ir.width,ir.height);x.globalAlpha=1;x.globalCompositeOperation='source-over';}catch(e){}}
-  rrPath(x,.5,.5,w-1,h-1,rad);x.strokeStyle='rgba(255,255,255,.34)';x.lineWidth=1;x.stroke();
+  rrPath(x,.5,.5,w-1,h-1,rad);var g3=x.createLinearGradient(0,0,w,h);g3.addColorStop(0,'rgba(255,255,255,.78)');g3.addColorStop(.3,'rgba(255,255,255,.2)');g3.addColorStop(.6,'rgba(255,255,255,.08)');g3.addColorStop(1,'rgba(255,255,255,.5)');x.strokeStyle=g3;x.lineWidth=1;x.stroke();
   return sp;}
 var pre=null,preJob=null;function prepShatterJobs(){var gl=$('mi5Gl'),R=gl.getBoundingClientRect(),w=R.width,h=R.height;
   if(!VW)size();
@@ -23152,7 +23138,7 @@ el.addEventListener('pointerdown',function(){if(tapRes){var f=tapRes;tapRes=null
 /* ================= TIMELINE ================= */
 async function script(t){
   /* 0 — logo plate: cursor taps it, it shatters */
-  var gl0=$('mi5Gl'),tag0=$('mi5Tag'),lw0=$('mi5Lw');gl0.style.visibility='';gl0.classList.remove('prs');tag0.classList.remove('gone');lw0.classList.remove('hit','gone');clearShards();
+  var gl0=$('mi5Gl'),lw0=$('mi5Lw');gl0.style.visibility='';gl0.classList.remove('prs');lw0.classList.remove('hit','gone');clearShards();
   show(0);S('swell');later(function(){S('rise');},200);
   later(function(){if(ok(t))deckPlan(t);},300);later(function(){if(ok(t))planPrep3(t);},400);later(function(){if(ok(t))planShatter(t);},500);
   await sleep(720);if(!ok(t))return;
@@ -23161,7 +23147,7 @@ async function script(t){
   var gp=pt(gl0,.62,.55);await glide(gp.x,gp.y,700);if(!ok(t))return;
   el.classList.remove('hint');
   gl0.classList.add('prs');lw0.classList.add('hit');S('click');cur.classList.remove('ck');void cur.offsetWidth;cur.classList.add('ck');ripple(pos.x,pos.y);await sleep(110);if(!ok(t))return;
-  S('glass');tag0.classList.add('gone');var gb=pt(gl0,.5,.5);shatter();burst(gb.x,gb.y,12,true);
+  S('glass');var gb=pt(gl0,.5,.5);shatter();burst(gb.x,gb.y,12,true);
   await sleep(120);curHide();await sleep(80);if(!ok(t))return;
   /* 1 — pick a package (cards appear right after the shatter and sit at their final place at once) */
   if(!deck.ready){flushWork();if(!deck.ready)buildDeck();}
