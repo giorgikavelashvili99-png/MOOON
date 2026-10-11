@@ -21244,7 +21244,7 @@ function lite(){
     (c&&c.saveData)||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2));
 }
 /* ---------- 1. 3D glass carousel: geometry cached, one rAF per scroll tick, zero layout reads per frame ---------- */
-var raf=0,lastT=0,bad=0,idleT=0,geo=new WeakMap(),dirty=true;
+var raf=0,lastT=0,bad=0,idleT=0,mov=false,poseL=null,settleT=0,geo=new WeakMap(),dirty=true;
 function geometry(track){
   var kids=track.children,sl=[],i;
   for(i=0;i<kids.length;i++) if(kids[i].classList.contains('pc-slide')) sl.push(kids[i]);
@@ -21277,7 +21277,14 @@ function poseAll(t){
   if(root.classList.contains('mi5-lock')){dirty=true;return;}
   if(t&&lastT&&t-lastT>40&&t-lastT<400&&++bad>=10) setLite();
   lastT=t||0;
-  var L=lite();
+  /* the 3D tilt is only ever switched off while the carousel is at rest, and eased - flattening every neighbour in the middle of a swipe looked like a flash */
+  var w=lite();
+  if(poseL===null) poseL=w;
+  else if(w!==poseL&&!mov){
+    if(w){root.classList.add('mo-settle');clearTimeout(settleT);settleT=setTimeout(function(){root.classList.remove('mo-settle')},620)}
+    poseL=w;
+  }
+  var L=poseL;
   document.querySelectorAll('.pc-scroll-track').forEach(function(tr){poseTrack(tr,L)});
   dirty=false;
 }
@@ -21287,7 +21294,7 @@ window.moMorphInvalidate=invalidate;
 document.addEventListener('scroll',function(e){
   var tr=e.target;
   if(!tr||!tr.classList||!tr.classList.contains('pc-scroll-track')) return;
-  schedule();clearTimeout(idleT);idleT=setTimeout(function(){lastT=0;bad=0},160);
+  mov=true;schedule();clearTimeout(idleT);idleT=setTimeout(function(){lastT=0;bad=0;mov=false;if(lite()!==poseL) schedule()},160);
 },{capture:true,passive:true});
 window.addEventListener('resize',invalidate,{passive:true});
 window.addEventListener('orientationchange',invalidate,{passive:true});
@@ -23115,6 +23122,7 @@ html body :is(.pc-card--any,#anyOrderPanel){--pc-cta-bg:linear-gradient(120deg,#
 html body :is(.pc-card--cheapmonthly,#cheapMonthlyPanel){--pc-cta-bg:linear-gradient(120deg,#9AA3B0 0%,#C2C8D1 50%,#9AA3B0 100%)}
 </style>
 <style id="moon-polish">
+html.mo-settle body .pricing-cards .pc-scroll-track > .pc-slide > .pc-card-wrap{transition:rotate .5s cubic-bezier(.4,0,.2,1),scale .5s cubic-bezier(.4,0,.2,1)!important}
 
 html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::before{transition:opacity .85s cubic-bezier(.4,0,.2,1)!important}
 html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::after{transform:scale(.965)!important;transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)!important}
@@ -23126,11 +23134,11 @@ html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggl
 }
 
 @media (hover:none),(pointer:coarse){
-  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::before{opacity:1!important;box-shadow:none!important;transition:opacity .85s cubic-bezier(.4,0,.2,1)!important}
-  html body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::after{opacity:1!important;transform:scale(1)!important;transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)!important}
+  html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::before{opacity:1!important;box-shadow:none!important;transition:none!important}
+  html body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::after{opacity:1!important;transform:scale(1)!important;transition:none!important}
 }
-html[data-touch] body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::before{opacity:1!important;box-shadow:none!important;transition:opacity .85s cubic-bezier(.4,0,.2,1)!important}
-html[data-touch] body .pc-slide.pc-slide--active .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::after{opacity:1!important;transform:scale(1)!important;transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)!important}
+html[data-touch] body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::before{opacity:1!important;box-shadow:none!important;transition:none!important}
+html[data-touch] body .pc-slide.pc-slide .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_a):not(#_b):not(#_c):not(#_d)::after{opacity:1!important;transform:scale(1)!important;transition:none!important}
 
 #mi5 .deck .dc .pc-card{transition:box-shadow 1.1s cubic-bezier(.22,.7,.2,1)!important}
 #mi5 .deck .dc .pc-toggle-btn{transition:background-color .7s ease,color .7s ease,border-color .7s ease,transform .15s ease!important}
@@ -23419,6 +23427,7 @@ html body .eo-style-tab.active.active:not(:focus-visible){outline:none!important
 </style>
 <script id="moon-touch-flag">
 (function(){try{var d=document.documentElement;
+try{if(matchMedia('(hover:none) and (pointer:coarse)').matches)d.setAttribute('data-touch','')}catch(e){}
 addEventListener('pointerdown',function(e){if(e.pointerType==='touch'){if(!d.hasAttribute('data-touch'))d.setAttribute('data-touch','')}else if(d.hasAttribute('data-touch'))d.removeAttribute('data-touch')},{passive:true,capture:true});
 addEventListener('pointermove',function(e){if(e.pointerType==='mouse'&&d.hasAttribute('data-touch'))d.removeAttribute('data-touch')},{passive:true,capture:true});
 }catch(e){}})();
