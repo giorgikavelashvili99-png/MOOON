@@ -9075,8 +9075,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     const container = anchor ? anchor.closest('.pc-modal-scroll') : null;
 
     // Already in the requested state (observers can fire several times
-    // for one upload) -> nothing to animate. Re-running the swap was what
-    // made the tiles blink and the panel jump.
+    // for one upload) -> nothing to animate.
     if (!toHide.length && !toShow.length) { if (midCallback) midCallback(); return; }
 
     // A swap that is still in flight gets finished instantly first.
@@ -9093,35 +9092,14 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 
     if (reduce || !container) { applySwap(); return; }
 
-    const startH = container.offsetHeight;
-    container.style.height = startH + 'px';
-    container.style.overflowY = 'hidden';
+    // fade the outgoing step out, then swap in ONE style pass. The panel height
+    // follows the content by itself (moStepMorph: top edge fixed, only the
+    // bottom edge moves, compositor-friendly WAAPI), so nothing else is touched here.
     toHide.forEach(el => el.classList.add('wiz-step-exit'));
-
-    let applied = false, finished = false, tA = null, tB = null;
-    function apply(){ if (applied) return; applied = true; applySwap(); }
-    function finish(){
-      if (finished) return; finished = true;
-      clearTimeout(tA); clearTimeout(tB);
-      apply();
-      container.style.transition = '';
-      container.style.height = '';
-      container.style.overflowY = '';
-      container._wizSwapDone = null;
-    }
-    container._wizSwapDone = finish;
-
-    tA = window.setTimeout(function(){
-      apply();
-      container.style.height = 'auto';
-      const endH = container.offsetHeight;
-      container.style.height = startH + 'px';
-      void container.offsetHeight;
-      if (Math.abs(endH - startH) < 2) { finish(); return; }
-      container.style.transition = 'height .32s cubic-bezier(.22,1,.36,1)';
-      container.style.height = endH + 'px';
-      tB = window.setTimeout(finish, 340);
-    }, 140);
+    let applied = false, tA = null;
+    function apply(){ if (applied) return; applied = true; clearTimeout(tA); container._wizSwapDone = null; applySwap(); }
+    container._wizSwapDone = apply;
+    tA = window.setTimeout(apply, 130);
   }
 
   // ============================================================
@@ -21528,7 +21506,7 @@ position:fixed;inset:0;z-index:100001;color:var(--ink);font-family:'BPGAcademiur
 #mi5 .mp{position:absolute;left:14px;right:14px;top:75px;opacity:0;visibility:hidden}
 #mi5 .mp.on{opacity:1;visibility:visible}
 #mi5 .pr{transition:transform .15s ease}
-#mi5 .pr.press{transform:scale(.95)}
+#mi5 .pr.press{transform:translate3d(0,1px,0)}
 /* 1a drop zone */
 #mi5 .dz{position:relative;height:151px;padding:30px 18px 26px;border-radius:16px;text-align:center;background:var(--vc);border:1.5px dashed rgba(255,255,255,.14);transition:border-color .25s,background .3s,box-shadow .3s}
 #mi5 .dz.over{border-color:rgba(47,184,168,.9);background:radial-gradient(ellipse 75% 95% at 50% 50%,rgba(47,184,168,.2),rgba(47,184,168,0) 72%),#0d1317;box-shadow:inset 0 0 44px -14px rgba(47,184,168,.45),0 0 40px -12px rgba(47,184,168,.4)}
@@ -21587,12 +21565,12 @@ position:fixed;inset:0;z-index:100001;color:var(--ink);font-family:'BPGAcademiur
 #mi5 .ti{position:relative;display:flex;align-items:center;margin-top:12px;height:48px;border-radius:12px;background:var(--vc);border:1px solid var(--vl);padding:0 16px 0 54px;font-size:15px;font-weight:700;color:#eef0f5;transition:box-shadow .2s,border-color .2s}
 #mi5 .ti .at{position:absolute;left:18px;top:50%;margin-top:-10px;line-height:20px;color:#f5b942;font-size:16px;font-weight:800}
 #mi5 .ti .tv{position:relative;flex:1;min-width:0;height:100%;overflow:hidden;display:flex;align-items:center}
-#mi5 .ti .tv.of{justify-content:flex-end}
 #mi5 .ti .ph{position:absolute;left:0;color:var(--vf);font-weight:500;white-space:nowrap}
 #mi5 .ti.has .ph{opacity:0}
 #mi5 .ti .tx{flex:none;white-space:pre}
 #mi5 .ti.foc{border-color:#22c3ff;box-shadow:0 0 0 2px #22c3ff,0 0 14px rgba(34,195,255,.45)}
 #mi5 .ttb{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;height:41px;border-radius:12px;border:1px dashed rgba(34,195,255,.5);background:rgba(34,195,255,.08);box-shadow:inset 0 0 0 1px rgba(63,137,168,.6);color:#bfe9ff;font-size:12.5px;font-weight:700}
+#mi5 .cf,#mi5 .gob,#mi5 .tra .yes{background-clip:padding-box;background-origin:border-box}
 #mi5 .cf{display:grid;place-items:center;margin-top:14px;height:50px;border-radius:14px;border:1px solid rgba(80,220,80,.75);background:linear-gradient(135deg,#10a20d,#198983);color:#fff;font-size:15px;font-weight:800}
 /* 4 price + send */
 #mi5 .pbx{display:flex;align-items:center;justify-content:space-between;height:57px;padding:0 18px 0 16px;border-radius:17px;background:linear-gradient(100deg,#154949,#113142);box-shadow:inset 0 0 0 2px #565da4}
@@ -21658,7 +21636,7 @@ position:fixed;inset:0;z-index:100001;color:var(--ink);font-family:'BPGAcademiur
 #mi5 .chc{flex:none;width:30px;height:34px;display:grid;place-items:center;color:#5f6f96}
 #mi5 .chc svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #mi5 .chf{position:relative;flex:1 1 auto;min-width:0;height:38px;overflow:hidden;display:flex;align-items:center;font-size:14px;color:#fff;transition:opacity .2s}
-#mi5 .chf.of{justify-content:flex-end}
+#mi5 .chf .chw{flex:none;display:flex;align-items:center}
 #mi5 .chf .chp{position:absolute;left:4px;color:#5f6f96;white-space:nowrap}
 #mi5 .chf.has .chp{opacity:0}
 #mi5 .chf .chx{flex:none;white-space:pre;padding:0 2px 0 4px}
@@ -21719,7 +21697,7 @@ position:fixed;inset:0;z-index:100001;color:var(--ink);font-family:'BPGAcademiur
       <div class="chv" id="mi5ChV"><div class="chl" id="mi5ChL"></div></div>
       <div class="chi" id="mi5ChI">
         <span class="chc"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a5.5 5.5 0 0 1-7.78-7.78l9.2-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.48"/></svg></span>
-        <div class="chf" id="mi5ChF"><span class="chp">დაწერე შეტყობინება...</span><span class="chx" id="mi5ChX"></span><i class="cr"></i></div>
+        <div class="chf" id="mi5ChF"><span class="chp">დაწერე შეტყობინება...</span><span class="chw" id="mi5ChW"><span class="chx" id="mi5ChX"></span><i class="cr"></i></span></div>
         <div class="chb2"><span class="chm" id="mi5ChM"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><span class="chn" id="mi5ChN"><svg viewBox="0 0 24 24"><path d="M3 20l18-8L3 4v6l12 2-12 2v6z"/></svg></span></div>
         <div class="chr" id="mi5ChR"><i class="rd"></i><span class="rt" id="mi5ChT">0:00</span><div class="rb" id="mi5ChB"></div><span class="rh">‹ გააუქმე</span></div>
       </div>
@@ -22015,15 +21993,15 @@ function resetModal(){stp(1);
   [].forEach.call(el.querySelectorAll('#mi5Md .mp'),function(p){p.classList.remove('on');});mpCur=null;
   $('mi5Uc').classList.remove('done');$('mi5Up').textContent='0%';$('mi5Ub').style.transform='';$('mi5Ue').textContent='⏱ 3წმ დარჩა · 4.3 MB/s';
   [].forEach.call(el.querySelectorAll('#mi5Pq .qb'),function(q){q.classList.remove('act');});
-  $('mi5Ti').classList.remove('foc','has');$('mi5Tv').classList.remove('of');$('mi5Tx').textContent='';$('mi5Pr').textContent='0.00';
+  $('mi5Ti').classList.remove('foc','has');$('mi5Tx').style.transform='';$('mi5Tx').textContent='';$('mi5Pr').textContent='0.00';
   [].forEach.call(el.querySelectorAll('#mi5Md .pr'),function(p){p.classList.remove('press');});}
 function units(s){var o=[];Array.from(s).forEach(function(c){if((c==='️'||c==='‍')&&o.length)o[o.length-1]+=c;else o.push(c);});return o;}
 /* types a text into a field one character at a time; the field keeps showing the end of long text */
-function typeInto(x,box,fld,txt,ms,onN){var u=units(txt),last=-1;
+function typeInto(x,box,fld,txt,ms,onN,wrap){var u=units(txt),last=-1,mv=wrap||x;mv.style.transform='';
+  function fit(){var over=mv.offsetWidth-(fld.clientWidth-(wrap?10:6));mv.style.transform=over>0?'translate3d('+(-over).toFixed(1)+'px,0,0)':'';}
   return tween(0,u.length,ms,function(v){var n=Math.min(u.length,Math.floor(v+.001));if(n===last)return;last=n;
-    x.textContent=u.slice(0,n).join('');box.classList.toggle('has',n>0);if(onN)onN(n);
-    fld.classList.toggle('of',x.offsetWidth>fld.clientWidth-10);if(n>0&&n<u.length&&n%3===0)S('key');},function(k){return k;})
-  .then(function(){x.textContent=u.join('');fld.classList.toggle('of',x.offsetWidth>fld.clientWidth-10);});}
+    x.textContent=u.slice(0,n).join('');box.classList.toggle('has',n>0);fit();if(onN)onN(n);if(n>0&&n<u.length&&n%3===0)S('key');},function(k){return k;})
+  .then(function(){x.textContent=u.join('');fit();});}
 /* ---- chat ---- */
 var CH={cy:0};
 function hm(d){return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
@@ -22051,8 +22029,8 @@ function chScroll(m){var vp=$('mi5ChV'),L=$('mi5ChL'),need=Math.max(0,m.offsetTo
     a.addEventListener('finish',function(){L.style.transform='translate3d(0,'+(-need)+'px,0)';try{a.cancel();}catch(e){}});}}
 /* the message pops in; src (a rect) = it flies in from where it was typed / recorded */
 function chShow(m,src){var T=tok,bb=m.querySelector('.bb'),kf;bb.classList.add('vis');
-  if(src){var r=bb.getBoundingClientRect(),dy=(src.top+src.height/2-r.top-r.height/2)/D;kf=[{opacity:0,transform:'translate3d(0,'+dy.toFixed(1)+'px,0) scale(.8)'},{opacity:1,transform:'none'}];}
-  else kf=[{opacity:0,transform:'translate3d(0,14px,0) scale(.94)'},{opacity:1,transform:'none'}];
+  if(src){var r=bb.getBoundingClientRect(),dy=(src.top+src.height/2-r.top-r.height/2)/D;kf=[{opacity:0,transform:'translate3d(0,'+dy.toFixed(1)+'px,0)'},{opacity:1,transform:'none'}];}
+  else kf=[{opacity:0,transform:'translate3d(0,14px,0)'},{opacity:1,transform:'none'}];
   var a=an(bb,kf,{duration:src?430:340,easing:'cubic-bezier(.2,.9,.25,1)',fill:'both'});
   a.addEventListener('finish',function(){if(T===tok){bb.classList.add('in');}try{a.cancel();}catch(e){}});
   chScroll(m);}
@@ -22134,18 +22112,18 @@ async function script(t){
   var go=$('mi5Go');await moveTo(go,.5,.5,560);if(!ok(t))return;await sleep(70);await clk(go);await sleep(160);if(!ok(t))return;curHide();
   /* 3 - the order chat: the order itself arrives, the customer writes (text + a voice message), the manager answers */
   var chm=chBuild(TTL),chi=$('mi5ChI'),fld=$('mi5ChF'),cx=$('mi5ChX'),mic=$('mi5ChM'),rr=$('mi5ChR'),rt=$('mi5ChT');
-  chi.className='chi';fld.className='chf';cx.textContent='';rr.className='chr';rt.textContent='0:00';
+  chi.className='chi';fld.className='chf';cx.textContent='';$('mi5ChW').style.transform='';rr.className='chr';rt.textContent='0:00';
   show(3);S('whoosh');
   await sleep(500);if(!ok(t))return;
   chShow(chm.ord);S('pop');await sleep(900);if(!ok(t))return;
   curShow(VW*.84,VH*.93);await sleep(40);
   await moveTo(fld,.5,.5,640);if(!ok(t))return;await sleep(50);await clk(fld);fld.classList.add('foc');await sleep(160);if(!ok(t))return;
-  await typeInto(cx,fld,fld,'გამარჯობა, გიგზავნით ვიდეოს, მჭირდება მაქსიმალური ხარისხი ❤️',1500,function(n){chi.classList.toggle('typing',n>0);});if(!ok(t))return;
+  await typeInto(cx,fld,fld,'გამარჯობა, გიგზავნით ვიდეოს, მჭირდება მაქსიმალური ხარისხი ❤️',1500,function(n){chi.classList.toggle('typing',n>0);},$('mi5ChW'));if(!ok(t))return;
   await sleep(260);var sb=$('mi5ChN');await moveTo(sb,.5,.5,420);if(!ok(t))return;await sleep(50);await clk(sb);
-  var fr0=fld.getBoundingClientRect();cx.textContent='';fld.classList.remove('has','of','foc');chi.classList.remove('typing');chShow(chm.hi,fr0);S('swish');
+  var fr0=fld.getBoundingClientRect();cx.textContent='';$('mi5ChW').style.transform='';fld.classList.remove('has','foc');chi.classList.remove('typing');chShow(chm.hi,fr0);S('swish');
   await sleep(900);if(!ok(t))return;
   /* the manager is typing, then answers */
-  var tp=chm.rep.querySelector('.tp');tp.classList.add('on');an(tp,[{opacity:0,transform:'translate3d(0,6px,0) scale(.85)'},{opacity:1,transform:'none'}],{duration:260,fill:'forwards'});chScroll(chm.rep);
+  var tp=chm.rep.querySelector('.tp');tp.classList.add('on');an(tp,[{opacity:0,transform:'translate3d(0,6px,0)'},{opacity:1,transform:'none'}],{duration:260,fill:'forwards'});chScroll(chm.rep);
   await sleep(1100);if(!ok(t))return;
   an(tp,[{opacity:1},{opacity:0}],{duration:160,fill:'forwards'});chShow(chm.rep);S('recv');
   var hp=pt(chm.rep.querySelector('.bb'),.5,.5);burst(hp.x+10,hp.y,6,true);
@@ -22251,6 +22229,22 @@ html body .pc-modal-scrim .drop-zone .dz-icon::before,
 html body .pc-modal-scrim .drop-zone .dz-icon::after{ animation:none !important; }
 html body .pc-modal-scrim .drop-zone .dz-icon::before{ opacity:0 !important; }
 </style>
+<style id="moon-steps-v75">
+/* ---- order window: the top edge stays where it is while a step changes (only the bottom edge follows the content) ---- */
+html body .pc-modal-scrim.mz-lock:not(#_a):not(#_b){ align-items:flex-start!important; }
+html body .pc-modal-scrim.mz-lock>.pc-accordion-body.panel:not(#_a):not(#_b){ margin:var(--mz-top,0px) auto 0!important; }
+/* ---- "დადასტურება": no growth on hover / tap, fill stays inside the line (no bleeding corners) ---- */
+html body .pc-modal-scrim .wizard-confirm-btn:not(#_a):not(#_b),
+html body .pc-modal-scrim .wizard-confirm-btn:hover:not(#_a):not(#_b),
+html body .pc-modal-scrim .wizard-confirm-btn:focus:not(#_a):not(#_b){
+  scale:none!important; transform:none!important; background-clip:padding-box; background-origin:border-box;
+  transition:opacity .2s ease, filter .2s ease!important;
+}
+@media (hover:hover){
+  html body .pc-modal-scrim .wizard-confirm-btn:hover:not(#_a):not(#_b){ filter:brightness(1.08); }
+}
+html body .pc-modal-scrim .wizard-confirm-btn:active:not(#_a):not(#_b){ transform:translate3d(0,1px,0)!important; filter:brightness(.96); }
+</style>
 <script id="moon-noflicker-js">
 (function(){
   /* remove the one-shot step class when its fade has finished */
@@ -22259,6 +22253,83 @@ html body .pc-modal-scrim .drop-zone .dz-icon::before{ opacity:0 !important; }
     if (e.animationName === 'wizardStepIn' && t && t.classList && t.classList.contains('wiz-enter')) t.classList.remove('wiz-enter');
   }, true);
 
+})();
+</script>
+<script id="moon-steps-v75-js">
+/* Order window: smooth, stable step changes.
+   - whenever the content of the window changes height (a new step, the upload states, an error line...) the height is
+     animated from the old to the new value (320ms, WAAPI) instead of snapping;
+   - the TOP edge of the window is frozen at the moment of the first change, so the stepper and all texts stay exactly
+     where they are and only the bottom edge moves (before, the whole window re-centred itself and every text slid). */
+(function(){
+  'use strict';
+  var scrim = document.getElementById('pcModalScrim');
+  if (!scrim || !window.ResizeObserver || !Element.prototype.animate) return;
+  var root = document.documentElement, MS = 320, EASE = 'cubic-bezier(.22,1,.36,1)';
+  function still(){
+    return root.classList.contains('low-power') || root.classList.contains('pc-opening') ||
+      (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+  /* every opening starts centred again */
+  new MutationObserver(function(){
+    if (!scrim.classList.contains('open') && scrim.classList.contains('mz-lock')){
+      scrim.classList.remove('mz-lock'); scrim.style.removeProperty('--mz-top');
+    }
+  }).observe(scrim, { attributes:true, attributeFilter:['class'] });
+
+  function padT(){ return parseFloat(getComputedStyle(scrim).paddingTop) || 0; }
+  function mtop(p){ return parseFloat(getComputedStyle(p).marginTop) || 0; }
+  function base(c, st, p){ st.h = c.offsetHeight; st.top = mtop(p); }
+
+  function go(c, st, p, from, to){
+    if (!scrim.classList.contains('mz-lock')){
+      scrim.style.setProperty('--mz-top', Math.max(0, st.top).toFixed(1) + 'px');
+      scrim.classList.add('mz-lock');
+    }
+    /* keep the bottom edge on screen: if the new height does not fit under the frozen top, move up (transform, smooth) */
+    var cs = getComputedStyle(scrim), room = scrim.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0) - p.offsetHeight;
+    var mt = parseFloat(getComputedStyle(p).marginTop) || 0;
+    if (mt > room + .5){
+      var nt = Math.max(0, room);
+      scrim.style.setProperty('--mz-top', nt.toFixed(1) + 'px');
+      try { p.animate([{ transform:'translate3d(0,' + (mt - nt).toFixed(1) + 'px,0)' }, { transform:'none' }], { duration:MS, easing:EASE }); } catch(e){}
+    }
+    c.style.overflowY = 'hidden';
+    var a = c.animate([{ height:from + 'px' }, { height:to + 'px' }], { duration:MS, easing:EASE });
+    st.a = a; st.h = to;
+    var end = function(){ if (st.a === a){ st.a = null; c.style.overflowY = ''; st.top = mtop(p); } };
+    a.onfinish = end; a.oncancel = end;
+  }
+
+  function size(c, st){
+    var p = c.closest('.pc-accordion-body.panel');
+    if (!p || p.parentNode !== scrim || !scrim.classList.contains('open')){
+      st.h = 0; if (st.a){ try { st.a.cancel(); } catch(e){} st.a = null; c.style.overflowY = ''; } return;
+    }
+    if (st.a){                       /* a morph is still running: continue from where it is */
+      var cur = c.offsetHeight;
+      try { st.a.cancel(); } catch(e){}
+      st.a = null; c.style.overflowY = '';
+      var nat = c.offsetHeight;
+      if (Math.abs(nat - cur) < 1 || still()){ base(c, st, p); return; }
+      go(c, st, p, cur, nat); return;
+    }
+    if (!st.h){ base(c, st, p); return; }
+    var to = c.offsetHeight;
+    if (Math.abs(to - st.h) < 2){ st.h = to; return; }
+    if (still()){ base(c, st, p); return; }
+    go(c, st, p, st.h, to);
+  }
+
+  function hook(c){
+    if (c.__mz) return;
+    var st = c.__mz = { h:0, top:0, a:null };
+    var ro = new ResizeObserver(function(){ size(c, st); });
+    function watch(){ [].forEach.call(c.children, function(k){ if (!k.__mzw){ k.__mzw = 1; ro.observe(k); } }); }
+    watch();
+    new MutationObserver(watch).observe(c, { childList:true });
+  }
+  [].forEach.call(document.querySelectorAll('.pc-modal-scroll'), hook);
 })();
 </script>
 <style id="mn-nav-css">
