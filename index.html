@@ -23214,7 +23214,9 @@ html body .dg-card.dg-card{background-image:none!important;background-color:rgba
 html body .mn-card.mn-card{background-image:none!important;background-color:rgba(20,21,26,.95)!important}
 </style>
 <style id="moon-shells">
-
+/* ===== every shell (except the order cards, which keep their thick ring) gets ONE solid, crisp, THIN ring: big shells ~1.8px, small controls ~1px.
+   Ring = inset box-shadow (the old border is made invisible), so it is always an exact whole number of device pixels (no half-lit row), sits inside the border box
+   (no layout shift) and never touches the shell's other effects. ===== */
 :root{--rw3:2px;--rw2:1px;--ow3:2px;--ow2:1px}
 @media (min-width:901px){:root{--rw3:calc(2px / 1.15);--rw2:calc(1px / 1.15);--ow3:calc(2.02px / 1.15);--ow2:calc(1.02px / 1.15)}}
 @media (min-width:901px) and (min-resolution:1.2dppx) and (max-resolution:1.39dppx){:root{--rw3:calc(2px / (1.15 * 1.25));--rw2:calc(1px / (1.15 * 1.25))}}
@@ -23229,11 +23231,6 @@ html body .mn-card.mn-card{background-image:none!important;background-color:rgba
 @media (max-width:900px) and (min-resolution:2.7dppx) and (max-resolution:2.8dppx){:root{--rw3:calc(5px / 2.75);--rw2:calc(3px / 2.75)}}
 @media (max-width:900px) and (min-resolution:3.4dppx) and (max-resolution:3.6dppx){:root{--rw3:calc(6px / 3.5);--rw2:calc(4px / 3.5)}}
 html body .promo-box-inline:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(108,148,255)!important}
-html body #mooonPromptAo:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptWp:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptMp:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptCp:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(71,98,168)!important}
 html body #cDiscordLoggedOut:not(#_a):not(#_b):not(#_c),
 html body #commentEmojiPanel:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(130,141,248)!important}
 html body .wizard-question:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(86,93,164)!important}
@@ -23254,7 +23251,6 @@ html body #baSlider:not(#_a):not(#_b):not(#_c),
 html body .panel.comments-panel:not(#_a):not(#_b):not(#_c),
 html body .panel.comments-panel.enh-rv:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(78,104,170)!important}
 html body .scanner-stage:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(51,69,112)!important}
-html body #messengerReplyPreview:not(#_a):not(#_b):not(#_c),
 html body .dg-card:not(#_a):not(#_b):not(#_c),
 html body .dg-ban-footer:not(#_a):not(#_b):not(#_c),
 html body .mn-glass:not(#_a):not(#_b):not(#_c),
@@ -23263,10 +23259,8 @@ html body .ttdl-glass:not(#_a):not(#_b):not(#_c),
 html body #commentsRatingRow:not(#_a):not(#_b):not(#_c),
 html body .mn-card:not(#_a):not(#_b):not(#_c),
 html body .mn-note:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(112,120,146)!important}
-html body .sr-price-hero.sr-details-hidden:not(#_a):not(#_b):not(#_c),
-html body #srTransfer:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
-html body #srReject:not(#_a):not(#_b):not(#_c),
-html body #warnPanel:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(168,82,92)!important}
+html body .sr-price-hero.sr-details-hidden:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
+html body #srReject:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(168,82,92)!important}
 html body #discordLoginBtn:not(#_a):not(#_b):not(#_c),
 html body #cDiscordLoggedIn:not(#_a):not(#_b):not(#_c),
 html body #commentName:not(#_a):not(#_b):not(#_c),
@@ -23341,7 +23335,7 @@ html body #mooonAutoErrorCp:not(#_a):not(#_b):not(#_c),
 html body #scanRejectCpm:not(#_a):not(#_b):not(#_c),
 html body #mooonAutoErrorCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(168,82,92)!important}
 html body .tnf-note:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(96,224,204)!important}
-
+/* the two quality chips on each card (1080P / 4K): ring in the card colour, lightened */
 html body .pc-card--indiv .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
 html body .pc-card--any .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
 html body .pc-card--edit .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
@@ -23350,7 +23344,7 @@ html body .pc-card--monthly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_
 html body .pc-card--cheapmonthly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
 html body .pc-card--cheap .pc-feature:nth-child(2):not(#_a):not(#_b):not(#_c),
 html body .pc-card--cheap .pc-feature:nth-child(3):not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--pc-accent,#7c8fff) 40%,#fff)!important}
-
+/* shells that carry their own glow / shadow / focus effects keep those: their ring is an outline instead (inside the border box) */
 html body .trust-item.moon-glow-card.tilt-3d:not(:focus-visible){outline:var(--ow3) solid rgb(108,148,255)!important;outline-offset:calc(-1 * var(--ow3))!important}
 html body .howto-step.moon-glow-card.tilt-3d:not(:focus-visible){outline:var(--ow3) solid rgb(70,150,170)!important;outline-offset:calc(-1 * var(--ow3))!important}
 html body #orderFlowPanel:not(:focus-visible),
@@ -23395,7 +23389,7 @@ html body #adminPass:not(:focus-visible),
 html body .pc-nav.pc-nav--prev:not(:focus-visible),
 html body .pc-nav.pc-nav--next:not(:focus-visible){outline:var(--ow2) solid rgb(112,120,146)!important;outline-offset:calc(-1 * var(--ow2))!important}
 html body .pc-modal-close:not(:focus-visible){outline:var(--ow2) solid rgb(74,79,96)!important;outline-offset:calc(-1 * var(--ow2))!important}
-
+/* intro scenes: the inner shells (modal replica, steps, chips, frame, stats, summary...) get the same ring, in the darker order-panel tones */
 html body #mi5 .mdl:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(51,69,112)!important}
 html body #mi5 .sm:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
 html body #mi5 .hintp:not(#_a):not(#_b),html body #mi5 .gf:not(#_a):not(#_b){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(74,79,96)!important}
@@ -23410,9 +23404,9 @@ html body #mi5 .frame:not(#_a):not(#_b){border-color:transparent!important;backg
 html body #mi5 .frame::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:2;pointer-events:none;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
 html body #mi5 .stats:not(#_a):not(#_b){position:relative;border-color:transparent!important}
 html body #mi5 .stats::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 var(--rw3) rgb(74,79,96)!important}
-
+/* intro glass logo plate: the blurry masked gradient hairline is replaced by the same clean solid ring (the glass fill, shine sweep and inner glow stay) */
 html body #mi5 .gl:not(#_a):not(#_b):after{padding:0!important;background:none!important;-webkit-mask:none!important;mask:none!important;border-radius:inherit!important;z-index:3;box-shadow:inset 0 0 0 var(--rw3) rgb(98,112,156)!important}
-
+/* inside the order windows these three wrappers are plain (no shell) - they must stay plain */
 html body .pc-modal-scrim .scanner-stage:not(#_a):not(#_b):not(#_c),html body .pc-modal-scrim .mooon-auto-stay:not(#_a):not(#_b):not(#_c),html body .pc-modal-scrim .toggle-row:not(#_a):not(#_b):not(#_c){box-shadow:none!important}
 html body .wp-box:not(:focus-visible),html body .mp-box:not(:focus-visible),html body .quality-btn:not(:focus-visible){outline:var(--ow3) solid rgb(74,79,96)!important;outline-offset:calc(-1 * var(--ow3))!important}
 html body .wp-box:hover:not(:focus-visible),html body .mp-box:hover:not(:focus-visible),html body .quality-btn:hover:not(:focus-visible){outline-color:rgb(126,134,160)!important}
