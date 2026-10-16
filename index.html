@@ -24009,9 +24009,19 @@ function run(){
     var wake=setTimeout(function(){ msg(tr('wake')); },8000);
     x.upload.onprogress=function(e){ if(e.lengthComputable){ clearTimeout(wake); bar(e.loaded/e.total*45); msg(tr('up')+' '+Math.round(e.loaded/e.total*100)+'%'); } };
     x.onerror=function(){ clearTimeout(wake); finishFail(tk.ticket,'Network error'); };
-    x.onload=function(){ clearTimeout(wake); var j={}; try{ j=JSON.parse(x.responseText); }catch(e){}
-      if(x.status<200||x.status>=300||!(j.jobId||j.id)){ return finishFail(tk.ticket,(j&&(j.error||j.message))||('HTTP '+x.status)); }
-      poll(j.jobId||j.id,tk.ticket); };
+    x.onload=function(){ clearTimeout(wake); var j={}, raw=x.responseText||''; try{ j=JSON.parse(raw); }catch(e){ j={}; }
+      var jid=j.jobId||j.job_id||j.id||(j.job&&(j.job.id||j.job.jobId))||(j.data&&(j.data.jobId||j.data.id));
+      var ok=x.status>=200&&x.status<300;
+      /* backend returned the finished file straight away */
+      var direct=j.downloadUrl||j.download_url||j.url||j.download||(j.data&&(j.data.downloadUrl||j.data.url));
+      if(ok&&!jid&&direct){ bar(100); S.busy=false; setPill('done',tr('done')); msg(tr('ready'));
+        var u0=direct; if(!/^https?:/i.test(u0)) u0=CFG.PATCHER+u0;
+        var a0=$('optDl'); a0.href=u0; a0.style.display=''; updateGo(); return; }
+      if(!ok||!jid){
+        try{ console.error('[optimizer] upload response',x.status,raw.slice(0,500)); }catch(e){}
+        var why=(j&&(j.error||j.message))||(ok?('HTTP '+x.status+' — სერვერმა jobId არ დააბრუნა: '+(raw?raw.replace(/<[^>]*>/g,' ').trim().slice(0,160):'(ცარიელი პასუხი)')):('HTTP '+x.status));
+        return finishFail(tk.ticket,why); }
+      poll(jid,tk.ticket); };
     x.send(fd);
   }).catch(function(e){ S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):e.message),true); refreshStatus(); });
 }
