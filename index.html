@@ -7293,6 +7293,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       </ol>
       <button type="button" class="mn-cta" id="mnRuCta"><span data-i18n="mnOrdCta"></span></button>
     </article>
+    <article class="mn-view" data-view="optimizer" id="optView"></article>
   </section>
 
   <div class="mn-modal" id="mnContact" role="dialog" aria-modal="true" aria-hidden="true">
@@ -8913,11 +8914,13 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
         <button class="a-tab" id="adminTabUrgency" data-i18n="adminTabUrgency">ადგილები</button>
         <button class="a-tab" id="adminTabPromo" data-i18n="adminTabPromo">Promo</button>
         <button class="a-tab" id="adminTabChats" data-i18n="adminTabChats">ჩატები</button>
+        <button class="a-tab" id="adminTabOptimizer">ოპტიმიზატორი</button>
       </div>
       <div class="a-panel active" id="adminPanelVisits"></div>
       <div class="a-panel" id="adminPanelComments"></div>
       <div class="a-panel" id="adminPanelArchive"></div>
       <div class="a-panel" id="adminPanelChats"></div>
+      <div class="a-panel" id="adminPanelOptimizer"></div>
       <div class="a-panel" id="adminPanelOrders">
         <div class="a-chart-card" id="ordersDonutCard"></div>
         <div class="a-form-row"><label data-i18n="adminOrdersTotal">სულ შეკვეთა</label><input type="number" id="ordersTotalInput" min="0"></div>
@@ -17405,6 +17408,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     adminPanelUrgency.classList.toggle('active', tab === 'urgency');
     adminPanelPromo.classList.toggle('active', tab === 'promo');
     adminPanelChats.classList.toggle('active', tab === 'chats');
+    (function(){ var b=document.getElementById('adminTabOptimizer'), p=document.getElementById('adminPanelOptimizer'); if(b) b.classList.toggle('active', tab === 'optimizer'); if(p) p.classList.toggle('active', tab === 'optimizer'); })();
     if (tab === 'visits') renderAdminVisits();
     else if (tab === 'comments') renderAdminComments();
     else if (tab === 'archive') renderAdminArchive();
@@ -17415,6 +17419,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     else if (tab === 'urgency') renderAdminUrgency();
     else if (tab === 'promo') renderAdminPromo();
     else if (tab === 'chats') renderAdminChats();
+    else if (tab === 'optimizer' && window.renderAdminOptimizer) window.renderAdminOptimizer();
   }
   adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
   adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
@@ -23768,6 +23773,320 @@ try{if(matchMedia('(hover:none) and (pointer:coarse)').matches)d.setAttribute('d
 addEventListener('pointerdown',function(e){if(e.pointerType==='touch'){if(!d.hasAttribute('data-touch'))d.setAttribute('data-touch','')}else if(d.hasAttribute('data-touch'))d.removeAttribute('data-touch')},{passive:true,capture:true});
 addEventListener('pointermove',function(e){if(e.pointerType==='mouse'&&d.hasAttribute('data-touch'))d.removeAttribute('data-touch')},{passive:true,capture:true});
 }catch(e){}})();
+</script>
+<style id="moon-optimizer-css">
+/* ===== MOON optimizer (scoped .opt-*) ===== */
+html body .opt{max-width:760px;margin:0 auto;display:grid;gap:14px}
+html body .opt-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+html body .opt-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;letter-spacing:.3px;color:#a7acb8;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);white-space:nowrap;margin-top:10px}
+html body .opt-pill i{width:8px;height:8px;border-radius:50%;background:#6b7080}
+html body .opt-pill[data-s="busy"] i{background:#ffd23f;box-shadow:0 0 10px #ffd23f;animation:optPulse 1.1s infinite}
+html body .opt-pill[data-s="done"] i{background:#3ddc84;box-shadow:0 0 10px #3ddc84}
+html body .opt-pill[data-s="err"] i{background:#ff4d6d;box-shadow:0 0 10px #ff4d6d}
+@keyframes optPulse{50%{opacity:.35}}
+html body .opt-card{padding:16px 18px;border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015)),rgba(14,15,19,.6);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+html body .opt-quota{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+html body .opt-badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#15161a;background:linear-gradient(180deg,#f6f7f9,#bfc2c9)}
+html body .opt-q-main{display:flex;flex-direction:column;gap:6px}
+html body .opt-q-num{font-size:15px;color:#e6e8ee;font-weight:700}
+html body .opt-q-sub{font-size:12.5px;color:#8b90a0}
+html body .opt-dots{display:flex;gap:8px}
+html body .opt-dots b{width:34px;height:10px;border-radius:99px;background:linear-gradient(90deg,#f6f7f9,#aab0bd);box-shadow:0 0 12px rgba(255,255,255,.25)}
+html body .opt-dots b.off{background:rgba(255,255,255,.1);box-shadow:none}
+html body .opt-drop{position:relative;min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:26px 18px;border-radius:30px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01)),rgba(14,15,19,.55);border:1.5px dashed rgba(255,255,255,.2);transition:border-color .2s,background .2s,transform .15s}
+html body .opt-drop:hover,html body .opt-drop.drag{border-color:rgba(255,255,255,.55);background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.02)),rgba(14,15,19,.6)}
+html body .opt-drop.has{border-style:solid;border-color:rgba(255,255,255,.28)}
+html body .opt-drop svg{width:46px;height:46px;stroke:#cfd3dd;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+html body .opt-drop b{color:#f2f3f6;font-size:17px;font-weight:700;word-break:break-word;max-width:100%}
+html body .opt-drop span{color:#8b90a0;font-size:13px}
+html body .opt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+html body .opt-stat{padding:14px 8px;border-radius:20px;text-align:center;background:rgba(14,15,19,.6);border:1px solid rgba(255,255,255,.09)}
+html body .opt-stat small{display:block;font-size:11.5px;letter-spacing:.4px;color:#8b90a0;margin-bottom:6px}
+html body .opt-stat strong{font-size:16px;color:#f2f3f6;font-weight:700}
+html body .opt-label{font-size:13px;color:#9ea3af;font-weight:600;margin:2px 4px 8px}
+html body .opt-presets{display:flex;flex-wrap:wrap;gap:8px}
+html body .opt-chip{appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#cfd3dd;font-family:inherit;font-size:13.5px;font-weight:700;padding:10px 16px;border-radius:999px;cursor:pointer;transition:all .18s}
+html body .opt-chip:hover:not(:disabled){border-color:rgba(255,255,255,.4);color:#fff}
+html body .opt-chip.on{color:#15161a;background:linear-gradient(180deg,#f6f7f9,#bfc2c9);border-color:transparent;box-shadow:0 6px 18px rgba(255,255,255,.15)}
+html body .opt-chip:disabled{opacity:.38;cursor:not-allowed}
+html body .opt-go{max-width:none!important}
+html body .opt-go:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+html body .opt-bar{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+html body .opt-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#aab0bd,#fff);transition:width .35s ease}
+html body .opt-msg{margin-top:10px;font-size:13.5px;color:#a7acb8;line-height:1.5}
+html body .opt-msg.err{color:#ff8da1}
+html body .opt-dl{display:inline-flex;margin-top:12px;text-decoration:none;max-width:none!important}
+html body .opt-h3{margin:18px 4px 2px;font-size:20px;font-weight:800;color:#f2f3f6}
+html body .opt-plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+html body .opt-plan{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:24px;background:rgba(14,15,19,.6);border:1px solid rgba(255,255,255,.1)}
+html body .opt-plan.cur{border-color:rgba(255,255,255,.55);box-shadow:0 0 0 1px rgba(255,255,255,.2),0 10px 30px rgba(255,255,255,.08)}
+html body .opt-plan h4{margin:0;font-size:15px;color:#cfd3dd;font-weight:700}
+html body .opt-plan .pr{font-size:28px;font-weight:800;color:#fff}
+html body .opt-plan .pr small{font-size:13px;color:#8b90a0;font-weight:600}
+html body .opt-plan ul{margin:6px 0 10px;padding:0;list-style:none;display:grid;gap:6px;font-size:13.5px;color:#a7acb8}
+html body .opt-plan li::before{content:"✓ ";color:#fff}
+html body .opt-plan .mn-cta{margin-top:auto;max-width:none;padding:11px 16px;font-size:14px}
+html body .opt-login{text-align:center;padding:30px 18px}
+html body .opt-login p{color:#a7acb8;margin:0 0 16px}
+/* admin */
+.opt-adm-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:8px}
+.opt-adm-row .nm{flex:1 1 160px;min-width:140px;font-weight:700}
+.opt-adm-row .nm small{display:block;font-weight:400;opacity:.6}
+.opt-adm-row select,.opt-adm-row input{padding:7px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:inherit;font-family:inherit;width:auto;max-width:110px}
+.opt-adm-row button{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+@media (max-width:520px){html body .opt-stat strong{font-size:14px}html body .opt-head{flex-direction:column}}
+</style>
+<script id="moon-optimizer-js">
+(function(){
+'use strict';
+/* ============ CONFIG ============ */
+var CFG = {
+  PATCHER: 'https://patcheri.onrender.com',
+  GATE: '',                       // <-- ჩასვი დეპლოირებული optimizer-gate worker-ის URL
+  UPLOAD_PATH: '/api/optimize',   // patcheri: POST multipart (file, preset, ticket) -> {jobId}
+  JOB_PATH: '/api/jobs/',         // patcheri: GET /api/jobs/:id -> {status, progress, downloadUrl, error}
+  POLL_MS: 2000
+};
+var PRESETS = [
+  {id:'1080p30', label:'1080p · 30', h:1080, fps:30},
+  {id:'1080p60', label:'1080p · 60', h:1080, fps:60},
+  {id:'1080p120',label:'1080p · 120',h:1080, fps:120},
+  {id:'4k60',    label:'4K · 60',    h:2160, fps:60},
+  {id:'4k120',   label:'4K · 120',   h:2160, fps:120}
+];
+var PLANS = {
+  free:{h:1080,fps:30,price:0},
+  p1:{h:1080,fps:60,price:'5.99'},
+  p2:{h:1080,fps:120,price:'7.99'},
+  p3:{h:2160,fps:120,price:'14.99'}
+};
+var T = {
+ ka:{nav:'ოპტიმიზატორი',title:'ოპტიმიზატორი',sub:'ატვირთე mp4 და მიიღე გაუმჯობესებული ვიდეო',idle:'მზადაა',busy:'მუშავდება',done:'დასრულდა',err:'შეცდომა',
+  drop:'ჩააგდე mp4 აქ ან დააჭირე ასარჩევად',hint:'mp4 · 4K-მდე',size:'ზომა',res:'გარჩევადობა',dur:'ხანგრძლივობა',preset:'ხარისხი',go:'ოპტიმიზაცია',
+  left:'დარჩენილი ატვირთვა',week:'ამ კვირაში',unl:'ულიმიტო',resets:'ლიმიტი განახლდება',plans:'გეგმები',buy:'შეძენა',cur:'შენი გეგმა',perMonth:'/თვე',
+  free:'უფასო',freeL:'3 ატვირთვა კვირაში',unlimited:'ულიმიტო ატვირთვა',upTo:'მაქს. ',lock:'ამ გეგმაში მიუწვდომელია',
+  login:'ოპტიმიზატორის გამოსაყენებლად შედი Discord-ით',loginBtn:'Discord-ით შესვლა',noGate:'სერვისი ჯერ არ არის დაკავშირებული (GATE URL).',
+  blocked:'შენი წვდომა შეზღუდულია.',noQuota:'ამ კვირის ლიმიტი ამოწურულია. განახლდება: ',expired:'გეგმა ვადაგასულია — გადართულია უფასოზე.',
+  up:'იტვირთება',queue:'რიგშია',proc:'მუშავდება',ready:'მზადაა! ჩამოტვირთე ქვემოთ',dl:'ჩამოტვირთვა',pickMp4:'აირჩიე mp4 ფაილი',d:'დ',h:'სთ',m:'წთ',
+  wake:'სერვერი იღვიძებს, ცოტა ხანი დასჭირდება…'},
+ en:{nav:'Optimizer',title:'Optimizer',sub:'Upload an mp4 and get an enhanced video',idle:'ready',busy:'processing',done:'done',err:'error',
+  drop:'Drop an mp4 here or click to choose',hint:'mp4 · up to 4K',size:'Size',res:'Resolution',dur:'Duration',preset:'Quality',go:'Optimize',
+  left:'Uploads left',week:'this week',unl:'Unlimited',resets:'Limit resets in',plans:'Plans',buy:'Get plan',cur:'Your plan',perMonth:'/month',
+  free:'Free',freeL:'3 uploads per week',unlimited:'Unlimited uploads',upTo:'Up to ',lock:'Not available on your plan',
+  login:'Sign in with Discord to use the optimizer',loginBtn:'Sign in with Discord',noGate:'Service not connected yet (GATE URL).',
+  blocked:'Your access is restricted.',noQuota:'Weekly limit reached. Resets in: ',expired:'Plan expired — switched to free.',
+  up:'Uploading',queue:'Queued',proc:'Processing',ready:'Done! Download below',dl:'Download',pickMp4:'Choose an mp4 file',d:'d',h:'h',m:'m',
+  wake:'Server is waking up, this may take a moment…'}
+};
+function L(){ try{ return (typeof currentLang!=='undefined' && T[currentLang])?currentLang:'en'; }catch(e){ return 'ka'; } }
+function tr(k){ var l=L(); try{ if(typeof currentLang!=='undefined'&&currentLang==='ka') l='ka'; }catch(e){} return (T[l]&&T[l][k])||T.en[k]||k; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function user(){ try{ return (typeof currentDiscordUser!=='undefined')?currentDiscordUser:null; }catch(e){ return null; } }
+
+/* ============ NAV LINK + VIEW ============ */
+var nav = document.querySelector('.mn-links');
+var view = document.getElementById('optView');
+if(!view) return;
+view.innerHTML =
+ '<div class="opt">'+
+ '<div class="opt-head"><div><h2 data-k="title"></h2><p class="mn-sub" data-k="sub" style="margin-bottom:0"></p></div><span class="opt-pill" id="optPill" data-s="idle"><i></i><em data-k="idle" style="font-style:normal"></em></span></div>'+
+ '<div id="optLogin" class="opt-card opt-login" style="display:none"><p data-k="login"></p><button type="button" class="mn-cta" id="optLoginBtn"><span data-k="loginBtn"></span></button></div>'+
+ '<div id="optMain">'+
+  '<div class="opt-card opt-quota" id="optQuota"></div>'+
+  '<label class="opt-drop" id="optDrop" for="optFile"><svg viewBox="0 0 48 48"><path d="M24 6v24M14 21l10 10 10-10M8 34v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4"/></svg><b id="optName" data-k="drop"></b><span id="optHint" data-k="hint"></span><input id="optFile" type="file" accept="video/mp4,.mp4" hidden></label>'+
+  '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
+  '<div class="opt-card"><div class="opt-label" data-k="preset"></div><div class="opt-presets" id="optPresets"></div></div>'+
+  '<button type="button" class="mn-cta opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
+  '<div class="opt-card" id="optProg" style="display:none"><div class="opt-bar"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><a class="mn-cta opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a></div>'+
+ '</div>'+
+ '<div class="opt-h3" data-k="plans"></div><div class="opt-plans" id="optPlans"></div>'+
+ '</div>';
+
+function applyLang(){
+  view.querySelectorAll('[data-k]').forEach(function(n){ n.textContent = tr(n.getAttribute('data-k')); });
+  var lk=nav&&nav.querySelector('[data-mn="optimizer"]'); if(lk) lk.textContent=tr('nav');
+  renderPlans(); renderQuota(); renderPresets();
+}
+
+/* ============ STATE ============ */
+var S = {file:null, meta:null, preset:null, status:null, busy:false, jid:null};
+var $ = function(id){ return document.getElementById(id); };
+function setPill(s,txt){ var p=$('optPill'); p.setAttribute('data-s',s); p.querySelector('em').textContent=txt; }
+function fmtSize(b){ return b>=1073741824?(b/1073741824).toFixed(2)+' GB':(b/1048576).toFixed(1)+' MB'; }
+function fmtDur(s){ s=Math.round(s); var m=Math.floor(s/60); return m+':'+String(s%60).padStart(2,'0'); }
+function fmtLeft(ms){ var m=Math.max(0,Math.floor(ms/60000)),d=Math.floor(m/1440),h=Math.floor(m%1440/60); return d?(d+tr('d')+' '+h+tr('h')):(h+tr('h')+' '+(m%60)+tr('m')); }
+function api(path,opt){
+  if(!CFG.GATE) return Promise.reject(new Error(tr('noGate')));
+  opt=opt||{}; opt.headers=Object.assign({'Content-Type':'application/json'},opt.headers||{});
+  return fetch(CFG.GATE+path,opt).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ if(!r.ok) { var e=new Error(j.message||j.error||('HTTP '+r.status)); e.data=j; throw e; } return j; }); });
+}
+function ident(){ var u=user(); if(!u) return null; return {uid:String(u.id),username:u.username||'',sig:u.optSig||undefined,sigExp:u.optSigExp||undefined}; }
+
+/* ============ QUOTA / PRESETS / PLANS ============ */
+function allowed(p){ var pl=PLANS[(S.status&&S.status.plan)||'free']; return p.h<=pl.h && p.fps<=pl.fps; }
+function renderPresets(){
+  var box=$('optPresets'); if(!box) return;
+  box.innerHTML=PRESETS.map(function(p){ var ok=allowed(p); return '<button type="button" class="opt-chip'+(S.preset===p.id?' on':'')+'" data-p="'+p.id+'"'+(ok?'':' disabled title="'+esc(tr('lock'))+'"')+'>'+(ok?'':'🔒 ')+p.label+'</button>'; }).join('');
+  var cur=PRESETS.filter(function(p){return p.id===S.preset;})[0];
+  if(!cur||!allowed(cur)){ var first=PRESETS.filter(allowed).pop(); S.preset=first?first.id:null; if(S.preset) renderPresets(); }
+  updateGo();
+}
+function renderQuota(){
+  var q=$('optQuota'); if(!q) return; var st=S.status;
+  if(!st){ q.innerHTML='<div class="opt-q-sub">…</div>'; return; }
+  var name=st.plan==='free'?tr('free'):('Plan '+st.plan.toUpperCase());
+  var main, dots='';
+  if(st.unlimited){ main='<div class="opt-q-num">∞ '+tr('unl')+'</div>'; }
+  else{
+    main='<div class="opt-q-num">'+tr('left')+': '+st.remaining+' / '+st.limit+' <span style="color:#8b90a0;font-weight:500">('+tr('week')+')</span></div><div class="opt-q-sub">'+tr('resets')+' '+fmtLeft(st.resetAt-Date.now())+'</div>';
+    for(var i=0;i<st.limit&&i<10;i++) dots+='<b class="'+(i<st.remaining?'':'off')+'"></b>';
+  }
+  q.innerHTML='<div class="opt-q-main"><span class="opt-badge">'+esc(name)+'</span>'+main+'</div>'+(dots?'<div class="opt-dots">'+dots+'</div>':'');
+}
+function renderPlans(){
+  var box=$('optPlans'); if(!box) return; var cur=(S.status&&S.status.plan)||'free';
+  var items=[
+   ['free',tr('free'),0,[tr('freeL'),tr('upTo')+'1080p · 30fps']],
+   ['p1','Plan 1','5.99',[tr('unlimited'),tr('upTo')+'1080p · 60fps']],
+   ['p2','Plan 2','7.99',[tr('unlimited'),tr('upTo')+'1080p · 120fps']],
+   ['p3','Plan 3','14.99',[tr('unlimited'),tr('upTo')+'4K · 120fps']]
+  ];
+  box.innerHTML=items.map(function(x){
+    return '<div class="opt-plan'+(x[0]===cur?' cur':'')+'"><h4>'+esc(x[1])+'</h4><div class="pr">'+(x[2]?x[2]+' ₾ <small>'+tr('perMonth')+'</small>':'0 ₾')+'</div><ul>'+x[3].map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>'+
+      (x[0]===cur?'<span class="opt-badge" style="align-self:flex-start">'+tr('cur')+'</span>':(x[2]?'<button type="button" class="mn-cta" data-buy="1"><span>'+tr('buy')+'</span></button>':''))+'</div>';
+  }).join('');
+}
+function refreshStatus(){
+  var id=ident();
+  $('optLogin').style.display=id?'none':''; $('optMain').style.display=id?'':'none';
+  if(!id){ return Promise.resolve(); }
+  return api('/status?uid='+encodeURIComponent(id.uid)).then(function(st){
+    S.status=st; renderQuota(); renderPresets(); renderPlans();
+    if(st.blocked){ msg(tr('blocked'),true); }
+  }).catch(function(e){ S.status=null; renderQuota(); msg(e.message,true); });
+}
+
+/* ============ FILE ============ */
+function msg(t,err){ $('optProg').style.display=''; var m=$('optMsg'); m.textContent=t; m.className='opt-msg'+(err?' err':''); }
+function updateGo(){ var st=S.status; var ok=S.file&&S.preset&&!S.busy&&st&&!st.blocked&&(st.unlimited||st.remaining>0); $('optGo').disabled=!ok; }
+function setFile(f){
+  if(!f) return;
+  if(!/\.mp4$/i.test(f.name)&&f.type!=='video/mp4'){ msg(tr('pickMp4'),true); return; }
+  S.file=f; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); $('oSize').textContent=fmtSize(f.size);
+  $('oRes').textContent='…'; $('oDur').textContent='…';
+  var v=document.createElement('video'), url=URL.createObjectURL(f); v.preload='metadata'; v.muted=true;
+  v.onloadedmetadata=function(){ S.meta={w:v.videoWidth,h:v.videoHeight,d:v.duration}; var mx=Math.max(v.videoWidth,v.videoHeight), mn=Math.min(v.videoWidth,v.videoHeight);
+    $('oRes').textContent=(mx>=3000?'4K':(mn+'p'))+' · '+v.videoWidth+'×'+v.videoHeight; $('oDur').textContent=fmtDur(v.duration); URL.revokeObjectURL(url); };
+  v.onerror=function(){ $('oRes').textContent='—'; $('oDur').textContent='—'; URL.revokeObjectURL(url); };
+  v.src=url; updateGo();
+}
+
+/* ============ RUN JOB ============ */
+function bar(p){ $('optBar').style.width=Math.max(0,Math.min(100,p))+'%'; }
+function finishFail(ticket,text){
+  S.busy=false; setPill('err',tr('err')); msg(text,true);
+  if(ticket) api('/refund',{method:'POST',body:JSON.stringify({ticket:ticket,uid:ident().uid})}).catch(function(){});
+  refreshStatus();
+}
+function run(){
+  var id=ident(); if(!id||!S.file||!S.preset) return;
+  S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('up')+'…');
+  api('/ticket',{method:'POST',body:JSON.stringify(Object.assign({preset:S.preset,size:S.file.size,meta:S.meta},id))}).then(function(tk){
+    S.status=tk.status||S.status; renderQuota();
+    var fd=new FormData(); fd.append('file',S.file,S.file.name); fd.append('preset',S.preset); fd.append('ticket',tk.ticket); fd.append('uid',id.uid);
+    var x=new XMLHttpRequest(); x.open('POST',CFG.PATCHER+CFG.UPLOAD_PATH);
+    var wake=setTimeout(function(){ msg(tr('wake')); },8000);
+    x.upload.onprogress=function(e){ if(e.lengthComputable){ clearTimeout(wake); bar(e.loaded/e.total*45); msg(tr('up')+' '+Math.round(e.loaded/e.total*100)+'%'); } };
+    x.onerror=function(){ clearTimeout(wake); finishFail(tk.ticket,'Network error'); };
+    x.onload=function(){ clearTimeout(wake); var j={}; try{ j=JSON.parse(x.responseText); }catch(e){}
+      if(x.status<200||x.status>=300||!(j.jobId||j.id)){ return finishFail(tk.ticket,(j&&(j.error||j.message))||('HTTP '+x.status)); }
+      poll(j.jobId||j.id,tk.ticket); };
+    x.send(fd);
+  }).catch(function(e){ S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):e.message),true); refreshStatus(); });
+}
+function poll(jid,ticket){
+  fetch(CFG.PATCHER+CFG.JOB_PATH+encodeURIComponent(jid)).then(function(r){return r.json();}).then(function(j){
+    var st=(j.status||j.state||'').toLowerCase();
+    if(st==='done'||st==='completed'||st==='finished'){
+      bar(100); S.busy=false; setPill('done',tr('done')); msg(tr('ready'));
+      var u=j.downloadUrl||j.url||j.download||(CFG.PATCHER+'/api/download/'+encodeURIComponent(jid)); if(!/^https?:/i.test(u)) u=CFG.PATCHER+u;
+      var a=$('optDl'); a.href=u; a.style.display=''; updateGo(); return;
+    }
+    if(st==='error'||st==='failed') return finishFail(ticket,j.error||j.message||tr('err'));
+    var p=typeof j.progress==='number'?j.progress:0; bar(45+p*0.55); msg((st==='queued'?tr('queue'):tr('proc'))+(p?' '+Math.round(p)+'%':'…'));
+    setTimeout(function(){ poll(jid,ticket); },CFG.POLL_MS);
+  }).catch(function(){ setTimeout(function(){ poll(jid,ticket); },CFG.POLL_MS*2); });
+}
+
+/* ============ EVENTS ============ */
+var drop=$('optDrop');
+$('optFile').addEventListener('change',function(e){ setFile(e.target.files[0]); });
+['dragenter','dragover'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.add('drag'); }); });
+['dragleave','drop'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.remove('drag'); }); });
+drop.addEventListener('drop',function(e){ var f=e.dataTransfer&&e.dataTransfer.files[0]; if(f) setFile(f); });
+$('optPresets').addEventListener('click',function(e){ var b=e.target.closest('.opt-chip'); if(!b||b.disabled) return; S.preset=b.getAttribute('data-p'); renderPresets(); });
+$('optGo').addEventListener('click',run);
+$('optPlans').addEventListener('click',function(e){ if(e.target.closest('[data-buy]')){ var c=document.querySelector('.mn-link[data-mn="contact"]'); if(c) c.click(); } });
+$('optLoginBtn').addEventListener('click',function(){ try{ startDiscordLogin(); }catch(e){} });
+
+/* nav link */
+if(nav && !nav.querySelector('[data-mn="optimizer"]')){
+  var b=document.createElement('button'); b.type='button'; b.className='mn-link'; b.setAttribute('data-mn','optimizer'); b.textContent=tr('nav');
+  var up=nav.querySelector('[data-mn="upload"]'); if(up&&up.nextSibling) nav.insertBefore(b,up.nextSibling); else nav.appendChild(b);
+}
+/* refresh when view is shown / user changes / language changes */
+new MutationObserver(function(){ if(view.classList.contains('show')){ refreshStatus(); fetch(CFG.PATCHER+'/',{mode:'no-cors'}).catch(function(){}); } }).observe(view,{attributes:true,attributeFilter:['class']});
+document.addEventListener('click',function(e){ if(e.target.closest('.lang-btn')) setTimeout(applyLang,60); });
+setInterval(function(){ if(view.classList.contains('show')&&S.status&&!S.status.unlimited) renderQuota(); },60000);
+var lastU=null; setInterval(function(){ var u=user(), k=u&&u.id; if(k!==lastU){ lastU=k; S.status=null; refreshStatus(); } },1500);
+applyLang();
+
+/* ============ ADMIN PANEL ============ */
+var ADM_KEY='moon_opt_admin_key';
+window.renderAdminOptimizer=function(){
+  var p=$('adminPanelOptimizer'); if(!p) return;
+  var key=''; try{ key=sessionStorage.getItem(ADM_KEY)||''; }catch(e){}
+  p.innerHTML='<div class="opt-adm-row"><span class="nm">Gate admin key<small>Worker-ის ADMIN_KEY (ინახება მხოლოდ ამ სესიაში)</small></span><input type="password" id="optAdmKey" value="'+esc(key)+'" style="max-width:200px"><button id="optAdmLoad" class="a-go">ჩატვირთვა</button></div>'+
+   '<div class="a-form-row"><input type="text" id="optAdmSearch" placeholder="ძებნა სახელით ან ID-ით..." style="width:100%"></div><div id="optAdmList"></div>';
+  $('optAdmLoad').onclick=function(){ try{ sessionStorage.setItem(ADM_KEY,$('optAdmKey').value); }catch(e){} loadAdm(); };
+  $('optAdmSearch').oninput=drawAdm;
+  if(key) loadAdm();
+};
+var admDir=[],admMap={};
+function admApi(path,body){ var key=($('optAdmKey')||{}).value||''; return api(path,{method:body?'POST':'GET',headers:{'X-Admin-Key':key},body:body?JSON.stringify(body):undefined}); }
+function loadAdm(){
+  var list=$('optAdmList'); list.innerHTML='<div class="c-empty">…</div>';
+  Promise.all([mdbRead('discordDirectory'),admApi('/admin/list')]).then(function(r){
+    admDir=(r[0]&&Array.isArray(r[0].list))?r[0].list:[]; admMap={}; (r[1].users||[]).forEach(function(u){ admMap[u.uid]=u; });
+    (r[1].users||[]).forEach(function(u){ if(!admDir.some(function(d){return String(d.id)===u.uid;})) admDir.push({id:u.uid,username:u.name||u.uid}); });
+    drawAdm();
+  }).catch(function(e){ list.innerHTML='<div class="c-empty">'+esc(e.message)+'</div>'; });
+}
+function drawAdm(){
+  var q=(($('optAdmSearch')||{}).value||'').toLowerCase(), list=$('optAdmList');
+  var rows=admDir.filter(function(u){ return !q||String(u.username||'').toLowerCase().indexOf(q)>-1||String(u.id).indexOf(q)>-1; }).slice(0,200);
+  list.innerHTML=rows.map(function(u){
+    var r=admMap[String(u.id)]||{plan:'free'}; var days=r.expiresAt?Math.max(0,Math.ceil((r.expiresAt-Date.now())/864e5)):30;
+    return '<div class="opt-adm-row" data-id="'+esc(u.id)+'" data-name="'+esc(u.username||'')+'"><span class="nm">'+esc(u.username||u.id)+'<small>'+esc(u.id)+(r.expiresAt?' · ვადა: '+new Date(r.expiresAt).toLocaleDateString():'')+'</small></span>'+
+     '<select class="f-plan"><option value="free">უფასო (3/კვ.)</option><option value="p1">Plan 1 · 1080p60</option><option value="p2">Plan 2 · 1080p120</option><option value="p3">Plan 3 · 4K120</option></select>'+
+     '<input class="f-days" type="number" min="1" value="'+days+'" title="დღეები"><input class="f-lim" type="number" min="0" value="'+(r.weeklyLimit!=null?r.weeklyLimit:'')+'" placeholder="კვ.ლიმ." title="კვირის ლიმიტი (უფასოზე)">'+
+     '<label style="font-size:12px"><input class="f-bl" type="checkbox"'+(r.blocked?' checked':'')+'> ბლოკი</label><button class="a-go f-save">შენახვა</button><button class="f-reset" title="კვირის გამოყენების განულება">↺</button></div>';
+  }).join('')||'<div class="c-empty">—</div>';
+  list.querySelectorAll('.opt-adm-row').forEach(function(row){ var r=admMap[row.getAttribute('data-id')]; if(r) row.querySelector('.f-plan').value=r.plan||'free'; });
+}
+document.addEventListener('click',function(e){
+  var row=e.target.closest('.opt-adm-row[data-id]'); if(!row) return; var uid=row.getAttribute('data-id');
+  if(e.target.closest('.f-save')){
+    var plan=row.querySelector('.f-plan').value, days=+row.querySelector('.f-days').value||30, lim=row.querySelector('.f-lim').value;
+    var btn=e.target.closest('.f-save'); btn.disabled=true;
+    admApi('/admin/set',{uid:uid,name:row.getAttribute('data-name'),plan:plan,expiresAt:plan==='free'?null:Date.now()+days*864e5,weeklyLimit:lim===''?null:+lim,blocked:row.querySelector('.f-bl').checked})
+      .then(function(r){ admMap[uid]=r.user; btn.textContent='✓'; setTimeout(function(){ btn.textContent='შენახვა'; btn.disabled=false; },1200); })
+      .catch(function(er){ btn.disabled=false; alert(er.message); });
+  }
+  if(e.target.closest('.f-reset')){ admApi('/admin/reset-usage',{uid:uid}).then(function(){ e.target.textContent='✓'; setTimeout(function(){ e.target.textContent='↺'; },1200); }).catch(function(er){ alert(er.message); }); }
+});
+var tabBtn=$('adminTabOptimizer'); if(tabBtn) tabBtn.addEventListener('click',function(){ try{ switchAdminTab('optimizer'); }catch(e){} });
+})();
 </script>
 </body>
 </html>
