@@ -6914,6 +6914,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 }
 @media(prefers-reduced-motion:reduce){#moonIntro .mx-sc,#moonIntro .mx-ci,#moonIntro .mx-fs{animation:none;opacity:1}}
 </style>
+<style id="moon-menu-pages">.site-menu .qn-tab--go::after{content:"›";font-size:20px}</style>
 </head>
 <body>
 
@@ -7202,10 +7203,8 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       </div>
       <nav class="mn-links" aria-label="Main">
         <button type="button" class="mn-link active" data-mn="home" data-i18n="mnHome">მთავარი</button>
-        <button type="button" class="mn-link" data-mn="order" data-i18n="mnOrder">შეკვეთა</button>
-        <button type="button" class="mn-link" data-mn="upload" data-i18n="mnUpload">ატვირთვა</button>
+        <button type="button" class="mn-link" data-mn="optimizer">ოპტიმიზატორი</button>
         <button type="button" class="mn-link" data-mn="contact" data-i18n="mnContact">კონტაქტი</button>
-        <button type="button" class="mn-link" data-mn="rules" data-i18n="qnRules">წესები</button>
       </nav>
       <div class="mn-right">
                 <div class="mn-lang" id="mnLang">
@@ -7315,6 +7314,9 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 
       <div class="qn-nav-wrap">
         <div class="quick-nav" id="quickNav">
+        <button type="button" class="qn-tab qn-tab--go" data-mn-go="order"><span class="qn-tile-icon" aria-hidden="true">🛒</span><span class="qn-label" data-i18n="mnOrder">შეკვეთა</span></button>
+        <button type="button" class="qn-tab qn-tab--go" data-mn-go="upload"><span class="qn-tile-icon" aria-hidden="true">📤</span><span class="qn-label" data-i18n="mnUpload">ატვირთვა</span></button>
+        <button type="button" class="qn-tab qn-tab--go" data-mn-go="rules"><span class="qn-tile-icon" aria-hidden="true">📜</span><span class="qn-label" data-i18n="qnRules">წესები</span></button>
         <button type="button" class="qn-tab qn-tab--why scanner-jump-link" data-jump="trustPanel"><span class="qn-tile-icon" aria-hidden="true">🛡️</span><span class="qn-label" data-i18n="qnWhy">რატომ MOON<span class="qn-q">?</span></span></button>
         <button type="button" class="qn-tab qn-tab--portfolio scanner-jump-link" data-jump="portfolioPanel"><span class="qn-tile-icon" aria-hidden="true">🎬</span><span class="qn-label" data-i18n="qnPortfolio">პორტფოლიო</span></button>
         <button type="button" class="qn-tab qn-tab--orders scanner-jump-link" data-jump="myOrdersPanel"><span class="qn-tile-icon" aria-hidden="true">📦</span><span class="qn-label" data-i18n="myOrdersLabel">ჩემი შეკვეთები</span></button>
@@ -22664,6 +22666,15 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
       }
       transit(n==='home' ? function(){ closeView(); window.scrollTo(0,0); } : function(){ openView(n); }, n);
     });
+  });
+  /* ---- menu items (Order / Upload / Rules) open the same pages as the old top-bar links ---- */
+  document.addEventListener('click',function(e){
+    var g=e.target.closest('[data-mn-go]'); if(!g) return;
+    var n=g.getAttribute('data-mn-go');
+    closeMenus(); closeContact(true);
+    setActive(n);
+    if(n===shown && !busy) return;
+    transit(function(){ openView(n); }, n);
   });
   ['mnEmblem','mnWordmark'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.addEventListener('click',function(e){ e.preventDefault(); goHome(); });
