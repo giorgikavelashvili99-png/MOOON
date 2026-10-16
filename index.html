@@ -26046,5 +26046,73 @@ setInterval(function(){var o=document.querySelector('#optView .opt'); if(o)enhan
 })();
 </script>
 
+<style id="opt-plans-v6">
+/* ===== v6: plan cards — blue / purple / green glass look + gold 4K, slider nav ===== */
+html body #optView .opt-plans{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:18px!important;max-width:min(1180px,100%)!important;align-items:stretch;position:relative}
+html body #optView .opt-plans>.opt-plan{padding:28px 22px 22px;gap:18px;border-radius:24px;border:1px solid rgba(var(--ac),.7);
+ background:radial-gradient(130% 70% at 12% 0%,rgba(255,255,255,.16),transparent 55%),linear-gradient(160deg,rgba(var(--ac),.62) 0%,rgba(var(--ac),.16) 42%,rgba(6,7,16,.94) 100%),#07080f;
+ box-shadow:0 22px 50px -26px rgba(var(--ac),.8),inset 0 1px 0 rgba(255,255,255,.14)}
+html body #optView .opt-plans>.opt-plan:nth-child(1){--ac:34,197,94}
+html body #optView .opt-plans>.opt-plan:nth-child(2){--ac:76,108,255}
+html body #optView .opt-plans>.opt-plan:nth-child(3){--ac:176,96,255}
+html body #optView .opt-plans>.opt-plan:nth-child(4){--ac:242,187,6}
+html body #optView .opt-plans>.opt-plan:hover{box-shadow:0 34px 70px -28px rgba(var(--ac),.95),inset 0 1px 0 rgba(255,255,255,.2)}
+html body #optView .opt-plans>.opt-plan .pr{font-size:clamp(34px,3.3vw,46px);white-space:normal;line-height:1.05;background:linear-gradient(180deg,#fff 20%,rgb(var(--ac)) 150%);-webkit-background-clip:text;background-clip:text;color:transparent}
+html body #optView .opt-plans>.opt-plan .pr small{display:inline-block;font-size:13px}
+html body #optView .opt-plans>.opt-plan:nth-child(1) .pr{background:linear-gradient(180deg,#baffb0,#22c55e);-webkit-background-clip:text;background-clip:text}
+html body #optView .opt-plans>.opt-plan:nth-child(2) .pr{background:linear-gradient(180deg,#d6dcff,#5b7bff);-webkit-background-clip:text;background-clip:text}
+html body #optView .opt-plans>.opt-plan:nth-child(3) .pr{background:linear-gradient(180deg,#f3e3ff,#b060ff);-webkit-background-clip:text;background-clip:text}
+/* 4K plan price = exactly the monthly package price gradient */
+html body #optView .opt-plans>.opt-plan:nth-child(4) .pr{background:linear-gradient(180deg,#F8EC7E,#DCAB10);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 4px 14px rgba(242,187,6,.35))}
+html body #optView .opt-plans>.opt-plan:nth-child(4) h4{background:linear-gradient(90deg,#F8EC7E,#F2BB06 55%,#FBD02B);-webkit-background-clip:text;background-clip:text;color:transparent}
+html body #optView .opt-plans>.opt-plan .opt-buy{background:rgba(0,0,0,.35);border:1px solid rgba(var(--ac),.75)}
+html body #optView .opt-plans>.opt-plan:nth-child(4) .opt-buy{background:linear-gradient(90deg,#D9A015,#F2BB06 30%,#F8EC7E 50%,#DCAB10 75%,#F0CD4D);color:#241800;border-color:transparent}
+/* tablet / phone: swipeable slider with arrows + dots */
+@media (max-width:1099px){
+ html body #optView .opt-plans{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px!important;padding:16px 6px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+ html body #optView .opt-plans::-webkit-scrollbar{display:none}
+ html body #optView .opt-plans>.opt-plan{flex:0 0 min(290px,78%);scroll-snap-align:center}
+}
+.opt-pnav{display:none;align-items:center;justify-content:center;gap:16px;margin:2px 0 6px}
+@media (max-width:1099px){.opt-pnav{display:flex}.opt-pnav.off{display:none}}
+.opt-pn-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);transition:transform .2s,background .2s,opacity .2s}
+.opt-pn-btn:hover{background:rgba(255,255,255,.16)}.opt-pn-btn:active{transform:scale(.92)}.opt-pn-btn:disabled{opacity:.3;pointer-events:none}
+.opt-pn-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.opt-pn-dots{display:flex;gap:9px;align-items:center}
+.opt-pn-dot{width:9px;height:9px;padding:0;border-radius:99px;border:0;cursor:pointer;background:rgba(255,255,255,.28);transition:width .25s,background .25s}
+.opt-pn-dot.on{width:26px;background:#fff}
+</style>
+<script id="opt-plans-v6-js">
+(function(){
+ var ARW='<svg viewBox="0 0 24 24"><path d="%P"/></svg>';
+ function build(){
+  var box=document.getElementById('optPlans'); if(!box||box.__pn||!box.parentNode) return;
+  box.__pn=1;
+  var old=box.parentNode.querySelector('.opt-pnav'); if(old) old.remove();
+  var nav=document.createElement('div'); nav.className='opt-pnav';
+  nav.innerHTML='<button type="button" class="opt-pn-btn" aria-label="წინა">'+ARW.replace('%P','M15 5l-7 7 7 7')+'</button><div class="opt-pn-dots"></div><button type="button" class="opt-pn-btn" aria-label="შემდეგი">'+ARW.replace('%P','M9 5l7 7-7 7')+'</button>';
+  box.parentNode.insertBefore(nav,box.nextSibling);
+  var b=nav.querySelectorAll('.opt-pn-btn'), dots=nav.querySelector('.opt-pn-dots'), idx=0, tk=0;
+  function cs(){return box.querySelectorAll('.opt-plan');}
+  function go(i){var c=cs(); if(!c.length) return; i=Math.max(0,Math.min(c.length-1,i)); var el=c[i]; box.scrollTo({left:el.offsetLeft-(box.clientWidth-el.offsetWidth)/2,behavior:'smooth'});}
+  function sync(){
+   tk=0; var c=cs();
+   if(dots.children.length!==c.length){ dots.innerHTML=''; c.forEach(function(_,i){var d=document.createElement('button');d.type='button';d.className='opt-pn-dot';d.setAttribute('aria-label',String(i+1));d.onclick=function(){go(i)};dots.appendChild(d);}); }
+   var mid=box.scrollLeft+box.clientWidth/2, bd=1e9; idx=0;
+   c.forEach(function(el,i){var d=Math.abs(el.offsetLeft+el.offsetWidth/2-mid); if(d<bd){bd=d;idx=i;}});
+   for(var i=0;i<dots.children.length;i++) dots.children[i].classList.toggle('on',i===idx);
+   b[0].disabled=idx<=0; b[1].disabled=idx>=c.length-1;
+   nav.classList.toggle('off',box.scrollWidth<=box.clientWidth+2);
+  }
+  function q(){ if(!tk) tk=requestAnimationFrame(sync); }
+  b[0].onclick=function(){go(idx-1)}; b[1].onclick=function(){go(idx+1)};
+  box.addEventListener('scroll',q,{passive:true}); window.addEventListener('resize',q);
+  new MutationObserver(q).observe(box,{childList:true});
+  sync();
+ }
+ setInterval(build,400); build();
+})();
+</script>
+
 </body>
 </html>
