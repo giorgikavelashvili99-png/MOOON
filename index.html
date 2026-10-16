@@ -25535,6 +25535,54 @@ function _0x20ad(_0x29d931, _0x2f54f0) {
 #optView .opt-plan .opt-buy,#optView .opt-plan .op-slot{margin-top:auto}
 #optView .opt-plan .opt-buy{width:100%;padding:15px;border-radius:18px;font-weight:800;color:#fff;background:rgba(var(--ac),.16);border:1px solid rgba(var(--ac),.6);cursor:pointer;transition:all .25s}
 #optView .opt-plan .opt-buy:hover{background:linear-gradient(110deg,rgb(var(--ac)),#fff 220%);color:#07101f;transform:translateY(-3px);box-shadow:0 18px 36px -10px rgba(var(--ac),.9)}
+
+/* ===== v5: mobile fixes ===== */
+#optView .opt{grid-template-columns:minmax(0,1fr)!important;box-sizing:border-box;max-width:100%}
+#optView .opt>*{min-width:0;max-width:min(760px,100%)}
+#optView .opt>.opt-h3{max-width:100%}
+#optView .opt>.opt-plans{max-width:min(1080px,100%)!important}
+#optView #optMain{width:100%;max-width:min(760px,100%)}
+#optView .opt-plans{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr))!important}
+#optView .opt-stats{width:100%}
+@media (max-width:640px){
+ #optView .opt{padding:20px 12px 36px;gap:22px;border-radius:24px}
+ #optView .opt-head{margin-top:26px}
+ #optView .opt-head h2{font-size:clamp(30px,10vw,44px);letter-spacing:.02em;word-break:break-word}
+ #optView .opt-head .mn-sub{font-size:14px}
+ #optView .opt-quota{flex-wrap:wrap;gap:10px 16px;padding:14px 18px;border-radius:26px;width:100%}
+ #optView .opt-q-num{font-size:30px}
+ .or-steps{gap:6px}.or-step{padding:6px 12px 6px 6px;font-size:12px}.or-line{flex-basis:14px}
+ #optView .opt-drop{width:min(300px,84vw);padding:44px 28px}
+ #optView .opt-drop .opt-ic{width:60px;height:60px}
+ #optView .opt-stats{grid-template-columns:1fr;border-radius:20px}
+ #optView .opt-stat+.opt-stat{border-left:0;border-top:1px solid var(--o-line)}
+ #optView .opt-go{min-height:62px;font-size:18px}
+ #optView .opt-plans{gap:16px}
+ #optView .opt-plan{padding:26px 20px 20px;animation:orRise .7s both}
+ #optView .opt-plan .pr{font-size:44px}
+ #optView .opt-plan:hover{transform:none}
+ #optView .opt-pct b{font-size:44px}
+ #optView .opt-plan::after,#optView .opt-stats::after,#optView .opt-quota::after{display:none}
+ #optView .opt-card,#optView .opt-stats,#optView .opt-quota,#optView .opt-plan,#optView .opt-drop{backdrop-filter:none;-webkit-backdrop-filter:none}
+ #optView .opt-head{flex-wrap:wrap}
+}
+
+/* ===== v6: mobile polish ===== */
+@media (max-width:640px){
+ .or-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:100%}
+ .or-line{display:none}
+ .or-step{justify-content:center;padding:6px 6px;font-size:11.5px;gap:6px;min-width:0}
+ .or-step span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+ .or-step i{width:22px;height:22px;flex:0 0 22px;font-size:12px}
+ #optView .opt-drop b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:14px;line-height:1.4}
+ #optView .opt-drop span{white-space:normal}
+ #optView .opt-stat{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:13px 16px}
+ #optView .opt-stat small{margin:0}
+ #optView .opt-stat strong{text-align:right;font-size:15px;white-space:normal}
+ #optView .opt-pill{margin-top:0}
+}
+
+@media (max-width:640px){.or-step{font-size:10.5px;gap:4px;padding:6px 4px}.or-step i{width:18px;height:18px;flex-basis:18px;font-size:10px}.or-step span{text-overflow:clip}}
 </style>
 <script id="moon-optimizer-js">
 (function(){
