@@ -25612,7 +25612,7 @@ var PLANS = {
 };
 var T = {
  ka:{nav:'მეთოდი',title:'მუნის მეთოდი',sub:'ატვირთე ვიდეო და მიიღე წამებში',idle:'მზადაა',busy:'მუშავდება',done:'დასრულდა',err:'შეცდომა',
-  drop:'ჩააგდე mp4 აქ ან დააჭირე ასარჩევად',hint:'mp4 · 4K-მდე',size:'ზომა',res:'გარჩევადობა',dur:'ხანგრძლივობა',preset:'ხარისხი',go:'ოპტიმიზაცია',
+  drop:'ატვირთე ვიდეო ან გადმოიტანე ხელით',hint:'',size:'ზომა',res:'გარჩევადობა',dur:'ხანგრძლივობა',preset:'ხარისხი',go:'ოპტიმიზაცია',
   left:'დარჩენილი ატვირთვა',week:'ამ კვირაში',unl:'ულიმიტო',resets:'ლიმიტი განახლდება',plans:'გეგმები',buy:'შეძენა',cur:'შენი გეგმა',perMonth:'/თვე',
   freeNote:'გადახდა არ არის საჭირო',curNote:'მიმდინარე გეგმა',free:'უფასო',freeL:'3 ატვირთვა კვირაში',unlimited:'ულიმიტო ატვირთვა',upTo:'მაქს. ',lock:'ამ გეგმაში მიუწვდომელია',
   login:'გამოსაყენებლად შედი Discord-ით',loginBtn:'Discord-ით შესვლა',noGate:'სერვისი ჯერ არ არის დაკავშირებული (GATE URL).',
@@ -25620,7 +25620,7 @@ var T = {
   up:'იტვირთება',queue:'რიგშია',proc:'მუშავდება',ready:'მზადაა! ჩამოტვირთე ქვემოთ',dl:'ჩამოტვირთვა',tooFps:'ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება',noFps:'ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი',tooBig:'ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია',noMeta:'ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)',tooFps:'Video frame rate ({f} fps) is above your plan limit (max {n} fps). 120 fps videos need Plan 2 or Plan 3',noFps:'Could not read the video fps. Try another mp4 file',tooBig:'This video is above your plan limit (max 1080p). 4K is only on the 14.99 ₾ plan',noMeta:'Could not read the video resolution. Try another mp4 (H.264)',pickMp4:'აირჩიე mp4 ფაილი',d:'დ',h:'სთ',m:'წთ',
   wake:'სერვერი იღვიძებს, ცოტა ხანი დასჭირდება…'},
  en:{nav:'METHOD',title:'MOON METHOD',sub:'Upload a video and get it in seconds',idle:'ready',busy:'processing',done:'done',err:'error',
-  drop:'Drop an mp4 here or click to choose',hint:'mp4 · up to 4K',size:'Size',res:'Resolution',dur:'Duration',preset:'Quality',go:'Optimize',
+  drop:'Upload a video or drag it here',hint:'',size:'Size',res:'Resolution',dur:'Duration',preset:'Quality',go:'Optimize',
   left:'Uploads left',week:'this week',unl:'Unlimited',resets:'Limit resets in',plans:'Plans',buy:'Get plan',cur:'Your plan',perMonth:'/month',
   freeNote:'No payment needed',curNote:'Current plan',free:'Free',freeL:'3 uploads per week',unlimited:'Unlimited uploads',upTo:'Up to ',lock:'Not available on your plan',
   login:'Sign in with Discord to use MOON METHOD',loginBtn:'Sign in with Discord',noGate:'Service not connected yet (GATE URL).',
@@ -26218,6 +26218,8 @@ html body #optView .opt-drop::before,html body #optView .opt-drop::after{display
 html body #optView .opt-drop .opt-ic{grid-row:1/3;width:46px;height:46px}
 html body #optView .opt-drop b{align-self:end;font-size:16px;text-align:left}
 html body #optView .opt-drop #optHint{align-self:start;text-align:left}
+html body #optView .opt-drop #optHint:empty{display:none}
+html body #optView .opt-drop:not(.has) b{grid-row:1/3;align-self:center}
 html body #optView .opt-drop b#optName{min-width:0;max-width:min(360px,60vw)}
 html body #optView .opt-stats{max-width:640px}
 html body #optView .opt-stat{padding:10px 12px}
