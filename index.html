@@ -25931,6 +25931,17 @@ try{
   }
 }catch(e){}
 
+/* entrance: one ordered sequence, top to bottom, replayed every time the Method page opens */
+var _wasShown=false, _enT=0;
+function playEnter(n){
+  var o=view.querySelector('.opt'); if(!o) return;
+  if(!o.querySelector('.or-steps') && (n||0)<8){ setTimeout(function(){ playEnter((n||0)+1); },150); return; }
+  o.classList.remove('opt-enter'); void o.offsetWidth; o.classList.add('opt-enter');
+  clearTimeout(_enT); _enT=setTimeout(function(){ o.classList.remove('opt-enter'); },2200);
+}
+new MutationObserver(function(){ var sh=view.classList.contains('show'); if(sh&&!_wasShown) playEnter(); _wasShown=sh; }).observe(view,{attributes:true,attributeFilter:['class']});
+if(view.classList.contains('show')){ _wasShown=true; playEnter(); }
+
 /* nav link */
 if(nav && !nav.querySelector('[data-mn="optimizer"]')){
   var b=document.createElement('button'); b.type='button'; b.className='mn-link'; b.setAttribute('data-mn','optimizer'); b.textContent=tr('nav');
@@ -26267,7 +26278,7 @@ html body #optView .opt-drop #optHint{font-size:12.5px}
 /* 1) upload pill + all glass cards: no tilt / scale / shift (this caused the left-drift on hover) */
 html body #optView .opt-drop,html body #optView .opt-drop:hover,html body #optView .opt-drop:active,html body #optView .opt-drop.drag,
 html body #optView .opt-stats,html body #optView .opt-stats:hover,html body #optView .opt-quota,html body #optView .opt-quota:hover,
-html body #optView .opt-prog,html body #optView .opt-prog:hover{transform:none!important;rotate:none!important;translate:none!important;
+html body #optView .opt-prog,html body #optView .opt-prog:hover{transform:none!important;
   transition:box-shadow .25s ease,filter .25s ease,border-color .25s ease!important}
 html body #optView .opt-drop .opt-ic,html body #optView .opt-drop:hover .opt-ic,html body #optView .opt-drop .opt-ic svg{transform:none!important;translate:none!important;animation:none!important;transition:none!important}
 html body #optView .opt-drop{overflow:hidden}
@@ -26500,6 +26511,27 @@ html body #optView .opt-go:active:not(:disabled){transform:translateY(1px) scale
 html body #optView .opt-go:disabled{color:rgba(199,210,254,.45)!important;cursor:not-allowed;
   background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03))!important;border:1.5px dashed rgba(167,139,250,.35)!important;box-shadow:none!important;animation:none}
 @media (max-width:640px){html body #optView .opt-go{min-height:58px!important;font-size:16px!important}}
+</style>
+<style id="opt-stabilize-8">
+/* ===== Method page entrance: every block uses the same duration + easing, only the delay grows top → bottom ===== */
+@keyframes optIn{0%{opacity:0;translate:0 28px;scale:.96;filter:blur(8px)}55%{filter:blur(0)}100%{opacity:1;translate:0 0;scale:1;filter:blur(0)}}
+@keyframes optBannerIn{0%{opacity:0;translate:0 -100%}100%{opacity:1;translate:0 0}}
+@keyframes optBnShow{0%{opacity:0}100%{opacity:1}}
+/* banner fades in by itself whenever the plan status arrives later */
+html body #optView .opt > .opt-corner{animation:optBnShow .5s ease both}
+html body #optView .opt.opt-enter > .opt-corner{animation:optBannerIn .75s cubic-bezier(.2,.8,.2,1) 0s both}
+html body #optView .opt.opt-enter > .opt-head{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .08s both}
+html body #optView .opt.opt-enter > .or-steps{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .18s both}
+html body #optView .opt.opt-enter .opt-quota{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .30s both}
+html body #optView .opt.opt-enter .opt-drop{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .42s both}
+html body #optView .opt.opt-enter .opt-stats{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .54s both}
+html body #optView .opt.opt-enter .opt-go{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .66s both,optGoFlow 6s ease-in-out infinite}
+html body #optView .opt.opt-enter .opt-go:disabled{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .66s both}
+html body #optView .opt.opt-enter .opt-prog{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .78s both}
+/* the icon inside the upload card pops in right after its card */
+@keyframes optPop{0%{opacity:0;scale:.5}70%{scale:1.08}100%{opacity:1;scale:1}}
+html body #optView .opt.opt-enter .opt-drop .opt-ic{animation:optPop .6s cubic-bezier(.2,.9,.3,1.2) .85s both!important}
+@media (prefers-reduced-motion:reduce){html body #optView .opt *{animation:none!important}}
 </style>
 </body>
 </html>
