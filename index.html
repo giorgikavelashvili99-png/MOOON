@@ -25512,6 +25512,51 @@ function patchInBrowser(file,fps){
   });
 }
 
+/* ---- patcher-ის გამოძახება: გაღვიძება (Render cold start) + retry + დიაგნოსტიკა ---- */
+function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function fetchTO(url,opt,ms){
+  var ac=('AbortController' in window)?new AbortController():null, to=null;
+  if(ac){ opt=Object.assign({},opt,{signal:ac.signal}); to=setTimeout(function(){ ac.abort(); },ms); }
+  return fetch(url,opt).then(function(r){ clearTimeout(to); return r; },function(e){ clearTimeout(to); throw e; });
+}
+/* no-cors ping: CORS-ს არ საჭიროებს, ამიტომ ამოწმებს მხოლოდ იმას, ხელმისაწვდომია თუ არა სერვერი */
+function pingPatcher(){
+  return fetchTO(CFG.PATCHER+'/?_='+Date.now(),{method:'GET',mode:'no-cors',cache:'no-store'},45000).then(function(){ return true; },function(){ return false; });
+}
+function callPatcher(payload){
+  var url=CFG.PATCHER+CFG.UPLOAD_PATH, lastErr=null, MAX=4;
+  function attempt(i){
+    return fetchTO(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},60000).then(function(r){
+      return r.json().catch(function(){return {};}).then(function(j){
+        if(!r.ok||!j.success){
+          var e=new Error(j.error||j.message||('HTTP '+r.status)); e.http=true;
+          /* 502/503/504 = Render-ს ჯერ არ გაუღვიძია → ვცდით თავიდან */
+          if(r.status===502||r.status===503||r.status===504) e.retry=true;
+          throw e;
+        }
+        return j;
+      });
+    }).catch(function(e){
+      lastErr=e;
+      var network=!e.http;                 /* TypeError: Failed to fetch / abort */
+      if((network||e.retry) && i<MAX-1){
+        msg(tr('wake')+' ('+(i+2)+'/'+MAX+')');
+        return pingPatcher().then(function(){ return sleep(2500*(i+1)); }).then(function(){ return attempt(i+1); });
+      }
+      if(network){
+        /* საბოლოო დიაგნოსტიკა: სერვერი საერთოდ მიუწვდომელია თუ CORS-ია პრობლემა */
+        return pingPatcher().then(function(up){
+          throw new Error(up
+            ? 'სერვერი ჩანს, მაგრამ ბრაუზერმა მოთხოვნა დაბლოკა (CORS). patcheri-ზე დაამატე Access-Control-Allow-Origin და OPTIONS /api/optimize.'
+            : 'patcheri სერვერი მიუწვდომელია (Render გათიშულია/იძინებს ან ბლოკავს ქსელი). სცადე ცოტა ხანში.');
+        });
+      }
+      throw lastErr;
+    });
+  }
+  return attempt(0);
+}
+
 function run(){
   var id=ident(); if(!id||!S.file||!S.preset) return;
   var preset=PRESETS.filter(function(p){return p.id===S.preset;})[0];
@@ -25521,9 +25566,7 @@ function run(){
     tk=t; S.status=t.status||S.status; renderQuota(); bar(10);
     /* სერვერზე ვიდეო აღარ იტვირთება: მხოლოდ ბილეთის შემოწმება */
     var wake=setTimeout(function(){ msg(tr('wake')); },8000);
-    return fetch(CFG.PATCHER+CFG.UPLOAD_PATH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket:t.ticket,preset:S.preset,uid:id.uid})})
-      .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ clearTimeout(wake); if(!r.ok||!j.success) throw new Error(j.error||j.message||('HTTP '+r.status)); return j; }); },
-            function(e){ clearTimeout(wake); throw e; });
+    return callPatcher({ticket:t.ticket,preset:S.preset,uid:id.uid}).then(function(j){ clearTimeout(wake); return j; },function(e){ clearTimeout(wake); throw e; });
   }).then(function(srv){
     bar(25); msg(tr('proc')+'…');
     var fps=Math.min(preset.fps, Number(srv.fps)>0?Number(srv.fps):preset.fps);
