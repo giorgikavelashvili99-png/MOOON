@@ -26331,5 +26331,18 @@ html body #optView .or-step.done i{font-size:0!important;line-height:0}
 html body #optView .or-step.done i::after{content:"\2713";font-size:13px;line-height:1;font-weight:900;display:block}
 html body #optView .or-step i{display:grid;place-items:center;line-height:1;overflow:hidden}
 </style>
+<style id="opt-stabilize-3">
+/* ===== upload pill with a chosen file: symmetric 3-column layout (icon | name + size centered | spacer) ===== */
+html body #optView .opt-drop .opt-ic{width:46px!important;height:46px!important;min-width:46px;aspect-ratio:1/1;border-radius:50%!important;flex:0 0 46px;align-self:center}
+html body #optView .opt-drop.has{display:grid!important;grid-template-columns:46px minmax(0,1fr) 46px!important;grid-template-rows:auto auto;
+  align-items:center!important;justify-content:stretch!important;column-gap:12px!important;row-gap:2px!important;padding:12px 18px!important;min-height:76px}
+html body #optView .opt-drop.has .opt-ic{grid-column:1;grid-row:1/3;justify-self:start}
+html body #optView .opt-drop.has b#optName{grid-column:2;grid-row:1;align-self:end!important;justify-self:center;max-width:100%!important;width:100%;
+  text-align:center!important;font-size:15px;line-height:1.25;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+html body #optView .opt-drop.has #optHint{grid-column:2;grid-row:2;align-self:start!important;justify-self:center;text-align:center!important;font-size:12.5px;line-height:1.2}
+html body #optView .opt-drop.has #optHint:empty{display:block!important;min-height:0}
+/* Latin text (file name, size, numbers) in the clean numeric font instead of the serif fallback */
+html body #optView #optName,html body #optView #optHint,html body #optView .opt-stat strong{font-family:var(--o-num),system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+</style>
 </body>
 </html>
