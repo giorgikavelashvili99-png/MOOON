@@ -25680,17 +25680,32 @@ function eff(){ var pl=PLANS[(S.status&&S.status.plan)||'free']; var st=S.status
 function allowed(p){ var pl=eff(); return p.h<=pl.h && p.fps<=pl.fps; }
 function setHTML(el,h){ if(el._h!==h){ el._h=h; el.innerHTML=h; } }
 function renderPresets(){ var first=PRESETS.filter(allowed).pop(); S.preset=first?first.id:null; updateGo(); }
+function fmtCd(ms){ var t=Math.max(0,Math.floor(ms/1000)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sc=t%60; function p(n){return String(n).padStart(2,'0');} return p(h)+':'+p(m)+':'+p(sc); }
+function planLabel(st){ return st.plan==='free'?tr('free'):('Plan '+String(st.plan).replace(/^p/i,'')); }
+function upWord(){ var l=L(); try{ if(typeof currentLang!=='undefined'&&currentLang==='ka') l='ka'; }catch(e){} return l==='ka'?'ატვირთვა':(l==='ru'?'Загрузки':'Uploads'); }
+function renderChips(){
+  var st=S.status, o=view.querySelector('.opt');
+  /* 1) plan chip: top-right corner of the optimizer shell */
+  var c=$('optPlanChip');
+  if(o&&!c){ c=document.createElement('div'); c.id='optPlanChip'; c.className='opt-corner'; o.appendChild(c); }
+  if(c){ if(!st){ c.style.display='none'; } else { c.style.display=''; c.setAttribute('data-plan',st.plan||'free'); var t='<i></i><span>'+esc(planLabel(st))+'</span>'; if(c._h!==t){ c._h=t; c.innerHTML=t; } } }
+  /* 2) remaining uploads: next to the MEMBER badge in the profile popover */
+  var mb=document.querySelector('.dp-member-badge'); if(!mb||!mb.parentNode) return;
+  var row=mb.parentNode;
+  if(!row.classList.contains('dp-badge-row')){ var r=document.createElement('div'); r.className='dp-badge-row'; row.insertBefore(r,mb); r.appendChild(mb); row=r; }
+  var chip=document.getElementById('optMemberChip');
+  if(!chip){ chip=document.createElement('span'); chip.id='optMemberChip'; chip.className='dp-member-badge dp-limit-chip'; row.appendChild(chip); }
+  else if(chip.parentNode!==row){ row.appendChild(chip); }
+  if(!st||!user()){ chip.style.display='none'; return; }
+  chip.style.display='';
+  var txt=upWord()+' '+(st.unlimited?'∞':(st.remaining+'/'+st.limit)); if(chip.textContent!==txt) chip.textContent=txt;
+}
 function renderQuota(){
   var q=$('optQuota'); if(!q) return; var st=S.status;
-  if(!st){ setHTML(q,'<div class="opt-q-main"><div class="opt-q-sub">…</div></div>'); return; }
-  var name=st.plan==='free'?tr('free'):('Plan '+String(st.plan).replace(/^p/i,''));
-  var lab,num,sub='',dots='';
-  if(st.unlimited){ lab=tr('unl'); num='∞'; }
-  else{
-    lab=tr('left'); num=st.remaining+'<small> / '+st.limit+'</small>';
-    sub='<div class="opt-q-sub">'+tr('resets')+' '+fmtLeft(st.resetAt-Date.now())+'</div>';
-  }
-  setHTML(q,'<div class="opt-q-main"><span class="opt-badge">'+esc(name)+'</span><div class="opt-q-lab">'+lab+'</div><div class="opt-q-num">'+num+'</div>'+sub+'</div>'+(dots?'<div class="opt-moons">'+dots+'</div>':''));
+  renderChips();
+  if(!st){ setHTML(q,'<div class="opt-q-main"><div class="opt-q-cd">…</div></div>'); return; }
+  if(st.unlimited){ setHTML(q,'<div class="opt-q-main"><div class="opt-q-lab">'+tr('unl')+'</div><div class="opt-q-cd">∞</div></div>'); return; }
+  setHTML(q,'<div class="opt-q-main"><div class="opt-q-lab">'+tr('resets')+'</div><div class="opt-q-cd" id="optCd">'+fmtCd(st.resetAt-Date.now())+'</div></div>');
 }
 function planSpecs(id){
   var pl=PLANS[id], out=[];
@@ -25933,7 +25948,12 @@ if(nav && !nav.querySelector('[data-mn="optimizer"]')){
 /* refresh when view is shown / user changes / language changes */
 new MutationObserver(function(){ if(view.classList.contains('show')){ refreshStatus(); fetch(CFG.PATCHER+'/',{mode:'no-cors'}).catch(function(){}); } }).observe(view,{attributes:true,attributeFilter:['class']});
 document.addEventListener('click',function(e){ if(e.target.closest('.lang-btn')) setTimeout(applyLang,60); });
-setInterval(function(){ if(view.classList.contains('show')&&S.status&&!S.status.unlimited) renderQuota(); },60000);
+setInterval(function(){
+  var st=S.status; if(!st||st.unlimited) return;
+  var ms=st.resetAt-Date.now(), cd=$('optCd'); if(cd){ var tx=fmtCd(ms); if(cd.textContent!==tx) cd.textContent=tx; }
+  if(ms<=0 && Date.now()-(S._rfAt||0)>15000){ S._rfAt=Date.now(); refreshStatus(); }
+},1000);
+setInterval(function(){ if(S.status) renderChips(); },1500);
 var lastU=null; setInterval(function(){ var u=user(), k=u&&u.id; if(k!==lastU){ lastU=k; S.status=null; refreshStatus(); } },1500);
 applyLang();
 
@@ -26343,6 +26363,43 @@ html body #optView .opt-drop.has #optHint{grid-column:2;grid-row:2;align-self:st
 html body #optView .opt-drop.has #optHint:empty{display:block!important;min-height:0}
 /* Latin text (file name, size, numbers) in the clean numeric font instead of the serif fallback */
 html body #optView #optName,html body #optView #optHint,html body #optView .opt-stat strong{font-family:var(--o-num),system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+</style>
+<style id="opt-stabilize-4">
+/* ===== corner plan chip ===== */
+#optView .opt .opt-corner{position:absolute;top:12px;right:12px;z-index:5;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:26px;padding:0 12px 0 9px;border-radius:99px;
+  --pc:34,197,94;font-size:11.5px;font-weight:800;letter-spacing:.03em;line-height:1;white-space:nowrap;color:#fff;
+  background:linear-gradient(135deg,rgba(var(--pc),.4),rgba(var(--pc),.14));border:1px solid rgba(var(--pc),.75);box-shadow:0 0 16px -3px rgba(var(--pc),.7),inset 0 1px 0 rgba(255,255,255,.25)}
+#optView .opt .opt-corner[data-plan="p1"]{--pc:61,92,255}
+#optView .opt .opt-corner[data-plan="p2"]{--pc:168,85,247}
+#optView .opt .opt-corner[data-plan="p3"]{--pc:242,187,6}
+#optView .opt .opt-corner i{flex:0 0 10px;width:10px;height:10px;background:linear-gradient(135deg,#fff,rgb(var(--pc)));clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:optTwinkle 2.6s ease-in-out infinite}
+#optView .opt .opt-corner span{display:block;font-family:inherit}
+@media (max-width:640px){html body #optView .opt-head{margin-top:34px!important}}
+
+/* ===== limit-reset card: tiny + tidy ===== */
+html body #optView .opt-quota{padding:10px 20px 12px!important;gap:2px!important;border-radius:24px!important}
+html body #optView .opt-q-main{gap:2px!important}
+html body #optView .opt-q-lab{font-size:12px!important;font-weight:600;color:var(--o-faint)}
+html body #optView .opt-q-cd{font-family:var(--o-num),system-ui,sans-serif;font-size:19px;font-weight:700;line-height:1.15;letter-spacing:.06em;font-variant-numeric:tabular-nums;color:var(--o-text);white-space:nowrap}
+
+/* ===== member badge row in the profile popover ===== */
+.dp-badge-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.dp-badge-row .dp-member-badge{margin:0!important}
+.dp-member-badge.dp-limit-chip{white-space:nowrap;border-color:rgba(125,211,252,.55)!important;color:#bfe9ff!important;background:rgba(56,189,248,.1)!important;font-variant-numeric:tabular-nums}
+
+/* ===== bigger, perfectly symmetric upload pill (3 columns in every state) ===== */
+html body #optView .opt-drop,html body #optView .opt-drop.has{display:grid!important;grid-template-columns:60px minmax(0,1fr) 60px!important;grid-template-rows:auto auto;
+  align-items:center!important;justify-content:stretch!important;column-gap:14px!important;row-gap:3px!important;min-height:104px!important;padding:16px 20px!important;text-align:center!important}
+html body #optView .opt-drop .opt-ic{grid-column:1;grid-row:1/3;justify-self:start;width:60px!important;height:60px!important;min-width:60px;flex:none}
+html body #optView .opt-drop .opt-ic svg{width:28px!important;height:28px!important}
+html body #optView .opt-drop b#optName{grid-column:2;grid-row:1/3;align-self:center!important;justify-self:center;width:100%;max-width:100%!important;text-align:center!important;font-size:17px!important;line-height:1.3}
+html body #optView .opt-drop:not(.has) b#optName{white-space:normal!important}
+html body #optView .opt-drop.has b#optName{grid-row:1;align-self:end!important;font-size:16px!important}
+html body #optView .opt-drop #optHint{grid-column:2;grid-row:2;justify-self:center;align-self:start;text-align:center!important;font-size:13px}
+html body #optView .opt-drop:not(.has) #optHint{display:none!important}
+@media (max-width:640px){html body #optView .opt-drop,html body #optView .opt-drop.has{grid-template-columns:54px minmax(0,1fr) 54px!important;column-gap:10px!important;padding:14px 16px!important;min-height:100px!important}
+  html body #optView .opt-drop .opt-ic{width:54px!important;height:54px!important;min-width:54px}
+  html body #optView .opt-drop b#optName{font-size:16px!important}}
 </style>
 </body>
 </html>
