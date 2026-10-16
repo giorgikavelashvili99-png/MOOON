@@ -25745,7 +25745,9 @@ function refreshStatus(){
 }
 
 /* ============ FILE ============ */
-function msg(t,err){ $('optProg').style.display=''; var m=$('optMsg'); m.textContent=t; m.className='opt-msg'+(err?' err':''); }
+function msg(t,err){ $('optProg').style.display=''; var m=$('optMsg'); var i=String(t).lastIndexOf(' · ');
+  if(!err && i>0 && /(MB|GB)\s*$/.test(t)){ m.innerHTML='<span>'+esc(t.slice(0,i))+'</span><em class="opt-sz">'+esc(t.slice(i+3))+'</em>'; } else { m.textContent=t; }
+  m.className='opt-msg'+(err?' err':''); }
 /* ---- წყარო ვიდეოს fps: MP4-ის moov/stts-იდან ---- */
 function readMp4Fps(file){
   function rd(o,l){ return file.slice(o,o+l).arrayBuffer(); }
@@ -25811,7 +25813,7 @@ function setFile(f){
 }
 
 /* ============ RUN JOB ============ */
-function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); }
+function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); var pr=$('optProg'); if(pr) pr.style.setProperty('--pp',p); }
 function finishFail(ticket,text){
   S.busy=false; setPill('err',tr('err')); msg(text,true);
   if(ticket) api('/refund',{method:'POST',body:JSON.stringify({ticket:ticket,uid:ident().uid})}).catch(function(){});
@@ -26428,6 +26430,60 @@ html body #optView .opt-drop:not(.has) #optHint,html body #optView .opt-drop.has
 html body #optView .opt-drop.has #optHint{font-size:14px}
 @media (max-width:640px){html body #optView .opt-drop,html body #optView .opt-drop.has{min-height:196px!important;padding:22px 16px!important}
   html body #optView .opt-drop .opt-ic{width:68px!important;height:68px!important;min-width:68px}}
+</style>
+<style id="opt-stabilize-6">
+/* ===== progress / result card: ring gauge, status line, glowing download button ===== */
+@property --pp{syntax:'<number>';inherits:true;initial-value:0}
+html body #optView .opt-prog{--pp:0;display:grid!important;justify-items:center;gap:14px!important;padding:22px 20px 20px!important;border-radius:28px!important;text-align:center;
+  border:1.5px solid transparent!important;transition:--pp .5s cubic-bezier(.22,.9,.32,1),box-shadow .4s;
+  background:radial-gradient(120% 70% at 50% 0,rgba(129,140,248,.28),transparent 65%) padding-box,linear-gradient(180deg,#0f1638,#080b1f) padding-box,linear-gradient(120deg,#7dd3fc,#a78bfa 50%,#f0abfc) border-box!important;
+  box-shadow:0 22px 50px -26px rgba(139,92,246,.9),inset 0 1px 0 rgba(255,255,255,.1)!important}
+html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog{
+  background:radial-gradient(120% 70% at 50% 0,rgba(52,211,153,.26),transparent 65%) padding-box,linear-gradient(180deg,#0b1d2a,#06101c) padding-box,linear-gradient(120deg,#34d399,#22d3ee 60%,#818cf8) border-box!important;
+  box-shadow:0 22px 50px -26px rgba(52,211,153,.9),inset 0 1px 0 rgba(255,255,255,.1)!important}
+html body #optView .opt:has(#optPill[data-s="err"]) .opt-prog{
+  background:radial-gradient(120% 70% at 50% 0,rgba(255,125,150,.2),transparent 65%) padding-box,linear-gradient(180deg,#1a0d1c,#0a0612) padding-box,linear-gradient(120deg,#ff7d96,#f0abfc) border-box!important}
+
+/* ring gauge instead of a plain number + bar */
+html body #optView .opt-prog .opt-pct{position:relative;width:150px;height:150px;margin:2px auto 0;display:flex!important;align-items:center;justify-content:center;gap:1px;border-radius:50%;
+  background:conic-gradient(from -90deg,#7dd3fc 0,#a78bfa calc(var(--pp)*.55%),#f0abfc calc(var(--pp)*1%),rgba(255,255,255,.08) calc(var(--pp)*1%));
+  box-shadow:0 0 34px -6px rgba(167,139,250,.55)}
+html body #optView .opt-prog .opt-pct::before{content:"";position:absolute;inset:10px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#18204a,#0a0f28 75%);box-shadow:inset 0 2px 10px rgba(0,0,0,.6)}
+html body #optView .opt-prog .opt-pct b,html body #optView .opt-prog .opt-pct span{position:relative;z-index:1}
+html body #optView .opt-prog .opt-pct b{font-size:42px;line-height:1;background:linear-gradient(180deg,#fff,#c7d2fe);-webkit-background-clip:text;background-clip:text;color:transparent}
+html body #optView .opt-prog .opt-pct span{font-size:16px;font-weight:700;color:#a5b4fc;align-self:center;margin-top:10px}
+html body #optView .opt:has(#optPill[data-s="busy"]) .opt-prog .opt-pct{animation:optRing 1.8s ease-in-out infinite}
+@keyframes optRing{50%{box-shadow:0 0 52px -2px rgba(125,211,252,.75)}}
+html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-pct{background:conic-gradient(from -90deg,#34d399,#22d3ee,#34d399);box-shadow:0 0 40px -4px rgba(52,211,153,.7)}
+html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-pct span{color:#6ee7b7}
+html body #optView .opt:has(#optPill[data-s="err"]) .opt-prog .opt-pct{background:conic-gradient(from -90deg,#ff7d96 0,#f0abfc calc(var(--pp)*1%),rgba(255,255,255,.08) calc(var(--pp)*1%));box-shadow:0 0 30px -6px rgba(255,125,150,.5)}
+html body #optView .opt-prog .opt-track{display:none!important}
+
+/* status line */
+html body #optView .opt-prog .opt-msg{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;width:100%;box-sizing:border-box;margin:0!important;padding:10px 14px;border-radius:16px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:14px;line-height:1.4;color:#dbe4ff;text-align:center}
+html body #optView .opt-prog .opt-msg::before{content:"";flex:0 0 16px;width:16px;height:16px;border-radius:50%;border:2px solid rgba(125,211,252,.3);border-top-color:#7dd3fc;animation:optSpin .8s linear infinite}
+@keyframes optSpin{to{transform:rotate(360deg)}}
+html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-msg{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.4);color:#d1fae5}
+html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-msg::before{content:"\2713";display:grid;place-items:center;border:0;animation:none;background:#34d399;color:#04201a;font-size:11px;font-weight:900;line-height:1}
+html body #optView .opt-prog .opt-msg.err{background:rgba(255,125,150,.1);border-color:rgba(255,125,150,.4);color:#ffd1da}
+html body #optView .opt-prog .opt-msg.err::before{content:"!";display:grid;place-items:center;border:0;animation:none;background:#ff7d96;color:#2a0610;font-size:11px;font-weight:900;line-height:1}
+html body #optView .opt-prog .opt-sz{font-style:normal;padding:3px 11px;border-radius:99px;font-family:var(--o-num),system-ui,sans-serif;font-size:12.5px;font-weight:700;white-space:nowrap;
+  color:#a7f3d0;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.5)}
+
+/* download button */
+html body #optView .opt-prog .opt-dl{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;margin-top:2px!important;padding:16px 22px!important;border-radius:20px!important;
+  font-size:16px;font-weight:800;color:#04141f;text-decoration:none;
+  background:linear-gradient(110deg,#34d399,#22d3ee 55%,#818cf8)!important;border:0;
+  box-shadow:0 16px 32px -12px rgba(34,211,238,.8),inset 0 1px 0 rgba(255,255,255,.55)!important;transition:transform .18s ease,filter .18s ease!important}
+html body #optView .opt-prog .opt-dl:hover{transform:translateY(-2px)!important;filter:brightness(1.08)}
+html body #optView .opt-prog .opt-dl:active{transform:translateY(1px)!important}
+html body #optView .opt-prog .opt-dl::before{content:"";flex:0 0 20px;width:20px;height:20px;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4v11M7 11l5 5 5-5M5 20h14'/></svg>") center/contain no-repeat;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4v11M7 11l5 5 5-5M5 20h14'/></svg>") center/contain no-repeat}
+html body #optView .opt-prog .opt-dl::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;transform:skewX(-20deg);pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:optShine 3.2s ease-in-out infinite}
+@keyframes optShine{0%,55%{left:-60%}100%{left:130%}}
+@media (max-width:640px){html body #optView .opt-prog .opt-pct{width:136px;height:136px}html body #optView .opt-prog .opt-pct b{font-size:38px}}
 </style>
 </body>
 </html>
