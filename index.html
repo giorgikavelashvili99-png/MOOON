@@ -7203,7 +7203,8 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       </div>
       <nav class="mn-links" aria-label="Main">
         <button type="button" class="mn-link active" data-mn="home" data-i18n="mnHome">მთავარი</button>
-        <button type="button" class="mn-link" data-mn="optimizer">ოპტიმიზატორი</button>
+        <button type="button" class="mn-link" data-mn="optimizer">მეთოდი</button>
+        <button type="button" class="mn-link" data-mn="plans">გეგმები</button>
         <button type="button" class="mn-link" data-mn="contact" data-i18n="mnContact">კონტაქტი</button>
       </nav>
       <div class="mn-right">
@@ -7293,6 +7294,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       <button type="button" class="mn-cta" id="mnRuCta"><span data-i18n="mnOrdCta"></span></button>
     </article>
     <article class="mn-view" data-view="optimizer" id="optView"></article>
+    <article class="mn-view" data-view="plans" id="plansView"><div class="pl-hd"><h2>გეგმები</h2></div></article>
   </section>
 
   <div class="mn-modal" id="mnContact" role="dialog" aria-modal="true" aria-hidden="true">
@@ -25609,19 +25611,19 @@ var PLANS = {
   p3:{h:2160,fps:120,price:'14.99'}
 };
 var T = {
- ka:{nav:'ოპტიმიზატორი',title:'ოპტიმიზატორი',sub:'ატვირთე mp4 და მიიღე გაუმჯობესებული ვიდეო',idle:'მზადაა',busy:'მუშავდება',done:'დასრულდა',err:'შეცდომა',
+ ka:{nav:'მეთოდი',title:'მუნის მეთოდი',sub:'ატვირთე ვიდეო და მიიღე წამებში',idle:'მზადაა',busy:'მუშავდება',done:'დასრულდა',err:'შეცდომა',
   drop:'ჩააგდე mp4 აქ ან დააჭირე ასარჩევად',hint:'mp4 · 4K-მდე',size:'ზომა',res:'გარჩევადობა',dur:'ხანგრძლივობა',preset:'ხარისხი',go:'ოპტიმიზაცია',
   left:'დარჩენილი ატვირთვა',week:'ამ კვირაში',unl:'ულიმიტო',resets:'ლიმიტი განახლდება',plans:'გეგმები',buy:'შეძენა',cur:'შენი გეგმა',perMonth:'/თვე',
-  free:'უფასო',freeL:'3 ატვირთვა კვირაში',unlimited:'ულიმიტო ატვირთვა',upTo:'მაქს. ',lock:'ამ გეგმაში მიუწვდომელია',
-  login:'ოპტიმიზატორის გამოსაყენებლად შედი Discord-ით',loginBtn:'Discord-ით შესვლა',noGate:'სერვისი ჯერ არ არის დაკავშირებული (GATE URL).',
+  freeNote:'გადახდა არ არის საჭირო',curNote:'მიმდინარე გეგმა',free:'უფასო',freeL:'3 ატვირთვა კვირაში',unlimited:'ულიმიტო ატვირთვა',upTo:'მაქს. ',lock:'ამ გეგმაში მიუწვდომელია',
+  login:'გამოსაყენებლად შედი Discord-ით',loginBtn:'Discord-ით შესვლა',noGate:'სერვისი ჯერ არ არის დაკავშირებული (GATE URL).',
   blocked:'შენი წვდომა შეზღუდულია.',noQuota:'ამ კვირის ლიმიტი ამოწურულია. განახლდება: ',expired:'გეგმა ვადაგასულია — გადართულია უფასოზე.',
   up:'იტვირთება',queue:'რიგშია',proc:'მუშავდება',ready:'მზადაა! ჩამოტვირთე ქვემოთ',dl:'ჩამოტვირთვა',tooFps:'ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება',noFps:'ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი',tooBig:'ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია',noMeta:'ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)',tooFps:'Video frame rate ({f} fps) is above your plan limit (max {n} fps). 120 fps videos need Plan 2 or Plan 3',noFps:'Could not read the video fps. Try another mp4 file',tooBig:'This video is above your plan limit (max 1080p). 4K is only on the 14.99 ₾ plan',noMeta:'Could not read the video resolution. Try another mp4 (H.264)',pickMp4:'აირჩიე mp4 ფაილი',d:'დ',h:'სთ',m:'წთ',
   wake:'სერვერი იღვიძებს, ცოტა ხანი დასჭირდება…'},
- en:{nav:'Optimizer',title:'Optimizer',sub:'Upload an mp4 and get an enhanced video',idle:'ready',busy:'processing',done:'done',err:'error',
+ en:{nav:'METHOD',title:'MOON METHOD',sub:'Upload a video and get it in seconds',idle:'ready',busy:'processing',done:'done',err:'error',
   drop:'Drop an mp4 here or click to choose',hint:'mp4 · up to 4K',size:'Size',res:'Resolution',dur:'Duration',preset:'Quality',go:'Optimize',
   left:'Uploads left',week:'this week',unl:'Unlimited',resets:'Limit resets in',plans:'Plans',buy:'Get plan',cur:'Your plan',perMonth:'/month',
-  free:'Free',freeL:'3 uploads per week',unlimited:'Unlimited uploads',upTo:'Up to ',lock:'Not available on your plan',
-  login:'Sign in with Discord to use the optimizer',loginBtn:'Sign in with Discord',noGate:'Service not connected yet (GATE URL).',
+  freeNote:'No payment needed',curNote:'Current plan',free:'Free',freeL:'3 uploads per week',unlimited:'Unlimited uploads',upTo:'Up to ',lock:'Not available on your plan',
+  login:'Sign in with Discord to use MOON METHOD',loginBtn:'Sign in with Discord',noGate:'Service not connected yet (GATE URL).',
   blocked:'Your access is restricted.',noQuota:'Weekly limit reached. Resets in: ',expired:'Plan expired — switched to free.',
   up:'Uploading',queue:'Queued',proc:'Processing',ready:'Done! Download below',dl:'Download',pickMp4:'Choose an mp4 file',d:'d',h:'h',m:'m',
   wake:'Server is waking up, this may take a moment…'}
@@ -25685,7 +25687,7 @@ function renderQuota(){
   var lab,num,sub='',dots='';
   if(st.unlimited){ lab=tr('unl'); num='∞'; }
   else{
-    lab=tr('left')+' · '+tr('week'); num=st.remaining+'<small> / '+st.limit+'</small>';
+    lab=tr('left'); num=st.remaining+'<small> / '+st.limit+'</small>';
     sub='<div class="opt-q-sub">'+tr('resets')+' '+fmtLeft(st.resetAt-Date.now())+'</div>';
   }
   setHTML(q,'<div class="opt-q-main"><span class="opt-badge">'+esc(name)+'</span><div class="opt-q-lab">'+lab+'</div><div class="opt-q-num">'+num+'</div>'+sub+'</div>'+(dots?'<div class="opt-moons">'+dots+'</div>':''));
@@ -25693,8 +25695,8 @@ function renderQuota(){
 function planSpecs(id){
   var pl=PLANS[id], out=[];
   [{h:2160,l:'4K'},{h:1080,l:'1080p'}].forEach(function(r){
-    if(pl.h<r.h) return;
-    var f=PRESETS.filter(function(p){return p.h===r.h&&p.fps<=pl.fps;}).map(function(p){return p.fps;}).sort(function(a,b){return b-a;});
+    if(pl.h<r.h) return; if(r.h===1080&&pl.h>=2160) return;
+    var f=PRESETS.filter(function(p){return p.h===r.h&&p.fps<=pl.fps;}).map(function(p){return p.fps;}).filter(function(x){return x!==30;}).sort(function(a,b){return b-a;});
     if(f.length) out.push(r.l+' · '+f.join(' / ')+' fps');
   });
   return out;
@@ -25712,7 +25714,7 @@ function renderPlans(){
     return '<div class="opt-plan'+(isCur?' cur':'')+'"><div class="op-pn"><h4>'+esc(x[1])+'</h4>'+(isCur?'<span class="opt-badge">'+tr('cur')+'</span>':'')+'</div>'+
       '<div class="pr">'+(x[2]?x[2]+' ₾<small> '+tr('perMonth')+'</small>':'0 ₾')+'</div>'+
       '<ul>'+lines.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>'+
-      (isCur||!x[2]?'<span class="op-slot"></span>':'<button type="button" class="opt-buy" data-buy="1">'+tr('buy')+'</button>')+'</div>';
+      (isCur||!x[2]?'<span class="op-slot">'+(!x[2]?tr('freeNote'):tr('curNote'))+'</span>':'<button type="button" class="opt-buy" data-buy="1">'+tr('buy')+'</button>')+'</div>';
   }).join(''));
 }
 function refreshStatus(){
@@ -25987,7 +25989,7 @@ var tabBtn=$('adminTabOptimizer'); if(tabBtn) tabBtn.addEventListener('click',fu
 var T='.opt-drop,.opt-stats,.opt-quota,.opt-plan,.opt-prog';
 function enhance(o){
  if(o.getAttribute('data-enh'))return; o.setAttribute('data-enh','1');
- var nl=document.querySelector('#mnOptimizerLink,[data-mn="optimizer"]'), ka=!nl||!/^optimizer$/i.test((nl.textContent||'').trim());
+ var nl=document.querySelector('#mnOptimizerLink,[data-mn="optimizer"]'), ka=!nl||!/^(optimizer|method|moon method)$/i.test((nl.textContent||'').trim());
  var L=ka?['ატვირთვა','ოპტიმიზაცია','ჩამოტვირთვა']:['Upload','Optimize','Download'];
  var head=o.querySelector('.opt-head'); if(!head)return;
  var st=document.createElement('div'); st.className='or-steps';
@@ -26046,33 +26048,42 @@ setInterval(function(){var o=document.querySelector('#optView .opt'); if(o)enhan
 })();
 </script>
 
-<style id="opt-plans-v6">
-/* ===== v6: plan cards — blue / purple / green glass look + gold 4K, slider nav ===== */
-html body #optView .opt-plans{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:18px!important;max-width:min(1180px,100%)!important;align-items:stretch;position:relative}
-html body #optView .opt-plans>.opt-plan{padding:28px 22px 22px;gap:18px;border-radius:24px;border:1px solid rgba(var(--ac),.7);
- background:radial-gradient(130% 70% at 12% 0%,rgba(255,255,255,.16),transparent 55%),linear-gradient(160deg,rgba(var(--ac),.62) 0%,rgba(var(--ac),.16) 42%,rgba(6,7,16,.94) 100%),#07080f;
- box-shadow:0 22px 50px -26px rgba(var(--ac),.8),inset 0 1px 0 rgba(255,255,255,.14)}
-html body #optView .opt-plans>.opt-plan:nth-child(1){--ac:34,197,94}
-html body #optView .opt-plans>.opt-plan:nth-child(2){--ac:76,108,255}
-html body #optView .opt-plans>.opt-plan:nth-child(3){--ac:176,96,255}
-html body #optView .opt-plans>.opt-plan:nth-child(4){--ac:242,187,6}
-html body #optView .opt-plans>.opt-plan:hover{box-shadow:0 34px 70px -28px rgba(var(--ac),.95),inset 0 1px 0 rgba(255,255,255,.2)}
-html body #optView .opt-plans>.opt-plan .pr{font-size:clamp(34px,3.3vw,46px);white-space:normal;line-height:1.05;background:linear-gradient(180deg,#fff 20%,rgb(var(--ac)) 150%);-webkit-background-clip:text;background-clip:text;color:transparent}
-html body #optView .opt-plans>.opt-plan .pr small{display:inline-block;font-size:13px}
-html body #optView .opt-plans>.opt-plan:nth-child(1) .pr{background:linear-gradient(180deg,#baffb0,#22c55e);-webkit-background-clip:text;background-clip:text}
-html body #optView .opt-plans>.opt-plan:nth-child(2) .pr{background:linear-gradient(180deg,#d6dcff,#5b7bff);-webkit-background-clip:text;background-clip:text}
-html body #optView .opt-plans>.opt-plan:nth-child(3) .pr{background:linear-gradient(180deg,#f3e3ff,#b060ff);-webkit-background-clip:text;background-clip:text}
-/* 4K plan price = exactly the monthly package price gradient */
-html body #optView .opt-plans>.opt-plan:nth-child(4) .pr{background:linear-gradient(180deg,#F8EC7E,#DCAB10);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 4px 14px rgba(242,187,6,.35))}
-html body #optView .opt-plans>.opt-plan:nth-child(4) h4{background:linear-gradient(90deg,#F8EC7E,#F2BB06 55%,#FBD02B);-webkit-background-clip:text;background-clip:text;color:transparent}
-html body #optView .opt-plans>.opt-plan .opt-buy{background:rgba(0,0,0,.35);border:1px solid rgba(var(--ac),.75)}
-html body #optView .opt-plans>.opt-plan:nth-child(4) .opt-buy{background:linear-gradient(90deg,#D9A015,#F2BB06 30%,#F8EC7E 50%,#DCAB10 75%,#F0CD4D);color:#241800;border-color:transparent}
-/* tablet / phone: swipeable slider with arrows + dots */
+<style id="plans-page-css">
+/* ===== Plans page (nav tab) — blue / purple / green glass cards + gold 4K ===== */
+html body .mn-view[data-view="plans"]{max-width:1180px}
+#plansView .pl-hd{text-align:center;margin-bottom:6px}
+#plansView .pl-hd .mn-sub{margin-bottom:22px}
+#plansView #optPlans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;align-items:stretch;position:relative;max-width:none}
+#plansView .opt-plan{--c1:#baffd0;--c2:#22c55e;--c3:#03120a;--pg:linear-gradient(180deg,#d9ffe6,#22c55e);
+ position:relative;display:flex;flex-direction:column;gap:18px;padding:26px 22px 22px;border-radius:24px;min-width:0;box-sizing:border-box;
+ border:1px solid color-mix(in srgb,var(--c2) 80%,transparent);
+ background:radial-gradient(120% 55% at 14% 0%,rgba(255,255,255,.14),transparent 60%),linear-gradient(165deg,color-mix(in srgb,var(--c2) 62%,#000) 0%,color-mix(in srgb,var(--c2) 20%,#05060c) 48%,var(--c3) 100%);
+ box-shadow:0 22px 50px -26px var(--c2),inset 0 1px 0 rgba(255,255,255,.16);transition:transform .25s ease,box-shadow .25s ease}
+#plansView .opt-plan:nth-child(2){--c1:#c9d4ff;--c2:#3d5cff;--c3:#03061f;--pg:linear-gradient(180deg,#e2e8ff,#5b7bff)}
+#plansView .opt-plan:nth-child(3){--c1:#f1dcff;--c2:#a855f7;--c3:#0e0418;--pg:linear-gradient(180deg,#f7e8ff,#b968ff)}
+#plansView .opt-plan:nth-child(4){--c1:#F8EC7E;--c2:#F2BB06;--c3:#0a0701;--pg:linear-gradient(180deg,#F8EC7E,#DCAB10)}
+#plansView .opt-plan:hover{transform:translateY(-6px);box-shadow:0 34px 70px -28px var(--c2),inset 0 1px 0 rgba(255,255,255,.22)}
+#plansView .opt-plan.cur{box-shadow:0 0 0 1px var(--c2),0 0 46px -10px var(--c2)}
+#plansView .op-pn{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#plansView .opt-plan h4{margin:0;font-size:14px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--c1)}
+#plansView .opt-plan:nth-child(3) h4::before{content:"\25C6  "}#plansView .opt-plan:nth-child(4) h4::before{content:"\2605  "}
+#plansView .opt-badge{font-size:11px;padding:4px 10px;border-radius:99px;color:#fff;background:color-mix(in srgb,var(--c2) 30%,transparent);border:1px solid var(--c2)}
+#plansView .opt-plan .pr{font-size:clamp(34px,3.3vw,46px);font-weight:800;line-height:1.05;letter-spacing:-.01em;background:var(--pg);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 14px color-mix(in srgb,var(--c2) 40%,transparent))}
+#plansView .opt-plan .pr small{display:inline-block;font-size:13px;font-weight:600;letter-spacing:0;-webkit-text-fill-color:color-mix(in srgb,var(--c1) 75%,#fff);color:var(--c1)}
+#plansView .opt-plan ul{margin:0;padding:18px 0 0;list-style:none;display:grid;gap:13px;flex:1;align-content:start;border-top:1px solid color-mix(in srgb,var(--c2) 40%,transparent);color:#eef0fb;font-size:14px;line-height:1.4}
+#plansView .opt-plan li{position:relative;padding-left:30px}
+#plansView .opt-plan li::before{content:"\2713";position:absolute;left:0;top:0;width:20px;height:20px;display:grid;place-items:center;border:1px solid var(--c2);border-radius:50%;background:color-mix(in srgb,var(--c2) 25%,transparent);color:var(--c1);font-size:11px;font-weight:900}
+#plansView .opt-plan .opt-buy,#plansView .opt-plan .op-slot{margin-top:auto}
+#plansView .opt-plan .op-slot{min-height:1px}
+#plansView .opt-plan .opt-buy{width:100%;padding:14px;border-radius:16px;font:800 15px/1 inherit;font-family:inherit;color:#fff;cursor:pointer;background:color-mix(in srgb,var(--c2) 18%,#000);border:1px solid var(--c2);transition:background .2s,color .2s,transform .2s}
+#plansView .opt-plan .opt-buy:hover{background:var(--c2);color:#06070d;transform:translateY(-2px)}
+#plansView .opt-plan:nth-child(4) .opt-buy{background:linear-gradient(90deg,#D9A015,#F2BB06 30%,#F8EC7E 50%,#DCAB10 75%,#F0CD4D);color:#241800;border-color:transparent}
 @media (max-width:1099px){
- html body #optView .opt-plans{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px!important;padding:16px 6px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
- html body #optView .opt-plans::-webkit-scrollbar{display:none}
- html body #optView .opt-plans>.opt-plan{flex:0 0 min(290px,78%);scroll-snap-align:center}
+ #plansView #optPlans{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:16px 6px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+ #plansView #optPlans::-webkit-scrollbar{display:none}
+ #plansView .opt-plan{flex:0 0 min(290px,78%);scroll-snap-align:center}
 }
+@media (max-width:640px){html body .mn-links .mn-link{letter-spacing:-.2px}}
 .opt-pnav{display:none;align-items:center;justify-content:center;gap:16px;margin:2px 0 6px}
 @media (max-width:1099px){.opt-pnav{display:flex}.opt-pnav.off{display:none}}
 .opt-pn-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);transition:transform .2s,background .2s,opacity .2s}
@@ -26081,17 +26092,88 @@ html body #optView .opt-plans>.opt-plan:nth-child(4) .opt-buy{background:linear-
 .opt-pn-dots{display:flex;gap:9px;align-items:center}
 .opt-pn-dot{width:9px;height:9px;padding:0;border-radius:99px;border:0;cursor:pointer;background:rgba(255,255,255,.28);transition:width .25s,background .25s}
 .opt-pn-dot.on{width:26px;background:#fff}
+
+/* --- compact cards, single-line features, centered optimizer --- */
+#plansView #optPlans{align-items:stretch;gap:16px}
+#plansView .opt-plan{padding:22px 18px 18px;gap:14px}
+#plansView .opt-plan ul{padding-top:14px;gap:11px;flex:none}
+#plansView .opt-plan li{font-size:13px;letter-spacing:0;white-space:nowrap;padding-left:28px}
+#plansView .opt-plan .opt-buy{margin-top:auto}
+#plansView .opt-plan ul{flex:0 0 auto;margin-bottom:6px}
+#plansView .opt-plan .op-slot{display:block;margin-top:auto;box-sizing:border-box;width:100%;padding:14px 8px;border-radius:16px;text-align:center;font-size:13px;font-weight:700;line-height:1;white-space:nowrap;color:color-mix(in srgb,var(--c1) 85%,#fff);background:color-mix(in srgb,var(--c2) 10%,transparent);border:1px dashed color-mix(in srgb,var(--c2) 55%,transparent)}
+html body .mn-view[data-view="plans"]{max-width:1240px}
+html body #optView .opt-pill[data-s="idle"]{display:none}
+html body #optView .opt-quota{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:18px 40px;border-radius:28px;width:auto;margin-inline:auto}
+html body #optView .opt-q-main{justify-items:center;text-align:center;gap:8px}
+html body #optView .opt-q-num{font-size:40px}
+html body #optView .opt-head,html body #optView .opt-head>div{align-items:center;text-align:center}
+html body #optView .opt-stats,html body #optView .opt-prog{margin-inline:auto}
+
+/* --- glossy buy button (reference style) --- */
+#plansView .opt-plan .opt-buy{border-radius:14px;border:1px solid rgba(255,255,255,.22);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);
+ background:linear-gradient(180deg,color-mix(in srgb,var(--c2) 78%,#fff) 0%,var(--c2) 42%,color-mix(in srgb,var(--c2) 62%,#000) 100%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 10px 24px -8px var(--c2)}
+#plansView .opt-plan .opt-buy:hover{background:linear-gradient(180deg,color-mix(in srgb,var(--c2) 65%,#fff) 0%,color-mix(in srgb,var(--c2) 92%,#fff) 45%,var(--c2) 100%);color:#fff;transform:translateY(-2px)}
+#plansView .opt-plan:nth-child(4) .opt-buy{color:#241800;text-shadow:none;border-color:rgba(255,255,255,.3)}
+#plansView .opt-plan:nth-child(4) .opt-buy:hover{color:#241800}
+
+/* --- fully filled diamond / star + solid-filled buy button --- */
+#plansView .opt-plan:nth-child(3) h4::before,#plansView .opt-plan:nth-child(4) h4::before{content:"";display:inline-block;vertical-align:middle;margin:-2px 10px 0 2px;background:var(--c2);background:linear-gradient(135deg,var(--c1),var(--c2));filter:drop-shadow(0 0 6px var(--c2))}
+#plansView .opt-plan:nth-child(3) h4::before{width:9px;height:9px;transform:rotate(45deg)}
+#plansView .opt-plan:nth-child(4) h4::before{width:15px;height:15px;margin-right:9px;background:#F2BB06;background:linear-gradient(180deg,#F8EC7E,#DCAB10);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+#plansView .opt-plan .opt-buy{background-color:var(--c2)}
+/* --- entrance + shine animation, same feel as the main-page order cards --- */
+#plansView .opt-plan{overflow:hidden}
+#plansView .opt-plan::after{content:"";position:absolute;top:0;bottom:0;left:0;width:46%;z-index:3;pointer-events:none;opacity:0;transform:translateX(-160%) skewX(-18deg);
+ background:linear-gradient(105deg,transparent 0%,rgba(255,255,255,0) 28%,rgba(255,255,255,.18) 48%,rgba(255,255,255,.3) 52%,rgba(255,255,255,0) 72%,transparent 100%)}
+#plansView .opt-plan .opt-buy{position:relative;overflow:hidden}
+#plansView .opt-plan .opt-buy::before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;transform:skewX(-20deg);opacity:0;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent)}
+#plansView .opt-plan:nth-child(1){--i:0}#plansView .opt-plan:nth-child(2){--i:1}#plansView .opt-plan:nth-child(3){--i:2}#plansView .opt-plan:nth-child(4){--i:3}
+@keyframes plIn{0%{opacity:0;transform:perspective(900px) translateY(70px) rotateX(14deg) scale(.9);filter:blur(14px) brightness(.6)}60%{filter:blur(0) brightness(1.12)}}
+@keyframes plFade{from{opacity:0;transform:translateY(10px)}}
+@keyframes plFeat{from{opacity:0;transform:translateX(-12px)}}
+@keyframes plPop{from{opacity:0;transform:scale(.3)}}
+@keyframes plPrice{from{opacity:0}}
+@keyframes plGlint{0%{opacity:0;transform:translateX(-160%) skewX(-18deg)}15%,80%{opacity:1}100%{opacity:0;transform:translateX(340%) skewX(-18deg)}}
+@keyframes plGlintLoop{0%,70%{opacity:0;transform:translateX(-160%) skewX(-18deg)}74%,92%{opacity:1}100%{opacity:0;transform:translateX(340%) skewX(-18deg)}}
+@keyframes plBtnShine{0%,70%{left:-60%;opacity:0}74%,92%{opacity:1}100%{left:130%;opacity:0}}
+@media (prefers-reduced-motion:no-preference){
+ #plansView .opt-plan{animation:plIn 1.1s cubic-bezier(.16,1,.3,1) backwards;animation-delay:calc(var(--i,0)*140ms)}
+ #plansView .opt-plan .pr{animation:plPrice .8s ease-out backwards;animation-delay:calc(var(--i,0)*140ms + .3s)}
+ #plansView .opt-plan li{animation:plFeat .5s cubic-bezier(.2,.7,.2,1) backwards}
+ #plansView .opt-plan li:nth-child(1){animation-delay:calc(var(--i,0)*140ms + .5s)}
+ #plansView .opt-plan li:nth-child(2){animation-delay:calc(var(--i,0)*140ms + .57s)}
+ #plansView .opt-plan li:nth-child(3){animation-delay:calc(var(--i,0)*140ms + .64s)}
+ #plansView .opt-plan li::before{animation:plPop .4s cubic-bezier(.2,.9,.3,1.3) backwards;animation-delay:calc(var(--i,0)*140ms + .6s)}
+ #plansView .opt-plan .opt-buy,#plansView .opt-plan .op-slot{animation:plFade .55s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0)*140ms + .85s)}
+ #plansView .opt-plan::after{animation:plGlint 1.5s ease-out calc(var(--i,0)*140ms + .55s) 1 both,plGlintLoop 7s ease-in-out calc(var(--i,0)*140ms + 3s) infinite}
+ #plansView .opt-plan .opt-buy::before{animation:plBtnShine 5s ease-in-out calc(var(--i,0)*140ms + 3s) infinite}
+}
 </style>
-<script id="opt-plans-v6-js">
+<script id="plans-page-js">
 (function(){
  var ARW='<svg viewBox="0 0 24 24"><path d="%P"/></svg>';
+ var FALLBACK=[['უფასო','0 ₾','',['3 ატვირთვა კვირაში','1080p · 60 fps'],0],
+  ['Plan 1','5.99 ₾','/თვე',['ულიმიტო ატვირთვა','1080p · 60 fps'],1],
+  ['Plan 2','7.99 ₾','/თვე',['ულიმიტო ატვირთვა','1080p · 120 / 60 fps'],1],
+  ['Plan 3','14.99 ₾','/თვე',['ულიმიტო ატვირთვა','4K · 120 / 60 fps'],1]];
+ function fallback(box){
+  box.innerHTML=FALLBACK.map(function(p){
+   return '<div class="opt-plan"><div class="op-pn"><h4>'+p[0]+'</h4></div><div class="pr">'+p[1]+(p[2]?'<small> '+p[2]+'</small>':'')+'</div><ul>'+p[3].map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul>'+(p[4]?'<button type="button" class="opt-buy" data-buy="1">შეძენა</button>':'<span class="op-slot">გადახდა არ არის საჭირო</span>')+'</div>';
+  }).join('');
+ }
  function build(){
-  var box=document.getElementById('optPlans'); if(!box||box.__pn||!box.parentNode) return;
-  box.__pn=1;
-  var old=box.parentNode.querySelector('.opt-pnav'); if(old) old.remove();
+  var host=document.getElementById('plansView'), box=document.getElementById('optPlans');
+  if(!host||!box) return;
+  if(box.parentNode!==host){
+   var h3=document.querySelector('#optView .opt-h3[data-k="plans"]'); if(h3) h3.style.display='none';
+   host.appendChild(box);
+  }
+  if(!box.children.length) fallback(box);
+  if(box.__pn) return; box.__pn=1;
   var nav=document.createElement('div'); nav.className='opt-pnav';
   nav.innerHTML='<button type="button" class="opt-pn-btn" aria-label="წინა">'+ARW.replace('%P','M15 5l-7 7 7 7')+'</button><div class="opt-pn-dots"></div><button type="button" class="opt-pn-btn" aria-label="შემდეგი">'+ARW.replace('%P','M9 5l7 7-7 7')+'</button>';
-  box.parentNode.insertBefore(nav,box.nextSibling);
+  host.appendChild(nav);
   var b=nav.querySelectorAll('.opt-pn-btn'), dots=nav.querySelector('.opt-pn-dots'), idx=0, tk=0;
   function cs(){return box.querySelectorAll('.opt-plan');}
   function go(i){var c=cs(); if(!c.length) return; i=Math.max(0,Math.min(c.length-1,i)); var el=c[i]; box.scrollTo({left:el.offsetLeft-(box.clientWidth-el.offsetWidth)/2,behavior:'smooth'});}
@@ -26113,6 +26195,7 @@ html body #optView .opt-plans>.opt-plan:nth-child(4) .opt-buy{background:linear-
  setInterval(build,400); build();
 })();
 </script>
+
 
 </body>
 </html>
