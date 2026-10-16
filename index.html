@@ -25478,7 +25478,7 @@ var T = {
   free:'უფასო',freeL:'3 ატვირთვა კვირაში',unlimited:'ულიმიტო ატვირთვა',upTo:'მაქს. ',lock:'ამ გეგმაში მიუწვდომელია',
   login:'ოპტიმიზატორის გამოსაყენებლად შედი Discord-ით',loginBtn:'Discord-ით შესვლა',noGate:'სერვისი ჯერ არ არის დაკავშირებული (GATE URL).',
   blocked:'შენი წვდომა შეზღუდულია.',noQuota:'ამ კვირის ლიმიტი ამოწურულია. განახლდება: ',expired:'გეგმა ვადაგასულია — გადართულია უფასოზე.',
-  up:'იტვირთება',queue:'რიგშია',proc:'მუშავდება',ready:'მზადაა! ჩამოტვირთე ქვემოთ',dl:'ჩამოტვირთვა',pickMp4:'აირჩიე mp4 ფაილი',d:'დ',h:'სთ',m:'წთ',
+  up:'იტვირთება',queue:'რიგშია',proc:'მუშავდება',ready:'მზადაა! ჩამოტვირთე ქვემოთ',dl:'ჩამოტვირთვა',tooFps:'ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება',noFps:'ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი',tooBig:'ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია',noMeta:'ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)',tooFps:'Video frame rate ({f} fps) is above your plan limit (max {n} fps). 120 fps videos need Plan 2 or Plan 3',noFps:'Could not read the video fps. Try another mp4 file',tooBig:'This video is above your plan limit (max 1080p). 4K is only on the 14.99 ₾ plan',noMeta:'Could not read the video resolution. Try another mp4 (H.264)',pickMp4:'აირჩიე mp4 ფაილი',d:'დ',h:'სთ',m:'წთ',
   wake:'სერვერი იღვიძებს, ცოტა ხანი დასჭირდება…'},
  en:{nav:'Optimizer',title:'Optimizer',sub:'Upload an mp4 and get an enhanced video',idle:'ready',busy:'processing',done:'done',err:'error',
   drop:'Drop an mp4 here or click to choose',hint:'mp4 · up to 4K',size:'Size',res:'Resolution',dur:'Duration',preset:'Quality',go:'Optimize',
@@ -25611,16 +25611,67 @@ function refreshStatus(){
 
 /* ============ FILE ============ */
 function msg(t,err){ $('optProg').style.display=''; var m=$('optMsg'); m.textContent=t; m.className='opt-msg'+(err?' err':''); }
-function updateGo(){ var st=S.status; var ok=S.file&&S.preset&&!S.busy&&st&&!st.blocked&&(st.unlimited||st.remaining>0); $('optGo').disabled=!ok; }
+/* ---- წყარო ვიდეოს fps: MP4-ის moov/stts-იდან ---- */
+function readMp4Fps(file){
+  function rd(o,l){ return file.slice(o,o+l).arrayBuffer(); }
+  function tag(dv,o){ return String.fromCharCode(dv.getUint8(o),dv.getUint8(o+1),dv.getUint8(o+2),dv.getUint8(o+3)); }
+  function boxes(dv,st,en){ var out=[],o=st; while(o+8<=en){ var sz=dv.getUint32(o),hd=8; if(sz===1){ sz=dv.getUint32(o+8)*4294967296+dv.getUint32(o+12); hd=16; } else if(sz===0){ sz=en-o; } if(sz<hd||o+sz>en) break; out.push({t:tag(dv,o+4),s:o+hd,e:o+sz}); o+=sz; } return out; }
+  function kid(dv,b,t){ return boxes(dv,b.s,b.e).filter(function(x){return x.t===t;})[0]; }
+  function findMoov(){
+    var off=0,n=0;
+    function step(){
+      if(off+8>file.size||n++>5000) return Promise.resolve(null);
+      return rd(off,16).then(function(ab){
+        var dv=new DataView(ab),sz=dv.getUint32(0),hd=8;
+        if(sz===1&&ab.byteLength>=16){ sz=dv.getUint32(8)*4294967296+dv.getUint32(12); hd=16; } else if(sz===0){ sz=file.size-off; }
+        if(sz<hd) return null;
+        if(tag(dv,4)==='moov'){ return sz>67108864?null:{off:off+hd,len:sz-hd}; }
+        off+=sz; return step();
+      });
+    }
+    return step();
+  }
+  return findMoov().then(function(m){
+    if(!m) return null;
+    return rd(m.off,m.len).then(function(ab){
+      var dv=new DataView(ab), traks=boxes(dv,0,ab.byteLength).filter(function(b){return b.t==='trak';});
+      for(var i=0;i<traks.length;i++){
+        var mdia=kid(dv,traks[i],'mdia'); if(!mdia) continue;
+        var hd=kid(dv,mdia,'hdlr'); if(!hd||tag(dv,hd.s+8)!=='vide') continue;
+        var mh=kid(dv,mdia,'mdhd'), minf=kid(dv,mdia,'minf'); if(!mh||!minf) continue;
+        var ts=dv.getUint32(mh.s+(dv.getUint8(mh.s)===1?20:12));
+        var stbl=kid(dv,minf,'stbl'), stts=stbl&&kid(dv,stbl,'stts'); if(!stts||!ts) continue;
+        var cnt=dv.getUint32(stts.s+4),o=stts.s+8,n=0,dur=0;
+        for(var k=0;k<cnt&&o+8<=stts.e;k++,o+=8){ var c=dv.getUint32(o),d=dv.getUint32(o+4); n+=c; dur+=c*d; }
+        if(n>1&&dur>0) return n/(dur/ts);
+      }
+      return null;
+    });
+  }).catch(function(){ return null; });
+}
+function showRes(){ if(!S.resTxt) return; $('oRes').textContent=S.resTxt+(S.fps>0?' · '+Math.round(S.fps)+'fps':''); }
+function limitKey(){
+  var pl=PLANS[(S.status&&S.status.plan)||'free'], m=S.meta;
+  if(m){ var mx=Math.max(m.w,m.h), mn=Math.min(m.w,m.h); if(pl.h<2160&&(mn>1088||mx>1930)) return 'tooBig'; }
+  if(S.fps===undefined) return '';
+  if(S.fps===null) return pl.fps<120?'noFps':'';
+  return S.fps>pl.fps*1.05?'tooFps':'';
+}
+function overLimit(){ return !!limitKey(); }
+function updateGo(){
+  var st=S.status, lk=limitKey(), pl=PLANS[(st&&st.plan)||'free'];
+  if(lk&&S.file&&!S.busy) msg(tr(lk).replace('{n}',pl.fps).replace('{f}',S.fps>0?Math.round(S.fps):'?'),true);
+  var ok=S.file&&S.meta&&S.fps!==undefined&&!lk&&S.preset&&!S.busy&&st&&!st.blocked&&(st.unlimited||st.remaining>0); $('optGo').disabled=!ok;
+}
 function setFile(f){
   if(!f) return;
   if(!/\.mp4$/i.test(f.name)&&f.type!=='video/mp4'){ msg(tr('pickMp4'),true); return; }
-  S.file=f; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); $('oSize').textContent=fmtSize(f.size);
+  S.meta=null; S.fps=undefined; S.resTxt=''; S.file=f; (function(ff){ readMp4Fps(ff).then(function(v){ if(S.file!==ff) return; S.fps=v; showRes(); updateGo(); }); })(f); $('optProg').style.display='none'; $('optDl').style.display='none'; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); $('oSize').textContent=fmtSize(f.size);
   $('oRes').textContent='…'; $('oDur').textContent='…';
   var v=document.createElement('video'), url=URL.createObjectURL(f); v.preload='metadata'; v.muted=true;
   v.onloadedmetadata=function(){ S.meta={w:v.videoWidth,h:v.videoHeight,d:v.duration}; var mx=Math.max(v.videoWidth,v.videoHeight), mn=Math.min(v.videoWidth,v.videoHeight);
-    $('oRes').textContent=(mx>=3000?'4K':(mn+'p'))+' · '+v.videoWidth+'×'+v.videoHeight; $('oDur').textContent=fmtDur(v.duration); URL.revokeObjectURL(url); };
-  v.onerror=function(){ $('oRes').textContent='—'; $('oDur').textContent='—'; URL.revokeObjectURL(url); };
+    S.resTxt=(mx>=3000?'4K':(mn+'p'))+' · '+v.videoWidth+'×'+v.videoHeight; showRes(); $('oDur').textContent=fmtDur(v.duration); URL.revokeObjectURL(url); updateGo(); };
+  v.onerror=function(){ $('oRes').textContent='—'; $('oDur').textContent='—'; URL.revokeObjectURL(url); msg(tr('noMeta'),true); updateGo(); };
   v.src=url; updateGo();
 }
 
@@ -25708,7 +25759,7 @@ function callPatcher(payload){
 }
 
 function run(){
-  var id=ident(); if(!id||!S.file||!S.preset) return;
+  var id=ident(); if(!id||!S.file||!S.preset||!S.meta||S.fps===undefined||overLimit()) return;
   var preset=PRESETS.filter(function(p){return p.id===S.preset;})[0];
   var tk=null;
   S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('proc')+'…');
@@ -25817,4 +25868,4 @@ var tabBtn=$('adminTabOptimizer'); if(tabBtn) tabBtn.addEventListener('click',fu
 })();
 </script>
 </body>
-</html>
+</html></html>
