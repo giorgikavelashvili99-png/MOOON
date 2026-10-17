@@ -25691,7 +25691,7 @@ function renderChips(){
 function renderQuota(){
   var q=$('optQuota'); if(!q) return; var st=S.status;
   renderChips();
-  if(!st){ q.style.display=''; setHTML(q,'<div class="opt-q-main"><div class="opt-q-cd">…</div></div>'); return; }
+  if(!st){ q.style.display='none'; return; }
   if(st.unlimited){ q.style.display='none'; return; }
   q.style.display='';
   setHTML(q,'<div class="opt-q-main"><div class="opt-q-lab">'+tr('resets')+'</div><div class="opt-q-cd" id="optCd">'+fmtCd(st.resetAt-Date.now())+'</div></div>');
@@ -25947,14 +25947,23 @@ try{
 }catch(e){}
 
 /* entrance: one ordered sequence, top to bottom, replayed every time the Method page opens */
-var _wasShown=false, _enT=0;
-function playEnter(n){
+var _wasShown=false, _enT=0, _wT=0, _tok=0;
+function playEnter(n,t0,tok){
   var o=view.querySelector('.opt'); if(!o) return;
-  if(!o.querySelector('.or-steps') && (n||0)<8){ setTimeout(function(){ playEnter((n||0)+1); },150); return; }
-  o.classList.remove('opt-enter'); void o.offsetWidth; o.classList.add('opt-enter');
-  clearTimeout(_enT); _enT=setTimeout(function(){ o.classList.remove('opt-enter'); },2200);
+  if(tok===undefined){ tok=++_tok; t0=Date.now(); }
+  if(tok!==_tok) return;
+  /* start only when the layout is final: steps built + plan status known (max 1s) */
+  var ready=o.querySelector('.or-steps') && (S.status || !user());
+  if(!ready && Date.now()-t0<1000){ o.classList.add('opt-pre'); clearTimeout(_wT); _wT=setTimeout(function(){ playEnter((n||0)+1,t0,tok); },60); return; }
+  o.classList.remove('opt-enter'); void o.offsetWidth; o.classList.add('opt-enter'); o.classList.remove('opt-pre');
+  clearTimeout(_enT); _enT=setTimeout(function(){ o.classList.remove('opt-enter'); },1800);
 }
-new MutationObserver(function(){ var sh=view.classList.contains('show'); if(sh&&!_wasShown) playEnter(); _wasShown=sh; }).observe(view,{attributes:true,attributeFilter:['class']});
+new MutationObserver(function(){
+  var sh=view.classList.contains('show');
+  if(sh&&!_wasShown) playEnter();
+  if(!sh&&_wasShown){ _tok++; clearTimeout(_wT); var o=view.querySelector('.opt'); if(o) o.classList.remove('opt-pre','opt-enter'); }
+  _wasShown=sh;
+}).observe(view,{attributes:true,attributeFilter:['class']});
 if(view.classList.contains('show')){ _wasShown=true; playEnter(); }
 
 /* nav link */
@@ -26528,24 +26537,26 @@ html body #optView .opt-go:disabled{color:rgba(199,210,254,.45)!important;cursor
 @media (max-width:640px){html body #optView .opt-go{min-height:58px!important;font-size:16px!important}}
 </style>
 <style id="opt-stabilize-8">
-/* ===== Method page entrance: every block uses the same duration + easing, only the delay grows top → bottom ===== */
-@keyframes optIn{0%{opacity:0;translate:0 28px;scale:.96;filter:blur(8px)}55%{filter:blur(0)}100%{opacity:1;translate:0 0;scale:1;filter:blur(0)}}
+/* ===== Method page entrance: opacity + a small rise only (no scale, no blur) -> nothing shrinks or flickers ===== */
+@keyframes optIn{0%{opacity:0;translate:0 14px}100%{opacity:1;translate:0 0}}
 @keyframes optBannerIn{0%{opacity:0;translate:0 -100%}100%{opacity:1;translate:0 0}}
 @keyframes optBnShow{0%{opacity:0}100%{opacity:1}}
-/* banner fades in by itself whenever the plan status arrives later */
+@keyframes optPop{0%{opacity:0}100%{opacity:1}}
+/* while the page is still settling, blocks stay invisible (the shell and background stay put) */
+html body #optView .opt.opt-pre :is(.opt-corner,.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go,.opt-prog){opacity:0!important}
 html body #optView .opt > .opt-corner.bn-in{animation:optBnShow .5s ease both}
-html body #optView .opt.opt-enter > .opt-corner{animation:optBannerIn .75s cubic-bezier(.2,.8,.2,1) 0s both}
-html body #optView .opt.opt-enter > .opt-head{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .08s both}
-html body #optView .opt.opt-enter > .or-steps{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .18s both}
-html body #optView .opt.opt-enter .opt-quota{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .30s both}
-html body #optView .opt.opt-enter .opt-drop{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .42s both}
-html body #optView .opt.opt-enter .opt-stats{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .54s both}
-html body #optView .opt.opt-enter .opt-go{animation:optGoFlow 6s ease-in-out infinite,optIn .75s cubic-bezier(.2,.8,.2,1) .66s both}
-html body #optView .opt.opt-enter .opt-go:disabled{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .66s both}
-html body #optView .opt.opt-enter .opt-prog{animation:optIn .75s cubic-bezier(.2,.8,.2,1) .78s both}
-/* the icon inside the upload card pops in right after its card */
-@keyframes optPop{0%{opacity:0;scale:.5}70%{scale:1.08}100%{opacity:1;scale:1}}
-html body #optView .opt.opt-enter .opt-drop .opt-ic{animation:optPop .6s cubic-bezier(.2,.9,.3,1.2) .85s both!important}
+html body #optView .opt.opt-enter > .opt-corner{animation:optBannerIn .6s cubic-bezier(.22,.8,.26,1) 0s both}
+html body #optView .opt.opt-enter > .opt-head{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .05s both}
+html body #optView .opt.opt-enter > .or-steps{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .12s both}
+html body #optView .opt.opt-enter .opt-quota{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .19s both}
+html body #optView .opt.opt-enter .opt-drop{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .26s both}
+html body #optView .opt.opt-enter .opt-stats{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .33s both}
+html body #optView .opt.opt-enter .opt-go{animation:optGoFlow 6s ease-in-out infinite,optIn .6s cubic-bezier(.22,.8,.26,1) .40s both}
+html body #optView .opt.opt-enter .opt-go:disabled{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .40s both}
+html body #optView .opt.opt-enter .opt-prog{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .47s both}
+html body #optView .opt.opt-enter .opt-drop .opt-ic{animation:none!important}
+/* Latin text in the plan banner (Plan 3) in the clean font instead of the serif fallback */
+html body #optView .opt > .opt-corner,html body #optView .opt > .opt-corner span{font-family:var(--o-num),system-ui,-apple-system,"Segoe UI",Roboto,sans-serif!important}
 @media (prefers-reduced-motion:reduce){html body #optView .opt *{animation:none!important}}
 </style>
 </body>
