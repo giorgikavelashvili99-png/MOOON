@@ -25088,44 +25088,66 @@ html body #optView .opt-head{margin-top:46px!important}
 @media (prefers-reduced-motion:reduce){html body #optView .opt *{animation:none!important}}
 </style>
 <style id="motion-settle-fix">
-/* ===== FIX: nothing keeps moving after the entrance animation has finished =====
-   1) Plans page: cards used a 1.1s "ease-out-expo" rise (70px + 3D tilt + blur). Its flat tail made the cards creep for
-      another ~0.7s, and the inner pieces (features / check marks / button) kept sliding in until ~2s.
-      Now: one short, decisive rise (14px, .5s) and the inner pieces only fade, all finished within ~1s.
-   2) Method page: the subtitle ("ატვირთე ვიდეო და მიიღე წამებში") had its own 16px slide-up that ended after the
-      heading had already stopped. Now it takes part in the same opacity-only entrance as the rest of the page. */
-@keyframes plRiseFix{from{opacity:0;transform:translate3d(0,14px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
-@keyframes plFadeOnly{from{opacity:0}to{opacity:1}}
+/* ===== Plans page cards: same entrance as the cards on the home page =====
+   home card choreography: card fades in (1.1s, 140ms stagger) -> title -> price -> features one by one (65ms) with a pop on each
+   check mark -> button; one light sweep across the card; coloured border that keeps circling; button shine loop.
+   Nothing slides, so nothing creeps after the animation ends. */
+@keyframes plHFade{from{opacity:0}to{opacity:1}}
+@keyframes plHPop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes plHRing{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:no-preference){
-  html body #plansView .opt-plan{animation:plRiseFix .5s cubic-bezier(.25,.8,.25,1) backwards;animation-delay:calc(var(--i,0)*70ms);filter:none}
-  html body #plansView .opt-plan .pr{animation:plFadeOnly .4s ease-out backwards;animation-delay:calc(var(--i,0)*70ms + .15s)}
-  html body #plansView .opt-plan li{animation:plFadeOnly .35s ease-out backwards}
-  html body #plansView .opt-plan li:nth-child(1){animation-delay:calc(var(--i,0)*70ms + .25s)}
-  html body #plansView .opt-plan li:nth-child(2){animation-delay:calc(var(--i,0)*70ms + .3s)}
-  html body #plansView .opt-plan li:nth-child(3){animation-delay:calc(var(--i,0)*70ms + .35s)}
-  html body #plansView .opt-plan li::before{animation:plFadeOnly .35s ease-out backwards;animation-delay:calc(var(--i,0)*70ms + .3s)}
-  html body #plansView .opt-plan .opt-buy,html body #plansView .opt-plan .op-slot{animation:plFadeOnly .4s ease-out backwards;animation-delay:calc(var(--i,0)*70ms + .4s)}
-  /* the one-time light sweep starts only after everything has settled */
-  html body #plansView .opt-plan::after{animation:plGlint 1.5s ease-out calc(var(--i,0)*70ms + 1s) 1 both,plGlintLoop 7s ease-in-out calc(var(--i,0)*70ms + 4s) infinite}
+  html body #plansView .opt-plan{--b:calc(var(--i,0)*90ms);animation:plHFade 1.1s cubic-bezier(.16,1,.3,1) backwards;animation-delay:calc(var(--i,0)*140ms);filter:none}
+  html body #plansView .opt-plan h4{animation:plHFade .55s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--b) + .12s)}
+  html body #plansView .opt-plan .opt-badge{animation:plHFade .55s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--b) + .18s)}
+  html body #plansView .opt-plan .pr{animation:plHFade .8s ease-out backwards;animation-delay:calc(var(--b) + .26s)}
+  html body #plansView .opt-plan li{animation:plHFade .5s cubic-bezier(.2,.7,.2,1) backwards}
+  html body #plansView .opt-plan li:nth-child(1){animation-delay:calc(var(--b) + .42s + 65ms)}
+  html body #plansView .opt-plan li:nth-child(2){animation-delay:calc(var(--b) + .42s + 130ms)}
+  html body #plansView .opt-plan li:nth-child(3){animation-delay:calc(var(--b) + .42s + 195ms)}
+  html body #plansView .opt-plan li:nth-child(n+4){animation-delay:calc(var(--b) + .42s + 260ms)}
+  html body #plansView .opt-plan li::before{animation:plHPop .4s cubic-bezier(.2,.9,.3,1.3) backwards}
+  html body #plansView .opt-plan li:nth-child(1)::before{animation-delay:calc(var(--b) + .5s + 65ms)}
+  html body #plansView .opt-plan li:nth-child(2)::before{animation-delay:calc(var(--b) + .5s + 130ms)}
+  html body #plansView .opt-plan li:nth-child(3)::before{animation-delay:calc(var(--b) + .5s + 195ms)}
+  html body #plansView .opt-plan li:nth-child(n+4)::before{animation-delay:calc(var(--b) + .5s + 260ms)}
+  html body #plansView .opt-plan .opt-buy,html body #plansView .opt-plan .op-slot{animation:plHFade .55s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--b) + .95s)}
+  /* one light sweep, then the slow repeat (same timings as the home cards) */
+  html body #plansView .opt-plan::after{animation:plGlint 1.5s ease-out calc(var(--i,0)*140ms + .55s) 1 both,plGlintLoop 7s ease-in-out calc(var(--i,0)*140ms + 4.3s) infinite}
+  html body #plansView .opt-plan .opt-buy::before{animation:plBtnShine 5s ease-in-out 3s infinite}
 }
-/* method page subtitle: no separate slide-up */
-html body #optView.mn-view.show .opt-head .mn-sub,
-html body #optView.mn-view.show .opt-head h2.mn-hd{animation:none;transform:none}
-
-/* rebuilt while the Plans page is already open (status / language refresh): show the cards instantly, no second entrance */
+/* circling coloured border (home cards: .pc-ring / .pc-ring-spin) */
+html body #plansView .opt-plan > .op-ring{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;padding:1.5px;overflow:hidden;contain:strict;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+html body #plansView .opt-plan > .op-ring i{position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;margin:-130% 0 0 -130%;
+  background:conic-gradient(color-mix(in srgb,var(--c2) 35%,#fff) 0deg,var(--c2) 70deg,rgba(0,0,0,.42) 130deg,rgba(0,0,0,.42) 230deg,var(--c2) 290deg,color-mix(in srgb,var(--c2) 35%,#fff) 360deg)}
+@media (prefers-reduced-motion:no-preference){
+  html:not(.low-power) body #plansView .opt-plan > .op-ring i{will-change:transform;animation:plHRing 10s linear infinite}
+}
+/* rebuilt while the Plans page is already open (status / language refresh): cards appear instantly, no second entrance */
 html body #plansView #optPlans.pl-seen .opt-plan,
+html body #plansView #optPlans.pl-seen .opt-plan h4,
+html body #plansView #optPlans.pl-seen .opt-plan .opt-badge,
 html body #plansView #optPlans.pl-seen .opt-plan .pr,
 html body #plansView #optPlans.pl-seen .opt-plan li,
 html body #plansView #optPlans.pl-seen .opt-plan li::before,
 html body #plansView #optPlans.pl-seen .opt-plan .opt-buy,
 html body #plansView #optPlans.pl-seen .opt-plan .op-slot{animation:none!important}
-html body #plansView #optPlans.pl-seen .opt-plan::after{animation:plGlintLoop 7s ease-in-out calc(var(--i,0)*70ms + 4s) infinite!important}
+html body #plansView #optPlans.pl-seen .opt-plan::after{animation:plGlintLoop 7s ease-in-out calc(var(--i,0)*140ms + 4.3s) infinite!important}
+/* method page subtitle: no separate slide-up */
+html body #optView.mn-view.show .opt-head .mn-sub{animation:none;transform:none}
 </style>
 <script id="plans-seen-reset">
-/* when the Plans page closes, the next opening plays the entrance once again */
-(function(){var v=document.getElementById('plansView');if(!v)return;
- new MutationObserver(function(){if(!v.classList.contains('show')&&!v.classList.contains('mn-warm')){var b=document.getElementById('optPlans');if(b)b.classList.remove('pl-seen');}})
- .observe(v,{attributes:true,attributeFilter:['class']});})();
+(function(){
+ var v=document.getElementById('plansView'), box=document.getElementById('optPlans'); if(!v||!box) return;
+ /* when the Plans page closes, the next opening plays the entrance once again */
+ new MutationObserver(function(){ if(!v.classList.contains('show')&&!v.classList.contains('mn-warm')) box.classList.remove('pl-seen'); })
+  .observe(v,{attributes:true,attributeFilter:['class']});
+ /* every card gets the circling border element (cards are re-created by the page, so keep checking) */
+ function ring(){ box.querySelectorAll('.opt-plan').forEach(function(c){
+   if(!c.querySelector(':scope > .op-ring')){ var r=document.createElement('div'); r.className='op-ring'; r.setAttribute('aria-hidden','true'); r.innerHTML='<i></i>'; c.insertBefore(r,c.firstChild); } }); }
+ new MutationObserver(ring).observe(box,{childList:true}); ring();
+})();
 </script>
 
 <style id="plan3-star-fix">
