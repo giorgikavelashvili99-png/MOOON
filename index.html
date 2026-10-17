@@ -25113,8 +25113,32 @@ html body #optView .opt-head{margin-top:46px!important}
   html body #plansView .opt-plan .opt-buy,html body #plansView .opt-plan .op-slot{animation:plHFade .55s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--b) + .95s)}
   /* one light sweep, then the slow repeat (same timings as the home cards) */
   html body #plansView .opt-plan::after{animation:plGlint 1.5s ease-out calc(var(--i,0)*140ms + .55s) 1 both,plGlintLoop 7s ease-in-out calc(var(--i,0)*140ms + 4.3s) infinite}
-  html body #plansView .opt-plan .opt-buy::before{animation:plBtnShine 5s ease-in-out 3s infinite}
+  /* button shine: once after the entrance, then only when the pointer comes onto the button (like the home cards) */
+  html body #plansView .opt-plan .opt-buy::before{animation:plBtnOnce 5s ease-in-out calc(var(--i,0)*140ms + 2.2s) infinite backwards}
+  /* pointer / finger on the button: the sweep plays right away, on top of the automatic one */
+  html body #plansView .opt-plan .opt-buy:hover::before,html body #plansView .opt-plan .opt-buy:active::before,html body #plansView .opt-plan .opt-buy:focus-visible::before{animation:plBtnHover .75s ease-out 1 both}
 }
+@keyframes plBtnOnce{0%,70%{left:-60%;opacity:0}74%,92%{opacity:1}100%{left:130%;opacity:0}}
+@keyframes plBtnHover{0%{left:-60%;opacity:1}85%{opacity:1}100%{left:130%;opacity:0}}
+/* cards that are not on screen yet wait at the first frame; they play when they scroll into view (like the home cards) */
+html body #plansView .opt-plan[data-pl="wait"],
+html body #plansView .opt-plan[data-pl="wait"]::after,
+html body #plansView .opt-plan[data-pl="wait"] :not(.op-ring):not(.op-ring > i),
+html body #plansView .opt-plan[data-pl="wait"] :not(.op-ring):not(.op-ring > i)::before,
+html body #plansView .opt-plan[data-pl="wait"] :not(.op-ring):not(.op-ring > i)::after{animation-play-state:paused!important}
+/* hover on the buy button lights up the card shell (inner edge glow) and the button itself - same as the home cards */
+html body #plansView .opt-plan > .op-fx{display:block;position:absolute;inset:0;z-index:5;pointer-events:none;border-radius:inherit;opacity:0;
+  box-shadow:inset 0 0 0 2.6px color-mix(in srgb,var(--c2) 30%,#fff),inset 0 0 20px 2px color-mix(in srgb,var(--c2) 55%,#fff)!important;
+  transition:opacity .85s cubic-bezier(.4,0,.2,1)}
+html body #plansView .opt-plan .opt-buy{transition:box-shadow .45s ease,filter .45s ease,transform .15s ease}
+html body #plansView .opt-plan:has(.opt-buy:hover) > .op-fx,
+html body #plansView .opt-plan:has(.opt-buy:active) > .op-fx,
+html body #plansView .opt-plan:has(.opt-buy:focus-visible) > .op-fx{opacity:1;transition:opacity 1.4s cubic-bezier(.42,0,.2,1)}
+html body #plansView .opt-plan .opt-buy:hover,
+html body #plansView .opt-plan .opt-buy:active,
+html body #plansView .opt-plan .opt-buy:focus-visible{
+  box-shadow:0 0 10px 1px color-mix(in srgb,var(--c2) 85%,transparent),0 0 28px 4px color-mix(in srgb,var(--c2) 55%,transparent)!important;
+  filter:brightness(1.08) saturate(1.1)}
 /* circling coloured border (home cards: .pc-ring / .pc-ring-spin) */
 html body #plansView .opt-plan > .op-ring{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;padding:1.5px;overflow:hidden;contain:strict;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
@@ -25140,13 +25164,31 @@ html body #optView.mn-view.show .opt-head .mn-sub{animation:none;transform:none}
 <script id="plans-seen-reset">
 (function(){
  var v=document.getElementById('plansView'), box=document.getElementById('optPlans'); if(!v||!box) return;
- /* when the Plans page closes, the next opening plays the entrance once again */
- new MutationObserver(function(){ if(!v.classList.contains('show')&&!v.classList.contains('mn-warm')) box.classList.remove('pl-seen'); })
-  .observe(v,{attributes:true,attributeFilter:['class']});
- /* every card gets the circling border element (cards are re-created by the page, so keep checking) */
- function ring(){ box.querySelectorAll('.opt-plan').forEach(function(c){
-   if(!c.querySelector(':scope > .op-ring')){ var r=document.createElement('div'); r.className='op-ring'; r.setAttribute('aria-hidden','true'); r.innerHTML='<i></i>'; c.insertBefore(r,c.firstChild); } }); }
- new MutationObserver(ring).observe(box,{childList:true}); ring();
+ function shown(){ return v.classList.contains('show'); }
+ function cards(){ return [].slice.call(box.querySelectorAll('.opt-plan')); }
+ /* every card gets the circling border element */
+ function ring(){ cards().forEach(function(c){
+   if(!c.querySelector(':scope > .op-ring')){ var r=document.createElement('div'); r.className='op-ring'; r.setAttribute('aria-hidden','true'); r.innerHTML='<i></i>'; c.insertBefore(r,c.firstChild); }
+   if(!c.querySelector(':scope > .op-fx')){ var f=document.createElement('i'); f.className='op-fx'; f.setAttribute('aria-hidden','true'); c.insertBefore(f,c.firstChild); } }); }
+ /* a card plays its entrance when (most of) it is on screen */
+ function visible(c){ var r=c.getBoundingClientRect(), t=box.getBoundingClientRect(), w=r.width||1;
+   var vx=Math.min(r.right,t.right)-Math.max(r.left,t.left), vy=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);
+   return vx>=w*.55 && vy>40; }
+ function check(){
+   if(!shown()) return;
+   var k=0; cards().forEach(function(c){
+     if(c.getAttribute('data-pl')==='wait' && visible(c)){ c.style.setProperty('--i',k++); c.removeAttribute('data-pl'); } });
+ }
+ function rearm(){ cards().forEach(function(c){ c.setAttribute('data-pl','wait'); }); }
+ function onBuilt(){ ring(); if(!shown()||!box.classList.contains('pl-seen')){ cards().forEach(function(c){ if(!c.hasAttribute('data-done')){ c.setAttribute('data-pl','wait'); c.setAttribute('data-done','1'); } }); } else { cards().forEach(function(c){ c.setAttribute('data-done','1'); }); } check(); }
+ new MutationObserver(onBuilt).observe(box,{childList:true});
+ box.addEventListener('scroll',function(){ requestAnimationFrame(check); },{passive:true});
+ addEventListener('resize',function(){ requestAnimationFrame(check); });
+ new MutationObserver(function(){
+   if(shown()){ if(!v.classList.contains('mn-warm')) setTimeout(check,30); setTimeout(check,350); }
+   else if(!v.classList.contains('mn-warm')){ box.classList.remove('pl-seen'); rearm(); }
+ }).observe(v,{attributes:true,attributeFilter:['class']});
+ onBuilt(); if(!shown()) rearm();
 })();
 </script>
 
