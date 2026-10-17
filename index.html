@@ -24195,7 +24195,7 @@ function renderChips(){
   /* 1) plan chip: top-right corner of the optimizer shell */
   var c=$('optPlanChip');
   if(o&&!c){ c=document.createElement('div'); c.id='optPlanChip'; c.className='opt-corner'; o.appendChild(c); }
-  if(c){ if(!st){ c.style.display='none'; c._vis=0; } else { if(!c._vis){ c._vis=1; if(!o.classList.contains('opt-enter')){ c.classList.add('bn-in'); setTimeout(function(){ c.classList.remove('bn-in'); },700); } } c.style.display=''; c.setAttribute('data-plan',st.plan||'free'); var t='<i></i><span>'+esc(planLabel(st))+(st.unlimited?' · '+esc(tr('unl'))+' ∞':'')+'</span>'; if(c._h!==t){ c._h=t; c.innerHTML=t; } } }
+  if(c){ if(!st){ c.style.display='none'; c._vis=0; } else { if(!c._vis){ c._vis=1; c.classList.add('bn-in'); setTimeout(function(){ c.classList.remove('bn-in'); },700); } c.style.display=''; c.setAttribute('data-plan',st.plan||'free'); var t='<i></i><span>'+esc(planLabel(st))+(st.unlimited?' · '+esc(tr('unl'))+' ∞':'')+'</span>'; if(c._h!==t){ c._h=t; c.innerHTML=t; } } }
   /* 2) remaining uploads: next to the MEMBER badge in the profile popover */
   var mb=document.querySelector('.dp-member-badge'); if(!mb||!mb.parentNode) return;
   var row=mb.parentNode;
@@ -25056,26 +25056,27 @@ html body #optView .opt-go:disabled{color:rgba(199,210,254,.45)!important;cursor
 @media (max-width:640px){html body #optView .opt-go{min-height:58px!important;font-size:16px!important}}
 </style>
 <style id="opt-stabilize-8">
-/* ===== Method page entrance: opacity + a small rise only (no scale, no blur) -> nothing shrinks or flickers ===== */
-@keyframes optIn{0%{opacity:0;translate:0 14px}100%{opacity:1;translate:0 0}}
-@keyframes optBannerIn{0%{opacity:0;translate:0 -100%}100%{opacity:1;translate:0 0}}
+/* ===== Method page entrance: opacity ONLY (nothing moves, nothing shrinks, nothing creeps up at the end) ===== */
+@keyframes optIn{0%{opacity:0}100%{opacity:1}}
 @keyframes optBnShow{0%{opacity:0}100%{opacity:1}}
-@keyframes optPop{0%{opacity:0}100%{opacity:1}}
-/* while the page is still settling, blocks stay invisible (the shell and background stay put) */
-html body #optView .opt.opt-pre :is(.opt-corner,.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go,.opt-prog){opacity:0!important}
-html body #optView .opt > .opt-corner.bn-in{animation:optBnShow .5s ease both}
-html body #optView .opt.opt-enter > .opt-corner{animation:optBannerIn .6s cubic-bezier(.22,.8,.26,1) 0s both}
-html body #optView .opt.opt-enter > .opt-head{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .05s both}
-html body #optView .opt.opt-enter > .or-steps{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .12s both}
-html body #optView .opt.opt-enter .opt-quota{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .19s both}
-html body #optView .opt.opt-enter .opt-drop{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .26s both}
-html body #optView .opt.opt-enter .opt-stats{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .33s both}
-html body #optView .opt.opt-enter .opt-go{animation:optGoFlow 6s ease-in-out infinite,optIn .6s cubic-bezier(.22,.8,.26,1) .40s both}
-html body #optView .opt.opt-enter .opt-go:disabled{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .40s both}
-html body #optView .opt.opt-enter .opt-prog{animation:optIn .6s cubic-bezier(.22,.8,.26,1) .47s both}
+/* while the page settles, the content blocks wait invisible; the plan banner and the shell are NOT touched */
+html body #optView .opt.opt-pre :is(.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go){opacity:0!important}
+html body #optView .opt > .opt-corner.bn-in{animation:optBnShow .45s ease both}
+html body #optView .opt.opt-enter > .opt-head{animation:optIn .5s ease-out 0s backwards}
+html body #optView .opt.opt-enter > .or-steps{animation:optIn .5s ease-out .06s backwards}
+html body #optView .opt.opt-enter .opt-quota{animation:optIn .5s ease-out .12s backwards}
+html body #optView .opt.opt-enter .opt-drop{animation:optIn .5s ease-out .18s backwards}
+html body #optView .opt.opt-enter .opt-stats{animation:optIn .5s ease-out .24s backwards}
+html body #optView .opt.opt-enter .opt-go{animation:optGoFlow 6s ease-in-out infinite,optIn .5s ease-out .30s backwards}
+html body #optView .opt.opt-enter .opt-go:disabled{animation:optIn .5s ease-out .30s backwards}
 html body #optView .opt.opt-enter .opt-drop .opt-ic{animation:none!important}
-/* Latin text in the plan banner (Plan 3) in the clean font instead of the serif fallback */
+
+/* ===== plan banner: static, nothing blinking, Georgian letters not clipped ===== */
+html body #optView .opt > .opt-corner{height:40px!important;align-items:center}
+html body #optView .opt > .opt-corner i{animation:none!important}
+html body #optView .opt > .opt-corner span{overflow:visible!important;text-overflow:clip!important;line-height:1.7!important;padding:2px 0 5px!important}
 html body #optView .opt > .opt-corner,html body #optView .opt > .opt-corner span{font-family:var(--o-num),system-ui,-apple-system,"Segoe UI",Roboto,sans-serif!important}
+html body #optView .opt-head{margin-top:46px!important}
 @media (prefers-reduced-motion:reduce){html body #optView .opt *{animation:none!important}}
 </style>
 </body>
