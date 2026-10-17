@@ -24232,13 +24232,19 @@ function renderPlans(){
    ['p2','Plan 2','7.99',[tr('unlimited')]],
    ['p3','Plan 3','14.99',[tr('unlimited')]]
   ];
-  setHTML(box,items.map(function(x){
+  var __plH=items.map(function(x){
     var lines=x[3].concat(planSpecs(x[0])), isCur=x[0]===cur;
     return '<div class="opt-plan'+(isCur?' cur':'')+'"><div class="op-pn"><h4>'+esc(x[1])+'</h4>'+(isCur?'<span class="opt-badge">'+tr('cur')+'</span>':'')+'</div>'+
       '<div class="pr">'+(x[2]?x[2]+' ₾<small> '+tr('perMonth')+'</small>':'0 ₾')+'</div>'+
       '<ul>'+lines.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>'+
       (isCur||!x[2]?'<span class="op-slot">'+(!x[2]?tr('freeNote'):tr('curNote'))+'</span>':'<button type="button" class="opt-buy" data-buy="1">'+tr('buy')+'</button>')+'</div>';
-  }).join(''));
+  }).join('');
+  /* anti double-animation: identical markup -> keep the existing cards; a rebuild while the page is open must not replay the entrance */
+  if(box.__plH===__plH && box.children.length) return;
+  var __pv=document.getElementById('plansView'), __open=!!(__pv&&(__pv.classList.contains('show')||__pv.classList.contains('mn-warm')));
+  box.__plH=__plH;
+  box.classList.toggle('pl-seen', __open);
+  setHTML(box,__plH);
 }
 function refreshStatus(){
   var id=ident();
@@ -25103,11 +25109,27 @@ html body #optView .opt-head{margin-top:46px!important}
 /* method page subtitle: no separate slide-up */
 html body #optView.mn-view.show .opt-head .mn-sub,
 html body #optView.mn-view.show .opt-head h2.mn-hd{animation:none;transform:none}
+
+/* rebuilt while the Plans page is already open (status / language refresh): show the cards instantly, no second entrance */
+html body #plansView #optPlans.pl-seen .opt-plan,
+html body #plansView #optPlans.pl-seen .opt-plan .pr,
+html body #plansView #optPlans.pl-seen .opt-plan li,
+html body #plansView #optPlans.pl-seen .opt-plan li::before,
+html body #plansView #optPlans.pl-seen .opt-plan .opt-buy,
+html body #plansView #optPlans.pl-seen .opt-plan .op-slot{animation:none!important}
+html body #plansView #optPlans.pl-seen .opt-plan::after{animation:plGlintLoop 7s ease-in-out calc(var(--i,0)*70ms + 4s) infinite!important}
 </style>
+<script id="plans-seen-reset">
+/* when the Plans page closes, the next opening plays the entrance once again */
+(function(){var v=document.getElementById('plansView');if(!v)return;
+ new MutationObserver(function(){if(!v.classList.contains('show')&&!v.classList.contains('mn-warm')){var b=document.getElementById('optPlans');if(b)b.classList.remove('pl-seen');}})
+ .observe(v,{attributes:true,attributeFilter:['class']});})();
+</script>
+
 <style id="plan3-star-fix">
 /* Plan 3 banner (method page): same 5-point star as the Plan 3 card on the Plans page */
 html body #optView .opt > .opt-corner[data-plan="p3"] i{flex:0 0 14px;width:14px;height:14px;
   background:#241800;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 </style>
 </body>
-</html>
+</html></html>
