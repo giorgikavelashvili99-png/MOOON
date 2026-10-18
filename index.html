@@ -24807,7 +24807,8 @@ function enhance(o){
  var __lt=0;
  function loop(now){
   if(!orVis||document.hidden){ orRun=false; return; }
-  if(now&&now-__lt<(__co?32:15)){ requestAnimationFrame(loop); return; } __lt=now||0;
+  if(o.classList.contains('opt-enter')||o.classList.contains('opt-pre')){ requestAnimationFrame(loop); return; }   /* the entrance plays on its own: the particles start only after it has finished */
+  if(now&&now-__lt<15){ requestAnimationFrame(loop); return; } __lt=now||0;
   { x.clearRect(0,0,W,H); __bk[0].length=__bk[1].length=__bk[2].length=0;
    for(var i=0;i<P.length;i++){var p=P[i];
     if(M){var mx=p.x-M.x,my=p.y-M.y,md=Math.sqrt(mx*mx+my*my)||1; if(md<150){var f=(1-md/150)*1.6;p.vx+=mx/md*f;p.vy+=my/md*f;}}
@@ -25974,7 +25975,7 @@ html body #optView .opt-head h2{animation:orTitle 7s steps(420,end) infinite!imp
 
 /* ===== Method page entrance: the same smooth rise-and-fade the other pages have (transform + opacity only, so it stays on the GPU and never janks) ===== */
 @keyframes moRise{from{opacity:0;transform:translate3d(0,24px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
-@keyframes moShell{from{opacity:0;transform:translate3d(0,18px,0) scale(.982)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes moShell{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 @media (prefers-reduced-motion:no-preference){
   html body #optView .opt.opt-enter{animation:moShell .8s cubic-bezier(.16,1,.3,1) backwards;will-change:transform,opacity}
   html body #optView .opt.opt-enter > .opt-head{animation:moRise .85s cubic-bezier(.16,1,.3,1) .06s backwards;will-change:transform,opacity}
@@ -25987,6 +25988,19 @@ html body #optView .opt-head h2{animation:orTitle 7s steps(420,end) infinite!imp
   html body #optView .opt.opt-enter .opt-go:disabled{animation:moRise .85s cubic-bezier(.16,1,.3,1) .48s backwards}
   html body #optView .opt.opt-enter .opt-h3{animation:moRise .85s cubic-bezier(.16,1,.3,1) .5s backwards}
   html body #optView .opt.opt-enter #optPlans{animation:moRise .9s cubic-bezier(.16,1,.3,1) .58s backwards}
+}
+
+/* ===== Method page on phones / tablets: same look, far less work for the GPU ===== */
+/* particles fade in after the entrance instead of popping in */
+html body #optView .opt > canvas.or-cv{transition:opacity .9s ease}
+html body #optView .opt.opt-enter > canvas.or-cv,html body #optView .opt.opt-pre > canvas.or-cv{opacity:0}
+/* the aurora waits for the entrance too (it simply continues afterwards - nothing is removed) */
+html body #optView .opt.opt-enter::after,html body #optView .opt.opt-pre::after{animation-play-state:paused!important}
+@media (pointer:coarse){
+  /* a blurred "glass" layer over a moving background has to be re-blurred on EVERY frame - on touch screens it is the main cause of lag; the panels keep their translucent fill, border and glow */
+  html body #optView .opt *,html body #optView .opt{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  /* title colour sweep: ~13 repaints a second instead of 60 (the sweep takes 7 s, so the eye cannot tell) */
+  html body #optView .opt-head h2{animation:orTitle 7s steps(90,end) infinite!important}
 }
 
 </style>
