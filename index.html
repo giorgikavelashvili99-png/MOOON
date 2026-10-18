@@ -24372,7 +24372,7 @@ function api(path,opt){
 function ident(){ var u=user(); if(!u) return null; return {uid:String(u.id),username:u.username||'',sig:u.optSig||undefined,sigExp:u.optSigExp||undefined}; }
 
 /* ============ QUOTA / PRESETS / PLANS ============ */
-function eff(){ var pl=PLANS[(S.status&&S.status.plan)||'free']; var st=S.status; return {h:(st&&st.maxH)||pl.h, fps:(st&&st.maxFps)||pl.fps}; }
+function eff(){ var pl=PLANS[(S.status&&S.status.plan)||'free']; var st=S.status; return {h:(st&&st.maxH)||pl.h, fps:Math.max((st&&st.maxFps)||0, pl.fps)}; }   /* never below the plan table: free = 60 fps, 120 fps only on Plan 2 / Plan 3 */
 function allowed(p){ var pl=eff(); return p.h<=pl.h && p.fps<=pl.fps; }
 function setHTML(el,h){ if(el._h!==h){ el._h=h; el.innerHTML=h; } }
 function renderPresets(){ var first=PRESETS.filter(allowed).pop(); S.preset=first?first.id:null; updateGo(); }
@@ -26140,6 +26140,54 @@ html body #optView .opt.opt-enter::after,html body #optView .opt.opt-pre::after{
   window.addEventListener('resize', function(){ run(500); }, {passive:true});
   if(window.visualViewport) window.visualViewport.addEventListener('resize', function(){ run(500); }, {passive:true});
   if(scrim.classList.contains('open')) attach();
+})();
+
+/* ---- top menu: the sliding highlight is always checked against the REAL position of the active link (font loading, the account / upload counter appearing, language change, browser zoom ... can all move the links after the highlight was placed) ---- */
+(function(){
+  var box = document.getElementById('hzLinks');
+  if(!box) return;
+  var ind = box.querySelector('.hz-ind');
+  if(!ind) return;
+  var raf = 0, until = 0;
+  function align(){
+    var a = box.querySelector('.hz-link.is-active');
+    if(!a || !box.offsetWidth){ return; }
+    var moving = false;
+    try{ moving = ind.getAnimations().some(function(x){ return x.playState === 'running'; }); }catch(e){}
+    if(moving) return;                                                       /* it is still sliding - check again afterwards */
+    var br = box.getBoundingClientRect(), k = (br.width / box.offsetWidth) || 1;      /* screen px per css px (page zoom safe) */
+    var ar = a.getBoundingClientRect(), ir = ind.getBoundingClientRect();
+    var dL = (ar.left - ir.left) / k, dW = (ar.width - ir.width) / k;
+    if(Math.abs(dL) > 0.8 || Math.abs(dW) > 0.8){
+      var w = parseFloat(ind.style.width) || ind.offsetWidth;
+      var m = /translate3d\(\s*(-?[\d.]+)px/.exec(ind.style.transform || ''), x = m ? parseFloat(m[1]) : 0;
+      ind.style.transition = 'none';
+      ind.style.width = (w + dW) + 'px';
+      ind.style.transform = 'translate3d(' + (x + dL) + 'px,0,0)';
+      ind.style.opacity = '1';
+      void ind.offsetWidth;
+      ind.style.transition = '';
+    }
+  }
+  function run(ms){
+    until = Math.max(until, performance.now() + (ms || 900));
+    if(raf) return;
+    (function step(now){
+      align();
+      if(now < until) raf = requestAnimationFrame(step); else { raf = 0; setTimeout(align, 120); }
+    })(performance.now());
+  }
+  var bar = box.closest('.hz-bar') || box.parentElement;
+  document.addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-hz-go],.hz-link')){ run(1500); setTimeout(function(){ run(600); }, 1700); } }, true);
+  new MutationObserver(function(){ run(1000); }).observe(box, {subtree:true, attributes:true, attributeFilter:['class']});
+  new MutationObserver(function(){ run(900); }).observe(bar, {subtree:true, childList:true, characterData:true});
+  new MutationObserver(function(){ run(900); }).observe(document.body, {attributes:true, attributeFilter:['class']});
+  if(window.ResizeObserver){ var ro = new ResizeObserver(function(){ run(900); }); ro.observe(bar); ro.observe(box); }
+  window.addEventListener('resize', function(){ run(900); }, {passive:true});
+  window.addEventListener('pageshow', function(){ run(900); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ run(900); });
+  window.addEventListener('load', function(){ run(1500); setTimeout(function(){ run(900); }, 2500); });
+  run(1500);
 })();
 
 </script>
