@@ -26066,6 +26066,49 @@ html body #optView .opt-head h2{animation:orTitle 7s steps(420,end) infinite!imp
   }, true);
 })();
 
+/* ---- order window: whatever happens inside it (the warning opening / closing, the keyboard, the browser bars), the window is always put back in the vertical centre of the screen ---- */
+(function(){
+  var scrim = document.getElementById('pcModalScrim');
+  if(!scrim) return;
+  var raf = 0, until = 0, last = null, ro = null;
+  function panel(){ return scrim.querySelector('.pc-accordion-body'); }
+  function fix(){
+    var p = panel();
+    if(!p || !scrim.classList.contains('open')) return;
+    var top = p.offsetTop, h = p.offsetHeight, sh = scrim.clientHeight;      /* layout values: not affected by the open / close transforms */
+    if(!h || !sh) return;
+    var want = Math.max(16, (sh - h) / 2), d = want - top;
+    var cur = parseFloat(p.style.top) || 0;
+    if(Math.abs(d) > (cur ? 0.75 : 14)){            /* a normal, correctly centred window is never touched */
+      p.style.top = (cur + d) + 'px';
+    }
+  }
+  function run(ms){
+    until = Math.max(until, performance.now() + ms);
+    if(raf) return;
+    (function step(now){
+      fix();
+      if(now < until) raf = requestAnimationFrame(step); else { raf = 0; setTimeout(fix, 80); }
+    })(performance.now());
+  }
+  function clear(){ if(last){ last.style.top = ''; } last = null; if(ro){ ro.disconnect(); ro = null; } }
+  function attach(){
+    var p = panel(); if(!p) return;
+    if(last !== p){ clear(); last = p; p.style.top = ''; }
+    if(window.ResizeObserver && !ro){ ro = new ResizeObserver(function(){ run(900); }); ro.observe(p); var sc = p.querySelector('.pc-modal-scroll'); if(sc) ro.observe(sc); }
+    run(1200);
+  }
+  new MutationObserver(function(){
+    if(scrim.classList.contains('open')) attach(); else clear();
+  }).observe(scrim, {attributes:true, attributeFilter:['class']});
+  document.addEventListener('click', function(e){
+    if(e.target.closest && e.target.closest('#pcModalScrim .warn-panel .w-head, #pcModalScrim .trust-item')) run(1200);
+  }, true);
+  window.addEventListener('resize', function(){ run(500); }, {passive:true});
+  if(window.visualViewport) window.visualViewport.addEventListener('resize', function(){ run(500); }, {passive:true});
+  if(scrim.classList.contains('open')) attach();
+})();
+
 </script>
 </body>
 </html>
