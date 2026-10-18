@@ -25972,6 +25972,23 @@ html body #optView .opt-head h2{animation:orTitle 7s steps(420,end) infinite!imp
   html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide > .pc-card-wrap{will-change:opacity!important}
 }
 
+/* ===== Method page entrance: the same smooth rise-and-fade the other pages have (transform + opacity only, so it stays on the GPU and never janks) ===== */
+@keyframes moRise{from{opacity:0;transform:translate3d(0,24px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes moShell{from{opacity:0;transform:translate3d(0,18px,0) scale(.982)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@media (prefers-reduced-motion:no-preference){
+  html body #optView .opt.opt-enter{animation:moShell .8s cubic-bezier(.16,1,.3,1) backwards;will-change:transform,opacity}
+  html body #optView .opt.opt-enter > .opt-head{animation:moRise .85s cubic-bezier(.16,1,.3,1) .06s backwards;will-change:transform,opacity}
+  html body #optView .opt.opt-enter > .or-steps{animation:moRise .85s cubic-bezier(.16,1,.3,1) .16s backwards;will-change:transform,opacity}
+  html body #optView .opt.opt-enter > .opt-card,
+  html body #optView .opt.opt-enter .opt-quota{animation:moRise .85s cubic-bezier(.16,1,.3,1) .26s backwards;will-change:transform,opacity}
+  html body #optView .opt.opt-enter .opt-drop{animation:moRise .85s cubic-bezier(.16,1,.3,1) .32s backwards;will-change:transform,opacity}
+  html body #optView .opt.opt-enter .opt-stats{animation:moRise .85s cubic-bezier(.16,1,.3,1) .4s backwards;will-change:transform,opacity}
+  html body #optView .opt.opt-enter .opt-go{animation:optGoFlow 6s ease-in-out infinite,moRise .85s cubic-bezier(.16,1,.3,1) .48s backwards}
+  html body #optView .opt.opt-enter .opt-go:disabled{animation:moRise .85s cubic-bezier(.16,1,.3,1) .48s backwards}
+  html body #optView .opt.opt-enter .opt-h3{animation:moRise .85s cubic-bezier(.16,1,.3,1) .5s backwards}
+  html body #optView .opt.opt-enter #optPlans{animation:moRise .9s cubic-bezier(.16,1,.3,1) .58s backwards}
+}
+
 </style>
 <script id="moon-menu-final-js">
 (function(){
