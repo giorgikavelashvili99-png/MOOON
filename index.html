@@ -17837,7 +17837,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   function moonActivity(type, user, detail){
     try{
       if (!user || !user.id) return;
-      const body = JSON.stringify({ type: type, username: user.username || '', discordId: String(user.id), detail: detail || '' });
+      const body = JSON.stringify({ type: type, username: user.username || '', discordId: String(user.id), detail: detail || '', avatarUrl: user.avatarUrl || '' });
       const url = 'https://bot2-88ps.onrender.com/api/activity';
       // text/plain => "simple" CORS request (no preflight), and works with sendBeacon on page close
       if (type === 'leave' && navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
@@ -19636,11 +19636,14 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       const root = document.documentElement;
       const stopMoving = () => { root.classList.remove('pc-moving'); };
       track.addEventListener('scroll', () => {
-        if (!root.classList.contains('pc-moving')) root.classList.add('pc-moving');
-        clearTimeout(movingTimer); movingTimer = setTimeout(stopMoving, 140);
+        /* (no html.pc-moving toggle: restyling the whole page at the start/end of every swipe caused the hitch) */
+        /* while the finger is moving only the dots follow; the card's own "active" styling is swapped once the
+           swipe settles - swapping it mid-swipe restyled ~120 elements of two cards at every card boundary,
+           which is exactly the stutter you felt halfway through a swipe */
+        clearTimeout(movingTimer); movingTimer = setTimeout(() => { stopMoving(); if (!programmatic) syncActiveFromScroll(true); }, 140);
         if (programmatic || ticking) return;
         ticking = true;
-        requestAnimationFrame(() => { ticking = false; syncActiveFromScroll(); });
+        requestAnimationFrame(() => { ticking = false; syncActiveFromScroll(false); });
       }, { passive: true });
 
       let hovering = false;
@@ -19672,15 +19675,26 @@ TikTok პროფილი: ${getTiktokValue('cp')}
       if (!track || !slides.length) return;
       centers = slides.map(s => s.offsetLeft + s.offsetWidth / 2);
     }
-    function syncActiveFromScroll(){
+    let dotIndex = -1, trackW = 0;
+    function syncActiveFromScroll(settled){
       if (!track || !centers.length) return;
-      const c = track.scrollLeft + track.clientWidth / 2;
+      if (!trackW || settled) trackW = track.clientWidth;
+      const c = track.scrollLeft + trackW / 2;
       let closest = 0, d = Infinity;
       for (let i = 0; i < centers.length; i++){ const k = Math.abs(centers[i] - c); if (k < d){ d = k; closest = i; } }
+      if (settled === false) {
+        if (closest !== dotIndex) {
+          dotIndex = closest;
+          dots.forEach((dt, idx) => dt.classList.toggle('is-active', idx === closest));
+          if (prevBtn) prevBtn.disabled = closest === 0;
+          if (nextBtn) nextBtn.disabled = closest === slides.length - 1;
+        }
+        return;
+      }
       if (closest !== activeIndex) setActive(closest);
     }
     function setActive(i){
-      activeIndex = i;
+      activeIndex = i; dotIndex = i;
       slides.forEach((slide, idx) => slide.classList.toggle('pc-slide--active', idx === i));
       dots.forEach((d, idx) => d.classList.toggle('is-active', idx === i));
       if (prevBtn) prevBtn.disabled = i === 0;
@@ -19779,7 +19793,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         if (visX >= r.width * 0.3 && visY > 40) play(sl, k++);
       });
     }
-    function queueCheck(){ if (!ticking){ ticking = true; requestAnimationFrame(check); } }
+    var lastCheck = 0, checkT = 0;
+    function queueCheck(){ if (ticking) return; var w = 90 - (Date.now() - lastCheck); ticking = true; clearTimeout(checkT); checkT = setTimeout(function(){ lastCheck = Date.now(); requestAnimationFrame(check); }, w > 0 ? w : 0); }
     track.addEventListener('scroll', queueCheck, { passive:true });
     window.addEventListener('resize', queueCheck);
 
@@ -21193,7 +21208,7 @@ html.perf-scrolling .ttdl-glass{animation-play-state:paused!important}
   var st = null, on = false;
   function endScroll(){ on = false; root.classList.remove('perf-scrolling'); scheduleScan(); }
   addEventListener('scroll', function(){
-    if (!on){ on = true; root.classList.add('perf-scrolling'); }
+    if (!on){ on = true; }   /* html.perf-scrolling toggle removed: whole-page restyle at every scroll start/end = visible hitch */
     clearTimeout(st); st = setTimeout(endScroll, 140);
   }, { passive:true, capture:true });
   /* --- 2. off-screen looping animations are paused --- */
@@ -21253,7 +21268,11 @@ function geometry(track){
   for(i=0;i<kids.length;i++) if(kids[i].classList.contains('pc-slide')) sl.push(kids[i]);
   if(!sl.length) return null;
   var g=geo.get(track);
-  if(g&&!dirty&&g.n===sl.length&&g.cw===track.clientWidth) return g;
+  /* NO layout read on the fast path: track.clientWidth used to be read here every frame, right after the previous
+     frame's tilt was written, which forced a full style+layout pass per frame while swiping. Width changes are
+     reported by the ResizeObserver below (and window resize / fonts / load, which already call invalidate()). */
+  if(g&&!dirty&&g.n===sl.length) return g;
+  if(!track.__moRO&&window.ResizeObserver){ track.__moRO=1; new ResizeObserver(function(){ invalidate(); }).observe(track); }
   var off=sl[0].offsetParent===track?0:track.offsetLeft,c=[];
   for(i=0;i<sl.length;i++) c.push(sl[i].offsetLeft-off+sl[i].offsetWidth/2);
   g={n:sl.length,cw:track.clientWidth,sl:sl,c:c,w:sl.length>1?Math.abs(c[1]-c[0]):sl[0].offsetWidth+16};
@@ -24620,8 +24639,17 @@ function enhance(o){
  size(); if(window.ResizeObserver)new ResizeObserver(size).observe(o);
  o.addEventListener('pointerdown',function(){ if(!M)return; P.forEach(function(p){var dx=p.x-M.x,dy=p.y-M.y,dd=Math.sqrt(dx*dx+dy*dy)||1; if(dd<320){var f=(1-dd/320)*14;p.vx+=dx/dd*f;p.vy+=dy/dd*f;}}); cubeReact(true); ring=1; });
  var ring=0;
- (function loop(){
-  if(o.offsetParent!==null&&!document.hidden){ x.clearRect(0,0,W,H);
+ /* the particle loop only runs while the Method page is actually on screen (IntersectionObserver), instead of
+    polling o.offsetParent every frame - that getter forced a full style+layout pass 60x a second on every page,
+    which is what made page switches and scrolling stutter */
+ var orVis=false, orRun=false;
+ function orStart(){ if(orRun||!orVis||document.hidden) return; orRun=true; requestAnimationFrame(loop); }
+ if('IntersectionObserver' in window){ new IntersectionObserver(function(es){ orVis=es[es.length-1].isIntersecting; orStart(); }).observe(o); }
+ else { orVis=true; }
+ document.addEventListener('visibilitychange',orStart);
+ function loop(){
+  if(!orVis||document.hidden){ orRun=false; return; }
+  { x.clearRect(0,0,W,H);
    for(var i=0;i<P.length;i++){var p=P[i];
     if(M){var mx=p.x-M.x,my=p.y-M.y,md=Math.sqrt(mx*mx+my*my)||1; if(md<150){var f=(1-md/150)*1.6;p.vx+=mx/md*f;p.vy+=my/md*f;}}
     p.vx=p.vx*.93+p.bx*.07; p.vy=p.vy*.93+p.by*.07; p.x+=p.vx; p.y+=p.vy;
@@ -24633,7 +24661,8 @@ function enhance(o){
    if(ring>0&&M){x.strokeStyle='rgba(125,211,252,'+(Math.max(0,1-ring/60)).toFixed(2)+')';x.lineWidth=2;x.beginPath();x.arc(M.x,M.y,ring*5,0,6.283);x.stroke();ring++;if(ring>60)ring=0;}
   }
   requestAnimationFrame(loop);
- })();
+ }
+ orStart();
 }
 var LB={ka:['ატვირთვა','ოპტიმიზაცია','ჩამოტვირთვა'],en:['Upload','Optimize','Download'],ru:['Загрузка','Оптимизация','Скачать']};
 function relabel(o){ var l='ka'; try{ if(typeof currentLang!=='undefined'&&LB[currentLang]) l=currentLang; }catch(e){} if(o._lb===l) return; var sp=o.querySelectorAll('.or-step span'); if(sp.length!==3) return; o._lb=l; LB[l].forEach(function(t,i){ sp[i].textContent=t; }); }
@@ -24676,6 +24705,13 @@ html body .mn-view[data-view="plans"]{max-width:1180px}
  #plansView #optPlans::-webkit-scrollbar{display:none}
  #plansView .opt-plan{flex:0 0 min(290px,78%);scroll-snap-align:center}
 }
+@media (max-width:1099px){
+ #plansView #optPlans{scroll-padding-inline:6px;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+ #plansView .opt-plan{scroll-snap-stop:always}
+}
+@media (hover:none){#plansView .opt-plan:hover{transform:none}}
+/* phones: cards slide out to the screen edge instead of being cut off 20px before it */
+@media (max-width:1099px) and (hover:none){#plansView #optPlans{margin-inline:calc(50% - 50vw);padding-inline:calc(50vw - 50% + 6px);scroll-padding-inline:calc(50vw - 50% + 6px)}}
 @media (max-width:640px){html body .mn-links .mn-link{letter-spacing:-.2px}}
 .opt-pnav{display:none;align-items:center;justify-content:center;gap:16px;margin:2px 0 6px}
 @media (max-width:1099px){.opt-pnav{display:flex}.opt-pnav.off{display:none}}
@@ -24777,12 +24813,15 @@ html body #optView .opt-stats,html body #optView .opt-prog{margin-inline:auto}
    c.forEach(function(el,i){var d=Math.abs(el.offsetLeft+el.offsetWidth/2-mid); if(d<bd){bd=d;idx=i;}});
    for(var i=0;i<dots.children.length;i++) dots.children[i].classList.toggle('on',i===idx);
    b[0].disabled=idx<=0; b[1].disabled=idx>=c.length-1;
-   nav.classList.toggle('off',box.scrollWidth<=box.clientWidth+2);
+   if(box.clientWidth>0) nav.classList.toggle('off',box.scrollWidth<=box.clientWidth+2);
   }
-  function q(){ if(!tk) tk=requestAnimationFrame(sync); }
+  function q(){ if(!host.classList.contains('show')&&!host.classList.contains('mn-warm')) return; if(!tk) tk=requestAnimationFrame(sync); }
   b[0].onclick=function(){go(idx-1)}; b[1].onclick=function(){go(idx+1)};
   box.addEventListener('scroll',q,{passive:true}); window.addEventListener('resize',q);
   new MutationObserver(q).observe(box,{childList:true});
+  /* the page is built while hidden (width 0) -> measure again once it is actually shown */
+  new MutationObserver(function(){ if(host.classList.contains('show')){ q(); setTimeout(q,60); setTimeout(q,400); } }).observe(host,{attributes:true,attributeFilter:['class']});
+  if(window.ResizeObserver) new ResizeObserver(q).observe(box);
   sync();
  }
  setInterval(build,400); build();
@@ -25192,7 +25231,10 @@ html body #optView.mn-view.show .opt-head .mn-sub{animation:none;transform:none}
  /* a card plays its entrance when (most of) it is on screen */
  function visible(c){ var r=c.getBoundingClientRect(), t=box.getBoundingClientRect(), w=r.width||1;
    var vx=Math.min(r.right,t.right)-Math.max(r.left,t.left), vy=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);
-   return vx>=w*.55 && vy>40; }
+   /* every card plays its entrance as soon as the page opens (staggered), so a card swiped in later is already solid -
+      before, the off-screen cards were invisible until most of them was on screen, so the neighbour never peeked out and
+      a swiped-in card appeared as a half-transparent ghost */
+   return vy>40; }
  function check(){
    if(!shown()) return;
    var k=0; cards().forEach(function(c){
