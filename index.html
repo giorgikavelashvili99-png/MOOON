@@ -21381,6 +21381,8 @@ var root=document.documentElement, mq=window.matchMedia&&matchMedia('(prefers-re
 var canWAAPI=typeof Element!=='undefined'&&!!Element.prototype.animate;
 function flagged(){try{return sessionStorage.getItem('moLite')==='1'}catch(e){return false}}
 function setLite(){root.classList.add('moon-lite');try{sessionStorage.setItem('moLite','1')}catch(e){}}
+var flatMQ=window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine) and (min-width:900px)');
+function flatDesk(){ return !!(flatMQ&&flatMQ.matches); }
 function lite(){
   var c=navigator.connection;
   return !!((mq&&mq.matches)||root.classList.contains('low-power')||root.classList.contains('moon-lite')||flagged()||
@@ -21452,7 +21454,7 @@ function poseAll(t){
   if(t&&lastT&&t-lastT>40&&t-lastT<400&&++bad>=10) setLite();
   lastT=t||0;
   /* the 3D tilt is only ever switched off while the carousel is at rest, and eased - flattening every neighbour in the middle of a swipe looked like a flash */
-  var w=lite();
+  var w=lite()||flatDesk();
   if(poseL===null) poseL=w;
   else if(w!==poseL&&!mov){
     if(w){root.classList.add('mo-settle');clearTimeout(settleT);settleT=setTimeout(function(){root.classList.remove('mo-settle')},620)}
@@ -21468,7 +21470,7 @@ window.moMorphInvalidate=invalidate;
 document.addEventListener('scroll',function(e){
   var tr=e.target;
   if(!tr||!tr.classList||!tr.classList.contains('pc-scroll-track')) return;
-  mov=true;schedule();clearTimeout(idleT);idleT=setTimeout(function(){lastT=0;bad=0;mov=false;if(lite()!==poseL) schedule()},160);
+  mov=true;schedule();clearTimeout(idleT);idleT=setTimeout(function(){lastT=0;bad=0;mov=false;if((lite()||flatDesk())!==poseL) schedule()},160);
 },{capture:true,passive:true});
 window.addEventListener('resize',invalidate,{passive:true});
 window.addEventListener('orientationchange',invalidate,{passive:true});
@@ -24783,9 +24785,9 @@ function enhance(o){
    else cb.style.translate='0 0';});
  }
  var mg=document.createElement('div'); mg.className='or-mg'; o.prepend(mg);
- o.addEventListener('pointermove',function(e){var r=o.getBoundingClientRect(); M={x:e.clientX-r.left,y:e.clientY-r.top,cx:e.clientX,cy:e.clientY};
+ var __pe=null,__pr=0; o.addEventListener('pointermove',function(e0){ __pe=e0; if(__pr) return; __pr=requestAnimationFrame(function(){ __pr=0; var e=__pe; var r=o.getBoundingClientRect(); M={x:e.clientX-r.left,y:e.clientY-r.top,cx:e.clientX,cy:e.clientY};
   var z=(r.width/o.offsetWidth)||1; /* page uses CSS zoom (1.15): convert pointer px -> element px, otherwise the glow drifts away from the cursor */
-  mg.style.transform='translate3d('+((e.clientX-r.left)/z-o.clientLeft)+'px,'+((e.clientY-r.top)/z-o.clientTop)+'px,0)'; mg.style.opacity='1'; cubeReact(false);});
+  mg.style.transform='translate3d('+((e.clientX-r.left)/z-o.clientLeft)+'px,'+((e.clientY-r.top)/z-o.clientTop)+'px,0)'; mg.style.opacity='1'; cubeReact(false);}); });
  o.addEventListener('pointerleave',function(){M=null;mg.style.opacity='0';cubeReact(false);});
  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
  var c=document.createElement('canvas'); c.className='or-cv'; o.prepend(c); var x=c.getContext('2d'),W=0,H=0,P=[];
@@ -24801,8 +24803,10 @@ function enhance(o){
  if('IntersectionObserver' in window){ new IntersectionObserver(function(es){ orVis=es[es.length-1].isIntersecting; orStart(); }).observe(o); }
  else { orVis=true; }
  document.addEventListener('visibilitychange',orStart);
- function loop(){
+ var __lt=0;
+ function loop(now){
   if(!orVis||document.hidden){ orRun=false; return; }
+  if(now&&now-__lt<15){ requestAnimationFrame(loop); return; } __lt=now||0;
   { x.clearRect(0,0,W,H);
    for(var i=0;i<P.length;i++){var p=P[i];
     if(M){var mx=p.x-M.x,my=p.y-M.y,md=Math.sqrt(mx*mx+my*my)||1; if(md<150){var f=(1-md/150)*1.6;p.vx+=mx/md*f;p.vy+=my/md*f;}}
@@ -25942,6 +25946,30 @@ html.pc-modal-on body #pcModalScrim .pc-accordion-body,html.pc-modal-on body #pc
 html body .pc-modal-scrim .pc-modal-scroll{overscroll-behavior:contain;scroll-behavior:auto}
 html body #hzMenu #qnDrop .hs-text .scanner-jump-link{color:var(--hz-lime)!important;background:none!important;border:0!important;box-shadow:none!important;text-decoration:underline!important;text-underline-offset:3px;text-decoration-color:rgba(163,230,53,.45)!important;cursor:pointer}
 
+/* ---------- round 2 ---------- */
+/* Georgian letters were clipped by the menu labels (overflow:hidden + line-height 1.25): more line room, nothing cut */
+html body #hzMenu .hzm-lbl,html body #hzMenu #quickNav .hzm-lbl{line-height:1.6!important;padding:3px 0!important}
+html body #hzMenu .hzm-label{line-height:1.6!important}
+html body #hzMenu .hzm-promo b{line-height:1.5!important}html body #hzMenu .hzm-promo small{line-height:1.5!important}
+html body #hzMenu .qn-drop-head{line-height:1.45!important}
+html body #hzMenu #qnDrop :is(.ti-title,.hs-title,.portfolio-name,.cb-name,.sp-lbl){line-height:1.5!important}
+html body #hzMenu #qnDrop :is(.ti-text,.hs-text,.portfolio-cta,.cb-handle,.ba-caption,.contact-sub){line-height:1.65!important}
+html body #hzMenu .hzm-name,html body #hzMenu .hzm-acct-head,html body #hzMenu .hzm-langopt,html body #hzMenu .hzm-legend,html body #hzMenu .hzm-reset,html body #hzMenu .hzm-login-sub{line-height:1.5!important}
+html body .hz-link,html body .hz-acct{line-height:1.5!important}
+html body #hzMenu .hzm-langopt{line-height:1.5!important}
+
+/* "Method" page: the big aurora background moves on the GPU (transform) instead of repainting the whole page every frame */
+html body #optView .opt::after{inset:auto!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:140%!important;height:140%!important;
+  background-size:100% 100%!important;background-position:0 0!important;animation:orAuroraT 14s ease-in-out infinite alternate!important;will-change:transform}
+@keyframes orAuroraT{to{transform:translate3d(-28.571%,-28.571%,0)}}
+html body #optView .opt-head h2{animation:orTitle 7s steps(420,end) infinite!important}
+
+/* desktop carousel: neighbours are flat (a rotated / scaled layer is re-sampled = blurry text, jagged edges); they stay dimmed */
+@media (min-width:900px) and (hover:hover) and (pointer:fine){
+  html body .pricing-cards.pc-scroll-mode .pc-slide:not(#_x):not(#_y){transform:none!important}
+  html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide > .pc-card-wrap{will-change:opacity!important}
+}
+
 </style>
 <script id="moon-menu-final-js">
 (function(){
@@ -26027,6 +26055,15 @@ html body #hzMenu #qnDrop .hs-text .scanner-jump-link{color:var(--hz-lime)!impor
       }).observe(drop, {attributes:true, attributeFilter:['class']});
     }
   }
+})();
+
+/* ---- logo: a tap on it reloads the site (like the old wordmark did) ---- */
+(function(){
+  var b = document.getElementById('hzBrand');
+  if(!b) return;
+  document.addEventListener('click', function(e){
+    if(e.target.closest && e.target.closest('#hzBrand')){ e.preventDefault(); e.stopImmediatePropagation(); window.location.reload(); }
+  }, true);
 })();
 
 </script>
