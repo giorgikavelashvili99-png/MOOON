@@ -17833,7 +17833,23 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     startOrderChat(pending.orderData, pending.firstMessageText, null, null, pending.idleKey, null);
   }
 
+  // --- admin activity ping (join / leave) -> chat-server -> push to the admin's phone ---
+  function moonActivity(type, user, detail){
+    try{
+      if (!user || !user.id) return;
+      const body = JSON.stringify({ type: type, username: user.username || '', discordId: String(user.id), detail: detail || '' });
+      const url = 'https://bot2-88ps.onrender.com/api/activity';
+      // text/plain => "simple" CORS request (no preflight), and works with sendBeacon on page close
+      if (type === 'leave' && navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
+      else fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: body, keepalive: true }).catch(() => {});
+    }catch(e){}
+  }
+  let __moonJoinSent = false;
+  window.addEventListener('pagehide', () => { if (currentDiscordUser && __moonJoinSent) moonActivity('leave', currentDiscordUser); });
+  window.__moonActivity = moonActivity;
+
   function setDiscordUI(user){
+    if (user && !currentDiscordUser && !__moonJoinSent){ __moonJoinSent = true; moonActivity('join', user); }
     currentDiscordUser = user;
     // Re-check the logged-in Discord account's weekly/monthly package
     // status every time the login state changes (login, logout, or a
@@ -24426,6 +24442,7 @@ function run(){
   var id=ident(); if(!id||!S.file||!S.preset||!S.meta||S.fps===undefined||overLimit()) return;
   var preset=PRESETS.filter(function(p){return p.id===S.preset;})[0];
   var tk=null;
+  try{ var _u=user(); if(_u&&window.__moonActivity) window.__moonActivity('optimizing',_u,S.file&&S.file.name); }catch(e){}
   S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('proc')+'…');
   api('/ticket',{method:'POST',body:JSON.stringify(Object.assign({preset:S.preset,size:S.file.size,meta:S.meta},id))}).then(function(t){
     tk=t; S.status=t.status||S.status; renderQuota(); bar(10);
@@ -25139,15 +25156,17 @@ html body #plansView .opt-plan .opt-buy:active,
 html body #plansView .opt-plan .opt-buy:focus-visible{
   box-shadow:0 0 10px 1px color-mix(in srgb,var(--c2) 85%,transparent),0 0 28px 4px color-mix(in srgb,var(--c2) 55%,transparent)!important;
   filter:brightness(1.08) saturate(1.1)}
+html body #plansView .opt-plan{border-color:var(--c2)}
+/* shell = ONE solid outline drawn over the whole border area (no second layer, so no seam / dark hairline on the curves) */
+html body #plansView .opt-plan{outline:3px solid var(--c2)!important;outline-offset:-3px!important}
+html body #plansView .opt-plan > .op-ring{display:none!important}
+/* buy button shell: one solid outline over the whole border area (same method as the card) */
+html body #plansView .opt-plan .opt-buy{outline:2px solid var(--c2)!important;outline-offset:-2px!important}
 /* circling coloured border (home cards: .pc-ring / .pc-ring-spin) */
-html body #plansView .opt-plan > .op-ring{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;padding:1.5px;overflow:hidden;contain:strict;
+html body #plansView .opt-plan > .op-ring{position:absolute;inset:-1px;z-index:6;pointer-events:none;border-radius:inherit;padding:3px;overflow:hidden;contain:strict;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-html body #plansView .opt-plan > .op-ring i{position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;margin:-130% 0 0 -130%;
-  background:conic-gradient(color-mix(in srgb,var(--c2) 35%,#fff) 0deg,var(--c2) 70deg,rgba(0,0,0,.42) 130deg,rgba(0,0,0,.42) 230deg,var(--c2) 290deg,color-mix(in srgb,var(--c2) 35%,#fff) 360deg)}
-@media (prefers-reduced-motion:no-preference){
-  html:not(.low-power) body #plansView .opt-plan > .op-ring i{will-change:transform;animation:plHRing 10s linear infinite}
-}
+html body #plansView .opt-plan > .op-ring i{position:absolute;inset:0;margin:0;width:auto;aspect-ratio:auto;background:var(--c2)}
 /* rebuilt while the Plans page is already open (status / language refresh): cards appear instantly, no second entrance */
 html body #plansView #optPlans.pl-seen .opt-plan,
 html body #plansView #optPlans.pl-seen .opt-plan h4,
