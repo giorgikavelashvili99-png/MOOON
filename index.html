@@ -45,7 +45,7 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   /* MOON AI (ჩაშენებული ასისტენტი). ქვემოთ მხოლოდ ეს ერთი მისამართი უნდა იყოს სწორი: MOON AI სერვისის Render-ის მისამართი. */
   var MOON_AI_URL = 'https://REPLACE-ME.onrender.com/';
   var origin = ''; try { origin = new URL(MOON_AI_URL).origin; } catch (e) {}
-  var configured = origin && !/REPLACE-ME/.test(origin);
+  var configured = origin && !/replace-me/i.test(origin);
   var errs = [];
   function push(o){ try { o.t = Date.now(); errs.push(o); if (errs.length > 15) errs.shift(); } catch (e) {} }
   window.addEventListener('error', function(e){
@@ -6983,7 +6983,8 @@ html body .mn-view[data-view="ai"] .ai-load i{width:26px;height:26px;border-radi
 html body .mn-view[data-view="ai"] .ai-box.ai-miss .ai-load i{display:none}
 html body .mn-view[data-view="ai"] .ai-box.ai-ready .ai-load{opacity:0;pointer-events:none}
 @keyframes aiSpin{to{transform:rotate(360deg)}}
-@media (max-width:1023px){html body #mnBar .mn-link[data-mn="ai"],html body .hz-link[data-hz-go="ai"],html body .hzm-row[data-hz-go="ai"]{display:none!important}}
+html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
+@media (max-width:1023px){html body .mn-view[data-view="ai"]{padding:0 8px}html body .mn-view[data-view="ai"] .ai-box{height:calc(100vh - 150px);height:calc(100dvh - 150px);min-height:480px;border-radius:18px}}
 @media (prefers-reduced-motion:reduce){html body .mn-view[data-view="ai"] .ai-load i{animation:none}}
 </style>
 </head>
