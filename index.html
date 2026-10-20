@@ -22051,6 +22051,9 @@ glass:function(){var t=ctx.currentTime;nz(t,.5,'highpass',3500,9000,.34,.8,.003)
 function S(n,a){if(muted||!ctx||ctx.state!=='running')return;try{sfx[n](a);dbg.sfx++;}catch(e){}}
 function setMute(m){muted=m;el.classList.toggle('mute',m);if(master)master.gain.setTargetAtTime(m?0:.85,ctx.currentTime,.03);}
 function unlock(){
+  /* SMOOTHNESS: the audio engine is only started while the intro is actually playing. Before, the very first tap on the site (e.g. on the menu)
+     created the AudioContext right inside that tap - a visible hitch - and left an audio thread running for the whole visit. */
+  if(!open)return;
   if(!ensure())return;
   if(ctx.state!=='running'&&!muted){try{var p=ctx.resume();if(p&&p.then)p.then(afterResume);}catch(e){}}
   else afterResume();
@@ -22809,12 +22812,13 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
   var busy=false, pending=null, shown='home';
   var BLK='.wrap>*:not(.topbar):not(.mn-views):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style)';
   function blocks(){
-    var out=[], vh=window.innerHeight;
-    document.querySelectorAll(BLK).forEach(function(el){
-      var r=el.getBoundingClientRect();
+    var out=[], vh=window.innerHeight, all=document.querySelectorAll(BLK);
+    /* SMOOTHNESS: stops measuring as soon as 7 visible blocks are found (same 7 blocks as before, far fewer layout reads) */
+    for(var bi=0; bi<all.length && out.length<7; bi++){
+      var el=all[bi], r=el.getBoundingClientRect();
       if(r.height>0 && r.bottom>0 && r.top<vh) out.push(el);
-    });
-    return out.slice(0,7);
+    }
+    return out;
   }
   /* pre-build the page that is about to be shown (style + layout) invisibly, a few frames into the fade-out, so that the heavy part
      of the swap happens while the compositor is busy playing the fade and not in the gap between fade-out and fade-in */
@@ -24744,7 +24748,9 @@ function playEnter(n,t0,tok){
   /* start only when the layout is final: steps built + plan status known (max 1s) */
   var ready=o.querySelector('.or-steps') && (S.status || !user());
   if(!ready && Date.now()-t0<1000){ o.classList.add('opt-pre'); clearTimeout(_wT); _wT=setTimeout(function(){ playEnter((n||0)+1,t0,tok); },60); return; }
-  o.classList.remove('opt-enter'); void o.offsetWidth; o.classList.add('opt-enter'); o.classList.remove('opt-pre');
+  /* SMOOTHNESS: the forced reflow is only needed to RESTART an animation that is still running */
+  if(o.classList.contains('opt-enter')){ o.classList.remove('opt-enter'); void o.offsetWidth; }
+  o.classList.add('opt-enter'); o.classList.remove('opt-pre');
   clearTimeout(_enT); _enT=setTimeout(function(){ o.classList.remove('opt-enter'); },1800);
 }
 new MutationObserver(function(){
@@ -24864,8 +24870,10 @@ function enhance(o){
  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
  var __co=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches), __bk=[[],[],[]];
  var c=document.createElement('canvas'); c.className='or-cv'; o.prepend(c); var x=c.getContext('2d'),W=0,H=0,P=[];
- function size(){W=o.clientWidth;H=o.clientHeight;var dp=Math.min(__co?1.25:3,(window.devicePixelRatio||1)*(parseFloat(getComputedStyle(document.documentElement).zoom)||1));c.width=Math.max(1,Math.round(W*dp));c.height=Math.max(1,Math.round(H*dp));x.setTransform(dp,0,0,dp,0,0);var n=Math.min(__co?32:90,Math.round(W*H/(__co?16000:13000)));P=[];for(var i=0;i<n;i++){var bx=(Math.random()-.5)*.35,by=(Math.random()-.5)*.35;P.push({x:Math.random()*W,y:Math.random()*H,bx:bx,by:by,vx:bx,vy:by,r:Math.random()*1.7+.6});}}
- size(); if(window.ResizeObserver)new ResizeObserver(size).observe(o);
+ function size(){W=o.clientWidth;H=o.clientHeight;var dp=Math.min(__co?1:1.5,(window.devicePixelRatio||1)*(parseFloat(getComputedStyle(document.documentElement).zoom)||1));c.width=Math.max(1,Math.round(W*dp));c.height=Math.max(1,Math.round(H*dp));x.setTransform(dp,0,0,dp,0,0);var n=Math.min(__co?32:90,Math.round(W*H/(__co?16000:13000)));P=[];for(var i=0;i<n;i++){var bx=(Math.random()-.5)*.35,by=(Math.random()-.5)*.35;P.push({x:Math.random()*W,y:Math.random()*H,bx:bx,by:by,vx:bx,vy:by,r:Math.random()*1.7+.6});}}
+ size();
+ /* SMOOTHNESS: the particle canvas is rebuilt only when the page size really changed, and at most once per frame (it was rebuilt on every tiny height change while the page was still filling in) */
+ if(window.ResizeObserver){ var __rsT=0,__rW=W,__rH=H; new ResizeObserver(function(){ if(__rsT) return; __rsT=requestAnimationFrame(function(){ __rsT=0; if(Math.abs(o.clientWidth-__rW)<2&&Math.abs(o.clientHeight-__rH)<2) return; size(); __rW=W; __rH=H; }); }).observe(o); }
  o.addEventListener('pointerdown',function(){ if(!M)return; P.forEach(function(p){var dx=p.x-M.x,dy=p.y-M.y,dd=Math.sqrt(dx*dx+dy*dy)||1; if(dd<320){var f=(1-dd/320)*14;p.vx+=dx/dd*f;p.vy+=dy/dd*f;}}); cubeReact(true); ring=1; });
  var ring=0;
  /* the particle loop only runs while the Method page is actually on screen (IntersectionObserver), instead of
@@ -24877,10 +24885,14 @@ function enhance(o){
  else { orVis=true; }
  document.addEventListener('visibilitychange',orStart);
  var __lt=0;
+ /* SMOOTHNESS: a requestAnimationFrame that is registered on EVERY screen refresh makes the browser redo the style work of all running CSS animations on the main thread
+    at that rate - on a 240 Hz monitor that is 240 times a second, although the particles are only drawn 60 times a second. The waiting between two drawings is now
+    done with a timer, so the browser only produces the frames that are really drawn (the animations themselves keep running on the GPU in between). */
+ function again(wait){ setTimeout(function(){ requestAnimationFrame(loop); },Math.max(1,wait)); }
  function loop(now){
   if(!orVis||document.hidden){ orRun=false; return; }
-  if(o.classList.contains('opt-enter')||o.classList.contains('opt-pre')){ requestAnimationFrame(loop); return; }   /* the entrance plays on its own: the particles start only after it has finished */
-  if(now&&now-__lt<15){ requestAnimationFrame(loop); return; } __lt=now||0;
+  if(o.classList.contains('opt-enter')||o.classList.contains('opt-pre')){ again(100); return; }   /* the entrance plays on its own: the particles start only after it has finished */
+  if(now&&now-__lt<10){ again(12-(now-__lt)); return; } __lt=now||0;
   { x.clearRect(0,0,W,H); __bk[0].length=__bk[1].length=__bk[2].length=0;
    for(var i=0;i<P.length;i++){var p=P[i];
     if(M){var mx=p.x-M.x,my=p.y-M.y,md=Math.sqrt(mx*mx+my*my)||1; if(md<150){var f=(1-md/150)*1.6;p.vx+=mx/md*f;p.vy+=my/md*f;}}
@@ -24893,7 +24905,7 @@ function enhance(o){
    for(var bk=0;bk<3;bk++){var ar=__bk[bk]; if(!ar.length) continue; x.strokeStyle='rgba(129,140,248,'+((bk+.5)/3*.3).toFixed(3)+')'; x.lineWidth=1; x.beginPath(); for(var k=0;k<ar.length;k+=4){ x.moveTo(ar[k],ar[k+1]); x.lineTo(ar[k+2],ar[k+3]); } x.stroke(); }
    if(ring>0&&M){x.strokeStyle='rgba(125,211,252,'+(Math.max(0,1-ring/60)).toFixed(2)+')';x.lineWidth=2;x.beginPath();x.arc(M.x,M.y,ring*5,0,6.283);x.stroke();ring++;if(ring>60)ring=0;}
   }
-  requestAnimationFrame(loop);
+  again(12);
  }
  orStart();
 }
@@ -25766,7 +25778,9 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
     ind.style.width=a.__w+'px'; ind.style.transform='translate3d('+a.__x+'px,0,0)'; ind.style.opacity='1';
     if(instant){ void ind.offsetWidth; ind.style.transition=''; }
   }
-  function activeName(){ if(!document.body.classList.contains('mn-view-on')) return 'home'; var a=document.querySelector('#mnBar .mn-link.active'); return a ? a.getAttribute('data-mn') : 'home'; }
+  /* SMOOTHNESS: the highlight follows the tap at once. It used to wait for body.mn-view-on, i.e. for the page swap (300 ms+ later, much more on a slow phone),
+     so the menu looked frozen after a tap. The page's own nav marks the tapped link immediately, and the last tap always wins. */
+  function activeName(){ var a=document.querySelector('#mnBar .mn-link.active'); return a ? a.getAttribute('data-mn') : 'home'; }
   var lastActive=null;
   function syncActive(){
     var n=activeName(); if(n==='contact') n=lastActive||'home';
@@ -26221,12 +26235,22 @@ html body #optView .opt.opt-enter::after,html body #optView .opt.opt-pre::after{
   var ind = box.querySelector('.hz-ind');
   if(!ind) return;
   var raf = 0, until = 0;
+  /* SMOOTHNESS: whether the pill is still sliding is tracked from transition events (it used to be asked with getAnimations() on
+     every frame, which forced a whole-page style pass in the middle of the page switch) */
+  var sliding = 0, slideAt = 0, lastMove = 0;
+  function isSlide(e){ return e.target === ind && (e.propertyName === 'transform' || e.propertyName === 'width'); }
+  ind.addEventListener('transitionrun', function(e){ if(isSlide(e)){ sliding++; slideAt = performance.now(); } });
+  ind.addEventListener('transitionend', function(e){ if(isSlide(e) && sliding > 0) sliding--; });
+  ind.addEventListener('transitioncancel', function(e){ if(isSlide(e) && sliding > 0) sliding--; });
+  /* the moment the page moves the pill (its inline style changes) the slide has started, even before the browser has fired the first transition event */
+  var pillMO = new MutationObserver(function(){ lastMove = performance.now(); });
+  pillMO.observe(ind, {attributes:true, attributeFilter:['style']});
   function align(){
+    var now = performance.now();
+    if(now - lastMove < 520) return;                                              /* the slide (0.38s) has only just been started */
+    if(sliding > 0 && now - slideAt < 700) return;                                /* it is still sliding - check again afterwards */
     var a = box.querySelector('.hz-link.is-active');
     if(!a || !box.offsetWidth){ return; }
-    var moving = false;
-    try{ moving = ind.getAnimations().some(function(x){ return x.playState === 'running'; }); }catch(e){}
-    if(moving) return;                                                       /* it is still sliding - check again afterwards */
     var br = box.getBoundingClientRect(), k = (br.width / box.offsetWidth) || 1;      /* screen px per css px (page zoom safe) */
     var ar = a.getBoundingClientRect(), ir = ind.getBoundingClientRect();
     var dL = (ar.left - ir.left) / k, dW = (ar.width - ir.width) / k;
@@ -26239,15 +26263,17 @@ html body #optView .opt.opt-enter::after,html body #optView .opt.opt-pre::after{
       ind.style.opacity = '1';
       void ind.offsetWidth;
       ind.style.transition = '';
+      pillMO.takeRecords();                                                       /* these writes are the correction itself, not a new slide */
     }
   }
   function run(ms){
     until = Math.max(until, performance.now() + (ms || 900));
     if(raf) return;
-    (function step(now){
+    /* SMOOTHNESS: checked ~8 times a second instead of on every frame (every check reads the layout) */
+    (function step(){
       align();
-      if(now < until) raf = requestAnimationFrame(step); else { raf = 0; setTimeout(align, 120); }
-    })(performance.now());
+      if(performance.now() < until) raf = setTimeout(step, 120); else { raf = 0; setTimeout(align, 120); }
+    })();
   }
   var bar = box.closest('.hz-bar') || box.parentElement;
   document.addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-hz-go],.hz-link')){ run(1500); setTimeout(function(){ run(600); }, 1700); } }, true);
@@ -26263,5 +26289,17 @@ html body #optView .opt.opt-enter::after,html body #optView .opt.opt-pre::after{
 })();
 
 </script>
+
+<style id="moon-smooth-final">
+/* ===== SMOOTHNESS layer (nothing is removed - every animation stays; only the work behind it is made cheaper) ===== */
+/* Method page: the glass panels sit on top of a moving aurora and the particle canvas, so a backdrop blur had to be recomputed on EVERY frame.
+   They keep their translucent fill, border and glow (exactly what phones already had). */
+html body #optView .opt,html body #optView .opt *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* the contact window is closed most of the time: its floating orb no longer keeps animating while it is invisible */
+.mn-modal:not(.open) .mn-orb{animation-play-state:paused!important}
+/* Method page entrance: `will-change` made every piece its own layer and, when the entrance class was removed at the end, all of them were dropped
+   in one frame (a visible stop + flicker). The animations still run on the GPU (transform / opacity are promoted by the browser while they play). */
+html body #optView .opt.opt-enter,html body #optView .opt.opt-enter *{will-change:auto!important}
+</style>
 </body>
 </html>
