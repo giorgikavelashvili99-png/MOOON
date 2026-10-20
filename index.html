@@ -6367,7 +6367,7 @@ input,select,textarea{ font-size:max(16px,1em); border-radius:12px; transition:b
 input:focus,select:focus,textarea:focus{ border-color:var(--cyan); }
 
 
-.js-reveal .enh-rv{ opacity:0; transform:translateY(18px); transition:opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1); }
+.js-reveal .enh-rv{ opacity:0; transform:translateY(18px); transition:opacity .22s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1); }
 .js-reveal .enh-rv.enh-in{ opacity:1; transform:none; }
 
 
@@ -9220,9 +9220,9 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       const dm = navigator.deviceMemory; // undefined on unsupported browsers
       const cores = navigator.hardwareConcurrency;
       const narrow = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
-      if ((typeof dm === 'number' && dm <= 2) || (typeof cores === 'number' && cores <= 2)) {
-        document.documentElement.classList.add('low-power');
-      }
+      /* low mode is permanently disabled: every device gets the full animations */
+      document.documentElement.classList.remove('low-power','moon-lite');
+      try{ sessionStorage.removeItem('moLite'); }catch(_){}
     } catch(e) {}
   })();
 
@@ -12892,6 +12892,9 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   // 3) MESSENGER — real-time order chat, replaces WhatsApp/Telegram
   // ============================================================
   let messengerSocket = null;
+  /* LIVE-CHAT RELIABILITY: remember which room we joined so a reconnect can re-join it (socket.io rooms are lost when the
+     connection drops: sleeping Render server, phone in the background, network switch) */
+  let messengerJoined = null, messengerEverConnected = false, messengerSyncBusy = false;
   let messengerCurrentOrderId = null;
   // orderId -> promise of the background POST /api/sessions in
   // startOrderChat. Cancelling has to wait for it, otherwise a fast
@@ -13496,7 +13499,17 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
 
   function ensureMessengerSocket(){
     if (messengerSocket || typeof io === 'undefined') return messengerSocket;
-    messengerSocket = io(CHAT_SERVER_URL);
+    messengerSocket = io(CHAT_SERVER_URL, { reconnection: true, reconnectionDelay: 400, reconnectionDelayMax: 2500, timeout: 8000 });
+    messengerSocket.on('connect', () => {
+      /* first connect: openMessengerPage already queued join_order. Every later connect is a RECONNECT -> a brand new
+         socket that is in no room, so the other side's messages would never arrive until a full page reload. */
+      if (messengerEverConnected && messengerJoined) {
+        messengerSocket.emit('join_order', { orderId: messengerJoined.orderId, role: messengerJoined.role });
+        if (messengerCurrentOrderId === messengerJoined.orderId) messengerSocket.emit('mark_read', { orderId: messengerJoined.orderId });
+      }
+      messengerEverConnected = true;
+      syncMessengerHistory();
+    });
     messengerSocket.on('new_message', (msg) => {
       const pageOpen = document.getElementById('messengerPage')?.style.display === 'flex';
       if (pageOpen){
@@ -13569,6 +13582,58 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     return messengerSocket;
   }
 
+  /* Pulls the stored history and paints ONLY the messages that are not on screen yet (matched by message id), so a message
+     that the socket missed (connection dropped, server asleep, tab frozen) shows up without any reload. */
+  function syncMessengerHistory(){
+    const oid = messengerCurrentOrderId;
+    if (!oid || messengerSyncBusy) return;
+    const pageEl = document.getElementById('messengerPage');
+    if (!pageEl || pageEl.style.display !== 'flex') return;
+    messengerSyncBusy = true;
+    fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(oid), { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data || !Array.isArray(data.messages) || oid !== messengerCurrentOrderId) return;
+        const box = document.getElementById('messengerMessages');
+        if (!box) return;
+        let added = false;
+        data.messages.forEach(m => {
+          if (!m || !m.id) return;
+          if (box.querySelector('[data-msg-id="' + CSS.escape(String(m.id)) + '"]')) return;
+          renderMessageBubble(m);
+          added = true;
+        });
+        if (added) {
+          messengerRenderedCount = Math.max(messengerRenderedCount, data.messages.length);
+          hideTypingIndicator();
+          if (messengerSocket && messengerSocket.connected) messengerSocket.emit('mark_read', { orderId: oid });
+        }
+      })
+      .catch(() => {})
+      .then(() => { messengerSyncBusy = false; });
+  }
+  (function messengerLiveSafetyNet(){
+    let tick = 0;
+    /* open chat: poll lightly (every 3 s while the socket is down, every ~9 s while it claims to be up - a half-dead socket
+       on mobile data still reports "connected" for a while) */
+    setInterval(() => {
+      if (document.hidden) return;
+      const pageEl = document.getElementById('messengerPage');
+      if (!pageEl || pageEl.style.display !== 'flex') return;
+      tick++;
+      const up = messengerSocket && messengerSocket.connected;
+      if (!up || tick % 3 === 0) syncMessengerHistory();
+    }, 3000);
+    function wake(){
+      if (messengerSocket && !messengerSocket.connected) { try { messengerSocket.connect(); } catch (e) {} }
+      syncMessengerHistory();
+    }
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+    window.addEventListener('focus', wake);
+    window.addEventListener('online', wake);
+    window.addEventListener('pageshow', wake);
+  })();
+
   // Set only when openMessengerPage is called with an optimistic first
   // message — i.e. the chat was just opened as the immediate result of
   // submitting a brand new order, not reopened later via the floating
@@ -13625,6 +13690,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
 
     const socket = ensureMessengerSocket();
     if (socket) {
+      messengerJoined = { orderId, role: messengerRole };
       socket.emit('join_order', { orderId, role: messengerRole });
       socket.emit('mark_read', { orderId });
     }
@@ -19650,8 +19716,8 @@ TikTok პროფილი: ${getTiktokValue('cp')}
     // feel instant/snappy rather than a showcase moment.
     const hiddenTransform = 'none';
     const hiddenFilter = 'none';
-    const duration = isPhoneLayout ? '.3s' : '.6s';
-    const easing = isPhoneLayout ? 'cubic-bezier(.25,1,.5,1)' : 'cubic-bezier(.16,1,.3,1)';
+    const duration = isPhoneLayout ? '.18s' : '.2s';   /* faster comments/scroll reveal (was .6s) */
+    const easing = 'cubic-bezier(.22,1,.36,1)';
     const hiddenStyle = `opacity ${duration} ${easing}, transform ${duration} ${easing}, filter ${duration} ${easing}`;
 
     function hide(el){
@@ -19698,7 +19764,7 @@ TikTok პროფილი: ${getTiktokValue('cp')}
             observer.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      }, { threshold: 0.01, rootMargin: '0px 0px 12% 0px' });   /* starts a little BEFORE the panel scrolls into view, so it is already there */
       scrollTargets.forEach(el => observer.observe(el));
     }
 
@@ -21451,15 +21517,11 @@ html.pc-modal-on body #pcModalScrim .pc-modal-close{will-change:opacity,transfor
 if(window.__moMorph) return; window.__moMorph=1;
 var root=document.documentElement, mq=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)');
 var canWAAPI=typeof Element!=='undefined'&&!!Element.prototype.animate;
-function flagged(){try{return sessionStorage.getItem('moLite')==='1'}catch(e){return false}}
-function setLite(){root.classList.add('moon-lite');try{sessionStorage.setItem('moLite','1')}catch(e){}}
+function flagged(){return false}
+function setLite(){ /* low mode permanently disabled */ }
 var flatMQ=window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine) and (min-width:900px)');
 function flatDesk(){ return !!(flatMQ&&flatMQ.matches); }
-function lite(){
-  var c=navigator.connection;
-  return !!((mq&&mq.matches)||root.classList.contains('low-power')||root.classList.contains('moon-lite')||flagged()||
-    (c&&c.saveData)||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2));
-}
+function lite(){ return false; }   /* low mode permanently disabled */
 /* ---------- 1. 3D glass carousel: geometry cached, one rAF per scroll tick, zero layout reads per frame ---------- */
 var raf=0,lastT=0,bad=0,idleT=0,mov=false,poseL=null,settleT=0,geo=new WeakMap(),dirty=true;
 function geometry(track){
@@ -26300,6 +26362,14 @@ html body #optView .opt,html body #optView .opt *{-webkit-backdrop-filter:none!i
 /* Method page entrance: `will-change` made every piece its own layer and, when the entrance class was removed at the end, all of them were dropped
    in one frame (a visible stop + flicker). The animations still run on the GPU (transform / opacity are promoted by the browser while they play). */
 html body #optView .opt.opt-enter,html body #optView .opt.opt-enter *{will-change:auto!important}
+
+/* ---- chat: larger, easier-to-read text ---- */
+html body .msg-bubble{font-size:17px!important;line-height:1.5!important;padding:12px 16px!important}
+html body .msg-bubble-time{font-size:12.5px!important}
+html body .msg-bubble-avatar{width:20px!important;height:20px!important;font-size:13px!important}
+html body .msg-bubble-reply-quote{font-size:14.5px!important}
+html body .msg-bubble-reply-quote b{font-size:13px!important}
+html body .messenger-input{font-size:17px!important}
 </style>
 </body>
 </html>
