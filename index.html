@@ -21520,7 +21520,7 @@ var canWAAPI=typeof Element!=='undefined'&&!!Element.prototype.animate;
 function flagged(){return false}
 function setLite(){ /* low mode permanently disabled */ }
 var flatMQ=window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine) and (min-width:900px)');
-function flatDesk(){ return !!(flatMQ&&flatMQ.matches); }
+function flatDesk(){ return false; }   /* 3D glass carousel on desktop too (the flat desktop mode is switched off) */
 function lite(){ return false; }   /* low mode permanently disabled */
 /* ---------- 1. 3D glass carousel: geometry cached, one rAF per scroll tick, zero layout reads per frame ---------- */
 var raf=0,lastT=0,bad=0,idleT=0,mov=false,poseL=null,settleT=0,geo=new WeakMap(),dirty=true;
