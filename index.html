@@ -2690,6 +2690,9 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   .discord-gate.open{ opacity:1; visibility:visible; transition: opacity .25s ease, visibility 0s; }
   
   html:has(.discord-gate.open){ overflow:hidden; background:#010103; }
+  .discord-gate{ scrollbar-width:none !important; }
+  .discord-gate:not(.gate-ready){ visibility:hidden !important; opacity:0 !important; transition:none !important; }
+  .discord-gate::-webkit-scrollbar{ display:none !important; width:0 !important; height:0 !important; }
 
   
   .dg-stars{
@@ -2763,7 +2766,7 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   @keyframes dgTwinkleSlow{ from{ opacity:.62; } to{ opacity:1; } }
 
   
-  @keyframes dgRise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes dgRise{ from{ opacity:0; } to{ opacity:1; } }
   .discord-gate.open .dg-top{ animation: dgRise .5s cubic-bezier(.22,.9,.32,1) both; }
   .discord-gate.open .dg-logo-wrap{ animation: dgRise .6s cubic-bezier(.22,.9,.32,1) .06s both; }
   .discord-gate.open .discord-gate-title{ animation: dgRise .55s cubic-bezier(.22,.9,.32,1) .16s both; }
@@ -7161,8 +7164,12 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   }
 
   function openLoginGate(){
-    var gateEl = document.getElementById('discordGate');
-    if (gateEl){ gateEl.setAttribute('data-mode', 'login'); gateEl.classList.add('open'); }
+    var go = function(){
+      var gateEl = document.getElementById('discordGate');
+      if (gateEl){ gateEl.setAttribute('data-mode', 'login'); gateEl.classList.add('open'); }
+    };
+    /* open only after the whole stylesheet is parsed, so the card never re-lays out (jumps) while it is already visible */
+    go();
   }
 
   try{
@@ -8967,7 +8974,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   </div>
 
 
-  <footer><span data-i18n="footer">MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">ზუსტი</span> კალკულაცია, კადრამდე სიზუსტით</span></footer>
+  <footer><span data-i18n="footer">© 2026 MOONFULL4K. <span id="adminTriggerWord" class="admin-trigger-word">ყველა</span> უფლება დაცულია.</span></footer>
 
 </div>
 
@@ -9510,7 +9517,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       contactPanelOnline: 'ჩვეულებრივ სწრაფად ვპასუხობთ',
       contactPanelSub: 'შემოგვიერთდი Discord-ზე და დაწერე ნებისმიერი კითხვა, პირადად გიპასუხებ.',
       contactDiscordSub: 'შემოდი სერვერზე ♥',
-      footer: 'MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">ზუსტი</span> კალკულაცია, კადრამდე სიზუსტით',
+      footer: '© 2026 MOONFULL4K. <span id="adminTriggerWord" class="admin-trigger-word">ყველა</span> უფლება დაცულია.',
       chatAssistant: 'ასისტენტი',
       acbLabelLine1: 'შეკვეთის',
       acbLabelLine2: 'გაგრძელება',
@@ -9951,7 +9958,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       contactPanelOnline: 'Usually replies fast',
       contactPanelSub: "No need to fill out the calculator -- just join our Discord and send me any question, I'll answer you personally.",
       contactDiscordSub: 'Join and message us',
-      footer: 'MOON ENHANCER — <span id="adminTriggerWord" class="admin-trigger-word">precise</span> calculation, down to the frame',
+      footer: '© 2026 MOONFULL4K. <span id="adminTriggerWord" class="admin-trigger-word">All</span> rights reserved.',
       chatAssistant: 'Assistant',
       acbLabelLine1: 'Continue',
       acbLabelLine2: 'order',
@@ -24654,7 +24661,7 @@ function setFile(f){
 }
 
 /* ============ RUN JOB ============ */
-function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); var pr=$('optProg'); if(pr) pr.style.setProperty('--pp',p); }
+function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); var pr=$('optProg'); if(pr) pr.style.setProperty('--mpp',p); }
 function finishFail(ticket,text){
   S.busy=false; setPill('err',tr('err')); msg(text,true);
   if(ticket) api('/refund',{method:'POST',body:JSON.stringify({ticket:ticket,uid:ident().uid})}).catch(function(){});
@@ -24953,7 +24960,7 @@ function enhance(o){
  function again(wait){ setTimeout(function(){ requestAnimationFrame(loop); },Math.max(1,wait)); }
  function loop(now){
   if(!orVis||document.hidden){ orRun=false; return; }
-  if(window.matchMedia&&matchMedia('(pointer:coarse),(max-width:700px)').matches){ again(1500); return; }
+  if(true){ again(3000); return; } /* Method background animation removed */
   if(o.classList.contains('opt-pre')||(o.classList.contains('opt-enter')&&Date.now()-(o.__enAt||0)<1000)){ again(60); return; }   /* the entrance plays on its own: the particles start only after it has finished */
   if(now&&now-__lt<10){ again(12-(now-__lt)); return; } __lt=now||0;
   { x.clearRect(0,0,W,H); __bk[0].length=__bk[1].length=__bk[2].length=0;
@@ -25349,9 +25356,9 @@ html body #optView .opt-drop.has #optHint{font-size:14px}
 </style>
 <style id="opt-stabilize-6">
 /* ===== progress / result card: ring gauge, status line, glowing download button ===== */
-@property --pp{syntax:'<number>';inherits:true;initial-value:0}
-html body #optView .opt-prog{--pp:0;display:grid!important;justify-items:center;gap:14px!important;padding:22px 20px 20px!important;border-radius:28px!important;text-align:center;
-  border:1.5px solid transparent!important;transition:--pp .5s cubic-bezier(.22,.9,.32,1),box-shadow .4s;
+@property --mpp{syntax:'<number>';inherits:true;initial-value:0}
+html body #optView .opt-prog{--mpp:0;display:grid!important;justify-items:center;gap:14px!important;padding:22px 20px 20px!important;border-radius:28px!important;text-align:center;
+  border:1.5px solid transparent!important;transition:--mpp .5s cubic-bezier(.22,.9,.32,1),box-shadow .4s;
   background:radial-gradient(120% 70% at 50% 0,rgba(129,140,248,.28),transparent 65%) padding-box,linear-gradient(180deg,#0f1638,#080b1f) padding-box,linear-gradient(120deg,#7dd3fc,#a78bfa 50%,#f0abfc) border-box!important;
   box-shadow:0 22px 50px -26px rgba(139,92,246,.9),inset 0 1px 0 rgba(255,255,255,.1)!important}
 html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog{
@@ -25362,7 +25369,7 @@ html body #optView .opt:has(#optPill[data-s="err"]) .opt-prog{
 
 /* ring gauge instead of a plain number + bar */
 html body #optView .opt-prog .opt-pct{position:relative;width:150px;height:150px;margin:2px auto 0;display:flex!important;align-items:center;justify-content:center;gap:1px;border-radius:50%;
-  background:conic-gradient(from -90deg,#7dd3fc 0,#a78bfa calc(var(--pp)*.55%),#f0abfc calc(var(--pp)*1%),rgba(255,255,255,.08) calc(var(--pp)*1%));
+  background:conic-gradient(from -90deg,#7dd3fc 0,#a78bfa calc(var(--mpp)*.55%),#f0abfc calc(var(--mpp)*1%),rgba(255,255,255,.08) calc(var(--mpp)*1%));
   box-shadow:0 0 34px -6px rgba(167,139,250,.55)}
 html body #optView .opt-prog .opt-pct::before{content:"";position:absolute;inset:10px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#18204a,#0a0f28 75%);box-shadow:inset 0 2px 10px rgba(0,0,0,.6)}
 html body #optView .opt-prog .opt-pct b,html body #optView .opt-prog .opt-pct span{position:relative;z-index:1}
@@ -25372,7 +25379,7 @@ html body #optView .opt:has(#optPill[data-s="busy"]) .opt-prog .opt-pct{animatio
 @keyframes optRing{50%{box-shadow:0 0 52px -2px rgba(125,211,252,.75)}}
 html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-pct{background:conic-gradient(from -90deg,#34d399,#22d3ee,#34d399);box-shadow:0 0 40px -4px rgba(52,211,153,.7)}
 html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-pct span{color:#6ee7b7}
-html body #optView .opt:has(#optPill[data-s="err"]) .opt-prog .opt-pct{background:conic-gradient(from -90deg,#ff7d96 0,#f0abfc calc(var(--pp)*1%),rgba(255,255,255,.08) calc(var(--pp)*1%));box-shadow:0 0 30px -6px rgba(255,125,150,.5)}
+html body #optView .opt:has(#optPill[data-s="err"]) .opt-prog .opt-pct{background:conic-gradient(from -90deg,#ff7d96 0,#f0abfc calc(var(--mpp)*1%),rgba(255,255,255,.08) calc(var(--mpp)*1%));box-shadow:0 0 30px -6px rgba(255,125,150,.5)}
 html body #optView .opt-prog .opt-track{display:none!important}
 
 /* status line */
@@ -26399,7 +26406,7 @@ html body #optView .opt,html body #optView .opt *{-webkit-backdrop-filter:none!i
 .mn-modal:not(.open) .mn-orb{animation-play-state:paused!important}
 /* Method page entrance: `will-change` made every piece its own layer and, when the entrance class was removed at the end, all of them were dropped
    in one frame (a visible stop + flicker). The animations still run on the GPU (transform / opacity are promoted by the browser while they play). */
-html body #optView .opt.opt-enter,html body #optView .opt.opt-enter *{will-change:auto!important}
+/* layers stay identical before/after opt-enter removal */
 
 /* ---- chat: larger, easier-to-read text ---- */
 html body .msg-bubble{font-size:17px!important;line-height:1.5!important;padding:12px 16px!important}
@@ -26409,6 +26416,9 @@ html body .msg-bubble-reply-quote{font-size:14.5px!important}
 html body .msg-bubble-reply-quote b{font-size:13px!important}
 html body .messenger-input{font-size:17px!important}
 </style>
+<script>(function(){var g=document.getElementById('discordGate');if(!g)return;var d=0;function ok(){if(d)return;d=1;requestAnimationFrame(function(){requestAnimationFrame(function(){g.classList.add('gate-ready');});});}
+function afterLoad(){setTimeout(ok,300);}
+if(document.readyState==='complete')afterLoad();else addEventListener('load',afterLoad,{once:true});setTimeout(ok,3500);})();</script>
 <style id="moon-calm">
 /* Entrances on Method / Checker / order panels: every element fades in at its final place and final size (staggering and timing are unchanged) - nothing slides, grows or shrinks. Defined last, so it wins over the older definitions. */
 @keyframes moRise{from{opacity:0}to{opacity:1}}
@@ -26426,8 +26436,92 @@ html body .messenger-input{font-size:17px!important}
 @keyframes ttLine{from{opacity:0}to{opacity:1}}
 @keyframes pcCineKid{from{opacity:0}to{opacity:1}}
 @keyframes ttRing{from{opacity:.9}to{opacity:0}}
-#moonBuild{position:fixed;left:8px;bottom:6px;z-index:2147483000;font:600 10px/1 monospace;color:#fff;opacity:.4;pointer-events:none;-webkit-text-stroke:0}
+@keyframes mnOut{to{opacity:0}}
+@keyframes mnHomeIn{from{opacity:0}to{opacity:1}}
+@keyframes mnSlideR{from{opacity:0}to{opacity:1}}
+@keyframes mnNoteIn{from{opacity:0}to{opacity:1}}
+@keyframes mnCtaIn{from{opacity:0}to{opacity:1}}
+/* Panels (comments, Method card, Checker card): they stay on their own layer before, during and after the appearing animation, so nothing is re-drawn (= no flicker) when the animation ends. */
+@media (hover:hover) and (pointer:fine){
+  html body .panel.comments-panel,html body #optView#optView .opt,html body .ttdl-shell{will-change:opacity!important}
+}
+html body .ttdl-shell.tt-wait{transform:none!important}
+/* Discord gate: no scrollbar flash, fade in place */
+.discord-gate{scrollbar-width:none!important}
+.discord-gate::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+@keyframes dgRise{from{opacity:0}to{opacity:1}}
 </style>
-<div id="moonBuild" aria-hidden="true">build 21.10-C</div>
+
+<style id="moon-modal-fix">
+/* Order wizard: every step has the SAME panel size and position; steps and the panel only fade (no slide / no height change) */
+@keyframes wizardStepIn{from{opacity:0}to{opacity:1}}
+@keyframes wizardStepOut{from{opacity:1}to{opacity:0}}
+@keyframes pcPanelSlideDown{from{opacity:0}to{opacity:1}}
+@media (min-width:701px){
+  html body .pc-modal-scrim > .pc-accordion-body.panel{min-height:350px}
+  html body .pc-modal-scrim .pc-modal-scroll{display:flex;flex-direction:column;min-height:306px}
+  html body .pc-modal-scrim .pc-modal-scroll > .wizard-steps{flex:0 0 auto}
+  html body .pc-modal-scrim .pc-modal-scroll > #videoScannerPanel{flex:1 1 auto;display:flex;flex-direction:column}
+  html body .pc-modal-scrim #videoScannerPanel > .scanner-stage{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+  html body .pc-modal-scrim #videoScannerPanel .scanner-stage > .drop-zone{
+    flex:0 0 auto;min-height:224px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+    padding:26px 24px 22px;border-radius:20px;
+    border:1.5px dashed rgba(94,234,160,.30)!important;
+    background:radial-gradient(60% 70% at 50% 36%,rgba(34,214,110,.13),rgba(34,214,110,.04) 55%,transparent 78%),linear-gradient(180deg,#14171c,#0e1014)!important;
+  }
+  html body .pc-modal-scrim .drop-zone .dz-icon{width:66px;height:66px;margin:0 0 16px;box-shadow:0 0 0 9px rgba(34,214,110,.10),0 0 0 19px rgba(34,214,110,.045),0 10px 30px -6px rgba(34,214,110,.45)}
+  html body .pc-modal-scrim .drop-zone .dz-title{margin:0 0 14px;font-size:15.5px}
+  html body .pc-modal-scrim .drop-zone::after{content:"ან გადმოიტანე ხელით";display:inline-block;padding:6px 14px;border-radius:999px;font-size:11.5px;font-weight:600;letter-spacing:.02em;color:#9fb3a8;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09)}
+  html[lang="en"] body .pc-modal-scrim .drop-zone::after{content:"or bring it over by hand"}
+  html[lang="ru"] body .pc-modal-scrim .drop-zone::after{content:"или перенеси вручную"}
+  html body .pc-modal-scrim .drop-zone:hover{border-color:rgba(94,234,160,.55)!important}
+  html body .pc-modal-scrim .pc-modal-scroll > #qualityFieldWrap,
+  html body .pc-modal-scrim .pc-modal-scroll > #tiktokFieldWrap{margin-top:auto;margin-bottom:auto}
+  html body .pc-modal-scrim .pc-modal-scroll > #sendConfirmFieldWrap{margin-top:auto}
+  html body .pc-modal-scrim .pc-modal-scroll > #orderChannelsPanel{margin-bottom:auto}
+}
+@media (hover:hover) and (pointer:fine){
+  html body #optView#optView .opt > canvas.or-cv{will-change:opacity!important}
+  html body #optView#optView .opt > :is(.or-deco,#optLogin,#optMain,.opt-h3,.opt-corner){will-change:transform,opacity!important}
+}
+</style>
+<style id="moon-home-in">
+/* Home blocks fade in together (short, capped stagger) so the lower panels (comments) no longer "light up" a second later */
+html body .mn-in{animation-duration:.5s!important;animation-timing-function:ease-out!important;animation-delay:calc(min(var(--o,0),3)*40ms)!important}
+</style>
+<style id="moon-footer">
+html body footer{margin:34px auto 0!important;padding:20px 16px 26px!important;max-width:760px;text-align:center;color:#7d808c!important;font-size:12.5px!important;letter-spacing:.02em;border-top:1px solid rgba(255,255,255,.07)}
+@media (min-width:701px){html body.mn-view-on .mn-views{min-height:calc((100vh - 268px) / 1.15)}}
+</style>
+<style id="moon-opt-bg-off">
+/* Method page: no background animation at all (particles, aurora, deco) */
+html body #optView#optView .opt > canvas.or-cv,html body #optView#optView .opt > .or-deco{display:none!important}
+html body #optView#optView .opt::after,html body #optView#optView .opt::before{display:none!important;animation:none!important}
+</style>
+<style id="moon-checker-fx">
+/* Checker card: calm neutral graphite, no cyan/blue glow, no outer frame line, static */
+html body #checkerView .ttdl-shell:not(#_a):not(#_b){
+  background:linear-gradient(180deg,#141518,#0c0d0f 60%,#09090b)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 26px 60px -30px rgba(0,0,0,.85)!important;
+}
+html body #checkerView .ttdl-shell:not(#_a):not(#_b)::before,html body #checkerView .ttdl-shell:not(#_a):not(#_b)::after{display:none!important}
+html body #checkerView .ttdl-shell .ttdl-aurora:not(#_a):not(#_b){display:none!important}
+html body #checkerView .ttdl-shell .ttdl-titlebar:not(#_a):not(#_b){background:rgba(255,255,255,.025)!important;border-bottom:1px solid rgba(255,255,255,.07)!important}
+html body #checkerView .ttdl-shell .ttdl-step:not(#_a):not(#_b){background:rgba(255,255,255,.05)!important;box-shadow:none!important;color:#c9ccd3!important}
+html body #checkerView .ttdl-shell .ttdl-step-line:not(#_a):not(#_b)::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent)!important}
+html body #checkerView .ttdl-shell .ttdl-icon:not(#_a):not(#_b)::after{border-color:rgba(255,255,255,.22)!important}
+html body #checkerView .ttdl-shell .ttdl-glass:not(#_a):not(#_b){background:none!important;border:0!important;box-shadow:none!important;outline:0!important;border-radius:0!important}
+html body #checkerView .ttdl-shell .ttdl-glass:not(#_a):not(#_b)::before,html body #checkerView .ttdl-shell .ttdl-glass:not(#_a):not(#_b)::after{display:none!important}
+html body #checkerView .ttdl-shell .ttdl-input-wrap:not(#_a):not(#_b){background:rgba(0,0,0,.42)!important;border:1px solid rgba(255,255,255,.11)!important;border-radius:16px!important;box-shadow:none!important;transition:border-color .2s ease!important}
+html body #checkerView .ttdl-shell .ttdl-input-wrap:not(#_a):not(#_b)::before,html body #checkerView .ttdl-shell .ttdl-input-wrap:not(#_a):not(#_b)::after{display:none!important}
+html body #checkerView .ttdl-shell .ttdl-input-wrap:not(#_a):not(#_b):focus-within{border-color:rgba(255,255,255,.32)!important}
+html body #checkerView .ttdl-shell .ttdl-input:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e),html body #checkerView .ttdl-shell .ttdl-paste-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){box-shadow:none!important;-webkit-box-shadow:none!important}
+html body #checkerView .ttdl-shell .ttdl-input-icon:not(#_a):not(#_b){background:rgba(255,255,255,.06)!important}
+html body #checkerView .ttdl-shell .ttdl-analyze-btn:not(#_a):not(#_b){background:linear-gradient(180deg,#2aa876,#1d8a5f)!important;color:#f3fff9!important;font-weight:800!important;border:0!important;border-radius:16px!important;box-shadow:0 12px 26px -16px rgba(34,170,118,.6)!important}
+html body #checkerView .ttdl-shell .ttdl-heading:not(#_a):not(#_b):not(#_c){background:linear-gradient(100deg,#ffffff,#dfe3ec 60%,#ffffff)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-stroke:.9px rgba(235,238,246,.7)!important}
+html body #checkerView .ttdl-shell .ttdl-input-icon:not(#_a):not(#_b),html body #checkerView .ttdl-shell .ttdl-step:not(#_a):not(#_b){color:#cfd3dc!important}
+html body #checkerView .ttdl-shell .ttdl-log:not(#_a):not(#_b){background:rgba(0,0,0,.45)!important;border:1px solid rgba(255,255,255,.07)!important;border-radius:14px!important}
+</style>
 </body>
 </html>
