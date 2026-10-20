@@ -25545,6 +25545,8 @@ html{-webkit-text-stroke:.5px currentColor!important}
 html body :is(input,textarea,select){-webkit-text-stroke:.35px currentColor}
 /* gradient-filled big text (transparent colour) would get no stroke from currentColor: it gets a soft pale one instead */
 html body #optView .opt-head h2,html body #optView .opt-h3,html body #optView .opt-plan .pr,html body #plansView .opt-plan .pr,html body #optView .opt-prog .opt-pct b,html body #moonIntro .mx-name,html body #moonIntro .mx-h1{-webkit-text-stroke:.9px rgba(205,214,255,.7)!important}
+/* navigation bar + menu letters: stronger, like the logo */
+html body .hz-bar,html body .hz-bar *,html body #hzMenu,html body #hzMenu *{-webkit-text-stroke:.8px currentColor!important}
 /* ===== Plans: the first (entrance) animation is removed; the shine / glint / hover animations stay ===== */
 html body #plansView .opt-plan,html body #plansView .opt-plan h4,html body #plansView .opt-plan .opt-badge,html body #plansView .opt-plan .pr,html body #plansView .opt-plan li,html body #plansView .opt-plan li::before,html body #plansView .opt-plan .opt-buy,html body #plansView .opt-plan .op-slot{animation:none!important}
 /* ===== Method on phones / tablets: no entrance, no aurora drift, no particles / mouse effects ===== */
@@ -26407,5 +26409,25 @@ html body .msg-bubble-reply-quote{font-size:14.5px!important}
 html body .msg-bubble-reply-quote b{font-size:13px!important}
 html body .messenger-input{font-size:17px!important}
 </style>
+<style id="moon-calm">
+/* Entrances on Method / Checker / order panels: every element fades in at its final place and final size (staggering and timing are unchanged) - nothing slides, grows or shrinks. Defined last, so it wins over the older definitions. */
+@keyframes moRise{from{opacity:0}to{opacity:1}}
+@keyframes moShell{from{opacity:0}to{opacity:1}}
+@keyframes mnViewIn{from{opacity:0}to{opacity:1}}
+@keyframes mnHeadIn{from{opacity:0}to{opacity:1}}
+@keyframes mnSubIn{from{opacity:0}to{opacity:1}}
+@keyframes ttRise{from{opacity:0}to{opacity:1}}
+@keyframes ttDrop{from{opacity:0}to{opacity:1}}
+@keyframes ttPop{from{opacity:0}to{opacity:1}}
+@keyframes ttLogoIn{from{opacity:0}to{opacity:1}}
+@keyframes ttUp{from{opacity:0}to{opacity:1}}
+@keyframes ttSlideL{from{opacity:0}to{opacity:1}}
+@keyframes ttIconSpin{from{opacity:0}to{opacity:1}}
+@keyframes ttLine{from{opacity:0}to{opacity:1}}
+@keyframes pcCineKid{from{opacity:0}to{opacity:1}}
+@keyframes ttRing{from{opacity:.9}to{opacity:0}}
+#moonBuild{position:fixed;left:8px;bottom:6px;z-index:2147483000;font:600 10px/1 monospace;color:#fff;opacity:.4;pointer-events:none;-webkit-text-stroke:0}
+</style>
+<div id="moonBuild" aria-hidden="true">build 21.10-C</div>
 </body>
 </html>
