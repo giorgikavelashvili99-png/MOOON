@@ -11698,7 +11698,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
       readContainerMeta(file).then(m => {
         if (m && m.duration > 0 && myToken === scanToken) {
-          finishScan(m.duration, file, m.width, m.height, null);
+          finishScan(m.duration, file, m.width, m.height, m.fps || null);
           cleanup();
         } else {
           cleanup();
@@ -11713,10 +11713,14 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
       resolveVideoDims(videoEl, file, duration0, (duration, width, height) => {
         const FPS_DETECT_MAX_BYTES = 250 * 1024 * 1024; // huge files: skip the decode-based fps probe (never blocks an upload)
-        const fpsPromise = file.size > FPS_DETECT_MAX_BYTES ? Promise.resolve(null) : detectFrameRate(videoEl);
-        fpsPromise.then(fps => {
-          if (myToken === scanToken) finishScan(duration, file, width, height, fps);
-          cleanup();
+        // exact frame rate written inside the file first; playback measurement only as a fallback
+        readContainerMeta(file).then(cm => {
+          const cfps = cm && cm.fps ? cm.fps : null;
+          const fpsPromise = cfps ? Promise.resolve(cfps) : (file.size > FPS_DETECT_MAX_BYTES ? Promise.resolve(null) : detectFrameRate(videoEl));
+          fpsPromise.then(fps => {
+            if (myToken === scanToken) finishScan(duration, file, width, height, fps);
+            cleanup();
+          });
         });
       });
     };
@@ -11909,19 +11913,20 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         }
         if (ms < 0 || msize <= 0 || msize > 96*1024*1024) return null;
         const dv = new DataView(await file.slice(ms, ms+msize).arrayBuffer());
-        let timescale = 0, dur = 0, w = 0, h = 0, found = false;
+        let timescale = 0, dur = 0, w = 0, h = 0, found = false, cfps = null;
         for (const b of kids(dv,0,dv.byteLength)) {
           if (b.type === 'mvhd') {
             if (dv.getUint8(b.s) === 1) { timescale = dv.getUint32(b.s+20); dur = dv.getUint32(b.s+24)*4294967296 + dv.getUint32(b.s+28); }
             else { timescale = dv.getUint32(b.s+12); dur = dv.getUint32(b.s+16); }
           } else if (b.type === 'trak' && !found) {
-            let isVideo = false, tkhd = null, stsd = null;
+            let isVideo = false, tkhd = null, stsd = null, sttsB = null, mdhdB = null;
             for (const c of kids(dv,b.s,b.e)) {
               if (c.type === 'tkhd') tkhd = c;
               if (c.type === 'mdia') {
                 for (const d of kids(dv,c.s,c.e)) {
                   if (d.type === 'hdlr' && fourcc(dv,d.s+8) === 'vide') isVideo = true;
-                  if (d.type === 'minf') for (const m of kids(dv,d.s,d.e)) if (m.type === 'stbl') for (const t of kids(dv,m.s,m.e)) if (t.type === 'stsd') stsd = t;
+                  if (d.type === 'mdhd') mdhdB = d;
+                  if (d.type === 'minf') for (const m of kids(dv,d.s,d.e)) if (m.type === 'stbl') for (const t of kids(dv,m.s,m.e)) { if (t.type === 'stsd') stsd = t; if (t.type === 'stts') sttsB = t; }
                 }
               }
             }
@@ -11933,11 +11938,31 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
               if (!cw || !ch) { cw = Math.round(dv.getUint32(tkhd.s+wo)/65536); ch = Math.round(dv.getUint32(tkhd.s+wo+4)/65536); }
               else if (Math.abs(a) < 0.01 && Math.abs(bb) > 0.5) { const t = cw; cw = ch; ch = t; } // rotated 90deg, like the browser reports it
               w = cw; h = ch; found = true;
+              // Real frame rate straight from the file's own sample table (stts): the most common frame duration.
+              // Exact, instant, and independent of the browser's playback / decoder (which often can't measure it on phones).
+              try {
+                if (sttsB && mdhdB) {
+                  const mts = dv.getUint8(mdhdB.s) === 1 ? dv.getUint32(mdhdB.s+20) : dv.getUint32(mdhdB.s+12);
+                  const n = dv.getUint32(sttsB.s+4), byDelta = new Map();
+                  for (let i = 0; i < n && sttsB.s + 8 + i*8 + 8 <= sttsB.e; i++) {
+                    const cnt = dv.getUint32(sttsB.s+8+i*8), dl = dv.getUint32(sttsB.s+12+i*8);
+                    if (dl > 0) byDelta.set(dl, (byDelta.get(dl) || 0) + cnt);
+                  }
+                  let bestD = 0, bestC = 0;
+                  byDelta.forEach((c, d) => { if (c > bestC) { bestC = c; bestD = d; } });
+                  if (mts && bestD) {
+                    const raw = mts / bestD;
+                    let snap = Math.round(raw), bd = Infinity;
+                    [24, 25, 30, 50, 60, 120].forEach(r => { const df = Math.abs(r - raw); if (df < bd) { bd = df; if (df <= 3) snap = r; } });
+                    cfps = snap;
+                  }
+                }
+              } catch (e) {}
             }
           }
         }
         if (!timescale || !dur) return null;
-        return { duration: dur/timescale, width: w, height: h };
+        return { duration: dur/timescale, width: w, height: h, fps: cfps };
       } catch (e) { return null; }
     })();
   }
@@ -11980,7 +12005,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null; }
         readContainerMeta(file).then(m => {
           cleanup();
-          if (m && m.duration > 0) resolve({ duration: m.duration, width: m.width, height: m.height, fps: null, file });
+          if (m && m.duration > 0) resolve({ duration: m.duration, width: m.width, height: m.height, fps: (m.fps || null), file });
           else reject('read-error');
         });
       };
@@ -12002,14 +12027,20 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         // own, only a *confirmed* wrong one does; resolution is still
         // checked exactly as strictly as ever.
         const FPS_DETECT_MAX_BYTES = 250 * 1024 * 1024; // 250MB
-        if (file.size > FPS_DETECT_MAX_BYTES) {
-          cleanup();
-          resolve({ duration, width, height, fps: null, file });
-          return;
-        }
-        detectFrameRate(videoEl).then(fps => {
-          cleanup();
-          resolve({ duration, width, height, fps, file });
+        // First choice: the exact frame rate written inside the file (mp4 / mov). Only when the file has none (other containers)
+        // do we fall back to measuring it by playing the video.
+        readContainerMeta(file).then(cm => {
+          const cfps = cm && cm.fps ? cm.fps : null;
+          if (cfps) { cleanup(); resolve({ duration, width, height, fps: cfps, file }); return; }
+          if (file.size > FPS_DETECT_MAX_BYTES) {
+            cleanup();
+            resolve({ duration, width, height, fps: null, file });
+            return;
+          }
+          detectFrameRate(videoEl).then(fps => {
+            cleanup();
+            resolve({ duration, width, height, fps, file });
+          });
         });
         });
       };
@@ -25513,6 +25544,60 @@ html body .pc-card > .pc-cine-glint:not(#_a):not(#_b),html body .pc-cine-glint:n
 html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(footer):not(script):not(style){display:none!important}
 @supports (content-visibility:hidden){html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(footer):not(script):not(style){display:block!important;content-visibility:hidden!important;contain-intrinsic-size:0 0!important;height:0!important;min-height:0!important;max-height:0!important;margin-block:0!important;padding-block:0!important;border-block-width:0!important;overflow:hidden!important}}
 html body :is(.panel,.pc-accordion-body,.pc-modal-scrim .panel,.mn-card,.discord-popover,.site-menu,.admin-box){box-shadow:none!important}
+</style>
+<style id="moon-modal-mobile">
+/* ===== Order window on phones: one calm layout, same size on every step, nothing slides or grows; only opacity changes ===== */
+@media (max-width:700px){
+  html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a){min-height:346px;padding:18px 14px 16px!important;border-radius:22px}
+  html body .pc-modal-scrim .pc-modal-scroll{display:flex;flex-direction:column;min-height:306px;max-height:none!important;overflow:visible}
+  html body .pc-modal-scrim .pc-modal-scroll > .wizard-steps{flex:0 0 auto;margin:0 0 16px}
+  html body .pc-modal-scrim .pc-modal-scroll > :is(#videoScannerPanel){flex:1 1 auto;display:flex;flex-direction:column}
+  html body .pc-modal-scrim #videoScannerPanel > .scanner-stage{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+  html body .pc-modal-scrim .pc-modal-scroll > :is(#qualityFieldWrap,#tiktokFieldWrap){margin-top:auto;margin-bottom:auto}
+  html body .pc-modal-scrim .pc-modal-scroll > #sendConfirmFieldWrap{margin-top:auto}
+  html body .pc-modal-scrim .pc-modal-scroll > #orderChannelsPanel{margin-bottom:auto}
+
+  /* steps: clean numbered track, the active one gets a still ring */
+  html body .pc-modal-scrim .wizard-step-dot{width:30px;height:30px;font-size:13.5px;font-weight:700}
+  html body .pc-modal-scrim .wizard-step-line{margin-top:14px;height:2px;border-radius:2px}
+  html body .pc-modal-scrim .wizard-step.is-active .wizard-step-dot{box-shadow:0 0 0 4px rgba(34,214,110,.16)}
+
+  /* upload card */
+  html body .pc-modal-scrim #videoScannerPanel .scanner-stage > .drop-zone:not(#_a){
+    min-height:196px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:22px 16px 18px;border-radius:20px;
+    border:1.5px dashed rgba(94,234,160,.32)!important;
+    background:radial-gradient(70% 70% at 50% 34%,rgba(34,214,110,.14),rgba(34,214,110,.04) 58%,transparent 80%),linear-gradient(180deg,#14171c,#0e1014)!important}
+  html body .pc-modal-scrim .drop-zone .dz-icon{width:58px;height:58px;margin:0 0 14px;box-shadow:0 0 0 8px rgba(34,214,110,.10),0 0 0 17px rgba(34,214,110,.04)}
+  html body .pc-modal-scrim .drop-zone .dz-title{margin:0 0 12px;font-size:14.5px;line-height:1.45;text-align:center}
+  html body .pc-modal-scrim .drop-zone::after{content:"1080p  ·  60 fps  ·  მაქს. 59.59 წმ";display:inline-block;padding:6px 13px;border-radius:999px;font-size:11.5px;font-weight:600;letter-spacing:.02em;color:#9fb3a8;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09)}
+  html[lang="en"] body .pc-modal-scrim .drop-zone::after{content:"1080p  ·  60 fps  ·  max 59.59 s"}
+  html[lang="ru"] body .pc-modal-scrim .drop-zone::after{content:"1080p  ·  60 fps  ·  макс. 59.59 с"}
+
+  /* "processing" */
+  html body .pc-modal-scrim .scan-progress.show{display:flex;align-items:center;justify-content:center;gap:10px;min-height:196px;padding:16px;border-radius:20px;
+    background:linear-gradient(180deg,#14171c,#0e1014);border:1px solid rgba(255,255,255,.08);font-size:14px;flex-wrap:wrap}
+  html body .pc-modal-scrim .scan-progress-cancel{margin-left:0;padding:8px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:transparent;color:#c9ccd6;font-size:12.5px}
+
+  /* accepted + "send it to the team?" */
+  html body .pc-modal-scrim .scan-result.show{display:flex;flex-direction:column;gap:12px}
+  html body .pc-modal-scrim .simple-scan-ok{border-radius:16px;padding:12px 44px 12px 14px}
+  html body .pc-modal-scrim .sr-transfer-q{font-size:14px;line-height:1.55;text-align:center;color:#d7dae3;margin:0 0 12px}
+  html body .pc-modal-scrim .sr-transfer-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  html body .pc-modal-scrim .sr-transfer-actions .st-btn{height:46px;border-radius:14px;font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  html body .pc-modal-scrim .sr-transfer-actions .st-yes{background:linear-gradient(180deg,#25c27f,#1a9a64)!important;color:#04170e!important;border:0!important}
+  html body .pc-modal-scrim .sr-transfer-actions .st-no{background:transparent!important;color:#ff7a8e!important;border:1px solid rgba(255,90,115,.45)!important}
+
+  /* wrong format: short and readable on a phone (the computer tips are not needed here) */
+  html body .pc-modal-scrim .sr-reject{padding:14px 14px 14px;border-radius:18px}
+  html body .pc-modal-scrim .sr-reject-head{margin-bottom:8px}
+  html body .pc-modal-scrim .sr-reject-title{font-size:14px}
+  html body .pc-modal-scrim .sr-reject-detected-row{font-size:12px;padding:8px 10px;margin-bottom:8px}
+  html body .pc-modal-scrim .sr-reject-text{font-size:12.5px;line-height:1.55;margin:0 0 8px}
+  html body .pc-modal-scrim .sr-reject-ratio-note:not(:first-of-type),
+  html body .pc-modal-scrim .sr-reject-apps-row:last-of-type{display:none}
+  html body .pc-modal-scrim .sr-reject-apps-row{margin:0 0 8px}
+  html body .pc-modal-scrim .sr-reject-retry{width:100%;height:44px;border-radius:14px;margin-top:4px}
+}
 </style>
 </body>
 </html>
