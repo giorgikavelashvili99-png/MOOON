@@ -24917,7 +24917,7 @@ function enhance(o){
   if(s==='done'&&!o._d){o._d=1;o.classList.remove('boom');void o.offsetWidth;o.classList.add('boom');} if(s!=='done')o._d=0;
  }
  var mo=new MutationObserver(sync); if(pill)mo.observe(pill,{attributes:true}); if(drop)mo.observe(drop,{attributes:true,attributeFilter:['class']}); sync();
- o.addEventListener('pointermove',function(e){var t=e.target.closest&&e.target.closest(T); if(!t)return; var r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+ o.addEventListener('pointermove',function(e){return; var t=e.target.closest&&e.target.closest(T); if(!t)return; var r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
   t.style.setProperty('--mx',(x*100)+'%'); t.style.setProperty('--my',(y*100)+'%'); t.style.setProperty('--ty',((x-.5)*10).toFixed(2)+'deg'); t.style.setProperty('--tx',((.5-y)*10).toFixed(2)+'deg');});
  o.addEventListener('pointerout',function(e){var t=e.target.closest&&e.target.closest(T); if(t&&!t.contains(e.relatedTarget)){t.style.setProperty('--tx','0deg');t.style.setProperty('--ty','0deg');}});
  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
@@ -24934,7 +24934,7 @@ function enhance(o){
  var mg=document.createElement('div'); mg.className='or-mg'; o.prepend(mg);
  var __pe=null,__pr=0; o.addEventListener('pointermove',function(e0){ __pe=e0; if(__pr) return; __pr=requestAnimationFrame(function(){ __pr=0; var e=__pe; var r=o.getBoundingClientRect(); M={x:e.clientX-r.left,y:e.clientY-r.top,cx:e.clientX,cy:e.clientY};
   var z=(r.width/o.offsetWidth)||1; /* page uses CSS zoom (1.15): convert pointer px -> element px, otherwise the glow drifts away from the cursor */
-  mg.style.transform='translate3d('+((e.clientX-r.left)/z-o.clientLeft)+'px,'+((e.clientY-r.top)/z-o.clientTop)+'px,0)'; mg.style.opacity='1'; cubeReact(false);}); });
+  if(0)mg.style.transform='translate3d('+((e.clientX-r.left)/z-o.clientLeft)+'px,'+((e.clientY-r.top)/z-o.clientTop)+'px,0)'; mg.style.opacity='1'; cubeReact(false);}); });
  o.addEventListener('pointerleave',function(){M=null;mg.style.opacity='0';cubeReact(false);});
  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
  var __co=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches), __bk=[[],[],[]];
@@ -26564,5 +26564,13 @@ html body #optView#optView .opt.opt-pre :is(.opt-head,.or-steps,.opt-quota,.opt-
 html body #optView .opt.opt-enter:not(#_a):not(#_b) :is(.opt-head,.or-steps,.opt-card,.opt-quota,.opt-drop,.opt-stats,.opt-h3,#optPlans,.opt-go:disabled){animation-duration:.35s!important;animation-delay:0s!important}
 html body #optView .opt.opt-enter:not(#_a):not(#_b) .opt-go:not(:disabled){animation:optGoFlow 6s ease-in-out infinite,moRise .35s ease-out backwards!important}
 </style>
+<style id="moon-method-calm">
+/* Method page: nothing reacts to the mouse by moving, tilting, growing or glowing any more.
+   (The pointer-following glow, the 3D tilt of the panels, the hover "grow" and the pointer spotlight were redrawn on every mouse move -> the shimmer / flicker.) */
+html body #optView#optView .opt > .or-mg{display:none!important}
+html body #optView#optView .opt :is(.opt-drop,.opt-stats,.opt-quota,.opt-plan,.opt-prog,.opt-drop:hover,.opt-plan:hover):not(#_a):not(#_b):not(#_c){transform:none!important;transition:border-color .25s ease,box-shadow .25s ease,background-color .25s ease!important}
+html body #optView#optView .opt :is(.opt-stats,.opt-quota,.opt-plan,.opt-prog,.opt-drop)::after:not(#_a){background-image:none!important}
+html body #optView#optView .opt :is(.opt-stats,.opt-quota,.opt-plan,.opt-prog)::after{opacity:0!important}
+</style>
 </body>
-</html>>
+</html>
