@@ -24872,7 +24872,7 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
     var a=bar.querySelector('.hz-link.is-active');
     if(!a || !a.__w){ ind.style.opacity='0'; return; }
     if(instant) ind.style.transition='none';
-    ind.style.width=a.__w+'px'; ind.style.transform='translate3d('+a.__x+'px,0,0)'; ind.style.opacity='1';
+    ind.style.transform='translate3d('+a.__x+'px,0,0) scaleX('+(a.__w/100)+')'; ind.style.opacity='1';
     if(instant){ void ind.offsetWidth; ind.style.transition=''; }
   }
   /* SMOOTHNESS: the highlight follows the tap at once. It used to wait for body.mn-view-on, i.e. for the page swap (300 ms+ later, much more on a slow phone),
@@ -25352,11 +25352,10 @@ html body #optView .opt.opt-pre::after{animation-play-state:paused!important}
     var ar = a.getBoundingClientRect(), ir = ind.getBoundingClientRect();
     var dL = (ar.left - ir.left) / k, dW = (ar.width - ir.width) / k;
     if(Math.abs(dL) > 0.8 || Math.abs(dW) > 0.8){
-      var w = parseFloat(ind.style.width) || ind.offsetWidth;
+      var w = ir.width / k;
       var m = /translate3d\(\s*(-?[\d.]+)px/.exec(ind.style.transform || ''), x = m ? parseFloat(m[1]) : 0;
       ind.style.transition = 'none';
-      ind.style.width = (w + dW) + 'px';
-      ind.style.transform = 'translate3d(' + (x + dL) + 'px,0,0)';
+      ind.style.transform = 'translate3d(' + (x + dL) + 'px,0,0) scaleX(' + ((w + dW) / 100) + ')';
       ind.style.opacity = '1';
       void ind.offsetWidth;
       ind.style.transition = '';
@@ -25877,6 +25876,61 @@ html body #discordGate:not(.open) *{animation-play-state:paused!important}
   html body .hz-link .hz-ic{display:none}
   html body .hz-link{padding:0 12px}
 }
+</style>
+<style id="moon-gate-press">
+/* ===== Discord window: pressing a button feels soft — no size change at all (no scale / lift), only a gentle light + ripple + "connecting" state ===== */
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) :is(.dg-card,.dg-main,.dg-stage){transform:none!important;scale:none!important;zoom:1!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c) :is(.discord-btn,.discord-gate-skip,.discord-gate-close){touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;
+  transition:filter .22s ease,background-color .22s ease,border-color .22s ease,box-shadow .25s ease,color .2s ease,opacity .2s ease!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .discord-btn:is(:hover,:active,:focus){transform:none!important;translate:none!important;scale:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .discord-btn.primary:active{filter:brightness(.93) saturate(1.05);
+  box-shadow:inset 0 0 0 1px rgba(170,255,220,.5),inset 0 2px 10px rgba(0,60,40,.28),0 4px 16px -6px rgba(62,230,168,.5)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .discord-btn.outline:active{background:rgba(120,255,200,.10)!important;border-color:rgba(120,255,200,.42)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c) .discord-gate-skip:active{color:#4ff0b0!important}
+@media (hover:none){
+  html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .discord-btn.primary:hover{filter:none}
+  html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .discord-btn.outline:hover{background:rgba(255,255,255,.035)!important;border-color:rgba(255,255,255,.14)!important}
+}
+/* ripple from the touch point (inner circle: transform + opacity only, clipped by the button) */
+html body #discordGate .discord-btn{position:relative;overflow:hidden}
+.dg-rip{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);
+  opacity:.9;transform:scale(1);animation:dgRipple .6s cubic-bezier(.2,.7,.3,1) forwards;will-change:transform,opacity}
+html body #discordGate .discord-btn.outline .dg-rip{background:radial-gradient(circle,rgba(120,255,200,.4),rgba(120,255,200,0) 70%)}
+@keyframes dgRipple{to{transform:scale(22);opacity:0}}
+/* after the tap: the button just stays softly lit, nothing changes in it (no text change, no spinner) */
+html body #discordGate .discord-btn.primary.is-busy{pointer-events:none;filter:brightness(.96)}
+html body #discordGate.is-going :is(.discord-btn.outline,.discord-gate-skip,.discord-gate-close){opacity:.45;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.dg-rip{display:none}}
+</style>
+<script id="moon-gate-press-js">(function(){
+  var g=document.getElementById('discordGate'); if(!g) return;
+  /* touch ripple */
+  g.addEventListener('pointerdown',function(e){
+    var b=e.target.closest&&e.target.closest('.discord-btn'); if(!b||b.classList.contains('is-busy')) return;
+    var r=b.getBoundingClientRect(), z=1;
+    var d=document.createElement('span'); d.className='dg-rip';
+    d.style.left=(e.clientX-r.left)/z+'px'; d.style.top=(e.clientY-r.top)/z+'px';
+    b.appendChild(d); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); },700);
+  },{passive:true});
+  /* the card keeps its exact size while the browser leaves for Discord */
+  function lock(){ var c=g.querySelector('.dg-card'); if(!c) return; var r=c.getBoundingClientRect(); if(!r.width) return;
+    c.style.width=r.width+'px'; c.style.minHeight=r.height+'px'; c.style.maxWidth=r.width+'px'; }
+  function unlock(){ var c=g.querySelector('.dg-card'); if(!c) return; c.style.width=c.style.minHeight=c.style.maxWidth=''; }
+  var btn=document.getElementById('discordLoginBtn'); if(!btn) return;
+  btn.addEventListener('click',function(){
+    if(btn.classList.contains('is-busy')) return;
+    lock();
+    btn.classList.add('is-busy'); g.classList.add('is-going');
+  },true);
+  /* coming back with the browser's Back button: restore */
+  window.addEventListener('pageshow',function(e){
+    if(!btn.classList.contains('is-busy')) return;
+    btn.classList.remove('is-busy'); g.classList.remove('is-going'); unlock();
+  });
+})();</script>
+<style id="moon-pill-gpu">
+/* The sliding highlight in the top menu moves with transform only (position + stretch). It used to animate "width", which needs a layout pass every frame on the main thread - exactly when the page swap blocks it, so the slide froze half-way. Now the compositor plays it, whatever the page is doing. */
+html body .hz-ind:not(#_a):not(#_b){width:100px!important;transform-origin:0 50%;will-change:transform,opacity;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .2s ease!important}
 </style>
 </body>
 </html>
