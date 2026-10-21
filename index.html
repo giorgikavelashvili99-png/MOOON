@@ -2482,51 +2482,6 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
     .sr-reject{ padding:16px 14px; }
     .sr-reject-apps-row{ font-size:11px; }
   }
-
-  
-  .cp-upscale-modal-overlay{
-    position:fixed !important; inset:0 !important; z-index:99999;
-    background:rgba(8,8,16,0.75);
-    display:flex; align-items:center; justify-content:center;
-    padding:18px;
-    opacity:0; visibility:hidden;
-    transition: opacity .2s ease, visibility 0s linear .2s;
-  }
-  .cp-upscale-modal-overlay.show{
-    opacity:1; visibility:visible;
-    transition: opacity .2s ease, visibility 0s linear 0s;
-  }
-  .cp-upscale-modal{
-    position:relative; width:100%; max-width:380px;
-    background:#ffffff;
-    border-radius:20px;
-    padding:32px 24px 26px;
-    box-shadow:0 24px 60px rgba(0,0,0,0.5);
-    text-align:center;
-    transform:translateY(10px) scale(0.98);
-    transition: transform .22s ease;
-  }
-  .cp-upscale-modal-overlay.show .cp-upscale-modal{ transform:translateY(0) scale(1); }
-  .cp-upscale-modal-close{
-    position:absolute; top:14px; right:14px;
-    width:30px; height:30px; border-radius:50%;
-    border:none; background:transparent;
-    color:#9a9aa8; font-size:18px; line-height:1; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    transition: color .15s, transform .15s;
-  }
-  .cp-upscale-modal-close:hover{ color:#333340; transform:scale(1.12); }
-  .cp-upscale-modal-ico{ font-size:30px; margin-bottom:12px; }
-  .cp-upscale-modal-title{
-    font-family:'BPGAcademiuriU','Space Grotesk',sans-serif;
-    font-size:19px; font-weight:800; color:#6a3fd6;
-    margin:0 0 16px; padding:0 8px; line-height:1.35;
-  }
-  .cp-upscale-modal-text{ font-size:14px; line-height:1.7; color:#2b2b38; margin:0; }
-  .cp-upscale-modal-text b{ color:#b8720b; }
-  @media (max-width:480px){
-    .cp-upscale-modal{ padding:26px 18px 20px; }
-  }
   
   .mec-step{
     flex:0 0 auto; width:34px; height:34px; border-radius:50%;
@@ -4258,19 +4213,6 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   #editOrderPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
 
   
-  .pc-card--cheap, #cheapOrderPanel{
-    --pc-accent: #0048E5;
-    --pc-blue-shine: linear-gradient(90deg, #0242D6 0%, #0048E5 10%, #0047E6 20%, #0041DE 30%, #0037CD 40%, #002CBA 50%, #0123A9 60%, #011A97 70%, #00127E 80%, #020A5F 90%, #010535 100%);
-    --pc-bg: radial-gradient(ellipse 120% 60% at 15% 0%, rgba(255,255,255,0.22), transparent 55%), linear-gradient(180deg, rgba(1,3,15,0.4), rgba(1,3,15,0.6)), var(--pc-blue-shine);
-    --pc-border: rgba(0, 72, 229, 0.55);
-    --pc-icon-bg: var(--pc-blue-shine);
-    --pc-price-grad: linear-gradient(180deg, #0048E5, #010535);
-    --pc-cta-bg: var(--pc-blue-shine);
-    --pc-cta-text: #fff;
-  }
-  #cheapOrderPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
-
-  
   .pc-card--any, #anyOrderPanel{
     --pc-accent: #007D99;
     --pc-teal-shine: linear-gradient(90deg, #006A82 0%, #00A9CF 10%, #0097B9 20%, #007791 30%, #006177 40%, #004D5F 50%, #003C49 60%, #002F3A 70%, #00232B 80%, #00161C 90%, #000C0F 100%);
@@ -4282,22 +4224,6 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
     --pc-cta-text: #fff;
   }
   #anyOrderPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
-
-  
-  .pc-card--cheapmonthly, #cheapMonthlyPanel{
-    --pc-accent: #9aa3b0;
-    --pc-carbon-shine: linear-gradient(100deg, #1c1f25 0%, #3a4048 12%, #5a6472 24%, #7c8798 36%, #c2c8d1 48%, #eef1f4 54%, #c2c8d1 60%, #7c8798 72%, #5a6472 84%, #3a4048 94%, #1c1f25 100%);
-    --pc-bg: radial-gradient(ellipse 120% 60% at 15% 0%, rgba(255,255,255,0.18), transparent 55%), linear-gradient(180deg, rgba(8,9,12,0.4), rgba(8,9,12,0.6)), var(--pc-carbon-shine);
-    --pc-border: rgba(154, 163, 176, 0.55);
-    --pc-icon-bg: var(--pc-carbon-shine);
-    --pc-price-grad: linear-gradient(180deg, #c2c8d1, #3a4048);
-    --pc-cta-bg: var(--pc-carbon-shine);
-    --pc-cta-text: #14161b;
-  }
-  #cheapMonthlyPanel{ background: linear-gradient(180deg, #1a1a1c, #0d0d0e); }
-  
-  .pc-card--cheapmonthly{ --pc-bg: linear-gradient(180deg, #1b1d22, #0e0f12); }
-  .pc-card--cheapmonthly::before{ display:none; }
 
   
 
@@ -5627,20 +5553,11 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   body .pc-card .pc-feature .pc-check{ width:17px; height:17px; flex:0 0 17px; margin:0; font-size:9px; }
 
   
-  body .pc-card--indiv .pc-feature:nth-child(-n+2), body .pc-card--any .pc-feature:nth-child(-n+2), body .pc-card--edit .pc-feature:nth-child(-n+2),
-  body .pc-card--weekly .pc-feature:nth-child(-n+2), body .pc-card--monthly .pc-feature:nth-child(-n+2),
-  body .pc-card--cheapmonthly .pc-feature:nth-child(-n+2), body .pc-card--cheap .pc-feature:nth-child(2),
-  body .pc-card--cheap .pc-feature:nth-child(3){
+  body .pc-card--indiv .pc-feature:nth-child(-n+2),body .pc-card--any .pc-feature:nth-child(-n+2),body .pc-card--edit .pc-feature:nth-child(-n+2),body .pc-card--weekly .pc-feature:nth-child(-n+2),body .pc-card--monthly .pc-feature:nth-child(-n+2){
     width:auto; padding:4px 10px; margin:0 0 5px; border-radius:999px; font-size:11.5px; font-weight:700;
     background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.26);
   }
-  body .pc-card--indiv .pc-feature:nth-child(-n+2) .pc-check, body .pc-card--any .pc-feature:nth-child(-n+2) .pc-check, body .pc-card--edit .pc-feature:nth-child(-n+2) .pc-check,
-  body .pc-card--weekly .pc-feature:nth-child(-n+2) .pc-check, body .pc-card--monthly .pc-feature:nth-child(-n+2) .pc-check,
-  body .pc-card--cheapmonthly .pc-feature:nth-child(-n+2) .pc-check, body .pc-card--cheap .pc-feature:nth-child(2) .pc-check,
-  body .pc-card--cheap .pc-feature:nth-child(3) .pc-check{ display:none; }
-  body .pc-card--cheap .pc-feature:nth-child(2), body .pc-card--cheap .pc-feature:nth-child(3){ order:0; }
-  body .pc-card--cheap .pc-feature:nth-child(1){ order:1; }
-  body .pc-card--cheap .pc-feature:nth-child(n+4){ order:2; }
+  body .pc-card--indiv .pc-feature:nth-child(-n+2) .pc-check,body .pc-card--any .pc-feature:nth-child(-n+2) .pc-check,body .pc-card--edit .pc-feature:nth-child(-n+2) .pc-check,body .pc-card--weekly .pc-feature:nth-child(-n+2) .pc-check,body .pc-card--monthly .pc-feature:nth-child(-n+2) .pc-check{ display:none; }
 
   
   body .pc-card .pc-toggle-btn{
@@ -5992,7 +5909,7 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
 
   
   body .pc-card{ border:0; border-radius:22px; isolation:isolate; background:var(--pc-bg, linear-gradient(180deg, var(--panel), var(--panel-2))); }
-  body .pc-card::before, body .pc-card--cheapmonthly::before{ display:none; }
+  body .pc-card::before{ display:none; }
 
   body .pc-card > .pc-ring{
     position:absolute; inset:0; z-index:6; pointer-events:none;
@@ -8003,7 +7920,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
           </div>
           <div class="sr-reject-detected-row"><span data-i18n="srRejectDetectedLabel">ატვირთული ფაილის მონაცემები:</span> <b id="srRejectDetected">—</b></div>
           <p class="sr-reject-text" data-i18n="srRejectText">ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.</p>
-          <p class="sr-reject-text sr-reject-4k-note" id="srReject4kNote" style="display:none;" data-i18n="srReject4kNote">ℹ️ 4K ფორმატის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.</p>
           <p class="sr-reject-text sr-reject-ratio-note" data-i18n="srRejectRatioMobile">📱 თუ იყენებთ მობილურის აპლიკაციებს — გთხოვთ, ვიდეო გადაიყვანოთ <b>1:1</b> ან <b>16:9</b> ფორმატში.</p>
           <p class="sr-reject-text sr-reject-ratio-note" data-i18n="srRejectRatioDesktop">🖥️ თუ იყენებთ კომპიუტერს — გადაიყვანეთ <b>1080x1080</b> ფორმატში.</p>
           <div class="sr-reject-apps-row">
@@ -8302,7 +8218,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
           <div class="simple-scan-reject" id="scanRejectWp">
             <div data-i18n="srRejectTextShort">ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps</div>
             <div class="ssr-detected-info" id="scanRejectWpDetected"></div>
-            <div class="ssr-4k-note" id="scanRejectWp4kNote" style="display:none;" data-i18n="srReject4kNoteShort">ℹ️ 4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“</div>
           </div>
           <div class="mooon-prompt" id="mooonPromptWp">
             <div class="mooon-prompt-q" id="mooonPromptQWp" data-i18n="mooonPromptQ">გსურთ, ატვირთული ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს შესამოწმებლად?</div>
@@ -8459,7 +8374,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
           <div class="simple-scan-reject" id="scanRejectMp">
             <div data-i18n="srRejectTextShort">ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps</div>
             <div class="ssr-detected-info" id="scanRejectMpDetected"></div>
-            <div class="ssr-4k-note" id="scanRejectMp4kNote" style="display:none;" data-i18n="srReject4kNoteShort">ℹ️ 4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“</div>
           </div>
           <div class="mooon-prompt" id="mooonPromptMp">
             <div class="mooon-prompt-q" id="mooonPromptQMp" data-i18n="mooonPromptQ">გსურთ, ატვირთული ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს შესამოწმებლად?</div>
@@ -8613,299 +8527,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         </div>
     </div>
       </div>
-
-      <!-- Card 5 — cheap package (fixed price, no Enhance/effects) -->
-      <div class="pc-card-wrap pc-card-wrap--cheap">
-      <div class="pc-badge" data-i18n="pcRibbon">პოპულარული</div>
-      <div class="pc-card pc-card--cheap"><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
-        <div class="pc-top"><div class="pc-head">
-        <div class="pc-icon" aria-hidden="true">⚡</div>
-          <div class="pc-head-text">
-          <div class="pc-title" data-i18n="cpLabel">იაფი პაკეტი</div>
-          <div class="pc-desc" data-i18n="cpDesc">ბიუჯეტური ვარიანტი<br>მარტივი დამუშავება</div>
-          </div>
-        </div>
-        <div class="pc-price-line pc-price-line--dual"><b>0.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>1.99<sup>₾</sup></b></div>
-        <div class="pc-price-note pc-price-note--nowrap" data-i18n="cpPriceNote">1080p / 4K — ფასი ფიქსირებულია</div>
-        </div>
-        <div class="pc-features">
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeatureFast">ჩაბარდება მაქსიმუმ 30 წუთში</span></div>
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeature1">1080P • 60FPS</span></div>
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeature2">4K • 60FPS</span></div>
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="featTiktokLossless">TikTok-ზე ატვირთვა ხარისხის დაკარგვის გარეშე</span></div>
-          <div class="pc-feature pc-feature--no"><span class="pc-check">✕</span><span data-i18n="featEnhance">ხარისხის გაუმჯობესება</span></div>
-          <div class="pc-feature pc-feature--no"><span class="pc-check">✕</span><span data-i18n="featEffects">ეფექტების დამატება</span></div>
-        </div>
-        <button type="button" class="pc-toggle-btn" id="pcToggleCheap" aria-expanded="false" aria-controls="cheapOrderPanel">
-          <span data-i18n="pcCalcBtn">შეკვეთა</span>
-        </button>
-
-        <div class="panel pc-accordion-body" id="cheapOrderPanel">
-    <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
-    <div class="pc-modal-scroll">
-    <div class="wizard-steps" id="wizardStepsCp">
-      <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step" data-step="2"><span class="wizard-step-dot">2</span><span class="wizard-step-label" data-i18n="wizStepQuality">ხარისხი</span></div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step" data-step="3"><span class="wizard-step-dot">3</span><span class="wizard-step-label">TikTok</span></div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step" data-step="4"><span class="wizard-step-dot">4</span><span class="wizard-step-label" data-i18n="wizStepConfirm">დადასტურება</span></div>
-    </div>
-    <div class="eo-box moon-glow-card">
-      <div class="qn-stars" aria-hidden="true">
-        <span style="top:10%;left:8%;animation-delay:0s;"></span>
-        <span style="top:70%;left:14%;animation-delay:.6s;"></span>
-        <span style="top:18%;left:88%;animation-delay:1.2s;"></span>
-        <span style="top:82%;left:80%;animation-delay:.3s;"></span>
-        <span style="top:46%;left:6%;animation-delay:1.6s;"></span>
-      </div>
-      <div class="field" id="cpScannerField" style="margin-top:14px;">
-        <div class="scanner-stage">
-          <div class="drop-zone simple-drop-zone" id="dropZoneCp">
-            <input type="file" id="videoInputCp" accept="video/*">
-            <div class="dz-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path class="dz-plus" d="M12 5v14M5 12h14"/>
-              </svg>
-            </div>
-            <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
-            <div class="dz-sub" data-i18n="dzSubSimple">გადმოაგდეთ ან დააჭირეთ ასარჩევად</div>
-          </div>
-          <div class="simple-scan-result" id="scanResultCp">
-            <button type="button" class="sr-reset-btn" id="scanResetCp" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
-              <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
-            </button>
-            <div class="simple-scan-ok" id="scanOkCp">
-              <span class="simple-scan-ok-check">✓</span>
-              <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
-              <span class="simple-scan-ok-name" id="scanOkNameCp"></span>
-            </div>
-            <div class="simple-scan-reject" id="scanRejectCp" data-i18n="srRejectTextCp">გარჩევადობა 1080p-ზე დაბალია — საჭიროა მინიმუმ 1080p (ნებისმიერი fps)</div>
-            <div class="ssr-detected-info" id="scanRejectCpDetected"></div>
-            <div class="mooon-prompt" id="mooonPromptCp">
-              <div class="mooon-prompt-q" id="mooonPromptQCp" data-i18n="mooonPromptQ">გსურთ, ატვირთული ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს შესამოწმებლად?</div>
-              <div class="mooon-prompt-actions" id="mooonPromptActionsCp">
-                <button type="button" class="mooon-prompt-yes" id="mooonPromptYesCp" data-i18n="mooonPromptYes">დიახ</button>
-                <button type="button" class="mooon-prompt-no" id="mooonPromptNoCp" data-i18n="mooonPromptNo">არა</button>
-              </div>
-              <div class="mt-upload-head">
-                <span class="mt-upload-head-badge">☁️</span>
-                <span class="mt-upload-head-text" data-i18n="mtUploadHeadline">ავტომატური ატვირთვა</span>
-              </div>
-              <div class="mooon-auto" id="mooonAutoCp">
-                <div class="mooon-auto-status" id="mooonAutoStatusCp">
-                  <div class="mooon-auto-ring-box" id="mooonAutoRingBoxCp">
-                    <span class="mooon-auto-ring-percent" id="mooonAutoPercentCp">0%</span>
-                  </div>
-                  <span id="mooonAutoStatusTextCp" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
-                </div>
-                <div class="mooon-auto-stay" data-i18n="mooonAutoStayHint">📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება</div>
-                <div class="mooon-auto-error" id="mooonAutoErrorCp"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="mp-grid mp-grid-two" id="cpQualityGrid" style="margin-top:14px;">
-        <button type="button" class="mp-box" data-quality="1080_60">
-          <span class="mp-box-q">1080p</span>
-          <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">0.99<sup>₾</sup></span></span>
-        </button>
-        <button type="button" class="mp-box" data-quality="4k_120">
-          <span class="mp-box-q">4K</span>
-          <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">1.99<sup>₾</sup></span></span>
-        </button>
-      </div>
-
-      <div class="field field-tiktok" id="tiktokFieldCp" style="margin-bottom:6px;">
-        <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
-        <div class="link-input-wrap">
-          <span class="icon">@</span>
-          <input autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other" type="text" class="num-input" id="tiktokLinkCp" placeholder="tiktok.com/@username">
-        </div>
-        <button type="button" class="tt-auto-btn" id="tiktokAutoBtnCp">
-          <span class="tt-auto-ico">🔗</span>
-          <span data-i18n="tiktokAutoBtn">TikTok-ის გახსნა</span>
-        </button>
-        <div class="tt-auto-note" id="tiktokAutoNoteCp"></div>
-        <div class="error-msg" id="tiktokErrorCp" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
-        <button type="button" class="wizard-confirm-btn" id="cpTiktokConfirmBtn" data-i18n="wizardConfirmLink">დადასტურება</button>
-      </div>
-
-      <div class="field" id="cpSendConfirmFieldWrap">
-        <div class="wizard-question">
-          <div class="wc-price-row">
-            <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
-            <span class="wc-price-value" id="cpWizardFinalPrice">—</span>
-          </div>
-        </div>
-      </div>
-
-      <input type="hidden" id="videoLinkCp">
-
-      <div class="order-grid" id="cpOrderChannelsPanel" style="margin-top:14px;">
-        <button class="order-btn chat" id="cpOrderBtnChat">
-          <span data-i18n="cpSendChat" id="cpOrderBtnChatText">გაგზავნე შეკვეთა</span>
-        </button>
-      </div>
-      <div class="copy-note" id="cpCopyNote"></div>
-    </div>
-        </div>
-    </div>
-      </div>
-      </div>
-
-      <!-- Card 5b — cheap package (unlimited monthly variant) -->
-<!-- Card 5 — cheap package (fixed price, no Enhance/effects) -->
-      <div class="pc-card-wrap pc-card-wrap--cheapmonthly">
-      <div class="pc-card pc-card--cheapmonthly"><div class="pc-ring" aria-hidden="true"><i class="pc-ring-spin"></i></div>
-        <div class="pc-top"><div class="pc-head">
-        <div class="pc-icon" aria-hidden="true">🌙</div>
-          <div class="pc-head-text">
-          <div class="pc-title" data-i18n="cpmLabel">იაფი პაკეტი (ულიმიტო თვიური)</div>
-          <div class="pc-desc" data-i18n="cpmDesc">თვეში 20 ვიდეო<br><span class="pc-desc-spec">1080/60FPS - 4K/60FPS</span></div>
-          </div>
-        </div>
-        <div class="pc-price-line pc-price-line--dual"><b>9.99<sup>₾</sup></b><span class="pc-price-sep">/</span><b>19.99<sup>₾</sup></b></div>
-        <div class="pc-price-note pc-price-note--nowrap" data-i18n="cpmPriceNote">1080p/4K — არჩევანი პირველი შეკვეთისას</div>
-        </div>
-        <div class="pc-features">
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeature1">1080P • 60FPS</span></div>
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpFeature2">4K • 60FPS</span></div>
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="cpmFeature3">1 თვის განმავლობაში სრული შეკვეთა</span></div>
-          <div class="pc-feature"><span class="pc-check">✓</span><span data-i18n="featTiktokLossless">TikTok-ზე ატვირთვა ხარისხის დაკარგვის გარეშე</span></div>
-          <div class="pc-feature pc-feature--no"><span class="pc-check">✕</span><span data-i18n="featEnhance">ხარისხის გაუმჯობესება</span></div>
-          <div class="pc-feature pc-feature--no"><span class="pc-check">✕</span><span data-i18n="featEffects">ეფექტების დამატება</span></div>
-        </div>
-        <button type="button" class="pc-toggle-btn" id="pcToggleCheapMonthly" aria-expanded="false" aria-controls="cheapMonthlyPanel">
-          <span data-i18n="pcCalcBtn">შეკვეთა</span>
-        </button>
-
-        <div class="panel pc-accordion-body" id="cheapMonthlyPanel">
-    <button type="button" class="pc-modal-close" aria-label="დახურვა">✕</button>
-    <div class="pc-modal-scroll">
-    <div class="wizard-steps" id="wizardStepsCpm">
-      <div class="wizard-step is-active" data-step="1"><span class="wizard-step-dot">1</span><span class="wizard-step-label" data-i18n="wizStepUpload">ატვირთვა</span></div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step" data-step="2"><span class="wizard-step-dot">2</span><span class="wizard-step-label" data-i18n="wizStepQuality">ხარისხი</span></div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step" data-step="3"><span class="wizard-step-dot">3</span><span class="wizard-step-label">TikTok</span></div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step" data-step="4"><span class="wizard-step-dot">4</span><span class="wizard-step-label" data-i18n="wizStepConfirm">დადასტურება</span></div>
-    </div>
-    <div class="eo-box moon-glow-card">
-      <div class="qn-stars" aria-hidden="true">
-        <span style="top:10%;left:8%;animation-delay:0s;"></span>
-        <span style="top:70%;left:14%;animation-delay:.6s;"></span>
-        <span style="top:18%;left:88%;animation-delay:1.2s;"></span>
-        <span style="top:82%;left:80%;animation-delay:.3s;"></span>
-        <span style="top:46%;left:6%;animation-delay:1.6s;"></span>
-      </div>
-      <div class="field" id="cpmScannerField" style="margin-top:14px;">
-        <div class="scanner-stage">
-          <div class="drop-zone simple-drop-zone" id="dropZoneCpm">
-            <input type="file" id="videoInputCpm" accept="video/*">
-            <div class="dz-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path class="dz-plus" d="M12 5v14M5 12h14"/>
-              </svg>
-            </div>
-            <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
-            <div class="dz-sub" data-i18n="dzSubSimple">გადმოაგდეთ ან დააჭირეთ ასარჩევად</div>
-          </div>
-          <div class="simple-scan-result" id="scanResultCpm">
-            <button type="button" class="sr-reset-btn" id="scanResetCpm" aria-label="გაუქმება" title="გაუქმება · ხელახლა ატვირთვა">
-              <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
-            </button>
-            <div class="simple-scan-ok" id="scanOkCpm">
-              <span class="simple-scan-ok-check">✓</span>
-              <span data-i18n="simpleScanOk">ვიდეო მიღებულია</span>
-              <span class="simple-scan-ok-name" id="scanOkNameCpm"></span>
-            </div>
-            <div class="simple-scan-reject" id="scanRejectCpm" data-i18n="srRejectTextCp">გარჩევადობა 1080p-ზე დაბალია — საჭიროა მინიმუმ 1080p (ნებისმიერი fps)</div>
-            <div class="ssr-detected-info" id="scanRejectCpmDetected"></div>
-            <div class="mooon-prompt" id="mooonPromptCpm">
-              <div class="mooon-prompt-q" id="mooonPromptQCpm" data-i18n="mooonPromptQ">გსურთ, ატვირთული ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს შესამოწმებლად?</div>
-              <div class="mooon-prompt-actions" id="mooonPromptActionsCpm">
-                <button type="button" class="mooon-prompt-yes" id="mooonPromptYesCpm" data-i18n="mooonPromptYes">დიახ</button>
-                <button type="button" class="mooon-prompt-no" id="mooonPromptNoCpm" data-i18n="mooonPromptNo">არა</button>
-              </div>
-              <div class="mt-upload-head">
-                <span class="mt-upload-head-badge">☁️</span>
-                <span class="mt-upload-head-text" data-i18n="mtUploadHeadline">ავტომატური ატვირთვა</span>
-              </div>
-              <div class="mooon-auto" id="mooonAutoCpm">
-                <div class="mooon-auto-status" id="mooonAutoStatusCpm">
-                  <div class="mooon-auto-ring-box" id="mooonAutoRingBoxCpm">
-                    <span class="mooon-auto-ring-percent" id="mooonAutoPercentCpm">0%</span>
-                  </div>
-                  <span id="mooonAutoStatusTextCpm" class="mooon-auto-sr-only" data-i18n="mooonAutoUploading">იტვირთება…</span>
-                </div>
-                <div class="mooon-auto-stay" data-i18n="mooonAutoStayHint">📱 დატოვეთ ეს გვერდი ღია და ეკრანი ჩართული, სანამ ატვირთვა დასრულდება</div>
-                <div class="mooon-auto-error" id="mooonAutoErrorCpm"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="mp-grid mp-grid-two" id="cpmQualityGrid" style="margin-top:14px;">
-        <button type="button" class="mp-box" data-quality="1080_60">
-          <span class="mp-box-q">1080p</span>
-          <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">9.99<sup>₾</sup></span></span>
-        </button>
-        <button type="button" class="mp-box" data-quality="4k_120">
-          <span class="mp-box-q">4K</span>
-          <span class="mp-box-fps">60FPS</span>
-          <span class="mp-box-price"><span class="mp-new-price">19.99<sup>₾</sup></span></span>
-        </button>
-      </div>
-
-      <div class="field field-tiktok" id="tiktokFieldCpm" style="margin-bottom:6px;">
-        <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
-        <div class="link-input-wrap">
-          <span class="icon">@</span>
-          <input autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other" type="text" class="num-input" id="tiktokLinkCpm" placeholder="tiktok.com/@username">
-        </div>
-        <button type="button" class="tt-auto-btn" id="tiktokAutoBtnCpm">
-          <span class="tt-auto-ico">🔗</span>
-          <span data-i18n="tiktokAutoBtn">TikTok-ის გახსნა</span>
-        </button>
-        <div class="tt-auto-note" id="tiktokAutoNoteCpm"></div>
-        <div class="error-msg" id="tiktokErrorCpm" data-i18n="tiktokError">⚠️ შეკვეთის გასაგზავნად TikTok პროფილის ლინკის მითითება აუცილებელია!</div>
-        <button type="button" class="wizard-confirm-btn" id="cpmTiktokConfirmBtn" data-i18n="wizardConfirmLink">დადასტურება</button>
-      </div>
-
-      <div class="field" id="cpmSendConfirmFieldWrap">
-        <div class="wizard-question">
-          <div class="wc-price-row">
-            <span class="wc-price-label" data-i18n="srPrice">გამოთვლილი ფასი</span>
-            <span class="wc-price-value" id="cpmWizardFinalPrice">—</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="sub-active-badge" id="subActiveBadgeCpm">
-        <span class="sub-active-check">✅</span>
-        <span class="sub-active-text" data-i18n="subActivatedCheapMonthly">თქვენ გააქტიურებული გაქვთ ეს თვიური პაკეტი — ხარისხი და TikTok უკვე დადასტურებულია, საკმარისია მხოლოდ ვიდეოს ატვირთვა</span>
-      </div>
-
-      <input type="hidden" id="videoLinkCpm">
-
-      <div class="order-grid" id="cpmOrderChannelsPanel" style="margin-top:14px;">
-        <button class="order-btn chat" id="cpmOrderBtnChat">
-          <span data-i18n="cpmSendChat" id="cpmOrderBtnChatText">გაგზავნე შეკვეთა</span>
-        </button>
-      </div>
-      <div class="copy-note" id="cpmCopyNote"></div>
-    </div>
-        </div>
-    </div>
-      </div>
-      </div>
       
 
 
@@ -8957,7 +8578,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   </div>
 
 
-  <footer><span data-i18n="footer">© 2026 MOONFULL4K. <span id="adminTriggerWord" class="admin-trigger-word">ყველა</span> უფლება დაცულია.</span></footer>
+  <footer><span data-i18n="footer"><span class="ft-lat">© 2026 MOONFULL4K.</span> <span id="adminTriggerWord" class="admin-trigger-word">ყველა</span> უფლება დაცულია.</span></footer>
 
 </div>
 
@@ -9082,23 +8703,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   </div>
 </div>
 
-<!-- Cheap Package: "can't upscale past your uploaded source" notice. Deliberately
-     placed at the top level of <body> (like discord-gate / admin-overlay below),
-     NOT nested inside any .moon-glow-card container — those cards use
-     `contain: layout paint style` plus a `> *{ position:relative }` rule for their
-     own glow/star effects, and either one alone is enough to hijack a
-     position:fixed descendant into being positioned relative to the CARD instead
-     of the viewport. Nesting this modal inside one earlier caused it to render as
-     a tall, un-hideable block stretching down the whole accordion panel instead of
-     a proper full-screen popup. -->
-<div class="cp-upscale-modal-overlay" id="cpUpscaleModalOverlay">
-  <div class="cp-upscale-modal">
-    <button type="button" class="cp-upscale-modal-close" id="cpUpscaleModalClose" aria-label="დახურვა">✕</button>
-    <div class="cp-upscale-modal-ico" aria-hidden="true">⚠️</div>
-    <div class="cp-upscale-modal-title" id="cpUpscaleModalTitle" data-i18n="cpUpscaleModalTitle">ამ ხარისხში გადაყვანა შეუძლებელია</div>
-    <p class="cp-upscale-modal-text" id="cpUpscaleModalText" data-i18n="cpUpscaleModalText4k">ძვირფასო მომხმარებელო, თქვენი ვიდეო ატვირთულია <b>1080p</b> ფორმატში — რაც არ უნდა Fps იყოს, მას <b>4K</b> ფორმატში ვერ გადაიყვანთ. თუ გსურთ 4K-ით სარგებლობა, ატვირთეთ ვიდეო, რომელიც რეალურად 4K ფორმატშია.</p>
-  </div>
-</div>
 
 <script>
   // ============================================================
@@ -9114,7 +8718,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
 
   // ============================================================
   // -3) WIZARD STAGE INDICATOR — shared by all four order panels
-  //     (individual / weekly / monthly / cheap). Marks steps before
+  //     (individual / weekly / monthly). Marks steps before
   //     stepNum as done (checkmark) and the current one as active;
   //     safe no-op if the panel passed in doesn't have one.
   // ============================================================
@@ -9133,7 +8737,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
 
   // ============================================================
   // -3b) WIZARD STEP SWAP — shared by every order wizard (individual /
-  //      weekly / monthly / cheap / cheap-monthly) for moving between
+  //      weekly / monthly) for moving between
   //      steps. Replaces the old instant display:none swap, which
   //      dropped the outgoing step in the same frame the incoming one
   //      started fading in and made the whole panel jump straight to
@@ -9302,21 +8906,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       eoDesc: 'ზუსტად ამ სტილის მონტაჟი შენი საყვარელი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი და ა.შ). შეუკვეთე და ჩატში გამომიგზავნე პერსონაჟის ფოტო/რეფერენსი — დანარჩენს ჩვენ გავაკეთებთ.',
       eoPriceLabel: 'ფასი',
       eoSendChat: 'გაგზავნე შეკვეთა',
-      cpLabel: 'იაფი პაკეტი',
-      cpDesc: 'ბიუჯეტური ვარიანტი<br>მარტივი დამუშავება',
-      cpPriceNote: '1080p / 4K — ფასი ფიქსირებულია',
-      cpFeatureFast: 'ჩაბარდება მაქსიმუმ 30 წუთში',
-      cpFeature1: '1080P • 60FPS',
-      cpFeature2: '4K • 60FPS',
-      cpCaption: 'იაფი პაკეტი — სწრაფი და ეკონომიური დამუშავება, ხარისხის გაუმჯობესებისა და ეფექტების გარეშე',
-      cpSendChat: 'გაგზავნე შეკვეთა',
-      cpQualityHint: 'აირჩიეთ ხარისხი ან ატვირთეთ ვიდეო — შესაბამისი ფასი თავად მოინიშნება',
-      cpmLabel: 'იაფი პაკეტი (ულიმიტო თვიური)',
-      cpmDesc: 'თვეში 20 ვიდეო',
-      cpmPriceNote: '1080p/4K — არჩევანი პირველი შეკვეთისას',
-      cpmFeature3: '1 თვის განმავლობაში სრული შეკვეთა',
-      cpmSendChat: 'გაგზავნე შეკვეთა',
-      subActivatedCheapMonthly: 'თქვენ გააქტიურებული გაქვთ ეს თვიური პაკეტი — ხარისხი და TikTok უკვე დადასტურებულია, საკმარისია მხოლოდ ვიდეოს ატვირთვა',
       ttdlBadge: 'უფასო',
       ttdlTitle: 'MOON TT DOWNLOADER / CHECKER',
       ttdlDesc: 'ჩამოტვირთვა უმაღლესი ხარისხით<br>გაიგე თუ რა ხარისხში გაქვს ატვირთული ვიდეო',
@@ -9324,9 +8913,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       ttdlAnalyzeBtn: 'გაანალიზება',
       ttdlDownloadMusic: 'მუსიკის ჩამოტვირთვა',
       ttdlIosLinkText: '<span class="ttdl-ios-link-ico" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>ვიდეოს შენახვა — დააჭირეთ აქ',
-      cpUpscaleModalTitle: 'ამ ხარისხში გადაყვანა შეუძლებელია',
-      cpUpscaleModalText4k: 'გთხოვთ მონიშნოთ <b>1080p / 60FPS</b> ვერსია, რადგან სწორედ ამ ფორმატშია თქვენი ვიდეო ატვირთული. თუ გსურთ 4K ფორმატით სარგებლობა TikTok-ზე, მაშინ ატვირთეთ ვიდეო, რომელიც რეალურად <b>4K</b> ფორმატშია.',
-      cpUpscaleModalTextDowngrade: 'გთხოვთ მონიშნოთ <b>4K / 60FPS</b> ვერსია, რადგან სწორედ ამ ფორმატშია თქვენი ვიდეო ატვირთული. თუ გსურთ 1080p ფორმატით სარგებლობა TikTok-ზე, მაშინ ატვირთეთ ვიდეო, რომელიც ზუსტად <b>1080p</b> ფორმატშია.',
       qnHowto: 'როგორ შევუკვეთო',
       qnPromo: 'პრომო კოდი',
       qnBeforeAfter: 'მონტაჟამდე / მონტაჟის შემდეგ',
@@ -9388,7 +8974,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       dzSubSimple: 'გადმოაგდეთ ან დააჭირეთ ასარჩევად',
       simpleScanOk: 'ვიდეო მიღებულია',
       srRejectTextShort: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps',
-      srRejectTextCp: 'ფორმატი არ ემთხვევა — საჭიროა ზუსტად 1080p / 60fps, ან ნებისმიერი 2K/4K ვიდეო',
       qualityWarnText: '',
       subscriberT1: 'ვარ არხის გამომწერი',
       subscriberT2: '10%-იანი ფასდაკლება',
@@ -9430,10 +9015,8 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       srRejectTitle: 'ფაილი არ შეესაბამება მოთხოვნებს',
       srRejectDetectedLabel: 'ატვირთული ფაილის მონაცემები:',
       srRejectText: 'ძვირფასო მომხმარებელო, აუცილებელია ატვირთოთ ვიდეო <b>1080p / 60fps</b> ფორმატში — ზუსტად ეს ფორმატი, არც მეტი და არც ნაკლები. ნებისმიერი სხვა გარჩევადობა ან კადრების სიხშირე (მაგ. 720p, 2K, 4K, 30fps, 120fps) არ მიიღება.',
-      srReject4kNote: 'ℹ️ 1080p-ზე მაღალი ხარისხის ვიდეოს ატვირთვა შესაძლებელია მხოლოდ „იაფი პაკეტის“ შეკვეთისას (ფასდება 4K ტარიფით) — დანარჩენ პაკეტებში ატვირთული ვიდეო აუცილებლად უნდა იყოს ზუსტად 1080p / 60fps.',
       srRejectRatioMobile: '📱 თუ იყენებთ მობილურის აპლიკაციებს — გთხოვთ, ვიდეო გადაიყვანოთ <b>1:1</b> ან <b>16:9</b> ფორმატში.',
       srRejectRatioDesktop: '🖥️ თუ იყენებთ კომპიუტერს — გადაიყვანეთ <b>1080x1080</b> ფორმატში.',
-      srReject4kNoteShort: 'ℹ️ 2K/4K ფორმატის ატვირთვა შესაძლებელია მხოლოდ „იაფ პაკეტში“',
       srRejectAppsMobile: 'მობილურებისთვის / აიფონისთვის / აიპადებისთვის:',
       srRejectAppsDesktop: 'კომპიუტერისთვის:',
       srRejectEtc: 'და ა.შ.',
@@ -9500,7 +9083,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       contactPanelOnline: 'ჩვეულებრივ სწრაფად ვპასუხობთ',
       contactPanelSub: 'შემოგვიერთდი Discord-ზე და დაწერე ნებისმიერი კითხვა, პირადად გიპასუხებ.',
       contactDiscordSub: 'შემოდი სერვერზე ♥',
-      footer: '© 2026 MOONFULL4K. <span id="adminTriggerWord" class="admin-trigger-word">ყველა</span> უფლება დაცულია.',
+      footer: '<span class="ft-lat">© 2026 MOONFULL4K.</span> <span id="adminTriggerWord" class="admin-trigger-word">ყველა</span> უფლება დაცულია.',
       chatAssistant: 'ასისტენტი',
       acbLabelLine1: 'შეკვეთის',
       acbLabelLine2: 'გაგრძელება',
@@ -9575,7 +9158,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       adminOrderTypeWeekly: 'კვირის',
       adminOrderTypeMonthly: 'თვის',
       adminOrderTypeEditOrder: 'ედითის შეკვეთა',
-      adminOrderTypeCheapOrder: 'იაფი პაკეტი',
       adminConfirmedOrdersTitle: 'დადასტურებული შეკვეთების არქივი',
       adminNoConfirmedOrders: 'დადასტურებული შეკვეთა ჯერ არ არის.',
       adminNoConfirmedOrdersMatch: 'ამ ID-ით დადასტურებულ შეკვეთებში ვერაფერი მოიძებნა.',
@@ -9743,21 +9325,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       eoDesc: 'The exact same style of edit, made with your favorite character (anime, game hero, movie character, etc). Order it, then send us a photo/reference of the character in chat — we handle the rest.',
       eoPriceLabel: 'Price',
       eoSendChat: 'Send order',
-      cpLabel: 'Cheap Package',
-      cpDesc: 'Budget option<br>simple processing',
-      cpPriceNote: '1080p / 4K — fixed price',
-      cpFeatureFast: 'Delivered within 30 minutes max',
-      cpFeature1: '1080P • 60FPS',
-      cpFeature2: '4K • 60FPS',
-      cpCaption: 'Cheap Package — fast and affordable processing, without quality boost or effects',
-      cpSendChat: 'Send order',
-      cpQualityHint: 'Pick a quality or upload your video — the matching price will be selected automatically',
-      cpmLabel: 'Cheap Package (Unlimited Monthly)',
-      cpmDesc: '20 videos / month',
-      cpmPriceNote: '1080p/4K — choose on your first order',
-      cpmFeature3: 'Full order support for 1 month',
-      cpmSendChat: 'Send order',
-      subActivatedCheapMonthly: 'You have this monthly package activated — quality and TikTok are already confirmed, just upload your video',
       ttdlBadge: 'FREE',
       ttdlTitle: 'MOON TT DOWNLOADER / CHECKER',
       ttdlDesc: 'Download in the highest quality<br>Find out what quality your video was uploaded in',
@@ -9765,9 +9332,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       ttdlAnalyzeBtn: 'Analyze Video',
       ttdlDownloadMusic: 'Download music',
       ttdlIosLinkText: '<span class="ttdl-ios-link-ico" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>Save video — tap here',
-      cpUpscaleModalTitle: "You can't switch to this quality",
-      cpUpscaleModalText4k: "Please select the <b>1080p / 60FPS</b> option — that's the format your video was actually uploaded in. If you'd like to use 4K on TikTok, upload a video that is actually in <b>4K</b> format.",
-      cpUpscaleModalTextDowngrade: "Please select the <b>4K / 60FPS</b> option — that's the format your video was actually uploaded in. If you'd like to use 1080p on TikTok, upload a video that is exactly <b>1080p</b> format.",
       qnHowto: 'How it works',
       qnPromo: 'Promo code',
       qnBeforeAfter: 'Before / After',
@@ -9829,7 +9393,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       dzSubSimple: 'Drop it here or click to choose',
       simpleScanOk: 'Video accepted',
       srRejectTextShort: 'Format doesn\'t match — must be exactly 1080p / 60fps',
-      srRejectTextCp: 'Format doesn\'t match — must be exactly 1080p / 60fps, or any 2K/4K video',
       qualityWarnText: '',
       subscriberT1: "I'm a channel subscriber",
       subscriberT2: '10% discount',
@@ -9871,10 +9434,8 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       srRejectTitle: "This file doesn't meet the requirements",
       srRejectDetectedLabel: 'Uploaded file details:',
       srRejectText: 'Dear user, you must upload the video in <b>1080p / 60fps</b> format — exactly this format, no more and no less. Any other resolution or frame rate (e.g. 720p, 2K, 4K, 30fps, 120fps) will not be accepted.',
-      srReject4kNote: 'ℹ️ Uploading a video above 1080p quality is only possible when ordering the "Cheap Package" (priced at the 4K rate) — for every other package, the uploaded video must be exactly 1080p / 60fps.',
       srRejectRatioMobile: '📱 If you\'re using mobile apps — please convert the video to <b>1:1</b> or <b>16:9</b> format.',
       srRejectRatioDesktop: '🖥️ If you\'re using a computer — convert it to <b>1080x1080</b> format.',
-      srReject4kNoteShort: 'ℹ️ 2K/4K upload is only possible in the "Cheap Package"',
       srRejectAppsMobile: 'For mobile / iPhone / iPad:',
       srRejectAppsDesktop: 'For desktop:',
       srRejectEtc: 'etc.',
@@ -10016,7 +9577,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       adminOrderTypeWeekly: 'Weekly',
       adminOrderTypeMonthly: 'Monthly',
       adminOrderTypeEditOrder: 'Character Edit',
-      adminOrderTypeCheapOrder: 'Cheap Package',
       adminConfirmedOrdersTitle: 'Confirmed orders archive',
       adminNoConfirmedOrders: 'No confirmed orders yet.',
       adminNoConfirmedOrdersMatch: 'No confirmed order found with that ID.',
@@ -10112,9 +9672,9 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     }
   };
 
-  Object.assign(TRANSLATIONS.ka, {"mnHome": "მთავარი", "mnOrder": "შეკვეთა", "mnUpload": "ატვირთვა", "mnContact": "კონტაქტი", "mnOnline": "ონლაინ", "mnLangAria": "ენა", "mnClose": "დახურვა", "mnOrdTitle": "როგორ შევუკვეთოთ", "mnOrdSub": "6 მარტივი ნაბიჯი — ვიდეოდან მზა შედეგამდე", "mnOrdS1T": "აირჩიე პაკეტი", "mnOrdS1X": "მთავარ გვერდზე აირჩიე შენთვის შესაფერისი პაკეტი: ერთჯერადი, კვირის, თვის, იაფი ან მსგავსი მონტაჟი შენი პერსონაჟით.", "mnOrdS2T": "გამოთვალე ფასი", "mnOrdS2X": "მიუთითე ვიდეოს ხანგრძლივობა და ხარისხი (1080p ან 4K) — ფასი მაშინვე გამოჩნდება.", "mnOrdS3T": "ატვირთე ვიდეო", "mnOrdS3X": "ატვირთე ვიდეო VIDEO SCANNER-ში: ხანგრძლივობა ავტომატურად გამოითვლება, ვიდეო კი ფონურ რეჟიმში გადაეგზავნება ჩვენს გუნდს.", "mnOrdS4T": "მიუთითე TikTok", "mnOrdS4X": "ჩასვი შენი TikTok პროფილის ლინკი ან დააჭირე ავტომატურ ამოცნობას ბუფერიდან.", "mnOrdS5T": "დააჭირე „შეკვეთას“", "mnOrdS5X": "Discord-ით შესვლის შემდეგ პირდაპირ ჩვენთან ჩატი გაიხსნება, შეკვეთის მზა დეტალებით.", "mnOrdS6T": "დაელოდე დადასტურებას", "mnOrdS6X": "მენეჯერი ჩატშივე დაგიდასტურებს შეკვეთას, გადახდის დეტალებს და ვადას. ჩაბარება — მაქსიმუმ 24 საათში.", "mnNotesTitle": "კარგია იცოდე", "mnOrdN1": "ატვირთვისას ვიდეო უნდა იყოს ზუსტად 1080p / 60fps; გამომავალ ხარისხს (1080p ან 4K) შეკვეთისას ირჩევ.", "mnOrdN2": "მაქსიმალური ხანგრძლივობა — 59.59 წამი. უფრო გრძელი ვიდეო ფასდება ინდივიდუალურად.", "mnOrdN3": "მონტაჟი მხოლოდ TikTok-ისთვისაა, ამიტომ საჭიროა სწორი პროფილის ლინკი.", "mnOrdN4": "პირველი ვერსიის შესწორება ერთხელ უფასოა; თანხის დაბრუნება შესაძლებელია ჩაბარებიდან 24 საათში.", "mnOrdCta": "შეკვეთის დაწყება", "mnUpTitle": "როგორ ავტვირთოთ", "mnUpSub": "ატვირთვა პირდაპირ საიტზე ხდება — რამდენიმე წამში", "mnUpS1T": "გახსენი ატვირთვის ველი", "mnUpS1X": "დააჭირე „ატვირთეთ ვიდეო“ ღილაკს VIDEO SCANNER ბლოკში ან პაკეტის ბარათზე.", "mnUpS2T": "აირჩიე ფაილი", "mnUpS2X": "აირჩიე ვიდეო გალერეიდან ან ფაილებიდან. ფორმატი უნდა იყოს ზუსტად 1080p / 60fps (2K/4K — მხოლოდ „იაფ პაკეტში“).", "mnUpS3T": "დაელოდე გაზომვას", "mnUpS3X": "საიტი ავტომატურად აჩვენებს ხანგრძლივობას, ფორმატს და ფასს.", "mnUpS4T": "დაადასტურე გაგზავნა", "mnUpS4X": "კითხვაზე, გსურთ თუ არა ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს, აირჩიე „დიახ“.", "mnUpS5T": "არ დატოვო გვერდი", "mnUpS5X": "ატვირთვის დასრულებამდე გვერდი ღია და ეკრანი ჩართული უნდა გქონდეს — თორემ ატვირთვა შეჩერდება.", "mnUpTipsTitle": "თუ ფორმატი არ ემთხვევა", "mnUpT1": "მობილურზე: გადაიყვანე ვიდეო 1:1 ან 16:9 ფორმატში.", "mnUpT2": "კომპიუტერზე: გადაიყვანე 1080x1080 ფორმატში.", "mnUpT3": "მაქსიმალური ხანგრძლივობა — 59.59 წამი.", "mnUpCta": "ატვირთვის დაწყება", "mnCtTitle": "დაგვიკავშირდი Discord-ზე", "mnCtSub": "შემოგვიერთდი სერვერზე და დაწერე ნებისმიერი კითხვა — პირადად გიპასუხებ.", "mnCtBtn": "Discord-ზე გადასვლა", "mnCtNote": "ჩვეულებრივ სწრაფად ვპასუხობთ"});
-  Object.assign(TRANSLATIONS.en, {"mnHome": "Home", "mnOrder": "Order", "mnUpload": "Upload", "mnContact": "Contact", "mnOnline": "Online", "mnLangAria": "Language", "mnClose": "Close", "mnOrdTitle": "How to order", "mnOrdSub": "6 simple steps — from your video to the finished edit", "mnOrdS1T": "Choose a package", "mnOrdS1X": "On the main page pick the package that suits you: single, weekly, monthly, cheap, or a similar edit with your character.", "mnOrdS2T": "Calculate the price", "mnOrdS2X": "Set the video duration and quality (1080p or 4K) — the price appears instantly.", "mnOrdS3T": "Upload your video", "mnOrdS3X": "Upload it in the VIDEO SCANNER: the duration is measured automatically and the video is sent to our team in the background.", "mnOrdS4T": "Add your TikTok", "mnOrdS4X": "Paste your TikTok profile link, or tap auto-detect from the clipboard.", "mnOrdS5T": "Press “Order”", "mnOrdS5X": "After signing in with Discord, a chat opens with us directly, with your order details ready.", "mnOrdS6T": "Wait for confirmation", "mnOrdS6X": "A manager confirms the order, payment details and deadline right in the chat. Delivery within 24 hours at most.", "mnNotesTitle": "Good to know", "mnOrdN1": "On upload the video must be exactly 1080p / 60fps; you pick the output quality (1080p or 4K) when ordering.", "mnOrdN2": "Maximum duration is 59.59 seconds. Longer videos are priced individually.", "mnOrdN3": "Editing is for TikTok only, so a valid profile link is required.", "mnOrdN4": "The first revision is free (once); a refund is possible within 24 hours of delivery.", "mnOrdCta": "Start an order", "mnUpTitle": "How to upload", "mnUpSub": "Uploading happens right on the site — it takes a few seconds", "mnUpS1T": "Open the upload field", "mnUpS1X": "Tap “Upload a video” in the VIDEO SCANNER block or on a package card.", "mnUpS2T": "Choose a file", "mnUpS2X": "Pick the video from your gallery or files. It must be exactly 1080p / 60fps (2K/4K only in the “Cheap Package”).", "mnUpS3T": "Wait for the scan", "mnUpS3X": "The site automatically shows the duration, format and price.", "mnUpS4T": "Confirm sending", "mnUpS4X": "When asked whether to send the video to our team automatically, choose “Yes”.", "mnUpS5T": "Don’t leave the page", "mnUpS5X": "Keep the page open and the screen on until the upload finishes — otherwise it stops.", "mnUpTipsTitle": "If the format doesn’t match", "mnUpT1": "On mobile: convert the video to 1:1 or 16:9.", "mnUpT2": "On a computer: convert it to 1080x1080.", "mnUpT3": "Maximum duration is 59.59 seconds.", "mnUpCta": "Start uploading", "mnCtTitle": "Reach us on Discord", "mnCtSub": "Join our server and ask any question — I’ll answer you personally.", "mnCtBtn": "Open Discord", "mnCtNote": "Usually replies fast"});
-  TRANSLATIONS.ru = Object.assign({}, TRANSLATIONS.en, {"visitorsLabel": "Всего посетителей на сайте:", "menuVisitors": "Посетители", "menuViews": "Просмотры", "topbarTagline": "Вы заслуживаете лучшего качества", "authGateTitle": "Вы заслуживаете лучшего качества.", "authGateSub": "<span class=\"dg-spec\"><b>1080p / 4K • 60FPS</b></span><span class=\"dg-cta\">Чтобы продолжить, войдите через Discord</span>", "authGateClose": "Закрыть", "authLoginBtn": "Войти через Discord", "authJoinBtn": "Присоединиться к серверу Discord", "authGateSkip": "Продолжить как гость", "guildGateTitle": "Нужно присоединиться к нашему серверу Discord", "authLoggedInSub": "Вход выполнен через Discord", "authMemberBadge": "УЧАСТНИК", "authLogout": "Выйти", "authError": "Не удалось войти через Discord — попробуйте ещё раз.", "heroTitle": "<span>Заказать сейчас!</span>", "heroSub": "Укажите длительность видео (или загрузите видео — она определится автоматически), цена рассчитывается в реальном времени, монтаж на уровне After Effects.", "pcHeading": "Выберите пакет", "pcSubheading": "Выберите подходящий пакет", "pcCalcBtn": "Заказать", "pcRibbon": "Популярный", "pcFrom": "от", "pc1Title": "Разовый пакет", "pc1Desc": "Одно видео —<br>цена считается автоматически по длительности.", "pc1PriceNote": "Цена зависит от длительности", "pc1Feature1": "1080P • 60FPS", "pc1Feature2": "Сдача в течение 24 часов", "pc1Feature3": "4K • 60FPS", "aoTitle": "Разовый заказ", "aoDesc": "Любой формат видео<br>— загрузка напрямую", "aoSendChat": "Отправить заказ", "pc2Title": "Недельный пакет", "pc2Desc": "5 видео в неделю<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc2PriceNote": "1080p/4K — выбор после загрузки", "pc2Feature1": "В течение 1 недели<br>полный заказ", "pc2Feature2": "4K • 60FPS", "pc3Title": "Месячный пакет", "pc3Desc": "20 видео в месяц<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc3PriceNote": "1080p/4K — выбор после загрузки", "pc3Feature1": "В течение 1 месяца<br>полный заказ", "pc3Feature2": "4K • 60FPS", "pc4Desc": "Похожий монтаж<br>с вашим персонажем", "pc4PriceNote": "<span class=\"pc-price-note-line\">Цена зависит от выбранного стиля и качества</span>", "pc4Feature3": "Сдача в течение 24 часов", "featEnhance": "Улучшение качества", "featEffects": "Добавление эффектов", "featTiktokLossless": "Загрузка в TikTok без потери качества", "portfolioLabel": "Портфолио работ", "portfolioCta": "Смотреть работы в TikTok", "myOrdersLabel": "Мои заказы", "qnWhy": "Почему MOON<span class=\"qn-q\">?</span>", "qnPortfolio": "Портфолио", "qnEditOrder": "Заказать монтаж", "eoLabel": "Заказать монтаж", "eoVideoBadge": "Пример", "eoStyle1": "Стиль 1", "eoStyle2": "Стиль 2", "eoStyle3": "Стиль 3", "eoStyle4": "Стиль 4", "eoCaption": "Похожий монтаж — с вашим персонажем", "eoDesc": "Точно такой же стиль монтажа, но с вашим любимым персонажем (аниме, герой игры, кино и т. д.). Закажите, затем пришлите нам в чате фото/референс персонажа — остальное сделаем мы.", "eoPriceLabel": "Цена", "eoSendChat": "Отправить заказ", "cpLabel": "Дешёвый пакет", "cpDesc": "Бюджетный вариант<br>простая обработка", "cpPriceNote": "1080p / 4K — фиксированная цена", "cpFeatureFast": "Сдача максимум за 30 минут", "cpCaption": "Дешёвый пакет — быстрая и доступная обработка, без улучшения качества и эффектов", "cpSendChat": "Отправить заказ", "cpQualityHint": "Выберите качество или загрузите видео — подходящая цена выберется автоматически", "cpmLabel": "Дешёвый пакет (безлимитный месячный)", "cpmDesc": "20 видео в месяц", "cpmPriceNote": "1080p/4K — выбор при первом заказе", "cpmFeature3": "Полное сопровождение заказов в течение 1 месяца", "cpmSendChat": "Отправить заказ", "ttdlBadge": "БЕСПЛАТНО", "ttdlDesc": "Скачивайте в максимальном качестве<br>Узнайте, в каком качестве загружено ваше видео", "ttdlInputPh": "Вставьте ссылку на видео TikTok...", "ttdlAnalyzeBtn": "Анализировать видео", "ttdlDownloadMusic": "Скачать музыку", "qnHowto": "Как это работает", "qnPromo": "Промокод", "qnBeforeAfter": "До / После", "qnContact": "Контакты", "qnRules": "Правила", "rule1Title": "Формат видео", "rule1Text": "При загрузке видео должно быть строго 1080p/60fps. Качество результата (1080p или 4K) выбирается при заказе.", "rule2Title": "Длительность", "rule2Text": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "rule3Title": "Назначение монтажа", "rule3Text": "Видео монтируется только для формата TikTok. Нужна корректная ссылка на профиль TikTok.", "rule4Title": "Срок сдачи", "rule4Text": "Сдача максимум за 24 часа. При системных изменениях — как только это станет возможным.", "rule5Title": "Бесплатная правка", "rule5Text": "Если первая версия не совпала с договорённостью, мы один раз исправим её совершенно бесплатно.", "rule6Title": "Если TikTok удалит видео", "rule6Text": "Если после сдачи TikTok сам удалил или ограничил видео — это вина его алгоритма, а не нашего. По этой причине деньги не возвращаются.", "rule7Title": "Возврат средств", "rule7Text": "Возврат возможен только в течение 24 часов после сдачи. Позже — невозможен.", "rule8Title": "Оплата", "rule8Text": "Реквизиты оплаты уточнит менеджер в чате после подтверждения заказа.", "trustLabel": "Почему MOON", "trust1Title": "Настоящие отзывы", "trust2Title": "Ручной монтаж, а не шаблоны", "trust3Title": "Прямой контакт с менеджером", "trust4Title": "Прозрачная цена заранее", "trust5Title": "Гарантия — одна бесплатная правка", "trustRatingText": "Средняя оценка <b>{AVG}</b> — на основе {COUNT} реальных отзывов", "finalPrice": "Итоговая цена", "markDuration": "Укажите точную длительность (секунды)", "secLabelShort": "Секунды", "msLabelShort": "Сотые", "secUnit": "сек", "msUnit": "сотых", "secondsPlaceholder": "Введите секунды (0–59)", "msLabel": "Сотые доли секунды (00–59)", "msHint": "Максимальная общая длительность — 59.59. В этом диапазоне цена считается по тарифу 59 секунд.", "qualityLabel": "Выберите качество видео:", "wizStepUpload": "Загрузка", "wizStepQuality": "Качество", "wizStepConfirm": "Подтверждение", "qualityWizardLabel": "Выберите качество для загрузки в TikTok", "scannerPrimaryBadge": "⚡ Автоматически и точно", "manualFallbackSub": "Быстрый ручной ввод — секунды и сотые", "manualEntryBadge": "Ручной ввод", "qualityRecBadge": "Единственный формат", "qualityBadgeStandard": "Стандарт", "qualityBadgePremium": "Премиум", "simpleScanLabel": "Сканер видео", "dzTitleSimple": "Загрузите видео", "dzSubSimple": "Перетащите сюда или нажмите, чтобы выбрать", "simpleScanOk": "Видео принято", "srRejectTextShort": "Формат не подходит — нужно строго 1080p / 60fps", "srRejectTextCp": "Формат не подходит — нужно строго 1080p / 60fps или любое 2K/4K видео", "subscriberT2": "Скидка 10%", "wizardConfirmLink": "Подтвердить", "sendOrderWizardQ": "Хотите отправить заказ?", "wizardYes": "Да", "wizardNo": "Нет", "wantOrderQ": "Хотите заказать?", "subscriberWizardQ": "Вы подписчик нашего канала в TikTok?", "tiktokLabel": "Ссылка на ваш профиль TikTok *", "tiktokError": "⚠️ Для отправки заказа нужна ссылка на профиль TikTok!", "videoLinkLabel": "Ссылка на загруженное видео *", "videoLinkError": "⚠️ Для отправки заказа нужна ссылка на загруженное видео!", "tiktokConfirmPrompt": "Нажмите для подтверждения", "tiktokConfirmDone": "✓ Подтверждено", "videoScanner": "VIDEO SCANNER", "dzTitle": "Загрузите видео для автоматического замера", "dzSub": "Перетащите сюда или нажмите — длительность заполнится автоматически", "scanProcessing": "Обработка видео…", "scanCancelBtn": "Отмена", "srFile": "Файл", "srDuration": "Длительность", "srDetectedFormat": "Формат загруженного видео", "srRequestedFormat": "Запрошенное качество", "srPrice": "Рассчитанная цена", "srSuccessText": "Видео загружено", "srUnit": "с", "srFpsUnknown": "fps неизвестен", "srMatchNote": "✓ Загруженное видео соответствует запрошенному качеству ({REQ})", "srMismatchNote": "⚠️ Вы запросили {REQ}, но загруженное видео фактически {DET} — цена всё равно считается по запрошенному качеству ({REQ}).", "srWarnOver": "⚠️ Видео длиннее 59.59 секунды — оно оценивается индивидуально; калькулятор показывает тариф 59.59.", "dzReq": "Обязательный формат: строго 1080p · 60fps", "srRejectDetectedLabel": "Данные загруженного файла:", "srRejectText": "Уважаемый пользователь, загрузить нужно видео в формате <b>1080p / 60fps</b> — именно в этом формате, не больше и не меньше. Любое другое разрешение или частота кадров (например 720p, 2K, 4K, 30fps, 120fps) не принимается.", "srReject4kNote": "ℹ️ Загрузка видео выше 1080p возможна только при заказе «Дешёвого пакета» (оценивается по тарифу 4K) — в остальных пакетах загруженное видео должно быть строго 1080p / 60fps.", "srRejectRatioMobile": "📱 Если вы пользуетесь мобильными приложениями — переведите видео в формат <b>1:1</b> или <b>16:9</b>.", "srRejectRatioDesktop": "🖥️ Если вы пользуетесь компьютером — переведите в формат <b>1080x1080</b>.", "srReject4kNoteShort": "ℹ️ Загрузка 2K/4K возможна только в «Дешёвом пакете»", "srRejectAppsMobile": "Для мобильных / iPhone / iPad:", "srRejectAppsDesktop": "Для компьютера:", "srRejectEtc": "и т. д.", "srRejectRetry": "↻ Попробовать другое видео", "srTransferQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "srTransferYes": "Да", "srTransferNo": "Нет", "mooonPromptQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "mooonPromptYes": "Да", "mooonPromptNo": "Нет", "mooonAutoUploading": "Загружаем ваше видео в mooontransferr…", "mooonAutoFinalizing": "Готовим вашу ссылку…", "mooonAutoError": "⚠️ Автоматическая загрузка не удалась. ", "mooonAutoErrorBackgrounded": "⚠️ Загрузка остановилась, потому что страница ушла в фон (экран заблокирован или вы переключили приложение). ", "mooonAutoStayHint": "📱 Держите страницу открытой, а экран включённым, пока загрузка не завершится", "mooonAutoManualLink": "Загрузить вручную на mooontransferr.onrender.com →", "mooonAutoRetry": "↻ Попробовать снова", "mtUploadHeadline": "Автоматическая загрузка", "tiktokAutoBtn": "Открыть TikTok", "tiktokAutoOpenedNote": "TikTok открылся в новой вкладке — зайдите в профиль, нажмите «Поделиться» и скопируйте ссылку. Затем вернитесь сюда и снова нажмите кнопку.", "tiktokAutoFound": "✓ Ссылка определена и подтверждена автоматически", "tiktokAutoDenied": "Нет доступа к буферу обмена — вставьте ссылку вручную ниже", "tiktokAutoUnsupported": "Этот браузер не поддерживает автоопределение — вставьте ссылку вручную", "subActivatedWeekly": "У вас активен недельный пакет", "subActivatedMonthly": "У вас активен месячный пакет", "alertNotVideo": "Загрузите видеофайл (mp4, mov, webm и т. д.)", "alertReadError": "Не удалось прочитать видео — попробуйте другой файл.", "sendOrder": "Отправить заказ", "sendChat": "Отправить заказ", "messengerTitle": "Чат заказа", "messengerOrderLabel": "Заказ №", "messengerInputPh": "Напишите сообщение...", "messengerNeedsLogin": "Войдите через Discord, чтобы открыть чат заказа.", "messengerCompleted": "Заказ выполнен — спасибо! ✅", "pmPickerPrompt": "Выберите способ оплаты:", "pmBankMethodLabel": "Банковский перевод", "pmChosenPrefix": "Выбранный способ оплаты:", "pmThankYou": "Уважаемый клиент, наш администратор скоро рассмотрит ваш заказ 💚", "pmAccountCopied": "📋 Номер счёта скопирован — откройте мобильный банк и вставьте его в поле перевода.", "orderProcessing": "Обрабатываем ваш заказ…", "orderProcessed": "Ваш заказ обработан ✓", "warnTitle": "Важно перед заказом", "warnP1": "Видео монтируется <b>только для TikTok</b>, с безупречным качеством.", "warnP2": "Убедитесь, что длительность видео <b>не превышает 59.59 секунды</b> — более длинные оцениваются индивидуально и в калькулятор не входят.", "warnP3": "Также убедитесь, что материал снят и отрендерен в качестве <b>1080p / 60fps</b> — это влияет на чистоту итогового результата.", "warnP4": "При загрузке материал всегда должен быть <b>строго 1080p / 60fps</b> — а для результата можно выбрать стандартный 1080p или премиум 4K/60fps.", "baLabel": "Без монтажа и после монтажа", "baTabMovies": "Фильмы", "baTabGames": "Игры", "baCaptionMovies": "Качество для фильмов<br>(сериалы, аниме и т. д.)", "baCaptionGames": "Качество для игр", "baBeforeTag": "ДО", "baAfterTag": "ПОСЛЕ", "baHint": "↔ потяните для сравнения", "contactPanelTitle": "Есть вопрос? Напишите мне напрямую", "contactPanelOnline": "Обычно отвечаем быстро", "contactDiscordSub": "Присоединяйтесь и пишите нам", "contactPanelSub": "Присоединяйтесь к нам в Discord и задавайте любые вопросы — отвечу лично.", "chatAssistant": "Ассистент", "acbLabelLine1": "Продолжить", "acbLabelLine2": "заказ", "chatOnline": "Онлайн", "chatInputPlaceholder": "Задайте вопрос…", "tutorialLink": "🎬 Инструкция", "commentsLabel": "Комментарии", "commentSubmit": "Отправить", "commentNamePh": "Имя", "commentTextPh": "Напишите комментарий…", "commentEmpty": "Комментариев пока нет — будьте первым!", "commentRatingLabel": "Ваша оценка:", "commentErrNeedDiscord": "Чтобы оставить комментарий, войдите через Discord.", "commentDiscordRequired": "Чтобы оставить комментарий, войдите через Discord.", "commentPostingAs": "Публикуете как:", "commentReadMore": "Читать далее", "commentReadLess": "Свернуть", "socialProofTotalLabel": "всего", "socialProofOrdersLabel": "заказов", "socialProofSuccessLabel": "успешных", "socialProofFailLabel": "неудачных", "spotsLeftWeek": "мест осталось", "spotsLeftMonth": "мест осталось в этом месяце", "promoLabel": "Есть промокод?", "promoPlaceholder": "Введите код", "promoApply": "Применить", "promoOk": "Код активен — −{WEEK}₾ на недельную подписку, −{MONTH}₾ на месячную, плюс дополнительная скидка {PCT}% на разовый заказ! Назовите этот код при оформлении заказа.", "promoBad": "Такого кода нет или он больше не действует.", "promoEmpty": "Введите код.", "howtoLabel": "Как заказать", "howtoStep1Title": "Рассчитайте цену", "howtoStep1Text": "Ниже в калькуляторе укажите длительность и качество видео — или загрузите видео в блок «<span class=\"scanner-jump-link\" data-jump=\"videoScannerPanel\">VIDEO SCANNER</span>», чтобы длительность определилась автоматически.", "howtoStep2Title": "Загрузите видео", "howtoStep2Text": "Загрузите видео прямо в блок «VIDEO SCANNER» — оно автоматически уйдёт нашей команде в фоновом режиме, переходить на отдельный сайт не нужно.", "howtoStep3Title": "Укажите TikTok", "howtoStep3Text": "Вставьте ссылку на профиль TikTok или нажмите «Автоопределение из буфера» — мы распознаем и подтвердим ссылку автоматически. Затем нажмите кнопку «Заказ — в чате» ниже: после входа через Discord откроется чат с нами с готовыми деталями заказа.", "howtoStep4Title": "Дождитесь подтверждения", "howtoStep4Text": "Менеджер подтвердит заказ и срок прямо в чате.", "wpLabel": "Подписка на 1 неделю", "wpBadge": "5 видео / 7 дней", "wpChannelT2": "✓ скидка −3₾", "wpSendChat": "Отправить заказ", "mpLabel": "<span class=\"mp-crown\">👑</span>Подписка на 1 месяц", "mpBadge": "20 видео / месяц", "mpSendChat": "Отправить заказ"}, {"mnHome": "Главная", "mnOrder": "Заказ", "mnUpload": "Загрузка", "mnContact": "Контакты", "mnOnline": "Онлайн", "mnLangAria": "Язык", "mnClose": "Закрыть", "mnOrdTitle": "Как заказать", "mnOrdSub": "6 простых шагов — от видео до готового результата", "mnOrdS1T": "Выберите пакет", "mnOrdS1X": "На главной странице выберите подходящий пакет: разовый, недельный, месячный, дешёвый или похожий монтаж с вашим персонажем.", "mnOrdS2T": "Рассчитайте цену", "mnOrdS2X": "Укажите длительность видео и качество (1080p или 4K) — цена появится сразу.", "mnOrdS3T": "Загрузите видео", "mnOrdS3X": "Загрузите его в VIDEO SCANNER: длительность определится автоматически, а видео в фоновом режиме уйдёт нашей команде.", "mnOrdS4T": "Укажите TikTok", "mnOrdS4X": "Вставьте ссылку на ваш профиль TikTok или нажмите автоопределение из буфера обмена.", "mnOrdS5T": "Нажмите «Заказать»", "mnOrdS5X": "После входа через Discord откроется чат с нами, где уже будут данные вашего заказа.", "mnOrdS6T": "Дождитесь подтверждения", "mnOrdS6X": "Менеджер подтвердит заказ, реквизиты оплаты и срок прямо в чате. Сдача — максимум за 24 часа.", "mnNotesTitle": "Полезно знать", "mnOrdN1": "При загрузке видео должно быть строго 1080p / 60fps; качество результата (1080p или 4K) выбирается при заказе.", "mnOrdN2": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "mnOrdN3": "Монтаж делается только для TikTok, поэтому нужна корректная ссылка на профиль.", "mnOrdN4": "Первая правка бесплатна (один раз); возврат средств возможен в течение 24 часов после сдачи.", "mnOrdCta": "Начать заказ", "mnUpTitle": "Как загрузить", "mnUpSub": "Загрузка происходит прямо на сайте — это займёт несколько секунд", "mnUpS1T": "Откройте поле загрузки", "mnUpS1X": "Нажмите «Загрузить видео» в блоке VIDEO SCANNER или на карточке пакета.", "mnUpS2T": "Выберите файл", "mnUpS2X": "Выберите видео из галереи или файлов. Формат должен быть строго 1080p / 60fps (2K/4K — только в «Дешёвом пакете»).", "mnUpS3T": "Дождитесь сканирования", "mnUpS3X": "Сайт автоматически покажет длительность, формат и цену.", "mnUpS4T": "Подтвердите отправку", "mnUpS4X": "На вопрос, отправить ли видео нашей команде автоматически, выберите «Да».", "mnUpS5T": "Не покидайте страницу", "mnUpS5X": "Пока загрузка не завершится, держите страницу открытой, а экран включённым — иначе загрузка остановится.", "mnUpTipsTitle": "Если формат не подходит", "mnUpT1": "На телефоне: переведите видео в формат 1:1 или 16:9.", "mnUpT2": "На компьютере: переведите в формат 1080x1080.", "mnUpT3": "Максимальная длительность — 59.59 секунды.", "mnUpCta": "Начать загрузку", "mnCtTitle": "Мы в Discord", "mnCtSub": "Присоединяйтесь к серверу и задавайте любые вопросы — отвечу лично.", "mnCtBtn": "Перейти в Discord", "mnCtNote": "Обычно отвечаем быстро"});
+  Object.assign(TRANSLATIONS.ka, {"mnHome": "მთავარი", "mnOrder": "შეკვეთა", "mnUpload": "ატვირთვა", "mnContact": "კონტაქტი", "mnOnline": "ონლაინ", "mnLangAria": "ენა", "mnClose": "დახურვა", "mnOrdTitle": "როგორ შევუკვეთოთ", "mnOrdSub": "6 მარტივი ნაბიჯი — ვიდეოდან მზა შედეგამდე", "mnOrdS1T": "აირჩიე პაკეტი", "mnOrdS1X": "მთავარ გვერდზე აირჩიე შენთვის შესაფერისი პაკეტი: ერთჯერადი, კვირის, თვის ან მსგავსი მონტაჟი შენი პერსონაჟით.", "mnOrdS2T": "გამოთვალე ფასი", "mnOrdS2X": "მიუთითე ვიდეოს ხანგრძლივობა და ხარისხი (1080p ან 4K) — ფასი მაშინვე გამოჩნდება.", "mnOrdS3T": "ატვირთე ვიდეო", "mnOrdS3X": "ატვირთე ვიდეო VIDEO SCANNER-ში: ხანგრძლივობა ავტომატურად გამოითვლება, ვიდეო კი ფონურ რეჟიმში გადაეგზავნება ჩვენს გუნდს.", "mnOrdS4T": "მიუთითე TikTok", "mnOrdS4X": "ჩასვი შენი TikTok პროფილის ლინკი ან დააჭირე ავტომატურ ამოცნობას ბუფერიდან.", "mnOrdS5T": "დააჭირე „შეკვეთას“", "mnOrdS5X": "Discord-ით შესვლის შემდეგ პირდაპირ ჩვენთან ჩატი გაიხსნება, შეკვეთის მზა დეტალებით.", "mnOrdS6T": "დაელოდე დადასტურებას", "mnOrdS6X": "მენეჯერი ჩატშივე დაგიდასტურებს შეკვეთას, გადახდის დეტალებს და ვადას. ჩაბარება — მაქსიმუმ 24 საათში.", "mnNotesTitle": "კარგია იცოდე", "mnOrdN1": "ატვირთვისას ვიდეო უნდა იყოს ზუსტად 1080p / 60fps; გამომავალ ხარისხს (1080p ან 4K) შეკვეთისას ირჩევ.", "mnOrdN2": "მაქსიმალური ხანგრძლივობა — 59.59 წამი. უფრო გრძელი ვიდეო ფასდება ინდივიდუალურად.", "mnOrdN3": "მონტაჟი მხოლოდ TikTok-ისთვისაა, ამიტომ საჭიროა სწორი პროფილის ლინკი.", "mnOrdN4": "პირველი ვერსიის შესწორება ერთხელ უფასოა; თანხის დაბრუნება შესაძლებელია ჩაბარებიდან 24 საათში.", "mnOrdCta": "შეკვეთის დაწყება", "mnUpTitle": "როგორ ავტვირთოთ", "mnUpSub": "ატვირთვა პირდაპირ საიტზე ხდება — რამდენიმე წამში", "mnUpS1T": "გახსენი ატვირთვის ველი", "mnUpS1X": "დააჭირე „ატვირთეთ ვიდეო“ ღილაკს VIDEO SCANNER ბლოკში ან პაკეტის ბარათზე.", "mnUpS2T": "აირჩიე ფაილი", "mnUpS2X": "აირჩიე ვიდეო გალერეიდან ან ფაილებიდან. ფორმატი უნდა იყოს ზუსტად 1080p / 60fps.", "mnUpS3T": "დაელოდე გაზომვას", "mnUpS3X": "საიტი ავტომატურად აჩვენებს ხანგრძლივობას, ფორმატს და ფასს.", "mnUpS4T": "დაადასტურე გაგზავნა", "mnUpS4X": "კითხვაზე, გსურთ თუ არა ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს, აირჩიე „დიახ“.", "mnUpS5T": "არ დატოვო გვერდი", "mnUpS5X": "ატვირთვის დასრულებამდე გვერდი ღია და ეკრანი ჩართული უნდა გქონდეს — თორემ ატვირთვა შეჩერდება.", "mnUpTipsTitle": "თუ ფორმატი არ ემთხვევა", "mnUpT1": "მობილურზე: გადაიყვანე ვიდეო 1:1 ან 16:9 ფორმატში.", "mnUpT2": "კომპიუტერზე: გადაიყვანე 1080x1080 ფორმატში.", "mnUpT3": "მაქსიმალური ხანგრძლივობა — 59.59 წამი.", "mnUpCta": "ატვირთვის დაწყება", "mnCtTitle": "დაგვიკავშირდი Discord-ზე", "mnCtSub": "შემოგვიერთდი სერვერზე და დაწერე ნებისმიერი კითხვა — პირადად გიპასუხებ.", "mnCtBtn": "Discord-ზე გადასვლა", "mnCtNote": "ჩვეულებრივ სწრაფად ვპასუხობთ"});
+  Object.assign(TRANSLATIONS.en, {"mnHome": "Home", "mnOrder": "Order", "mnUpload": "Upload", "mnContact": "Contact", "mnOnline": "Online", "mnLangAria": "Language", "mnClose": "Close", "mnOrdTitle": "How to order", "mnOrdSub": "6 simple steps — from your video to the finished edit", "mnOrdS1T": "Choose a package", "mnOrdS1X": "On the main page pick the package that suits you: single, weekly, monthly, or a similar edit with your character.", "mnOrdS2T": "Calculate the price", "mnOrdS2X": "Set the video duration and quality (1080p or 4K) — the price appears instantly.", "mnOrdS3T": "Upload your video", "mnOrdS3X": "Upload it in the VIDEO SCANNER: the duration is measured automatically and the video is sent to our team in the background.", "mnOrdS4T": "Add your TikTok", "mnOrdS4X": "Paste your TikTok profile link, or tap auto-detect from the clipboard.", "mnOrdS5T": "Press “Order”", "mnOrdS5X": "After signing in with Discord, a chat opens with us directly, with your order details ready.", "mnOrdS6T": "Wait for confirmation", "mnOrdS6X": "A manager confirms the order, payment details and deadline right in the chat. Delivery within 24 hours at most.", "mnNotesTitle": "Good to know", "mnOrdN1": "On upload the video must be exactly 1080p / 60fps; you pick the output quality (1080p or 4K) when ordering.", "mnOrdN2": "Maximum duration is 59.59 seconds. Longer videos are priced individually.", "mnOrdN3": "Editing is for TikTok only, so a valid profile link is required.", "mnOrdN4": "The first revision is free (once); a refund is possible within 24 hours of delivery.", "mnOrdCta": "Start an order", "mnUpTitle": "How to upload", "mnUpSub": "Uploading happens right on the site — it takes a few seconds", "mnUpS1T": "Open the upload field", "mnUpS1X": "Tap “Upload a video” in the VIDEO SCANNER block or on a package card.", "mnUpS2T": "Choose a file", "mnUpS2X": "Pick the video from your gallery or files. It must be exactly 1080p / 60fps.", "mnUpS3T": "Wait for the scan", "mnUpS3X": "The site automatically shows the duration, format and price.", "mnUpS4T": "Confirm sending", "mnUpS4X": "When asked whether to send the video to our team automatically, choose “Yes”.", "mnUpS5T": "Don’t leave the page", "mnUpS5X": "Keep the page open and the screen on until the upload finishes — otherwise it stops.", "mnUpTipsTitle": "If the format doesn’t match", "mnUpT1": "On mobile: convert the video to 1:1 or 16:9.", "mnUpT2": "On a computer: convert it to 1080x1080.", "mnUpT3": "Maximum duration is 59.59 seconds.", "mnUpCta": "Start uploading", "mnCtTitle": "Reach us on Discord", "mnCtSub": "Join our server and ask any question — I’ll answer you personally.", "mnCtBtn": "Open Discord", "mnCtNote": "Usually replies fast"});
+  TRANSLATIONS.ru = Object.assign({}, TRANSLATIONS.en, {"visitorsLabel": "Всего посетителей на сайте:", "menuVisitors": "Посетители", "menuViews": "Просмотры", "topbarTagline": "Вы заслуживаете лучшего качества", "authGateTitle": "Вы заслуживаете лучшего качества.", "authGateSub": "<span class=\"dg-spec\"><b>1080p / 4K • 60FPS</b></span><span class=\"dg-cta\">Чтобы продолжить, войдите через Discord</span>", "authGateClose": "Закрыть", "authLoginBtn": "Войти через Discord", "authJoinBtn": "Присоединиться к серверу Discord", "authGateSkip": "Продолжить как гость", "guildGateTitle": "Нужно присоединиться к нашему серверу Discord", "authLoggedInSub": "Вход выполнен через Discord", "authMemberBadge": "УЧАСТНИК", "authLogout": "Выйти", "authError": "Не удалось войти через Discord — попробуйте ещё раз.", "heroTitle": "<span>Заказать сейчас!</span>", "heroSub": "Укажите длительность видео (или загрузите видео — она определится автоматически), цена рассчитывается в реальном времени, монтаж на уровне After Effects.", "pcHeading": "Выберите пакет", "pcSubheading": "Выберите подходящий пакет", "pcCalcBtn": "Заказать", "pcRibbon": "Популярный", "pcFrom": "от", "pc1Title": "Разовый пакет", "pc1Desc": "Одно видео —<br>цена считается автоматически по длительности.", "pc1PriceNote": "Цена зависит от длительности", "pc1Feature1": "1080P • 60FPS", "pc1Feature2": "Сдача в течение 24 часов", "pc1Feature3": "4K • 60FPS", "aoTitle": "Разовый заказ", "aoDesc": "Любой формат видео<br>— загрузка напрямую", "aoSendChat": "Отправить заказ", "pc2Title": "Недельный пакет", "pc2Desc": "5 видео в неделю<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc2PriceNote": "1080p/4K — выбор после загрузки", "pc2Feature1": "В течение 1 недели<br>полный заказ", "pc2Feature2": "4K • 60FPS", "pc3Title": "Месячный пакет", "pc3Desc": "20 видео в месяц<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc3PriceNote": "1080p/4K — выбор после загрузки", "pc3Feature1": "В течение 1 месяца<br>полный заказ", "pc3Feature2": "4K • 60FPS", "pc4Desc": "Похожий монтаж<br>с вашим персонажем", "pc4PriceNote": "<span class=\"pc-price-note-line\">Цена зависит от выбранного стиля и качества</span>", "pc4Feature3": "Сдача в течение 24 часов", "featEnhance": "Улучшение качества", "featEffects": "Добавление эффектов", "featTiktokLossless": "Загрузка в TikTok без потери качества", "portfolioLabel": "Портфолио работ", "portfolioCta": "Смотреть работы в TikTok", "myOrdersLabel": "Мои заказы", "qnWhy": "Почему MOON<span class=\"qn-q\">?</span>", "qnPortfolio": "Портфолио", "qnEditOrder": "Заказать монтаж", "eoLabel": "Заказать монтаж", "eoVideoBadge": "Пример", "eoStyle1": "Стиль 1", "eoStyle2": "Стиль 2", "eoStyle3": "Стиль 3", "eoStyle4": "Стиль 4", "eoCaption": "Похожий монтаж — с вашим персонажем", "eoDesc": "Точно такой же стиль монтажа, но с вашим любимым персонажем (аниме, герой игры, кино и т. д.). Закажите, затем пришлите нам в чате фото/референс персонажа — остальное сделаем мы.", "eoPriceLabel": "Цена", "eoSendChat": "Отправить заказ", "ttdlBadge": "БЕСПЛАТНО", "ttdlDesc": "Скачивайте в максимальном качестве<br>Узнайте, в каком качестве загружено ваше видео", "ttdlInputPh": "Вставьте ссылку на видео TikTok...", "ttdlAnalyzeBtn": "Анализировать видео", "ttdlDownloadMusic": "Скачать музыку", "qnHowto": "Как это работает", "qnPromo": "Промокод", "qnBeforeAfter": "До / После", "qnContact": "Контакты", "qnRules": "Правила", "rule1Title": "Формат видео", "rule1Text": "При загрузке видео должно быть строго 1080p/60fps. Качество результата (1080p или 4K) выбирается при заказе.", "rule2Title": "Длительность", "rule2Text": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "rule3Title": "Назначение монтажа", "rule3Text": "Видео монтируется только для формата TikTok. Нужна корректная ссылка на профиль TikTok.", "rule4Title": "Срок сдачи", "rule4Text": "Сдача максимум за 24 часа. При системных изменениях — как только это станет возможным.", "rule5Title": "Бесплатная правка", "rule5Text": "Если первая версия не совпала с договорённостью, мы один раз исправим её совершенно бесплатно.", "rule6Title": "Если TikTok удалит видео", "rule6Text": "Если после сдачи TikTok сам удалил или ограничил видео — это вина его алгоритма, а не нашего. По этой причине деньги не возвращаются.", "rule7Title": "Возврат средств", "rule7Text": "Возврат возможен только в течение 24 часов после сдачи. Позже — невозможен.", "rule8Title": "Оплата", "rule8Text": "Реквизиты оплаты уточнит менеджер в чате после подтверждения заказа.", "trustLabel": "Почему MOON", "trust1Title": "Настоящие отзывы", "trust2Title": "Ручной монтаж, а не шаблоны", "trust3Title": "Прямой контакт с менеджером", "trust4Title": "Прозрачная цена заранее", "trust5Title": "Гарантия — одна бесплатная правка", "trustRatingText": "Средняя оценка <b>{AVG}</b> — на основе {COUNT} реальных отзывов", "finalPrice": "Итоговая цена", "markDuration": "Укажите точную длительность (секунды)", "secLabelShort": "Секунды", "msLabelShort": "Сотые", "secUnit": "сек", "msUnit": "сотых", "secondsPlaceholder": "Введите секунды (0–59)", "msLabel": "Сотые доли секунды (00–59)", "msHint": "Максимальная общая длительность — 59.59. В этом диапазоне цена считается по тарифу 59 секунд.", "qualityLabel": "Выберите качество видео:", "wizStepUpload": "Загрузка", "wizStepQuality": "Качество", "wizStepConfirm": "Подтверждение", "qualityWizardLabel": "Выберите качество для загрузки в TikTok", "scannerPrimaryBadge": "⚡ Автоматически и точно", "manualFallbackSub": "Быстрый ручной ввод — секунды и сотые", "manualEntryBadge": "Ручной ввод", "qualityRecBadge": "Единственный формат", "qualityBadgeStandard": "Стандарт", "qualityBadgePremium": "Премиум", "simpleScanLabel": "Сканер видео", "dzTitleSimple": "Загрузите видео", "dzSubSimple": "Перетащите сюда или нажмите, чтобы выбрать", "simpleScanOk": "Видео принято", "srRejectTextShort": "Формат не подходит — нужно строго 1080p / 60fps", "subscriberT2": "Скидка 10%", "wizardConfirmLink": "Подтвердить", "sendOrderWizardQ": "Хотите отправить заказ?", "wizardYes": "Да", "wizardNo": "Нет", "wantOrderQ": "Хотите заказать?", "subscriberWizardQ": "Вы подписчик нашего канала в TikTok?", "tiktokLabel": "Ссылка на ваш профиль TikTok *", "tiktokError": "⚠️ Для отправки заказа нужна ссылка на профиль TikTok!", "videoLinkLabel": "Ссылка на загруженное видео *", "videoLinkError": "⚠️ Для отправки заказа нужна ссылка на загруженное видео!", "tiktokConfirmPrompt": "Нажмите для подтверждения", "tiktokConfirmDone": "✓ Подтверждено", "videoScanner": "VIDEO SCANNER", "dzTitle": "Загрузите видео для автоматического замера", "dzSub": "Перетащите сюда или нажмите — длительность заполнится автоматически", "scanProcessing": "Обработка видео…", "scanCancelBtn": "Отмена", "srFile": "Файл", "srDuration": "Длительность", "srDetectedFormat": "Формат загруженного видео", "srRequestedFormat": "Запрошенное качество", "srPrice": "Рассчитанная цена", "srSuccessText": "Видео загружено", "srUnit": "с", "srFpsUnknown": "fps неизвестен", "srMatchNote": "✓ Загруженное видео соответствует запрошенному качеству ({REQ})", "srMismatchNote": "⚠️ Вы запросили {REQ}, но загруженное видео фактически {DET} — цена всё равно считается по запрошенному качеству ({REQ}).", "srWarnOver": "⚠️ Видео длиннее 59.59 секунды — оно оценивается индивидуально; калькулятор показывает тариф 59.59.", "dzReq": "Обязательный формат: строго 1080p · 60fps", "srRejectDetectedLabel": "Данные загруженного файла:", "srRejectText": "Уважаемый пользователь, загрузить нужно видео в формате <b>1080p / 60fps</b> — именно в этом формате, не больше и не меньше. Любое другое разрешение или частота кадров (например 720p, 2K, 4K, 30fps, 120fps) не принимается.", "srRejectRatioMobile": "📱 Если вы пользуетесь мобильными приложениями — переведите видео в формат <b>1:1</b> или <b>16:9</b>.", "srRejectRatioDesktop": "🖥️ Если вы пользуетесь компьютером — переведите в формат <b>1080x1080</b>.", "srRejectAppsMobile": "Для мобильных / iPhone / iPad:", "srRejectAppsDesktop": "Для компьютера:", "srRejectEtc": "и т. д.", "srRejectRetry": "↻ Попробовать другое видео", "srTransferQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "srTransferYes": "Да", "srTransferNo": "Нет", "mooonPromptQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "mooonPromptYes": "Да", "mooonPromptNo": "Нет", "mooonAutoUploading": "Загружаем ваше видео в mooontransferr…", "mooonAutoFinalizing": "Готовим вашу ссылку…", "mooonAutoError": "⚠️ Автоматическая загрузка не удалась. ", "mooonAutoErrorBackgrounded": "⚠️ Загрузка остановилась, потому что страница ушла в фон (экран заблокирован или вы переключили приложение). ", "mooonAutoStayHint": "📱 Держите страницу открытой, а экран включённым, пока загрузка не завершится", "mooonAutoManualLink": "Загрузить вручную на mooontransferr.onrender.com →", "mooonAutoRetry": "↻ Попробовать снова", "mtUploadHeadline": "Автоматическая загрузка", "tiktokAutoBtn": "Открыть TikTok", "tiktokAutoOpenedNote": "TikTok открылся в новой вкладке — зайдите в профиль, нажмите «Поделиться» и скопируйте ссылку. Затем вернитесь сюда и снова нажмите кнопку.", "tiktokAutoFound": "✓ Ссылка определена и подтверждена автоматически", "tiktokAutoDenied": "Нет доступа к буферу обмена — вставьте ссылку вручную ниже", "tiktokAutoUnsupported": "Этот браузер не поддерживает автоопределение — вставьте ссылку вручную", "subActivatedWeekly": "У вас активен недельный пакет", "subActivatedMonthly": "У вас активен месячный пакет", "alertNotVideo": "Загрузите видеофайл (mp4, mov, webm и т. д.)", "alertReadError": "Не удалось прочитать видео — попробуйте другой файл.", "sendOrder": "Отправить заказ", "sendChat": "Отправить заказ", "messengerTitle": "Чат заказа", "messengerOrderLabel": "Заказ №", "messengerInputPh": "Напишите сообщение...", "messengerNeedsLogin": "Войдите через Discord, чтобы открыть чат заказа.", "messengerCompleted": "Заказ выполнен — спасибо! ✅", "pmPickerPrompt": "Выберите способ оплаты:", "pmBankMethodLabel": "Банковский перевод", "pmChosenPrefix": "Выбранный способ оплаты:", "pmThankYou": "Уважаемый клиент, наш администратор скоро рассмотрит ваш заказ 💚", "pmAccountCopied": "📋 Номер счёта скопирован — откройте мобильный банк и вставьте его в поле перевода.", "orderProcessing": "Обрабатываем ваш заказ…", "orderProcessed": "Ваш заказ обработан ✓", "warnTitle": "Важно перед заказом", "warnP1": "Видео монтируется <b>только для TikTok</b>, с безупречным качеством.", "warnP2": "Убедитесь, что длительность видео <b>не превышает 59.59 секунды</b> — более длинные оцениваются индивидуально и в калькулятор не входят.", "warnP3": "Также убедитесь, что материал снят и отрендерен в качестве <b>1080p / 60fps</b> — это влияет на чистоту итогового результата.", "warnP4": "При загрузке материал всегда должен быть <b>строго 1080p / 60fps</b> — а для результата можно выбрать стандартный 1080p или премиум 4K/60fps.", "baLabel": "Без монтажа и после монтажа", "baTabMovies": "Фильмы", "baTabGames": "Игры", "baCaptionMovies": "Качество для фильмов<br>(сериалы, аниме и т. д.)", "baCaptionGames": "Качество для игр", "baBeforeTag": "ДО", "baAfterTag": "ПОСЛЕ", "baHint": "↔ потяните для сравнения", "contactPanelTitle": "Есть вопрос? Напишите мне напрямую", "contactPanelOnline": "Обычно отвечаем быстро", "contactDiscordSub": "Присоединяйтесь и пишите нам", "contactPanelSub": "Присоединяйтесь к нам в Discord и задавайте любые вопросы — отвечу лично.", "chatAssistant": "Ассистент", "acbLabelLine1": "Продолжить", "acbLabelLine2": "заказ", "chatOnline": "Онлайн", "chatInputPlaceholder": "Задайте вопрос…", "tutorialLink": "🎬 Инструкция", "commentsLabel": "Комментарии", "commentSubmit": "Отправить", "commentNamePh": "Имя", "commentTextPh": "Напишите комментарий…", "commentEmpty": "Комментариев пока нет — будьте первым!", "commentRatingLabel": "Ваша оценка:", "commentErrNeedDiscord": "Чтобы оставить комментарий, войдите через Discord.", "commentDiscordRequired": "Чтобы оставить комментарий, войдите через Discord.", "commentPostingAs": "Публикуете как:", "commentReadMore": "Читать далее", "commentReadLess": "Свернуть", "socialProofTotalLabel": "всего", "socialProofOrdersLabel": "заказов", "socialProofSuccessLabel": "успешных", "socialProofFailLabel": "неудачных", "spotsLeftWeek": "мест осталось", "spotsLeftMonth": "мест осталось в этом месяце", "promoLabel": "Есть промокод?", "promoPlaceholder": "Введите код", "promoApply": "Применить", "promoOk": "Код активен — −{WEEK}₾ на недельную подписку, −{MONTH}₾ на месячную, плюс дополнительная скидка {PCT}% на разовый заказ! Назовите этот код при оформлении заказа.", "promoBad": "Такого кода нет или он больше не действует.", "promoEmpty": "Введите код.", "howtoLabel": "Как заказать", "howtoStep1Title": "Рассчитайте цену", "howtoStep1Text": "Ниже в калькуляторе укажите длительность и качество видео — или загрузите видео в блок «<span class=\"scanner-jump-link\" data-jump=\"videoScannerPanel\">VIDEO SCANNER</span>», чтобы длительность определилась автоматически.", "howtoStep2Title": "Загрузите видео", "howtoStep2Text": "Загрузите видео прямо в блок «VIDEO SCANNER» — оно автоматически уйдёт нашей команде в фоновом режиме, переходить на отдельный сайт не нужно.", "howtoStep3Title": "Укажите TikTok", "howtoStep3Text": "Вставьте ссылку на профиль TikTok или нажмите «Автоопределение из буфера» — мы распознаем и подтвердим ссылку автоматически. Затем нажмите кнопку «Заказ — в чате» ниже: после входа через Discord откроется чат с нами с готовыми деталями заказа.", "howtoStep4Title": "Дождитесь подтверждения", "howtoStep4Text": "Менеджер подтвердит заказ и срок прямо в чате.", "wpLabel": "Подписка на 1 неделю", "wpBadge": "5 видео / 7 дней", "wpChannelT2": "✓ скидка −3₾", "wpSendChat": "Отправить заказ", "mpLabel": "<span class=\"mp-crown\">👑</span>Подписка на 1 месяц", "mpBadge": "20 видео / месяц", "mpSendChat": "Отправить заказ"}, {"mnHome": "Главная", "mnOrder": "Заказ", "mnUpload": "Загрузка", "mnContact": "Контакты", "mnOnline": "Онлайн", "mnLangAria": "Язык", "mnClose": "Закрыть", "mnOrdTitle": "Как заказать", "mnOrdSub": "6 простых шагов — от видео до готового результата", "mnOrdS1T": "Выберите пакет", "mnOrdS1X": "На главной странице выберите подходящий пакет: разовый, недельный, месячный, дешёвый или похожий монтаж с вашим персонажем.", "mnOrdS2T": "Рассчитайте цену", "mnOrdS2X": "Укажите длительность видео и качество (1080p или 4K) — цена появится сразу.", "mnOrdS3T": "Загрузите видео", "mnOrdS3X": "Загрузите его в VIDEO SCANNER: длительность определится автоматически, а видео в фоновом режиме уйдёт нашей команде.", "mnOrdS4T": "Укажите TikTok", "mnOrdS4X": "Вставьте ссылку на ваш профиль TikTok или нажмите автоопределение из буфера обмена.", "mnOrdS5T": "Нажмите «Заказать»", "mnOrdS5X": "После входа через Discord откроется чат с нами, где уже будут данные вашего заказа.", "mnOrdS6T": "Дождитесь подтверждения", "mnOrdS6X": "Менеджер подтвердит заказ, реквизиты оплаты и срок прямо в чате. Сдача — максимум за 24 часа.", "mnNotesTitle": "Полезно знать", "mnOrdN1": "При загрузке видео должно быть строго 1080p / 60fps; качество результата (1080p или 4K) выбирается при заказе.", "mnOrdN2": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "mnOrdN3": "Монтаж делается только для TikTok, поэтому нужна корректная ссылка на профиль.", "mnOrdN4": "Первая правка бесплатна (один раз); возврат средств возможен в течение 24 часов после сдачи.", "mnOrdCta": "Начать заказ", "mnUpTitle": "Как загрузить", "mnUpSub": "Загрузка происходит прямо на сайте — это займёт несколько секунд", "mnUpS1T": "Откройте поле загрузки", "mnUpS1X": "Нажмите «Загрузить видео» в блоке VIDEO SCANNER или на карточке пакета.", "mnUpS2T": "Выберите файл", "mnUpS2X": "Выберите видео из галереи или файлов. Формат должен быть строго 1080p / 60fps (2K/4K — только в «Дешёвом пакете»).", "mnUpS3T": "Дождитесь сканирования", "mnUpS3X": "Сайт автоматически покажет длительность, формат и цену.", "mnUpS4T": "Подтвердите отправку", "mnUpS4X": "На вопрос, отправить ли видео нашей команде автоматически, выберите «Да».", "mnUpS5T": "Не покидайте страницу", "mnUpS5X": "Пока загрузка не завершится, держите страницу открытой, а экран включённым — иначе загрузка остановится.", "mnUpTipsTitle": "Если формат не подходит", "mnUpT1": "На телефоне: переведите видео в формат 1:1 или 16:9.", "mnUpT2": "На компьютере: переведите в формат 1080x1080.", "mnUpT3": "Максимальная длительность — 59.59 секунды.", "mnUpCta": "Начать загрузку", "mnCtTitle": "Мы в Discord", "mnCtSub": "Присоединяйтесь к серверу и задавайте любые вопросы — отвечу лично.", "mnCtBtn": "Перейти в Discord", "mnCtNote": "Обычно отвечаем быстро"});
 
   TRANSLATIONS.ka.mnRulesSub='გთხოვთ, შეკვეთამდე გაეცანით ჩვენს წესებს — ისინი ყველასთვის ერთნაირია.';
   TRANSLATIONS.en.mnRulesSub='Please read our rules before you order — they are the same for everyone.';
@@ -11303,52 +10863,24 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   // as "can't disprove it" and is not, by itself, a rejection reason —
   // only a *confirmed* mismatch blocks the upload.
   //
-  // The Cheap Package is the one exception: it sells a 1080p tier and a 4K
-  // tier, so its scanner passes allowFourK=true. In that package:
-  //   - 1080p is a FLOOR, not a band: any resolution at or above ~1080p is
-  //     accepted (2K, 4K, 5K, 8K, whatever the phone/camera produced) —
-  //     only something clearly BELOW 1080p (720p, 480p…) is rejected.
-  //   - FPS never matters, for either tier. The visitor may upload footage
-  //     at any frame rate — fps only ever affected the price/format match
-  //     elsewhere on the site, and the Cheap Package deliberately drops
-  //     that requirement entirely (resolution is the only thing judged).
-  //   - Pricing: exactly-1080p footage matches the 1080p tier; literally
-  //     anything higher than that (2K included) matches the 4K tier — i.e.
-  //     "above 1080p" always prices at the 4K rate, never in between.
-  // Every other package still calls this with no 3rd argument, so their
-  // gate (strict 1080p/60fps, nothing else) is unchanged.
   const REQUIRED_DIM = 1080;
   const REQUIRED_DIM_TOLERANCE = 24; // absorbs minor container/encode rounding
   const REQUIRED_FPS = 60;
 
-  function checkUploadAcceptable(width, height, fps, allowFourK){
+  function checkUploadAcceptable(width, height, fps){
     const hasDims = !!(width && height);
     let resOk = null;
     let is1080 = false;
-    let aboveHD = false; // strictly higher than the 1080p band — 2K, 4K, 5K, 8K, all of it
+    let aboveHD = false;
     if (hasDims) {
       const minDim = Math.min(width, height);
       is1080 = Math.abs(minDim - REQUIRED_DIM) <= REQUIRED_DIM_TOLERANCE;
       aboveHD = minDim > (REQUIRED_DIM + REQUIRED_DIM_TOLERANCE);
-      resOk = allowFourK
-        ? (minDim >= (REQUIRED_DIM - REQUIRED_DIM_TOLERANCE)) // cheap package: 1080p is a floor
-        : is1080; // every other package: still an exact 1080p match only
+      resOk = is1080;
     }
     const fpsOk = (fps != null) ? (fps === REQUIRED_FPS) : null;
-    // Reject only on a *confirmed* violation — an unknown value never blocks
-    // the upload on its own. In the Cheap Package (allowFourK) fps is never
-    // checked at all, for any resolution; every other package still
-    // requires a confirmed 60fps match on top of the resolution match.
-    const rejected = allowFourK
-      ? (resOk === false)
-      : ((resOk === false) || (fpsOk === false));
-    // matchedTier is only meaningful when the upload was accepted: exactly
-    // 1080p → the 1080p tier; anything clearly above it → the 4K tier.
-    // aboveHD is also reported as `is4k` regardless of allowFourK, so
-    // callers that DON'T sell above-1080p footage (wp/mp) can tell a
-    // rejected higher-resolution upload apart from a rejected sub-1080p
-    // one, to point the visitor at the Cheap Package instead of just
-    // saying "no".
+    // Reject only on a *confirmed* violation — an unknown value never blocks the upload on its own.
+    const rejected = (resOk === false) || (fpsOk === false);
     const matchedTier = is1080 ? '1080_60' : (aboveHD ? '4k_120' : null);
     return { rejected, resOk, fpsOk, is4k: aboveHD, matchedTier };
   }
@@ -11382,22 +10914,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       autoBtn: document.getElementById('tiktokAutoBtnMp'),
       autoNote: document.getElementById('tiktokAutoNoteMp')
     },
-    cp: {
-      link: document.getElementById('tiktokLinkCp'),
-      confirm: document.getElementById('tiktokConfirmCp'),
-      confirmText: document.getElementById('tiktokConfirmTextCp'),
-      error: document.getElementById('tiktokErrorCp'),
-      autoBtn: document.getElementById('tiktokAutoBtnCp'),
-      autoNote: document.getElementById('tiktokAutoNoteCp')
-    },
-    cpm: {
-      link: document.getElementById('tiktokLinkCpm'),
-      confirm: document.getElementById('tiktokConfirmCpm'),
-      confirmText: document.getElementById('tiktokConfirmTextCpm'),
-      error: document.getElementById('tiktokErrorCpm'),
-      autoBtn: document.getElementById('tiktokAutoBtnCpm'),
-      autoNote: document.getElementById('tiktokAutoNoteCpm')
-    },
     ao: {
       link: document.getElementById('tiktokLinkAo'),
       confirm: document.getElementById('tiktokConfirmAo'),
@@ -11410,7 +10926,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
 
   // Each package's TikTok link field is fully independent now — its own
   // value, and its own "confirmed" state, not shared with the others.
-  const tiktokLinkConfirmed = { main: false, wp: false, mp: false, cp: false, cpm: false, ao: false };
+  const tiktokLinkConfirmed = { main: false, wp: false, mp: false, ao: false };
 
   // ============================================================
   // DISCORD SUBSCRIPTION STATE (1-week / 1-month package already active) —
@@ -11420,11 +10936,11 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   // hasn't expired yet, the matching order panel (wp/mp) hides its TikTok
   // link field entirely and shows a "package activated" badge instead —
   // the link on file from the original order is reused automatically.
-  // Only 'wp' and 'mp' can ever have an active subscription; 'main'/'cp'
+  // Only 'wp' and 'mp' can ever have an active subscription; 'main'
   // are one-off orders and are unaffected.
   // ============================================================
-  const SUB_PANEL_TYPE = { wp: 'weekly', mp: 'monthly', cpm: 'cheapMonthly' };
-  let mySubscriptions = { weekly: null, monthly: null, cheapMonthly: null };
+  const SUB_PANEL_TYPE = { wp: 'weekly', mp: 'monthly' };
+  let mySubscriptions = { weekly: null, monthly: null };
 
   function getActiveSubFor(panelKey){
     const type = SUB_PANEL_TYPE[panelKey];
@@ -11446,8 +10962,8 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     const sub = mySubscriptions[type];
     // Generalized from a hardcoded wp/mp ternary to a naming convention
     // (tiktokField+Suffix / subActiveBadge+Suffix) so this same function
-    // covers any future panel — e.g. 'cpm' -> tiktokFieldCpm /
-    // subActiveBadgeCpm — without needing a matching new branch here
+    // covers any future panel — e.g. 'wp' -> tiktokFieldWp /
+    // subActiveBadgeWp — without needing a matching new branch here
     // every time one gets added.
     const suffix = panelKey.charAt(0).toUpperCase() + panelKey.slice(1);
     const fieldEl = document.getElementById('tiktokField' + suffix);
@@ -11480,7 +10996,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   // subscription-badge system above. That one only ever applies to an
   // ACTIVE, unexpired weekly/monthly package. This persists indefinitely
   // instead, purely as a convenience: a returning customer's TikTok link
-  // gets pre-filled on EVERY panel (main/weekly/monthly/cheap), not just
+  // gets pre-filled on EVERY panel (main/weekly/monthly), not just
   // the two subscription ones, so they never have to retype it on a
   // second order just because their first one wasn't a subscription (or
   // its subscription window already ended).
@@ -11532,7 +11048,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   function applySubscriptionUI(){
     applySubscriptionUIFor('wp');
     applySubscriptionUIFor('mp');
-    applySubscriptionUIFor('cpm');
   }
 
   // Re-reads the shared 'activeSubscriptions' store and refreshes which
@@ -11541,7 +11056,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   // Expired entries are simply ignored here (not deleted) — the very next
   // read after expiry naturally puts the TikTok field back for everyone.
   async function refreshMySubscriptions(){
-    mySubscriptions = { weekly: null, monthly: null, cheapMonthly: null };
+    mySubscriptions = { weekly: null, monthly: null };
     if (currentDiscordUser && currentDiscordUser.id){
       try{
         const data = await mdbRead('activeSubscriptions');
@@ -11719,20 +11234,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       error: document.getElementById('videoLinkErrorMp'),
       field: document.getElementById('videoLinkFieldMp')
     },
-    cp: {
-      link: document.getElementById('videoLinkCp'),
-      confirm: document.getElementById('videoLinkConfirmCp'),
-      confirmText: document.getElementById('videoLinkConfirmTextCp'),
-      error: document.getElementById('videoLinkErrorCp'),
-      field: document.getElementById('videoLinkFieldCp')
-    },
-    cpm: {
-      link: document.getElementById('videoLinkCpm'),
-      confirm: document.getElementById('videoLinkConfirmCpm'),
-      confirmText: document.getElementById('videoLinkConfirmTextCpm'),
-      error: document.getElementById('videoLinkErrorCpm'),
-      field: document.getElementById('videoLinkFieldCpm')
-    },
     ao: {
       link: document.getElementById('videoLinkAo'),
       confirm: document.getElementById('videoLinkConfirmAo'),
@@ -11742,7 +11243,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     }
   };
 
-  const videoLinkConfirmed = { main: false, wp: false, mp: false, cp: false, cpm: false, ao: false };
+  const videoLinkConfirmed = { main: false, wp: false, mp: false, ao: false };
 
   function getVideoLinkValue(panelKey){
     const g = videoLinkGroups[panelKey] || videoLinkGroups.main;
@@ -11833,7 +11334,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         updateVideoLinkConfirmBadge();
         const ids = (panelKey === 'wp') ? { wrap: 'mooonAutoWp', statusRow: 'mooonAutoStatusWp', fill: 'mooonAutoFillWp', percent: 'mooonAutoPercentWp', error: 'mooonAutoErrorWp' }
           : (panelKey === 'mp') ? { wrap: 'mooonAutoMp', statusRow: 'mooonAutoStatusMp', fill: 'mooonAutoFillMp', percent: 'mooonAutoPercentMp', error: 'mooonAutoErrorMp' }
-          : (panelKey === 'cp') ? { wrap: 'mooonAutoCp', statusRow: 'mooonAutoStatusCp', fill: 'mooonAutoFillCp', percent: 'mooonAutoPercentCp', error: 'mooonAutoErrorCp' }
           : (panelKey === 'ao') ? { wrap: 'mooonAutoAo', statusRow: 'mooonAutoStatusAo', fill: 'mooonAutoFillAo', percent: 'mooonAutoPercentAo', error: 'mooonAutoErrorAo' }
           : { wrap: 'srAuto', statusRow: 'srAutoStatus', fill: 'srAutoFill', percent: 'srAutoPercent', error: 'srAutoError' };
         const wrap = document.getElementById(ids.wrap);
@@ -11875,7 +11375,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   const srResetBtn = document.getElementById('srResetBtn');
   const scanProgressCancel = document.getElementById('scanProgressCancel');
   const srReject = document.getElementById('srReject');
-  const srReject4kNote = document.getElementById('srReject4kNote');
   const srRejectDetected = document.getElementById('srRejectDetected');
   const srRejectRetry = document.getElementById('srRejectRetry');
   const srTransfer = document.getElementById('srTransfer');
@@ -12585,15 +12084,12 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       if (cfg.autoIds) resetMooonAutoUI(cfg.autoIds);
     }
 
-    const fourKNoteEl = cfg.fourKNoteId ? document.getElementById(cfg.fourKNoteId) : null;
-
     const resetBtn = cfg.resetId ? document.getElementById(cfg.resetId) : null;
 
     function showOk(file, meta){
       currentFile = file;
       result.classList.add('show');
       if (rejectEl) rejectEl.classList.remove('show');
-      if (fourKNoteEl) fourKNoteEl.style.display = 'none';
       if (okEl) okEl.classList.add('show');
       if (okName) okName.textContent = file.name;
       resetPrompt();
@@ -12620,16 +12116,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
           detectedEl.textContent = '';
         }
       }
-      // This package doesn't sell a 4K tier itself — if that's exactly why
-      // the upload was rejected, point the visitor at the Cheap Package
-      // instead of leaving them with just a generic mismatch message.
-      if (fourKNoteEl) {
-        fourKNoteEl.style.display = (!cfg.allowFourK && acceptability && acceptability.is4k) ? 'block' : 'none';
-      }
-      // Cheap Package only: without a currently-accepted file there's
-      // nothing to hold the visitor's quality pick to, so lift the
-      // upscale restriction until a valid video is scanned again.
-      if (cfg.allowFourK && typeof cpUploadedTier !== 'undefined') cpUploadedTier = null;
       // A rejected upload must not leave behind a stale "video already
       // confirmed" state from a PREVIOUS (accepted) upload in this same
       // session — otherwise the order can still look/behave as if a
@@ -12649,13 +12135,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       if (okEl) okEl.classList.remove('show');
       if (rejectEl) rejectEl.classList.remove('show');
       if (detectedEl) detectedEl.textContent = '';
-      if (fourKNoteEl) fourKNoteEl.style.display = 'none';
-      // Cheap Package only: cancelling clears whatever tier the (now
-      // abandoned) upload had locked in, the same way a rejected upload
-      // already does -- otherwise a manually-picked tile after cancelling
-      // could still get blocked as an "upscale/downgrade" of a video that
-      // no longer counts.
-      if (cfg.allowFourK && typeof cpUploadedTier !== 'undefined') cpUploadedTier = null;
       // Same stale-state guard as showReject() above — cancelling/resetting
       // must never leave a previous upload's "confirmed" video link behind.
       if (cfg.panelKey) resetVideoLinkFor(cfg.panelKey);
@@ -12715,21 +12194,10 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         // purely from its duration instead of gated on its quality.
         const acceptability = cfg.acceptAny
           ? { rejected: false, resOk: true, fpsOk: true, is4k: false, matchedTier: null }
-          : checkUploadAcceptable(meta.width, meta.height, meta.fps, cfg.allowFourK);
+          : checkUploadAcceptable(meta.width, meta.height, meta.fps);
         if (acceptability.rejected) {
           showReject(acceptability, meta);
         } else {
-          // Cheap Package only: remember which tier the uploaded footage
-          // actually supports, as the ceiling for the manual click
-          // handler below — e.g. 1080p/2K footage only ever unlocks the
-          // 1080p tile; trying to hand-pick 4K afterwards gets blocked
-          // (see tryManualSelectCpQuality). Per explicit request, this
-          // NO LONGER auto-highlights either tile — the visitor must
-          // click one themselves; only the locking (not the pre-pick)
-          // survives the upload.
-          if (cfg.allowFourK && acceptability.matchedTier && typeof cpUploadedTier !== 'undefined') {
-            cpUploadedTier = acceptability.matchedTier;
-          }
           showOk(file, meta);
         }
       }).catch(() => {
@@ -12754,7 +12222,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   initSimpleScanner({
     zoneId: 'dropZoneWp', inputId: 'videoInputWp', resultId: 'scanResultWp', okId: 'scanOkWp', okNameId: 'scanOkNameWp', rejectId: 'scanRejectWp',
     resetId: 'scanResetWp',
-    fourKNoteId: 'scanRejectWp4kNote',
     promptId: 'mooonPromptWp', promptQId: 'mooonPromptQWp', promptActionsId: 'mooonPromptActionsWp', promptYesId: 'mooonPromptYesWp', promptNoId: 'mooonPromptNoWp', promptDoneId: 'mooonPromptDoneWp',
     panelKey: 'wp',
     autoIds: { wrap: 'mooonAutoWp', statusRow: 'mooonAutoStatusWp', statusText: 'mooonAutoStatusTextWp', fill: 'mooonAutoFillWp', percent: 'mooonAutoPercentWp', error: 'mooonAutoErrorWp' }
@@ -12762,32 +12229,9 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   initSimpleScanner({
     zoneId: 'dropZoneMp', inputId: 'videoInputMp', resultId: 'scanResultMp', okId: 'scanOkMp', okNameId: 'scanOkNameMp', rejectId: 'scanRejectMp',
     resetId: 'scanResetMp',
-    fourKNoteId: 'scanRejectMp4kNote',
     promptId: 'mooonPromptMp', promptQId: 'mooonPromptQMp', promptActionsId: 'mooonPromptActionsMp', promptYesId: 'mooonPromptYesMp', promptNoId: 'mooonPromptNoMp', promptDoneId: 'mooonPromptDoneMp',
     panelKey: 'mp',
     autoIds: { wrap: 'mooonAutoMp', statusRow: 'mooonAutoStatusMp', statusText: 'mooonAutoStatusTextMp', fill: 'mooonAutoFillMp', percent: 'mooonAutoPercentMp', error: 'mooonAutoErrorMp' }
-  });
-  initSimpleScanner({
-    zoneId: 'dropZoneCp', inputId: 'videoInputCp', resultId: 'scanResultCp', okId: 'scanOkCp', okNameId: 'scanOkNameCp', rejectId: 'scanRejectCp',
-    resetId: 'scanResetCp',
-    // Only the Cheap Package sells both a 1080p AND a 4K output tier, so
-    // its scanner is the one that also accepts 4K uploads (any fps — see
-    // checkUploadAcceptable / selectCpQuality below).
-    allowFourK: true,
-    promptId: 'mooonPromptCp', promptQId: 'mooonPromptQCp', promptActionsId: 'mooonPromptActionsCp', promptYesId: 'mooonPromptYesCp', promptNoId: 'mooonPromptNoCp',
-    panelKey: 'cp',
-    autoIds: { wrap: 'mooonAutoCp', statusRow: 'mooonAutoStatusCp', statusText: 'mooonAutoStatusTextCp', fill: 'mooonAutoFillCp', percent: 'mooonAutoPercentCp', error: 'mooonAutoErrorCp' }
-  });
-  initSimpleScanner({
-    zoneId: 'dropZoneCpm', inputId: 'videoInputCpm', resultId: 'scanResultCpm', okId: 'scanOkCpm', okNameId: 'scanOkNameCpm', rejectId: 'scanRejectCpm',
-    resetId: 'scanResetCpm',
-    // Same 1080p-floor / any-fps rule as the one-off Cheap Package —
-    // see the comment above CPM_PRICES for why this package shares that
-    // exact upload rule.
-    allowFourK: true,
-    promptId: 'mooonPromptCpm', promptQId: 'mooonPromptQCpm', promptActionsId: 'mooonPromptActionsCpm', promptYesId: 'mooonPromptYesCpm', promptNoId: 'mooonPromptNoCpm',
-    panelKey: 'cpm',
-    autoIds: { wrap: 'mooonAutoCpm', statusRow: 'mooonAutoStatusCpm', statusText: 'mooonAutoStatusTextCpm', fill: 'mooonAutoFillCpm', percent: 'mooonAutoPercentCpm', error: 'mooonAutoErrorCpm' }
   });
 
   function finishScan(duration, file, width, height, fps){
@@ -12802,13 +12246,9 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       srRejectDetected.textContent = hasDimensions ? `${width}x${height} · ${fpsLabel}` : fpsLabel;
       scanResult.classList.remove('show');
       srReject.classList.add('show');
-      // Point 4K uploads specifically at the Cheap Package, since this
-      // (single-video) scanner only ever sells the 1080p output tier.
-      if (srReject4kNote) srReject4kNote.style.display = acceptability.is4k ? 'block' : 'none';
       return;
     }
     srReject.classList.remove('show');
-    if (srReject4kNote) srReject4kNote.style.display = 'none';
 
     let s = Math.floor(duration);
     let frac = duration - s;
@@ -14608,7 +14048,6 @@ TikTok პროფილი: ${getTiktokValue('main')}
       main: { wrap: 'srAuto', zone: 'dropZone' },
       wp: { wrap: 'mooonAutoWp', zone: 'dropZoneWp' },
       mp: { wrap: 'mooonAutoMp', zone: 'dropZoneMp' },
-      cp: { wrap: 'mooonAutoCp', zone: 'dropZoneCp' },
       ao: { wrap: 'mooonAutoAo', zone: 'dropZoneAo' }
     };
     const m = map[panelKey] || map.main;
@@ -14840,414 +14279,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     const orderData = { type: 'editOrder', price, style: eoSelectedStyle, quality: eoSelectedQuality };
     const firstMessage = buildEditOrderMessage('');
     startOrderChat(orderData, firstMessage, btn, textEl, 'eoSendChat', flashEoCopyNote);
-  });
-
-  // ---- Fixed-price "Cheap Package" (no Enhance, no effects) ----
-  const CP_PRICES = {
-    '1080_60': 0.99,
-    '4k_120': 1.99
-  };
-  // Nothing is pre-selected on load — the visitor picks a tile themselves,
-  // or it gets set automatically once their upload is scanned.
-  let cpSelectedQuality = null;
-  // The resolution ceiling their ACTUAL uploaded footage supports, set by
-  // the scanner (see initSimpleScanner's cp config, allowFourK:true) once a
-  // video has been accepted. null = nothing uploaded yet (manual picks are
-  // free in that case — we don't know their footage yet, so there's
-  // nothing to contradict). This is what stops a visitor from uploading
-  // 1080p/2K footage and then manually clicking the 4K tile afterwards.
-  let cpUploadedTier = null;
-  const cpQualityGrid = document.getElementById('cpQualityGrid');
-  const cpUpscaleModalOverlay = document.getElementById('cpUpscaleModalOverlay');
-  const cpUpscaleModalClose = document.getElementById('cpUpscaleModalClose');
-
-  function showCpUpscaleBlockedPopup(direction){
-    if (!cpUpscaleModalOverlay) return;
-    const textEl = document.getElementById('cpUpscaleModalText');
-    if (textEl) {
-      const key = direction === 'downgrade' ? 'cpUpscaleModalTextDowngrade' : 'cpUpscaleModalText4k';
-      textEl.setAttribute('data-i18n', key);
-      textEl.innerHTML = t(key);
-    }
-    cpUpscaleModalOverlay.classList.add('show');
-  }
-  function hideCpUpscaleBlockedPopup(){
-    if (cpUpscaleModalOverlay) cpUpscaleModalOverlay.classList.remove('show');
-  }
-  if (cpUpscaleModalClose) cpUpscaleModalClose.addEventListener('click', hideCpUpscaleBlockedPopup);
-  if (cpUpscaleModalOverlay) {
-    cpUpscaleModalOverlay.addEventListener('click', (e) => {
-      if (e.target === cpUpscaleModalOverlay) hideCpUpscaleBlockedPopup();
-    });
-  }
-
-  // Shared by the manual click handler below AND by the upload scanner
-  // (see initSimpleScanner's cp config, allowFourK:true): once a video is
-  // scanned and turns out to be 1080p or 4K, this marks the matching price
-  // tile active automatically, exactly as if the visitor had clicked it.
-  // Unlike the manual handler, this is never blocked — it always reflects
-  // whatever the scanner actually detected.
-  function selectCpQuality(key){
-    if (key !== '1080_60' && key !== '4k_120') return;
-    cpSelectedQuality = key;
-    if (cpQualityGrid) {
-      cpQualityGrid.querySelectorAll('.mp-box').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-quality') === key);
-      });
-    }
-  }
-
-  // A visitor clicking a tile by hand — unlike selectCpQuality(), this is
-  // fully LOCKED to whatever tier the uploaded footage actually matched,
-  // in both directions: a 1080p source can't hand-pick the 4K tile
-  // (upscaling isn't possible), and — just as strictly — footage above
-  // 1080p can't hand-pick the cheaper 1080p tile either (the price always
-  // has to match the real uploaded quality). The only way to change tier
-  // is to upload a different video; before any upload at all
-  // (cpUploadedTier is null) both tiles are still freely clickable.
-  // Returns whether the click actually resulted in a selection (vs.
-  // being blocked by the popup) — the wizard below uses this to decide
-  // whether to advance to the next step.
-  function tryManualSelectCpQuality(key){
-    if (cpUploadedTier && key !== cpUploadedTier) {
-      showCpUpscaleBlockedPopup(cpUploadedTier === '1080_60' ? 'upgrade' : 'downgrade');
-      return false;
-    }
-    selectCpQuality(key);
-    return true;
-  }
-
-  // Wired inside initCheapOrderWizard below, together with the
-  // step-advance logic that depends on tryManualSelectCpQuality's
-  // return value — a click blocked by the upscale/downgrade popup must
-  // NOT advance the wizard.
-  const cpCopyNote = document.getElementById('cpCopyNote');
-
-  function flashCpCopyNote(text){
-    if (!cpCopyNote) return;
-    cpCopyNote.textContent = text;
-    cpCopyNote.classList.add('active');
-    setTimeout(() => cpCopyNote.classList.remove('active'), 4000);
-  }
-
-  // ============================================================
-  // "CHEAP PACKAGE (UNLIMITED MONTHLY)" — same 1080p-floor / any-fps
-  // upload rule and quality-tile locking as the one-off Cheap Package
-  // above (tryManualSelectCpQuality's exact logic, just against this
-  // panel's own state instead). The prices here are the FULL monthly
-  // subscription cost for that tier, not a per-video price.
-  //
-  // Repeat-order behavior: the first order is a normal quality-pick +
-  // TikTok-link flow, same as any other package. Sending it saves an
-  // 'cheapMonthly' entry to the shared activeSubscriptions store (see
-  // the cpmOrderBtnChat handler below) recording which quality tier was
-  // chosen and the TikTok link, good for 30 days. Every order placed
-  // within that window (checked via getActiveSubFor('cpm') /
-  // mySubscriptions.cheapMonthly, refreshed on login exactly like the
-  // weekly/monthly badges) skips straight from a successful upload to
-  // the confirm+send step — no quality tiles, no TikTok field — since
-  // both are already on file. See initCheapMonthlyOrderWizard below for
-  // where that skip actually happens.
-  // ============================================================
-  const CPM_PRICES = {
-    '1080_60': 9.99,
-    '4k_120': 19.99
-  };
-  let cpmSelectedQuality = null;
-  let cpmUploadedTier = null;
-  const cpmQualityGrid = document.getElementById('cpmQualityGrid');
-  const cpmCopyNote = document.getElementById('cpmCopyNote');
-
-  function flashCpmCopyNote(text){
-    if (!cpmCopyNote) return;
-    cpmCopyNote.textContent = text;
-    cpmCopyNote.classList.add('active');
-    setTimeout(() => cpmCopyNote.classList.remove('active'), 4000);
-  }
-
-  // Reuses the exact same popup as the one-off Cheap Package — it's a
-  // generic "can't switch tiers" message with no panel-specific wording,
-  // so a second copy of the modal would just be duplicate markup.
-  function selectCpmQuality(key){
-    if (key !== '1080_60' && key !== '4k_120') return;
-    cpmSelectedQuality = key;
-    if (cpmQualityGrid) {
-      cpmQualityGrid.querySelectorAll('.mp-box').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-quality') === key);
-      });
-    }
-  }
-
-  function tryManualSelectCpmQuality(key){
-    if (cpmUploadedTier && key !== cpmUploadedTier) {
-      showCpUpscaleBlockedPopup(cpmUploadedTier === '1080_60' ? 'upgrade' : 'downgrade');
-      return false;
-    }
-    selectCpmQuality(key);
-    return true;
-  }
-
-  // ============================================================
-  // CHEAP PACKAGE ORDER WIZARD — same pattern as weekly/monthly above,
-  // but the quality step's own click handling has to live here (rather
-  // than a plain forEach wired at top level) because advancing to the
-  // tiktok step must only happen when tryManualSelectCpQuality()
-  // actually succeeded — a click blocked by the upscale/downgrade popup
-  // must NOT advance the wizard. See the main panel's initOrderWizard
-  // for the full rationale of watching mooonAutoCp's own completion
-  // marker instead of the transfer yes/no click.
-  // ============================================================
-  (function initCheapOrderWizard(){
-    const tiktokWrap = document.getElementById('tiktokFieldCp');
-    const sendConfirmWrap = document.getElementById('cpSendConfirmFieldWrap');
-    const channelsPanel = document.getElementById('cpOrderChannelsPanel');
-    if (!cpQualityGrid) return;
-
-    const tiktokConfirmBtn = document.getElementById('cpTiktokConfirmBtn');
-
-    // Whole uploader box (label + bordered shell around the drop zone) --
-    // hidden once the visitor reaches the quality step, the same way the
-    // individual-order calculator hides its own uploader, so an empty
-    // padded shell isn't left sitting on screen with nothing inside it.
-    const scannerFieldEl = document.getElementById('cpScannerField');
-
-    [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
-      if (el) el.classList.add('wizard-step-hidden');
-    });
-    // Same upload-gated logic as the individual/weekly/monthly wizards:
-    // quality tiles stay hidden until a video's actually been uploaded
-    // and transferred.
-    cpQualityGrid.classList.add('wizard-step-hidden');
-    setWizardStage('wizardStepsCp', 1);
-
-    const autoWrapEl = document.getElementById('mooonAutoCp');
-    if (autoWrapEl) {
-      const autoObserver = new MutationObserver(() => {
-        if (autoWrapEl.querySelector('.mooon-auto-done')) {
-          const scanResultEl = document.getElementById('scanResultCp');
-          wizStepSwap([scanResultEl, scannerFieldEl], [cpQualityGrid]);
-          setWizardStage('wizardStepsCp', 2);
-          // NOT disconnected — see the identical comment in
-          // initWeeklyOrderWizard for why a one-shot observer here broke
-          // every re-upload after the first successful one.
-        }
-      });
-      autoObserver.observe(autoWrapEl, { childList: true });
-    }
-
-    const scanResultEl2 = document.getElementById('scanResultCp');
-    if (scanResultEl2) {
-      const resetObserver = new MutationObserver(() => {
-        if (!scanResultEl2.classList.contains('show')) {
-          wizStepSwap([cpQualityGrid, tiktokWrap, sendConfirmWrap], [scannerFieldEl]);
-          cpQualityGrid.querySelectorAll('.mp-box.active').forEach(b => b.classList.remove('active'));
-          setWizardStage('wizardStepsCp', 1);
-        }
-      });
-      resetObserver.observe(scanResultEl2, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    cpQualityGrid.querySelectorAll('.mp-box').forEach(box => {
-      box.addEventListener('click', () => {
-        const succeeded = tryManualSelectCpQuality(box.getAttribute('data-quality'));
-        if (!succeeded) return;
-        wizStepSwap([cpQualityGrid], [tiktokWrap]);
-        setWizardStage('wizardStepsCp', 3);
-      });
-    });
-
-    tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
-      const linkEl = document.getElementById('tiktokLinkCp');
-      const errorEl = document.getElementById('tiktokErrorCp');
-      if (!linkEl || !linkEl.value.trim()) {
-        if (errorEl) errorEl.classList.add('show');
-        return;
-      }
-      if (errorEl) errorEl.classList.remove('show');
-      // The button is literally the "confirm" step -- getting here means
-      // validation above already passed, so mark the link confirmed
-      // regardless of whether it was typed, pasted, auto-detected from
-      // the clipboard, or pre-filled from a previous order.
-      tiktokLinkConfirmed['cp'] = true;
-      const priceEl = document.getElementById('cpWizardFinalPrice');
-      if (priceEl) priceEl.textContent = (CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60']) + ' ₾';
-      wizStepSwap([tiktokWrap], [sendConfirmWrap, channelsPanel]);
-      setWizardStage('wizardStepsCp', 4);
-    });
-  })();
-
-  // ============================================================
-  // "CHEAP PACKAGE (UNLIMITED MONTHLY)" ORDER WIZARD — same shape as
-  // initCheapOrderWizard above, EXCEPT the upload-success observer here
-  // branches on whether this Discord user already has an active
-  // 'cheapMonthly' subscription (see getActiveSubFor('cpm')):
-  //   - No active subscription (first order): behaves exactly like the
-  //     one-off Cheap Package — reveal the quality tiles, then TikTok,
-  //     then confirm+send.
-  //   - Active subscription (any later order within its 30-day window):
-  //     quality and TikTok are already on file, so both steps are
-  //     skipped entirely — straight from a successful upload to the
-  //     price+send step, using the quality stored on the subscription.
-  // ============================================================
-  (function initCheapMonthlyOrderWizard(){
-    const tiktokWrap = document.getElementById('tiktokFieldCpm');
-    const sendConfirmWrap = document.getElementById('cpmSendConfirmFieldWrap');
-    const channelsPanel = document.getElementById('cpmOrderChannelsPanel');
-    if (!cpmQualityGrid) return;
-
-    const tiktokConfirmBtn = document.getElementById('cpmTiktokConfirmBtn');
-    const scannerFieldEl = document.getElementById('cpmScannerField');
-
-    [tiktokWrap, sendConfirmWrap, channelsPanel].forEach(el => {
-      if (el) el.classList.add('wizard-step-hidden');
-    });
-    cpmQualityGrid.classList.add('wizard-step-hidden');
-    setWizardStage('wizardStepsCpm', 1);
-
-    // Shared by both the "skip straight to step 4" repeat-order path and
-    // the normal step-4 TikTok-confirm path below, so the price line is
-    // computed identically either way.
-    function revealSendStep(extraHide){
-      const priceEl = document.getElementById('cpmWizardFinalPrice');
-      if (priceEl) priceEl.textContent = (CPM_PRICES[cpmSelectedQuality] || CPM_PRICES['1080_60']) + ' ₾';
-      wizStepSwap((extraHide || []).concat([tiktokWrap, cpmQualityGrid]), [sendConfirmWrap, channelsPanel]);
-      setWizardStage('wizardStepsCpm', 4);
-    }
-
-    const autoWrapEl = document.getElementById('mooonAutoCpm');
-    if (autoWrapEl) {
-      const autoObserver = new MutationObserver(() => {
-        if (autoWrapEl.querySelector('.mooon-auto-done')) {
-          const scanResultEl = document.getElementById('scanResultCpm');
-
-          const activeSub = getActiveSubFor('cpm');
-          if (activeSub && activeSub.quality) {
-            // Repeat order within the 30-day window: quality + TikTok
-            // are already on file — skip both steps entirely.
-            selectCpmQuality(activeSub.quality);
-            cpmUploadedTier = activeSub.quality;
-            tiktokLinkConfirmed['cpm'] = true;
-            revealSendStep([scanResultEl, scannerFieldEl]);
-          } else {
-            // First order — normal quality-pick step.
-            wizStepSwap([scanResultEl, scannerFieldEl], [cpmQualityGrid]);
-            setWizardStage('wizardStepsCpm', 2);
-          }
-          // NOT disconnected — see the identical comment in
-          // initWeeklyOrderWizard for why a one-shot observer here broke
-          // every re-upload after the first successful one.
-        }
-      });
-      autoObserver.observe(autoWrapEl, { childList: true });
-    }
-
-    const scanResultEl2 = document.getElementById('scanResultCpm');
-    if (scanResultEl2) {
-      const resetObserver = new MutationObserver(() => {
-        if (!scanResultEl2.classList.contains('show')) {
-          wizStepSwap([cpmQualityGrid, tiktokWrap, sendConfirmWrap], [scannerFieldEl]);
-          cpmQualityGrid.querySelectorAll('.mp-box.active').forEach(b => b.classList.remove('active'));
-          setWizardStage('wizardStepsCpm', 1);
-        }
-      });
-      resetObserver.observe(scanResultEl2, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    cpmQualityGrid.querySelectorAll('.mp-box').forEach(box => {
-      box.addEventListener('click', () => {
-        const succeeded = tryManualSelectCpmQuality(box.getAttribute('data-quality'));
-        if (!succeeded) return;
-        wizStepSwap([cpmQualityGrid], [tiktokWrap]);
-        setWizardStage('wizardStepsCpm', 3);
-      });
-    });
-
-    tiktokConfirmBtn && tiktokConfirmBtn.addEventListener('click', () => {
-      const linkEl = document.getElementById('tiktokLinkCpm');
-      const errorEl = document.getElementById('tiktokErrorCpm');
-      if (!getTiktokValue('cpm') && (!linkEl || !linkEl.value.trim())) {
-        if (errorEl) errorEl.classList.add('show');
-        return;
-      }
-      if (errorEl) errorEl.classList.remove('show');
-      tiktokLinkConfirmed['cpm'] = true;
-      revealSendStep();
-    });
-  })();
-
-  function buildCheapOrderMessage(orderId){
-    const price = CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60'];
-    const qualityLabel = QUALITY_LABELS[cpSelectedQuality] || QUALITY_LABELS['1080_60'];
-    return `⚡ ახალი შეკვეთა — MOON (იაფი პაკეტი)
-პაკეტი: იაფი პაკეტი (ხარისხის გაუმჯობესებისა და ეფექტების გარეშე)
-ხარისხი: ${qualityLabel}
-ღირებულება: ${price} ₾
-TikTok პროფილი: ${getTiktokValue('cp')}
-ვიდეო ლინკი: ${getVideoLinkValue('cp')}
-
-ვადასტურებ რომ ვეთანხმები წესებს✅
-ვიდეო ჩამბარდეს არაუმეტეს 30 წუთში`;
-  }
-
-  const cpOrderBtnChat = document.getElementById('cpOrderBtnChat');
-
-  if (cpOrderBtnChat) cpOrderBtnChat.addEventListener('click', () => {
-    if (!validateBeforeSend('cp')) return;
-    const btn = cpOrderBtnChat;
-    const textEl = document.getElementById('cpOrderBtnChatText');
-    const price = CP_PRICES[cpSelectedQuality] || CP_PRICES['1080_60'];
-    const orderData = {
-      type: 'cheapOrder', price,
-      tiktok: getTiktokValue('cp'), videoLink: getVideoLinkValue('cp')
-    };
-    rememberTiktokForUser(orderData.tiktok);
-    const firstMessage = buildCheapOrderMessage('');
-    startOrderChat(orderData, firstMessage, btn, textEl, 'cpSendChat', flashCpCopyNote);
-  });
-
-  function buildCheapMonthlyOrderMessage(){
-    const quality = cpmSelectedQuality || '1080_60';
-    const qualityLabel = QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60'];
-    const activeSub = getActiveSubFor('cpm');
-    if (activeSub) {
-      // Repeat order within the 30-day window — quality and TikTok are
-      // already on file from the first order, so this message doesn't
-      // repeat them; it's just the new video for the same package.
-      return `🔄 შეკვეთა — MOON (იაფი პაკეტი, ულიმიტო თვიური)\n` +
-        `მორიგი ვიდეო აქტიური თვიური პაკეტის ფარგლებში\n` +
-        `ხარისხი (უცვლელი): ${qualityLabel}\n` +
-        `ვიდეო ლინკი: ${getVideoLinkValue('cpm')}\n\n` +
-        `ვადასტურებ რომ ვეთანხმები წესებს✅`;
-    }
-    const price = CPM_PRICES[quality] || CPM_PRICES['1080_60'];
-    return `🔄 ახალი შეკვეთა — MOON (იაფი პაკეტი, ულიმიტო თვიური)\n` +
-      `პაკეტი: იაფი პაკეტი — ულიმიტო თვიური (ხარისხის გაუმჯობესებისა და ეფექტების გარეშე)\n` +
-      `ხარისხი: ${qualityLabel} (ეს ხარისხი ფიქსირდება მომდევნო 30 დღის ყველა შეკვეთისთვის)\n` +
-      `ღირებულება: ${price} ₾ / თვე\n` +
-      `TikTok პროფილი: ${getTiktokValue('cpm')}\n` +
-      `ვიდეო ლინკი: ${getVideoLinkValue('cpm')}\n\n` +
-      `ვადასტურებ რომ ვეთანხმები წესებს✅`;
-  }
-
-  const cpmOrderBtnChat = document.getElementById('cpmOrderBtnChat');
-
-  if (cpmOrderBtnChat) cpmOrderBtnChat.addEventListener('click', () => {
-    if (!validateBeforeSend('cpm')) return;
-    const btn = cpmOrderBtnChat;
-    const textEl = document.getElementById('cpmOrderBtnChatText');
-    const quality = cpmSelectedQuality || '1080_60';
-    const price = CPM_PRICES[quality] || CPM_PRICES['1080_60'];
-    const orderData = {
-      // Deliberately 'cheapMonthly' (matching SUB_PANEL_TYPE/
-      // SUB_DURATION_MS) on EVERY order from this panel, first or
-      // repeat — admin-confirming any of them resets/extends the same
-      // 30-day window at the same quality, via activateDiscordSubscription.
-      type: 'cheapMonthly', price, quality,
-      tiktok: getTiktokValue('cpm'), videoLink: getVideoLinkValue('cpm')
-    };
-    rememberTiktokForUser(orderData.tiktok);
-    const firstMessage = buildCheapMonthlyOrderMessage();
-    startOrderChat(orderData, firstMessage, btn, textEl, 'cpmSendChat', flashCpmCopyNote);
   });
 
   // ============================================================
@@ -16671,13 +15702,12 @@ TikTok პროფილი: ${getTiktokValue('cp')}
   let discordDirectoryCache = [];
   let blockedDiscordUsersCache = [];
 
-  const SUB_DURATION_MS = { weekly: 7 * 24 * 60 * 60 * 1000, monthly: 30 * 24 * 60 * 60 * 1000, cheapMonthly: 30 * 24 * 60 * 60 * 1000 };
+  const SUB_DURATION_MS = { weekly: 7 * 24 * 60 * 60 * 1000, monthly: 30 * 24 * 60 * 60 * 1000 };
 
   function pendingOrderTypeLabel(type){
     if (type === 'weekly') return t('adminOrderTypeWeekly');
     if (type === 'monthly') return t('adminOrderTypeMonthly');
     if (type === 'editOrder') return t('adminOrderTypeEditOrder');
-    if (type === 'cheapOrder') return t('adminOrderTypeCheapOrder');
     return t('adminOrderTypeSingle');
   }
 
@@ -16861,11 +15891,6 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         discordUsername: order.discordUsername || '',
         type: order.type,
         tiktok: order.tiktok || '',
-        // Not used by weekly/monthly (they're a single fixed deliverable
-        // per period), but the Unlimited Monthly Cheap Package needs to
-        // remember which quality tier the customer's first order used,
-        // so every later order in the same 30-day window can be locked
-        // to that same tier automatically (see getActiveSubFor('cpm')).
         quality: order.quality || '',
         orderId: order.id,
         activatedAt: now,
@@ -17126,11 +16151,11 @@ TikTok პროფილი: ${getTiktokValue('cp')}
         ]);
         await mdbWrite('confirmedOrders', { list: confirmedOrdersCache });
         renderConfirmedOrdersList();
-        // Weekly/monthly/cheapMonthly order placed via Discord login —
+        // Weekly/monthly order placed via Discord login —
         // activate (or reset) that customer's package now, so their next
         // visit shows the "activated" badge / skips quality+TikTok
         // instead of asking again.
-        if ((order.type === 'weekly' || order.type === 'monthly' || order.type === 'cheapMonthly') && order.discordId) {
+        if ((order.type === 'weekly' || order.type === 'monthly') && order.discordId) {
           await activateDiscordSubscription(order);
         }
       }
@@ -20330,8 +19355,6 @@ MF={w:1,h:'დამუშავება',d:'ვიდეოს ხარის
 TT={w:1,h:'TikTok-ზე ატვირთვა',d:'ვიდეო ხარისხის დაკარგვის გარეშე აიტვირთება.'};
 function D(d){return {w:1,h:'ჩაბარდება',d:d};}
 var P=[
-{n:'იაფი პაკეტი',t:'ბიუჯეტური ვარიანტი',p:.99,o:1.99,u:'',c:'#ffb020',pill:'ჩაბარდება მაქსიმუმ 30 წუთში',r:[U1,U2,U3,MS,D('მზა ვიდეოს მიიღებთ მაქსიმუმ 30 წუთში.'),TT]},
-{n:'იაფი თვიური პაკეტი',t:'თვეში 20 ვიდეო',p:9.99,o:19.99,u:'',c:'#8b7bff',pill:'ერთ თვეში 20 ვიდეო',r:[U1,U2,U3,MS,D('თვის განმავლობაში ყოველი ვიდეო ამავე გზას გაივლის.'),TT]},
 {n:'ცალობითი პაკეტი',t:'1 ვიდეოს დამუშავება',p:1.49,o:0,u:'დან',c:'#22d36b',note:'ფასი დამოკიდებულია ვიდეოს ხანგრძლივობაზე',r:[U1,U2,U3,MF,D('მზა ვიდეოს მიიღებთ მაქსიმუმ 24 საათში.'),TT]},
 {n:'ცალობითი შეკვეთა',t:'ნებისმიერი ფორმატის ვიდეო',p:2.99,o:0,u:'დან',c:'#ffd23f',r:[{w:0,h:'ვიდეოს ატვირთვა',d:'ატვირთეთ ნებისმიერი ფორმატის ვიდეო.'},U2,U3,MF,D('მზა ვიდეოს მიიღებთ მაქსიმუმ 24 საათში.'),TT]},
 {n:'კვირის პაკეტი',t:'კვირაში 5 ვიდეო',p:24.99,o:35.99,u:'',c:'#22c3ff',pill:'5 ვიდეო 1 კვირის განმავლობაში',r:[U1,{w:0,h:'ხარისხის არჩევა',d:'ყოველი ატვირთვისას აირჩიეთ 1080P ან 4K.'},U3,MF,D('ვიდეოები მზადდება 1 კვირის განმავლობაში.'),TT]},
@@ -20842,11 +19865,7 @@ html .pc-modal-scrim .wizard-question .wc-price-value{
   font-size:30px; line-height:1; font-weight:800; white-space:nowrap;
   color:color-mix(in srgb, var(--pc-accent, #22c55e) 55%, #fff);
 }
-html .pc-modal-scrim #aoOrderChannelsPanel,
-html .pc-modal-scrim #wpOrderChannelsPanel,
-html .pc-modal-scrim #mpOrderChannelsPanel,
-html .pc-modal-scrim #cpOrderChannelsPanel,
-html .pc-modal-scrim #cpmOrderChannelsPanel{ margin-top:0 !important; }
+html .pc-modal-scrim #aoOrderChannelsPanel,html .pc-modal-scrim #wpOrderChannelsPanel,html .pc-modal-scrim #mpOrderChannelsPanel{ margin-top:0 !important; }
 html .pc-modal-scrim .field:has(> .wizard-question){ margin-bottom:0; }
 </style>
 <style id="moon-gate-v1">
@@ -22731,9 +21750,6 @@ html body .mn-right .menu-toggle{width:38px!important;height:38px!important;bord
 
 html body .mn-views{display:none}
 html body.mn-view-on .mn-views{display:block}
-html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style){display:none!important}
-
-@supports (content-visibility:hidden){html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style){display:block!important;content-visibility:hidden!important;contain-intrinsic-size:0 0!important;height:0!important;min-height:0!important;max-height:0!important;margin-block:0!important;padding-block:0!important;border-block-width:0!important;overflow:hidden!important}}
 html body .mn-view{display:none;max-width:760px;margin:6px auto 30px;padding:0 4px}
 html body .mn-view.show{display:block;animation:mnViewIn .55s cubic-bezier(.22,.9,.32,1) both}
 
@@ -22862,7 +21878,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
   /* ---- page change: current content steps out, new content builds in piece by piece ---- */
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   var busy=false, pending=null, shown='home';
-  var BLK='.wrap>*:not(.topbar):not(.mn-views):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(.cp-upscale-modal):not(footer):not(script):not(style)';
+  var BLK='.wrap>*:not(.topbar):not(.mn-views):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(footer):not(script):not(style)';
   function blocks(){
     var out=[], vh=window.innerHeight, all=document.querySelectorAll(BLK);
     /* SMOOTHNESS: stops measuring as soon as 7 visible blocks are found (same 7 blocks as before, far fewer layout reads) */
@@ -23547,9 +22563,6 @@ html body .mn-links .mn-link{flex:1 1 0!important;min-width:0!important;padding-
 html body .mn-links .mn-ind{transition:left .36s cubic-bezier(.4,0,.2,1),opacity .2s ease;transform:none;will-change:auto}
 
 
-html body :is(.panel,.pc-accordion-body,.pc-modal-scrim .panel,.mn-card,.discord-popover,.site-menu,.admin-box,.cp-upscale-modal){box-shadow:none!important}
-
-
 html body .mn-emblem{box-shadow:0 0 10px 2px rgba(190,210,255,.196),0 0 26px 6px rgba(150,180,255,.136)!important}
 html body .mn-emblem:hover{box-shadow:0 0 14px 3px rgba(200,220,255,.272),0 0 34px 9px rgba(160,190,255,.196)!important}
 html body .mn-wordmark .brand-logo{position:relative;isolation:isolate}
@@ -23783,15 +22796,12 @@ html.low-power body .pc-card.pc-card--monthly::before,html.low-power body .pc-ca
 <style id="moon-stable-colors">
 
 html body .pc-card--weekly{--pc-bg:radial-gradient(ellipse 120% 60% at 15% 0%,rgba(255,255,255,.10),transparent 55%),linear-gradient(115deg,#430C8C 0%,#5614AA 50%,#450D8E 100%)}
-html body .pc-card--cheap{--pc-bg:radial-gradient(ellipse 120% 60% at 15% 0%,rgba(255,255,255,.10),transparent 55%),linear-gradient(115deg,#082AA0 0%,#0A3BC1 50%,#082BA2 100%)}
 html body .pc-card--any{--pc-bg:radial-gradient(ellipse 120% 60% at 15% 0%,rgba(255,255,255,.10),transparent 55%),linear-gradient(115deg,#044A5C 0%,#06647A 50%,#044B5E 100%)}
 html body :is(.pc-card--indiv,#orderFlowPanel){--pc-cta-bg:linear-gradient(120deg,#12B80F 0%,#25DD22 50%,#12B80F 100%)}
 html body :is(.pc-card--weekly,#weeklySubPanel){--pc-cta-bg:linear-gradient(120deg,#9A06D2 0%,#B813EA 50%,#9A06D2 100%)}
 html body :is(.pc-card--monthly,#monthlySubPanel){--pc-cta-bg:linear-gradient(120deg,#E5A907 0%,#F7C81C 50%,#E5A907 100%)}
 html body :is(.pc-card--edit,#editOrderPanel){--pc-cta-bg:linear-gradient(120deg,#C80000 0%,#E80000 50%,#C80000 100%)}
-html body :is(.pc-card--cheap,#cheapOrderPanel){--pc-cta-bg:linear-gradient(120deg,#1558F0 0%,#2F74FF 50%,#1558F0 100%)}
 html body :is(.pc-card--any,#anyOrderPanel){--pc-cta-bg:linear-gradient(120deg,#02829E 0%,#0897B8 50%,#02829E 100%)}
-html body :is(.pc-card--cheapmonthly,#cheapMonthlyPanel){--pc-cta-bg:linear-gradient(120deg,#9AA3B0 0%,#C2C8D1 50%,#9AA3B0 100%)}
 </style>
 <style id="moon-polish">
 html.mo-settle body .pricing-cards .pc-scroll-track > .pc-slide > .pc-card-wrap{transition:rotate .5s cubic-bezier(.4,0,.2,1),scale .5s cubic-bezier(.4,0,.2,1)!important}
@@ -23845,8 +22855,6 @@ html body .pc-slide:has(.pc-card--any){--moon-gl:#007D99}
 html body .pc-slide:has(.pc-card--weekly){--moon-gl:#B501E7}
 html body .pc-slide:has(.pc-card--monthly){--moon-gl:#F2BB06}
 html body .pc-slide:has(.pc-card--edit){--moon-gl:#F70000}
-html body .pc-slide:has(.pc-card--cheap){--moon-gl:#0048E5}
-html body .pc-slide:has(.pc-card--cheapmonthly){--moon-gl:#9aa3b0}
 html body .pc-slide.pc-slide--active:not(#_a):not(#_b)::before{content:"";position:absolute;inset:0;border-radius:22px;z-index:-1;pointer-events:none;
   box-shadow:0 0 8px 1px color-mix(in srgb,var(--moon-gl,#7c8fff) 70%,transparent),0 0 14px 2px color-mix(in srgb,var(--moon-gl,#7c8fff) 38%,transparent);
   opacity:0;transform:scale(.985);transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)}
@@ -23882,8 +22890,6 @@ html body .pc-card--any{--pc-bg:#065F75}
 html body .pc-card--weekly{--pc-bg:#5313A5}
 html body .pc-card--monthly{--pc-bg:#C0800A}
 html body .pc-card--edit{--pc-bg:#7D0101}
-html body .pc-card--cheap{--pc-bg:#0A38BB}
-html body .pc-card--cheapmonthly{--pc-bg:#131418}
 html body .comments-panel.comments-panel{background-image:none!important;background-color:rgb(24,24,25)!important}
 html body .mn-glass.mn-glass{background-image:none!important;background-color:rgb(44,47,57)!important}
 html body .ttdl-shell.ttdl-shell::after{background-image:none!important;background-color:rgb(7,11,18)!important}
@@ -23916,12 +22922,7 @@ html body #commentEmojiPanel:not(#_a):not(#_b):not(#_c){border-color:transparent
 html body .wizard-question:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(86,93,164)!important}
 html body #ordersDonutCard:not(#_a):not(#_b):not(#_c),
 html body #analyticsSummaryCard:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(96,208,255)!important}
-html body #srAuto:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoAo:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoWp:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoMp:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoCp:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(63,137,168)!important}
+html body #srAuto:not(#_a):not(#_b):not(#_c),html body #mooonAutoAo:not(#_a):not(#_b):not(#_c),html body #mooonAutoWp:not(#_a):not(#_b):not(#_c),html body #mooonAutoMp:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(63,137,168)!important}
 html body .toggle-row:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(73,148,99)!important}
 html body #socialProofBar:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw3) rgb(226,250,110)!important}
 html body #discordPopover:not(#_a):not(#_b):not(#_c),
@@ -23949,31 +22950,13 @@ html body #commentEmojiBtn:not(#_a):not(#_b):not(#_c),
 html body #adminModeRow:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(130,141,248)!important}
 html body #adminCloseLogin:not(#_a):not(#_b):not(#_c),
 html body #adminCloseDash:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(96,208,255)!important}
-html body .mooon-auto-stay:not(#_a):not(#_b):not(#_c),
-html body #tiktokAutoBtn:not(#_a):not(#_b):not(#_c),
-html body #tiktokAutoBtnAo:not(#_a):not(#_b):not(#_c),
-html body #tiktokAutoBtnWp:not(#_a):not(#_b):not(#_c),
-html body #tiktokAutoBtnMp:not(#_a):not(#_b):not(#_c),
-html body #tiktokAutoBtnCp:not(#_a):not(#_b):not(#_c),
-html body #tiktokAutoBtnCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(63,137,168)!important}
+html body .mooon-auto-stay:not(#_a):not(#_b):not(#_c),html body #tiktokAutoBtn:not(#_a):not(#_b):not(#_c),html body #tiktokAutoBtnAo:not(#_a):not(#_b):not(#_c),html body #tiktokAutoBtnWp:not(#_a):not(#_b):not(#_c),html body #tiktokAutoBtnMp:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(63,137,168)!important}
 html body .ttdl-status-chip:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(110,225,150)!important}
-html body #srSuccess:not(#_a):not(#_b):not(#_c),
-html body #scanOkAo:not(#_a):not(#_b):not(#_c),
-html body #scanOkWp:not(#_a):not(#_b):not(#_c),
-html body #scanOkMp:not(#_a):not(#_b):not(#_c),
-html body #scanOkCp:not(#_a):not(#_b):not(#_c),
-html body #scanOkCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(73,148,99)!important}
+html body #srSuccess:not(#_a):not(#_b):not(#_c),html body #scanOkAo:not(#_a):not(#_b):not(#_c),html body #scanOkWp:not(#_a):not(#_b):not(#_c),html body #scanOkMp:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(73,148,99)!important}
 html body #siteMenuClose:not(#_a):not(#_b):not(#_c),
 html body #qnDropClose:not(#_a):not(#_b):not(#_c),
 html body .dp-icon-btn:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(78,104,170)!important}
-html body #scanProgressCancel:not(#_a):not(#_b):not(#_c),
-html body .sr-row:not(#_a):not(#_b):not(#_c),
-html body #srQualityRow:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptNoAo:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptNoWp:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptNoMp:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptNoCp:not(#_a):not(#_b):not(#_c),
-html body #mooonPromptNoCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(51,69,112)!important}
+html body #scanProgressCancel:not(#_a):not(#_b):not(#_c),html body .sr-row:not(#_a):not(#_b):not(#_c),html body #srQualityRow:not(#_a):not(#_b):not(#_c),html body #mooonPromptNoAo:not(#_a):not(#_b):not(#_c),html body #mooonPromptNoWp:not(#_a):not(#_b):not(#_c),html body #mooonPromptNoMp:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(51,69,112)!important}
 html body #messengerBackBtn:not(#_a):not(#_b):not(#_c),
 html body .lang-switch.dg-lang:not(#_a):not(#_b):not(#_c),
 html body #discordJoinBtn:not(#_a):not(#_b):not(#_c),
@@ -23995,45 +22978,15 @@ html body #mi5Snd:not(#_a):not(#_b):not(#_c),
 html body #mi5Skip:not(#_a):not(#_b):not(#_c),
 html body .mn-card-x:not(#_a):not(#_b):not(#_c),
 html body .dg-spec b:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(112,120,146)!important}
-html body #srResetBtn:not(#_a):not(#_b):not(#_c),
-html body .sr-reject-detected-row:not(#_a):not(#_b):not(#_c),
-html body #scanResetAo:not(#_a):not(#_b):not(#_c),
-html body #scanResetWp:not(#_a):not(#_b):not(#_c),
-html body #scanResetMp:not(#_a):not(#_b):not(#_c),
-html body #scanResetCp:not(#_a):not(#_b):not(#_c),
-html body #scanResetCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(74,79,96)!important}
-html body #srTransferNo:not(#_a):not(#_b):not(#_c),
-html body #srAutoError:not(#_a):not(#_b):not(#_c),
-html body #srRejectRetry:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoErrorAo:not(#_a):not(#_b):not(#_c),
-html body #scanRejectWp:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoErrorWp:not(#_a):not(#_b):not(#_c),
-html body #scanRejectMp:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoErrorMp:not(#_a):not(#_b):not(#_c),
-html body #scanRejectCp:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoErrorCp:not(#_a):not(#_b):not(#_c),
-html body #scanRejectCpm:not(#_a):not(#_b):not(#_c),
-html body #mooonAutoErrorCpm:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(168,82,92)!important}
+html body #srResetBtn:not(#_a):not(#_b):not(#_c),html body .sr-reject-detected-row:not(#_a):not(#_b):not(#_c),html body #scanResetAo:not(#_a):not(#_b):not(#_c),html body #scanResetWp:not(#_a):not(#_b):not(#_c),html body #scanResetMp:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(74,79,96)!important}
+html body #srTransferNo:not(#_a):not(#_b):not(#_c),html body #srAutoError:not(#_a):not(#_b):not(#_c),html body #srRejectRetry:not(#_a):not(#_b):not(#_c),html body #mooonAutoErrorAo:not(#_a):not(#_b):not(#_c),html body #scanRejectWp:not(#_a):not(#_b):not(#_c),html body #mooonAutoErrorWp:not(#_a):not(#_b):not(#_c),html body #scanRejectMp:not(#_a):not(#_b):not(#_c),html body #mooonAutoErrorMp:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(168,82,92)!important}
 html body .tnf-note:not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) rgb(96,224,204)!important}
-/* the two quality chips on each card (1080P / 4K): ring in the card colour, lightened */
-html body .pc-card--indiv .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
-html body .pc-card--any .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
-html body .pc-card--edit .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
-html body .pc-card--weekly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
-html body .pc-card--monthly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
-html body .pc-card--cheapmonthly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),
-html body .pc-card--cheap .pc-feature:nth-child(2):not(#_a):not(#_b):not(#_c),
-html body .pc-card--cheap .pc-feature:nth-child(3):not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--pc-accent,#7c8fff) 40%,#fff)!important}
+/* the two quality chips on each card (1080P / 4K): ring in the card colour,lightened */
+html body .pc-card--indiv .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),html body .pc-card--any .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),html body .pc-card--edit .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),html body .pc-card--weekly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c),html body .pc-card--monthly .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c){border-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 var(--rw2) color-mix(in srgb,var(--pc-accent,#7c8fff) 40%,#fff)!important}
 /* shells that carry their own glow / shadow / focus effects keep those: their ring is an outline instead (inside the border box) */
 html body .trust-item.moon-glow-card.tilt-3d:not(:focus-visible){outline:var(--ow3) solid rgb(108,148,255)!important;outline-offset:calc(-1 * var(--ow3))!important}
 html body .howto-step.moon-glow-card.tilt-3d:not(:focus-visible){outline:var(--ow3) solid rgb(70,150,170)!important;outline-offset:calc(-1 * var(--ow3))!important}
-html body #orderFlowPanel:not(:focus-visible),
-html body #anyOrderPanel:not(:focus-visible),
-html body #weeklySubPanel:not(:focus-visible),
-html body #editOrderPanel:not(:focus-visible),
-html body .eo-video-wrap:not(:focus-visible),
-html body #cheapOrderPanel:not(:focus-visible),
-html body #cheapMonthlyPanel:not(:focus-visible){outline:var(--ow3) solid rgb(51,69,112)!important;outline-offset:calc(-1 * var(--ow3))!important}
+html body #orderFlowPanel:not(:focus-visible),html body #anyOrderPanel:not(:focus-visible),html body #weeklySubPanel:not(:focus-visible),html body #editOrderPanel:not(:focus-visible),html body .eo-video-wrap:not(:focus-visible){outline:var(--ow3) solid rgb(51,69,112)!important;outline-offset:calc(-1 * var(--ow3))!important}
 html body #portfolioCard1:not(:focus-visible),
 html body #portfolioCard2:not(:focus-visible),
 html body .a-tabs:not(:focus-visible){outline:var(--ow3) solid rgb(112,120,146)!important;outline-offset:calc(-1 * var(--ow3))!important}
@@ -24057,12 +23010,7 @@ html body #promoCodeInput:not(:focus-visible),
 html body #promoWeekDiscountInput:not(:focus-visible),
 html body #promoMonthDiscountInput:not(:focus-visible),
 html body #promoSingleDiscountInput:not(:focus-visible){outline:var(--ow2) solid rgb(78,104,170)!important;outline-offset:calc(-1 * var(--ow2))!important}
-html body #tiktokLink:not(:focus-visible),
-html body #tiktokLinkAo:not(:focus-visible),
-html body #tiktokLinkWp:not(:focus-visible),
-html body #tiktokLinkMp:not(:focus-visible),
-html body #tiktokLinkCp:not(:focus-visible),
-html body #tiktokLinkCpm:not(:focus-visible){outline:var(--ow2) solid rgb(51,69,112)!important;outline-offset:calc(-1 * var(--ow2))!important}
+html body #tiktokLink:not(:focus-visible),html body #tiktokLinkAo:not(:focus-visible),html body #tiktokLinkWp:not(:focus-visible),html body #tiktokLinkMp:not(:focus-visible){outline:var(--ow2) solid rgb(51,69,112)!important;outline-offset:calc(-1 * var(--ow2))!important}
 html body .messenger-input-row:not(:focus-visible),
 html body .lang-btn.active:not(:focus-visible),
 html body #adminPass:not(:focus-visible),
@@ -26473,6 +25421,8 @@ html body .ttdl-shell.tt-wait{transform:none!important}
 html body .mn-in{animation-duration:.5s!important;animation-timing-function:ease-out!important;animation-delay:calc(min(var(--o,0),3)*40ms)!important}
 </style>
 <style id="moon-footer">
+/* the Latin part sits on its own baseline - the Georgian font's baseline is lower, so the two halves of the line were not level */
+html body footer .ft-lat{position:relative;top:2.6px}
 html body footer{margin:34px auto 0!important;padding:20px 16px 26px!important;max-width:760px;text-align:center;color:#7d808c!important;font-size:12.5px!important;letter-spacing:.02em;border-top:1px solid rgba(255,255,255,.07)}
 @media (min-width:701px){html body.mn-view-on .mn-views{min-height:calc((100vh - 268px) / 1.15)}}
 </style>
@@ -26554,6 +25504,15 @@ html body #optView#optView .opt > .or-mg{display:none!important}
 html body #optView#optView .opt :is(.opt-drop,.opt-stats,.opt-quota,.opt-plan,.opt-prog,.opt-drop:hover,.opt-plan:hover):not(#_a):not(#_b):not(#_c){transform:none!important;transition:border-color .25s ease,box-shadow .25s ease,background-color .25s ease!important}
 html body #optView#optView .opt :is(.opt-stats,.opt-quota,.opt-plan,.opt-prog,.opt-drop)::after:not(#_a){background-image:none!important}
 html body #optView#optView .opt :is(.opt-stats,.opt-quota,.opt-plan,.opt-prog)::after{opacity:0!important}
+</style>
+<style id="moon-no-glint">
+/* pricing cards: the diagonal light streak that sweeps across them is gone */
+html body .pc-card > .pc-cine-glint:not(#_a):not(#_b),html body .pc-cine-glint:not(#_a):not(#_b){display:none!important;animation:none!important;opacity:0!important}
+</style>
+<style id="moon-view-hide">
+html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(footer):not(script):not(style){display:none!important}
+@supports (content-visibility:hidden){html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-menu):not(.site-menu-scrim):not(.pc-modal-scrim):not(.admin-box):not(footer):not(script):not(style){display:block!important;content-visibility:hidden!important;contain-intrinsic-size:0 0!important;height:0!important;min-height:0!important;max-height:0!important;margin-block:0!important;padding-block:0!important;border-block-width:0!important;overflow:hidden!important}}
+html body :is(.panel,.pc-accordion-body,.pc-modal-scrim .panel,.mn-card,.discord-popover,.site-menu,.admin-box){box-shadow:none!important}
 </style>
 </body>
 </html>
