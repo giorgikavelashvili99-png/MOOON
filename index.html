@@ -25682,5 +25682,21 @@ html body .discord-popover:not(#_a):not(#_b):not(#_c){background-color:#0f0b17!i
   html body #hzMenu .qn-drop:not(#_a):not(#_b){background:#15141a!important;border-radius:22px!important}
 }
 </style>
+<style id="moon-modal-safe">
+/* ===== Phone: order windows always start below the top bar (never hidden under it); the edit-order window is compact ===== */
+@media (max-width:700px){
+  html body .pc-modal-scrim.open:not(#_a):not(#_b){align-items:flex-start!important;padding-top:calc(var(--hz-h,66px) + 22px)!important;padding-bottom:14px!important;overflow-y:auto!important;overscroll-behavior:contain}
+  html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b){margin-top:auto!important;margin-bottom:auto!important;top:0!important}
+  /* edit order: 4 styles in one row, smaller sample, shorter quality tiles */
+  html body #editOrderPanel .eo-style-tabs:not(#_a){display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 12px;width:100%!important;max-width:none!important;padding:0!important}
+  html body #editOrderPanel .eo-style-tab:not(#_a){min-width:0!important;width:auto!important;padding:9px 2px!important;font-size:12px!important;white-space:nowrap;margin:0!important;text-align:center}
+  html body #editOrderPanel .eo-video-wrap:not(#_a){width:118px!important}
+  html body #editOrderPanel .eo-caption{margin-top:10px;font-size:13px}
+  html body #editOrderPanel #eoQualityGrid:not(#_a){margin-top:12px!important;padding:2px;gap:10px}
+  html body #editOrderPanel #eoQualityGrid .mp-box:not(#_a){min-height:92px!important;height:auto!important;aspect-ratio:auto!important;padding:12px 8px!important;transform:none!important}
+  html body #editOrderPanel #eoQualityGrid .mp-box.active .mp-new-price sup{color:inherit!important;-webkit-text-fill-color:currentColor!important}
+  html body #editOrderPanel .order-grid{margin-top:12px!important}
+}
+</style>
 </body>
 </html>
