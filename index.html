@@ -26545,5 +26545,24 @@ html body #optView .opt-head h2[data-t]:not(#_a):not(#_b)::after{content:attr(da
   try{ new MutationObserver(sync).observe(v,{childList:true,subtree:true,characterData:true}); }catch(e){}
 })();
 </script>
+<style id="moon-switch">
+/* ===== Page switch without the black blink =====
+   Before: the old page faded to 0, the new one started from 0 -> an empty (black) screen for ~150 ms, then everything "lit up" one block after another.
+   Now: old page dims only to 55 %, the new one starts from the same 55 % and settles to 100 % at once (opacity only, so it never re-rasters the text). */
+@keyframes mnOut{to{opacity:.55}}
+@keyframes mnHomeIn{from{opacity:.55}to{opacity:1}}
+@keyframes mnViewIn{from{opacity:.55}to{opacity:1}}
+@keyframes mnHeadIn{from{opacity:.55}to{opacity:1}}
+@keyframes mnSubIn{from{opacity:.55}to{opacity:1}}
+@keyframes optIn{from{opacity:.55}to{opacity:1}}
+@keyframes moRise{from{opacity:.55}to{opacity:1}}
+@keyframes moShell{from{opacity:1}to{opacity:1}}
+html body .mn-in:not(#_a):not(#_b){animation-duration:.35s!important;animation-delay:0s!important}
+html body .mn-out:not(#_a):not(#_b){animation-duration:.11s!important;animation-timing-function:linear!important;animation-delay:0s!important}
+html body #optView .opt.opt-pre :is(.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go){opacity:.55!important}
+html body #optView#optView .opt.opt-pre :is(.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go){opacity:.55!important}
+html body #optView .opt.opt-enter:not(#_a):not(#_b) :is(.opt-head,.or-steps,.opt-card,.opt-quota,.opt-drop,.opt-stats,.opt-h3,#optPlans,.opt-go:disabled){animation-duration:.35s!important;animation-delay:0s!important}
+html body #optView .opt.opt-enter:not(#_a):not(#_b) .opt-go:not(:disabled){animation:optGoFlow 6s ease-in-out infinite,moRise .35s ease-out backwards!important}
+</style>
 </body>
-</html>
+</html>>
