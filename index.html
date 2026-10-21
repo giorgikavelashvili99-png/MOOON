@@ -21966,6 +21966,15 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     warmEl=t; t.classList.add('mn-warm');
     if(!view) vhost.classList.add('mn-warming');
   }
+  /* the finger is on the button ~100 ms before the click: build the target page NOW (invisible), so the heavy part is not done in the middle of the fade */
+  var unwarmT=0;
+  document.addEventListener('pointerdown',function(e){
+    if(reduce||busy) return;
+    var g=e.target.closest&&e.target.closest('[data-hz-go],[data-mn-go]'); if(!g) return;
+    var n=g.getAttribute('data-hz-go')||g.getAttribute('data-mn-go');
+    if(!n||n==='home'||n==='contact'||n===shown) return;
+    warm(n); clearTimeout(unwarmT); unwarmT=setTimeout(function(){ if(!busy) unwarm(); },1200);
+  },true);
   function stagger(list,cls,gap){ list.forEach(function(el,i){ el.style.animationDelay=(i*gap)+'ms'; el.style.setProperty('--d',(i*gap)+'ms'); el.classList.add(cls); }); }
   function unstagger(list,cls){ list.forEach(function(el){ el.classList.remove(cls); el.style.animationDelay=''; el.style.removeProperty('--d'); }); }
   /* Page change. Rules that keep it stable no matter how fast the person taps:
@@ -24879,12 +24888,20 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
 
   /* ---------- active state + sliding pill ---------- */
   var links=[].slice.call(bar.querySelectorAll('.hz-link')), ind=bar.querySelector('.hz-ind'), linksBox=document.getElementById('hzLinks');
-  function measure(){ links.forEach(function(b){ b.__x=b.offsetLeft; b.__w=b.offsetWidth; }); }
+  var probe=document.createElement('i'); probe.className='hz-probe'; probe.setAttribute('aria-hidden','true'); linksBox.appendChild(probe);
+  /* geometry in the pill's OWN units: link rect relative to the bar, divided by what 100 css px really measure on screen (so html zoom, Safari or Chrome, can not shift the pill) */
+  function measure(){ var br=linksBox.getBoundingClientRect(), k=(probe.getBoundingClientRect().width/100)||1; links.forEach(function(b){ var r=b.getBoundingClientRect(); b.__x=(r.left-br.left)/k; b.__w=r.width/k; }); }
   function moveInd(instant){
     var a=bar.querySelector('.hz-link.is-active');
     if(!a || !a.__w){ ind.style.opacity='0'; return; }
     if(instant) ind.style.transition='none';
-    ind.setAttribute('data-t',a.getAttribute('data-hz-go')||''); ind.style.transform='translate3d('+a.__x+'px,0,0) scaleX('+(a.__w/100)+')'; ind.style.opacity='1';
+    ind.setAttribute('data-t',a.getAttribute('data-hz-go')||'');
+    if(!instant && ind.__has && ind.animate && (ind.__x!==a.__x || ind.__w!==a.__w) && !(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){
+      /* the light stretches towards the new tab and then settles on it (transform only, runs on the compositor) */
+      var x0=ind.__x, w0=ind.__w, lf=Math.min(x0,a.__x), sp=Math.max(x0+w0,a.__x+a.__w)-lf;
+      try{ ind.animate([{transform:'translate3d('+x0+'px,0,0) scaleX('+(w0/100)+')'},{transform:'translate3d('+lf+'px,0,0) scaleX('+(sp/100)+')',offset:.42},{transform:'translate3d('+a.__x+'px,0,0) scaleX('+(a.__w/100)+')'}],{duration:520,easing:'cubic-bezier(.3,.8,.3,1)'}); }catch(e){}
+    }
+    ind.style.transform='translate3d('+a.__x+'px,0,0) scaleX('+(a.__w/100)+')'; ind.style.opacity='1'; ind.__x=a.__x; ind.__w=a.__w; ind.__has=true;
     if(instant){ void ind.offsetWidth; ind.style.transition=''; }
   }
   /* SMOOTHNESS: the highlight follows the tap at once. It used to wait for body.mn-view-on, i.e. for the page swap (300 ms+ later, much more on a slow phone),
@@ -25373,14 +25390,14 @@ html body #optView .opt.opt-pre::after{animation-play-state:paused!important}
     if(sliding > 0 && now - slideAt < 700) return;                                /* it is still sliding - check again afterwards */
     var a = box.querySelector('.hz-link.is-active');
     if(!a || !box.offsetWidth){ return; }
-    var br = box.getBoundingClientRect(), k = (br.width / box.offsetWidth) || 1;      /* screen px per css px (page zoom safe) */
+    var pr = box.querySelector('.hz-probe'), br = box.getBoundingClientRect(), k = (pr ? pr.getBoundingClientRect().width / 100 : (br.width / box.offsetWidth)) || 1;      /* screen px per css px (page zoom safe) */
     var ar = a.getBoundingClientRect(), ir = ind.getBoundingClientRect();
     var dL = (ar.left - ir.left) / k, dW = (ar.width - ir.width) / k;
     if(Math.abs(dL) > 0.8 || Math.abs(dW) > 0.8){
       var w = ir.width / k;
       var m = /translate3d\(\s*(-?[\d.]+)px/.exec(ind.style.transform || ''), x = m ? parseFloat(m[1]) : 0;
       ind.style.transition = 'none';
-      ind.style.transform = 'translate3d(' + (x + dL) + 'px,0,0) scaleX(' + ((w + dW) / 100) + ')';
+      ind.style.transform = 'translate3d(' + (x + dL) + 'px,0,0) scaleX(' + ((w + dW) / 100) + ')'; ind.__x = x + dL; ind.__w = w + dW; ind.__has = true;
       ind.style.opacity = '1';
       void ind.offsetWidth;
       ind.style.transition = '';
@@ -25973,8 +25990,15 @@ html body .mn-out:not(#_a):not(#_b):not(#_c){animation-duration:.13s!important;a
 html body .mn-in:not(#_a):not(#_b):not(#_c){animation-duration:.5s!important;animation-timing-function:cubic-bezier(.22,.8,.3,1)!important;animation-delay:var(--d,0ms)!important}
 html body .mn-view.show:not(#_a):not(#_b){animation:mnViewIn .38s cubic-bezier(.22,.8,.3,1) both!important}
 /* headline wipe */
-html body .mn-view.show:not(#_a):not(#_b) :is(h2,.ttdl-heading){animation:mqWipe .55s cubic-bezier(.22,.8,.3,1) both!important;animation-delay:0s!important}
-html body #optView .opt-head h2:not(#_a):not(#_b){animation:mqWipe .55s cubic-bezier(.22,.8,.3,1) both!important}
+@keyframes mqRise{0%{opacity:0;transform:translateY(34%);clip-path:polygon(-12% -50%,-12% -50%,-42% 150%,-12% 150%)}14%{opacity:1}100%{opacity:1;transform:none;clip-path:polygon(-12% -50%,175% -50%,145% 150%,-12% 150%)}}
+html body .mn-view.show:not(#_a):not(#_b) :is(h2,.ttdl-heading){animation:mqRise .85s cubic-bezier(.2,.75,.25,1) both!important;animation-delay:.02s!important}
+html body #optView .opt-head h2:not(#_a):not(#_b){animation:mqRise .85s cubic-bezier(.2,.75,.25,1) both!important}
+html body #optView#optView .opt.opt-enter:not(#_a):not(#_b):not(#_c) .opt-head{animation:none!important;opacity:1!important}
+html body #optView#optView .opt.opt-pre :is(.opt-head){opacity:1!important}
+html body #optView .opt-head p:not(#_a):not(#_b){animation:mnSubIn .5s ease-out .42s both!important}
+html body .mn-view.show:not(#_a):not(#_b) .mn-sub{animation-delay:.42s!important;animation-duration:.5s!important}
+html body #checkerView:not(#_a):not(#_b) .ttdl-heading{animation-delay:.12s!important;animation-duration:.85s!important}
+html body #checkerView:not(#_a):not(#_b) .ttdl-subtext{animation-delay:.5s!important}
 /* rules / upload / order: numbered steps one after another, top down */
 html body .mn-view.show:not(#_a):not(#_b) .mn-sub{animation-delay:.07s!important;animation-duration:.45s!important}
 html body .mn-steps li:not(#_a):not(#_b){animation:mnViewIn .45s cubic-bezier(.22,.8,.3,1) both!important;animation-delay:calc(var(--i,0)*55ms + 130ms)!important}
@@ -26002,7 +26026,7 @@ html body #checkerView:not(#_a):not(#_b) .ttdl-glass{animation-delay:.28s!import
 /* top bar: glowing pill that carries the colour of the page it points at */
 html body .hz-ind:not(#_a):not(#_b){--ac:#3ee6a8;--ag:rgba(62,230,168,.38);background:rgba(255,255,255,.045)!important;border-radius:12px;
   box-shadow:inset 0 0 0 1px var(--ac),0 0 18px -3px var(--ag),inset 0 0 14px -6px var(--ag);
-  transition:transform .46s cubic-bezier(.34,1.28,.5,1),opacity .2s ease,box-shadow .4s ease!important}
+  transition:opacity .2s ease,box-shadow .4s ease!important}
 html body .hz-ind[data-t="optimizer"]:not(#_a){--ac:#a78bfa;--ag:rgba(139,92,246,.45)}
 html body .hz-ind[data-t="checker"]:not(#_a){--ac:#5fd8f2;--ag:rgba(34,211,238,.4)}
 html body .hz-ind[data-t="plans"]:not(#_a){--ac:#f2c35b;--ag:rgba(245,184,74,.42)}
@@ -26014,16 +26038,15 @@ html body .hz-ind[data-t="ai"]:not(#_a){--ac:#7fb2ff;--ag:rgba(96,165,250,.42)}
    Only opacity / transform are animated (the running light is a rotating gradient behind a ring-shaped mask), so it stays at full frame rate. ===== */
 html body .order-btn.mo-sending{position:relative!important;overflow:visible!important;animation:none!important;border-color:transparent!important;box-shadow:none!important;pointer-events:none}
 html body .order-btn.mo-sending>*:not(.mo-send){visibility:hidden!important}
-.mo-send,.mo-send mo-glow,.mo-send mo-ring,.mo-send mo-road,.mo-send mo-ok{display:block}
+.mo-send,.mo-send mo-lum,.mo-send mo-ring,.mo-send mo-road,.mo-send mo-ok{display:block}
 .mo-send{display:grid!important;position:absolute;inset:-1px;border-radius:inherit;background:#09090c;z-index:6;display:grid;place-items:center;opacity:0;transition:opacity .22s ease;pointer-events:none;font-family:inherit}
 .mo-send.go{opacity:1}
-.mo-send .mo-glow{position:absolute;inset:0;border-radius:inherit;opacity:0;transition:opacity .35s ease}
-.mo-send .mo-glow.w{box-shadow:0 0 22px 1px rgba(255,255,255,.42),inset 0 0 20px rgba(255,255,255,.16)}
-.mo-send .mo-glow.y{box-shadow:0 0 30px 3px rgba(255,205,0,.55),inset 0 0 24px rgba(255,205,0,.2)}
-.mo-send .mo-glow.g{box-shadow:0 0 30px 3px rgba(40,230,90,.55),inset 0 0 24px rgba(40,230,90,.2)}
-.mo-send.go .mo-glow.w{opacity:1}
-.mo-send.run .mo-glow.w{opacity:0}.mo-send.run .mo-glow.y{opacity:1}
-.mo-send.ok .mo-glow.y{opacity:0}.mo-send.ok .mo-glow.g{opacity:1}
+.mo-send .mo-lum{position:absolute;inset:0;border-radius:inherit;border:4px solid #fff;opacity:0;filter:blur(8px);transition:opacity .35s ease}
+.mo-send .mo-lum.y{border-color:#ffcd00}
+.mo-send .mo-lum.g{border-color:#28e65a}
+.mo-send.go .mo-lum.w{opacity:.8}
+.mo-send.run .mo-lum.w{opacity:0}.mo-send.run .mo-lum.y{opacity:.95}
+.mo-send.ok .mo-lum.y{opacity:0}.mo-send.ok .mo-lum.g{opacity:.95}
 /* ring: static coloured track + running light */
 .mo-send .mo-ring{position:absolute;inset:0;border-radius:inherit;padding:2px;overflow:hidden;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
@@ -26060,7 +26083,7 @@ html body .order-btn.mo-sending>*:not(.mo-send){visibility:hidden!important}
         if(!btn || (window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches)) return res();
         var L=(document.documentElement.getAttribute('lang')||'ka').slice(0,2);
         var o=document.createElement('mo-send'); o.className='mo-send'; o.setAttribute('aria-hidden','true');
-        o.innerHTML='<mo-glow class="mo-glow w"></mo-glow><mo-glow class="mo-glow y"></mo-glow><mo-glow class="mo-glow g"></mo-glow><mo-ring class="mo-ring"><i></i></mo-ring><mo-road class="mo-road"><i></i></mo-road>'+TRUCK+'<mo-ok class="mo-ok">'+(TXT[L]||TXT.ka)+'</mo-ok>';
+        o.innerHTML='<mo-lum class="mo-lum w"></mo-lum><mo-lum class="mo-lum y"></mo-lum><mo-lum class="mo-lum g"></mo-lum><mo-ring class="mo-ring"><i></i></mo-ring><mo-road class="mo-road"><i></i></mo-road>'+TRUCK+'<mo-ok class="mo-ok">'+(TXT[L]||TXT.ka)+'</mo-ok>';
         btn.classList.add('mo-sending'); btn.appendChild(o);
         requestAnimationFrame(function(){ requestAnimationFrame(function(){ o.classList.add('go'); }); });
         setTimeout(function(){ o.classList.add('run'); },420);
@@ -26073,5 +26096,50 @@ html body .order-btn.mo-sending>*:not(.mo-send){visibility:hidden!important}
     });
   };
 })();</script>
+<style id="moon-gate-swing">
+/* The lamp light used to jump sideways when the sway started (it went from "straight" to the first keyframe at -1.6deg in one frame, which moves the long beam by ~6px). Now the sway starts from straight and eases into the movement (a sine built from linear steps, no alternate, no delay gap). */
+@keyframes dgSwingSmooth{0%{transform:rotate(0deg)}12.5%{transform:rotate(1.13deg)}25%{transform:rotate(1.6deg)}37.5%{transform:rotate(1.13deg)}50%{transform:rotate(0deg)}62.5%{transform:rotate(-1.13deg)}75%{transform:rotate(-1.6deg)}87.5%{transform:rotate(-1.13deg)}100%{transform:rotate(0deg)}}
+html body #discordGate.gate-ready .dg-swing:not(#_a):not(#_b){animation:dgSwingSmooth 9.6s linear 0s infinite both}
+</style>
+<script id="moon-tap-js">(function(){
+  /* iPad / iPhone Safari treat the FIRST tap on an element that has a :hover style as "hover" and swallow the click, so buttons needed two taps.
+     If a real tap (finger down + up, no movement) did not produce a click within 140 ms, the click is sent now. A normal click cancels it, so nothing fires twice. */
+  var touch=false; try{ touch=(navigator.maxTouchPoints>0)||(window.matchMedia&&matchMedia('(any-pointer:coarse)').matches); }catch(e){}
+  if(!touch) return;
+  document.documentElement.classList.add('is-touchdev');
+  var SEL='button,a[href],[role="button"],summary,[data-hz-go],[data-mn-go],.order-btn,.hero-cta-btn,.qn-tab,.pc-toggle-btn,.hz-link,.hzm-row';
+  var d=null, lastClick=0;
+  document.addEventListener('click',function(){ lastClick=performance.now(); },true);
+  document.addEventListener('pointerdown',function(e){ d=(e.pointerType==='touch')?{x:e.clientX,y:e.clientY,t:performance.now()}:null; },true);
+  document.addEventListener('pointercancel',function(){ d=null; },true);
+  document.addEventListener('pointerup',function(e){
+    if(!d||e.pointerType!=='touch') return; var s=d; d=null;
+    if(Math.abs(e.clientX-s.x)>10||Math.abs(e.clientY-s.y)>10||performance.now()-s.t>700) return;
+    var el=e.target&&e.target.closest&&e.target.closest(SEL);
+    if(!el||el.disabled||el.getAttribute('aria-disabled')==='true') return;
+    var up=performance.now();
+    setTimeout(function(){
+      if(lastClick>=up-5) return;
+      if(!document.documentElement.contains(el)) return;
+      try{ el.click(); }catch(x){}
+    },140);
+  },true);
+})();</script>
+<style id="moon-nav-look">
+/* top bar: the neon capsule of the reference - clear ring, soft glow, the active link takes the colour of the capsule */
+.hz-probe{position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden;pointer-events:none}
+html body .hz-ind:not(#_a):not(#_b){box-sizing:border-box;border:1.5px solid var(--ac);background:rgba(255,255,255,.03)!important;transition:opacity .2s ease,border-color .4s ease!important}
+html body .hz-ind:not(#_a):not(#_b)::after{content:"";position:absolute;inset:-2px;border-radius:inherit;border:4px solid var(--ac);opacity:.5;filter:blur(7px);pointer-events:none;transition:border-color .4s ease}
+html body .hz-ind[data-t="optimizer"]:not(#_a):not(#_b){--ac:#a78bfa}
+html body .hz-ind[data-t="checker"]:not(#_a):not(#_b){--ac:#5fd8f2}
+html body .hz-ind[data-t="plans"]:not(#_a):not(#_b){--ac:#f2c35b}
+html body .hz-ind[data-t="ai"]:not(#_a):not(#_b){--ac:#7fb2ff}
+html body .hz-link{transition:color .35s ease}
+html body .hz-link.is-active[data-hz-go="home"]{color:#7ff0c6}
+html body .hz-link.is-active[data-hz-go="optimizer"]{color:#c4b5fd}
+html body .hz-link.is-active[data-hz-go="checker"]{color:#8ae6f7}
+html body .hz-link.is-active[data-hz-go="plans"]{color:#f6d37b}
+html body .hz-link.is-active[data-hz-go="ai"]{color:#9fc4ff}
+</style>
 </body>
 </html>
