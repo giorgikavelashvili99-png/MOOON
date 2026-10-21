@@ -8094,23 +8094,6 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     </div>
     <div class="copy-note" id="copyNote"></div>
 
-    <div class="warn-panel warn-starry" id="warnPanel" style="margin-top:12px;">
-      <div class="w-head" id="warnHeadRow">
-        <div class="w-head-left">
-          <div class="ico">!</div>
-          <span class="title" data-i18n="warnTitle">გაფრთხილება შეკვეთამდე</span>
-        </div>
-      </div>
-      <div class="warn-content-wrap">
-        <div class="warn-content-inner">
-          <p data-i18n="warnP1">ვიდეო მონტაჟდება <b>მხოლოდ TikTok-ისთვის</b>, უნაკლო ხარისხით.</p>
-          <p data-i18n="warnP2">გთხოვთ, დარწმუნდით, რომ თქვენი ვიდეოს ხანგრძლივობა <b>არ აღემატება 59.59 წამს</b> — ამაზე მეტი ხანგრძლივობა ფასდება ინდივიდუალურად და კალკულატორში არ შედის.</p>
-          <p data-i18n="warnP3">ასევე დარწმუნდით, რომ მასალა გადაღებული და დარენდერებულია <b>1080p / 60fps</b> ხარისხში — ეს გავლენას ახდენს საბოლოო შედეგის სისუფთავეზე.</p>
-          <p data-i18n="warnP4">ატვირთვისას მასალა ყოველთვის უნდა იყოს <b>ზუსტად 1080p / 60fps</b> — გამომავალი კი შეგიძლიათ აირჩიოთ: სტანდარტული 1080p ან პრემიუმ 4K/60fps.</p>
-          <p class="spec">REC.SPEC → 1080x1920 · 60fps · MAX 59.59s</p>
-        </div>
-      </div>
-    </div>
     </div>
   </div>
   </div>
@@ -22920,7 +22903,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     kick();
   }
   function kick(){
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(fadeOut,60); }); });
+    requestAnimationFrame(function(){ fadeOut(); });
   }
   function fadeOut(){
     var req=pending;
@@ -22928,8 +22911,8 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     if(req.tab && req.tab===shown){ pending=null; busy=false; return; }   /* already showing what was asked for */
     var outs=view ? [document.querySelector('.mn-view.show')].filter(Boolean) : blocks();
     stagger(outs,'mn-out',12);
-    if(outs.length){ var wt=req.tab; warmT=setTimeout(function(){ warm(wt); },70); }
-    setTimeout(function(){ swap(outs); }, outs.length ? 130+outs.length*12 : 0);
+    if(outs.length){ var wt=req.tab; warmT=setTimeout(function(){ warm(wt); },20); }
+    setTimeout(function(){ swap(outs); }, outs.length ? 70 : 0);
   }
   function swap(outs){
     unstagger(outs,'mn-out');
@@ -22940,7 +22923,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     requestAnimationFrame(function(){
       if(!view){ var ins=blocks(); stagger(ins,'mn-in',75); setTimeout(function(){ unstagger(ins,'mn-in'); },1100); }
     });
-    setTimeout(function(){ busy=false; if(pending){ busy=true; kick(); } },220);
+    setTimeout(function(){ busy=false; if(pending){ busy=true; kick(); } },120);
   }
   var view=null;
   function closeMenus(){
@@ -24816,7 +24799,7 @@ function playEnter(n,t0,tok){
   if(tok!==_tok) return;
   /* start only when the layout is final: steps built + plan status known (max 1s) */
   var ready=o.querySelector('.or-steps') && (S.status || !user());
-  if(!ready && Date.now()-t0<1000){ o.classList.add('opt-pre'); clearTimeout(_wT); _wT=setTimeout(function(){ playEnter((n||0)+1,t0,tok); },60); return; }
+  if(!ready && Date.now()-t0<300){ o.classList.add('opt-pre'); clearTimeout(_wT); _wT=setTimeout(function(){ playEnter((n||0)+1,t0,tok); },60); return; }
   /* SMOOTHNESS: the forced reflow is only needed to RESTART an animation that is still running */
   if(o.classList.contains('opt-enter')){ o.classList.remove('opt-enter'); void o.offsetWidth; }
   o.classList.add('opt-enter'); o.classList.remove('opt-pre'); o.__enAt=Date.now();
@@ -26558,7 +26541,7 @@ html body #optView .opt-head h2[data-t]:not(#_a):not(#_b)::after{content:attr(da
 @keyframes moRise{from{opacity:.55}to{opacity:1}}
 @keyframes moShell{from{opacity:1}to{opacity:1}}
 html body .mn-in:not(#_a):not(#_b){animation-duration:.35s!important;animation-delay:0s!important}
-html body .mn-out:not(#_a):not(#_b){animation-duration:.11s!important;animation-timing-function:linear!important;animation-delay:0s!important}
+html body .mn-out:not(#_a):not(#_b){animation-duration:.06s!important;animation-timing-function:linear!important;animation-delay:0s!important}
 html body #optView .opt.opt-pre :is(.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go){opacity:.55!important}
 html body #optView#optView .opt.opt-pre :is(.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go){opacity:.55!important}
 html body #optView .opt.opt-enter:not(#_a):not(#_b) :is(.opt-head,.or-steps,.opt-card,.opt-quota,.opt-drop,.opt-stats,.opt-h3,#optPlans,.opt-go:disabled){animation-duration:.35s!important;animation-delay:0s!important}
