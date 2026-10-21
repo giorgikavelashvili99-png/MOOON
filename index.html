@@ -26524,5 +26524,26 @@ html body #checkerView .ttdl-shell .ttdl-heading:not(#_a):not(#_b):not(#_c){back
 html body #checkerView .ttdl-shell .ttdl-input-icon:not(#_a):not(#_b),html body #checkerView .ttdl-shell .ttdl-step:not(#_a):not(#_b){color:#cfd3dc!important}
 html body #checkerView .ttdl-shell .ttdl-log:not(#_a):not(#_b){background:rgba(0,0,0,.45)!important;border:1px solid rgba(255,255,255,.07)!important;border-radius:14px!important}
 </style>
+<style id="moon-method-fix">
+/* Method: title sits higher and no longer touches the sub-line */
+html body #optView .opt-head{margin-top:36px!important}
+html body #optView .opt-head h2:not(#_a){margin-bottom:12px!important}
+/* Method title colour: no per-frame repaint any more. Two static gradient layers cross-fade with opacity only (GPU) - same colours, same slow sweep, zero flicker */
+html body #optView .opt-head h2:not(#_a):not(#_b){position:relative;animation:none!important;background-size:100% 100%!important;background-position:0 0!important;
+  background-image:linear-gradient(100deg,#fff 10%,#7dd3fc 38%,#c084fc 64%,#fff 90%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+html body #optView .opt-head h2[data-t]:not(#_a):not(#_b)::after{content:attr(data-t);position:absolute;left:0;top:0;right:0;bottom:0;text-align:inherit;text-shadow:none;
+  background-image:linear-gradient(100deg,#c084fc 10%,#fff 38%,#7dd3fc 64%,#c084fc 90%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;will-change:opacity;animation:moTitleB 3.5s ease-in-out infinite alternate}
+@keyframes moTitleB{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){html body #optView .opt-head h2::after{animation:none!important}}
+</style>
+<script id="moon-method-title-js">
+(function(){
+  var v=document.getElementById('optView'); if(!v) return;
+  function sync(){ var h=v.querySelector('.opt-head h2'); if(h){ var t=h.textContent; if(h.getAttribute('data-t')!==t) h.setAttribute('data-t',t); } }
+  sync();
+  try{ new MutationObserver(sync).observe(v,{childList:true,subtree:true,characterData:true}); }catch(e){}
+})();
+</script>
 </body>
 </html>
