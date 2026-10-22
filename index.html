@@ -4413,12 +4413,49 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   }
   .messenger-complete-btn:active{ transform:scale(0.95); }
   .messenger-cancel-btn{
-    flex:0 0 auto; padding:8px 14px; border-radius:100px; border:none; cursor:pointer;
-    background:#ff5c5c; color:#2a0505; font-weight:700; font-size:12.5px;
-    font-family:'BPGAcademiuriU','Space Grotesk',sans-serif;
+    position:relative; flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center;
+    min-height:34px; padding:0 15px; border-radius:100px; border:none; cursor:pointer; overflow:visible;
+    background:#7b2ff7; color:#fff; font-weight:700; font-size:12.5px; letter-spacing:0;
+    font-family:'GateSans','BPGAcademiuriU',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent; outline:0;
+    transition:transform .14s ease, background-color .2s ease, width .38s cubic-bezier(.65,0,.35,1), padding .38s cubic-bezier(.65,0,.35,1);
   }
   .messenger-cancel-btn:active{ transform:scale(0.95); }
-  .messenger-cancel-btn:disabled{ opacity:0.55; cursor:default; }
+  .messenger-cancel-btn:disabled{ cursor:default; }
+  .mcb-body{ display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; }
+  .mcb-ico{ position:relative; display:inline-flex; width:16px; height:16px; flex:0 0 auto; transition:opacity .2s ease, transform .25s ease; }
+  .mcb-ico svg{ display:block; overflow:visible; }
+  .mcb-lid{ transform-box:fill-box; transform-origin:0% 100%; }
+  .mcb-label{ display:inline-flex; margin-left:7px; overflow:visible; transition:max-width .38s cubic-bezier(.65,0,.35,1), margin .38s cubic-bezier(.65,0,.35,1); }
+  .mcb-label i{ display:inline-block; font-style:normal; will-change:transform,opacity; }
+  .mcb-dot{ position:absolute; left:50%; top:30%; width:3px; height:3px; margin:-1.5px; border-radius:50%; background:#fff; opacity:0; pointer-events:none; }
+  .mcb-ring-svg{ position:absolute; left:-5px; top:-5px; width:44px !important; height:44px !important; max-width:none !important; opacity:0; pointer-events:none; overflow:visible; }
+  .mcb-ring-svg circle{ stroke-dasharray:125.7; stroke-dashoffset:125.7; transform-box:view-box; transform-origin:50% 50%; }
+  .mcb-check{ position:absolute; left:50%; top:50%; width:18px; height:18px; margin:-9px 0 0 -9px; opacity:0; transform:scale(.3); pointer-events:none; transition:opacity .2s ease, transform .35s cubic-bezier(.3,1.5,.5,1); }
+  .mcb-check path{ stroke-dasharray:24; stroke-dashoffset:24; }
+  /* run: letters fall into the bin, lid flips, pill collapses to a circle, ring spins, check pops */
+  .messenger-cancel-btn.mcb-run:disabled{ opacity:1; }
+  .mcb-run .mcb-label i{ animation:mcbLetter .46s cubic-bezier(.55,0,.85,.45) forwards; animation-delay:calc(var(--i) * 48ms); }
+  .mcb-run .mcb-lid{ animation:mcbLid 1s ease-in-out .08s both; }
+  .mcb-run .mcb-ico{ animation:mcbBin 1s ease-in-out .08s both; }
+  .mcb-run .mcb-dot{ animation:mcbDot .6s ease-out .15s both; }
+  .mcb-run .mcb-dot:nth-of-type(2){ animation-delay:.3s; } .mcb-run .mcb-dot:nth-of-type(3){ animation-delay:.22s; } .mcb-run .mcb-dot:nth-of-type(4){ animation-delay:.4s; }
+  .mcb-circle{ padding:0 !important; }
+  .mcb-circle .mcb-label{ max-width:0 !important; margin-left:0 !important; overflow:hidden; }
+  .mcb-ring .mcb-ring-svg{ opacity:1; }
+  .mcb-ring .mcb-ring-svg circle{ stroke-dashoffset:34; transition:stroke-dashoffset .5s ease; animation:mcbSpin .9s linear infinite; }
+  .mcb-done .mcb-ring-svg{ opacity:0; transition:opacity .3s ease; }
+  .mcb-done .mcb-ico{ opacity:0; transform:scale(.3); animation:none; }
+  .mcb-done .mcb-check{ opacity:1; transform:scale(1); }
+  .mcb-done .mcb-check path{ stroke-dashoffset:0; transition:stroke-dashoffset .35s ease .12s; }
+  .mcb-done::after{ content:''; position:absolute; left:50%; top:50%; width:60px; height:60px; margin:-30px 0 0 -30px; border-radius:50%; background:radial-gradient(circle, rgba(139,92,246,.55), rgba(139,92,246,0) 68%); pointer-events:none; animation:mcbGlow 1.2s ease-out both; }
+  @keyframes mcbLetter{ 0%{ opacity:1; transform:none } 100%{ opacity:0; transform:translate(calc(var(--i) * -9px - 20px), -3px) rotate(-35deg) scale(.15) } }
+  @keyframes mcbLid{ 0%,100%{ transform:none } 18%,62%{ transform:rotate(-28deg) translate(-1px,-1.5px) } 78%{ transform:rotate(-6deg) } }
+  @keyframes mcbBin{ 0%,100%{ transform:none } 20%{ transform:rotate(-8deg) } 40%{ transform:rotate(7deg) } 60%{ transform:rotate(-4deg) } 80%{ transform:none } }
+  @keyframes mcbDot{ 0%{ opacity:0; transform:translate(0,0) } 25%{ opacity:1 } 100%{ opacity:0; transform:translate(calc(cos(var(--a)) * 15px), calc(sin(var(--a)) * 15px)) } }
+  @keyframes mcbSpin{ to{ transform:rotate(360deg) } }
+  @keyframes mcbGlow{ 0%{ opacity:0; transform:scale(.5) } 40%{ opacity:1 } 100%{ opacity:.0; transform:scale(1.5) } }
+  @media (prefers-reduced-motion:reduce){ .mcb-run .mcb-label i,.mcb-run .mcb-lid,.mcb-run .mcb-ico,.mcb-run .mcb-dot,.mcb-ring .mcb-ring-svg circle,.mcb-done::after{ animation-duration:.01s !important; animation-delay:0s !important } }
   
   .moon-confirm{
     position:fixed; inset:0; z-index:10050; display:none;
@@ -6930,7 +6967,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     </div>
     <div class="messenger-status-dot" id="messengerStatusDot" aria-hidden="true"></div>
     <button type="button" id="messengerCompleteBtn" class="messenger-complete-btn" data-i18n="messengerCompleteBtn" style="display:none;">დასრულება</button>
-    <button type="button" id="messengerCancelBtn" class="messenger-cancel-btn" style="display:none;">გაუქმება</button>
+    <button type="button" id="messengerCancelBtn" class="messenger-cancel-btn mcb" style="display:none;"><span class="mcb-body"><span class="mcb-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="mcb-lid"><path d="M3.5 6h17"/><path d="M8.5 6V4.2a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1V6"/></g><path d="M5.5 6.5l.9 12.6a2 2 0 0 0 2 1.9h7.2a2 2 0 0 0 2-1.9l.9-12.6"/><path d="M10 10.5v6M14 10.5v6"/></svg><b class="mcb-dot" style="--a:-70deg"></b><b class="mcb-dot" style="--a:-20deg"></b><b class="mcb-dot" style="--a:25deg"></b><b class="mcb-dot" style="--a:-110deg"></b></span><span class="mcb-label">გაუქმება</span></span><svg class="mcb-ring-svg" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="#c4a3ff" stroke-width="2" stroke-linecap="round"/></svg><svg class="mcb-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.8l4.3 4.3L18.8 7.8"/></svg></button>
   </div>
   <div class="messenger-messages" id="messengerMessages"></div>
   <div class="messenger-reply-preview" id="messengerReplyPreview" style="display:none;"></div>
@@ -13159,11 +13196,11 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     renderAcbDot(0);
     if (completeBtn) completeBtn.style.display = (messengerRole === 'admin') ? 'block' : 'none';
     if (cancelBtn) {
-      cancelBtn.style.display = (messengerRole === 'customer') ? 'block' : 'none';
+      cancelBtn.style.display = (messengerRole === 'customer') ? 'inline-flex' : 'none';
       // A previous attempt used to leave this disabled with "in progress"
       // text until a full page reload, so a second try did nothing.
       cancelBtn.disabled = false;
-      cancelBtn.textContent = currentLang === 'ka' ? 'გაუქმება' : 'Cancel';
+      mcbReset(cancelBtn);
     }
     // Known immediately for the customer's own view (they're the one
     // logged in); left blank for admin until refreshMessengerHistory
@@ -13788,6 +13825,30 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     });
   }
 
+  // ---- animated cancel button (letters fall into the bin → circle → ring → ✓) ----
+  function mcbText(){ return currentLang === 'ka' ? 'გაუქმება' : (currentLang === 'ru' ? 'Отменить' : 'Cancel'); }
+  function mcbReset(btn){
+    if (!btn) return;
+    btn.classList.remove('mcb-run', 'mcb-circle', 'mcb-ring', 'mcb-done');
+    btn.style.width = ''; btn.style.height = '';
+    const lab = btn.querySelector('.mcb-label');
+    if (lab){
+      lab.style.maxWidth = '';
+      lab.innerHTML = Array.from(mcbText()).map((ch, i) => '<i style="--i:' + i + '">' + (ch === ' ' ? '&nbsp;' : ch.replace(/&/g,'&amp;').replace(/</g,'&lt;')) + '</i>').join('');
+    }
+    btn.setAttribute('aria-label', mcbText());
+  }
+  function mcbStart(btn){
+    if (!btn) return;
+    const w = btn.offsetWidth, h = btn.offsetHeight;
+    const lab = btn.querySelector('.mcb-label');
+    btn.style.width = w + 'px'; btn.style.height = h + 'px';
+    if (lab) lab.style.maxWidth = lab.offsetWidth + 'px';
+    btn.classList.add('mcb-run');
+    setTimeout(() => { btn.style.width = h + 'px'; btn.classList.add('mcb-circle'); }, 600);
+    setTimeout(() => btn.classList.add('mcb-ring'), 980);
+  }
+  function mcbDone(btn){ if (btn) btn.classList.add('mcb-done'); }
   let cancelUiBusy = false;
   document.getElementById('messengerCancelBtn').addEventListener('click', async () => {
     if (!messengerCurrentOrderId || cancelUiBusy) return;
@@ -13804,7 +13865,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
 
     cancelUiBusy = true;
     const btn = document.getElementById('messengerCancelBtn');
-    if (btn){ btn.disabled = true; btn.textContent = ka ? 'მიმდინარეობს...' : 'Cancelling...'; }
+    if (btn){ btn.disabled = true; mcbStart(btn); }
 
     // 1) Recorded on this device immediately and synchronously: from this
     //    moment the order can no longer reappear here, whatever the
@@ -13824,11 +13885,12 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       if (messengerSocket) messengerSocket.emit('cancel_order', { orderId: orderId });
     }catch(e){ console.error('[MOON] cancel_order emit failed', e); }
     try{
-      await Promise.race([runCancelJob(orderId), sleepMs(3500)]);
+      await Promise.all([Promise.race([runCancelJob(orderId), sleepMs(3500)]), sleepMs(1750)]);
     }catch(e){ console.error('[MOON] order cancellation flow failed', e); }
 
-    appendSystemMessage(ka ? 'შეკვეთა გაუქმდა' : 'Order cancelled');
-    setTimeout(() => window.location.reload(), 900);
+    mcbDone(btn);
+    appendSystemMessage(ka ? 'შეკვეთა გაუქმდა' : (currentLang === 'ru' ? 'Заказ отменён' : 'Order cancelled'));
+    setTimeout(() => window.location.reload(), 1300);
   });
 
   // Single entry point used by every one of the 5 order flows below --
