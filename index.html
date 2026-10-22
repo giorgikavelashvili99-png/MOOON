@@ -25946,41 +25946,21 @@ html body #discordGate:not(#_a):not(#_b):not(#_c) .discord-gate-skip:active{colo
   html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .discord-btn.primary:hover{filter:none}
   html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .discord-btn.outline:hover{background:rgba(255,255,255,.035)!important;border-color:rgba(255,255,255,.14)!important}
 }
-/* ripple from the touch point (inner circle: transform + opacity only, clipped by the button) */
-html body #discordGate .discord-btn{position:relative;overflow:hidden}
-.dg-rip{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);
-  opacity:.9;transform:scale(1);animation:dgRipple .6s cubic-bezier(.2,.7,.3,1) forwards;will-change:transform,opacity}
-html body #discordGate .discord-btn.outline .dg-rip{background:radial-gradient(circle,rgba(120,255,200,.4),rgba(120,255,200,0) 70%)}
-@keyframes dgRipple{to{transform:scale(22);opacity:0}}
 /* after the tap: the button just stays softly lit, nothing changes in it (no text change, no spinner) */
 html body #discordGate .discord-btn.primary.is-busy{pointer-events:none;filter:brightness(.96)}
 html body #discordGate.is-going :is(.discord-btn.outline,.discord-gate-skip,.discord-gate-close){opacity:.45;pointer-events:none}
-@media (prefers-reduced-motion:reduce){.dg-rip{display:none}}
 </style>
 <script id="moon-gate-press-js">(function(){
   var g=document.getElementById('discordGate'); if(!g) return;
-  /* touch ripple */
-  g.addEventListener('pointerdown',function(e){
-    var b=e.target.closest&&e.target.closest('.discord-btn'); if(!b||b.classList.contains('is-busy')) return;
-    var r=b.getBoundingClientRect(), z=1;
-    var d=document.createElement('span'); d.className='dg-rip';
-    d.style.left=(e.clientX-r.left)/z+'px'; d.style.top=(e.clientY-r.top)/z+'px';
-    b.appendChild(d); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); },700);
-  },{passive:true});
-  /* the card keeps its exact size while the browser leaves for Discord */
-  function lock(){ var c=g.querySelector('.dg-card'); if(!c) return; var r=c.getBoundingClientRect(); if(!r.width) return;
-    c.style.width=r.width+'px'; c.style.minHeight=r.height+'px'; c.style.maxWidth=r.width+'px'; }
-  function unlock(){ var c=g.querySelector('.dg-card'); if(!c) return; c.style.width=c.style.minHeight=c.style.maxWidth=''; }
   var btn=document.getElementById('discordLoginBtn'); if(!btn) return;
   btn.addEventListener('click',function(){
     if(btn.classList.contains('is-busy')) return;
-    lock();
     btn.classList.add('is-busy'); g.classList.add('is-going');
   },true);
   /* coming back with the browser's Back button: restore */
   window.addEventListener('pageshow',function(e){
     if(!btn.classList.contains('is-busy')) return;
-    btn.classList.remove('is-busy'); g.classList.remove('is-going'); unlock();
+    btn.classList.remove('is-busy'); g.classList.remove('is-going');
   });
 })();</script>
 <style id="moon-pill-gpu">
