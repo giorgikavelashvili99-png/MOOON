@@ -26544,5 +26544,24 @@ html body #optView#optView:not(#_a):not(#_b):not(#_c) .opt.opt-pre :is(.opt-head
 html body #optView.show:not(#_a):not(#_b):not(#_c){animation:mnViewIn .3s ease-out both!important;will-change:opacity}
 html body #optView.show:not(#_a):not(#_b):not(#_c) .opt-head h2{transform:none!important}
 </style>
+<style id="moon-small-screen">
+/* Small laptops (width <= 1500px or height <= 820px): the page is drawn at 90% instead of 115% (22% smaller panels, text, gaps); everything tied to the 1.15 zoom follows the new factor */
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)){html{zoom:.9;max-width:none!important}body{max-width:none!important}.hz-bar,.hz-menu,.hz-scrim,.hz-spacer{zoom:1.111111}
+.pc-modal-scroll,.pc-modal-scrim .pc-modal-scroll{max-height:calc((100vh - 100px) / .9);max-height:calc((100dvh - 100px) / .9)}
+.pc-modal-scrim>.pc-accordion-body.panel{max-height:calc(100dvh / .9)}
+html body .pricing-cards.pc-scroll-mode .pc-nav--prev{left:calc(50% - 50vw / .9 + 22px)!important}
+html body .pricing-cards.pc-scroll-mode .pc-nav--next{right:calc(50% - 50vw / .9 + 22px)!important;left:auto!important}
+html body.mn-view-on .mn-views{min-height:calc((100vh - 268px) / .9)}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)){html body .pc-card.pc-card{--mrw:calc(3px / .9)}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.2dppx) and (max-resolution:1.39dppx){html body .pc-card.pc-card{--mrw:calc(4px / (.9 * 1.25))}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.4dppx) and (max-resolution:1.59dppx){html body .pc-card.pc-card{--mrw:calc(5px / (.9 * 1.5))}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.6dppx) and (max-resolution:1.89dppx){html body .pc-card.pc-card{--mrw:calc(6px / (.9 * 1.75))}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.9dppx) and (max-resolution:2.19dppx){html body .pc-card.pc-card{--mrw:calc(7px / (.9 * 2))}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)){:root{--rw3:calc(2px / .9);--rw2:calc(1px / .9);--ow3:calc(2.02px / .9);--ow2:calc(1.02px / .9)}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.2dppx) and (max-resolution:1.39dppx){:root{--rw3:calc(2px / (.9 * 1.25));--rw2:calc(1px / (.9 * 1.25))}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.4dppx) and (max-resolution:1.59dppx){:root{--rw3:calc(3px / (.9 * 1.5));--rw2:calc(2px / (.9 * 1.5))}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.6dppx) and (max-resolution:1.89dppx){:root{--rw3:calc(3px / (.9 * 1.75));--rw2:calc(2px / (.9 * 1.75))}}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)) and (min-resolution:1.9dppx) and (max-resolution:2.19dppx){:root{--rw3:calc(4px / (.9 * 2));--rw2:calc(2px / (.9 * 2))}}
+</style>
 </body>
 </html>
