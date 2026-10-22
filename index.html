@@ -8663,47 +8663,68 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       <button class="a-close" id="adminCloseLogin" data-i18n="adminClose">დახურვა</button>
     </div>
     <div id="adminDashboard" style="display:none;">
-      <h3 data-i18n="adminTitle">ადმინის პანელი</h3>
-      <div class="admin-mode-row" id="adminModeRow">
-        <span class="amt-label" id="adminModeLabel" data-i18n="adminModeLabel">დაწერე ადმინის სახელით</span>
-        <label class="admin-mode-toggle">
-          <input type="checkbox" id="adminModeCheckbox" checked>
-          <span class="switch"></span>
-        </label>
-      </div>
-      <div class="a-tabs">
-        <button class="a-tab active" id="adminTabVisits" data-i18n="adminTabVisits">ვიზიტორები</button>
-        <button class="a-tab" id="adminTabComments" data-i18n="adminTabComments">კომენტარები</button>
-        <button class="a-tab" id="adminTabArchive" data-i18n="adminTabArchive">არქივი</button>
-        <button class="a-tab" id="adminTabOrders" data-i18n="adminTabOrders">შეკვეთები</button>
-        <button class="a-tab" id="adminTabDiscordUsers" data-i18n="adminTabDiscordUsers">Discord მომხმარებლები</button>
-        <button class="a-tab" id="adminTabTiktokNotify" data-i18n="adminTabTiktokNotify">TikTok ანალიტიკის გაგზავნა</button>
-        <button class="a-tab" id="adminTabAnalytics" data-i18n="adminTabAnalytics">ანალიტიკა</button>
-        <button class="a-tab" id="adminTabUrgency" data-i18n="adminTabUrgency">ადგილები</button>
-        <button class="a-tab" id="adminTabPromo" data-i18n="adminTabPromo">Promo</button>
-        <button class="a-tab" id="adminTabChats" data-i18n="adminTabChats">ჩატები</button>
-        <button class="a-tab" id="adminTabOptimizer">ოპტიმიზატორი</button>
-      </div>
+      <aside class="ad-side">
+        <div class="ad-brand"><span class="ad-logo"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><div class="ad-brand-t"><b>MOONFULL 4K</b><small data-i18n="adBrandSub"></small></div></div>
+        <nav class="a-tabs" id="adNav">
+        <button class="a-tab active" id="adminTabVisits" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="ad-tl" data-i18n="adminTabVisits"></span></button>
+        <button class="a-tab" id="adminTabOrders" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg><span class="ad-tl" data-i18n="adminTabOrders"></span><em class="ad-badge" id="adBadgeOrders" hidden>0</em></button>
+        <button class="a-tab" id="adminTabComments" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ad-tl" data-i18n="adminTabComments"></span></button>
+        <button class="a-tab" id="adminTabChats" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg><span class="ad-tl" data-i18n="adminTabChats"></span></button>
+        <button class="a-tab" id="adminTabDiscordUsers" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg><span class="ad-tl" data-i18n="adNavDiscord"></span></button>
+        <button class="a-tab" id="adminTabTiktokNotify" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg><span class="ad-tl" data-i18n="adNavTiktok"></span></button>
+        <button class="a-tab" id="adminTabAnalytics" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg><span class="ad-tl" data-i18n="adminTabAnalytics"></span></button>
+        <button class="a-tab" id="adminTabArchive" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg><span class="ad-tl" data-i18n="adminTabArchive"></span></button>
+        <div class="ad-group" id="adGroup"><button class="ad-group-btn" id="adGroupBtn" type="button" aria-expanded="true"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg><span class="ad-tl" data-i18n="adGroupConfig"></span><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="ad-sub" id="adGroupBody"><button class="a-tab a-tab-sub" id="adminTabUrgency" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg><span class="ad-tl" data-i18n="adminTabUrgency"></span></button><button class="a-tab a-tab-sub" id="adminTabPromo" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".6" fill="currentColor"/></svg><span class="ad-tl" data-i18n="adminTabPromo"></span></button><button class="a-tab a-tab-sub" id="adminTabOptimizer" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.9 6.1a1 1 0 0 0 .95 1.27H20a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.9-6.1A1 1 0 0 0 12 14z"/></svg><span class="ad-tl" data-i18n="adTabOptimizer"></span></button></div></div>
+        </nav>
+        <div class="ad-user"><span class="ad-avatar" id="adAvatar">A</span><div class="ad-user-t"><b id="adUserName">Admin</b><small data-i18n="adRole"></small></div><button class="a-close" id="adminCloseDash" type="button" aria-label="Close"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span data-i18n="adminClose"></span></button></div>
+      </aside>
+      <section class="ad-main">
+        <header class="ad-top">
+          <label class="ad-search"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="search" id="adSearch" autocomplete="off" spellcheck="false" data-i18n-placeholder="adSearchPh" placeholder=""></label>
+          <div class="admin-mode-row" id="adminModeRow">
+            <span class="amt-label" id="adminModeLabel" data-i18n="adminModeLabel">დაწერე ადმინის სახელით</span>
+            <label class="admin-mode-toggle">
+              <input type="checkbox" id="adminModeCheckbox" checked>
+              <span class="switch"></span>
+            </label>
+          </div>
+          <button class="ad-bell" id="adBell" type="button" aria-label="Notifications"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i class="ad-dot" id="adBellDot" hidden></i></button>
+          <button class="ad-new" id="adNewBtn" type="button"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg><span data-i18n="adNewOrder"></span></button>
+          <button class="ad-xtop" id="adTopClose" type="button" aria-label="Close"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </header>
+        <div class="ad-scroll" id="adScroll">
+          <div class="ad-stats" id="adStats"><div class="ad-stat ad-cyan"><div class="ad-stat-top"><span class="ad-stat-label" data-i18n="adStatPending"></span><span class="ad-stat-ic"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span></div><div class="ad-stat-bot"><b id="adNumPending">–</b><span class="ad-chip ad-up" id="adChipPending" hidden></span></div></div><div class="ad-stat ad-orange"><div class="ad-stat-top"><span class="ad-stat-label" data-i18n="adStatVisitors"></span><span class="ad-stat-ic"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span></div><div class="ad-stat-bot"><b id="adNumVisitors">–</b><span class="ad-chip ad-mute" id="adChipVisitors" hidden></span></div></div><div class="ad-stat ad-green"><div class="ad-stat-top"><span class="ad-stat-label" data-i18n="adStatConfirmed"></span><span class="ad-stat-ic"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span></div><div class="ad-stat-bot"><b id="adNumConfirmed">–</b><span class="ad-chip ad-up" id="adChipConfirmed" hidden></span></div></div><div class="ad-stat ad-red"><div class="ad-stat-top"><span class="ad-stat-label" data-i18n="adStatBlocked"></span><span class="ad-stat-ic"><svg class="ad-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg></span></div><div class="ad-stat-bot"><b id="adNumBlocked">–</b><span class="ad-note" id="adChipBlocked"></span></div></div></div>
+          <div class="ad-head"><h3 id="adTitle" data-i18n="adminTabVisits"></h3>
+            <div class="ad-pills" id="adPills" hidden>
+              <button type="button" class="on" data-f="all"><span data-i18n="adAll"></span> <em id="adPillAll">0</em></button>
+              <button type="button" data-f="new"><i class="d-c"></i><span data-i18n="adNew"></span> <em id="adPillNew">0</em></button>
+              <button type="button" data-f="done"><i class="d-g"></i><span data-i18n="adDone"></span> <em id="adPillDone">0</em></button>
+            </div>
+          </div>
       <div class="a-panel active" id="adminPanelVisits"></div>
       <div class="a-panel" id="adminPanelComments"></div>
       <div class="a-panel" id="adminPanelArchive"></div>
       <div class="a-panel" id="adminPanelChats"></div>
       <div class="a-panel" id="adminPanelOptimizer"></div>
       <div class="a-panel" id="adminPanelOrders">
-        <div class="a-chart-card" id="ordersDonutCard"></div>
-        <div class="a-form-row"><label data-i18n="adminOrdersTotal">სულ შეკვეთა</label><input type="number" id="ordersTotalInput" min="0"></div>
-        <div class="a-form-row"><label data-i18n="adminOrdersSuccess">წარმატებული</label><input type="number" id="ordersSuccessInput" min="0"></div>
-        <div class="a-form-row"><label data-i18n="adminOrdersFail">წარუმატებელი</label><input type="number" id="ordersFailInput" min="0"></div>
-        <div class="a-stat-note" data-i18n="adminOrdersNote">ეს რიცხვები ჩანს საიტზე, როგორც სოციალური მტკიცება (✅ X წარმატებული მონტაჟი).</div>
-        <button class="a-go a-save-row" id="ordersSaveBtn" data-i18n="adminSave">შენახვა</button>
-
-        <div class="a-subheading" data-i18n="adminPendingOrdersTitle">დაუდასტურებელი შეკვეთები</div>
-        <div class="a-form-row"><input type="text" id="pendingOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
-        <div id="pendingOrdersList"></div>
-
-        <div class="a-subheading" data-i18n="adminConfirmedOrdersTitle">დადასტურებული შეკვეთების არქივი</div>
-        <div class="a-form-row"><input type="text" id="confirmedOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
-        <div id="confirmedOrdersList"></div>
+        <section class="ad-sec ad-sec-pending">
+          <div class="a-subheading" data-i18n="adminPendingOrdersTitle">დაუდასტურებელი შეკვეთები</div>
+          <div class="a-form-row ad-sr"><input type="text" id="pendingOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+          <div id="pendingOrdersList" class="ad-grid"></div>
+        </section>
+        <section class="ad-sec ad-sec-confirmed">
+          <div class="a-subheading" data-i18n="adminConfirmedOrdersTitle">დადასტურებული შეკვეთების არქივი</div>
+          <div class="a-form-row ad-sr"><input type="text" id="confirmedOrdersSearch" data-i18n-placeholder="adminPendingOrdersSearchPh" placeholder="ძებნა ID-ით..."></div>
+          <div id="confirmedOrdersList" class="ad-grid"></div>
+        </section>
+        <section class="ad-sec ad-sec-stats">
+          <div class="a-chart-card" id="ordersDonutCard"></div>
+          <div class="a-form-row"><label data-i18n="adminOrdersTotal">სულ შეკვეთა</label><input type="number" id="ordersTotalInput" min="0"></div>
+          <div class="a-form-row"><label data-i18n="adminOrdersSuccess">წარმატებული</label><input type="number" id="ordersSuccessInput" min="0"></div>
+          <div class="a-form-row"><label data-i18n="adminOrdersFail">წარუმატებელი</label><input type="number" id="ordersFailInput" min="0"></div>
+          <div class="a-stat-note" data-i18n="adminOrdersNote">ეს რიცხვები ჩანს საიტზე, როგორც სოციალური მტკიცება (✅ X წარმატებული მონტაჟი).</div>
+          <button class="a-go a-save-row" id="ordersSaveBtn" data-i18n="adminSave">შენახვა</button>
+        </section>
       </div>
       <div class="a-panel" id="adminPanelDiscordUsers">
         <div class="a-subheading" data-i18n="adminDiscordUsersTitle">Discord მომხმარებლები</div>
@@ -8766,7 +8787,8 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         <div class="a-stat-note" data-i18n="adminPromoNote">გააქტიურების შემდეგ ეს ფასდაკლება ავტომატურად აისახება 1-კვირიან/1-თვიან პანელებში (₾ ფასდაკლება) და ცალკეული ვიდეოს კალკულატორში (% ფასდაკლება), როცა სტუმარი სწორ კოდს შეიყვანს.</div>
         <button class="a-go a-save-row" id="promoSaveBtn" data-i18n="adminSave">შენახვა</button>
       </div>
-      <button class="a-close" id="adminCloseDash" data-i18n="adminClose">დახურვა</button>
+        </div>
+      </section>
     </div>
   </div>
 </div>
@@ -9184,6 +9206,33 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       adminEnter: 'შესვლა',
       adminWrongPass: 'არასწორი პაროლი',
       adminClose: 'დახურვა',
+      adNavDiscord: 'მომხმარებლები',
+      adNavTiktok: 'TikTok გაგზავნა',
+      adBrandSub: 'ადმინ პორტალი',
+      adRole: 'მმართველი',
+      adSearchPh: 'ძებნა შეკვეთებში, მომხმარებლებში...',
+      adNewOrder: 'ახალი შეკვეთა',
+      adGroupConfig: 'კონფიგურაცია',
+      adTabOptimizer: 'ოპტიმიზატორი',
+      adQueue: 'შეკვეთების რიგი',
+      adStatPending: 'დაუდასტურებელი',
+      adStatVisitors: 'ვიზიტორები დღეს',
+      adStatConfirmed: 'დადასტურებული',
+      adStatBlocked: 'დაბლოკილი',
+      adToday: 'დღეს',
+      adTotal: 'სულ',
+      adAllClear: 'ყველაფერი წესრიგშია',
+      adBlockedAccts: 'დაბლოკილი ანგარიში',
+      adAll: 'ყველა',
+      adNew: 'ახალი',
+      adDone: 'დადასტურებული',
+      adChipNew: 'ახალი შეკვეთა',
+      adChipWait: 'მოლოდინში',
+      adChipLate: 'დაგვიანებული',
+      adChipDone: 'დადასტურებული',
+      adLblDuration: 'ხანგრძლივობა',
+      adLblQuality: 'ხარისხი',
+      adLblPrice: 'ფასი',
       adminTabVisits: 'ვიზიტორები',
       adminTabComments: 'კომენტარები',
       adminTabArchive: 'არქივი',
@@ -9604,6 +9653,33 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       adminEnter: 'Enter',
       adminWrongPass: 'Incorrect password',
       adminClose: 'Close',
+      adNavDiscord: 'Users',
+      adNavTiktok: 'TikTok Send',
+      adBrandSub: 'ADMIN PORTAL',
+      adRole: 'Manager',
+      adSearchPh: 'Search orders, users, comments...',
+      adNewOrder: 'New Order',
+      adGroupConfig: 'Configuration',
+      adTabOptimizer: 'Optimizer',
+      adQueue: 'Orders Queue',
+      adStatPending: 'Pending Orders',
+      adStatVisitors: 'Visitors Today',
+      adStatConfirmed: 'Confirmed',
+      adStatBlocked: 'Blocked Users',
+      adToday: 'today',
+      adTotal: 'Total',
+      adAllClear: 'All clear',
+      adBlockedAccts: 'Blocked accounts',
+      adAll: 'All',
+      adNew: 'New',
+      adDone: 'Confirmed',
+      adChipNew: 'New order',
+      adChipWait: 'Waiting',
+      adChipLate: 'Delayed',
+      adChipDone: 'Confirmed',
+      adLblDuration: 'Duration',
+      adLblQuality: 'Quality',
+      adLblPrice: 'Price',
       adminTabVisits: 'Visitors',
       adminTabComments: 'Comments',
       adminTabArchive: 'Archive',
@@ -9744,7 +9820,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
 
   Object.assign(TRANSLATIONS.ka, {"mnHome": "მთავარი", "mnOrder": "შეკვეთა", "mnUpload": "ატვირთვა", "mnContact": "კონტაქტი", "mnOnline": "ონლაინ", "mnLangAria": "ენა", "mnClose": "დახურვა", "mnOrdTitle": "როგორ შევუკვეთოთ", "mnOrdSub": "6 მარტივი ნაბიჯი — ვიდეოდან მზა შედეგამდე", "mnOrdS1T": "აირჩიე პაკეტი", "mnOrdS1X": "მთავარ გვერდზე აირჩიე შენთვის შესაფერისი პაკეტი: ერთჯერადი, კვირის, თვის ან მსგავსი მონტაჟი შენი პერსონაჟით.", "mnOrdS2T": "გამოთვალე ფასი", "mnOrdS2X": "მიუთითე ვიდეოს ხანგრძლივობა და ხარისხი (1080p ან 4K) — ფასი მაშინვე გამოჩნდება.", "mnOrdS3T": "ატვირთე ვიდეო", "mnOrdS3X": "ატვირთე ვიდეო VIDEO SCANNER-ში: ხანგრძლივობა ავტომატურად გამოითვლება, ვიდეო კი ფონურ რეჟიმში გადაეგზავნება ჩვენს გუნდს.", "mnOrdS4T": "მიუთითე TikTok", "mnOrdS4X": "ჩასვი შენი TikTok პროფილის ლინკი ან დააჭირე ავტომატურ ამოცნობას ბუფერიდან.", "mnOrdS5T": "დააჭირე „შეკვეთას“", "mnOrdS5X": "Discord-ით შესვლის შემდეგ პირდაპირ ჩვენთან ჩატი გაიხსნება, შეკვეთის მზა დეტალებით.", "mnOrdS6T": "დაელოდე დადასტურებას", "mnOrdS6X": "მენეჯერი ჩატშივე დაგიდასტურებს შეკვეთას, გადახდის დეტალებს და ვადას. ჩაბარება — მაქსიმუმ 24 საათში.", "mnNotesTitle": "კარგია იცოდე", "mnOrdN1": "ატვირთვისას ვიდეო უნდა იყოს ზუსტად 1080p / 60fps; გამომავალ ხარისხს (1080p ან 4K) შეკვეთისას ირჩევ.", "mnOrdN2": "მაქსიმალური ხანგრძლივობა — 59.59 წამი. უფრო გრძელი ვიდეო ფასდება ინდივიდუალურად.", "mnOrdN3": "მონტაჟი მხოლოდ TikTok-ისთვისაა, ამიტომ საჭიროა სწორი პროფილის ლინკი.", "mnOrdN4": "პირველი ვერსიის შესწორება ერთხელ უფასოა; თანხის დაბრუნება შესაძლებელია ჩაბარებიდან 24 საათში.", "mnOrdCta": "შეკვეთის დაწყება", "mnUpTitle": "როგორ ავტვირთოთ", "mnUpSub": "ატვირთვა პირდაპირ საიტზე ხდება — რამდენიმე წამში", "mnUpS1T": "გახსენი ატვირთვის ველი", "mnUpS1X": "დააჭირე „ატვირთეთ ვიდეო“ ღილაკს VIDEO SCANNER ბლოკში ან პაკეტის ბარათზე.", "mnUpS2T": "აირჩიე ფაილი", "mnUpS2X": "აირჩიე ვიდეო გალერეიდან ან ფაილებიდან. ფორმატი უნდა იყოს ზუსტად 1080p / 60fps.", "mnUpS3T": "დაელოდე გაზომვას", "mnUpS3X": "საიტი ავტომატურად აჩვენებს ხანგრძლივობას, ფორმატს და ფასს.", "mnUpS4T": "დაადასტურე გაგზავნა", "mnUpS4X": "კითხვაზე, გსურთ თუ არა ვიდეო ავტომატურად გაეგზავნოს ჩვენს გუნდს, აირჩიე „დიახ“.", "mnUpS5T": "არ დატოვო გვერდი", "mnUpS5X": "ატვირთვის დასრულებამდე გვერდი ღია და ეკრანი ჩართული უნდა გქონდეს — თორემ ატვირთვა შეჩერდება.", "mnUpTipsTitle": "თუ ფორმატი არ ემთხვევა", "mnUpT1": "მობილურზე: გადაიყვანე ვიდეო 1:1 ან 16:9 ფორმატში.", "mnUpT2": "კომპიუტერზე: გადაიყვანე 1080x1080 ფორმატში.", "mnUpT3": "მაქსიმალური ხანგრძლივობა — 59.59 წამი.", "mnUpCta": "ატვირთვის დაწყება", "mnCtTitle": "დაგვიკავშირდი Discord-ზე", "mnCtSub": "შემოგვიერთდი სერვერზე და დაწერე ნებისმიერი კითხვა — პირადად გიპასუხებ.", "mnCtBtn": "Discord-ზე გადასვლა", "mnCtNote": "ჩვეულებრივ სწრაფად ვპასუხობთ"});
   Object.assign(TRANSLATIONS.en, {"mnHome": "Home", "mnOrder": "Order", "mnUpload": "Upload", "mnContact": "Contact", "mnOnline": "Online", "mnLangAria": "Language", "mnClose": "Close", "mnOrdTitle": "How to order", "mnOrdSub": "6 simple steps — from your video to the finished edit", "mnOrdS1T": "Choose a package", "mnOrdS1X": "On the main page pick the package that suits you: single, weekly, monthly, or a similar edit with your character.", "mnOrdS2T": "Calculate the price", "mnOrdS2X": "Set the video duration and quality (1080p or 4K) — the price appears instantly.", "mnOrdS3T": "Upload your video", "mnOrdS3X": "Upload it in the VIDEO SCANNER: the duration is measured automatically and the video is sent to our team in the background.", "mnOrdS4T": "Add your TikTok", "mnOrdS4X": "Paste your TikTok profile link, or tap auto-detect from the clipboard.", "mnOrdS5T": "Press “Order”", "mnOrdS5X": "After signing in with Discord, a chat opens with us directly, with your order details ready.", "mnOrdS6T": "Wait for confirmation", "mnOrdS6X": "A manager confirms the order, payment details and deadline right in the chat. Delivery within 24 hours at most.", "mnNotesTitle": "Good to know", "mnOrdN1": "On upload the video must be exactly 1080p / 60fps; you pick the output quality (1080p or 4K) when ordering.", "mnOrdN2": "Maximum duration is 59.59 seconds. Longer videos are priced individually.", "mnOrdN3": "Editing is for TikTok only, so a valid profile link is required.", "mnOrdN4": "The first revision is free (once); a refund is possible within 24 hours of delivery.", "mnOrdCta": "Start an order", "mnUpTitle": "How to upload", "mnUpSub": "Uploading happens right on the site — it takes a few seconds", "mnUpS1T": "Open the upload field", "mnUpS1X": "Tap “Upload a video” in the VIDEO SCANNER block or on a package card.", "mnUpS2T": "Choose a file", "mnUpS2X": "Pick the video from your gallery or files. It must be exactly 1080p / 60fps.", "mnUpS3T": "Wait for the scan", "mnUpS3X": "The site automatically shows the duration, format and price.", "mnUpS4T": "Confirm sending", "mnUpS4X": "When asked whether to send the video to our team automatically, choose “Yes”.", "mnUpS5T": "Don’t leave the page", "mnUpS5X": "Keep the page open and the screen on until the upload finishes — otherwise it stops.", "mnUpTipsTitle": "If the format doesn’t match", "mnUpT1": "On mobile: convert the video to 1:1 or 16:9.", "mnUpT2": "On a computer: convert it to 1080x1080.", "mnUpT3": "Maximum duration is 59.59 seconds.", "mnUpCta": "Start uploading", "mnCtTitle": "Reach us on Discord", "mnCtSub": "Join our server and ask any question — I’ll answer you personally.", "mnCtBtn": "Open Discord", "mnCtNote": "Usually replies fast"});
-  TRANSLATIONS.ru = Object.assign({}, TRANSLATIONS.en, {"commentSubmit": "Отправить", "commentTextPh": "Напишите комментарий", "subscriberT1": "Я подписчик канала","wpChannelT1": "Я подписчик канала","srRejectTitle": "Файл не соответствует требованиям","banBadge": "Бан на 100 лет","banGreeting": "Уважаемый бывший пользователь","banBody1": "Вам выдан <b>бан на 100 лет</b>❗ — наша система обнаружила, что вы используете нелегальный способ загрузки видео в TikTok. У каждого такого стороннего способа почти 100% шанс, что ваши видео в TikTok будут заблокированы и станут невидимыми для всех остальных.","banBody2": "Только вы сами сможете их смотреть — и то с постоянной буферизацией.","banFooter": "Так что пользоваться сайтом <b>MOONFULL4K</b> вы снова сможете всего через <b>100 лет</b>.","banSwitch": "Войти с другого аккаунта","trust1Text": "Каждая оценка ниже оставлена реальным клиентом — загляните в комментарии внизу страницы.","trust2Text": "Каждое видео обрабатывается индивидуально по технологии After Effects, без автоматических шаблонов.","trust3Text": "Заказ подтверждает реальный человек в чате — не бот и не автоматическая система.","trust4Text": "Вы видите цену в калькуляторе до заказа — никаких скрытых комиссий до отправки.","trust5Text": "Если первая версия получится не так, как договаривались, мы бесплатно исправим видео один раз — без доплаты.","ttdlIosLinkText": "<span class=\"ttdl-ios-link-ico\" aria-hidden=\"true\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3v11\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M7.5 10.5L12 15l4.5-4.5\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></svg></span>Сохранить видео — нажми здесь", "srRejectHow": "Как конвертировать?", "visitorsLabel": "Всего посетителей на сайте:", "menuVisitors": "Посетители", "menuViews": "Просмотры", "topbarTagline": "Вы заслуживаете лучшего качества", "authGateTitle": "Вы заслуживаете лучшего качества.", "authGateSub": "<span class=\"dg-spec\"><b>1080p / 4K • 60FPS</b></span><span class=\"dg-cta\">Чтобы продолжить, войдите через Discord</span>", "authGateClose": "Закрыть", "authLoginBtn": "Войти через Discord", "authJoinBtn": "Присоединиться к серверу Discord", "authGateSkip": "Продолжить как гость", "guildGateTitle": "Нужно присоединиться к нашему серверу Discord", "authLoggedInSub": "Вход выполнен через Discord", "authMemberBadge": "УЧАСТНИК", "authLogout": "Выйти", "authError": "Не удалось войти через Discord — попробуйте ещё раз.", "heroTitle": "<span>Заказать сейчас!</span>", "heroSub": "Укажите длительность видео (или загрузите видео — она определится автоматически), цена рассчитывается в реальном времени, монтаж на уровне After Effects.", "pcHeading": "Выберите пакет", "pcSubheading": "Выберите подходящий пакет", "pcCalcBtn": "Заказать", "pcRibbon": "Популярный", "pcFrom": "от", "pc1Title": "Разовый пакет", "pc1Desc": "Одно видео —<br>цена считается автоматически по длительности.", "pc1PriceNote": "Цена зависит от длительности", "pc1Feature1": "1080P • 60FPS", "pc1Feature2": "Сдача в течение 24 часов", "pc1Feature3": "4K • 60FPS", "aoTitle": "Разовый заказ", "aoDesc": "Любой формат видео<br>— загрузка напрямую", "aoSendChat": "Отправить заказ", "pc2Title": "Недельный пакет", "pc2Desc": "5 видео в неделю<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc2PriceNote": "1080p/4K — выбор после загрузки", "pc2Feature1": "В течение 1 недели<br>полный заказ", "pc2Feature2": "4K • 60FPS", "pc3Title": "Месячный пакет", "pc3Desc": "20 видео в месяц<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc3PriceNote": "1080p/4K — выбор после загрузки", "pc3Feature1": "В течение 1 месяца<br>полный заказ", "pc3Feature2": "4K • 60FPS", "pc4Desc": "Похожий монтаж<br>с вашим персонажем", "pc4PriceNote": "<span class=\"pc-price-note-line\">Цена зависит от выбранного стиля и качества</span>", "pc4Feature3": "Сдача в течение 24 часов", "featEnhance": "Улучшение качества", "featEffects": "Добавление эффектов", "featTiktokLossless": "Загрузка в TikTok без потери качества", "portfolioLabel": "Портфолио работ", "portfolioCta": "Смотреть работы в TikTok", "myOrdersLabel": "Мои заказы", "qnWhy": "Почему MOON<span class=\"qn-q\">?</span>", "qnPortfolio": "Портфолио", "qnEditOrder": "Заказать монтаж", "eoLabel": "Заказать монтаж", "eoVideoBadge": "Пример", "eoStyle1": "Стиль 1", "eoStyle2": "Стиль 2", "eoStyle3": "Стиль 3", "eoStyle4": "Стиль 4", "eoCaption": "Похожий монтаж — с вашим персонажем", "eoDesc": "Точно такой же стиль монтажа, но с вашим любимым персонажем (аниме, герой игры, кино и т. д.). Закажите, затем пришлите нам в чате фото/референс персонажа — остальное сделаем мы.", "eoPriceLabel": "Цена", "eoSendChat": "Отправить заказ", "ttdlBadge": "БЕСПЛАТНО", "ttdlDesc": "Скачивайте в максимальном качестве<br>Узнайте, в каком качестве загружено ваше видео", "ttdlInputPh": "Вставьте ссылку на видео TikTok...", "ttdlAnalyzeBtn": "Анализировать видео", "ttdlDownloadMusic": "Скачать музыку", "qnHowto": "Как это работает", "qnPromo": "Промокод", "qnBeforeAfter": "До / После", "qnContact": "Контакты", "qnRules": "Правила", "rule1Title": "Формат видео", "rule1Text": "При загрузке видео должно быть строго 1080p/60fps. Качество результата (1080p или 4K) выбирается при заказе.", "rule2Title": "Длительность", "rule2Text": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "rule3Title": "Назначение монтажа", "rule3Text": "Видео монтируется только для формата TikTok. Нужна корректная ссылка на профиль TikTok.", "rule4Title": "Срок сдачи", "rule4Text": "Сдача максимум за 24 часа. При системных изменениях — как только это станет возможным.", "rule5Title": "Бесплатная правка", "rule5Text": "Если первая версия не совпала с договорённостью, мы один раз исправим её совершенно бесплатно.", "rule6Title": "Если TikTok удалит видео", "rule6Text": "Если после сдачи TikTok сам удалил или ограничил видео — это вина его алгоритма, а не нашего. По этой причине деньги не возвращаются.", "rule7Title": "Возврат средств", "rule7Text": "Возврат возможен только в течение 24 часов после сдачи. Позже — невозможен.", "rule8Title": "Оплата", "rule8Text": "Реквизиты оплаты уточнит менеджер в чате после подтверждения заказа.", "trustLabel": "Почему MOON", "trust1Title": "Настоящие отзывы", "trust2Title": "Ручной монтаж, а не шаблоны", "trust3Title": "Прямой контакт с менеджером", "trust4Title": "Прозрачная цена заранее", "trust5Title": "Гарантия — одна бесплатная правка", "trustRatingText": "Средняя оценка <b>{AVG}</b> — на основе {COUNT} реальных отзывов", "finalPrice": "Итоговая цена", "markDuration": "Укажите точную длительность (секунды)", "secLabelShort": "Секунды", "msLabelShort": "Сотые", "secUnit": "сек", "msUnit": "сотых", "secondsPlaceholder": "Введите секунды (0–59)", "msLabel": "Сотые доли секунды (00–59)", "msHint": "Максимальная общая длительность — 59.59. В этом диапазоне цена считается по тарифу 59 секунд.", "qualityLabel": "Выберите качество видео:", "wizStepUpload": "Загрузка", "wizStepQuality": "Качество", "wizStepConfirm": "Подтверждение", "qualityWizardLabel": "Выберите качество для загрузки в TikTok", "scannerPrimaryBadge": "⚡ Автоматически и точно", "manualFallbackSub": "Быстрый ручной ввод — секунды и сотые", "manualEntryBadge": "Ручной ввод", "qualityRecBadge": "Единственный формат", "qualityBadgeStandard": "Стандарт", "qualityBadgePremium": "Премиум", "simpleScanLabel": "Сканер видео", "dzTitleSimple": "Загрузите видео", "dzSubSimple": "Перетащите сюда или нажмите, чтобы выбрать", "simpleScanOk": "Видео принято", "srRejectTextShort": "Формат не подходит — нужно строго 1080p / 60fps", "subscriberT2": "Скидка 10%", "wizardConfirmLink": "Подтвердить", "sendOrderWizardQ": "Хотите отправить заказ?", "wizardYes": "Да", "wizardNo": "Нет", "wantOrderQ": "Хотите заказать?", "subscriberWizardQ": "Вы подписчик нашего канала в TikTok?", "tiktokLabel": "Ссылка на ваш профиль TikTok *", "tiktokError": "⚠️ Для отправки заказа нужна ссылка на профиль TikTok!", "videoLinkLabel": "Ссылка на загруженное видео *", "videoLinkError": "⚠️ Для отправки заказа нужна ссылка на загруженное видео!", "tiktokConfirmPrompt": "Нажмите для подтверждения", "tiktokConfirmDone": "✓ Подтверждено", "videoScanner": "VIDEO SCANNER", "dzTitle": "Загрузите видео для автоматического замера", "dzSub": "Перетащите сюда или нажмите — длительность заполнится автоматически", "scanProcessing": "Обработка видео…", "scanCancelBtn": "Отмена", "srFile": "Файл", "srDuration": "Длительность", "srDetectedFormat": "Формат загруженного видео", "srRequestedFormat": "Запрошенное качество", "srPrice": "Рассчитанная цена", "srSuccessText": "Видео загружено", "srUnit": "с", "srFpsUnknown": "fps неизвестен", "srMatchNote": "✓ Загруженное видео соответствует запрошенному качеству ({REQ})", "srMismatchNote": "⚠️ Вы запросили {REQ}, но загруженное видео фактически {DET} — цена всё равно считается по запрошенному качеству ({REQ}).", "srWarnOver": "⚠️ Видео длиннее 59.59 секунды — оно оценивается индивидуально; калькулятор показывает тариф 59.59.", "dzReq": "Обязательный формат: строго 1080p · 60fps", "srRejectDetectedLabel": "Данные загруженного файла:", "srRejectText": "Уважаемый пользователь, загрузить нужно видео в формате <b>1080p / 60fps</b> — именно в этом формате, не больше и не меньше. Любое другое разрешение или частота кадров (например 720p, 2K, 4K, 30fps, 120fps) не принимается.", "srRejectRatioMobile": "📱 Если вы пользуетесь мобильными приложениями — переведите видео в формат <b>1:1</b> или <b>16:9</b>.", "srRejectRatioDesktop": "🖥️ Если вы пользуетесь компьютером — переведите в формат <b>1080x1080</b>.", "srRejectAppsMobile": "Для мобильных / iPhone / iPad:", "srRejectAppsDesktop": "Для компьютера:", "srRejectEtc": "и т. д.", "srRejectRetry": "↻ Попробовать другое видео", "srTransferQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "srTransferYes": "Да", "srTransferNo": "Нет", "mooonPromptQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "mooonPromptYes": "Да", "mooonPromptNo": "Нет", "mooonAutoUploading": "Загружаем ваше видео в mooontransferr…", "mooonAutoFinalizing": "Готовим вашу ссылку…", "mooonAutoError": "⚠️ Автоматическая загрузка не удалась. ", "mooonAutoErrorBackgrounded": "⚠️ Загрузка остановилась, потому что страница ушла в фон (экран заблокирован или вы переключили приложение). ", "mooonAutoStayHint": "📱 Держите страницу открытой, а экран включённым, пока загрузка не завершится", "mooonAutoManualLink": "Загрузить вручную на mooontransferr.onrender.com →", "mooonAutoRetry": "↻ Попробовать снова", "mtUploadHeadline": "Автоматическая загрузка", "tiktokAutoBtn": "Открыть TikTok", "tiktokAutoOpenedNote": "TikTok открылся в новой вкладке — зайдите в профиль, нажмите «Поделиться» и скопируйте ссылку. Затем вернитесь сюда и снова нажмите кнопку.", "tiktokAutoFound": "✓ Ссылка определена и подтверждена автоматически", "tiktokAutoDenied": "Нет доступа к буферу обмена — вставьте ссылку вручную ниже", "tiktokAutoUnsupported": "Этот браузер не поддерживает автоопределение — вставьте ссылку вручную", "subActivatedWeekly": "У вас активен недельный пакет", "subActivatedMonthly": "У вас активен месячный пакет", "alertNotVideo": "Загрузите видеофайл (mp4, mov, webm и т. д.)", "alertReadError": "Не удалось прочитать видео — попробуйте другой файл.", "sendOrder": "Отправить заказ", "sendChat": "Отправить заказ", "messengerTitle": "Чат заказа", "messengerOrderLabel": "Заказ №", "messengerInputPh": "Напишите сообщение...", "messengerNeedsLogin": "Войдите через Discord, чтобы открыть чат заказа.", "messengerCompleted": "Заказ выполнен — спасибо! ✅", "pmPickerPrompt": "Выберите способ оплаты:", "pmBankMethodLabel": "Банковский перевод", "pmChosenPrefix": "Выбранный способ оплаты:", "pmThankYou": "Уважаемый клиент, наш администратор скоро рассмотрит ваш заказ 💚", "pmAccountCopied": "📋 Номер счёта скопирован — откройте мобильный банк и вставьте его в поле перевода.", "orderProcessing": "Обрабатываем ваш заказ…", "orderProcessed": "Ваш заказ обработан ✓", "warnTitle": "Важно перед заказом", "warnP1": "Видео монтируется <b>только для TikTok</b>, с безупречным качеством.", "warnP2": "Убедитесь, что длительность видео <b>не превышает 59.59 секунды</b> — более длинные оцениваются индивидуально и в калькулятор не входят.", "warnP3": "Также убедитесь, что материал снят и отрендерен в качестве <b>1080p / 60fps</b> — это влияет на чистоту итогового результата.", "warnP4": "При загрузке материал всегда должен быть <b>строго 1080p / 60fps</b> — а для результата можно выбрать стандартный 1080p или премиум 4K/60fps.", "baLabel": "Без монтажа и после монтажа", "baTabMovies": "Фильмы", "baTabGames": "Игры", "baCaptionMovies": "Качество для фильмов<br>(сериалы, аниме и т. д.)", "baCaptionGames": "Качество для игр", "baBeforeTag": "ДО", "baAfterTag": "ПОСЛЕ", "baHint": "↔ потяните для сравнения", "contactPanelTitle": "Есть вопрос? Напишите мне напрямую", "contactPanelOnline": "Обычно отвечаем быстро", "contactDiscordSub": "Присоединяйтесь и пишите нам", "contactPanelSub": "Присоединяйтесь к нам в Discord и задавайте любые вопросы — отвечу лично.", "chatAssistant": "Ассистент", "acbLabelLine1": "Продолжить", "acbLabelLine2": "заказ", "chatOnline": "Онлайн", "chatInputPlaceholder": "Задайте вопрос…", "tutorialLink": "🎬 Инструкция", "commentsLabel": "Комментарии", "commentSubmit": "Отправить", "commentNamePh": "Имя", "commentTextPh": "Напишите комментарий…", "commentEmpty": "Комментариев пока нет — будьте первым!", "commentRatingLabel": "Ваша оценка:", "commentErrNeedDiscord": "Чтобы оставить комментарий, войдите через Discord.", "commentDiscordRequired": "Чтобы оставить комментарий, войдите через Discord.", "commentPostingAs": "Публикуете как:", "commentReadMore": "Читать далее", "commentReadLess": "Свернуть", "socialProofTotalLabel": "всего", "socialProofOrdersLabel": "заказов", "socialProofSuccessLabel": "успешных", "socialProofFailLabel": "неудачных", "spotsLeftWeek": "мест осталось", "spotsLeftMonth": "мест осталось в этом месяце", "promoLabel": "Есть промокод?", "promoPlaceholder": "Введите код", "promoApply": "Применить", "promoOk": "Код активен — −{WEEK}₾ на недельную подписку, −{MONTH}₾ на месячную, плюс дополнительная скидка {PCT}% на разовый заказ! Назовите этот код при оформлении заказа.", "promoBad": "Такого кода нет или он больше не действует.", "promoEmpty": "Введите код.", "howtoLabel": "Как заказать", "howtoStep1Title": "Рассчитайте цену", "howtoStep1Text": "Ниже в калькуляторе укажите длительность и качество видео — или загрузите видео в блок «<span class=\"scanner-jump-link\" data-jump=\"videoScannerPanel\">VIDEO SCANNER</span>», чтобы длительность определилась автоматически.", "howtoStep2Title": "Загрузите видео", "howtoStep2Text": "Загрузите видео прямо в блок «VIDEO SCANNER» — оно автоматически уйдёт нашей команде в фоновом режиме, переходить на отдельный сайт не нужно.", "howtoStep3Title": "Укажите TikTok", "howtoStep3Text": "Вставьте ссылку на профиль TikTok или нажмите «Автоопределение из буфера» — мы распознаем и подтвердим ссылку автоматически. Затем нажмите кнопку «Заказ — в чате» ниже: после входа через Discord откроется чат с нами с готовыми деталями заказа.", "howtoStep4Title": "Дождитесь подтверждения", "howtoStep4Text": "Менеджер подтвердит заказ и срок прямо в чате.", "wpLabel": "Подписка на 1 неделю", "wpBadge": "5 видео / 7 дней", "wpChannelT2": "✓ скидка −3₾", "wpSendChat": "Отправить заказ", "mpLabel": "<span class=\"mp-crown\">👑</span>Подписка на 1 месяц", "mpBadge": "20 видео / месяц", "mpSendChat": "Отправить заказ"}, {"mnHome": "Главная", "mnOrder": "Заказ", "mnUpload": "Загрузка", "mnContact": "Контакты", "mnOnline": "Онлайн", "mnLangAria": "Язык", "mnClose": "Закрыть", "mnOrdTitle": "Как заказать", "mnOrdSub": "6 простых шагов — от видео до готового результата", "mnOrdS1T": "Выберите пакет", "mnOrdS1X": "На главной странице выберите подходящий пакет: разовый, недельный, месячный, дешёвый или похожий монтаж с вашим персонажем.", "mnOrdS2T": "Рассчитайте цену", "mnOrdS2X": "Укажите длительность видео и качество (1080p или 4K) — цена появится сразу.", "mnOrdS3T": "Загрузите видео", "mnOrdS3X": "Загрузите его в VIDEO SCANNER: длительность определится автоматически, а видео в фоновом режиме уйдёт нашей команде.", "mnOrdS4T": "Укажите TikTok", "mnOrdS4X": "Вставьте ссылку на ваш профиль TikTok или нажмите автоопределение из буфера обмена.", "mnOrdS5T": "Нажмите «Заказать»", "mnOrdS5X": "После входа через Discord откроется чат с нами, где уже будут данные вашего заказа.", "mnOrdS6T": "Дождитесь подтверждения", "mnOrdS6X": "Менеджер подтвердит заказ, реквизиты оплаты и срок прямо в чате. Сдача — максимум за 24 часа.", "mnNotesTitle": "Полезно знать", "mnOrdN1": "При загрузке видео должно быть строго 1080p / 60fps; качество результата (1080p или 4K) выбирается при заказе.", "mnOrdN2": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "mnOrdN3": "Монтаж делается только для TikTok, поэтому нужна корректная ссылка на профиль.", "mnOrdN4": "Первая правка бесплатна (один раз); возврат средств возможен в течение 24 часов после сдачи.", "mnOrdCta": "Начать заказ", "mnUpTitle": "Как загрузить", "mnUpSub": "Загрузка происходит прямо на сайте — это займёт несколько секунд", "mnUpS1T": "Откройте поле загрузки", "mnUpS1X": "Нажмите «Загрузить видео» в блоке VIDEO SCANNER или на карточке пакета.", "mnUpS2T": "Выберите файл", "mnUpS2X": "Выберите видео из галереи или файлов. Формат должен быть строго 1080p / 60fps (2K/4K — только в «Дешёвом пакете»).", "mnUpS3T": "Дождитесь сканирования", "mnUpS3X": "Сайт автоматически покажет длительность, формат и цену.", "mnUpS4T": "Подтвердите отправку", "mnUpS4X": "На вопрос, отправить ли видео нашей команде автоматически, выберите «Да».", "mnUpS5T": "Не покидайте страницу", "mnUpS5X": "Пока загрузка не завершится, держите страницу открытой, а экран включённым — иначе загрузка остановится.", "mnUpTipsTitle": "Если формат не подходит", "mnUpT1": "На телефоне: переведите видео в формат 1:1 или 16:9.", "mnUpT2": "На компьютере: переведите в формат 1080x1080.", "mnUpT3": "Максимальная длительность — 59.59 секунды.", "mnUpCta": "Начать загрузку", "mnCtTitle": "Мы в Discord", "mnCtSub": "Присоединяйтесь к серверу и задавайте любые вопросы — отвечу лично.", "mnCtBtn": "Перейти в Discord", "mnCtNote": "Обычно отвечаем быстро"});
+  TRANSLATIONS.ru = Object.assign({}, TRANSLATIONS.en, {"adminOrderConfirm": "Подтвердить", "adminDelete": "Удалить", "adminDeleteForever": "Удалить навсегда", "adminPendingOrdersTitle": "Неподтверждённые заказы", "adminConfirmedOrdersTitle": "Архив подтверждённых заказов", "adminTabVisits": "Посетители", "adminTabComments": "Комментарии", "adminTabArchive": "Архив", "adminTabOrders": "Заказы", "adminTabDiscordUsers": "Пользователи Discord", "adminTabTiktokNotify": "Отправка аналитики TikTok", "adminTabAnalytics": "Аналитика", "adminTabUrgency": "Места", "adminTabChats": "Чаты", "adminClose": "Закрыть", "adminSave": "Сохранить", "adminOrdersTotal": "Всего заказов", "adminOrdersSuccess": "Успешных", "adminOrdersFail": "Неуспешных", "adNavDiscord": "Пользователи", "adNavTiktok": "Отправка TikTok", "adBrandSub": "ПАНЕЛЬ АДМИНА", "adRole": "Менеджер", "adSearchPh": "Поиск заказов, пользователей…", "adNewOrder": "Новый заказ", "adGroupConfig": "Настройки", "adTabOptimizer": "Оптимизатор", "adQueue": "Очередь заказов", "adStatPending": "Ожидают", "adStatVisitors": "Визиты сегодня", "adStatConfirmed": "Подтверждено", "adStatBlocked": "Заблокировано", "adToday": "сегодня", "adTotal": "Всего", "adAllClear": "Всё в порядке", "adBlockedAccts": "Заблокированные", "adAll": "Все", "adNew": "Новые", "adDone": "Подтверждённые", "adChipNew": "Новый заказ", "adChipWait": "Ожидает", "adChipLate": "Задержка", "adChipDone": "Подтверждён", "adLblDuration": "Длительность", "adLblQuality": "Качество", "adLblPrice": "Цена", "commentSubmit": "Отправить", "commentTextPh": "Напишите комментарий", "subscriberT1": "Я подписчик канала","wpChannelT1": "Я подписчик канала","srRejectTitle": "Файл не соответствует требованиям","banBadge": "Бан на 100 лет","banGreeting": "Уважаемый бывший пользователь","banBody1": "Вам выдан <b>бан на 100 лет</b>❗ — наша система обнаружила, что вы используете нелегальный способ загрузки видео в TikTok. У каждого такого стороннего способа почти 100% шанс, что ваши видео в TikTok будут заблокированы и станут невидимыми для всех остальных.","banBody2": "Только вы сами сможете их смотреть — и то с постоянной буферизацией.","banFooter": "Так что пользоваться сайтом <b>MOONFULL4K</b> вы снова сможете всего через <b>100 лет</b>.","banSwitch": "Войти с другого аккаунта","trust1Text": "Каждая оценка ниже оставлена реальным клиентом — загляните в комментарии внизу страницы.","trust2Text": "Каждое видео обрабатывается индивидуально по технологии After Effects, без автоматических шаблонов.","trust3Text": "Заказ подтверждает реальный человек в чате — не бот и не автоматическая система.","trust4Text": "Вы видите цену в калькуляторе до заказа — никаких скрытых комиссий до отправки.","trust5Text": "Если первая версия получится не так, как договаривались, мы бесплатно исправим видео один раз — без доплаты.","ttdlIosLinkText": "<span class=\"ttdl-ios-link-ico\" aria-hidden=\"true\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3v11\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M7.5 10.5L12 15l4.5-4.5\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M5 18.5v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></svg></span>Сохранить видео — нажми здесь", "srRejectHow": "Как конвертировать?", "visitorsLabel": "Всего посетителей на сайте:", "menuVisitors": "Посетители", "menuViews": "Просмотры", "topbarTagline": "Вы заслуживаете лучшего качества", "authGateTitle": "Вы заслуживаете лучшего качества.", "authGateSub": "<span class=\"dg-spec\"><b>1080p / 4K • 60FPS</b></span><span class=\"dg-cta\">Чтобы продолжить, войдите через Discord</span>", "authGateClose": "Закрыть", "authLoginBtn": "Войти через Discord", "authJoinBtn": "Присоединиться к серверу Discord", "authGateSkip": "Продолжить как гость", "guildGateTitle": "Нужно присоединиться к нашему серверу Discord", "authLoggedInSub": "Вход выполнен через Discord", "authMemberBadge": "УЧАСТНИК", "authLogout": "Выйти", "authError": "Не удалось войти через Discord — попробуйте ещё раз.", "heroTitle": "<span>Заказать сейчас!</span>", "heroSub": "Укажите длительность видео (или загрузите видео — она определится автоматически), цена рассчитывается в реальном времени, монтаж на уровне After Effects.", "pcHeading": "Выберите пакет", "pcSubheading": "Выберите подходящий пакет", "pcCalcBtn": "Заказать", "pcRibbon": "Популярный", "pcFrom": "от", "pc1Title": "Разовый пакет", "pc1Desc": "Одно видео —<br>цена считается автоматически по длительности.", "pc1PriceNote": "Цена зависит от длительности", "pc1Feature1": "1080P • 60FPS", "pc1Feature2": "Сдача в течение 24 часов", "pc1Feature3": "4K • 60FPS", "aoTitle": "Разовый заказ", "aoDesc": "Любой формат видео<br>— загрузка напрямую", "aoSendChat": "Отправить заказ", "pc2Title": "Недельный пакет", "pc2Desc": "5 видео в неделю<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc2PriceNote": "1080p/4K — выбор после загрузки", "pc2Feature1": "В течение 1 недели<br>полный заказ", "pc2Feature2": "4K • 60FPS", "pc3Title": "Месячный пакет", "pc3Desc": "20 видео в месяц<br><span class=\"pc-desc-spec\">1080/60FPS - 4K/60FPS</span>", "pc3PriceNote": "1080p/4K — выбор после загрузки", "pc3Feature1": "В течение 1 месяца<br>полный заказ", "pc3Feature2": "4K • 60FPS", "pc4Desc": "Похожий монтаж<br>с вашим персонажем", "pc4PriceNote": "<span class=\"pc-price-note-line\">Цена зависит от выбранного стиля и качества</span>", "pc4Feature3": "Сдача в течение 24 часов", "featEnhance": "Улучшение качества", "featEffects": "Добавление эффектов", "featTiktokLossless": "Загрузка в TikTok без потери качества", "portfolioLabel": "Портфолио работ", "portfolioCta": "Смотреть работы в TikTok", "myOrdersLabel": "Мои заказы", "qnWhy": "Почему MOON<span class=\"qn-q\">?</span>", "qnPortfolio": "Портфолио", "qnEditOrder": "Заказать монтаж", "eoLabel": "Заказать монтаж", "eoVideoBadge": "Пример", "eoStyle1": "Стиль 1", "eoStyle2": "Стиль 2", "eoStyle3": "Стиль 3", "eoStyle4": "Стиль 4", "eoCaption": "Похожий монтаж — с вашим персонажем", "eoDesc": "Точно такой же стиль монтажа, но с вашим любимым персонажем (аниме, герой игры, кино и т. д.). Закажите, затем пришлите нам в чате фото/референс персонажа — остальное сделаем мы.", "eoPriceLabel": "Цена", "eoSendChat": "Отправить заказ", "ttdlBadge": "БЕСПЛАТНО", "ttdlDesc": "Скачивайте в максимальном качестве<br>Узнайте, в каком качестве загружено ваше видео", "ttdlInputPh": "Вставьте ссылку на видео TikTok...", "ttdlAnalyzeBtn": "Анализировать видео", "ttdlDownloadMusic": "Скачать музыку", "qnHowto": "Как это работает", "qnPromo": "Промокод", "qnBeforeAfter": "До / После", "qnContact": "Контакты", "qnRules": "Правила", "rule1Title": "Формат видео", "rule1Text": "При загрузке видео должно быть строго 1080p/60fps. Качество результата (1080p или 4K) выбирается при заказе.", "rule2Title": "Длительность", "rule2Text": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "rule3Title": "Назначение монтажа", "rule3Text": "Видео монтируется только для формата TikTok. Нужна корректная ссылка на профиль TikTok.", "rule4Title": "Срок сдачи", "rule4Text": "Сдача максимум за 24 часа. При системных изменениях — как только это станет возможным.", "rule5Title": "Бесплатная правка", "rule5Text": "Если первая версия не совпала с договорённостью, мы один раз исправим её совершенно бесплатно.", "rule6Title": "Если TikTok удалит видео", "rule6Text": "Если после сдачи TikTok сам удалил или ограничил видео — это вина его алгоритма, а не нашего. По этой причине деньги не возвращаются.", "rule7Title": "Возврат средств", "rule7Text": "Возврат возможен только в течение 24 часов после сдачи. Позже — невозможен.", "rule8Title": "Оплата", "rule8Text": "Реквизиты оплаты уточнит менеджер в чате после подтверждения заказа.", "trustLabel": "Почему MOON", "trust1Title": "Настоящие отзывы", "trust2Title": "Ручной монтаж, а не шаблоны", "trust3Title": "Прямой контакт с менеджером", "trust4Title": "Прозрачная цена заранее", "trust5Title": "Гарантия — одна бесплатная правка", "trustRatingText": "Средняя оценка <b>{AVG}</b> — на основе {COUNT} реальных отзывов", "finalPrice": "Итоговая цена", "markDuration": "Укажите точную длительность (секунды)", "secLabelShort": "Секунды", "msLabelShort": "Сотые", "secUnit": "сек", "msUnit": "сотых", "secondsPlaceholder": "Введите секунды (0–59)", "msLabel": "Сотые доли секунды (00–59)", "msHint": "Максимальная общая длительность — 59.59. В этом диапазоне цена считается по тарифу 59 секунд.", "qualityLabel": "Выберите качество видео:", "wizStepUpload": "Загрузка", "wizStepQuality": "Качество", "wizStepConfirm": "Подтверждение", "qualityWizardLabel": "Выберите качество для загрузки в TikTok", "scannerPrimaryBadge": "⚡ Автоматически и точно", "manualFallbackSub": "Быстрый ручной ввод — секунды и сотые", "manualEntryBadge": "Ручной ввод", "qualityRecBadge": "Единственный формат", "qualityBadgeStandard": "Стандарт", "qualityBadgePremium": "Премиум", "simpleScanLabel": "Сканер видео", "dzTitleSimple": "Загрузите видео", "dzSubSimple": "Перетащите сюда или нажмите, чтобы выбрать", "simpleScanOk": "Видео принято", "srRejectTextShort": "Формат не подходит — нужно строго 1080p / 60fps", "subscriberT2": "Скидка 10%", "wizardConfirmLink": "Подтвердить", "sendOrderWizardQ": "Хотите отправить заказ?", "wizardYes": "Да", "wizardNo": "Нет", "wantOrderQ": "Хотите заказать?", "subscriberWizardQ": "Вы подписчик нашего канала в TikTok?", "tiktokLabel": "Ссылка на ваш профиль TikTok *", "tiktokError": "⚠️ Для отправки заказа нужна ссылка на профиль TikTok!", "videoLinkLabel": "Ссылка на загруженное видео *", "videoLinkError": "⚠️ Для отправки заказа нужна ссылка на загруженное видео!", "tiktokConfirmPrompt": "Нажмите для подтверждения", "tiktokConfirmDone": "✓ Подтверждено", "videoScanner": "VIDEO SCANNER", "dzTitle": "Загрузите видео для автоматического замера", "dzSub": "Перетащите сюда или нажмите — длительность заполнится автоматически", "scanProcessing": "Обработка видео…", "scanCancelBtn": "Отмена", "srFile": "Файл", "srDuration": "Длительность", "srDetectedFormat": "Формат загруженного видео", "srRequestedFormat": "Запрошенное качество", "srPrice": "Рассчитанная цена", "srSuccessText": "Видео загружено", "srUnit": "с", "srFpsUnknown": "fps неизвестен", "srMatchNote": "✓ Загруженное видео соответствует запрошенному качеству ({REQ})", "srMismatchNote": "⚠️ Вы запросили {REQ}, но загруженное видео фактически {DET} — цена всё равно считается по запрошенному качеству ({REQ}).", "srWarnOver": "⚠️ Видео длиннее 59.59 секунды — оно оценивается индивидуально; калькулятор показывает тариф 59.59.", "dzReq": "Обязательный формат: строго 1080p · 60fps", "srRejectDetectedLabel": "Данные загруженного файла:", "srRejectText": "Уважаемый пользователь, загрузить нужно видео в формате <b>1080p / 60fps</b> — именно в этом формате, не больше и не меньше. Любое другое разрешение или частота кадров (например 720p, 2K, 4K, 30fps, 120fps) не принимается.", "srRejectRatioMobile": "📱 Если вы пользуетесь мобильными приложениями — переведите видео в формат <b>1:1</b> или <b>16:9</b>.", "srRejectRatioDesktop": "🖥️ Если вы пользуетесь компьютером — переведите в формат <b>1080x1080</b>.", "srRejectAppsMobile": "Для мобильных / iPhone / iPad:", "srRejectAppsDesktop": "Для компьютера:", "srRejectEtc": "и т. д.", "srRejectRetry": "↻ Попробовать другое видео", "srTransferQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "srTransferYes": "Да", "srTransferNo": "Нет", "mooonPromptQ": "Хотите, чтобы загруженное видео автоматически отправилось нашей команде на проверку?", "mooonPromptYes": "Да", "mooonPromptNo": "Нет", "mooonAutoUploading": "Загружаем ваше видео в mooontransferr…", "mooonAutoFinalizing": "Готовим вашу ссылку…", "mooonAutoError": "⚠️ Автоматическая загрузка не удалась. ", "mooonAutoErrorBackgrounded": "⚠️ Загрузка остановилась, потому что страница ушла в фон (экран заблокирован или вы переключили приложение). ", "mooonAutoStayHint": "📱 Держите страницу открытой, а экран включённым, пока загрузка не завершится", "mooonAutoManualLink": "Загрузить вручную на mooontransferr.onrender.com →", "mooonAutoRetry": "↻ Попробовать снова", "mtUploadHeadline": "Автоматическая загрузка", "tiktokAutoBtn": "Открыть TikTok", "tiktokAutoOpenedNote": "TikTok открылся в новой вкладке — зайдите в профиль, нажмите «Поделиться» и скопируйте ссылку. Затем вернитесь сюда и снова нажмите кнопку.", "tiktokAutoFound": "✓ Ссылка определена и подтверждена автоматически", "tiktokAutoDenied": "Нет доступа к буферу обмена — вставьте ссылку вручную ниже", "tiktokAutoUnsupported": "Этот браузер не поддерживает автоопределение — вставьте ссылку вручную", "subActivatedWeekly": "У вас активен недельный пакет", "subActivatedMonthly": "У вас активен месячный пакет", "alertNotVideo": "Загрузите видеофайл (mp4, mov, webm и т. д.)", "alertReadError": "Не удалось прочитать видео — попробуйте другой файл.", "sendOrder": "Отправить заказ", "sendChat": "Отправить заказ", "messengerTitle": "Чат заказа", "messengerOrderLabel": "Заказ №", "messengerInputPh": "Напишите сообщение...", "messengerNeedsLogin": "Войдите через Discord, чтобы открыть чат заказа.", "messengerCompleted": "Заказ выполнен — спасибо! ✅", "pmPickerPrompt": "Выберите способ оплаты:", "pmBankMethodLabel": "Банковский перевод", "pmChosenPrefix": "Выбранный способ оплаты:", "pmThankYou": "Уважаемый клиент, наш администратор скоро рассмотрит ваш заказ 💚", "pmAccountCopied": "📋 Номер счёта скопирован — откройте мобильный банк и вставьте его в поле перевода.", "orderProcessing": "Обрабатываем ваш заказ…", "orderProcessed": "Ваш заказ обработан ✓", "warnTitle": "Важно перед заказом", "warnP1": "Видео монтируется <b>только для TikTok</b>, с безупречным качеством.", "warnP2": "Убедитесь, что длительность видео <b>не превышает 59.59 секунды</b> — более длинные оцениваются индивидуально и в калькулятор не входят.", "warnP3": "Также убедитесь, что материал снят и отрендерен в качестве <b>1080p / 60fps</b> — это влияет на чистоту итогового результата.", "warnP4": "При загрузке материал всегда должен быть <b>строго 1080p / 60fps</b> — а для результата можно выбрать стандартный 1080p или премиум 4K/60fps.", "baLabel": "Без монтажа и после монтажа", "baTabMovies": "Фильмы", "baTabGames": "Игры", "baCaptionMovies": "Качество для фильмов<br>(сериалы, аниме и т. д.)", "baCaptionGames": "Качество для игр", "baBeforeTag": "ДО", "baAfterTag": "ПОСЛЕ", "baHint": "↔ потяните для сравнения", "contactPanelTitle": "Есть вопрос? Напишите мне напрямую", "contactPanelOnline": "Обычно отвечаем быстро", "contactDiscordSub": "Присоединяйтесь и пишите нам", "contactPanelSub": "Присоединяйтесь к нам в Discord и задавайте любые вопросы — отвечу лично.", "chatAssistant": "Ассистент", "acbLabelLine1": "Продолжить", "acbLabelLine2": "заказ", "chatOnline": "Онлайн", "chatInputPlaceholder": "Задайте вопрос…", "tutorialLink": "🎬 Инструкция", "commentsLabel": "Комментарии", "commentSubmit": "Отправить", "commentNamePh": "Имя", "commentTextPh": "Напишите комментарий…", "commentEmpty": "Комментариев пока нет — будьте первым!", "commentRatingLabel": "Ваша оценка:", "commentErrNeedDiscord": "Чтобы оставить комментарий, войдите через Discord.", "commentDiscordRequired": "Чтобы оставить комментарий, войдите через Discord.", "commentPostingAs": "Публикуете как:", "commentReadMore": "Читать далее", "commentReadLess": "Свернуть", "socialProofTotalLabel": "всего", "socialProofOrdersLabel": "заказов", "socialProofSuccessLabel": "успешных", "socialProofFailLabel": "неудачных", "spotsLeftWeek": "мест осталось", "spotsLeftMonth": "мест осталось в этом месяце", "promoLabel": "Есть промокод?", "promoPlaceholder": "Введите код", "promoApply": "Применить", "promoOk": "Код активен — −{WEEK}₾ на недельную подписку, −{MONTH}₾ на месячную, плюс дополнительная скидка {PCT}% на разовый заказ! Назовите этот код при оформлении заказа.", "promoBad": "Такого кода нет или он больше не действует.", "promoEmpty": "Введите код.", "howtoLabel": "Как заказать", "howtoStep1Title": "Рассчитайте цену", "howtoStep1Text": "Ниже в калькуляторе укажите длительность и качество видео — или загрузите видео в блок «<span class=\"scanner-jump-link\" data-jump=\"videoScannerPanel\">VIDEO SCANNER</span>», чтобы длительность определилась автоматически.", "howtoStep2Title": "Загрузите видео", "howtoStep2Text": "Загрузите видео прямо в блок «VIDEO SCANNER» — оно автоматически уйдёт нашей команде в фоновом режиме, переходить на отдельный сайт не нужно.", "howtoStep3Title": "Укажите TikTok", "howtoStep3Text": "Вставьте ссылку на профиль TikTok или нажмите «Автоопределение из буфера» — мы распознаем и подтвердим ссылку автоматически. Затем нажмите кнопку «Заказ — в чате» ниже: после входа через Discord откроется чат с нами с готовыми деталями заказа.", "howtoStep4Title": "Дождитесь подтверждения", "howtoStep4Text": "Менеджер подтвердит заказ и срок прямо в чате.", "wpLabel": "Подписка на 1 неделю", "wpBadge": "5 видео / 7 дней", "wpChannelT2": "✓ скидка −3₾", "wpSendChat": "Отправить заказ", "mpLabel": "<span class=\"mp-crown\">👑</span>Подписка на 1 месяц", "mpBadge": "20 видео / месяц", "mpSendChat": "Отправить заказ"}, {"mnHome": "Главная", "mnOrder": "Заказ", "mnUpload": "Загрузка", "mnContact": "Контакты", "mnOnline": "Онлайн", "mnLangAria": "Язык", "mnClose": "Закрыть", "mnOrdTitle": "Как заказать", "mnOrdSub": "6 простых шагов — от видео до готового результата", "mnOrdS1T": "Выберите пакет", "mnOrdS1X": "На главной странице выберите подходящий пакет: разовый, недельный, месячный, дешёвый или похожий монтаж с вашим персонажем.", "mnOrdS2T": "Рассчитайте цену", "mnOrdS2X": "Укажите длительность видео и качество (1080p или 4K) — цена появится сразу.", "mnOrdS3T": "Загрузите видео", "mnOrdS3X": "Загрузите его в VIDEO SCANNER: длительность определится автоматически, а видео в фоновом режиме уйдёт нашей команде.", "mnOrdS4T": "Укажите TikTok", "mnOrdS4X": "Вставьте ссылку на ваш профиль TikTok или нажмите автоопределение из буфера обмена.", "mnOrdS5T": "Нажмите «Заказать»", "mnOrdS5X": "После входа через Discord откроется чат с нами, где уже будут данные вашего заказа.", "mnOrdS6T": "Дождитесь подтверждения", "mnOrdS6X": "Менеджер подтвердит заказ, реквизиты оплаты и срок прямо в чате. Сдача — максимум за 24 часа.", "mnNotesTitle": "Полезно знать", "mnOrdN1": "При загрузке видео должно быть строго 1080p / 60fps; качество результата (1080p или 4K) выбирается при заказе.", "mnOrdN2": "Максимальная длительность — 59.59 секунды. Более длинные видео оцениваются индивидуально.", "mnOrdN3": "Монтаж делается только для TikTok, поэтому нужна корректная ссылка на профиль.", "mnOrdN4": "Первая правка бесплатна (один раз); возврат средств возможен в течение 24 часов после сдачи.", "mnOrdCta": "Начать заказ", "mnUpTitle": "Как загрузить", "mnUpSub": "Загрузка происходит прямо на сайте — это займёт несколько секунд", "mnUpS1T": "Откройте поле загрузки", "mnUpS1X": "Нажмите «Загрузить видео» в блоке VIDEO SCANNER или на карточке пакета.", "mnUpS2T": "Выберите файл", "mnUpS2X": "Выберите видео из галереи или файлов. Формат должен быть строго 1080p / 60fps (2K/4K — только в «Дешёвом пакете»).", "mnUpS3T": "Дождитесь сканирования", "mnUpS3X": "Сайт автоматически покажет длительность, формат и цену.", "mnUpS4T": "Подтвердите отправку", "mnUpS4X": "На вопрос, отправить ли видео нашей команде автоматически, выберите «Да».", "mnUpS5T": "Не покидайте страницу", "mnUpS5X": "Пока загрузка не завершится, держите страницу открытой, а экран включённым — иначе загрузка остановится.", "mnUpTipsTitle": "Если формат не подходит", "mnUpT1": "На телефоне: переведите видео в формат 1:1 или 16:9.", "mnUpT2": "На компьютере: переведите в формат 1080x1080.", "mnUpT3": "Максимальная длительность — 59.59 секунды.", "mnUpCta": "Начать загрузку", "mnCtTitle": "Мы в Discord", "mnCtSub": "Присоединяйтесь к серверу и задавайте любые вопросы — отвечу лично.", "mnCtBtn": "Перейти в Discord", "mnCtNote": "Обычно отвечаем быстро"});
 
   TRANSLATIONS.ka.mnRulesSub='გთხოვთ, შეკვეთამდე გაეცანით ჩვენს წესებს — ისინი ყველასთვის ერთნაირია.';
   TRANSLATIONS.en.mnRulesSub='Please read our rules before you order — they are the same for everyone.';
@@ -15906,19 +15982,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       return;
     }
 
-    listEl.innerHTML = filtered.map(o =>
-      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
-        '<div class="aor-top">' +
-          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
-          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
-        '</div>' +
-        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.ts ? '<br>' + formatCommentDate(o.ts) : '') + '</div>' +
-        '<div class="aor-actions">' +
-          '<button class="a-save-btn" data-action="confirm-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminOrderConfirm') + '</button>' +
-          '<button class="a-del-btn" data-action="delete-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDelete') + '</button>' +
-        '</div>' +
-      '</div>'
-    ).join('');
+    listEl.innerHTML = filtered.map(o => adOrderCard(o, false)).join('');
+    try { adFromCaches(); } catch (e) {}
   }
 
   function renderConfirmedOrdersList(){
@@ -15937,18 +16002,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       return;
     }
 
-    listEl.innerHTML = filtered.map(o =>
-      '<div class="a-order-row" data-id="' + escapeHtml(String(o.id)) + '">' +
-        '<div class="aor-top">' +
-          '<span class="aor-id">🆔 ' + escapeHtml(String(o.id)) + '</span>' +
-          '<span class="aor-type">' + escapeHtml(pendingOrderTypeLabel(o.type)) + ' · ' + escapeHtml(o.channel || '') + '</span>' +
-        '</div>' +
-        '<div class="aor-meta">' + orderRowMetaBits(o).join(' · ') + (o.confirmedAt ? '<br>✅ ' + formatCommentDate(o.confirmedAt) : '') + '</div>' +
-        '<div class="aor-actions">' +
-          '<button class="a-del-btn" data-action="delete-confirmed-order" data-id="' + escapeHtml(String(o.id)) + '">' + t('adminDeleteForever') + '</button>' +
-        '</div>' +
-      '</div>'
-    ).join('');
+    listEl.innerHTML = filtered.map(o => adOrderCard(o, true)).join('');
+    try { adFromCaches(); } catch (e) {}
   }
 
   // ============================================================
@@ -16759,6 +16814,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     else if (tab === 'promo') renderAdminPromo();
     else if (tab === 'chats') renderAdminChats();
     else if (tab === 'optimizer' && window.renderAdminOptimizer) window.renderAdminOptimizer();
+    try { adOnTab(tab); } catch (e) {}
   }
   adminTabVisits.addEventListener('click', () => switchAdminTab('visits'));
   adminTabComments.addEventListener('click', () => switchAdminTab('comments'));
@@ -16770,6 +16826,151 @@ TikTok პროფილი: ${getTiktokValue('mp')}
   adminTabUrgency.addEventListener('click', () => switchAdminTab('urgency'));
   adminTabPromo.addEventListener('click', () => switchAdminTab('promo'));
   adminTabChats.addEventListener('click', () => switchAdminTab('chats'));
+
+
+  // ============================================================
+  // ADMIN SHELL (sidebar + top bar + stat cards + order cards)
+  // Pure presentation layer: every existing tab / panel / id / handler above is untouched.
+  // ============================================================
+  const AD_TITLES = { visits:'adminTabVisits', comments:'adminTabComments', archive:'adminTabArchive', orders:'adQueue', discordUsers:'adminTabDiscordUsers', tiktokNotify:'adminTabTiktokNotify', analytics:'adminTabAnalytics', urgency:'adminTabUrgency', promo:'adminTabPromo', chats:'adminTabChats', optimizer:'adTabOptimizer' };
+  let adTab = 'visits';
+  let adOrdFilter = 'all';
+  const adEl = id => document.getElementById(id);
+
+  function adAgeMin(ts){ const m = (Date.now() - Number(ts)) / 60000; return isFinite(m) && m >= 0 ? m : 0; }
+  function adAgeLabel(ts){
+    const L = currentLang === 'ka' ? { m:'წთ', h:'სთ', d:'დღ' } : currentLang === 'ru' ? { m:'м', h:'ч', d:'д' } : { m:'m', h:'h', d:'d' };
+    const m = Math.floor(adAgeMin(ts));
+    if (m < 60) return m + L.m;
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + L.h;
+    return Math.floor(h / 24) + L.d;
+  }
+  function adOrderCard(o, done){
+    const id = escapeHtml(String(o.id));
+    const m = adAgeMin(o.ts);
+    const st = done ? 'done' : (m < 60 ? 'new' : (m < 1440 ? 'wait' : 'late'));
+    const chipKey = { done:'adChipDone', 'new':'adChipNew', wait:'adChipWait', late:'adChipLate' }[st];
+    const hasPrice = o.price !== undefined && o.price !== null && o.price !== '';
+    const showPriceTop = hasPrice && (st === 'new' || st === 'done');
+    const sec = currentLang === 'ka' ? 'წმ' : (currentLang === 'ru' ? 'с' : 's');
+    const rows = [];
+    if (o.duration) rows.push([t('adLblDuration'), escapeHtml(o.duration) + ' ' + sec]);
+    if (o.quality) rows.push([t('adLblQuality'), escapeHtml(QUALITY_LABELS[o.quality] || o.quality)]);
+    if (hasPrice && !showPriceTop) rows.push([t('adLblPrice'), escapeHtml(String(o.price)) + ' ₾']);
+    if (o.tiktok) rows.push(['TikTok', '<span class="ad-link">' + escapeHtml(o.tiktok) + '</span>']);
+    if (o.discordUsername) rows.push(['Discord', escapeHtml(o.discordUsername)]);
+    const when = done ? (o.confirmedAt || o.ts) : o.ts;
+    const right = showPriceTop
+      ? '<span class="ad-ord-price"><b>' + escapeHtml(String(o.price)) + ' ₾</b><small>' + (when ? escapeHtml(adAgeLabel(when)) : '') + '</small></span>'
+      : '<span class="ad-age" title="' + escapeHtml(formatCommentDate(o.ts)) + '">' + escapeHtml(adAgeLabel(o.ts)) + '</span>';
+    const actions = done
+      ? '<button class="a-del-btn" data-action="delete-confirmed-order" data-id="' + id + '">' + t('adminDeleteForever') + '</button>'
+      : '<button class="a-save-btn" data-action="confirm-order" data-id="' + id + '">' + t('adminOrderConfirm') + '</button>' +
+        '<button class="a-del-btn" data-action="delete-order" data-id="' + id + '">' + t('adminDelete') + '</button>';
+    return '<div class="a-order-row ad-ord ad-s-' + st + '" data-id="' + id + '">' +
+      '<div class="ad-ord-top"><span class="ad-st"><i></i>' + escapeHtml(t(chipKey)) + '</span>' + right + '</div>' +
+      '<div class="ad-ord-id">#' + id + '</div>' +
+      '<div class="ad-ord-sub">' + escapeHtml(pendingOrderTypeLabel(o.type)) + (o.channel ? ' • ' + escapeHtml(o.channel) : '') + (when ? ' • ' + escapeHtml(formatCommentDate(when)) : '') + '</div>' +
+      (rows.length ? '<div class="ad-ord-rows">' + rows.map(r => '<div class="ad-row"><span>' + escapeHtml(r[0]) + '</span><b>' + r[1] + '</b></div>').join('') + '</div>' : '') +
+      '<div class="aor-actions">' + actions + '</div>' +
+    '</div>';
+  }
+
+  function adIsToday(ts){ try { return new Date(Number(ts)).toDateString() === new Date().toDateString(); } catch (e) { return false; } }
+  function adSetNum(id, v){ const el = adEl(id); if (el) el.textContent = String(v); }
+  function adChip(id, text, show){ const el = adEl(id); if (!el) return; el.textContent = text; el.hidden = !show; }
+  function adFromCaches(){
+    const pend = pendingOrdersCache.length, conf = confirmedOrdersCache.length;
+    adSetNum('adNumPending', pend); adSetNum('adNumConfirmed', conf);
+    const pt = pendingOrdersCache.filter(o => adIsToday(o.ts)).length;
+    const ct = confirmedOrdersCache.filter(o => adIsToday(o.confirmedAt || o.ts)).length;
+    adChip('adChipPending', '+' + pt + ' ' + t('adToday'), pt > 0);
+    adChip('adChipConfirmed', '+' + ct + ' ' + t('adToday'), ct > 0);
+    const badge = adEl('adBadgeOrders'); if (badge){ badge.textContent = String(pend); badge.hidden = pend < 1; }
+    const dot = adEl('adBellDot'); if (dot) dot.hidden = pend < 1;
+    adSetNum('adPillAll', pend + conf); adSetNum('adPillNew', pend); adSetNum('adPillDone', conf);
+  }
+  let adStatsAt = 0, adVisTotal = 0, adVisToday = 0, adBlockedN = 0, adStatsLoaded = false;
+  function adPaintChips(){
+    if (!adStatsLoaded) return;
+    adSetNum('adNumVisitors', adVisToday);
+    adChip('adChipVisitors', t('adTotal') + ' ' + adVisTotal, adVisTotal > 0);
+    adSetNum('adNumBlocked', adBlockedN);
+    const bn = adEl('adChipBlocked'); if (bn) bn.textContent = adBlockedN > 0 ? t('adBlockedAccts') : t('adAllClear');
+    const bc = bn && bn.closest('.ad-stat'); if (bc) bc.classList.toggle('ad-quiet', adBlockedN < 1);
+  }
+  async function adRefreshStats(force){
+    if (!adminAuthenticated) return;
+    if (!force && Date.now() - adStatsAt < 15000) return;
+    adStatsAt = Date.now();
+    try {
+      const [p, c, v, b] = await Promise.all([mdbRead('pendingOrders'), mdbRead('confirmedOrders'), mdbRead('visits'), mdbRead('blockedDiscordUsers')]);
+      if (p && Array.isArray(p.list)) pendingOrdersCache = p.list;
+      if (c && Array.isArray(c.list)) confirmedOrdersCache = c.list;
+      adFromCaches();
+      const vl = (v && Array.isArray(v.list)) ? v.list : [];
+      adVisTotal = vl.length; adVisToday = vl.filter(x => adIsToday(x.ts)).length;
+      adBlockedN = (b && Array.isArray(b.list)) ? b.list.length : 0;
+      adStatsLoaded = true;
+      adPaintChips();
+    } catch (e) {}
+  }
+
+  function adApplyFilter(){
+    const p = adEl('adminPanelOrders'); if (!p) return;
+    p.classList.toggle('ad-f-new', adOrdFilter === 'new');
+    p.classList.toggle('ad-f-done', adOrdFilter === 'done');
+    document.querySelectorAll('#adPills button').forEach(b => b.classList.toggle('on', b.getAttribute('data-f') === adOrdFilter));
+  }
+  function adApplySearch(){
+    const inp = adEl('adSearch'); if (!inp) return;
+    const q = inp.value.trim().toLowerCase();
+    const panel = document.querySelector('#adScroll .a-panel.active'); if (!panel) return;
+    panel.querySelectorAll('.a-order-row,.a-cmt,.a-visit-row,.chat-session-card,.a-blocklist-item,.opt-adm-row').forEach(r => {
+      const hide = q && r.textContent.toLowerCase().indexOf(q) === -1;
+      if (hide) r.style.display = 'none'; else if (r.style.display === 'none') r.style.display = '';
+    });
+  }
+  function adOnTab(tab){
+    adTab = tab;
+    const ttl = adEl('adTitle'); const key = AD_TITLES[tab] || 'adminTabVisits';
+    if (ttl){ ttl.setAttribute('data-i18n', key); ttl.innerHTML = t(key); }
+    const pills = adEl('adPills'); if (pills) pills.hidden = tab !== 'orders';
+    const grp = adEl('adGroup'); if (grp && ['urgency','promo','optimizer'].indexOf(tab) > -1){ grp.classList.add('open'); const gb = adEl('adGroupBtn'); if (gb) gb.setAttribute('aria-expanded','true'); }
+    const inp = adEl('adSearch'); if (inp) inp.value = '';
+    const sc = adEl('adScroll'); if (sc) sc.scrollTop = 0;
+    adApplyFilter();
+    adFromCaches(); adPaintChips();
+    adRefreshStats(false);
+    // the user card shows who is signed in
+    try {
+      const u = (typeof currentDiscordUser !== 'undefined') ? currentDiscordUser : null;
+      const nm = adEl('adUserName'), av = adEl('adAvatar');
+      if (nm && u && u.username) nm.textContent = u.username;
+      if (av){
+        if (u && u.avatarUrl){ av.innerHTML = '<img alt="" src="' + escapeHtml(u.avatarUrl) + '">'; }
+        else { av.textContent = ((u && u.username) || 'A').trim().charAt(0).toUpperCase() || 'A'; }
+      }
+    } catch (e) {}
+  }
+  (function adWire(){
+    const pills = adEl('adPills');
+    if (pills) pills.addEventListener('click', e => { const b = e.target.closest('button[data-f]'); if (!b) return; adOrdFilter = b.getAttribute('data-f'); adApplyFilter(); });
+    const gb = adEl('adGroupBtn'), grp = adEl('adGroup');
+    if (grp) grp.classList.add('open');
+    if (gb) gb.addEventListener('click', () => { const o = !grp.classList.contains('open'); grp.classList.toggle('open', o); gb.setAttribute('aria-expanded', String(o)); });
+    const bell = adEl('adBell'); if (bell) bell.addEventListener('click', () => { switchAdminTab('orders'); adOrdFilter = 'new'; adApplyFilter(); });
+    const nb = adEl('adNewBtn'); if (nb) nb.addEventListener('click', () => { switchAdminTab('analytics'); setTimeout(() => { const i = adEl('analyticsTiktokInput'); if (i) i.focus(); }, 60); });
+    const tc = adEl('adTopClose'); if (tc) tc.addEventListener('click', () => { const c = adEl('adminCloseDash'); if (c) c.click(); });
+    const si = adEl('adSearch'); if (si) si.addEventListener('input', adApplySearch);
+    const sc = adEl('adScroll');
+    if (sc && window.MutationObserver){
+      let raf = 0;
+      new MutationObserver(() => { const q = (adEl('adSearch').value || '').trim(); if (!q || raf) return; raf = requestAnimationFrame(() => { raf = 0; adApplySearch(); }); }).observe(sc, { childList:true, subtree:true });
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && adminOverlay.classList.contains('open') && !document.getElementById('messengerPage')?.style.display?.includes('flex')) closeAdmin(); });
+  })();
 
   let adminCheckInFlight = false;
   async function tryAdminLogin(){
@@ -26570,6 +26771,326 @@ html body #checkerView#checkerView:not(#_a):not(#_b) .ttdl-shell :is(.ttdl-title
 html body #checkerView#checkerView:not(#_a):not(#_b) .ttdl-shell :is(.ttdl-icon,.ttdl-step-line)::after{animation:none!important;display:none!important}
 html body #checkerView#checkerView:not(#_a):not(#_b) .ttdl-shell :is(.ttdl-icon,.ttdl-step-line)::before{animation:none!important}
 html body #checkerView#checkerView:not(#_a):not(#_b) .ttdl-heading::after{animation:none!important}
+</style>
+<style id="moon-admin-pro">
+/* ===================================================================
+   ADMIN PANEL — dashboard look (sidebar · top bar · stat cards · order cards)
+   =================================================================== */
+html body #adminOverlay{--ad-line:rgba(56,170,200,.17);--ad-line2:rgba(56,170,200,.30);--ad-card:linear-gradient(180deg,#0f2b3a 0%,#0b2130 100%);--ad-field:#0a202d;--ad-text:#eaf4f8;--ad-mut:#8ea9b6;--ad-mut2:#a9c0cb;--ad-cy:#22c4e8;--ad-cy2:#38d6f2;--ad-or:#f5a524;--ad-gr:#2fcf94;--ad-rd:#f26b6b;
+  --moon-glow:#22d3ee;--moon-blue:#0ea5e9;--moon-silver:#eaf4f8;--moon-silver-dim:#8ea9b6;--moon-line:rgba(56,170,200,.2);--moon-blue-soft:#22c4e8;--purple-soft:#22c4e8;--text:#eaf4f8;--text-dim:#a9c0cb;--text-faint:#7f9aa8;--warn:#f26b6b;
+  z-index:9000;padding:20px;align-items:stretch;justify-content:center;color:var(--ad-text);
+  background:radial-gradient(900px 620px at 88% 100%,rgba(33,70,150,.30),transparent 62%),radial-gradient(760px 520px at 0% 0%,rgba(14,116,144,.22),transparent 60%),#07121b;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  font-family:'GateSans','BPGAcademiuriU',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;letter-spacing:0;word-spacing:0;-webkit-text-stroke:0;line-height:1.45}
+html:is([lang="en"],[lang="ru"]) body #adminOverlay{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif}
+html body #adminOverlay::before{display:none!important}
+html body #adminOverlay *{box-sizing:border-box;letter-spacing:0;word-spacing:0;-webkit-text-stroke:0;text-shadow:none}
+html body #adminOverlay .admin-box{max-width:none;max-height:none;width:100%;height:100%;padding:0;background:none;border:0;border-radius:0;box-shadow:none;animation:none;overflow:hidden;display:flex;align-items:center;justify-content:center;background-clip:border-box}
+html body #adminOverlay .admin-box h3::before{display:none}
+html body #adminOverlay ::-webkit-scrollbar{width:8px;height:8px}
+html body #adminOverlay ::-webkit-scrollbar-thumb{background:rgba(120,190,215,.22);border-radius:8px}
+html body #adminOverlay ::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- login ---------- */
+html body #adminOverlay #adminLogin{width:min(430px,100%);padding:34px 30px 28px;border-radius:26px;background:var(--ad-card);border:1px solid var(--ad-line)}
+html body #adminOverlay #adminLogin h3{margin:0 0 22px;font-size:22px;font-weight:700;line-height:1.4;color:#fff;display:block;padding:0}
+html body #adminOverlay #adminLogin .a-pass-row{gap:10px}
+html body #adminOverlay input.a-pass{height:48px;background:var(--ad-field);border:1px solid var(--ad-line2);border-radius:14px;color:#fff;font-size:15.5px;padding:0 16px}
+html body #adminOverlay input.a-pass:focus{border-color:var(--ad-cy);outline:0;box-shadow:none}
+html body #adminOverlay #adminLogin .a-close{width:100%;margin-top:14px}
+
+/* ---------- buttons ---------- */
+html body #adminOverlay .a-go{height:48px;padding:0 26px;border:0;border-radius:14px;background:var(--ad-cy);color:#04222b;font-size:15.5px;font-weight:700;cursor:pointer;box-shadow:none;transition:background .15s,transform .1s;font-family:inherit}
+html body #adminOverlay .a-go:hover{background:var(--ad-cy2);transform:none}
+html body #adminOverlay .a-go:active{transform:scale(.98)}
+html body #adminOverlay .a-go:disabled{opacity:.6}
+html body #adminOverlay .a-save-row{margin-top:10px}
+html body #adminOverlay .a-close{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 18px;border-radius:14px;background:#0d2635;border:1px solid var(--ad-line);color:var(--ad-mut2);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+html body #adminOverlay .a-close:hover{background:#12313f;color:#fff;border-color:var(--ad-line2)}
+html body #adminOverlay .a-err{color:var(--ad-rd);font-size:14px;margin-top:10px}
+html body #adminOverlay .ad-i{width:22px;height:22px;flex:0 0 auto;display:block}
+
+/* ---------- shell ---------- */
+html body #adminOverlay #adminDashboard[style*="block"]{display:grid!important;grid-template-columns:288px minmax(0,1fr);gap:20px;width:100%;height:100%;max-width:1780px;min-height:0}
+html body #adminOverlay .ad-side{display:flex;flex-direction:column;min-height:0;min-width:0;border-radius:28px;background:linear-gradient(180deg,#10303f 0%,#0c2230 50%,#0a1c28 100%);border:1px solid var(--ad-line);padding:24px 16px 0;overflow:hidden}
+html body #adminOverlay .ad-brand{display:flex;align-items:center;gap:14px;padding:0 6px}
+html body #adminOverlay .ad-logo{width:46px;height:46px;border-radius:14px;flex:0 0 auto;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,#2bb3ff 0%,#1569e6 100%)}
+html body #adminOverlay .ad-logo .ad-i{width:24px;height:24px}
+html body #adminOverlay .ad-brand-t{min-width:0;display:flex;flex-direction:column;gap:3px}
+html body #adminOverlay .ad-brand-t b{font-size:20px;font-weight:700;line-height:1.3;color:#fff;white-space:nowrap}
+html body #adminOverlay .ad-brand-t small{font-size:12.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ad-cy);line-height:1.3;white-space:nowrap}
+html:is([lang="ka"]) body #adminOverlay .ad-brand-t small{letter-spacing:.04em;text-transform:none;font-size:13px}
+
+html body #adminOverlay .ad-side .a-tabs{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;flex-wrap:nowrap;gap:4px;margin:30px 0 14px;padding:0 0 8px;background:none;border:0;border-radius:0;box-shadow:none}
+html body #adminOverlay .ad-side .a-tab,html body #adminOverlay .ad-side .ad-group-btn{position:relative;display:flex;align-items:center;gap:14px;flex:0 0 auto;width:100%;height:50px;padding:0 16px;border:0;border-radius:16px;background:transparent;color:var(--ad-mut2);font-family:inherit;font-size:15.5px;font-weight:600;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;box-shadow:none;transition:background .15s,color .15s}
+html body #adminOverlay .ad-side .a-tab .ad-i,html body #adminOverlay .ad-side .ad-group-btn .ad-i{color:#6f98ab}
+html body #adminOverlay .ad-side .a-tab:hover,html body #adminOverlay .ad-side .ad-group-btn:hover{background:rgba(120,200,230,.07);color:#fff}
+html body #adminOverlay .ad-side .a-tab.active{background:linear-gradient(90deg,#0f7f9c 0%,#10698a 100%);color:#fff;border:0}
+html body #adminOverlay .ad-side .a-tab.active .ad-i{color:#5fe3ff}
+html body #adminOverlay .ad-side .a-tab.active::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:4px;border-radius:0 4px 4px 0;background:#45e0ff}
+html body #adminOverlay .ad-tl{min-width:0;overflow:hidden;text-overflow:ellipsis;line-height:1.6;padding:2px 0}
+html body #adminOverlay .ad-badge{margin-left:auto;font-style:normal;min-width:28px;height:24px;padding:0 9px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;background:rgba(34,196,232,.18);color:#43dcf5;font-size:12.5px;font-weight:700;line-height:1}
+html body #adminOverlay .ad-badge[hidden]{display:none}
+html body #adminOverlay .ad-group-btn .ad-i:last-child{margin-left:auto;width:18px;height:18px;transition:transform .2s}
+html body #adminOverlay .ad-group:not(.open) .ad-group-btn .ad-i:last-child{transform:rotate(-90deg)}
+html body #adminOverlay .ad-sub{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+html body #adminOverlay .ad-group:not(.open) .ad-sub{display:none}
+html body #adminOverlay .ad-side .a-tab-sub{height:46px;padding:0 16px 0 46px;font-weight:500;font-size:15px}
+html body #adminOverlay .ad-side .a-tab-sub .ad-i{display:none}
+html body #adminOverlay .ad-side .a-tab-sub.active::before{left:0}
+
+html body #adminOverlay .ad-user{flex:0 0 auto;display:flex;align-items:center;gap:12px;margin:0 -16px;padding:18px 20px;border-top:1px solid rgba(255,255,255,.07)}
+html body #adminOverlay .ad-avatar{width:46px;height:46px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;overflow:hidden;background:linear-gradient(140deg,#f6d3a8,#e7a66a);color:#5a3512;font-weight:800;font-size:19px}
+html body #adminOverlay .ad-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+html body #adminOverlay .ad-user-t{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}
+html body #adminOverlay .ad-user-t b{font-size:15.5px;font-weight:600;color:#fff;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #adminOverlay .ad-user-t small{font-size:13px;color:var(--ad-mut);line-height:1.5}
+html body #adminOverlay .ad-user .a-close{width:42px;height:42px;padding:0;border-radius:12px;flex:0 0 auto;position:relative}
+html body #adminOverlay .ad-user .a-close .ad-i{width:20px;height:20px}
+html body #adminOverlay .ad-user .a-close span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- main column ---------- */
+html body #adminOverlay .ad-main{display:flex;flex-direction:column;gap:20px;min-height:0;min-width:0}
+html body #adminOverlay .ad-top{flex:0 0 auto;display:flex;align-items:center;gap:14px;height:74px;padding:0 22px;border-radius:26px;background:var(--ad-card);border:1px solid var(--ad-line)}
+html body #adminOverlay .ad-search{flex:1 1 auto;max-width:680px;height:46px;display:flex;align-items:center;gap:12px;padding:0 16px;border-radius:14px;background:var(--ad-field);border:1px solid var(--ad-line2);color:var(--ad-mut);cursor:text}
+html body #adminOverlay .ad-search .ad-i{width:21px;height:21px}
+html body #adminOverlay .ad-search:focus-within{border-color:var(--ad-cy)}
+html body #adminOverlay .ad-search input{flex:1;min-width:0;height:100%;background:transparent;border:0;outline:0;box-shadow:none;color:#fff;font-size:15.5px;font-family:inherit;padding:0}
+html body #adminOverlay .ad-search input::placeholder{color:#7a95a3;opacity:1}
+html body #adminOverlay .ad-search input::-webkit-search-cancel-button{-webkit-appearance:none}
+html body #adminOverlay .ad-top .admin-mode-row{margin:0 0 0 auto;padding:0 14px;height:46px;border-radius:14px;background:var(--ad-field);border:1px solid var(--ad-line2);gap:12px}
+html body #adminOverlay .ad-top .admin-mode-row:not([style*="flex"]):not([style*="block"]){display:none}
+html body #adminOverlay .ad-top .admin-mode-row .amt-label{font-size:14px;font-weight:600;color:var(--ad-mut2);white-space:nowrap}
+html body #adminOverlay .ad-bell{position:relative;margin-left:auto;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:transparent;border:0;color:#a9c0cb;cursor:pointer}
+html body #adminOverlay .ad-top .admin-mode-row[style*="flex"]~.ad-bell,html body #adminOverlay .ad-top .admin-mode-row[style*="block"]~.ad-bell{margin-left:0}
+html body #adminOverlay .ad-bell:hover{color:#fff;background:rgba(120,200,230,.08)}
+html body #adminOverlay .ad-dot{position:absolute;top:8px;right:9px;width:10px;height:10px;border-radius:50%;background:#ef4444;border:2px solid #0d2635}
+html body #adminOverlay .ad-dot[hidden]{display:none}
+html body #adminOverlay .ad-new{height:46px;padding:0 22px;display:inline-flex;align-items:center;gap:10px;border-radius:14px;background:rgba(14,165,200,.16);border:1px solid #1a9fbd;color:#3ad8f3;font-family:inherit;font-size:15.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s}
+html body #adminOverlay .ad-new .ad-i{width:19px;height:19px}
+html body #adminOverlay .ad-new:hover{background:rgba(14,165,200,.28)}
+html body #adminOverlay .ad-xtop{display:none;width:44px;height:44px;border-radius:12px;place-items:center;background:#0d2635;border:1px solid var(--ad-line);color:#cfe3ec;cursor:pointer}
+html body #adminOverlay .ad-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 6px 24px 0;scrollbar-gutter:stable}
+
+/* ---------- stat cards ---------- */
+html body #adminOverlay .ad-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+html body #adminOverlay .ad-stat{min-height:146px;padding:22px 24px 20px;border-radius:26px;background:var(--ad-card);border:1px solid var(--ad-line);display:flex;flex-direction:column;justify-content:space-between;gap:14px;min-width:0}
+html body #adminOverlay .ad-stat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+html body #adminOverlay .ad-stat-label{font-size:15.5px;font-weight:500;color:var(--ad-mut2);line-height:1.5;padding-top:2px}
+html body #adminOverlay .ad-stat-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto}
+html body #adminOverlay .ad-stat-ic .ad-i{width:20px;height:20px}
+html body #adminOverlay .ad-cyan .ad-stat-ic{background:rgba(34,168,232,.2);color:#43c0f5}
+html body #adminOverlay .ad-orange .ad-stat-ic{background:rgba(245,165,36,.2);color:#f7b84b}
+html body #adminOverlay .ad-green .ad-stat-ic{background:rgba(47,207,148,.2);color:#3ddba2}
+html body #adminOverlay .ad-red .ad-stat-ic{background:rgba(242,107,107,.2);color:#f58282}
+html body #adminOverlay .ad-stat-bot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-width:0}
+html body #adminOverlay .ad-stat-bot b{font-size:42px;font-weight:800;line-height:1.1;color:#fff;font-variant-numeric:tabular-nums}
+html body #adminOverlay .ad-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 6px;border-radius:9px;font-size:14px;font-weight:600;line-height:1.4;white-space:nowrap}
+html body #adminOverlay .ad-chip[hidden]{display:none}
+html body #adminOverlay .ad-up{background:rgba(47,207,148,.15);color:#37d69b}
+html body #adminOverlay .ad-mute{background:rgba(255,255,255,.07);color:var(--ad-mut2)}
+html body #adminOverlay .ad-note{font-size:15px;color:var(--ad-mut2);line-height:1.5}
+html body #adminOverlay .ad-red:not(.ad-quiet) .ad-note{color:#f58f8f}
+
+/* ---------- section head + pills ---------- */
+html body #adminOverlay .ad-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:28px 0 20px}
+html body #adminOverlay .ad-head h3{margin:0;padding:0;font-size:26px;font-weight:700;line-height:1.4;color:#fff;display:block}
+html body #adminOverlay .ad-pills{display:inline-flex;gap:4px;padding:6px;border-radius:18px;background:rgba(7,24,35,.7);border:1px solid var(--ad-line)}
+html body #adminOverlay .ad-pills[hidden]{display:none}
+html body #adminOverlay .ad-pills button{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;border:0;border-radius:12px;background:transparent;color:var(--ad-mut2);font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;white-space:nowrap}
+html body #adminOverlay .ad-pills button em{font-style:normal}
+html body #adminOverlay .ad-pills button.on{background:#17394b;color:#fff}
+html body #adminOverlay .ad-pills i{width:9px;height:9px;border-radius:50%}
+html body #adminOverlay .ad-pills .d-c{background:#26b8ee}
+html body #adminOverlay .ad-pills .d-g{background:#2fcf94}
+
+/* ---------- panels + generic cards ---------- */
+html body #adminOverlay .a-panel.active{display:block;animation:none}
+html body #adminOverlay .a-subheading{margin:0 0 14px;padding:0;border:0;font-size:19px;font-weight:700;line-height:1.5;color:#fff}
+html body #adminOverlay .a-subheading::before{display:none}
+html body #adminOverlay .ad-sec+.ad-sec,html body #adminOverlay .a-panel>.a-subheading:not(:first-child){margin-top:34px}
+html body #adminOverlay .a-stat-note{margin:2px 0 16px;font-size:14px;line-height:1.55;color:var(--ad-mut)}
+html body #adminOverlay .c-empty,html body #adminOverlay .chat-admin-empty,html body #adminOverlay .a-blocklist-empty{padding:34px 16px;text-align:center;font-size:15px;color:var(--ad-mut);border:1px dashed var(--ad-line2);border-radius:20px;background:rgba(10,32,45,.45)}
+html body #adminOverlay .ad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px;align-items:start}
+html body #adminOverlay .ad-grid>.c-empty{grid-column:1/-1}
+html body #adminOverlay .ad-sr{margin-bottom:18px}
+html body #adminOverlay .ad-sr input{width:100%;max-width:520px}
+html body #adminOverlay #adminPanelOrders.ad-f-new .ad-sec-confirmed,html body #adminOverlay #adminPanelOrders.ad-f-new .ad-sec-stats,html body #adminOverlay #adminPanelOrders.ad-f-done .ad-sec-pending,html body #adminOverlay #adminPanelOrders.ad-f-done .ad-sec-stats{display:none}
+
+html body #adminOverlay .a-form-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+html body #adminOverlay .a-form-row label{flex:1 1 auto;font-size:15px;line-height:1.5;color:var(--ad-mut2)}
+html body #adminOverlay .a-form-row input,html body #adminOverlay .a-form-row select,html body #adminOverlay .aor-tiktok-input,html body #adminOverlay .a-cmt textarea,html body #adminOverlay .a-blocklist-add input{height:46px;padding:0 16px;border-radius:14px;background:var(--ad-field);border:1px solid var(--ad-line2);color:#fff;font-family:inherit;font-size:15px;outline:0;box-shadow:none}
+html body #adminOverlay .a-form-row input[type="number"]{width:170px;text-align:left}
+html body #adminOverlay .a-form-row input[type="text"]{flex:1 1 auto;text-align:left}
+html body #adminOverlay .a-form-row input[type="checkbox"]{width:22px;height:22px;padding:0;accent-color:#22c4e8}
+html body #adminOverlay .a-form-row input:focus,html body #adminOverlay .a-form-row select:focus,html body #adminOverlay .aor-tiktok-input:focus,html body #adminOverlay .a-cmt textarea:focus{border-color:var(--ad-cy);outline:0;box-shadow:none}
+html body #adminOverlay .a-form-row input::placeholder,html body #adminOverlay .aor-tiktok-input::placeholder{color:#6f8a98}
+html body #adminOverlay .a-cmt textarea{height:auto;min-height:64px;padding:12px 16px;line-height:1.55;resize:vertical}
+
+html body #adminOverlay .a-chart-card{position:relative;padding:22px 24px;margin-bottom:20px;border-radius:24px;background:var(--ad-card);border:1px solid var(--ad-line);box-shadow:none;overflow:hidden}
+html body #adminOverlay .a-chart-card::after,html body #adminOverlay .a-stat-card::before{display:none}
+html body #adminOverlay .a-chart-card .acc-title{margin:0 0 14px;font-size:17px;font-weight:700;line-height:1.5;color:#fff;text-transform:none;letter-spacing:0}
+html body #adminOverlay .a-stat-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:22px}
+html body #adminOverlay .a-stat-card{padding:18px 20px;border-radius:22px;background:var(--ad-card);border:1px solid var(--ad-line);box-shadow:none;transform:none}
+html body #adminOverlay .a-stat-card .asc-num{font-size:32px;font-weight:800;line-height:1.2;color:#fff}
+html body #adminOverlay .a-stat-card .asc-label{margin-top:4px;font-size:14px;color:var(--ad-mut2);line-height:1.5}
+html body #adminOverlay .a-donut-legend{font-size:15px;gap:12px}
+html body #adminOverlay .a-visit-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 18px;margin-bottom:8px;border-radius:16px;background:#0c2432;border:1px solid var(--ad-line);font-size:14.5px;color:var(--ad-mut2);line-height:1.5}
+html body #adminOverlay .a-visit-row b{color:#fff;font-weight:600}
+html body #adminOverlay .a-visit-row:hover{background:#0f2a3a}
+
+/* generic list rows (discord users, subscriptions, tiktok, chats, blocklists, optimizer admin) */
+html body #adminOverlay .a-order-row:not(.ad-ord),html body #adminOverlay .chat-session-card,html body #adminOverlay .a-blocklist-item,html body #adminOverlay .a-cmt,html body #adminOverlay .opt-adm-row{padding:16px 20px;margin-bottom:12px;border-radius:20px;background:var(--ad-card);border:1px solid var(--ad-line);box-shadow:none;gap:10px}
+html body #adminOverlay .a-order-row:not(.ad-ord):hover,html body #adminOverlay .chat-session-card:hover{border-color:var(--ad-line2);background:var(--ad-card)}
+html body #adminOverlay .a-order-row:not(.ad-ord) .aor-id,html body #adminOverlay .tnf-id{background:rgba(34,196,232,.14);border:1px solid rgba(34,196,232,.3);border-radius:9px;color:#6fe0f6;padding:3px 10px 4px;font-size:14px;font-family:inherit;font-weight:700;line-height:1.5}
+html body #adminOverlay .aor-meta,html body #adminOverlay .tnf-meta,html body #adminOverlay .a-du-meta,html body #adminOverlay .a-cmt .a-cmt-meta,html body #adminOverlay .chat-session-meta,html body #adminOverlay .tnf-note{font-size:13.5px;line-height:1.6;color:var(--ad-mut)}
+html body #adminOverlay .aor-meta b,html body #adminOverlay .a-du-name,html body #adminOverlay .chat-session-name,html body #adminOverlay .a-blocklist-name{color:#fff}
+html body #adminOverlay .aor-type{font-size:12.5px;color:var(--ad-mut2);letter-spacing:0}
+html body #adminOverlay .a-du-avatar{background:#12313f;border:1px solid var(--ad-line)}
+html body #adminOverlay .chat-session-card{cursor:pointer}
+html body #adminOverlay .chat-session-last{color:var(--ad-mut2);font-size:14px;line-height:1.55}
+html body #adminOverlay .a-cmt{border-left:1px solid var(--ad-line)}
+html body #adminOverlay .a-cmt.a-cmt-pinned{border-color:rgba(245,165,36,.5)}
+html body #adminOverlay .a-reply{background:#0a202d;border:1px solid var(--ad-line);border-radius:14px}
+html body #adminOverlay .a-cmt-replies{border-left:2px solid var(--ad-line)}
+html body #adminOverlay .aor-actions button,html body #adminOverlay .a-cmt-actions button,html body #adminOverlay .a-du-actions button,html body #adminOverlay .a-blocklist-item .a-unblock-btn,html body #adminOverlay .tnf-send-btn,html body #adminOverlay .tnf-send-btn-msg{height:42px;padding:0 18px;border:1px solid var(--ad-line2);border-radius:13px;background:#0f2a39;color:#fff;font-family:inherit;font-size:14.5px;font-weight:600;line-height:1;cursor:pointer;box-shadow:none;background-image:none;transition:background .15s,filter .15s}
+html body #adminOverlay .a-save-btn,html body #adminOverlay .a-unblock-btn,html body #adminOverlay .a-pin-btn.is-pinned,html body #adminOverlay .tnf-send-btn:not(.tnf-send-btn-msg){background:var(--ad-cy);border-color:transparent;color:#04222b}
+html body #adminOverlay .a-del-btn,html body #adminOverlay .a-block-btn{background:#2a1a24;border-color:rgba(242,107,107,.4);color:#ff9a9a}
+html body #adminOverlay .a-pin-btn{background:#2c2614;border-color:rgba(245,165,36,.4);color:#f7c366}
+html body #adminOverlay .a-logout-btn{background:#142a44;border-color:rgba(90,130,255,.4);color:#a8bcff}
+html body #adminOverlay .aor-actions button:hover,html body #adminOverlay .a-cmt-actions button:hover,html body #adminOverlay .a-du-actions button:hover{filter:brightness(1.15);transform:none}
+
+/* ---------- order cards (like the reference) ---------- */
+html body #adminOverlay .ad-ord{--c:#26b8ee;--c2:#1d6fe6;--cb:rgba(38,184,238,.30);position:relative;display:flex;flex-direction:column;gap:0;margin:0;padding:24px 22px 22px;border-radius:24px;background:var(--ad-card);border:1px solid var(--cb);overflow:hidden}
+html body #adminOverlay .ad-ord::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--c),var(--c2))}
+html body #adminOverlay .ad-s-wait{--c:#fbbf3a;--c2:#f59e0b;--cb:rgba(245,165,36,.30)}
+html body #adminOverlay .ad-s-late{--c:#ff8585;--c2:#ef4444;--cb:rgba(239,68,68,.34)}
+html body #adminOverlay .ad-s-done{--c:#4ae0ab;--c2:#10b981;--cb:rgba(47,207,148,.28)}
+html body #adminOverlay .ad-ord-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+html body #adminOverlay .ad-st{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:5px 12px 7px;border-radius:9px;border:1px solid var(--cb);background:color-mix(in srgb,var(--c) 13%,transparent);color:var(--c);font-size:13px;font-weight:700;line-height:1.35}
+html:not([lang="ka"]) body #adminOverlay .ad-st{text-transform:uppercase;letter-spacing:.07em;font-size:12.5px}
+html body #adminOverlay .ad-st i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto}
+html body #adminOverlay .ad-age{width:46px;height:46px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;border:2px solid var(--cb);background:color-mix(in srgb,var(--c) 10%,transparent);color:var(--c);font-size:13.5px;font-weight:700;line-height:1;white-space:nowrap}
+html body #adminOverlay .ad-ord-price{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+html body #adminOverlay .ad-ord-price b{font-size:21px;font-weight:800;line-height:1.3;color:#fff;white-space:nowrap}
+html body #adminOverlay .ad-ord-price small{font-size:14px;color:var(--ad-mut);line-height:1.4}
+html body #adminOverlay .ad-ord-id{margin-top:16px;font-size:24px;font-weight:800;line-height:1.3;color:#fff;overflow-wrap:anywhere}
+html body #adminOverlay .ad-ord-sub{margin-top:4px;font-size:14.5px;line-height:1.55;color:var(--ad-mut)}
+html body #adminOverlay .ad-ord-rows{margin-top:14px}
+html body #adminOverlay .ad-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:15.5px;line-height:1.55}
+html body #adminOverlay .ad-row:last-child{border-bottom:0}
+html body #adminOverlay .ad-row span{color:var(--ad-cy);font-weight:700;white-space:nowrap}
+html body #adminOverlay .ad-row b{min-width:0;font-weight:500;color:#fff;overflow-wrap:anywhere}
+html body #adminOverlay .ad-link{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:1px 0 3px;color:#cfe3ec}
+html body #adminOverlay .ad-ord .aor-actions{display:flex;gap:12px;margin-top:16px}
+html body #adminOverlay .ad-ord .aor-actions button{height:48px;border-radius:14px;font-size:15.5px;font-weight:700;padding:0 22px}
+html body #adminOverlay .ad-ord .aor-actions .a-save-btn{flex:1 1 auto}
+html body #adminOverlay .ad-ord .aor-actions .a-del-btn{flex:0 0 auto}
+html body #adminOverlay .ad-s-wait .aor-actions .a-save-btn,html body #adminOverlay .ad-s-late .aor-actions .a-save-btn{background:#1b3544;border:1px solid var(--ad-line2);color:#fff}
+html body #adminOverlay .ad-s-done .aor-actions .a-del-btn{flex:1 1 auto}
+
+/* ---------- responsive ---------- */
+@media (max-width:1280px){
+  html body #adminOverlay #adminDashboard[style*="block"]{grid-template-columns:248px minmax(0,1fr);gap:16px}
+  html body #adminOverlay .ad-stats{gap:14px}
+  html body #adminOverlay .ad-stat{padding:18px 18px 16px}
+  html body #adminOverlay .ad-stat-bot b{font-size:36px}
+}
+@media (max-width:1100px){
+  html body #adminOverlay .ad-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  html body #adminOverlay{padding:0}
+  html body #adminOverlay #adminDashboard[style*="block"]{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:0;max-width:none}
+  html body #adminOverlay .ad-side{flex-direction:row;align-items:center;gap:10px;border-radius:0;border-width:0 0 1px 0;padding:10px 12px}
+  html body #adminOverlay .ad-brand{padding:0}
+  html body #adminOverlay .ad-brand-t,html body #adminOverlay .ad-user{display:none}
+  html body #adminOverlay .ad-logo{width:42px;height:42px}
+  html body #adminOverlay .ad-side .a-tabs{flex-direction:row;flex:1 1 auto;margin:0;padding:0;overflow-x:auto;overflow-y:hidden;gap:6px;scrollbar-width:none}
+  html body #adminOverlay .ad-side .a-tabs::-webkit-scrollbar{display:none}
+  html body #adminOverlay .ad-group,html body #adminOverlay .ad-sub{display:contents}
+  html body #adminOverlay .ad-group-btn{display:none!important}
+  html body #adminOverlay .ad-side .a-tab,html body #adminOverlay .ad-side .a-tab-sub{width:auto;height:42px;padding:0 14px;gap:9px;font-size:14px;border-radius:13px;flex:0 0 auto}
+  html body #adminOverlay .ad-side .a-tab-sub .ad-i{display:block}
+  html body #adminOverlay .ad-side .a-tab .ad-i{width:19px;height:19px}
+  html body #adminOverlay .ad-side .a-tab.active::before{display:none}
+  html body #adminOverlay .ad-main{gap:12px;padding:12px 12px 0}
+  html body #adminOverlay .ad-top{height:62px;padding:0 12px;border-radius:20px;gap:8px}
+  html body #adminOverlay .ad-search{height:44px;padding:0 12px}
+  html body #adminOverlay .ad-new span{display:none}
+  html body #adminOverlay .ad-new{width:44px;padding:0;justify-content:center}
+  html body #adminOverlay .ad-top .admin-mode-row .amt-label{display:none}
+  html body #adminOverlay .ad-xtop{display:grid}
+  html body #adminOverlay .ad-scroll{padding:0 0 22px;margin-right:0;scrollbar-gutter:auto}
+  html body #adminOverlay .ad-stats{gap:12px}
+  html body #adminOverlay .ad-stat{min-height:120px;border-radius:22px;padding:16px}
+  html body #adminOverlay .ad-stat-label{font-size:14px}
+  html body #adminOverlay .ad-stat-ic{width:34px;height:34px}
+  html body #adminOverlay .ad-stat-bot b{font-size:30px}
+  html body #adminOverlay .ad-head{margin:22px 0 16px}
+  html body #adminOverlay .ad-head h3{font-size:22px}
+  html body #adminOverlay .ad-pills{max-width:100%;overflow-x:auto}
+  html body #adminOverlay .ad-grid{grid-template-columns:minmax(0,1fr)}
+  html body #adminOverlay .a-stat-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  html body #adminOverlay .a-form-row{flex-wrap:wrap}
+  html body #adminOverlay .a-form-row input[type="number"]{width:100%}
+}
+@media (max-width:480px){
+  html body #adminOverlay .ad-stat-bot{gap:8px}
+  html body #adminOverlay .ad-stat-bot b{font-size:28px}
+  html body #adminOverlay .a-stat-card .asc-num{font-size:24px}
+  html body #adminOverlay .ad-top .admin-mode-row{padding:0 10px}
+}
+
+/* ---- neutralise the old site-wide ring / outline rules inside the admin ---- */
+html body #adminOverlay #adminModeRow:not(#_a):not(#_b):not(#_c):not(#_d){border-color:var(--ad-line2)!important;box-shadow:none!important;background-clip:border-box!important}
+html body #adminOverlay :is(#adminCloseLogin,#adminCloseDash):not(#_a):not(#_b):not(#_c):not(#_d){border-color:var(--ad-line)!important;box-shadow:none!important;background-clip:border-box!important}
+html body #adminOverlay .tnf-note:not(#_a):not(#_b):not(#_c):not(#_d){border-color:transparent!important;box-shadow:none!important}
+html body #adminOverlay .a-tabs:not(:focus-visible){outline:0!important}
+html body #adminOverlay *:not(:focus-visible){outline:0!important}
+html body #adminOverlay *{box-shadow:none!important}
+html:has(#adminOverlay.open),html:has(#adminOverlay.open) body{overflow:hidden!important}
+
+/* ---- Georgian letters are thin in this font: same stroke trick the rest of the site uses for bold ---- */
+html body #adminOverlay :is(#adTitle,.a-subheading,.acc-title){-webkit-text-stroke:.55px currentColor}
+html body #adminOverlay :is(.ad-brand-t b,.ad-user-t b,.ad-tl,.ad-stat-bot b,.ad-ord-id,.ad-st,.ad-age,.ad-chip,.ad-row span,.ad-badge,.ad-new,.ad-pills button,.a-go,.aor-actions button,.a-cmt-actions button,.a-du-actions button,.ad-stat-label,.a-stat-card .asc-num){-webkit-text-stroke:.4px currentColor}
+html body #adminOverlay :is(.ad-ord-price b){-webkit-text-stroke:.4px currentColor}
+html body #adminOverlay .ad-stat-bot b,html body #adminOverlay .ad-brand-t b,html body #adminOverlay .ad-user-t b{-webkit-text-stroke:.25px currentColor}
+html:has(#adminOverlay.open){scrollbar-gutter:auto!important}
+html body #adminOverlay .ad-head h3{border:0!important;border-bottom:0!important}
+html body #adminOverlay .ad-head h3::after,html body #adminOverlay #adminLogin h3::after{display:none!important}
+html body #adminOverlay #adminPanelDiscordUsers>.a-subheading:first-child{display:none}
+html body #adminOverlay :is(#ordersDonutCard,#analyticsSummaryCard):not(#_a):not(#_b):not(#_c):not(#_d){border-color:var(--ad-line)!important;box-shadow:none!important;background-clip:border-box!important}
+html body #adminOverlay .ad-scroll{margin-right:-14px;padding-right:6px;scrollbar-gutter:stable}
+html body #adminOverlay .a-form-row input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:26px;height:26px;padding:0;border-radius:8px;background:var(--ad-field);border:1px solid var(--ad-line2);cursor:pointer;display:grid;place-items:center;flex:0 0 auto}
+html body #adminOverlay .a-form-row input[type="checkbox"]:checked{background:var(--ad-cy) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2304222b' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'><path d='m5 12.5 4.5 4.5L19 7'/></svg>") center/16px no-repeat;border-color:transparent}
+html body #adminOverlay .a-form-row select{-webkit-appearance:none;appearance:none;padding-right:42px;background:var(--ad-field) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238ea9b6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>") right 14px center/18px no-repeat;cursor:pointer}
+html body #adminOverlay .a-form-row select option{background:#0c2230;color:#fff}
+html body #adminOverlay :is(.asc-num,.a-donut-legend b,.adl-row,.acc-title,.a-subheading,.tnf-id,.aor-id){font-family:inherit}
+html body #adminOverlay .ad-search{min-width:0}
+@media (max-width:600px){
+  html body #adminOverlay .ad-top{gap:6px;padding:0 8px}
+  html body #adminOverlay .ad-search{padding:0 10px;gap:8px}
+  html body #adminOverlay .ad-search .ad-i{width:19px;height:19px}
+  html body #adminOverlay .ad-pills{display:flex;width:100%;padding:5px;gap:2px}
+  html body #adminOverlay .ad-pills button{flex:1 1 auto;justify-content:center;padding:0 8px;font-size:13.5px;height:40px}
+  html body #adminOverlay .ad-pills i{display:none}
+  html body #adminOverlay .ad-ord{padding:22px 18px 18px}
+}
+@media (max-width:480px){
+  html body #adminOverlay .ad-bell{display:none}
+  html body #adminOverlay .ad-top .admin-mode-row{height:44px}
+}
+@media (max-width:420px){
+  html body #adminOverlay .ad-stat-ic{display:none}
+  html body #adminOverlay .ad-stat-label{font-size:13.5px}
+}
+html body #adminOverlay .a-cmt-actions{flex-wrap:wrap}
+html body #adminOverlay .a-cmt-actions button,html body #adminOverlay .a-du-actions button,html body #adminOverlay .aor-actions button{flex:1 1 auto;min-width:max-content;white-space:nowrap}
+html body #adminOverlay .a-cmt-actions--solo button{flex:none}
+@media (max-width:1280px){html body #adminOverlay .ad-brand-t b{font-size:18px}html body #adminOverlay .ad-brand{gap:10px}}
+html body #adminOverlay #adminLogin h3{border:0!important;-webkit-text-stroke:.5px currentColor;font-size:24px;margin-bottom:24px}
+html body #adminOverlay #adminLogin .a-close{-webkit-text-stroke:.3px currentColor}
 </style>
 </body>
 </html>
