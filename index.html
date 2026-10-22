@@ -20711,17 +20711,17 @@ document.addEventListener('click',function(e){
   var scrim=document.getElementById('pcModalScrim');
   if(!scrim||!scrim.classList.contains('open')) return;
   var panel=scrim.querySelector('.pc-accordion-body');if(!panel) return;
-  var L=lite(),T=L?null:fly(panel,cardRect),X=scrim.querySelector('.pc-modal-close');
+  var L=lite(),T=null /* no more flying out of the card: it scaled the window down and back up while it moved */,X=scrim.querySelector('.pc-modal-close');
   if(!L){
     scrim.animate([{opacity:0},{opacity:1}],{duration:200,easing:'ease-out'});
-    if(X) X.animate([{opacity:0,transform:'scale(.6)'},{opacity:1,transform:'none'}],{duration:280,delay:100,easing:'cubic-bezier(.2,.8,.3,1)',fill:'backwards'});
+    if(X) X.animate([{opacity:0},{opacity:1}],{duration:200,delay:60,easing:'ease-out',fill:'backwards'});
   }
   if(T){
     panel.animate([{transform:T,opacity:0,offset:0},{opacity:1,offset:.4},{transform:'none',opacity:1,offset:1}],
       {duration:380,easing:'cubic-bezier(.16,1,.3,1)'});
     watch(460);
   }else{
-    panel.animate([{opacity:0},{opacity:1}],{duration:160,easing:'ease-out'});
+    panel.animate([{opacity:0},{opacity:1}],{duration:190,easing:'ease-out'});
   }
 },false);
 /* close: the page's own close is deferred until the real panel has flown back into its card */
@@ -20729,20 +20729,17 @@ window.pcCineExit=function(){};
 window.moAnimClose=function(card,done){
   var scrim=document.getElementById('pcModalScrim'),panel=scrim&&scrim.querySelector('.pc-accordion-body');
   if(!canWAAPI||!scrim||!panel||lite()){done();return}
-  var r=card.getBoundingClientRect(),T=fly(panel,r);
-  if(!T){done();return}
   scrim.style.pointerEvents='none';
   var a=[
-    panel.animate([{transform:'none',opacity:1,offset:0},{opacity:1,offset:.25},{transform:T,opacity:0,offset:1}],
-      {duration:300,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'}),
-    scrim.animate([{opacity:1},{opacity:0}],{duration:300,easing:'ease-in',fill:'forwards'})
+    panel.animate([{opacity:1},{opacity:0}],{duration:170,easing:'ease-in',fill:'forwards'}),
+    scrim.animate([{opacity:1},{opacity:0}],{duration:170,easing:'ease-in',fill:'forwards'})
   ],fin=false;
   function end(){
     if(fin) return;fin=true;
     a.forEach(function(x){try{x.cancel()}catch(_){}});
     scrim.style.pointerEvents='';done();
   }
-  a[0].onfinish=end;setTimeout(end,360);
+  a[0].onfinish=end;setTimeout(end,260);
 };
 })();
 </script>
@@ -26205,6 +26202,22 @@ html body #editOrderPanel .eo-caption:not(#_a){margin-top:8px!important;font-siz
 html body #editOrderPanel #eoQualityGrid:not(#_a){margin-top:12px!important;padding:0!important;gap:10px!important;grid-template-columns:repeat(2,124px)!important;justify-content:center}
 html body #editOrderPanel #eoQualityGrid .mp-box:not(#_a){width:124px!important;min-height:84px!important;height:auto!important;aspect-ratio:auto!important;padding:10px 8px!important;transform:none!important}
 html body #editOrderPanel .order-grid:not(#_a){margin-top:12px!important}
+/* ONE height for every step (the window used to shrink and then jump bigger when the next step appeared); shorter steps sit in the middle of it */
+html body .pc-modal-scrim .pc-modal-scroll:not(#_a):not(#_b){display:flex!important;flex-direction:column;justify-content:flex-start;min-height:259px!important}
+html body .pc-modal-scrim .pc-modal-scroll > .wizard-steps:not(#_a):not(#_b){flex:none}
+html body .pc-modal-scrim .pc-modal-scroll > .field:not(#_a):not(#_b),html body .pc-modal-scrim .pc-modal-scroll > .mp-grid:not(#_a):not(#_b),html body .pc-modal-scrim .pc-modal-scroll > .wp-grid:not(#_a):not(#_b),html body .pc-modal-scrim .pc-modal-scroll > .order-grid:not(#_a):not(#_b){margin-top:auto!important;margin-bottom:auto!important}
+html body .pc-modal-scrim .pc-modal-scroll > .panel-divider:not(#_a){margin:8px 0!important}
+/* step change: opacity only - nothing moves, shrinks or grows */
+@keyframes wizardStepIn{from{opacity:0}to{opacity:1}}
+@keyframes wizardStepOut{from{opacity:1}to{opacity:0}}
+html body .pc-modal-scrim .wiz-step-exit:not(#_a){animation:wizardStepOut .12s linear forwards!important;transform:none!important}
+html body .pc-modal-scrim .wiz-enter:not(#_a){animation:wizardStepIn .2s ease-out both!important;transform:none!important}
+/* TikTok step: tighter so it fits the common height */
+html body .pc-modal-scrim #tiktokFieldWrap:not(#_a):not(#_b) .link-input-wrap,html body .pc-modal-scrim #tiktokFieldWrap:not(#_a):not(#_b) #tiktokLink{height:44px!important;min-height:44px!important}
+html body .pc-modal-scrim #tiktokFieldWrap:not(#_a):not(#_b) #tiktokLink{padding-top:0!important;padding-bottom:0!important}
+html body .pc-modal-scrim #tiktokFieldWrap:not(#_a):not(#_b) #tiktokConfirmBtn{min-height:44px!important;height:44px!important;margin-top:8px!important;padding-top:0!important;padding-bottom:0!important}
+html body .pc-modal-scrim #tiktokFieldWrap:not(#_a):not(#_b) #tiktokAutoBtn{margin-top:8px!important;min-height:38px!important;padding-top:0!important;padding-bottom:0!important}
+html body .pc-modal-scrim #tiktokFieldWrap:not(#_a):not(#_b) .field-top{margin-bottom:6px!important}
 </style>
 </body>
 </html>
