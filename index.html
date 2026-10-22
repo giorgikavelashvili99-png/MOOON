@@ -26529,5 +26529,20 @@ html body #editOrderPanel .eo-style-tabs:not(#_a):not(#_b){margin-right:0!import
 </style>
 
 
+<style id="moon-method-smooth">
+/* ===== Method page opening: ONE fade, nothing else =====
+   Before: the page fade + the shell + the headline (clip-path wipe, repainted every frame) + 8 blocks each fading in turn, all on top of each other (opacity inside opacity),
+   each block on its own GPU layer. On a 240 Hz screen that was a burst of layer creation + repaints -> lag and flicker. Now only the page fade runs; the content is simply there. */
+html body #optView#optView:not(#_a):not(#_b):not(#_c) .opt,
+html body #optView#optView:not(#_a):not(#_b):not(#_c) .opt > *,
+html body #optView#optView:not(#_a):not(#_b):not(#_c) .opt :is(.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-card,.opt-h3,#optPlans,.opt-head p,.opt-head h2){
+  animation:none!important;will-change:auto!important;clip-path:none!important;opacity:1!important}
+html body #optView#optView:not(#_a):not(#_b):not(#_c) .opt .opt-go:not(:disabled){animation:optGoFlow 6s ease-in-out infinite!important;will-change:auto!important;opacity:1!important}
+html body #optView#optView:not(#_a):not(#_b):not(#_c) .opt .opt-go:disabled{animation:none!important;opacity:1!important}
+html body #optView#optView:not(#_a):not(#_b):not(#_c) .opt.opt-pre :is(.opt-head,.or-steps,.opt-quota,.opt-drop,.opt-stats,.opt-go){opacity:1!important}
+/* the page fade itself: short, opacity only, on the page's own layer */
+html body #optView.show:not(#_a):not(#_b):not(#_c){animation:mnViewIn .3s ease-out both!important;will-change:opacity}
+html body #optView.show:not(#_a):not(#_b):not(#_c) .opt-head h2{transform:none!important}
+</style>
 </body>
 </html>
