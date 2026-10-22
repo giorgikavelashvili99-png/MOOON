@@ -24891,18 +24891,36 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
   var probe=document.createElement('i'); probe.className='hz-probe'; probe.setAttribute('aria-hidden','true'); linksBox.appendChild(probe);
   /* geometry in the pill's OWN units: link rect relative to the bar, divided by what 100 css px really measure on screen (so html zoom, Safari or Chrome, can not shift the pill) */
   function measure(){ var br=linksBox.getBoundingClientRect(), k=(probe.getBoundingClientRect().width/100)||1; links.forEach(function(b){ var r=b.getBoundingClientRect(); b.__x=(r.left-br.left)/k; b.__w=r.width/k; }); }
+  /* ---- the capsule is built from three crisp parts (left cap, stretchable middle, right cap) so that nothing is ever scaled across its outline:
+     the outline stays exactly 1.5 px and sharp while the capsule stretches towards the new tab (transform only, compositor) ---- */
+  var CAP=14;
+  ind.innerHTML='<b class="hi-l"></b><b class="hi-m"></b><b class="hi-r"></b>';
+  var pL=ind.children[0], pM=ind.children[1], pR=ind.children[2];
+  function setPill(x,w){
+    pL.style.transform='translate3d('+x+'px,0,0)';
+    pM.style.transform='translate3d('+(x+CAP-.5)+'px,0,0) scaleX('+(Math.max(0,w-2*CAP+1)/100)+')';
+    pR.style.transform='translate3d('+(x+w-CAP)+'px,0,0)';
+    ind.__x=x; ind.__w=w; ind.__has=true;
+    ind.style.setProperty('--mv',String((ind.__mv=(ind.__mv||0)+1)));
+  }
+  ind.__set=setPill;
+  function bez(x1,y1,x2,y2){ return function(t){ if(t<=0) return 0; if(t>=1) return 1; var lo=0,hi=1,m,cx,cy; for(var k=0;k<22;k++){ m=(lo+hi)/2; cx=3*(1-m)*(1-m)*m*x1+3*(1-m)*m*m*x2+m*m*m; if(cx<t) lo=m; else hi=m; } m=(lo+hi)/2; return 3*(1-m)*(1-m)*m*y1+3*(1-m)*m*m*y2+m*m*m; }; }
+  var eLead=bez(.2,.9,.25,1), eTrail=bez(.45,0,.2,1);
+  function stretch(x0,w0,x1,w1){
+    var L0=x0,R0=x0+w0,L1=x1,R1=x1+w1,right=x1>=x0, N=16, fL=[],fM=[],fR=[];
+    for(var i=0;i<=N;i++){ var p=i/N, L=L0+(L1-L0)*(right?eTrail(p):eLead(p)), R=R0+(R1-R0)*(right?eLead(p):eTrail(p)); if(R-L<2*CAP) R=L+2*CAP;
+      fL.push({transform:'translate3d('+L+'px,0,0)'}); fR.push({transform:'translate3d('+(R-CAP)+'px,0,0)'}); fM.push({transform:'translate3d('+(L+CAP-.5)+'px,0,0) scaleX('+((R-L-2*CAP+1)/100)+')'}); }
+    var o={duration:540,easing:'linear'};
+    pL.animate(fL,o); pM.animate(fM,o); pR.animate(fR,o);
+  }
   function moveInd(instant){
     var a=bar.querySelector('.hz-link.is-active');
     if(!a || !a.__w){ ind.style.opacity='0'; return; }
-    if(instant) ind.style.transition='none';
     ind.setAttribute('data-t',a.getAttribute('data-hz-go')||'');
-    if(!instant && ind.__has && ind.animate && (ind.__x!==a.__x || ind.__w!==a.__w) && !(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){
-      /* the light stretches towards the new tab and then settles on it (transform only, runs on the compositor) */
-      var x0=ind.__x, w0=ind.__w, lf=Math.min(x0,a.__x), sp=Math.max(x0+w0,a.__x+a.__w)-lf;
-      try{ ind.animate([{transform:'translate3d('+x0+'px,0,0) scaleX('+(w0/100)+')'},{transform:'translate3d('+lf+'px,0,0) scaleX('+(sp/100)+')',offset:.42},{transform:'translate3d('+a.__x+'px,0,0) scaleX('+(a.__w/100)+')'}],{duration:520,easing:'cubic-bezier(.3,.8,.3,1)'}); }catch(e){}
+    if(!instant && ind.__has && pL.animate && (ind.__x!==a.__x || ind.__w!==a.__w) && !(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){
+      try{ stretch(ind.__x,ind.__w,a.__x,a.__w); }catch(e){}
     }
-    ind.style.transform='translate3d('+a.__x+'px,0,0) scaleX('+(a.__w/100)+')'; ind.style.opacity='1'; ind.__x=a.__x; ind.__w=a.__w; ind.__has=true;
-    if(instant){ void ind.offsetWidth; ind.style.transition=''; }
+    setPill(a.__x,a.__w); ind.style.opacity='1';
   }
   /* SMOOTHNESS: the highlight follows the tap at once. It used to wait for body.mn-view-on, i.e. for the page swap (300 ms+ later, much more on a slow phone),
      so the menu looked frozen after a tap. The page's own nav marks the tapped link immediately, and the last tap always wins. */
@@ -25391,16 +25409,11 @@ html body #optView .opt.opt-pre::after{animation-play-state:paused!important}
     var a = box.querySelector('.hz-link.is-active');
     if(!a || !box.offsetWidth){ return; }
     var pr = box.querySelector('.hz-probe'), br = box.getBoundingClientRect(), k = (pr ? pr.getBoundingClientRect().width / 100 : (br.width / box.offsetWidth)) || 1;      /* screen px per css px (page zoom safe) */
-    var ar = a.getBoundingClientRect(), ir = ind.getBoundingClientRect();
-    var dL = (ar.left - ir.left) / k, dW = (ar.width - ir.width) / k;
+    var ar = a.getBoundingClientRect(), lr = ind.children[0].getBoundingClientRect(), rr = ind.children[2].getBoundingClientRect();
+    var iL = lr.left, iW = rr.right - lr.left;
+    var dL = (ar.left - iL) / k, dW = (ar.width - iW) / k;
     if(Math.abs(dL) > 0.8 || Math.abs(dW) > 0.8){
-      var w = ir.width / k;
-      var m = /translate3d\(\s*(-?[\d.]+)px/.exec(ind.style.transform || ''), x = m ? parseFloat(m[1]) : 0;
-      ind.style.transition = 'none';
-      ind.style.transform = 'translate3d(' + (x + dL) + 'px,0,0) scaleX(' + ((w + dW) / 100) + ')'; ind.__x = x + dL; ind.__w = w + dW; ind.__has = true;
-      ind.style.opacity = '1';
-      void ind.offsetWidth;
-      ind.style.transition = '';
+      if(ind.__set && ind.__has){ ind.__set(ind.__x + dL, ind.__w + dW); ind.style.opacity = '1'; }
       pillMO.takeRecords();                                                       /* these writes are the correction itself, not a new slide */
     }
   }
@@ -26140,6 +26153,15 @@ html body .hz-link.is-active[data-hz-go="optimizer"]{color:#c4b5fd}
 html body .hz-link.is-active[data-hz-go="checker"]{color:#8ae6f7}
 html body .hz-link.is-active[data-hz-go="plans"]{color:#f6d37b}
 html body .hz-link.is-active[data-hz-go="ai"]{color:#9fc4ff}
+</style>
+<style id="moon-nav-clean">
+/* the capsule: three crisp parts, 1.5px outline, a very light fill, no glow / blur at all */
+html body .hz-ind:not(#_a):not(#_b):not(#_c){width:0!important;height:40px;border:0!important;background:none!important;transform:none!important;box-shadow:none!important;will-change:auto;transition:opacity .2s ease!important}
+html body .hz-ind:not(#_a):not(#_b):not(#_c)::after{display:none!important}
+html body .hz-ind b{position:absolute;top:0;left:0;height:40px;box-sizing:border-box;border:1.5px solid var(--ac);pointer-events:none;will-change:transform;transition:border-color .35s ease;background:none}
+html body .hz-ind b.hi-l{width:14px;border-right:0;border-radius:12px 0 0 12px}
+html body .hz-ind b.hi-m{width:100px;transform-origin:0 50%;border-left:0;border-right:0;border-radius:0}
+html body .hz-ind b.hi-r{width:14px;border-left:0;border-radius:0 12px 12px 0}
 </style>
 </body>
 </html>
