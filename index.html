@@ -25005,9 +25005,9 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
   var CAP=14;
   ind.innerHTML='<b class="hi-l"></b><b class="hi-m"></b><b class="hi-r"></b>';
   var pL=ind.children[0], pM=ind.children[1], pR=ind.children[2];
-  var DY=0, BW=1.5;
+  var DY=0, BW=2.25;
   function fitPill(){
-    var u=K*DPR; BW=Math.max(1,Math.round(1.5*u))/u; var H=Math.max(2,Math.round(40*u))/u;
+    var u=K*DPR; BW=Math.max(2,Math.round(2.25*u))/u; var H=Math.max(2,Math.round(40*u))/u;
     ind.style.setProperty('--bw',BW+'px'); [pL,pM,pR].forEach(function(e){ e.style.height=H+'px'; });
     /* vertical position: nudge by a fraction of a device pixel so the top and bottom outline lines are exactly on pixel rows */
     var t=ind.getBoundingClientRect().top*DPR; DY=(Math.round(t)-t)/u;
@@ -26401,7 +26401,7 @@ html body .hz-link.is-active[data-hz-go="ai"]{color:#9fc4ff}
 /* the capsule: three crisp parts, 1.5px outline, a very light fill, no glow / blur at all */
 html body .hz-ind:not(#_a):not(#_b):not(#_c){width:0!important;height:40px;border:0!important;background:none!important;transform:none!important;box-shadow:none!important;will-change:auto;transition:opacity .2s ease!important}
 html body .hz-ind:not(#_a):not(#_b):not(#_c)::after{display:none!important}
-html body .hz-ind b{position:absolute;top:0;left:0;height:40px;box-sizing:border-box;border:var(--bw,1.5px) solid var(--ac);pointer-events:none;will-change:transform;transition:border-color .35s ease;background:none}
+html body .hz-ind b{position:absolute;top:0;left:0;height:40px;box-sizing:border-box;border:var(--bw,2.25px) solid var(--ac);pointer-events:none;will-change:transform;transition:border-color .35s ease;background:none}
 html body .hz-ind b.hi-l{width:14px;border-right:0;border-radius:12px 0 0 12px}
 html body .hz-ind b.hi-m{width:100px;transform-origin:0 50%;border-left:0;border-right:0;border-radius:0}
 html body .hz-ind b.hi-r{width:14px;border-left:0;border-radius:0 12px 12px 0}
