@@ -7079,6 +7079,10 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authLoginBtn">შესვლა Discord-ით</span>
     </button>
+    <button type="button" class="discord-btn outline" id="tiktokLoginBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 3c.3 2.4 1.7 3.9 4 4.1v3.1c-1.4.1-2.7-.3-4-1.1v6.2c0 3.9-3.1 6.2-6.2 5.7-2.9-.5-4.9-3.1-4.5-6.1.4-3.2 3.3-5.2 6.4-4.7v3.2c-1.5-.5-3.3.4-3.3 2.2 0 1.4 1.1 2.4 2.4 2.4 1.5 0 2.4-1.1 2.4-2.6V3h2.8z"/></svg>
+      <span>შესვლა TikTok-ით</span>
+    </button>
     <a class="discord-btn outline" id="discordJoinBtn" href="https://discord.gg/mmpnEeJnXv" target="_blank" rel="noopener noreferrer">
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authJoinBtn">შემოუერთდი ჩვენს Discord სერვერს</span>
@@ -7127,6 +7131,26 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   };
   var earlyBtn = document.getElementById('discordLoginBtn');
   if (earlyBtn) earlyBtn.addEventListener('click', window.__moonStartDiscordLogin);
+
+  /* ---- TikTok Login Kit (web) ---- */
+  window.__moonStartTikTokLogin = function(){
+    var st = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (String(Date.now()) + Math.random().toString(36).slice(2));
+    try{ sessionStorage.setItem('tt_state', st); }catch(e){}
+    var p = new URLSearchParams({
+      client_key: 'awe2hsnn9rzbz29n',
+      scope: 'user.info.basic',
+      response_type: 'code',
+      redirect_uri: 'https://moonfull4k.xyz/tiktok-callback.html',
+      state: st
+    });
+    window.location.href = 'https://www.tiktok.com/v2/auth/authorize/?' + p.toString();
+  };
+  var earlyTT = document.getElementById('tiktokLoginBtn');
+  if (earlyTT) earlyTT.addEventListener('click', window.__moonStartTikTokLogin);
+  try{
+    var tq = new URLSearchParams(window.location.search);
+    if (tq.get('tt')){ tq.delete('tt'); var tu = window.location.pathname + (tq.toString() ? '?' + tq.toString() : '') + window.location.hash; history.replaceState({}, document.title, tu); }
+  }catch(e){}
 
   function earlyMdbRead(path){
     return fetch(MDB_BASE + '/' + MDB_NS + '/' + path, { cache: 'no-store' })
@@ -17588,6 +17612,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
 
   async function discordLogout(){
     try{ await fetch(DISCORD_AUTH_WORKER_URL + '/logout', { method: 'POST', credentials: 'include' }); }catch(e){}
+    try{ localStorage.removeItem('moon_tt_token'); }catch(e){}
     cacheDiscordUser(null);
     setDiscordUI(null);
     const pop = document.getElementById('discordPopover');
@@ -27091,6 +27116,16 @@ html body #adminOverlay .a-cmt-actions--solo button{flex:none}
 @media (max-width:1280px){html body #adminOverlay .ad-brand-t b{font-size:18px}html body #adminOverlay .ad-brand{gap:10px}}
 html body #adminOverlay #adminLogin h3{border:0!important;-webkit-text-stroke:.5px currentColor;font-size:24px;margin-bottom:24px}
 html body #adminOverlay #adminLogin .a-close{-webkit-text-stroke:.3px currentColor}
+</style>
+<style id="moon-tt-login">
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-stage{min-height:480px!important;align-self:stretch}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card{grid-template-rows:1fr auto auto auto auto auto auto auto 1fr!important;min-height:480px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > #tiktokLoginBtn{grid-row:5!important;grid-column:2}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > #discordJoinBtn{grid-row:6!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-gate-skip{grid-row:7!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-gate-close{grid-row:8!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) #tiktokLoginBtn svg{fill:#fff!important;color:#fff}
+html body #discordGate[data-mode="banned"] #tiktokLoginBtn,html body #discordGate[data-mode="guild"] #tiktokLoginBtn{display:none!important}
 </style>
 </body>
 </html>
