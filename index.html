@@ -27504,7 +27504,7 @@ function showVideoResult(blob){
 var wake=null;
 el.go.addEventListener('click',async function(){
   if(st.busy||!st.file) return;
-  st.busy=true; st.cancel=false; clearResult(); el.go.disabled=true; el.prog.hidden=false; setProg(0,t('run'),''); warn('');
+  var lastErr=''; st.busy=true; st.cancel=false; clearResult(); el.go.disabled=true; el.prog.hidden=false; setProg(0,t('run'),''); warn('');
   try{ if(navigator.wakeLock) wake=await navigator.wakeLock.request('screen'); }catch(e){}
   try{
     var blob = st.kind==='image' ? await runImage() : await runVideo();
@@ -27512,10 +27512,10 @@ el.go.addEventListener('click',async function(){
     else { setProg(1,t('done'),''); if(st.kind==='image') showImageResult(blob); else showVideoResult(blob); }
   }catch(e){
     console.warn('enhancer',e);
-    var m=t('err'); var em=e&&e.message||''; if(em==='noenc') m=t('noEnc'); else if(/^\[(lib|runtime|model|init)/.test(em)||/^load /.test(em)||/fetch|model|onnx/i.test(em)) m=t('aiFail'); else if(em==='big') m=t('tooBig'); warn(m+(em?' ['+String(em).slice(0,140)+']':'')); el.prog.hidden=true;
+    var m=t('err'); var em=e&&e.message||''; if(em==='noenc') m=t('noEnc'); else if(/^\[(lib|runtime|model|init)/.test(em)||/^load /.test(em)||/fetch|model|onnx/i.test(em)) m=t('aiFail'); else if(em==='big') m=t('tooBig'); lastErr=m+(em?' ['+String(em).slice(0,160)+'] v5':' v5'); el.prog.hidden=true;
   }
   try{ wake&&wake.release(); }catch(e){} wake=null;
-  st.busy=false; st.cancel=false; refreshWarn();
+  st.busy=false; st.cancel=false; refreshWarn(); if(lastErr) warn(lastErr);
 });
 
 applyText(); refreshWarn();
