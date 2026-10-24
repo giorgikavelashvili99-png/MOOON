@@ -12,9 +12,9 @@ if(err||!code){m.textContent='TikTok login cancelled';setTimeout(function(){loca
 var saved='';try{saved=sessionStorage.getItem('tt_state')||''}catch(e){}
 if(saved&&state!==saved){m.textContent='Invalid state';setTimeout(function(){location.replace(back)},1500);return;}
 var verifier='';try{verifier=sessionStorage.getItem('tt_verifier')||''}catch(e){}
-fetch('https://98.onrender.com/auth/tiktok/exchange',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,verifier:verifier,redirect_uri:location.origin+location.pathname})})
+fetch('https://curly-grass-9b0e.giorgikavelashvili99.workers.dev/exchange',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,verifier:verifier,redirect_uri:location.origin+location.pathname})})
 .then(function(r){return r.json()}).then(function(d){
-  try{if(d&&d.token)localStorage.setItem('moon_tt_token',d.token)}catch(e){}
+  if(!d||!d.token||!d.user)throw 0;try{localStorage.setItem('moon_tt_token',d.token);localStorage.setItem('moon_discord_user_cache',JSON.stringify({id:'tt_'+d.user.open_id,username:d.user.name||'TikTok',avatarUrl:d.user.avatar||'',provider:'tiktok'}))}catch(e){}
   location.replace(back+'?tt=ok');
 }).catch(function(){m.textContent='Server error';setTimeout(function(){location.replace(back)},1800)});
 })();
