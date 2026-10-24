@@ -27166,7 +27166,7 @@ var V=document.getElementById('aiView'); if(!V) return;
 var Q=function(s){return V.querySelector(s)};
 var ORT_BASE='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/';
 var MUX_URL='https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js';
-var MODEL_URL='models/realesr-general-x4v3.onnx';
+var MODEL_URL='realesr-general-x4v3.onnx';
 var TILE=192, PAD=12, CORE=TILE-2*PAD;
 
 var TX={
@@ -27374,7 +27374,7 @@ async function runImage(){
   }
   setProg(0,t('loadAi')); await tick();
   outCv=document.createElement('canvas'); outCv.width=ow; outCv.height=oh;
-  var ok=await proUpscale(src,outCv,s,function(p){ var el_=(performance.now()-t0)/1000; setProg(p,null,p>0.02?fmtT(el_/p*(1-p))+' '+t('left'):''); },function(){return st.cancel;});
+  var ok=await proUpscale(src,outCv,s,function(p){ var el_=(performance.now()-t0)/1000; setProg(p,null,(p>0.02?fmtT(el_/p*(1-p))+' '+t('left'):'')+' · '+(window.__enhCpu?'CPU':'GPU')); },function(){return st.cancel;});
   if(!ok) return null;
   setProg(.98,t('finish')); await tick();
   return await toBlob(outCv);
