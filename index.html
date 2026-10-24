@@ -40,62 +40,6 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   window.addEventListener('pageshow', function(e){ if (e.persisted) reveal(); });
 })();
 </script>
-<script id="moon-ai-bridge">
-(function(){
-  /* MOON AI (ჩაშენებული ასისტენტი). ქვემოთ მხოლოდ ეს ერთი მისამართი უნდა იყოს სწორი: MOON AI სერვისის Render-ის მისამართი. */
-  var MOON_AI_URL = 'https://5-5ajo.onrender.com/';
-  var origin = ''; try { origin = new URL(MOON_AI_URL).origin; } catch (e) {}
-  var configured = origin && !/replace-me/i.test(origin);
-  var errs = [];
-  function push(o){ try { o.t = Date.now(); errs.push(o); if (errs.length > 15) errs.shift(); } catch (e) {} }
-  window.addEventListener('error', function(e){
-    if (!e || (!e.message && !e.error)) return;
-    push({ msg: String(e.message || (e.error && e.error.message) || 'error').slice(0, 300), line: e.lineno || 0, col: e.colno || 0, src: String(e.filename || '').slice(-60) });
-  }, true);
-  window.addEventListener('unhandledrejection', function(e){ var r = e && e.reason; push({ msg: 'Promise: ' + String((r && r.message) || r).slice(0, 300), line: 0, col: 0 }); });
-  var ce = console.error;
-  console.error = function(){
-    try { push({ msg: 'console.error: ' + [].slice.call(arguments).map(function(a){ return a && a.message ? a.message : (typeof a === 'object' ? '[object]' : String(a)); }).join(' ').slice(0, 300), line: 0, col: 0 }); } catch (e) {}
-    return ce.apply(console, arguments);
-  };
-  var prev = 'home';
-  function track(){ var v = document.querySelector('.mn-view.show'); var n = v ? v.getAttribute('data-view') : 'home'; if (n !== 'ai') prev = n; }
-  function pageInfo(){
-    var info = { view: prev, lang: document.documentElement.lang || 'ka', width: window.innerWidth };
-    try { info.loggedIn = (typeof currentDiscordUser !== 'undefined') && !!currentDiscordUser; } catch (e) {}
-    try { var st = window.__moonOptStatus; if (st) info.uploads = st.unlimited ? 'unlimited' : st.remaining; } catch (e) {}
-    try { if (prev !== 'home') { var pv = document.querySelector('.mn-view[data-view="' + prev + '"]'); if (pv) info.viewText = (pv.innerText || pv.textContent || '').slice(0, 1500); } } catch (e) {}
-    return info;
-  }
-  window.addEventListener('message', function(ev){
-    if (!configured || ev.origin !== origin || !ev.data || ev.data.moonAi !== 'ctx?') return;
-    try { ev.source.postMessage({ moonAi: 'ctx', page: pageInfo(), errors: errs.slice(-8) }, origin); } catch (e) {}
-  });
-  var TXT = {
-    ka: ['MOON AI იტვირთება…', 'სერვისი ეღვიძება, რამდენიმე წამში მზად იქნება…', 'MOON AI-ს მისამართი ჯერ არ არის მითითებული.'],
-    en: ['Loading MOON AI…', 'The service is waking up, a few more seconds…', 'The MOON AI address is not set yet.'],
-    ru: ['MOON AI загружается…', 'Сервис просыпается, ещё несколько секунд…', 'Адрес MOON AI ещё не указан.']
-  };
-  function tx(i){ var l = document.documentElement.lang; return (TXT[l] || TXT.ka)[i]; }
-  document.addEventListener('DOMContentLoaded', function(){
-    var v = document.getElementById('aiView'); if (!v) return;
-    var frame = v.querySelector('iframe'), box = v.querySelector('.ai-box'), msg = v.querySelector('.ai-load span');
-    function load(){
-      if (frame.getAttribute('src')) return;
-      if (!configured) { box.classList.add('ai-miss'); msg.textContent = tx(2); return; }
-      msg.textContent = tx(0);
-      frame.setAttribute('src', origin + '/?embed=1');
-      setTimeout(function(){ if (!box.classList.contains('ai-ready')) msg.textContent = tx(1); }, 8000);
-    }
-    frame.addEventListener('load', function(){ if (frame.getAttribute('src')) box.classList.add('ai-ready'); });
-    new MutationObserver(function(){ if (v.classList.contains('show')) load(); }).observe(v, { attributes: true, attributeFilter: ['class'] });
-    document.querySelectorAll('.mn-view').forEach(function(x){ new MutationObserver(track).observe(x, { attributes: true, attributeFilter: ['class'] }); });
-    new MutationObserver(track).observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    /* Render-ის უფასო სერვისი იძინებს: გვერდის ჩატვირთვიდან რამდენიმე წამში ერთხელ „ვაღვიძებთ“, რომ MOON AI მყისიერად გაიხსნას */
-    if (configured) setTimeout(function(){ try { fetch(origin + '/health', { mode: 'no-cors', cache: 'no-store' }).catch(function(){}); } catch (e) {} }, 4000);
-  });
-})();
-</script>
 <title>MOON — ვიდეო მონტაჟის კალკულატორი</title>
 <link rel="preconnect" href="https://www.tikwm.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.tikwm.com">
@@ -6931,18 +6875,61 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 </style>
 <style id="moon-menu-pages">.site-menu .qn-tab--go::after{content:"›";font-size:20px}</style>
 <style id="moon-ai-css">
-html body .mn-view[data-view="ai"]{max-width:1120px;padding:0 12px}
-html body .mn-view[data-view="ai"] .ai-box{position:relative;height:calc(100vh - 168px);min-height:560px;border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#09090a;box-shadow:0 24px 70px -28px rgba(0,0,0,.7)}
-html body .mn-view[data-view="ai"] .ai-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#09090a;opacity:0;transition:opacity .35s ease}
-html body .mn-view[data-view="ai"] .ai-box.ai-ready iframe{opacity:1}
-html body .mn-view[data-view="ai"] .ai-load{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#8b8b96;font-size:14px;letter-spacing:.04em;text-align:center;padding:0 24px;transition:opacity .3s}
-html body .mn-view[data-view="ai"] .ai-load i{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.12);border-top-color:#a9bbff;animation:aiSpin .9s linear infinite}
-html body .mn-view[data-view="ai"] .ai-box.ai-miss .ai-load i{display:none}
-html body .mn-view[data-view="ai"] .ai-box.ai-ready .ai-load{opacity:0;pointer-events:none}
+/* Enhancer (replaces MOON AI) */
+html body .mn-view[data-view="ai"]{max-width:980px;padding:0 14px}
+html body .enh{padding:6px 0 40px}
+html body .enh-card{border:1px solid rgba(255,255,255,.08);border-radius:22px;background:rgba(14,14,20,.78);padding:26px 24px 24px}
+html body .enh-t{margin:2px 0 6px;text-align:center;font-size:30px;line-height:1.25;font-weight:700;color:#c9c3ff}
+html body .enh-s{margin:0 auto 20px;max-width:560px;text-align:center;font-size:14px;line-height:1.55;color:#9a9ab0}
+html body .enh-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:190px;padding:20px;border:1.5px dashed rgba(167,139,250,.38);border-radius:18px;background:rgba(167,139,250,.05);cursor:pointer;text-align:center;transition:background-color .2s ease,border-color .2s ease}
+html body .enh-drop:hover,html body .enh-drop.is-over{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.7)}
+html body .enh-ic{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#a9bbff,#d6a9ff)}
+html body .enh-ic svg{width:28px;height:28px;fill:none;stroke:#10101c;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html body .enh-d1{font-size:16px;font-weight:600;color:#fff}
+html body .enh-d2{font-size:12.5px;color:#8c8ca2}
+html body .enh-file{margin-top:14px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03);font-size:13.5px;color:#cfcfe0;word-break:break-all}
+html body .enh-file b{color:#fff;font-weight:600}
+html body .enh-opts{margin-top:16px;display:grid;gap:14px}
+html body .enh-grp{display:grid;gap:8px}
+html body .enh-lbl{font-size:12px;letter-spacing:.04em;color:#8c8ca2}
+html body .enh-chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+html body .enh-chips-s{grid-template-columns:1fr 1fr}
+html body .enh-chip{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 10px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.03);color:#b8b8cc;font:inherit;cursor:pointer;transition:background-color .18s ease,border-color .18s ease,color .18s ease}
+html body .enh-chip b{font-size:15px;font-weight:700;color:inherit}
+html body .enh-chip i{font-style:normal;font-size:11.5px;line-height:1.35;color:#82829a}
+html body .enh-chip:hover{border-color:rgba(167,139,250,.45)}
+html body .enh-chip.is-on{border-color:#a78bfa;background:rgba(167,139,250,.14);color:#fff}
+html body .enh-chip.is-on i{color:#b9b4dd}
+html body .enh-chip[disabled]{opacity:.38;cursor:not-allowed}
+html body .enh-out{font-size:13.5px;color:#b8b8cc;text-align:center;min-height:20px}
+html body .enh-out b{color:#fff}
+html body .enh-warn{padding:10px 12px;border:1px solid rgba(255,196,92,.28);border-radius:12px;background:rgba(255,196,92,.06);font-size:12.8px;line-height:1.5;color:#e7cf9c}
+html body .enh-go{display:block;width:100%;margin-top:16px;padding:15px;border:0;border-radius:14px;background:linear-gradient(90deg,#a9bbff,#d6a9ff);color:#11111d;font:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:filter .15s ease,opacity .2s ease}
+html body .enh-go:hover:not([disabled]){filter:brightness(1.06)}
+html body .enh-go[disabled]{opacity:.35;cursor:not-allowed}
+html body .enh-prog{margin-top:16px}
+html body .enh-bar{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+html body .enh-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#a9bbff,#d6a9ff)}
+html body .enh-ptxt{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:13px;color:#b8b8cc}
+html body .enh-ptxt #enhEta{flex:1;text-align:center;color:#8c8ca2}
+html body .enh-ptxt button{padding:6px 12px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:transparent;color:#cfcfe0;font:inherit;font-size:12.5px;cursor:pointer}
+html body .enh-keep{margin-top:6px;font-size:12px;color:#7e7e94;text-align:center}
+html body .enh-res{margin-top:20px}
+html body .enh-cmp{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#08080c;touch-action:none;user-select:none;-webkit-user-select:none;line-height:0}
+html body .enh-cmp img{display:block;width:100%;height:auto;pointer-events:none;-webkit-user-drag:none}
+html body .enh-cmp .enh-b{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;clip-path:inset(0 50% 0 0)}
+html body .enh-cmp .enh-h{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:#fff;pointer-events:none}
+html body .enh-cmp .enh-h::after{content:"";position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:#fff;border:0}
+html body .enh-tag{position:absolute;top:10px;padding:4px 9px;border-radius:8px;background:rgba(8,8,12,.72);font-size:11.5px;line-height:1.3;color:#fff;pointer-events:none}
+html body .enh-vid{display:block;width:100%;border-radius:16px;background:#000;border:1px solid rgba(255,255,255,.08)}
+html body .enh-dl{display:block;width:100%;margin-top:14px;padding:14px;border:1px solid rgba(167,139,250,.55);border-radius:14px;background:rgba(167,139,250,.12);color:#fff;font:inherit;font-size:15px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer}
+html body .enh-dl:hover{background:rgba(167,139,250,.2)}
+html body .enh-msg{margin-top:12px;font-size:13px;color:#b8b8cc;text-align:center}
+@media (max-width:640px){html body .mn-view[data-view="ai"]{padding:0 10px}html body .enh-card{padding:20px 14px 18px;border-radius:18px}html body .enh-t{font-size:24px}html body .enh-drop{min-height:150px}}
+@media (prefers-reduced-motion:reduce){html body .enh *{transition:none!important}}
+
 @keyframes aiSpin{to{transform:rotate(360deg)}}
 html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
-@media (max-width:1023px){html body .mn-view[data-view="ai"]{padding:0 8px}html body .mn-view[data-view="ai"] .ai-box{height:calc(100vh - 150px);height:calc(100dvh - 150px);min-height:480px;border-radius:18px}}
-@media (prefers-reduced-motion:reduce){html body .mn-view[data-view="ai"] .ai-load i{animation:none}}
 </style>
 </head>
 <body>
@@ -7280,7 +7267,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
     <a class="hz-brand" id="hzBrand" href="#" aria-label="MOONFULL4K"><span class="hz-wm" role="img" aria-label="MOONFULL4K"></span></a>
     <span class="hz-badge">MOON · ENGINE 2.1</span>
     <span class="hz-sep" aria-hidden="true"></span>
-    <nav class="hz-links" id="hzLinks" aria-label="Main"><i class="hz-ind" aria-hidden="true"></i><button type="button" class="hz-link" data-hz-go="home"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span data-hz="nav_home">მთავარი</span></button><button type="button" class="hz-link" data-hz-go="optimizer"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 9h6v6"/><path d="m9 15 6-6"/></svg><span data-hz="nav_optimizer">მეთოდი</span></button><button type="button" class="hz-link" data-hz-go="checker"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span data-hz="nav_checker">ჩექერი</span></button><button type="button" class="hz-link" data-hz-go="plans"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2A2 2 0 0 1 15.8 21H8.2a2 2 0 0 1-2-1.8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span data-hz="nav_plans">გეგმები</span></button><button type="button" class="hz-link" data-hz-go="ai"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg><span data-hz="nav_ai">MOON AI</span></button><button type="button" class="hz-link" data-hz-go="contact"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg><span data-hz="nav_contact">კონტაქტი</span></button></nav>
+    <nav class="hz-links" id="hzLinks" aria-label="Main"><i class="hz-ind" aria-hidden="true"></i><button type="button" class="hz-link" data-hz-go="home"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span data-hz="nav_home">მთავარი</span></button><button type="button" class="hz-link" data-hz-go="optimizer"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 9h6v6"/><path d="m9 15 6-6"/></svg><span data-hz="nav_optimizer">მეთოდი</span></button><button type="button" class="hz-link" data-hz-go="checker"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span data-hz="nav_checker">ჩექერი</span></button><button type="button" class="hz-link" data-hz-go="plans"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2A2 2 0 0 1 15.8 21H8.2a2 2 0 0 1-2-1.8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span data-hz="nav_plans">გეგმები</span></button><button type="button" class="hz-link" data-hz-go="ai"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span data-hz="nav_ai">Enhancer</span></button><button type="button" class="hz-link" data-hz-go="contact"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg><span data-hz="nav_contact">კონტაქტი</span></button></nav>
     <div class="hz-right">
       <div class="hz-lang" id="hzLang">
         <button type="button" class="hz-icbtn" id="hzLangBtn" aria-label="Language" aria-expanded="false"><svg class="hz-flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#flag-ge"/></svg></button>
@@ -7302,7 +7289,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
   <div class="hzm-scroll" id="hzmScroll">
     <button type="button" class="hzm-promo" data-hz-go="plans"><span class="hzm-tile hzm-tile--lime"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span><span class="hzm-promo-txt"><b data-hz="promoT">Premium გეგმები</b><small data-hz="promoS">4K · 120fps — 5.99 ₾-დან</small></span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
     <div class="hzm-sec hzm-sec--tools"><div class="hzm-label" data-hz="tools">ხელსაწყოები</div>
-    <div class="hzm-group"><button type="button" class="hzm-row" data-hz-go="optimizer"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 9h6v6"/><path d="m9 15 6-6"/></svg></span><span class="hzm-lbl" data-hz="nav_optimizer">მეთოდი</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-hz-go="checker"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span><span class="hzm-lbl" data-hz="nav_checker">ჩექერი</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-hz-go="plans"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2A2 2 0 0 1 15.8 21H8.2a2 2 0 0 1-2-1.8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></span><span class="hzm-lbl" data-hz="nav_plans">გეგმები</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-hz-go="ai"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg></span><span class="hzm-lbl" data-hz="nav_ai">MOON AI</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-mn-go="order"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></span><span class="hzm-lbl" data-i18n="mnOrder">შეკვეთა</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-mn-go="upload"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></span><span class="hzm-lbl" data-i18n="mnUpload">ატვირთვა</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button></div></div>
+    <div class="hzm-group"><button type="button" class="hzm-row" data-hz-go="optimizer"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 9h6v6"/><path d="m9 15 6-6"/></svg></span><span class="hzm-lbl" data-hz="nav_optimizer">მეთოდი</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-hz-go="checker"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span><span class="hzm-lbl" data-hz="nav_checker">ჩექერი</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-hz-go="plans"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2A2 2 0 0 1 15.8 21H8.2a2 2 0 0 1-2-1.8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></span><span class="hzm-lbl" data-hz="nav_plans">გეგმები</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-hz-go="ai"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></span><span class="hzm-lbl" data-hz="nav_ai">Enhancer</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-mn-go="order"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></span><span class="hzm-lbl" data-i18n="mnOrder">შეკვეთა</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" class="hzm-row" data-mn-go="upload"><span class="hzm-tile"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></span><span class="hzm-lbl" data-i18n="mnUpload">ატვირთვა</span><svg class="hzm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button></div></div>
     <div class="hzm-sec hzm-sec--more"><div class="hzm-label" data-hz="more">მეტი</div>
     <div class="qn-nav-wrap">
         <div class="quick-nav hzm-group" id="quickNav">
@@ -7659,7 +7646,7 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         <button type="button" class="mn-link" data-mn="optimizer">მეთოდი</button>
         <button type="button" class="mn-link" data-mn="checker">ჩექერი</button>
         <button type="button" class="mn-link" data-mn="plans">გეგმები</button>
-        <button type="button" class="mn-link" data-mn="ai">MOON AI</button>
+        <button type="button" class="mn-link" data-mn="ai">Enhancer</button>
         <button type="button" class="mn-link" data-mn="contact" data-i18n="mnContact">კონტაქტი</button>
       </nav>
       <div class="mn-right">
@@ -7865,7 +7852,43 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
       </div>
       </div></article>
     <article class="mn-view" data-view="plans" id="plansView"><div class="pl-hd"><h2>გეგმები</h2></div></article>
-    <article class="mn-view" data-view="ai" id="aiView"><div class="ai-box"><div class="ai-load"><i></i><span>MOON AI</span></div><iframe title="MOON AI" allow="clipboard-write; clipboard-read" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></article>
+    <article class="mn-view" data-view="ai" id="aiView"><div class="enh" id="enh">
+  <div class="enh-card">
+    <h2 class="enh-t" data-e="title">ხარისხის გაუმჯობესება</h2>
+    <p class="enh-s" data-e="sub"></p>
+    <label class="enh-drop" id="enhDrop" for="enhFile">
+      <span class="enh-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></span>
+      <span class="enh-d1" data-e="drop1"></span>
+      <span class="enh-d2" data-e="drop2"></span>
+      <input type="file" id="enhFile" accept="image/*,video/*" hidden>
+    </label>
+    <div class="enh-file" id="enhFileInfo" hidden></div>
+    <div class="enh-opts" id="enhOpts" hidden>
+      <div class="enh-grp"><span class="enh-lbl" data-e="mode"></span>
+        <div class="enh-chips" id="enhMode">
+          <button type="button" class="enh-chip is-on" data-v="fast"><b>Fast</b><i data-e="fastD"></i></button>
+          <button type="button" class="enh-chip" data-v="pro"><b>Pro AI</b><i data-e="proD"></i></button>
+        </div>
+      </div>
+      <div class="enh-grp"><span class="enh-lbl" data-e="scale"></span>
+        <div class="enh-chips enh-chips-s" id="enhScale">
+          <button type="button" class="enh-chip is-on" data-v="2"><b>2x</b></button>
+          <button type="button" class="enh-chip" data-v="4"><b>4x</b></button>
+        </div>
+      </div>
+      <div class="enh-out" id="enhOut"></div>
+      <div class="enh-warn" id="enhWarn" hidden></div>
+    </div>
+    <button type="button" class="enh-go" id="enhGo" disabled data-e="go"></button>
+    <div class="enh-prog" id="enhProg" hidden>
+      <div class="enh-bar"><i id="enhBar"></i></div>
+      <div class="enh-ptxt"><span id="enhPct">0%</span><span id="enhEta"></span><button type="button" id="enhCancel" data-e="cancel"></button></div>
+      <div class="enh-keep" data-e="keep"></div>
+    </div>
+    <div class="enh-res" id="enhRes" hidden></div>
+  </div>
+</div>
+</article>
   </section>
 
   <div class="mn-modal" id="mnContact" role="dialog" aria-modal="true" aria-hidden="true">
@@ -25160,15 +25183,15 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
   if(!bar||!menu) return;
   var root=document.documentElement;
   var T={
-    ka:{nav_home:'მთავარი',nav_optimizer:'მეთოდი',nav_checker:'ჩექერი',nav_plans:'გეგმები',nav_ai:'MOON AI',nav_contact:'კონტაქტი',menu:'მენიუ',tools:'ხელსაწყოები',more:'მეტი',
+    ka:{nav_home:'მთავარი',nav_optimizer:'მეთოდი',nav_checker:'ჩექერი',nav_plans:'გეგმები',nav_ai:'Enhancer',nav_contact:'კონტაქტი',menu:'მენიუ',tools:'ხელსაწყოები',more:'მეტი',
         promoT:'Premium გეგმები',promoS:'4K · 120fps — 5.99 ₾-დან',lang:'ენა',langName:'ქართული',account:'ანგარიში',uploads:'ატვირთვა',uploadsCard:'MOON ატვირთვები',
         getPlans:'გეგმები',weekly:'კვირაში',plan:'გეგმა',resets:'განახლდება',discordAcc:'Discord ანგარიში',signOut:'გამოსვლა',login:'შესვლა Discord-ით',loginShort:'შესვლა',
         loginSub:'ატვირთვები, გეგმები და შეკვეთები — ერთ ადგილას',free:'უფასო',unlimited:'ულიმიტო'},
-    en:{nav_home:'Home',nav_optimizer:'Method',nav_checker:'Checker',nav_plans:'Plans',nav_ai:'MOON AI',nav_contact:'Contact',menu:'Menu',tools:'Tools',more:'More',
+    en:{nav_home:'Home',nav_optimizer:'Method',nav_checker:'Checker',nav_plans:'Plans',nav_ai:'Enhancer',nav_contact:'Contact',menu:'Menu',tools:'Tools',more:'More',
         promoT:'Premium plans',promoS:'4K · 120fps — from 5.99 ₾ / month',lang:'Language',langName:'English',account:'Account',uploads:'uploads',uploadsCard:'MOON uploads',
         getPlans:'Get plans',weekly:'Weekly',plan:'Plan',resets:'Resets in',discordAcc:'Discord account',signOut:'Sign out',login:'Sign in with Discord',loginShort:'Sign in',
         loginSub:'Uploads, plans and orders — in one place',free:'Free',unlimited:'Unlimited'},
-    ru:{nav_home:'Главная',nav_optimizer:'Метод',nav_checker:'Чекер',nav_plans:'Тарифы',nav_ai:'MOON AI',nav_contact:'Контакты',menu:'Меню',tools:'Инструменты',more:'Ещё',
+    ru:{nav_home:'Главная',nav_optimizer:'Метод',nav_checker:'Чекер',nav_plans:'Тарифы',nav_ai:'Улучшение',nav_contact:'Контакты',menu:'Меню',tools:'Инструменты',more:'Ещё',
         promoT:'Premium тарифы',promoS:'4K · 120fps — от 5.99 ₾ / мес',lang:'Язык',langName:'Русский',account:'Аккаунт',uploads:'загрузок',uploadsCard:'Загрузки MOON',
         getPlans:'Тарифы',weekly:'В неделю',plan:'Тариф',resets:'Сброс через',discordAcc:'Аккаунт Discord',signOut:'Выйти',login:'Войти через Discord',loginShort:'Войти',
         loginSub:'Загрузки, тарифы и заказы — в одном месте',free:'Бесплатно',unlimited:'Безлимит'}
@@ -27129,5 +27152,331 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-g
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) #tiktokLoginBtn svg{fill:#fff!important;color:#fff}
 html body #discordGate[data-mode="banned"] #tiktokLoginBtn,html body #discordGate[data-mode="guild"] #tiktokLoginBtn{display:none!important}
 </style>
+<script id="moon-enhancer">
+(function(){
+'use strict';
+var V=document.getElementById('aiView'); if(!V) return;
+var Q=function(s){return V.querySelector(s)};
+var ORT_BASE='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/';
+var MUX_URL='https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js';
+var MODEL_URL='models/realesr-general-x4v3.onnx';
+var TILE=192, PAD=12, CORE=TILE-2*PAD;
+
+var TX={
+ka:{title:'ხარისხის გაუმჯობესება',sub:'ფოტო ან ვიდეო: გაზარდე ხარისხი 4K-მდე პირდაპირ შენს მოწყობილობაზე. ფაილი არსად იგზავნება.',drop1:'აირჩიე ან ჩააგდე ფოტო / ვიდეო',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'რეჟიმი',fastD:'სწრაფი, ბუნებრივი გამკვეთრება',proD:'AI აღადგენს დეტალებს, ნელია',scale:'გადიდება',go:'გაუმჯობესება',cancel:'შეწყვეტა',keep:'დამუშავებისას ეს გვერდი ღია და ეკრანი ჩართული დატოვე.',
+ out:'შედეგი',px:'პიქსელი',dur:'წმ',noWebgl:'ამ ბრაუზერში Fast რეჟიმი ვერ ეშვება (WebGL2 არ არის).',noGpu:'Pro AI სრული სიჩქარით საჭიროებს WebGPU-ს (Chrome / Edge კომპიუტერზე ან ახალი Android). ამ მოწყობილობაზე ძალიან ნელი იქნება.',noGpuVid:'ვიდეოზე Pro AI-ს ამ მოწყობილობაზე WebGPU სჭირდება. აირჩიე Fast.',proVidSlow:'Pro AI ვიდეოზე ნელია. რაც მცირეა ვიდეოს ზომა და ხანგრძლივობა, მით სწრაფად დასრულდება.',aiFail:'AI მოდელი ვერ ჩაიტვირთა. შეამოწმე ინტერნეტი და სცადე თავიდან.',noEnc:'ამ ბრაუზერს ვიდეოს ჩაწერა (WebCodecs) არ შეუძლია. გამოიყენე Chrome ან Edge.',tooBig:'ეს ფაილი ძალიან დიდია გასაზრდელად ამ მოწყობილობაზე.',alreadyBig:'ვიდეო უკვე 4K ან უფრო დიდია, გადიდება საჭირო არ არის.',loadAi:'AI მოდელი იტვირთება…',run:'მუშავდება…',finish:'ვასრულებ…',done:'მზადაა',err:'შეცდომა. სცადე სხვა ფაილი ან Fast რეჟიმი.',cancelled:'შეწყვეტილია.',dl:'გადმოწერა',before:'წინ',after:'შემდეგ',left:'დარჩა',silent:'ხმა ვერ გადავიტანე, ვიდეო უხმოდ შეინახა.',badType:'ეს ფორმატი არ მხარდაჭერილია.',frame:'კადრი',of:'/'},
+en:{title:'Quality Enhancer',sub:'Photo or video: upscale up to 4K right on your device. Your file is never uploaded.',drop1:'Choose or drop a photo / video',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'Mode',fastD:'Quick, natural sharpening',proD:'AI restores detail, slower',scale:'Upscale',go:'Enhance',cancel:'Cancel',keep:'Keep this page open and the screen on while it works.',
+ out:'Output',px:'px',dur:'s',noWebgl:'Fast mode is not available in this browser (no WebGL2).',noGpu:'Pro AI needs WebGPU for full speed (desktop Chrome / Edge or a recent Android). It will be very slow here.',noGpuVid:'Pro AI on video needs WebGPU on this device. Choose Fast.',proVidSlow:'Pro AI is slow on video. Smaller and shorter clips finish much faster.',aiFail:'The AI model could not be loaded. Check your connection and try again.',noEnc:'This browser cannot encode video (WebCodecs). Use Chrome or Edge.',tooBig:'This file is too large to upscale on this device.',alreadyBig:'This video is already 4K or larger, no upscale needed.',loadAi:'Loading AI model…',run:'Processing…',finish:'Finishing…',done:'Done',err:'Something went wrong. Try another file or Fast mode.',cancelled:'Cancelled.',dl:'Download',before:'Before',after:'After',left:'left',silent:'Audio could not be carried over, the video was saved without sound.',badType:'This file type is not supported.',frame:'Frame',of:'/'},
+ru:{title:'Улучшение качества',sub:'Фото или видео: увеличение до 4K прямо на вашем устройстве. Файл никуда не отправляется.',drop1:'Выберите или перетащите фото / видео',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'Режим',fastD:'Быстрая естественная резкость',proD:'ИИ восстанавливает детали, медленнее',scale:'Увеличение',go:'Улучшить',cancel:'Отмена',keep:'Не закрывайте страницу и не выключайте экран во время работы.',
+ out:'Результат',px:'пикс.',dur:'с',noWebgl:'Режим Fast недоступен в этом браузере (нет WebGL2).',noGpu:'Для полной скорости Pro AI нужен WebGPU (Chrome / Edge на компьютере или новый Android). Здесь будет очень медленно.',noGpuVid:'Для Pro AI на видео нужен WebGPU. Выберите Fast.',proVidSlow:'Pro AI на видео работает медленно. Чем короче и меньше ролик, тем быстрее.',aiFail:'Не удалось загрузить модель ИИ. Проверьте интернет и повторите.',noEnc:'Этот браузер не умеет кодировать видео (WebCodecs). Используйте Chrome или Edge.',tooBig:'Файл слишком большой для увеличения на этом устройстве.',alreadyBig:'Видео уже 4K или больше, увеличение не нужно.',loadAi:'Загрузка модели ИИ…',run:'Обработка…',finish:'Завершаю…',done:'Готово',err:'Ошибка. Попробуйте другой файл или режим Fast.',cancelled:'Отменено.',dl:'Скачать',before:'До',after:'После',left:'осталось',silent:'Звук перенести не удалось, видео сохранено без звука.',badType:'Этот формат не поддерживается.',frame:'Кадр',of:'/'}
+};
+function L(){var l=(document.documentElement.lang||'ka').slice(0,2);return TX[l]||TX.ka}
+function t(k){return L()[k]||TX.ka[k]||''}
+function applyText(){ V.querySelectorAll('[data-e]').forEach(function(el){ el.textContent=t(el.getAttribute('data-e')); }); renderOut(); }
+
+var st={file:null,kind:null,w:0,h:0,dur:0,mode:'fast',scale:2,busy:false,cancel:false,url:null,resUrl:null};
+var gpu=!!navigator.gpu;
+var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
+var MAXPX=mobile?16e6:48e6, MAXSIDE=mobile?8192:12000;
+
+var el={drop:Q('#enhDrop'),file:Q('#enhFile'),info:Q('#enhFileInfo'),opts:Q('#enhOpts'),mode:Q('#enhMode'),scale:Q('#enhScale'),out:Q('#enhOut'),warn:Q('#enhWarn'),go:Q('#enhGo'),prog:Q('#enhProg'),bar:Q('#enhBar'),pct:Q('#enhPct'),eta:Q('#enhEta'),cancel:Q('#enhCancel'),res:Q('#enhRes')};
+
+function fmtT(s){ s=Math.max(0,Math.round(s)); var m=Math.floor(s/60); return m? m+':'+('0'+(s%60)).slice(-2) : s+t('dur'); }
+function setProg(p,txt,eta){ el.bar.style.width=(Math.max(0,Math.min(1,p))*100).toFixed(1)+'%'; el.pct.textContent=txt||((p*100).toFixed(0)+'%'); el.eta.textContent=eta||''; }
+function warn(msg){ if(msg){ el.warn.textContent=msg; el.warn.hidden=false; } else { el.warn.hidden=true; el.warn.textContent=''; } }
+
+/* ---------- output size ---------- */
+function plan(){
+  var s=st.scale, w=st.w*s, h=st.h*s;
+  if(st.kind==='image'){ return {w:w,h:h,ok:(w*h<=MAXPX && Math.max(w,h)<=MAXSIDE)}; }
+  var long=Math.max(w,h), short=Math.min(w,h);
+  return {w:w,h:h,ok:(long<=3840 && short<=2160)};
+}
+function refreshScaleChips(){
+  var c2=st.scale, ok={};
+  [2,4].forEach(function(s){ var w=st.w*s,h=st.h*s; ok[s]= st.kind==='image' ? (w*h<=MAXPX&&Math.max(w,h)<=MAXSIDE) : (Math.max(w,h)<=3840&&Math.min(w,h)<=2160); });
+  el.scale.querySelectorAll('.enh-chip').forEach(function(b){ var v=+b.getAttribute('data-v'); b.disabled=!ok[v]; });
+  if(!ok[st.scale]){ if(ok[2]) st.scale=2; else if(ok[4]) st.scale=4; }
+  el.scale.querySelectorAll('.enh-chip').forEach(function(b){ b.classList.toggle('is-on',+b.getAttribute('data-v')===st.scale); });
+  return ok[2]||ok[4];
+}
+function renderOut(){
+  if(!st.file){ el.out.innerHTML=''; return; }
+  var p=plan();
+  var txt='<b>'+st.w+'x'+st.h+'</b> → <b>'+p.w+'x'+p.h+'</b>';
+  if(st.kind==='video') txt+=' · '+fmtT(st.dur);
+  el.out.innerHTML=txt;
+}
+function refreshWarn(){
+  var m='';
+  if(!hasGL()) m=t('noWebgl');
+  else if(st.mode==='pro' && !gpu) m= st.kind==='video' ? t('noGpuVid') : t('noGpu');
+  else if(st.mode==='pro' && st.kind==='video') m=t('proVidSlow');
+  warn(m);
+  var okSize=refreshScaleChips();
+  var blockedVid=(st.mode==='pro'&&st.kind==='video'&&!gpu);
+  if(st.kind==='video' && !okSize){ warn(t('alreadyBig')); }
+  if(st.kind==='image' && !okSize){ warn(t('tooBig')); }
+  el.go.disabled= !st.file || st.busy || !okSize || blockedVid || !hasGL();
+  renderOut();
+}
+var _gl=null; function hasGL(){ if(_gl!==null) return _gl; try{ var c=document.createElement('canvas'); _gl=!!c.getContext('webgl2'); }catch(e){ _gl=false; } return _gl; }
+
+/* ---------- file select ---------- */
+function clearResult(){ if(st.resUrl){ try{URL.revokeObjectURL(st.resUrl)}catch(e){} st.resUrl=null; } el.res.hidden=true; el.res.innerHTML=''; }
+function pick(f){
+  if(!f||st.busy) return;
+  clearResult(); el.prog.hidden=true;
+  var isV=/^video\//.test(f.type)||/\.(mp4|mov|m4v|webm)$/i.test(f.name), isI=/^image\//.test(f.type)||/\.(jpe?g|png|webp|bmp|gif|avif)$/i.test(f.name);
+  if(!isV&&!isI){ warn(t('badType')); return; }
+  if(st.url){ try{URL.revokeObjectURL(st.url)}catch(e){} st.url=null; }
+  st.file=f; st.kind=isV?'video':'image'; st.url=URL.createObjectURL(f);
+  el.info.hidden=false; el.info.innerHTML='<b></b>'; el.info.firstChild.textContent=f.name;
+  var done=function(w,h,d){ st.w=w; st.h=h; st.dur=d||0; el.opts.hidden=false; refreshWarn(); };
+  if(isI){
+    var im=new Image(); im.onload=function(){ done(im.naturalWidth,im.naturalHeight,0); }; im.onerror=function(){ st.file=null; warn(t('badType')); }; im.src=st.url;
+  } else {
+    var v=document.createElement('video'); v.preload='metadata'; v.muted=true; v.playsInline=true;
+    v.onloadedmetadata=function(){ done(v.videoWidth,v.videoHeight,v.duration); };
+    v.onerror=function(){ st.file=null; warn(t('badType')); }; v.src=st.url;
+  }
+}
+el.file.addEventListener('change',function(){ pick(el.file.files[0]); el.file.value=''; });
+['dragenter','dragover'].forEach(function(n){ el.drop.addEventListener(n,function(e){ e.preventDefault(); el.drop.classList.add('is-over'); }); });
+['dragleave','drop'].forEach(function(n){ el.drop.addEventListener(n,function(e){ e.preventDefault(); el.drop.classList.remove('is-over'); }); });
+el.drop.addEventListener('drop',function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) pick(f); });
+el.mode.addEventListener('click',function(e){ var b=e.target.closest('.enh-chip'); if(!b||st.busy) return; st.mode=b.getAttribute('data-v'); el.mode.querySelectorAll('.enh-chip').forEach(function(x){x.classList.toggle('is-on',x===b)}); refreshWarn(); });
+el.scale.addEventListener('click',function(e){ var b=e.target.closest('.enh-chip'); if(!b||b.disabled||st.busy) return; st.scale=+b.getAttribute('data-v'); refreshWarn(); });
+el.cancel.addEventListener('click',function(){ st.cancel=true; });
+
+/* ---------- Fast: WebGL2 Lanczos3 + contrast-adaptive sharpen ---------- */
+function makeFast(srcW,srcH,outW,outH){
+  var cv=document.createElement('canvas'); cv.width=outW; cv.height=outH;
+  var gl=cv.getContext('webgl2',{preserveDrawingBuffer:true,antialias:false,alpha:false,premultipliedAlpha:false});
+  if(!gl) throw new Error('webgl2');
+  var mt=Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE),gl.getParameter(gl.MAX_RENDERBUFFER_SIZE)); if(outW>mt||outH>mt) throw new Error('big');
+  var vs='#version 300 es\nvoid main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0.,1.);}';
+  var f1='#version 300 es\nprecision highp float;precision highp int;uniform sampler2D uTex;uniform vec2 uSrc;uniform vec2 uOut;out vec4 o;'+
+  'float Lz(float x){x=abs(x);if(x<1e-4)return 1.;if(x>=3.)return 0.;float p=3.14159265*x;return 3.*sin(p)*sin(p/3.)/(p*p);}'+
+  'vec4 T(ivec2 c){return texelFetch(uTex,clamp(c,ivec2(0),ivec2(uSrc)-1),0);}'+
+  'void main(){vec2 uv=vec2(gl_FragCoord.x,uOut.y-gl_FragCoord.y)/uOut;vec2 p=uv*uSrc-.5;vec2 f=floor(p);vec2 fr=p-f;ivec2 b=ivec2(f);'+
+  'vec4 sum=vec4(0.);float ws=0.;vec4 mn=vec4(9.),mx=vec4(-9.);'+
+  'for(int j=-2;j<=3;j++){float wy=Lz(float(j)-fr.y);for(int i=-2;i<=3;i++){float w=Lz(float(i)-fr.x)*wy;vec4 s=T(b+ivec2(i,j));sum+=s*w;ws+=w;if(i>=0&&i<=1&&j>=0&&j<=1){mn=min(mn,s);mx=max(mx,s);}}}'+
+  'vec4 c=sum/ws;c=clamp(c,mn,mx);o=vec4(clamp(c.rgb,0.,1.),1.);}';
+  var f2='#version 300 es\nprecision highp float;precision highp int;uniform sampler2D uTex;uniform float uSharp;out vec4 o;'+
+  'vec3 T(ivec2 c){ivec2 s=textureSize(uTex,0);return texelFetch(uTex,clamp(c,ivec2(0),s-1),0).rgb;}'+
+  'void main(){ivec2 p=ivec2(gl_FragCoord.xy);vec3 e=T(p),b=T(p+ivec2(0,-1)),d=T(p+ivec2(-1,0)),f=T(p+ivec2(1,0)),h=T(p+ivec2(0,1));'+
+  'vec3 mn=min(min(min(d,e),min(f,b)),h);vec3 mx=max(max(max(d,e),max(f,b)),h);'+
+  'vec3 amp=sqrt(clamp(min(mn,1.-mx)/max(mx,1e-4),0.,1.));float peak=-1./mix(8.,5.,uSharp);vec3 w=amp*peak;'+
+  'vec3 r=clamp(((b+d+f+h)*w+e)/(1.+4.*w),0.,1.);o=vec4(r,1.);}';
+  function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
+  function prog(fs){var p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,vs));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));return p;}
+  var P1=prog(f1),P2=prog(f2);
+  function tex(w,h){var x=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,x);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);if(w)gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);return x;}
+  var srcT=tex(srcW,srcH), midT=tex(outW,outH), fbo=gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,midT,0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+  var vao=gl.createVertexArray(); gl.bindVertexArray(vao);
+  var self={canvas:cv,
+    draw:function(source,srcCopyW,srcCopyH){
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
+      gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,srcT);
+      gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,source);
+      gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.viewport(0,0,outW,outH);gl.useProgram(P1);
+      gl.uniform1i(gl.getUniformLocation(P1,'uTex'),0);gl.uniform2f(gl.getUniformLocation(P1,'uSrc'),srcW,srcH);gl.uniform2f(gl.getUniformLocation(P1,'uOut'),outW,outH);
+      gl.drawArrays(gl.TRIANGLES,0,3);
+      gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,outW,outH);gl.useProgram(P2);
+      gl.bindTexture(gl.TEXTURE_2D,midT);gl.uniform1i(gl.getUniformLocation(P2,'uTex'),0);gl.uniform1f(gl.getUniformLocation(P2,'uSharp'),0.7);
+      gl.drawArrays(gl.TRIANGLES,0,3);
+    },
+    free:function(){ try{ var e=gl.getExtension('WEBGL_lose_context'); e&&e.loseContext(); }catch(x){} }
+  };
+  return self;
+}
+
+/* ---------- Pro: Real-ESRGAN (ONNX Runtime Web) ---------- */
+var _ort=null, _sess=null;
+function loadScript(src){ return new Promise(function(res,rej){ var s=document.createElement('script'); s.src=src; s.async=true; s.onload=res; s.onerror=function(){rej(new Error('load '+src))}; document.head.appendChild(s); }); }
+async function getSession(){
+  if(_sess) return _sess;
+  if(!window.ort) await loadScript(ORT_BASE+'ort.webgpu.min.js');
+  var ort=window.ort; ort.env.wasm.wasmPaths=ORT_BASE;
+  try{ ort.env.wasm.numThreads=(self.crossOriginIsolated?Math.min(4,navigator.hardwareConcurrency||2):1); }catch(e){}
+  var buf=await (await fetch(MODEL_URL)).arrayBuffer();
+  var eps=gpu?['webgpu','wasm']:['wasm'];
+  _sess=await ort.InferenceSession.create(new Uint8Array(buf),{executionProviders:eps,graphOptimizationLevel:'all'});
+  _ort=ort; return _sess;
+}
+/* src: canvas (2D) holding the source; dst: canvas 2D final size; returns when done */
+async function proUpscale(srcCv,dstCv,scale,onTile,shouldStop){
+  var sess=await getSession(), ort=_ort||window.ort;
+  var sctx=srcCv.getContext('2d',{willReadFrequently:true}), dctx=dstCv.getContext('2d');
+  var W=srcCv.width,H=srcCv.height;
+  var tmp=document.createElement('canvas'); tmp.width=TILE*4; tmp.height=TILE*4; var tctx=tmp.getContext('2d');
+  var inp=new Float32Array(3*TILE*TILE), nx=Math.ceil(W/CORE), ny=Math.ceil(H/CORE), n=0;
+  dctx.imageSmoothingEnabled=true; dctx.imageSmoothingQuality='high';
+  for(var ty=0;ty<ny;ty++) for(var tx=0;tx<nx;tx++){
+    if(shouldStop&&shouldStop()) return false;
+    var cx=tx*CORE, cy=ty*CORE, cw=Math.min(CORE,W-cx), ch=Math.min(CORE,H-cy);
+    var rx0=Math.max(0,cx-PAD), ry0=Math.max(0,cy-PAD), rx1=Math.min(W,cx+cw+PAD), ry1=Math.min(H,cy+ch+PAD);
+    var rd=sctx.getImageData(rx0,ry0,rx1-rx0,ry1-ry0).data, rw=rx1-rx0, rh=ry1-ry0, plane=TILE*TILE;
+    for(var y=0;y<TILE;y++){ var sy=Math.min(rh-1,Math.max(0,cy-PAD+y-ry0)); for(var x=0;x<TILE;x++){ var sx=Math.min(rw-1,Math.max(0,cx-PAD+x-rx0)); var si=(sy*rw+sx)*4, di=y*TILE+x; inp[di]=rd[si]/255; inp[plane+di]=rd[si+1]/255; inp[2*plane+di]=rd[si+2]/255; } }
+    var out=await sess.run({input:new ort.Tensor('float32',inp,[1,3,TILE,TILE])});
+    var o=out.output.data, T4=TILE*4, p4=T4*T4, img=tctx.createImageData(T4,T4), d=img.data;
+    for(var i=0;i<p4;i++){ var j=i*4; var r=o[i],g=o[p4+i],b=o[2*p4+i]; d[j]=r*255; d[j+1]=g*255; d[j+2]=b*255; d[j+3]=255; }
+    tctx.putImageData(img,0,0);
+    dctx.drawImage(tmp,PAD*4,PAD*4,cw*4,ch*4,cx*scale,cy*scale,cw*scale,ch*scale);
+    n++; if(onTile) onTile(n/(nx*ny));
+  }
+  return true;
+}
+
+/* ---------- photo ---------- */
+async function runImage(){
+  var bmp=await createImageBitmap(st.file,{imageOrientation:'from-image'}).catch(function(){return null;});
+  var w,h,src;
+  if(bmp){ w=bmp.width;h=bmp.height; src=document.createElement('canvas'); src.width=w;src.height=h; src.getContext('2d').drawImage(bmp,0,0); try{bmp.close()}catch(e){} }
+  else { var im=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=st.url;}); w=im.naturalWidth;h=im.naturalHeight; src=document.createElement('canvas'); src.width=w;src.height=h; src.getContext('2d').drawImage(im,0,0); }
+  var s=st.scale, ow=w*s, oh=h*s, outCv;
+  var t0=performance.now();
+  if(st.mode==='fast'){
+    setProg(.3,t('run')); await tick();
+    var f=makeFast(w,h,ow,oh); f.draw(src); outCv=f.canvas; setProg(.9,t('finish')); await tick();
+    var blob=await toBlob(outCv); f.free(); return blob;
+  }
+  setProg(0,t('loadAi')); await tick();
+  outCv=document.createElement('canvas'); outCv.width=ow; outCv.height=oh;
+  var ok=await proUpscale(src,outCv,s,function(p){ var el_=(performance.now()-t0)/1000; setProg(p,null,p>0.02?fmtT(el_/p*(1-p))+' '+t('left'):''); },function(){return st.cancel;});
+  if(!ok) return null;
+  setProg(.98,t('finish')); await tick();
+  return await toBlob(outCv);
+}
+function toBlob(cv){ var png=/png|webp|gif|bmp/i.test(st.file.type||''); return new Promise(function(r){ cv.toBlob(function(b){r(b)}, png?'image/png':'image/jpeg', .97); }); }
+function tick(){ return new Promise(function(r){ requestAnimationFrame(function(){ setTimeout(r,0); }); }); }
+
+function showImageResult(blob){
+  var u=URL.createObjectURL(blob); st.resUrl=u;
+  var ext=blob.type==='image/png'?'png':'jpg', base=(st.file.name||'image').replace(/\.[^.]+$/,'');
+  el.res.innerHTML='<div class="enh-cmp" id="enhCmp"><img class="enh-a" alt=""><img class="enh-b" alt=""><span class="enh-h"></span><span class="enh-tag" style="left:10px"></span><span class="enh-tag" style="right:10px"></span></div><a class="enh-dl" download></a>';
+  var A=el.res.querySelector('.enh-a'),B=el.res.querySelector('.enh-b'),tg=el.res.querySelectorAll('.enh-tag'),dl=el.res.querySelector('.enh-dl'),cmp=el.res.querySelector('#enhCmp'),hd=el.res.querySelector('.enh-h');
+  A.src=u; B.src=st.url; tg[0].textContent=t('before'); tg[1].textContent=t('after');
+  dl.href=u; dl.download=base+'_enhanced.'+ext; dl.textContent=t('dl')+' · '+(blob.size/1048576).toFixed(1)+' MB';
+  var pos=.5; function set(p){ pos=Math.max(0,Math.min(1,p)); B.style.clipPath='inset(0 '+((1-pos)*100)+'% 0 0)'; hd.style.left=(pos*100)+'%'; }
+  set(.5);
+  function mv(e){ var r=cmp.getBoundingClientRect(); set((e.clientX-r.left)/r.width); }
+  cmp.addEventListener('pointerdown',function(e){ cmp.setPointerCapture(e.pointerId); mv(e); cmp.onpointermove=mv; });
+  cmp.addEventListener('pointerup',function(){ cmp.onpointermove=null; });
+  el.res.hidden=false;
+}
+
+/* ---------- video ---------- */
+function loadVideo(){ return new Promise(function(res,rej){ var v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=st.url; v.onloadeddata=function(){res(v)}; v.onerror=function(){rej(new Error('video'))}; }); }
+function seekTo(v,tm){ return new Promise(function(res){ var done=false; function fin(){ if(done) return; done=true; v.removeEventListener('seeked',fin); res(); } v.addEventListener('seeked',fin); v.currentTime=tm; setTimeout(fin,4000); }); }
+async function detectFps(v){
+  if(!('requestVideoFrameCallback' in v)) return 30;
+  return await new Promise(function(res){
+    var last=null,min=1e9,cnt=0,tm=setTimeout(done,1500);
+    function done(){ clearTimeout(tm); v.pause(); res(cnt>=3&&min<1?Math.max(1,Math.min(120,1/min)):30); }
+    function cb(now,meta){ if(last!==null){ var d=meta.mediaTime-last; if(d>0.001&&d<min) min=d; cnt++; } last=meta.mediaTime; if(cnt>=12) done(); else v.requestVideoFrameCallback(cb); }
+    v.requestVideoFrameCallback(cb); v.play().catch(function(){done()});
+  });
+}
+function snapFps(f){ var c=[23.976,24,25,29.97,30,48,50,59.94,60,90,120],b=c[0]; c.forEach(function(x){ if(Math.abs(x-f)<Math.abs(b-f)) b=x; }); return Math.abs(b-f)/b<0.04?b:f; }
+async function pickEncoder(w,h,fps,bitrate){
+  if(!('VideoEncoder' in window)) return null;
+  var tries=[{c:'avc1.640034',m:'avc'},{c:'avc1.640033',m:'avc'},{c:'avc1.64002A',m:'avc'},{c:'avc1.4D4028',m:'avc'},{c:'vp09.00.51.08',m:'vp9'},{c:'vp09.00.40.08',m:'vp9'}];
+  for(var i=0;i<tries.length;i++){ var cfg={codec:tries[i].c,width:w,height:h,bitrate:bitrate,framerate:fps}; if(tries[i].m==='avc') cfg.avc={format:'avc'}; try{ var r=await VideoEncoder.isConfigSupported(cfg); if(r&&r.supported) return {cfg:r.config||cfg,mux:tries[i].m}; }catch(e){} }
+  return null;
+}
+async function encodeAudio(file,muxer,fileSize){
+  try{
+    if(!('AudioEncoder' in window)||!('AudioData' in window)||file.size>400*1048576) return false;
+    var Ctx=window.AudioContext||window.webkitAudioContext; var ac=new Ctx(); var ab; try{ ab=await ac.decodeAudioData(await file.arrayBuffer()); }finally{ try{ac.close()}catch(e){} }
+    var sr=ab.sampleRate, ch=Math.min(2,ab.numberOfChannels), total=ab.length;
+    var cfg={codec:'mp4a.40.2',sampleRate:sr,numberOfChannels:ch,bitrate:160000}; var sup=await AudioEncoder.isConfigSupported(cfg); if(!sup.supported) return false;
+    var enc=new AudioEncoder({output:function(c,m){ muxer.addAudioChunk(c,m); },error:function(){}}); enc.configure(cfg);
+    var chunk=sr, data=[]; for(var c=0;c<ch;c++) data.push(ab.getChannelData(c));
+    for(var off=0;off<total;off+=chunk){ var n=Math.min(chunk,total-off), buf=new Float32Array(n*ch); for(var c2=0;c2<ch;c2++) buf.set(data[c2].subarray(off,off+n),c2*n); var ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:ch,timestamp:Math.round(off/sr*1e6),data:buf}); enc.encode(ad); ad.close(); if(enc.encodeQueueSize>20) await new Promise(function(r){setTimeout(r,10)}); }
+    await enc.flush(); enc.close(); return {sr:sr,ch:ch};
+  }catch(e){ return false; }
+}
+async function runVideo(){
+  var v=await loadVideo(), fps=snapFps(await detectFps(v)), dur=v.duration, total=Math.max(1,Math.floor(dur*fps));
+  var w=v.videoWidth,h=v.videoHeight,s=st.scale,ow=w*s,oh=h*s;
+  var bitrate=Math.max(4e6,Math.min(60e6,Math.round(ow*oh*fps*0.09)));
+  var enc=await pickEncoder(ow,oh,fps,bitrate); if(!enc){ throw new Error('noenc'); }
+  if(!window.Mp4Muxer) await loadScript(MUX_URL);
+  var hasAudioProbe=true;
+  var target=new Mp4Muxer.ArrayBufferTarget();
+  var aud=null;
+  // audio is probed first so the muxer is created with the right tracks
+  var tmpMux={chunks:[],addAudioChunk:function(c,m){ var u=new Uint8Array(c.byteLength); c.copyTo(u); this.chunks.push({u:u,type:c.type,ts:c.timestamp,d:c.duration,m:m}); }};
+  aud=await encodeAudio(st.file,tmpMux);
+  var mcfg={target:target,video:{codec:enc.mux,width:ow,height:oh,frameRate:fps},fastStart:'in-memory',firstTimestampBehavior:'offset'};
+  if(aud) mcfg.audio={codec:'aac',numberOfChannels:aud.ch,sampleRate:aud.sr};
+  var muxer=new Mp4Muxer.Muxer(mcfg);
+  if(aud){ tmpMux.chunks.forEach(function(c){ muxer.addAudioChunk(new EncodedAudioChunk({type:c.type,timestamp:c.ts,duration:c.d,data:c.u}),c.m); }); tmpMux.chunks=[]; }
+  var encErr=null;
+  var venc=new VideoEncoder({output:function(c,m){ muxer.addVideoChunk(c,m); },error:function(e){ encErr=e; }});
+  venc.configure(enc.cfg);
+  var srcCv=document.createElement('canvas'); srcCv.width=w;srcCv.height=h; var sctx=srcCv.getContext('2d',{willReadFrequently:st.mode==='pro'});
+  var fast=null,outCv=null;
+  if(st.mode==='fast') fast=makeFast(w,h,ow,oh); else { setProg(0,t('loadAi')); await tick(); await getSession(); outCv=document.createElement('canvas'); outCv.width=ow; outCv.height=oh; }
+  var t0=performance.now(), kf=Math.round(fps*2);
+  for(var i=0;i<total;i++){
+    if(st.cancel||encErr) break;
+    await seekTo(v,Math.min(dur-0.001,(i+0.5)/fps));
+    sctx.drawImage(v,0,0,w,h);
+    var frameCv;
+    if(fast){ fast.draw(srcCv); frameCv=fast.canvas; }
+    else { var ok=await proUpscale(srcCv,outCv,s,null,function(){return st.cancel}); if(!ok) break; frameCv=outCv; }
+    var vf=new VideoFrame(frameCv,{timestamp:Math.round(i*1e6/fps),duration:Math.round(1e6/fps)});
+    venc.encode(vf,{keyFrame:i%kf===0}); vf.close();
+    while(venc.encodeQueueSize>6 && !encErr) await new Promise(function(r){setTimeout(r,5)});
+    var p=(i+1)/total, el_=(performance.now()-t0)/1000;
+    setProg(p*0.98,(p*100).toFixed(0)+'% · '+t('frame')+' '+(i+1)+t('of')+total,fmtT(el_/p*(1-p))+' '+t('left'));
+    if(i%4===3) await tick();
+  }
+  if(fast) fast.free();
+  if(st.cancel){ try{venc.close()}catch(e){} return null; }
+  if(encErr) throw encErr;
+  setProg(.99,t('finish')); await tick();
+  await venc.flush(); venc.close(); muxer.finalize();
+  var blob=new Blob([target.buffer],{type:'video/mp4'});
+  blob.__silent=!aud; return blob;
+}
+function showVideoResult(blob){
+  var u=URL.createObjectURL(blob); st.resUrl=u; var base=(st.file.name||'video').replace(/\.[^.]+$/,'');
+  el.res.innerHTML='<video class="enh-vid" controls playsinline></video><a class="enh-dl" download></a>'+(blob.__silent?'<div class="enh-msg"></div>':'');
+  var v=el.res.querySelector('video'); v.src=u; var dl=el.res.querySelector('.enh-dl'); dl.href=u; dl.download=base+'_enhanced.mp4'; dl.textContent=t('dl')+' · '+(blob.size/1048576).toFixed(1)+' MB';
+  var m=el.res.querySelector('.enh-msg'); if(m) m.textContent=t('silent');
+  el.res.hidden=false;
+}
+
+/* ---------- main ---------- */
+var wake=null;
+el.go.addEventListener('click',async function(){
+  if(st.busy||!st.file) return;
+  st.busy=true; st.cancel=false; clearResult(); el.go.disabled=true; el.prog.hidden=false; setProg(0,t('run'),''); warn('');
+  try{ if(navigator.wakeLock) wake=await navigator.wakeLock.request('screen'); }catch(e){}
+  try{
+    var blob = st.kind==='image' ? await runImage() : await runVideo();
+    if(!blob){ setProg(0,t('cancelled'),''); }
+    else { setProg(1,t('done'),''); if(st.kind==='image') showImageResult(blob); else showVideoResult(blob); }
+  }catch(e){
+    console.warn('enhancer',e);
+    var m=t('err'); var em=e&&e.message||''; if(em==='noenc') m=t('noEnc'); else if(/^load /.test(em)||/fetch|model|onnx/i.test(em)) m=t('aiFail'); else if(em==='big') m=t('tooBig'); warn(m); el.prog.hidden=true;
+  }
+  try{ wake&&wake.release(); }catch(e){} wake=null;
+  st.busy=false; st.cancel=false; refreshWarn();
+});
+
+applyText(); refreshWarn();
+new MutationObserver(function(){ if(V.classList.contains('show')) applyText(); }).observe(V,{attributes:true,attributeFilter:['class']});
+new MutationObserver(applyText).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+window.__enh={state:st,proUpscale:proUpscale,makeFast:makeFast};
+})();
+
+</script>
 </body>
 </html>
