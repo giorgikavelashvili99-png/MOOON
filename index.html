@@ -27184,7 +27184,8 @@ function applyText(){ V.querySelectorAll('[data-e]').forEach(function(el){ el.te
 var st={file:null,kind:null,w:0,h:0,dur:0,mode:'fast',scale:2,busy:false,cancel:false,url:null,resUrl:null};
 var gpu=!!navigator.gpu;
 var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
-var MAXPX=mobile?16e6:48e6, MAXSIDE=mobile?8192:12000;
+var ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
+var MAXPX=ios?16e6:(mobile?40e6:48e6), MAXSIDE=ios?8192:(mobile?16384:12000);
 
 var el={drop:Q('#enhDrop'),file:Q('#enhFile'),info:Q('#enhFileInfo'),opts:Q('#enhOpts'),mode:Q('#enhMode'),scale:Q('#enhScale'),out:Q('#enhOut'),warn:Q('#enhWarn'),go:Q('#enhGo'),prog:Q('#enhProg'),bar:Q('#enhBar'),pct:Q('#enhPct'),eta:Q('#enhEta'),cancel:Q('#enhCancel'),res:Q('#enhRes')};
 
@@ -27304,15 +27305,35 @@ function makeFast(srcW,srcH,outW,outH){
 /* ---------- Pro: Real-ESRGAN (ONNX Runtime Web) ---------- */
 var _ort=null, _sess=null;
 function loadScript(src){ return new Promise(function(res,rej){ var s=document.createElement('script'); s.src=src; s.async=true; s.onload=res; s.onerror=function(){rej(new Error('load '+src))}; document.head.appendChild(s); }); }
+function S(ka,en){ return ((document.documentElement.lang||'ka').slice(0,2)==='ka')?ka:en; }
+function withTimeout(pr,ms,tag){ return new Promise(function(res,rej){ var d=setTimeout(function(){rej(new Error(tag+': timeout'))},ms); pr.then(function(v){clearTimeout(d);res(v)},function(e){clearTimeout(d);rej(e)}); }); }
+async function dl(url,label,optional){
+  try{
+    var r=await fetch(url); if(!r.ok) throw new Error(label+': HTTP '+r.status+' '+url);
+    var tot=+r.headers.get('content-length')||0, rd=r.body&&r.body.getReader?r.body.getReader():null, chunks=[], got=0;
+    if(!rd){ var ab=await r.arrayBuffer(); return new Uint8Array(ab); }
+    for(;;){ var x=await rd.read(); if(x.done) break; chunks.push(x.value); got+=x.value.length;
+      setProg(tot?got/tot:0, label+' '+(got/1048576).toFixed(1)+(tot?' / '+(tot/1048576).toFixed(1):'')+' MB'); }
+    var out=new Uint8Array(got), o=0; chunks.forEach(function(c){out.set(c,o);o+=c.length}); return out;
+  }catch(e){ if(optional) return null; throw e; }
+}
 async function getSession(){
   if(_sess) return _sess;
-  if(!window.ort) await loadScript(ORT_BASE+'ort.webgpu.min.js');
-  var ort=window.ort; ort.env.wasm.wasmPaths=ORT_BASE;
-  try{ ort.env.wasm.numThreads=(self.crossOriginIsolated?Math.min(4,navigator.hardwareConcurrency||2):1); }catch(e){}
-  var mr=await fetch(MODEL_URL); if(!mr.ok) throw new Error('model file missing: '+MODEL_URL+' ('+mr.status+')'); var buf=await mr.arrayBuffer();
-  var eps=gpu?['webgpu','wasm']:['wasm'];
-  _sess=await ort.InferenceSession.create(new Uint8Array(buf),{executionProviders:eps,graphOptimizationLevel:'all'});
-  _ort=ort; return _sess;
+  var stage='lib';
+  try{
+    if(!window.ort){ setProg(0,S('ბიბლიოთეკა იტვირთება…','Loading library…')); await withTimeout(loadScript(ORT_BASE+'ort.webgpu.min.js'),45000,'lib'); }
+    var ort=window.ort; ort.env.wasm.wasmPaths=ORT_BASE;
+    try{ ort.env.wasm.numThreads=(self.crossOriginIsolated?Math.min(4,navigator.hardwareConcurrency||2):1); }catch(e){}
+    stage='runtime';
+    if(!window.__enhWasmWarm){ await withTimeout(dl(ORT_BASE+'ort-wasm-simd-threaded.jsep.wasm',S('AI ძრავა','AI engine'),true),120000,'runtime'); window.__enhWasmWarm=1; }
+    stage='model';
+    var buf=await withTimeout(dl(MODEL_URL,S('AI მოდელი','AI model')),60000,'model');
+    setProg(0,S('AI ინიციალიზაცია…','Initializing AI…')); await tick();
+    var opt={graphOptimizationLevel:'all'}, tried=[];
+    if(gpu){ stage='init-gpu'; try{ _sess=await withTimeout(ort.InferenceSession.create(buf,Object.assign({executionProviders:['webgpu']},opt)),90000,'init-gpu'); }catch(e){ tried.push(e.message||e); _sess=null; } }
+    if(!_sess){ stage='init-cpu'; setProg(0,S('AI ინიციალიზაცია (CPU)…','Initializing AI (CPU)…')); await tick(); _sess=await withTimeout(ort.InferenceSession.create(buf,Object.assign({executionProviders:['wasm']},opt)),90000,'init-cpu'); window.__enhCpu=true; }
+    _ort=ort; return _sess;
+  }catch(e){ throw new Error('['+stage+'] '+(e&&e.message||e)); }
 }
 /* src: canvas (2D) holding the source; dst: canvas 2D final size; returns when done */
 async function proUpscale(srcCv,dstCv,scale,onTile,shouldStop){
@@ -27491,7 +27512,7 @@ el.go.addEventListener('click',async function(){
     else { setProg(1,t('done'),''); if(st.kind==='image') showImageResult(blob); else showVideoResult(blob); }
   }catch(e){
     console.warn('enhancer',e);
-    var m=t('err'); var em=e&&e.message||''; if(em==='noenc') m=t('noEnc'); else if(/^load /.test(em)||/fetch|model|onnx/i.test(em)) m=t('aiFail'); else if(em==='big') m=t('tooBig'); warn(m+(em?' ['+String(em).slice(0,140)+']':'')); el.prog.hidden=true;
+    var m=t('err'); var em=e&&e.message||''; if(em==='noenc') m=t('noEnc'); else if(/^\[(lib|runtime|model|init)/.test(em)||/^load /.test(em)||/fetch|model|onnx/i.test(em)) m=t('aiFail'); else if(em==='big') m=t('tooBig'); warn(m+(em?' ['+String(em).slice(0,140)+']':'')); el.prog.hidden=true;
   }
   try{ wake&&wake.release(); }catch(e){} wake=null;
   st.busy=false; st.cancel=false; refreshWarn();
