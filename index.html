@@ -27330,8 +27330,8 @@ async function getSession(){
     var buf=await withTimeout(dl(MODEL_URL,S('AI მოდელი','AI model')),60000,'model');
     setProg(0,S('AI ინიციალიზაცია…','Initializing AI…')); await tick();
     var opt={graphOptimizationLevel:'all'}, tried=[];
-    if(gpu){ stage='init-gpu'; try{ _sess=await withTimeout(ort.InferenceSession.create(buf,Object.assign({executionProviders:['webgpu']},opt)),90000,'init-gpu'); }catch(e){ tried.push(e.message||e); _sess=null; } }
-    if(!_sess){ stage='init-cpu'; setProg(0,S('AI ინიციალიზაცია (CPU)…','Initializing AI (CPU)…')); await tick(); _sess=await withTimeout(ort.InferenceSession.create(buf,Object.assign({executionProviders:['wasm']},opt)),90000,'init-cpu'); window.__enhCpu=true; }
+    if(gpu){ stage='init-gpu'; try{ _sess=await withTimeout(ort.InferenceSession.create(buf,Object.assign({executionProviders:['webgpu']},opt)),90000,'init-gpu'); }catch(e){ tried.push(e.message||e); window.__enhGpuErr=String((e&&e.message)||e).slice(0,90); _sess=null; } }
+    if(!_sess){ stage='init-cpu'; setProg(0,S('AI ინიციალიზაცია (CPU)…','Initializing AI (CPU)…')); await tick(); _sess=await withTimeout(ort.InferenceSession.create(buf,Object.assign({executionProviders:['wasm']},opt)),90000,'init-cpu'); window.__enhCpu=true; if(!window.__enhGpuErr) window.__enhGpuErr=gpu?'':'no WebGPU in this browser'; }
     _ort=ort; return _sess;
   }catch(e){ throw new Error('['+stage+'] '+(e&&e.message||e)); }
 }
@@ -27374,7 +27374,7 @@ async function runImage(){
   }
   setProg(0,t('loadAi')); await tick();
   outCv=document.createElement('canvas'); outCv.width=ow; outCv.height=oh;
-  var ok=await proUpscale(src,outCv,s,function(p){ var el_=(performance.now()-t0)/1000; setProg(p,null,(p>0.02?fmtT(el_/p*(1-p))+' '+t('left'):'')+' · '+(window.__enhCpu?'CPU':'GPU')); },function(){return st.cancel;});
+  var ok=await proUpscale(src,outCv,s,function(p){ var el_=(performance.now()-t0)/1000; setProg(p,null,(p>0.02?fmtT(el_/p*(1-p))+' '+t('left'):'')+' · '+(window.__enhCpu?('CPU'+(window.__enhGpuErr?' ('+window.__enhGpuErr+')':'')):'GPU')); },function(){return st.cancel;});
   if(!ok) return null;
   setProg(.98,t('finish')); await tick();
   return await toBlob(outCv);
