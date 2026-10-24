@@ -7878,7 +7878,8 @@ html body #mnBar .mn-link[data-mn="ai"]{display:none!important}
         </div>
       </div>
       <div class="enh-grp"><span class="enh-lbl" data-e="scale"></span>
-        <div class="enh-chips enh-chips-s" id="enhScale">
+        <div class="enh-chips enh-chips-s" id="enhScale" style="grid-template-columns:repeat(3,1fr)">
+          <button type="button" class="enh-chip" data-v="1"><b>1x</b><i data-e="keepSz"></i></button>
           <button type="button" class="enh-chip is-on" data-v="2"><b>2x</b></button>
           <button type="button" class="enh-chip" data-v="4"><b>4x</b></button>
         </div>
@@ -27170,11 +27171,11 @@ var MODEL_URL='realesr-general-x4v3.onnx';
 var TILE=192, PAD=12, CORE=TILE-2*PAD;
 
 var TX={
-ka:{title:'ხარისხის გაუმჯობესება',sub:'ფოტო ან ვიდეო: გაზარდე ხარისხი 4K-მდე პირდაპირ შენს მოწყობილობაზე. ფაილი არსად იგზავნება.',drop1:'აირჩიე ან ჩააგდე ფოტო / ვიდეო',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'რეჟიმი',fastD:'სწრაფი, ბუნებრივი გამკვეთრება',proD:'AI აღადგენს დეტალებს, ნელია',scale:'გადიდება',go:'გაუმჯობესება',cancel:'შეწყვეტა',keep:'დამუშავებისას ეს გვერდი ღია და ეკრანი ჩართული დატოვე.',
+ka:{keepSz:'ზომა იგივე',title:'ხარისხის გაუმჯობესება',sub:'ფოტო ან ვიდეო: გაზარდე ხარისხი 4K-მდე პირდაპირ შენს მოწყობილობაზე. ფაილი არსად იგზავნება.',drop1:'აირჩიე ან ჩააგდე ფოტო / ვიდეო',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'რეჟიმი',fastD:'სწრაფი, ბუნებრივი გამკვეთრება',proD:'AI აღადგენს დეტალებს, ნელია',scale:'გადიდება',go:'გაუმჯობესება',cancel:'შეწყვეტა',keep:'დამუშავებისას ეს გვერდი ღია და ეკრანი ჩართული დატოვე.',
  out:'შედეგი',px:'პიქსელი',dur:'წმ',noWebgl:'ამ ბრაუზერში Fast რეჟიმი ვერ ეშვება (WebGL2 არ არის).',noGpu:'Pro AI სრული სიჩქარით საჭიროებს WebGPU-ს (Chrome / Edge კომპიუტერზე ან ახალი Android). ამ მოწყობილობაზე ძალიან ნელი იქნება.',noGpuVid:'ვიდეოზე Pro AI-ს ამ მოწყობილობაზე WebGPU სჭირდება. აირჩიე Fast.',proVidSlow:'Pro AI ვიდეოზე ნელია. რაც მცირეა ვიდეოს ზომა და ხანგრძლივობა, მით სწრაფად დასრულდება.',aiFail:'AI მოდელი ვერ ჩაიტვირთა. შეამოწმე ინტერნეტი და სცადე თავიდან.',noEnc:'ამ ბრაუზერს ვიდეოს ჩაწერა (WebCodecs) არ შეუძლია. გამოიყენე Chrome ან Edge.',tooBig:'ეს ფაილი ძალიან დიდია გასაზრდელად ამ მოწყობილობაზე.',alreadyBig:'ვიდეო უკვე 4K ან უფრო დიდია, გადიდება საჭირო არ არის.',loadAi:'AI მოდელი იტვირთება…',run:'მუშავდება…',finish:'ვასრულებ…',done:'მზადაა',err:'შეცდომა. სცადე სხვა ფაილი ან Fast რეჟიმი.',cancelled:'შეწყვეტილია.',dl:'გადმოწერა',before:'წინ',after:'შემდეგ',left:'დარჩა',silent:'ხმა ვერ გადავიტანე, ვიდეო უხმოდ შეინახა.',badType:'ეს ფორმატი არ მხარდაჭერილია.',frame:'კადრი',of:'/'},
-en:{title:'Quality Enhancer',sub:'Photo or video: upscale up to 4K right on your device. Your file is never uploaded.',drop1:'Choose or drop a photo / video',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'Mode',fastD:'Quick, natural sharpening',proD:'AI restores detail, slower',scale:'Upscale',go:'Enhance',cancel:'Cancel',keep:'Keep this page open and the screen on while it works.',
+en:{keepSz:'same size',title:'Quality Enhancer',sub:'Photo or video: upscale up to 4K right on your device. Your file is never uploaded.',drop1:'Choose or drop a photo / video',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'Mode',fastD:'Quick, natural sharpening',proD:'AI restores detail, slower',scale:'Upscale',go:'Enhance',cancel:'Cancel',keep:'Keep this page open and the screen on while it works.',
  out:'Output',px:'px',dur:'s',noWebgl:'Fast mode is not available in this browser (no WebGL2).',noGpu:'Pro AI needs WebGPU for full speed (desktop Chrome / Edge or a recent Android). It will be very slow here.',noGpuVid:'Pro AI on video needs WebGPU on this device. Choose Fast.',proVidSlow:'Pro AI is slow on video. Smaller and shorter clips finish much faster.',aiFail:'The AI model could not be loaded. Check your connection and try again.',noEnc:'This browser cannot encode video (WebCodecs). Use Chrome or Edge.',tooBig:'This file is too large to upscale on this device.',alreadyBig:'This video is already 4K or larger, no upscale needed.',loadAi:'Loading AI model…',run:'Processing…',finish:'Finishing…',done:'Done',err:'Something went wrong. Try another file or Fast mode.',cancelled:'Cancelled.',dl:'Download',before:'Before',after:'After',left:'left',silent:'Audio could not be carried over, the video was saved without sound.',badType:'This file type is not supported.',frame:'Frame',of:'/'},
-ru:{title:'Улучшение качества',sub:'Фото или видео: увеличение до 4K прямо на вашем устройстве. Файл никуда не отправляется.',drop1:'Выберите или перетащите фото / видео',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'Режим',fastD:'Быстрая естественная резкость',proD:'ИИ восстанавливает детали, медленнее',scale:'Увеличение',go:'Улучшить',cancel:'Отмена',keep:'Не закрывайте страницу и не выключайте экран во время работы.',
+ru:{keepSz:'тот же размер',title:'Улучшение качества',sub:'Фото или видео: увеличение до 4K прямо на вашем устройстве. Файл никуда не отправляется.',drop1:'Выберите или перетащите фото / видео',drop2:'JPG, PNG, WEBP, MP4, MOV, WEBM',mode:'Режим',fastD:'Быстрая естественная резкость',proD:'ИИ восстанавливает детали, медленнее',scale:'Увеличение',go:'Улучшить',cancel:'Отмена',keep:'Не закрывайте страницу и не выключайте экран во время работы.',
  out:'Результат',px:'пикс.',dur:'с',noWebgl:'Режим Fast недоступен в этом браузере (нет WebGL2).',noGpu:'Для полной скорости Pro AI нужен WebGPU (Chrome / Edge на компьютере или новый Android). Здесь будет очень медленно.',noGpuVid:'Для Pro AI на видео нужен WebGPU. Выберите Fast.',proVidSlow:'Pro AI на видео работает медленно. Чем короче и меньше ролик, тем быстрее.',aiFail:'Не удалось загрузить модель ИИ. Проверьте интернет и повторите.',noEnc:'Этот браузер не умеет кодировать видео (WebCodecs). Используйте Chrome или Edge.',tooBig:'Файл слишком большой для увеличения на этом устройстве.',alreadyBig:'Видео уже 4K или больше, увеличение не нужно.',loadAi:'Загрузка модели ИИ…',run:'Обработка…',finish:'Завершаю…',done:'Готово',err:'Ошибка. Попробуйте другой файл или режим Fast.',cancelled:'Отменено.',dl:'Скачать',before:'До',after:'После',left:'осталось',silent:'Звук перенести не удалось, видео сохранено без звука.',badType:'Этот формат не поддерживается.',frame:'Кадр',of:'/'}
 };
 function L(){var l=(document.documentElement.lang||'ka').slice(0,2);return TX[l]||TX.ka}
@@ -27202,11 +27203,11 @@ function plan(){
 }
 function refreshScaleChips(){
   var c2=st.scale, ok={};
-  [2,4].forEach(function(s){ var w=st.w*s,h=st.h*s; ok[s]= st.kind==='image' ? (w*h<=MAXPX&&Math.max(w,h)<=MAXSIDE) : (Math.max(w,h)<=3840&&Math.min(w,h)<=2160); });
+  [1,2,4].forEach(function(s){ var w=st.w*s,h=st.h*s; ok[s]= st.kind==='image' ? (w*h<=MAXPX&&Math.max(w,h)<=MAXSIDE) : (Math.max(w,h)<=3840&&Math.min(w,h)<=2160); });
   el.scale.querySelectorAll('.enh-chip').forEach(function(b){ var v=+b.getAttribute('data-v'); b.disabled=!ok[v]; });
-  if(!ok[st.scale]){ if(ok[2]) st.scale=2; else if(ok[4]) st.scale=4; }
+  if(!ok[st.scale]){ if(ok[2]) st.scale=2; else if(ok[4]) st.scale=4; else if(ok[1]) st.scale=1; }
   el.scale.querySelectorAll('.enh-chip').forEach(function(b){ b.classList.toggle('is-on',+b.getAttribute('data-v')===st.scale); });
-  return ok[2]||ok[4];
+  return ok[1]||ok[2]||ok[4];
 }
 function renderOut(){
   if(!st.file){ el.out.innerHTML=''; return; }
