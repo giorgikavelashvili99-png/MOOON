@@ -27242,7 +27242,7 @@ var st={file:null,kind:null,w:0,h:0,dur:0,mode:'classic',speed:'best',look:'clea
 var gpu=!!navigator.gpu;
 var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
 var ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
-var MAXPX=ios?16e6:(mobile?40e6:48e6), MAXSIDE=ios?8192:(mobile?16384:12000);
+var MAXPX=ios?16e6:(mobile?24e6:48e6), MAXSIDE=ios?8192:(mobile?12000:12000);
 
 var el={drop:Q('#enhDrop'),file:Q('#enhFile'),main:Q('#enhMain'),name:Q('#enhName'),meta:Q('#enhMeta'),nw:Q('#enhNew'),pvw:Q('#enhPvWrap'),aiHere:Q('#enhAiHere'),busy:Q('#enhBusy'),busyT:Q('#enhBusyT'),cmpB:Q('#enhCmpBtn'),zoomB:Q('#enhZoomBtn'),
  opts:Q('#enhOpts'),mode:Q('#enhMode'),speedSec:Q('#enhSpeedSec'),speed:Q('#enhSpeed'),look:Q('#enhLook'),fS:Q('#enhFSharp'),fC:Q('#enhFCon'),fV:Q('#enhFSat'),scale:Q('#enhScale'),out:Q('#enhOut'),warn:Q('#enhWarn'),go:Q('#enhGo'),hint:Q('#enhHint'),prog:Q('#enhProg'),bar:Q('#enhBar'),pct:Q('#enhPct'),eta:Q('#enhEta'),cancel:Q('#enhCancel'),res:Q('#enhRes'),n3:Q('#enhN3'),n4:Q('#enhN4')};
@@ -27555,7 +27555,7 @@ window.addEventListener('resize',function(){ if(st.w&&!el.main.hidden) vwFit(); 
 function gridInfo(){ var C=st.mode==='pro'?TILE-2*padFor():168; return {C:C,nx:Math.ceil(st.w/C),ny:Math.ceil(st.h/C)}; }
 function tileScale(){ return Math.max(1,Math.min(4,Math.ceil(sizeScale()))); }
 function tileKey(tx,ty){ return st.mode+'|'+(st.mode==='pro'?padFor()+'|'+tileScale():0)+'|'+tx+','+ty; }
-function maxTiles(){ var g=gridInfo(), ps=st.mode==='pro'?tileScale():4; return Math.max(8,Math.floor(220e6/(g.C*g.C*ps*ps*4*2))); }
+function maxTiles(){ var g=gridInfo(), ps=st.mode==='pro'?tileScale():4; return Math.max(8,Math.floor((mobile?120e6:220e6)/(g.C*g.C*ps*ps*4*2))); }
 function allTilesOrdered(){ var g=gridInfo(), out=[], mx=st.w/2, my=st.h/2; for(var ty=0;ty<g.ny;ty++) for(var tx=0;tx<g.nx;tx++) out.push({tx:tx,ty:ty,d:Math.hypot(tx*g.C+g.C/2-mx,ty*g.C+g.C/2-my)}); out.sort(function(a,b){return a.d-b.d;}); return out; }
 function visibleTiles(){
   var g=gridInfo(), x0=Math.max(0,-VW.tx/VW.z), y0=Math.max(0,-VW.ty/VW.z), x1=Math.min(st.w,(VW.cssW-VW.tx)/VW.z), y1=Math.min(st.h,(VW.cssH-VW.ty)/VW.z);
