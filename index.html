@@ -27327,35 +27327,30 @@ function makeFast(srcW,srcH,outW,outH){
 }
 
 /* ---------- Pro engine: Real-ESRGAN (realesr-general-x4v3) on WebGPU, own compute shaders ---------- */
-var WGSL_CONV='struct P{W:u32,H:u32,icg:u32,ocg:u32,wOff:u32,bOff:u32,act:u32,pad:u32};\n'+
-'@group(0) @binding(0) var<storage,read> inp:array<vec4<f32>>;\n@group(0) @binding(1) var<storage,read_write> outp:array<vec4<f32>>;\n@group(0) @binding(2) var<storage,read> wts:array<vec4<f32>>;\n@group(0) @binding(3) var<uniform> p:P;\n'+
-'@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid:vec3<u32>,@builtin(num_workgroups) nwg:vec3<u32>){\n'+
-' let xq=p.W/4u; let occ=p.ocg/2u; let idx=gid.x+gid.y*nwg.x*64u; if(idx>=xq*p.H*occ){return;}\n'+
-' let qx=idx%xq; let r=idx/xq; let y=r%p.H; let oc=r/p.H; let x0=qx*4u;\n'+
-' let b0=wts[p.bOff+oc*2u]; let b1=wts[p.bOff+oc*2u+1u];\n'+
-' var a00=b0;var a01=b1;var a10=b0;var a11=b1;var a20=b0;var a21=b1;var a30=b0;var a31=b1;\n'+
-' let Wi=i32(p.W); let Hi=i32(p.H);\n'+
-' for(var tap=0u;tap<9u;tap++){\n'+
-'  let yy=i32(y)+i32(tap/3u)-1; if(yy<0||yy>=Hi){continue;}\n'+
-'  let xa=i32(x0)+i32(tap%3u)-1;\n'+
-'  let v0=xa>=0&&xa<Wi; let v1=xa+1>=0&&xa+1<Wi; let v2=xa+2>=0&&xa+2<Wi; let v3=xa+3>=0&&xa+3<Wi;\n'+
-'  let rb=u32(yy)*p.W;\n'+
-'  for(var g=0u;g<p.icg;g++){\n'+
-'   var x0v=vec4<f32>(0.0);var x1v=x0v;var x2v=x0v;var x3v=x0v;\n'+
-'   if(v0){x0v=inp[(rb+u32(xa))*p.icg+g];} if(v1){x1v=inp[(rb+u32(xa+1))*p.icg+g];} if(v2){x2v=inp[(rb+u32(xa+2))*p.icg+g];} if(v3){x3v=inp[(rb+u32(xa+3))*p.icg+g];}\n'+
-'   for(var c=0u;c<4u;c++){\n'+
-'    let wb=p.wOff+(tap*p.icg*4u+g*4u+c)*p.ocg+oc*2u; let w0=wts[wb]; let w1=wts[wb+1u];\n'+
-'    let s0=x0v[c];let s1=x1v[c];let s2=x2v[c];let s3=x3v[c];\n'+
-'    a00+=s0*w0;a01+=s0*w1;a10+=s1*w0;a11+=s1*w1;a20+=s2*w0;a21+=s2*w1;a30+=s3*w0;a31+=s3*w1;\n'+
-'   }\n  }\n }\n'+
-' if(p.act==1u){\n'+
-'  let q0=wts[p.bOff+p.ocg+oc*2u]; let q1=wts[p.bOff+p.ocg+oc*2u+1u];\n'+
-'  a00=select(a00*q0,a00,a00>=vec4<f32>(0.0));a01=select(a01*q1,a01,a01>=vec4<f32>(0.0));\n'+
-'  a10=select(a10*q0,a10,a10>=vec4<f32>(0.0));a11=select(a11*q1,a11,a11>=vec4<f32>(0.0));\n'+
-'  a20=select(a20*q0,a20,a20>=vec4<f32>(0.0));a21=select(a21*q1,a21,a21>=vec4<f32>(0.0));\n'+
-'  a30=select(a30*q0,a30,a30>=vec4<f32>(0.0));a31=select(a31*q1,a31,a31>=vec4<f32>(0.0));\n }\n'+
-' let ob=(y*p.W+x0)*p.ocg+oc*2u;\n'+
-' outp[ob]=a00;outp[ob+1u]=a01;outp[ob+p.ocg]=a10;outp[ob+p.ocg+1u]=a11;outp[ob+2u*p.ocg]=a20;outp[ob+2u*p.ocg+1u]=a21;outp[ob+3u*p.ocg]=a30;outp[ob+3u*p.ocg+1u]=a31;\n}';
+var WGSL_CONV=(function(){
+  var s='struct P{W:u32,H:u32,icg:u32,ocg:u32,wOff:u32,bOff:u32,act:u32,pad:u32};\n'+
+  '@group(0) @binding(0) var<storage,read> inp:array<vec4<f32>>;\n@group(0) @binding(1) var<storage,read_write> outp:array<vec4<f32>>;\n@group(0) @binding(2) var<storage,read> wts:array<vec4<f32>>;\n@group(0) @binding(3) var<uniform> p:P;\n'+
+  '@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid:vec3<u32>,@builtin(num_workgroups) nwg:vec3<u32>){\n'+
+  ' let xq=p.W/8u; let occ=p.ocg/2u; let idx=gid.x+gid.y*nwg.x*64u; if(idx>=xq*p.H*occ){return;}\n'+
+  ' let qx=idx%xq; let r=idx/xq; let y=r%p.H; let oc=r/p.H; let x0=i32(qx*8u);\n'+
+  ' let b0=wts[p.bOff+oc*2u]; let b1=wts[p.bOff+oc*2u+1u]; let Wi=i32(p.W); let Hi=i32(p.H);\n';
+  for(var k=0;k<8;k++) s+=' var a'+k+'0=b0; var a'+k+'1=b1;\n';
+  s+=' for(var dy=0u;dy<3u;dy++){\n  let yy=i32(y)+i32(dy)-1; if(yy<0||yy>=Hi){continue;}\n  let rb=u32(yy)*p.W;\n  for(var g=0u;g<p.icg;g++){\n';
+  for(var j=0;j<10;j++) s+='   var v'+j+'=vec4<f32>(0.0); { let xx='+'x0+'+(j-1)+'; if(xx>=0&&xx<Wi){ v'+j+'=inp[(rb+u32(xx))*p.icg+g]; } }\n';
+  s+='   for(var c=0u;c<4u;c++){\n    let wb=p.wOff+((dy*3u*p.icg*4u)+g*4u+c)*p.ocg+oc*2u; let st=p.icg*4u*p.ocg;\n';
+  for(var dx=0;dx<3;dx++){
+    s+='    { let w0=wts[wb+'+dx+'u*st]; let w1=wts[wb+'+dx+'u*st+1u];\n';
+    for(var k=0;k<8;k++) s+='      { let q=v'+(k+dx)+'[c]; a'+k+'0+=q*w0; a'+k+'1+=q*w1; }\n';
+    s+='    }\n';
+  }
+  s+='   }\n  }\n }\n';
+  s+=' if(p.act==1u){\n  let q0=wts[p.bOff+p.ocg+oc*2u]; let q1=wts[p.bOff+p.ocg+oc*2u+1u];\n';
+  for(var k=0;k<8;k++) s+='  a'+k+'0=select(a'+k+'0*q0,a'+k+'0,a'+k+'0>=vec4<f32>(0.0)); a'+k+'1=select(a'+k+'1*q1,a'+k+'1,a'+k+'1>=vec4<f32>(0.0));\n';
+  s+=' }\n let ob=(y*p.W+u32(x0))*p.ocg+oc*2u;\n';
+  for(var k=0;k<8;k++) s+=' outp[ob+'+(k)+'u*p.ocg]=a'+k+'0; outp[ob+'+(k)+'u*p.ocg+1u]=a'+k+'1;\n';
+  s+='}';
+  return s;
+})();
 var WGSL_OUT='struct O{TW:u32,off:u32,ow:u32,oh:u32};\n'+
 '@group(0) @binding(0) var<storage,read> feat:array<vec4<f32>>;\n@group(0) @binding(1) var<storage,read> base:array<vec4<f32>>;\n@group(0) @binding(2) var<storage,read_write> res:array<u32>;\n@group(0) @binding(3) var<uniform> o:O;\n'+
 '@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid:vec3<u32>,@builtin(num_workgroups) nwg:vec3<u32>){\n'+
@@ -27391,7 +27386,7 @@ async function createEngine(TILE,wbuf,status){
     dev.queue.writeBuffer(u,0,new Uint32Array([TILE,TILE,icpad/4,oc/4,wOff,bOff,k===33?0:1,0]));
     var src=k===0?inB:(k%2===1?bufA:bufB), dst=k%2===0?bufA:bufB;
     layers.push({u:u,bg:dev.createBindGroup({layout:pC.getBindGroupLayout(0),entries:[{binding:0,resource:{buffer:src}},{binding:1,resource:{buffer:dst}},{binding:2,resource:{buffer:wg}},{binding:3,resource:{buffer:u}}]}),
-      th:(TILE/4)*TILE*(oc/4/2)});
+      th:(TILE/8)*TILE*(oc/4/2)});
   }
   var uo=dev.createBuffer({size:16,usage:S.UNIFORM|S.COPY_DST});
   var bgO=dev.createBindGroup({layout:pO.getBindGroupLayout(0),entries:[{binding:0,resource:{buffer:bufB}},{binding:1,resource:{buffer:inB}},{binding:2,resource:{buffer:resB}},{binding:3,resource:{buffer:uo}}]});
@@ -27407,12 +27402,14 @@ async function createEngine(TILE,wbuf,status){
       if(lost) throw new Error('gpu lost: '+lost);
       var ow=cw*4, oh=ch*4, n=ow*oh;
       dev.queue.writeBuffer(inB,0,f32); dev.queue.writeBuffer(uo,0,new Uint32Array([TILE,pad,ow,oh]));
-      var G=3, lastY=performance.now();
+      var G=2, lastY=performance.now();
       for(var k0=0;k0<34;k0+=G){
         var enc=dev.createCommandEncoder(), pass=enc.beginComputePass(); pass.setPipeline(pC);
         for(var k=k0;k<Math.min(34,k0+G);k++){ pass.setBindGroup(0,layers[k].bg); disp(pass,layers[k].th); }
-        pass.end(); dev.queue.submit([enc.finish()]);
+        pass.end(); var ts=performance.now(); dev.queue.submit([enc.finish()]);
         await dev.queue.onSubmittedWorkDone();
+        var dt=performance.now()-ts;
+        if(dt>8) await new Promise(function(r){ setTimeout(r,Math.min(45,dt*0.7)); });
         if(performance.now()-lastY>28){ await new Promise(function(r){ var d=false; function f(){ if(!d){ d=true; r(); } } requestAnimationFrame(f); setTimeout(f,60); }); lastY=performance.now(); }
       }
       var enc2=dev.createCommandEncoder(), pass2=enc2.beginComputePass(); pass2.setPipeline(pO); pass2.setBindGroup(0,bgO); disp(pass2,n); pass2.end();
