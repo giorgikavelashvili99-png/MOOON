@@ -27363,8 +27363,12 @@ function h2f(h){ var s=(h&0x8000)?-1:1, e=(h>>10)&31, f=h&1023; if(e===0) return
 function decodeHalf(u16){ var o=new Float32Array(u16.length); for(var i=0;i<u16.length;i++) o[i]=h2f(u16[i]); return o; }
 async function createEngine(TILE,wbuf,status){
   if(!navigator.gpu) throw new Error('no WebGPU');
-  var ad=await navigator.gpu.requestAdapter({powerPreference:'high-performance'}); if(!ad) throw new Error('no GPU adapter');
-  var dev=await ad.requestDevice({requiredLimits:{maxStorageBufferBindingSize:Math.min(ad.limits.maxStorageBufferBindingSize,1<<28),maxBufferSize:Math.min(ad.limits.maxBufferSize,1<<28)}});
+  var tried=[];
+  async function tryAd(o){ try{ return await navigator.gpu.requestAdapter(o); }catch(e){ tried.push(String((e&&e.message)||e)); return null; } }
+  var ad=(await tryAd({powerPreference:'high-performance'}))||(await tryAd())||(await tryAd({powerPreference:'low-power'}))||(await tryAd({forceFallbackAdapter:true}));
+  if(!ad) throw new Error('no GPU adapter'+(tried.length?' '+tried[0]:''));
+  var dev=null;
+  try{ dev=await ad.requestDevice({requiredLimits:{maxStorageBufferBindingSize:Math.min(ad.limits.maxStorageBufferBindingSize,1<<28),maxBufferSize:Math.min(ad.limits.maxBufferSize,1<<28)}}); }catch(e1){ try{ dev=await ad.requestDevice(); }catch(e2){ throw new Error('gpu device: '+String((e2&&e2.message)||e2)); } }
   var lost=null; dev.lost.then(function(i){ lost=i.message||'device lost'; });
   dev.pushErrorScope('validation');
   var S=GPUBufferUsage, wf=decodeHalf(new Uint16Array(wbuf));
@@ -27763,7 +27767,7 @@ function showErr(e){
   var em=(e&&e.message)||String(e||''), m;
   if(em==='noenc') m=t('noEnc');
   else if(/missing/.test(em)) m=t('missing')+' ['+em+'] '+VER;
-  else if(/no WebGPU|no GPU adapter/.test(em)) m=t('noGpu');
+  else if(/no WebGPU|no GPU adapter/.test(em)) m=t('noGpu')+' ['+em.replace(/^\[[a-z]+\]\s*/,'').slice(0,120)+'] '+VER;
   else if(em==='big') m=t('tooBig');
   else if(/^\[(gpu|model|init)\]/.test(em)||/^gpu/.test(em)) m=t('aiFail')+' '+em.slice(0,200)+' '+VER;
   else m=t('err')+(em?' ['+em.slice(0,160)+'] '+VER:'');
