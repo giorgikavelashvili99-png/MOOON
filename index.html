@@ -27407,11 +27407,16 @@ async function createEngine(TILE,wbuf,status){
       if(lost) throw new Error('gpu lost: '+lost);
       var ow=cw*4, oh=ch*4, n=ow*oh;
       dev.queue.writeBuffer(inB,0,f32); dev.queue.writeBuffer(uo,0,new Uint32Array([TILE,pad,ow,oh]));
-      var enc=dev.createCommandEncoder(), pass=enc.beginComputePass();
-      pass.setPipeline(pC);
-      for(var k=0;k<34;k++){ pass.setBindGroup(0,layers[k].bg); disp(pass,layers[k].th); }
-      pass.setPipeline(pO); pass.setBindGroup(0,bgO); disp(pass,n);
-      pass.end(); enc.copyBufferToBuffer(resB,0,stg,0,n*4); dev.queue.submit([enc.finish()]);
+      var G=3, lastY=performance.now();
+      for(var k0=0;k0<34;k0+=G){
+        var enc=dev.createCommandEncoder(), pass=enc.beginComputePass(); pass.setPipeline(pC);
+        for(var k=k0;k<Math.min(34,k0+G);k++){ pass.setBindGroup(0,layers[k].bg); disp(pass,layers[k].th); }
+        pass.end(); dev.queue.submit([enc.finish()]);
+        await dev.queue.onSubmittedWorkDone();
+        if(performance.now()-lastY>28){ await new Promise(function(r){ var d=false; function f(){ if(!d){ d=true; r(); } } requestAnimationFrame(f); setTimeout(f,60); }); lastY=performance.now(); }
+      }
+      var enc2=dev.createCommandEncoder(), pass2=enc2.beginComputePass(); pass2.setPipeline(pO); pass2.setBindGroup(0,bgO); disp(pass2,n); pass2.end();
+      enc2.copyBufferToBuffer(resB,0,stg,0,n*4); dev.queue.submit([enc2.finish()]);
       await stg.mapAsync(GPUMapMode.READ,0,n*4);
       var out=new Uint8Array(stg.getMappedRange(0,n*4).slice(0)); stg.unmap(); return out;
   }
@@ -27506,7 +27511,7 @@ function beforeSrc(){ return st.kind==='image'? st.img : st.vframe; }
 function vwResize(){
   var wrap=el.pvw, cssW=wrap.clientWidth||300, maxH=Math.max(260,Math.round(window.innerHeight*.66));
   var cssH=st.w? Math.max(200,Math.min(maxH,Math.round(cssW*st.h/st.w))) : 200;
-  wrap.style.height=cssH+'px'; VW.dpr=Math.min(3,window.devicePixelRatio||1);
+  wrap.style.height=cssH+'px'; VW.dpr=Math.min(2,window.devicePixelRatio||1);
   var pw=Math.round(cssW*VW.dpr), ph=Math.round(cssH*VW.dpr); if(cv.width!==pw||cv.height!==ph){ cv.width=pw; cv.height=ph; }
   VW.cssW=cssW; VW.cssH=cssH; VW.fit=st.w?Math.min(cssW/st.w,cssH/st.h):1;
 }
@@ -27517,7 +27522,7 @@ function vwDraw(){ if(VW.raf) return; VW.raf=requestAnimationFrame(function(){ V
 function vwPaint(){
   var b=beforeSrc(); if(!b||!st.w) return;
   var d=VW.dpr, W=cv.width, H=cv.height, c=cx2;
-  c.setTransform(1,0,0,1,0,0); c.fillStyle='#0c0916'; c.fillRect(0,0,W,H); c.imageSmoothingEnabled=true; c.imageSmoothingQuality='high';
+  c.setTransform(1,0,0,1,0,0); c.fillStyle='#0c0916'; c.fillRect(0,0,W,H); c.imageSmoothingEnabled=true; c.imageSmoothingQuality=(VW.ptrs.size||VW.raf===-1)?'low':'medium';
   c.setTransform(d*VW.z,0,0,d*VW.z,d*VW.tx,d*VW.ty); c.drawImage(b,0,0,st.w,st.h);
   var dx=cmpOn?VW.div*VW.cssW:0;
   c.save(); c.setTransform(1,0,0,1,0,0); c.beginPath(); c.rect(dx*d,0,W-dx*d,H); c.clip();
