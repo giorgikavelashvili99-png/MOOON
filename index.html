@@ -23951,6 +23951,12 @@ function setFile(f){
 
 /* ============ RUN JOB ============ */
 function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); var pr=$('optProg'); if(pr) pr.style.setProperty('--mpp',p); }
+var _outN=0;
+function nextOutName(){
+  var n=0; try{ n=parseInt(localStorage.getItem('moonOutN')||'0',10)||0; }catch(e){ n=_outN; }
+  n++; _outN=n; try{ localStorage.setItem('moonOutN',String(n)); }catch(e){}
+  return 'www.moonfull4k.xyz '+n+'.mp4';
+}
 function finishFail(ticket,text){
   if(S.engine==='21'&&S.stage==='patch'){ text=text+' · '+tr('tryBackup'); try{ var bb=document.querySelector('#optEng [data-eng="12"]'); if(bb){ bb.classList.add('eng-warn'); } }catch(e){} }
   S.busy=false; setPill('err',tr('err')); msg(text,true);
@@ -24090,7 +24096,7 @@ function run(){
     bar(100); S.busy=false; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
     if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} }
     S.dlUrl=URL.createObjectURL(blob);
-    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download='patched_'+S.file.name; a.style.display=''; updateGo();
+    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(); a.style.display=''; updateGo();
   }).catch(function(e){
     if(tk){ return finishFail(tk.ticket,e.message||String(e)); }
     S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):e.message),true); refreshStatus();
