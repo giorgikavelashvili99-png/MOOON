@@ -23753,6 +23753,9 @@ var T = {
  en:{"nav": "METHOD", "title": "MOON METHOD", "sub": "Upload a video and get it in seconds", "idle": "ready", "busy": "processing", "done": "done", "err": "error", "drop": "Upload a video", "dropSub": "Drag & drop or tap to choose", "hint": "", "size": "Size", "res": "Resolution", "dur": "Duration", "preset": "Quality", "go": "Optimize", "left": "Uploads left", "week": "this week", "unl": "Unlimited", "resets": "Limit resets in", "plans": "Plans", "buy": "Get plan", "cur": "Your plan", "perMonth": "/month", "freeNote": "No payment needed", "curNote": "Current plan", "free": "Free", "freeL": "3 uploads per week", "unlimited": "Unlimited uploads", "upTo": "Up to ", "lock": "Not available on your plan", "login": "Sign in with Discord to use MOON METHOD", "loginBtn": "Sign in with Discord", "noGate": "Service not connected yet (GATE URL).", "blocked": "Your access is restricted.", "noQuota": "Weekly limit reached. Resets in: ", "expired": "Plan expired — switched to free.", "up": "Uploading", "queue": "Queued", "proc": "Processing", "ready": "Done! Download below", "dl": "Download", "tooFps": "Video frame rate ({f} fps) is above your plan limit (max {n} fps). 120 fps videos need Plan 2 or Plan 3", "noFps": "Could not read the video fps. Try another mp4 file", "tooBig": "This video is above your plan limit (max 1080p). 4K is only on the 14.99 ₾ plan", "noMeta": "Could not read the video resolution. Try another mp4 (H.264)", "pickMp4": "Choose an mp4 file", "d": "d", "h": "h", "m": "m", "wake": "Connection failed, trying again…", "slow": "Processing your video, this may take a moment…"},
  ru:{"nav": "МЕТОД", "title": "МЕТОД MOON", "sub": "Загрузите видео и получите результат за секунды", "idle": "готово", "busy": "обработка", "done": "готово", "err": "ошибка", "drop": "Загрузите видео", "dropSub": "Перетащите сюда или нажмите, чтобы выбрать", "hint": "", "size": "Размер", "res": "Разрешение", "dur": "Длительность", "preset": "Качество", "go": "Оптимизировать", "left": "Осталось загрузок", "week": "на этой неделе", "unl": "Безлимит", "resets": "Лимит обновится через", "plans": "Тарифы", "buy": "Купить", "cur": "Ваш тариф", "perMonth": "/мес", "freeNote": "Оплата не требуется", "curNote": "Текущий тариф", "free": "Бесплатно", "freeL": "3 загрузки в неделю", "unlimited": "Безлимитные загрузки", "upTo": "До ", "lock": "Недоступно на вашем тарифе", "login": "Войдите через Discord, чтобы пользоваться MOON METHOD", "loginBtn": "Войти через Discord", "noGate": "Сервис ещё не подключён (GATE URL).", "blocked": "Ваш доступ ограничен.", "noQuota": "Недельный лимит исчерпан. Обновится через: ", "expired": "Тариф истёк — переключено на бесплатный.", "up": "Загрузка", "queue": "В очереди", "proc": "Обработка", "ready": "Готово! Скачайте ниже", "dl": "Скачать", "tooFps": "Частота кадров видео ({f} fps) выше лимита вашего тарифа (макс. {n} fps). Видео 120 fps доступно только на Plan 2 и Plan 3", "noFps": "Не удалось определить fps видео. Попробуйте другой mp4-файл", "tooBig": "Разрешение видео выше лимита вашего тарифа (макс. 1080p). 4K доступно только на тарифе за 14.99 ₾", "noMeta": "Не удалось определить разрешение видео. Попробуйте другой mp4 (H.264)", "pickMp4": "Выберите mp4-файл", "d": "д", "h": "ч", "m": "мин", "wake": "Не удалось подключиться, пробую снова…", "slow": "Видео обрабатывается, это может занять немного времени…"}
 };
+T.ka.engBest='საუკეთესო'; T.ka.engBackup='რეზერვი'; T.ka.tryBackup='MOON 2.1 ვერ იმუშავა — სცადეთ MOON 1.2 (რეზერვი)';
+T.en.engBest='Best'; T.en.engBackup='Backup'; T.en.tryBackup='MOON 2.1 did not work — try MOON 1.2 (backup)';
+T.ru.engBest='Лучший'; T.ru.engBackup='Резерв'; T.ru.tryBackup='MOON 2.1 не сработал — попробуйте MOON 1.2 (резерв)';
 function L(){ try{ return (typeof currentLang!=='undefined' && T[currentLang])?currentLang:'en'; }catch(e){ return 'ka'; } }
 function tr(k){ var l=L(); try{ if(typeof currentLang!=='undefined'&&currentLang==='ka') l='ka'; }catch(e){} return (T[l]&&T[l][k])||T.en[k]||k; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -23773,7 +23776,8 @@ view.innerHTML =
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
-      '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
+      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 2.1</b><small data-k="engBest"></small></button><button type="button" data-eng="12"><b>MOON 1.2</b><small data-k="engBackup"></small></button></div>'+
+   '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
    '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a></div>'+
   '</div>'+
  '</div>'+
@@ -23788,7 +23792,7 @@ function applyLang(){
 }
 
 /* ============ STATE ============ */
-var S = {file:null, meta:null, preset:null, status:null, busy:false, jid:null};
+var S = {file:null, meta:null, preset:null, status:null, busy:false, jid:null, engine:'21', stage:''};
 var $ = function(id){ return document.getElementById(id); };
 function setPill(s,txt){ var p=$('optPill'); p.setAttribute('data-s',s); p.querySelector('em').textContent=txt; }
 function fmtSize(b){ return b>=1073741824?(b/1073741824).toFixed(2)+' GB':(b/1048576).toFixed(1)+' MB'; }
@@ -23948,22 +23952,27 @@ function setFile(f){
 /* ============ RUN JOB ============ */
 function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); var pr=$('optProg'); if(pr) pr.style.setProperty('--mpp',p); }
 function finishFail(ticket,text){
+  if(S.engine==='21'&&S.stage==='patch'){ text=text+' · '+tr('tryBackup'); try{ var bb=document.querySelector('#optEng [data-eng="12"]'); if(bb){ bb.classList.add('eng-warn'); } }catch(e){} }
   S.busy=false; setPill('err',tr('err')); msg(text,true);
   if(ticket) api('/refund',{method:'POST',body:JSON.stringify({ticket:ticket,uid:ident().uid})}).catch(function(){});
   refreshStatus();
 }
 /* ---- ვიდეოს დაპატჩვა ბრაუზერში (core.js) ---- */
-function findCore(){
+var ENGINE_KEY={'12':'3.0'};   /* MOON 1.2 (backup) registers as engine 3.0; MOON 2.1 is every other registered engine (3.5) */
+function findCore(eng){
   try{
     var reg=window.ZilemPatchEngines;
-    if(reg){ var ks=Object.keys(reg); for(var i=ks.length-1;i>=0;i--){ if(reg[ks[i]]&&reg[ks[i]].quickPatch) return reg[ks[i]]; } }
+    if(reg){
+      if(eng==='12'){ var e12=reg[ENGINE_KEY['12']]; return (e12&&e12.quickPatch)?e12:null; }
+      var ks=Object.keys(reg); for(var i=ks.length-1;i>=0;i--){ if(ks[i]===ENGINE_KEY['12']) continue; if(reg[ks[i]]&&reg[ks[i]].quickPatch) return reg[ks[i]]; }
+    }
   }catch(e){}
   return null;
 }
 function isMp4(u8){ return u8&&u8.byteLength>12&&String.fromCharCode(u8[4],u8[5],u8[6],u8[7])==='ftyp'; }
-function patchWithCore(file,fps){
+function patchWithCore(file,fps,eng){
   return file.arrayBuffer().then(function(ab){
-    var core=findCore(); if(!core) throw new Error('პატჩერის ბირთვი (core.js) ვერ ჩაიტვირთა');
+    var core=findCore(eng); if(!core) throw new Error('პატჩერის ბირთვი (core.js) ვერ ჩაიტვირთა');
     var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
     if(c&&c.compatible===false) throw new Error('ვიდეო არ არის თავსებადი: '+(c.reason||''));
     /* quickPatch-ის შედეგი პირდაპირ Uint8Array-ია (არა .out). თუ ცარიელი გამოვიდა, ოფციებს ვამცირებთ */
@@ -23984,19 +23993,19 @@ function patchWithCore(file,fps){
 }
 
 /* core.js is no longer a public file: it is fetched from the gate with a ticket, once per page session */
-function ensureCore(ticket){
-  if(findCore()) return Promise.resolve();                 /* already loaded (this session, or still served by the page) */
+function ensureCore(ticket,eng){
+  if(findCore(eng)) return Promise.resolve();                 /* already loaded (this session, or still served by the page) */
   if(!ticket) return Promise.reject(new Error('core ticket missing'));
-  return fetchTO(CFG.GATE+'/core?ticket='+encodeURIComponent(ticket),{cache:'no-store'},30000).then(function(r){
+  return fetchTO(CFG.GATE+'/core?ticket='+encodeURIComponent(ticket)+(eng==='12'?'&engine=12':''),{cache:'no-store'},30000).then(function(r){
     if(!r.ok) return r.json().catch(function(){return {};}).then(function(j){ throw new Error('core: '+(j.error||('HTTP '+r.status))); });
     return r.text();
   }).then(function(code){
     var el=document.createElement('script'); el.textContent=code; document.head.appendChild(el); el.parentNode.removeChild(el);
-    if(!findCore()) throw new Error('core load failed');
+    if(!findCore(eng)) throw new Error('core load failed');
   });
 }
-function patchInBrowser(file,fps,ticket){
-  return ensureCore(ticket).then(function(){ return patchWithCore(file,fps); });
+function patchInBrowser(file,fps,ticket,eng){
+  return ensureCore(ticket,eng).then(function(){ return patchWithCore(file,fps,eng); });
 }
 /* ---- patcher-ის გამოძახება: გაღვიძება (Render cold start) + retry + დიაგნოსტიკა ---- */
 function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
@@ -24048,7 +24057,7 @@ function run(){
   var preset=PRESETS.filter(function(p){return p.id===S.preset;})[0];
   var tk=null;
   try{ var _u=user(); if(_u&&window.__moonActivity) window.__moonActivity('optimizing',_u,S.file&&S.file.name); }catch(e){}
-  S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('proc')+'…');
+  S.stage=''; S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('proc')+'…');
   api('/ticket',{method:'POST',body:JSON.stringify(Object.assign({preset:S.preset,size:S.file.size,meta:S.meta},id))}).then(function(t){
     tk=t; S.status=t.status||S.status; renderQuota(); bar(10);
     /* სერვერზე ვიდეო აღარ იტვირთება: მხოლოდ ბილეთის შემოწმება */
@@ -24057,7 +24066,7 @@ function run(){
   }).then(function(srv){
     bar(25); msg(tr('proc')+'…');
     var fps=Math.min(preset.fps, Number(srv.fps)>0?Number(srv.fps):preset.fps);
-    return patchInBrowser(S.file,fps,tk&&tk.ticket);
+    S.stage='patch'; return patchInBrowser(S.file,fps,tk&&tk.ticket,S.engine);
   }).then(function(blob){
     bar(100); S.busy=false; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
     if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} }
@@ -24070,6 +24079,11 @@ function run(){
 }
 
 /* ============ EVENTS ============ */
+var engBox=$('optEng');
+function setEngine(v){ if(S.busy) return; S.engine=(v==='12')?'12':'21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
+  engBox.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-eng')===S.engine; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); if(on) b.classList.remove('eng-warn'); }); }
+engBox.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-eng]'); if(b) setEngine(b.getAttribute('data-eng')); });
+try{ if(localStorage.getItem('moonEngine')==='12') setEngine('12'); else setEngine('21'); }catch(e){ setEngine('21'); }
 var drop=$('optDrop');
 $('optFile').addEventListener('change',function(e){ setFile(e.target.files[0]); });
 ['dragenter','dragover'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.add('drag'); }); });
@@ -27241,6 +27255,16 @@ window.moonVideoMsgNode=function(text,role){
 /* single-line labels with overflow:hidden: room for tall Georgian letters (no other change) */
 html body #optView .opt-stat small,html body .ttdl-titlebar-path,html body .ttdl-dl-label,html body .wizard-step-label,html body .q-rec{line-height:1.6!important;padding-top:.16em!important;padding-bottom:.2em!important}
 html body .ttdl-analyze-btn{line-height:1.5!important}
+</style>
+<style id="moon-engine-css">
+#optView .opt-eng{width:100%;max-width:504px;box-sizing:border-box;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 auto 12px}
+#optView .opt-eng button{width:100%;min-width:0;appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:11px 10px 12px;border-radius:18px;border:1.5px solid var(--o-line-2);background:rgba(255,255,255,.04);color:var(--o-dim);font-family:inherit;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+#optView .opt-eng button b{font-size:15px;font-weight:800;line-height:1.5;color:inherit}
+#optView .opt-eng button small{font-size:12px;line-height:1.6;padding-bottom:.1em;color:var(--o-faint)}
+#optView .opt-eng button.on{border-color:rgba(var(--o-tide-rgb),.9);background:rgba(var(--o-tide-rgb),.12);color:var(--o-text)}
+#optView .opt-eng button.on small{color:var(--o-dim)}
+#optView .opt-eng button.eng-warn{border-color:#f0abfc;box-shadow:0 0 0 3px rgba(240,171,252,.18)}
+#optView .opt-eng button:focus-visible{outline:2px solid var(--o-tide);outline-offset:2px}
 </style>
 </body>
 </html>
