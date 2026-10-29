@@ -23957,6 +23957,10 @@ function nextOutName(){
   n++; _outN=n; try{ localStorage.setItem('moonOutN',String(n)); }catch(e){}
   return 'www.moonfull4k.xyz '+n+'.mp4';
 }
+function scrollToProg(blockMode){
+  try{ var p=$('optProg'); if(!p||p.style.display==='none') return;
+    requestAnimationFrame(function(){ try{ p.scrollIntoView({behavior:'smooth',block:blockMode||'start'}); }catch(e){ p.scrollIntoView(); } }); }catch(e){}
+}
 function finishFail(ticket,text){
   if(S.engine==='21'&&S.stage==='patch'){ text=text+' · '+tr('tryBackup'); try{ var bb=document.querySelector('#optEng [data-eng="12"]'); if(bb){ bb.classList.add('eng-warn'); } }catch(e){} }
   S.busy=false; setPill('err',tr('err')); msg(text,true);
@@ -24082,7 +24086,7 @@ function run(){
   var preset=PRESETS.filter(function(p){return p.id===S.preset;})[0];
   var tk=null;
   try{ var _u=user(); if(_u&&window.__moonActivity) window.__moonActivity('optimizing',_u,S.file&&S.file.name); }catch(e){}
-  S.stage=''; S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('proc')+'…');
+  S.stage=''; S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('proc')+'…'); setTimeout(function(){ scrollToProg('start'); },60);
   api('/ticket',{method:'POST',body:JSON.stringify(Object.assign({preset:S.preset,size:S.file.size,meta:S.meta},id))}).then(function(t){
     tk=t; S.status=t.status||S.status; renderQuota(); bar(10);
     /* სერვერზე ვიდეო აღარ იტვირთება: მხოლოდ ბილეთის შემოწმება */
@@ -24096,7 +24100,7 @@ function run(){
     bar(100); S.busy=false; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
     if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} }
     S.dlUrl=URL.createObjectURL(blob);
-    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(); a.style.display=''; updateGo();
+    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(); a.style.display=''; updateGo(); setTimeout(function(){ scrollToProg('nearest'); },120);
   }).catch(function(e){
     if(tk){ return finishFail(tk.ticket,e.message||String(e)); }
     S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):e.message),true); refreshStatus();
@@ -27289,6 +27293,7 @@ html body .ttdl-analyze-btn{line-height:1.5!important}
 #optView .opt-eng button.on{border-color:rgba(var(--o-tide-rgb),.9);background:rgba(var(--o-tide-rgb),.12);color:var(--o-text)}
 #optView .opt-eng button.on small{color:var(--o-dim)}
 #optView .opt-eng button.eng-warn{border-color:#f0abfc;box-shadow:0 0 0 3px rgba(240,171,252,.18)}
+#optView #optProg{scroll-margin-top:84px}
 #optView .opt-eng button:focus-visible{outline:2px solid var(--o-tide);outline-offset:2px}
 </style>
 </body>
