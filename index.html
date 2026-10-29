@@ -6874,7 +6874,6 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 @media(prefers-reduced-motion:reduce){#moonIntro .mx-sc,#moonIntro .mx-ci,#moonIntro .mx-fs{animation:none;opacity:1}}
 </style>
 <style id="moon-menu-pages">.site-menu .qn-tab--go::after{content:"›";font-size:20px}</style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -7876,7 +7875,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
           <input type="file" id="videoInput" accept="video/*">
           <div class="dz-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
-              <path class="dz-plus" d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4.5 15v3a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3"/>
+              <path class="dz-plus" d="M12 5v14M5 12h14"/>
             </svg>
           </div>
           <div class="dz-title" data-i18n="dzTitle">ატვირთეთ ვიდეო ფასის გამოსათვლელად</div>
@@ -8089,7 +8088,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
             <input type="file" id="videoInputAo" accept="video/*">
             <div class="dz-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
-                <path class="dz-plus" d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4.5 15v3a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3"/>
+                <path class="dz-plus" d="M12 5v14M5 12h14"/>
               </svg>
             </div>
             <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
@@ -8221,7 +8220,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
           <input type="file" id="videoInputWp" accept="video/*">
           <div class="dz-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
-              <path class="dz-plus" d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4.5 15v3a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3"/>
+              <path class="dz-plus" d="M12 5v14M5 12h14"/>
             </svg>
           </div>
           <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
@@ -8377,7 +8376,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
           <input type="file" id="videoInputMp" accept="video/*">
           <div class="dz-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
-              <path class="dz-plus" d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4.5 15v3a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3"/>
+              <path class="dz-plus" d="M12 5v14M5 12h14"/>
             </svg>
           </div>
           <div class="dz-title" data-i18n="dzTitleSimple">ატვირთეთ ვიდეო</div>
@@ -20922,7 +20921,7 @@ function poseTrack(track,L){
     s=g.sl[i];w=s._w||(s._w=s.firstElementChild);if(!w) continue;
     d=(g.c[i]-mid)/g.w;a=Math.min(Math.abs(d),2);
     dimSlide(s,Math.min(a,1));
-    sc=(1-.09*a).toFixed(3);ry='0.0';if(Math.abs(d)<.004){sc='1.000';ry='0.0'}k=L?'x':sc+ry;
+    sc=(1-.09*a).toFixed(3);ry=Math.max(-48,Math.min(48,-d*34)).toFixed(1);if(Math.abs(d)<.004){sc='1.000';ry='0.0'}k=L?'x':sc+ry;
     if(s._mo!==k){s._mo=k;
       /* the INNER wrapper is tilted, never the snap target itself: scroll-snap measures the transformed box,
          which made the card overshoot ~6px and then slide back */
@@ -27238,180 +27237,10 @@ window.moonVideoMsgNode=function(text,role){
 })();
 </script>
 
-<style id="moon-clean-theme">
-/* ===== MOONFULL 4K — plain dark background + clean pill buttons (colours untouched) ===== */
-html{background:#0a0a0a!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6){--zf:'Inter','BPGAcademiuriU',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#0a0a0a!important}
-/* Latin letters & digits in Inter, Georgian keeps its own font (Inter has no Georgian glyphs) */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :not(code):not(kbd):not(pre):not(samp):not(sup):not(.ttdl-log):not(.ttdl-log *):not(.ttdl-titlebar):not(.ttdl-titlebar *):not(svg):not(svg *){font-family:var(--zf)!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(input,textarea,select,button){font-family:var(--zf)!important}
-/* background: plain dark instead of the space picture */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .bg-layer{display:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-bar{background:rgba(10,10,10,.82)!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .messenger-page{background:#0a0a0a!important}
-
-/* ---------- buttons: pill shape, crisp text, soft press (same colours) ---------- */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.pc-toggle-btn,.order-btn,.wizard-confirm-btn,.tt-auto-btn,.sr-reset-btn,.sr-reject-retry,.scan-progress-cancel,.mooon-prompt-yes,.mooon-prompt-no,.mooon-auto-retry-btn,.mn-cta,.mn-discord-btn,.ttdl-analyze-btn,.ttdl-dl-btn,.tnf-send-btn,.st-btn,.opt-buy,.opt-go,.opt-discord,.mcu-btn,.discord-btn,.c-submit,.c-reply-submit,.c-discord-login-btn,.c-more-btn,.moon-confirm-yes,.moon-confirm-no,.messenger-complete-btn,.messenger-cancel-btn,.mrp-cancel,.hzm-login,.hzm-getbtn,.dg-intro-btn,.discord-gate-skip,.a-go,.a-save-btn,.a-logout-btn,.ad-new){
- border-radius:999px!important;font-weight:650!important;letter-spacing:-.005em!important;text-shadow:none!important;
- -webkit-tap-highlight-color:transparent;transition:transform .14s ease,filter .18s ease,opacity .18s ease!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.pc-toggle-btn,.order-btn,.wizard-confirm-btn,.tt-auto-btn,.mooon-prompt-yes,.mn-cta,.mn-discord-btn,.ttdl-analyze-btn,.ttdl-dl-btn,.opt-buy,.opt-go,.opt-discord,.discord-btn,.c-submit,.moon-confirm-yes,.hzm-getbtn,.hzm-login,.dg-intro-btn):not(:disabled):hover{filter:brightness(1.07)}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.pc-toggle-btn,.order-btn,.wizard-confirm-btn,.tt-auto-btn,.sr-reset-btn,.mooon-prompt-yes,.mooon-prompt-no,.mn-cta,.mn-discord-btn,.ttdl-analyze-btn,.ttdl-dl-btn,.tnf-send-btn,.st-btn,.opt-buy,.opt-go,.opt-discord,.mcu-btn,.discord-btn,.c-submit,.c-reply-submit,.moon-confirm-yes,.moon-confirm-no,.messenger-complete-btn,.messenger-cancel-btn,.hzm-getbtn,.hzm-login,.dg-intro-btn):not(:disabled):active{transform:scale(.97)}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.pc-toggle-btn,.order-btn,.wizard-confirm-btn,.mn-cta,.ttdl-analyze-btn,.opt-buy,.opt-go) *{text-shadow:none!important}
-
-/* ===== Zilem-style shapes (sizes, roundness, spacing, layout) — colours stay as they are ===== */
-/* ---------- menu: tool tiles + big rounded rows ---------- */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu{border-radius:28px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-scroll{padding:16px 16px 18px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-label{text-transform:uppercase!important;letter-spacing:.2em!important;font-size:11.5px!important;font-weight:700!important;margin:18px 6px 12px!important;padding:0!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-group{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px!important;height:auto!important;min-height:118px!important;margin:0!important;padding:16px 16px 15px!important;border-radius:24px!important;background:rgba(255,255,255,.045)!important;border:1px solid rgba(255,255,255,.06)!important;text-align:left!important;white-space:normal!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row:last-child:nth-child(odd){grid-column:1/-1!important;min-height:0!important;flex-direction:row!important;align-items:center!important;gap:14px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row:is(:hover,.is-active,[aria-current]){background:rgba(255,255,255,.075)!important;border-color:rgba(255,255,255,.28)!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row .hzm-tile{width:30px!important;height:30px!important;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;justify-content:flex-start!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row .hzm-tile svg{width:26px!important;height:26px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row .hzm-chev{display:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row .hzm-lbl{display:block!important;font-size:16.5px!important;font-weight:700!important;line-height:1.2!important;margin:2px 0 0!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-row .zt-sub{display:block;font-size:13px;font-weight:500;line-height:1.3;opacity:.62;margin-top:3px}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row .zt-txt{display:flex;flex-direction:column;min-width:0}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-group{display:flex!important;flex-direction:column!important;gap:8px!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row{height:auto!important;min-height:58px!important;margin:0!important;padding:0 16px 0 14px!important;gap:14px!important;border-radius:22px!important;background:rgba(255,255,255,.045)!important;border:1px solid rgba(255,255,255,.06)!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row:is(:hover,.is-active){background:rgba(255,255,255,.075)!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row .hzm-tile{background:none!important;border:0!important;box-shadow:none!important;width:28px!important;height:28px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row .hzm-tile svg{width:23px!important;height:23px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row .hzm-lbl{font-size:16px!important;font-weight:650!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-promo{border-radius:24px!important;padding:14px 16px!important;background:rgba(255,255,255,.045)!important;border:1px solid rgba(255,255,255,.06)!important}
-
-/* ---------- big cards & wells ---------- */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView .opt,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .ttdl-shell,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.pc-accordion-body,.pc-accordion-body.panel),html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .mn-card{border-radius:32px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-card,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .opt-plan{border-radius:28px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView :is(.opt-quota,.opt-stats,.opt-card,.opt-plan-mini),html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.c-form,.c-empty,.pm-picker){border-radius:26px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView .opt-drop,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.drop-zone,.simple-drop-zone){border-radius:30px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.mp-box,.wp-box,.eo-box,.quality-btn){border-radius:22px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .ttdl-log{border-radius:22px!important}
-
-/* ---------- small uppercase section labels ---------- */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView :is(.opt-q-main small,.opt-stats small,.opt-stats span:first-child,.opt-label),html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .opt-plan h4,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .ttdl-label{letter-spacing:.05em!important}
-
-/* ---------- inputs: round ---------- */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .ttdl-input-wrap,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .ttdl-input{border-radius:22px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .messenger-input-row{border-radius:999px!important}
-
-/* ---------- main buttons: tall pills, bold text ---------- */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(#optView .opt-go,.ttdl-analyze-btn,.order-btn,.wizard-confirm-btn,.mn-discord-btn,.mn-cta){border-radius:999px!important;font-weight:700!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.opt-buy,.tt-auto-btn,.mooon-prompt-yes,.mooon-prompt-no,.st-btn,.sr-reset-btn){border-radius:999px!important;font-weight:700!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-toggle-btn{border-radius:999px!important;font-weight:700!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.c-submit,.mcu-btn,.messenger-complete-btn,.messenger-cancel-btn){border-radius:999px!important;font-weight:700!important}
-
-/* ---------- chips ---------- */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.pc-feature,.opt-pill,.ttdl-status-chip,.op-slot){border-radius:999px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView .or-step{border-radius:22px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .msg-bubble{border-radius:24px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .msg-bubble.customer{border-bottom-right-radius:8px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .msg-bubble.admin{border-bottom-left-radius:8px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .mcu-card{border-radius:24px!important}
-
-/* ===== gradient headings: no clipped/hollow descenders, a little thicker ===== */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(#optView .opt-head h2,.pc-heading,.ttdl-heading,.pl-hd h2,.mn-view>h2){padding-bottom:.2em!important;margin-bottom:0!important;padding-top:.04em!important;overflow:visible!important;font-weight:900!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView .opt-head h2{-webkit-text-stroke-width:1.3px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) :is(.pc-heading,.pl-hd h2,.mn-view>h2){-webkit-text-stroke-width:.9px!important}
-
-/* ===== phone menu = full-screen sheet like Zilem ===== */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .zm-head{display:none}
-@media (max-width:900px){
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu{top:0!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;max-width:none!important;height:auto!important;max-height:none!important;border-radius:0!important;border:0!important;background:#0a0a0a!important;box-shadow:none!important;z-index:10050!important;flex-direction:column!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-scrim{z-index:10049!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .zm-head{display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;height:76px;padding:0 18px 0 22px;border-bottom:1px solid rgba(255,255,255,.07)}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .zm-head .zm-logo{display:block;width:150px;height:25px;background-position:left center!important;background-size:contain!important;background-repeat:no-repeat!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .zm-x{all:unset;box-sizing:border-box;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:rgba(255,255,255,.07);color:#f5f5f5;transition:transform .14s,background .2s}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .zm-x:active{transform:scale(.92)}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .zm-x svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu .hzm-scroll{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;padding:10px 20px 34px!important;gap:0!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu .hzm-label{font-size:12.5px!important;letter-spacing:.22em!important;margin:24px 4px 14px!important}
- /* tool tiles */
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-group{gap:12px!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row{min-height:132px!important;padding:20px 18px 18px!important;border-radius:28px!important;gap:12px!important;background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.045)!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row:is(.is-active,[aria-current],:focus-visible){background:rgba(255,255,255,.085)!important;border:1.5px solid rgba(255,255,255,.5)!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row .hzm-tile svg{width:28px!important;height:28px!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--tools .hzm-row .hzm-lbl{font-size:19px!important;font-weight:800!important;color:#fff!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-row .zt-sub{font-size:14px!important;font-weight:600!important;margin-top:5px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- /* more rows */
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-group{gap:12px!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row{min-height:66px!important;padding:0 20px 0 18px!important;gap:16px!important;border-radius:34px!important;background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.045)!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row .hzm-lbl{font-size:17.5px!important;font-weight:750!important;color:#fff!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row .hzm-tile svg{width:25px!important;height:25px!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hzm-sec--more .hzm-row>svg:last-child{display:block!important;flex:none!important;margin-left:auto!important;width:20px!important;height:20px!important;opacity:.55!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu .hzm-row::before,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu .hzm-row::after{display:none!important}
- /* cards at the bottom */
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu :is(.hzm-card,.hzm-acct,.hzm-promo){border-radius:30px!important;margin-top:12px!important}
- html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .hz-menu .hzm-acct{padding:4px!important}
-}
-
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView .opt-head{padding-top:0!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView .opt:has(> .opt-corner[style*="none"]) .opt-head{margin-top:12px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) #optView .opt-head p{margin-top:6px!important}
-
-/* order windows: upload icon — open arrow (no black fill), fully flat green circle, shine sweep only */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-plus{fill:none!important;stroke:#fff!important;stroke-width:2.2!important;stroke-linejoin:round!important;stroke-linecap:round!important;transform:none!important;transition:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon svg{fill:none!important;position:relative;z-index:2}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon{position:relative!important;overflow:hidden!important;isolation:isolate;background:#14d011!important;background-image:none!important;border-color:transparent!important;box-shadow:0 0 0 1px #14d011,0 8px 22px -8px rgba(20,208,17,.55)!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon::before{content:none!important;display:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon::after{content:"";display:block!important;opacity:1!important;position:absolute;top:-20%;bottom:-20%;left:0;width:45%;z-index:1;pointer-events:none;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.5),rgba(255,255,255,0));transform:translateX(-160%) skewX(-18deg);animation:none!important;display:none!important}
-@keyframes zDzShine{0%,55%{transform:translateX(-160%) skewX(-18deg)}85%,100%{transform:translateX(330%) skewX(-18deg)}}
-@media (prefers-reduced-motion:reduce){html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon::after{animation:none!important;display:none!important}}
-
-/* prices on plan cards: no white outline over the coloured digits */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .opt-plan .pr,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .opt-plan .pr *{-webkit-text-stroke:0 transparent!important;text-shadow:none!important}
-
-/* smoother letters: thinner contour + soft edge instead of a heavy rough outline */
-html{-webkit-text-stroke:.28px currentColor!important}
-html body :is(input,textarea,select){-webkit-text-stroke:.2px currentColor!important}
-html body #optView .opt-head h2,html body #optView .opt-h3,html body #optView .opt-plan .pr,html body #plansView .opt-plan .pr,html body #optView .opt-prog .opt-pct b{-webkit-text-stroke:.5px rgba(205,214,255,.6)!important}
-html body .hz-bar,html body .hz-bar *,html body #hzMenu,html body #hzMenu *{-webkit-text-stroke:.45px currentColor!important}
-/* order window: centred and a bit larger */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim{padding:22px!important;align-items:center!important;justify-content:center!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(470px,calc(100vw - 44px));width:var(--wz-w)!important;max-width:calc(100vw - 44px)!important;margin:auto!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .pc-modal-scroll{max-height:calc(100dvh - 80px)}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone{min-height:215px!important;padding:28px 20px!important;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone .dz-icon{width:66px!important;height:66px!important;margin:0 auto 16px!important;flex:0 0 auto}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone .dz-icon svg{width:30px!important;height:30px!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone .dz-title{font-size:17px!important}
-/* icon: no shadow behind it at all */
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon{box-shadow:none!important;filter:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .dz-scanning-hidden,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone.dz-scanning-hidden{display:none!important}
-
+<style id="moon-letter-fix">
+/* single-line labels with overflow:hidden: room for tall Georgian letters (no other change) */
+html body #optView .opt-stat small,html body .ttdl-titlebar-path,html body .ttdl-dl-label,html body .wizard-step-label,html body .q-rec{line-height:1.6!important;padding-top:.16em!important;padding-bottom:.2em!important}
+html body .ttdl-analyze-btn{line-height:1.5!important}
 </style>
-<script id="moon-clean-menu">
-(function(){
-var SUB={
- ka:{optimizer:'ვიდეოს ხარისხი',checker:'TikTok ანალიზი',plans:'Premium',order:'შეკვეთის წესი',upload:'როგორ ავტვირთო'},
- en:{optimizer:'Patch a video',checker:'Check a TikTok',plans:'Premium',order:'How to order',upload:'How to upload'},
- ru:{optimizer:'Качество видео',checker:'Анализ TikTok',plans:'Premium',order:'Как заказать',upload:'Как загрузить'}};
-function lang(){var l=(document.documentElement.lang||'ka').slice(0,2);return SUB[l]?l:'ka';}
-function apply(){
- var rows=document.querySelectorAll('.hzm-sec--tools .hzm-row'); if(!rows.length)return;
- var S=SUB[lang()];
- rows.forEach(function(r){
-  var k=r.getAttribute('data-hz-go')||r.getAttribute('data-mn-go'); if(!S[k])return;
-  var lbl=r.querySelector('.hzm-lbl'); if(!lbl)return;
-  var wrap=r.querySelector('.zt-txt');
-  if(!wrap){wrap=document.createElement('span');wrap.className='zt-txt';lbl.parentNode.insertBefore(wrap,lbl);wrap.appendChild(lbl);var sm=document.createElement('small');sm.className='zt-sub';wrap.appendChild(sm);}
-  var sub=wrap.querySelector('.zt-sub'); if(sub.textContent!==S[k])sub.textContent=S[k];
- });
-}
-function head(){
- var m=document.getElementById('hzMenu'); if(!m||m.querySelector('.zm-head'))return;
- var h=document.createElement('div'); h.className='zm-head';
- var wm=document.querySelector('.hz-wm'); var lg=document.createElement('span'); lg.className='zm-logo';
- if(wm){var cs=getComputedStyle(wm); lg.style.backgroundImage=cs.backgroundImage;}
- var x=document.createElement('button'); x.type='button'; x.className='zm-x'; x.setAttribute('aria-label','Close');
- x.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>';
- x.addEventListener('click',function(){var b=document.getElementById('hzMenuBtn'); if(b)b.click();});
- h.appendChild(lg); h.appendChild(x); m.insertBefore(h,m.firstChild);
-}
-function init(){head();apply();new MutationObserver(apply).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-
-</script>
 </body>
 </html>
