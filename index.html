@@ -27355,7 +27355,7 @@ html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon svg{fill:none!important;position:relative;z-index:2}
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon{position:relative!important;overflow:hidden!important;isolation:isolate;background:#14d011!important;background-image:none!important;border-color:transparent!important;box-shadow:0 0 0 1px #14d011,0 8px 22px -8px rgba(20,208,17,.55)!important}
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon::before{content:none!important;display:none!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon::after{content:"";display:block!important;opacity:1!important;position:absolute;top:-20%;bottom:-20%;left:0;width:45%;z-index:1;pointer-events:none;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.5),rgba(255,255,255,0));transform:translateX(-160%) skewX(-18deg);animation:zDzShine 3.6s ease-in-out infinite!important;will-change:transform}
+html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon::after{content:"";display:block!important;opacity:1!important;position:absolute;top:-20%;bottom:-20%;left:0;width:45%;z-index:1;pointer-events:none;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.5),rgba(255,255,255,0));transform:translateX(-160%) skewX(-18deg);animation:none!important;display:none!important}
 @keyframes zDzShine{0%,55%{transform:translateX(-160%) skewX(-18deg)}85%,100%{transform:translateX(330%) skewX(-18deg)}}
 @media (prefers-reduced-motion:reduce){html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon::after{animation:none!important;display:none!important}}
 
@@ -27367,17 +27367,19 @@ html{-webkit-text-stroke:.28px currentColor!important}
 html body :is(input,textarea,select){-webkit-text-stroke:.2px currentColor!important}
 html body #optView .opt-head h2,html body #optView .opt-h3,html body #optView .opt-plan .pr,html body #plansView .opt-plan .pr,html body #optView .opt-prog .opt-pct b{-webkit-text-stroke:.5px rgba(205,214,255,.6)!important}
 html body .hz-bar,html body .hz-bar *,html body #hzMenu,html body #hzMenu *{-webkit-text-stroke:.45px currentColor!important}
-html body{text-shadow:0 0 .6px currentColor}
 /* order window: centred and a bit larger */
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim{padding:22px!important;align-items:center!important;justify-content:center!important}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(540px,calc(100vw - 44px));width:var(--wz-w)!important;max-width:calc(100vw - 44px)!important;margin:auto!important}
+html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim>.pc-accordion-body.panel{--wz-w:min(470px,calc(100vw - 44px));width:var(--wz-w)!important;max-width:calc(100vw - 44px)!important;margin:auto!important}
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .pc-modal-scroll{max-height:calc(100dvh - 80px)}
-html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone{min-height:250px!important;padding:34px 22px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center}
+html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone{min-height:215px!important;padding:28px 20px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center}
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone .dz-icon{width:66px!important;height:66px!important;margin:0 auto 16px!important;flex:0 0 auto}
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone .dz-icon svg{width:30px!important;height:30px!important}
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim .drop-zone .dz-title{font-size:17px!important}
 /* icon: no shadow behind it at all */
 html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .drop-zone .dz-icon{box-shadow:none!important;filter:none!important}
+/* performance: nothing animates or blurs while an order window is open */
+html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim.open,html body:not(#zz1):not(#zz2):not(#zz3):not(#zz4):not(#zz5):not(#zz6) .pc-modal-scrim{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html:has(.pc-modal-scrim.open) :is(.pricing-cards,.pricing-cards *,.pricing-cards *::before,.pricing-cards *::after,.pc-modal-scrim *,.pc-modal-scrim *::before,.pc-modal-scrim *::after){animation-play-state:paused!important}
 
 </style>
 <script id="moon-clean-menu">
