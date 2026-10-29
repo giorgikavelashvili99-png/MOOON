@@ -12772,10 +12772,15 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       // A child element rather than bubble.innerHTML = ... directly --
       // that would have wiped out the meta row/quote just appended above
       // it, since innerHTML replaces everything already inside.
-      const textEl = document.createElement('div');
-      textEl.className = 'msg-bubble-text';
-      textEl.innerHTML = linkifyMessengerText(msg.text);
-      bubble.appendChild(textEl);
+      const vidNode = (window.moonVideoMsgNode && msg.from !== 'admin') ? window.moonVideoMsgNode(msg.text, messengerRole) : null;
+      if (vidNode) {
+        bubble.appendChild(vidNode);
+      } else {
+        const textEl = document.createElement('div');
+        textEl.className = 'msg-bubble-text';
+        textEl.innerHTML = linkifyMessengerText(msg.text);
+        bubble.appendChild(textEl);
+      }
     }
     // A single tap opens the Copy/React/Reply/Delete menu -- skipped for
     // messages that never got a real id (a system-style message, or one
@@ -13205,6 +13210,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
   function openMessengerPage(orderId, role, optimisticFirstMessage, optimisticFirstMessageId){
     messengerRole = role || 'customer';
     messengerCurrentOrderId = orderId;
+    try { if (window.moonChatUploadReset) window.moonChatUploadReset(); } catch(e){}
     justSubmittedFreshOrder = !!optimisticFirstMessage;
     const orderIdEl = document.getElementById('messengerOrderId');
     const messagesEl = document.getElementById('messengerMessages');
@@ -13267,6 +13273,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     // authoritative server copy as soon as that exists.
     if (optimisticFirstMessage) {
       renderMessageBubble({ id: optimisticFirstMessageId, from: 'customer', text: optimisticFirstMessage, ts: Date.now() });
+      try { if (window.moonChatUploadSync) window.moonChatUploadSync(orderId, { messages: [{ from: 'customer', text: optimisticFirstMessage }] }); } catch(e){}
     }
 
     refreshMessengerHistory(orderId, optimisticFirstMessage);
@@ -13287,6 +13294,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     fetch(CHAT_SERVER_URL + '/api/sessions/' + encodeURIComponent(orderId))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
+        try { if (window.moonChatUploadSync) window.moonChatUploadSync(orderId, data); } catch(e){}
         if (messengerRole === 'admin' && data && data.customer) {
           if (titleEl && data.customer.username) titleEl.textContent = data.customer.username;
           if (data.customer.avatarUrl) messengerCustomerAvatarUrl = data.customer.avatarUrl;
@@ -13605,6 +13613,8 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     if (!file || !messengerSocket || !messengerCurrentOrderId) return;
 
     if (file.type && file.type.startsWith('video/')) {
+      // edit-order chats: videos go to mooontransferr (any size) and only a "video sent" note is shown
+      try { if (window.moonChatUploadHandle && window.moonChatUploadHandle(file)) return; } catch(e){}
       if (file.size > MESSENGER_VIDEO_MAX_BYTES) {
         appendSystemMessage(currentLang === 'ka'
           ? 'ვიდეო ძალიან დიდია (მაქს. 12MB) — სცადეთ უფრო მოკლე/მსუბუქი ვიდეო'
@@ -27057,5 +27067,157 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-g
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) #tiktokLoginBtn svg{fill:#fff!important;color:#fff}
 html body #discordGate[data-mode="banned"] #tiktokLoginBtn,html body #discordGate[data-mode="guild"] #tiktokLoginBtn{display:none!important}
 </style>
+<style id="moon-chat-upload-css">
+.mcu{flex:0 0 auto;margin:8px auto 0;width:calc(100% - 28px);max-width:560px;position:relative;font-family:'BPGAcademiuriU','Space Grotesk',sans-serif;color:#fff}
+.mcu[hidden]{display:none!important}
+.mcu-card{position:relative;display:flex;align-items:center;gap:12px;padding:11px 12px 11px 11px;border-radius:18px;background:linear-gradient(135deg,rgba(124,92,255,.16),rgba(214,76,160,.1));border:1px dashed rgba(167,139,255,.55);transition:border-color .2s,background .2s,transform .2s;overflow:hidden}
+.mcu.drag .mcu-card{border-color:#c4b5ff;background:linear-gradient(135deg,rgba(124,92,255,.3),rgba(214,76,160,.2));transform:scale(1.01)}
+.mcu-ic{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(155deg,#8b6cff,#d64ca0);box-shadow:0 8px 18px -8px rgba(160,90,255,.9),inset 0 1px 0 rgba(255,255,255,.45);position:relative;overflow:hidden}
+.mcu-ic::after{content:"";position:absolute;left:0;right:0;top:0;height:50%;background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,0))}
+.mcu-ic svg{position:relative;z-index:1;width:21px;height:21px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mcu-tx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mcu-tx b{font-size:14px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcu-tx span{font-size:11.5px;opacity:.62;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcu-btn{flex:none;all:unset;box-sizing:border-box;cursor:pointer;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7c5cff,#c04fb0);box-shadow:0 6px 16px -6px rgba(160,90,255,.9),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .12s,filter .15s}
+.mcu-btn[hidden]{display:none!important}
+.mcu-btn:hover{filter:brightness(1.1)}.mcu-btn:active{transform:scale(.95)}
+.mcu-bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:rgba(255,255,255,.1);opacity:0;transition:opacity .2s}
+.mcu-bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#8b6cff,#e05cb4);transform-origin:left;transform:scaleX(0);transition:transform .25s linear}
+.mcu[data-state="up"] .mcu-bar{opacity:1}
+.mcu[data-state="up"] .mcu-card{border-style:solid;border-color:rgba(167,139,255,.35)}
+.mcu[data-state="up"] .mcu-btn,.mcu[data-state="done"] .mcu-btn.mcu-pick{display:none}
+.mcu-pct{flex:none;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+.mcu:not([data-state="up"]) .mcu-pct{display:none}
+.mcu[data-state="done"] .mcu-card{border-style:solid;border-color:rgba(52,211,153,.55);background:linear-gradient(135deg,rgba(52,211,153,.16),rgba(16,185,129,.08))}
+.mcu[data-state="done"] .mcu-ic{background:linear-gradient(155deg,#34d399,#059669);box-shadow:0 8px 18px -8px rgba(16,185,129,.9),inset 0 1px 0 rgba(255,255,255,.45)}
+.mcu[data-state="err"] .mcu-card{border-style:solid;border-color:rgba(248,113,113,.6);background:linear-gradient(135deg,rgba(248,113,113,.14),rgba(220,38,38,.07))}
+.mcu[data-state="err"] .mcu-ic{background:linear-gradient(155deg,#f87171,#dc2626)}
+.mcu-again{all:unset;cursor:pointer;font-size:12px;font-weight:700;opacity:.75;padding:6px 4px;text-decoration:underline;text-underline-offset:3px}
+.mcu-again:hover{opacity:1}
+.mcu[data-state="idle"] .mcu-again,.mcu[data-state="up"] .mcu-again{display:none}
+/* the bubble that replaces the raw link */
+.msg-video-sent{display:flex;align-items:center;gap:10px;min-width:176px}
+.msg-video-sent .vs-ic{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.msg-video-sent .vs-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.msg-video-sent b{display:block;font-size:14px;font-weight:700;line-height:1.2}
+.msg-video-sent em{display:block;font-style:normal;font-size:11.5px;opacity:.75;margin-top:1px}
+.msg-video-sent .vs-ok{margin-left:auto;flex:none;width:20px;height:20px;border-radius:50%;background:#10b981;display:grid;place-items:center}
+.msg-video-sent .vs-ok svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.msg-video-sent a{display:block;margin-top:3px;font-size:12px;word-break:break-all}
+@media (max-width:420px){.mcu{margin:6px auto 0;width:calc(100% - 20px)}.mcu-card{padding:9px 10px;gap:10px}.mcu-ic{width:38px;height:38px;border-radius:12px}.mcu-btn{padding:8px 13px}}
+</style>
+<script id="moon-chat-upload-js">
+(function(){
+var LINK_RE=/^🎬\s*(?:ვიდეო|Video|Видео)\s*:\s*(https?:\/\/mooontransferr\.onrender\.com\/\S+)\s*$/i;
+var TX={
+ ka:{title:'ატვირთე ვიდეო',sub:'ნებისმიერი ზომა · მარტივად',btn:'არჩევა',up:'იტვირთება…',fin:'ბმულის მომზადება…',stay:'დატოვე გვერდი ღია და ეკრანი ჩართული',done:'ვიდეო გაგზავნილია',doneSub:'მივიღეთ, მალე შეგაფასებთ',again:'სხვა ვიდეოს ატვირთვა',err:'ატვირთვა ვერ მოხერხდა',errSub:'შეამოწმე ინტერნეტი და სცადე ხელახლა',retry:'ხელახლა',notVideo:'აირჩიე ვიდეო ფაილი',sent:'ვიდეო გაგზავნილია',sentSub:'ვიდეო მიღებულია',adm:'კლიენტის ვიდეო'},
+ en:{title:'Upload your video',sub:'Any size · quick & easy',btn:'Choose',up:'Uploading…',fin:'Preparing link…',stay:'Keep this page open and your screen on',done:'Video sent',doneSub:'Got it — we’ll review it soon',again:'Upload another video',err:'Upload failed',errSub:'Check your connection and try again',retry:'Retry',notVideo:'Please choose a video file',sent:'Video sent',sentSub:'Video received',adm:'Customer video'},
+ ru:{title:'Загрузи видео',sub:'Любой размер · просто',btn:'Выбрать',up:'Загрузка…',fin:'Готовим ссылку…',stay:'Держи страницу открытой и экран включённым',done:'Видео отправлено',doneSub:'Получили, скоро посмотрим',again:'Загрузить другое видео',err:'Не удалось загрузить',errSub:'Проверь интернет и попробуй снова',retry:'Повторить',notVideo:'Выбери видеофайл',sent:'Видео отправлено',sentSub:'Видео получено',adm:'Видео клиента'}};
+function T(){var l=(typeof currentLang==='string'&&TX[currentLang])?currentLang:((document.documentElement.lang||'ka').slice(0,2));return TX[l]||TX.ka;}
+var IFILM='<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9.5 5 2.5-5 2.5z"/></svg>';
+var IUP='<svg viewBox="0 0 24 24"><path d="M12 16V5"/><path d="M7.5 9.5 12 5l4.5 4.5"/><path d="M4.5 16v2a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2"/></svg>';
+var ICK='<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+var IERR='<svg viewBox="0 0 24 24"><path d="M12 7v6"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>';
+var el=null,st='idle',curOrder=null,lastFile=null,enabledFor=null,busy=false;
+function g(id){return document.getElementById(id);}
+function isEditOrder(data){
+ try{
+  if(data&&data.order&&data.order.type==='editOrder')return true;
+  var m=data&&data.messages&&data.messages[0];
+  if(m&&typeof m.text==='string'&&/ედითის შეკვეთა|Character Edit|Order an Edit/i.test(m.text))return true;
+ }catch(e){}
+ return false;
+}
+function build(){
+ if(el)return el;
+ var page=g('messengerPage'),row=page&&page.querySelector('.messenger-input-row'); if(!page||!row)return null;
+ el=document.createElement('div'); el.className='mcu'; el.id='moonChatUp'; el.hidden=true; el.setAttribute('data-state','idle');
+ el.innerHTML='<input type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv" hidden>'+
+  '<div class="mcu-card"><span class="mcu-ic"></span><div class="mcu-tx"><b></b><span></span></div><span class="mcu-pct">0%</span><button type="button" class="mcu-btn mcu-pick"></button><button type="button" class="mcu-btn mcu-retry" hidden></button><div class="mcu-bar"><i></i></div></div>'+
+  '<div style="text-align:center"><button type="button" class="mcu-again"></button></div>';
+ row.parentNode.insertBefore(el,row);
+ var inp=el.querySelector('input'),card=el.querySelector('.mcu-card');
+ el.querySelector('.mcu-pick').addEventListener('click',function(){inp.click();});
+ el.querySelector('.mcu-again').addEventListener('click',function(){inp.click();});
+ el.querySelector('.mcu-retry').addEventListener('click',function(){if(lastFile)start(lastFile);else inp.click();});
+ inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];inp.value='';if(f)start(f);});
+ card.addEventListener('click',function(e){if(st==='idle'&&!e.target.closest('button'))inp.click();});
+ ['dragenter','dragover'].forEach(function(n){el.addEventListener(n,function(e){if(st==='up')return;e.preventDefault();el.classList.add('drag');});});
+ ['dragleave','drop'].forEach(function(n){el.addEventListener(n,function(e){e.preventDefault();el.classList.remove('drag');});});
+ el.addEventListener('drop',function(e){var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&st!=='up')start(f);});
+ return el;
+}
+function setState(s,extra){
+ st=s; if(!el)return; el.setAttribute('data-state',s);
+ var t=T(),ic=el.querySelector('.mcu-ic'),b=el.querySelector('.mcu-tx b'),sp=el.querySelector('.mcu-tx span'),pk=el.querySelector('.mcu-pick'),rt=el.querySelector('.mcu-retry'),ag=el.querySelector('.mcu-again');
+ pk.textContent=t.btn; ag.textContent=t.again; rt.textContent=t.retry; rt.hidden=(s!=='err'); pk.hidden=(s==='up'||s==='err'||s==='done');
+ if(s==='idle'){ic.innerHTML=IUP;b.textContent=t.title;sp.textContent=t.sub;}
+ else if(s==='up'){ic.innerHTML=IFILM;b.textContent=extra||t.up;sp.textContent=t.stay;}
+ else if(s==='done'){ic.innerHTML=ICK;b.textContent=t.done;sp.textContent=t.doneSub;}
+ else if(s==='err'){ic.innerHTML=IERR;b.textContent=t.err;sp.textContent=extra||t.errSub;}
+}
+function pct(p){
+ if(!el)return; p=Math.max(0,Math.min(100,Math.round(p||0)));
+ el.querySelector('.mcu-pct').textContent=p+'%'; el.querySelector('.mcu-bar i').style.transform='scaleX('+(p/100)+')';
+ if(p>=100){var sp=el.querySelector('.mcu-tx span');if(sp)sp.textContent=T().fin;}
+}
+function sendLink(orderId,link){
+ var sock=(typeof messengerSocket!=='undefined'&&messengerSocket)?messengerSocket:(typeof ensureMessengerSocket==='function'?ensureMessengerSocket():null);
+ if(!sock)throw new Error('no-socket');
+ var id=newMessengerMessageId(), text='🎬 ვიდეო: '+link;
+ sock.emit('send_message',{orderId:orderId,message:{id:id,from:'customer',text:text}});
+ if(typeof messengerCurrentOrderId!=='undefined'&&messengerCurrentOrderId===orderId)renderMessageBubble({id:id,from:'customer',text:text,ts:Date.now()});
+ try{ if(typeof sendTelegramNotification==='function'&&typeof escTg==='function')sendTelegramNotification('🎬 <b>ვიდეო ატვირთულია</b> — შეკვეთა #'+escTg(orderId)+'\n'+escTg(link)); }catch(e){}
+}
+function start(file){
+ if(busy)return; var t=T();
+ var okType=(file.type&&/^video\//i.test(file.type))||/\.(mp4|mov|m4v|webm|mkv|avi|3gp)$/i.test(file.name||'');
+ if(!okType){setState('err',t.notVideo);return;}
+ if(typeof uploadFileToMoontransferr!=='function'){setState('err');return;}
+ busy=true; lastFile=file; var orderId=curOrder; if(!orderId){busy=false;setState('err');return;}
+ setState('up',file.name||t.up); pct(0);
+ try{ if(typeof wakeTransferService==='function')wakeTransferService(); }catch(e){}
+ uploadFileToMoontransferr(file,function(p){pct(p);}).then(function(data){
+  sendLink(orderId,data.link); busy=false; lastFile=null; if(curOrder===orderId)setState('done');
+ }).catch(function(err){
+  busy=false; if(window.console&&console.error)console.error('[MOON] chat video upload failed',err);
+  if(curOrder===orderId)setState('err',(err&&/background/i.test(String(err.message||err)))?T().stay:null);
+ });
+}
+// called from the chat code
+window.moonChatUploadReset=function(){
+ curOrder=null; enabledFor=null; if(el){el.hidden=true;}
+};
+window.moonChatUploadSync=function(orderId,data){
+ try{
+  if(typeof messengerRole!=='undefined'&&messengerRole!=='customer')return;
+  if(!isEditOrder(data))return;
+  if(!build())return;
+  if(curOrder!==orderId){curOrder=orderId; if(!busy)setState('idle');}
+  el.hidden=false;
+  var msgs=(data&&data.messages)||[];
+  var already=msgs.some(function(m){return m&&m.from==='customer'&&typeof m.text==='string'&&LINK_RE.test(m.text.trim());});
+  if(already&&st==='idle')setState('done');
+ }catch(e){ if(window.console)console.warn(e); }
+};
+// the paperclip in the chat: videos go to mooontransferr instead of being squeezed into the chat itself
+window.moonChatUploadHandle=function(file){
+ if(!el||el.hidden||!curOrder)return false;
+ start(file); return true;
+};
+// how a link message looks: the customer only sees "video sent", the admin gets the link
+window.moonVideoMsgNode=function(text,role){
+ var m=LINK_RE.exec((text||'').trim()); if(!m)return null; var t=T(), n=document.createElement('div'); n.className='msg-video-sent msg-bubble-text';
+ if(role==='customer'){
+  n.innerHTML='<span class="vs-ic">'+IFILM+'</span><span><b>'+t.sent+'</b><em>'+t.sentSub+'</em></span><span class="vs-ok">'+ICK+'</span>';
+ }else{
+  var a=document.createElement('a'); a.href=m[1]; a.target='_blank'; a.rel='noopener noreferrer'; a.textContent=m[1];
+  n.innerHTML='<span class="vs-ic">'+IFILM+'</span><span><b>'+TX.ka.adm+'</b></span>'; n.lastChild.appendChild(a);
+ }
+ return n;
+};
+})();
+</script>
+
 </body>
 </html>
