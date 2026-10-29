@@ -23756,6 +23756,9 @@ var T = {
 T.ka.engBest='საუკეთესო'; T.ka.engBackup='რეზერვი'; T.ka.tryBackup='MOON 2.1 ვერ იმუშავა — სცადეთ MOON 1.2 (რეზერვი)';
 T.en.engBest='Best'; T.en.engBackup='Backup'; T.en.tryBackup='MOON 2.1 did not work — try MOON 1.2 (backup)';
 T.ru.engBest='Лучший'; T.ru.engBackup='Резерв'; T.ru.tryBackup='MOON 2.1 не сработал — попробуйте MOON 1.2 (резерв)';
+T.ka.conv='გარდაიქმნება'; T.ka.convHint='გადადის MP4 ფორმატში'; T.ka.convLoad='ფორმატის გადაყვანის მომზადება…'; T.ka.convSlow='გადაყვანა რამდენიმე წუთს გასტანს…'; T.ka.convMsg='ვიდეო MP4 ფორმატში გადადის — დაელოდე, გვერდი არ დახურო'; T.ka.convFail='ამ ფორმატის გადაყვანა ვერ მოხერხდა. სცადე MP4 ან MOV'; T.ka.pickVideo='აირჩიე ვიდეო ფაილი'; T.ka.tooBigConv='ფაილი ძალიან დიდია გადასაყვანად (მაქს. 1.5 GB)';
+T.en.conv='Converting'; T.en.convHint='Converting to MP4'; T.en.convLoad='Preparing the converter…'; T.en.convSlow='Conversion will take a few minutes…'; T.en.convMsg='Converting the video to MP4 — please wait and keep this page open'; T.en.convFail='This format could not be converted. Try MP4 or MOV'; T.en.pickVideo='Choose a video file'; T.en.tooBigConv='File is too large to convert (max 1.5 GB)';
+T.ru.conv='Конвертация'; T.ru.convHint='Конвертация в MP4'; T.ru.convLoad='Подготовка конвертера…'; T.ru.convSlow='Конвертация займёт несколько минут…'; T.ru.convMsg='Видео конвертируется в MP4 — подождите и не закрывайте страницу'; T.ru.convFail='Не удалось конвертировать этот формат. Попробуйте MP4 или MOV'; T.ru.pickVideo='Выберите видеофайл'; T.ru.tooBigConv='Файл слишком большой для конвертации (макс. 1.5 GB)';
 function L(){ try{ return (typeof currentLang!=='undefined' && T[currentLang])?currentLang:'en'; }catch(e){ return 'ka'; } }
 function tr(k){ var l=L(); try{ if(typeof currentLang!=='undefined'&&currentLang==='ka') l='ka'; }catch(e){} return (T[l]&&T[l][k])||T.en[k]||k; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -23772,7 +23775,7 @@ view.innerHTML =
  '<div id="optMain">'+
   '<div class="opt-quota" id="optQuota"></div>'+
   '<div class="op-col">'+
-   '<label class="opt-drop" id="optDrop" for="optFile"><span class="opt-ic"><svg viewBox="0 0 48 48"><path d="M24 6v24M14 21l10 10 10-10M8 34v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4"/></svg></span><b id="optName" data-k="drop"></b><span id="optHint" data-k="dropSub"></span><input id="optFile" type="file" accept="video/mp4,.mp4" hidden></label>'+
+   '<label class="opt-drop" id="optDrop" for="optFile"><span class="opt-ic"><svg viewBox="0 0 48 48"><path d="M24 6v24M14 21l10 10 10-10M8 34v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4"/></svg></span><b id="optName" data-k="drop"></b><span id="optHint" data-k="dropSub"></span><input id="optFile" type="file" accept="video/*,.mp4,.mov,.m4v,.mkv,.webm,.avi,.flv,.wmv,.ts,.mts,.m2ts,.3gp,.mpg,.mpeg" hidden></label>'+
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
@@ -23792,7 +23795,7 @@ function applyLang(){
 }
 
 /* ============ STATE ============ */
-var S = {file:null, meta:null, preset:null, status:null, busy:false, jid:null, engine:'21', stage:''};
+var S = {file:null, meta:null, preset:null, status:null, busy:false, jid:null, engine:'21', stage:'', converting:false};
 var $ = function(id){ return document.getElementById(id); };
 function setPill(s,txt){ var p=$('optPill'); p.setAttribute('data-s',s); p.querySelector('em').textContent=txt; }
 function fmtSize(b){ return b>=1073741824?(b/1073741824).toFixed(2)+' GB':(b/1048576).toFixed(1)+' MB'; }
@@ -23937,16 +23940,99 @@ function updateGo(){
   if(lk&&S.file&&!S.busy) msg(tr(lk).replace('{n}',pl.fps).replace('{f}',S.fps>0?Math.round(S.fps):'?'),true);
   var ok=S.file&&S.meta&&S.fps!==undefined&&!lk&&S.preset&&!S.busy&&st&&!st.blocked&&(st.unlimited||st.remaining>0); $('optGo').disabled=!ok;
 }
-function setFile(f){
-  if(!f) return;
-  if(!/\.mp4$/i.test(f.name)&&f.type!=='video/mp4'){ msg(tr('pickMp4'),true); return; }
+function setFileReady(f){
   S.meta=null; S.fps=undefined; S.resTxt=''; S.file=f; (function(ff){ readMp4Fps(ff).then(function(v){ if(S.file!==ff) return; S.fps=v; showRes(); updateGo(); }); })(f); $('optProg').style.display='none'; $('optDl').style.display='none'; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); $('oSize').textContent=fmtSize(f.size);
   $('oRes').textContent='…'; $('oDur').textContent='…';
   var v=document.createElement('video'), url=URL.createObjectURL(f); v.preload='metadata'; v.muted=true;
-  v.onloadedmetadata=function(){ S.meta={w:v.videoWidth,h:v.videoHeight,d:v.duration}; var mx=Math.max(v.videoWidth,v.videoHeight), mn=Math.min(v.videoWidth,v.videoHeight);
-    S.resTxt=(mx>=3000?'4K':(mn+'p'))+' · '+v.videoWidth+'×'+v.videoHeight; showRes(); $('oDur').textContent=fmtDur(v.duration); URL.revokeObjectURL(url); updateGo(); };
-  v.onerror=function(){ $('oRes').textContent='—'; $('oDur').textContent='—'; URL.revokeObjectURL(url); msg(tr('noMeta'),true); updateGo(); };
+  function applyMeta(w,h,d){ if(S.file!==f) return; S.meta={w:w,h:h,d:d}; var mx=Math.max(w,h), mn=Math.min(w,h);
+    S.resTxt=(mx>=3000?'4K':(mn+'p'))+' · '+w+'×'+h; showRes(); $('oDur').textContent=fmtDur(d); updateGo(); }
+  v.onloadedmetadata=function(){ if(!v.videoWidth||!isFinite(v.duration)){ v.onerror(); return; } URL.revokeObjectURL(url); applyMeta(v.videoWidth,v.videoHeight,v.duration); };
+  v.onerror=function(){ URL.revokeObjectURL(url);
+    readMp4Meta(f).then(function(m){ if(m&&S.file===f) applyMeta(m.w,m.h,m.d); else if(S.file===f){ $('oRes').textContent='—'; $('oDur').textContent='—'; msg(tr('noMeta'),true); updateGo(); } },function(){ $('oRes').textContent='—'; $('oDur').textContent='—'; msg(tr('noMeta'),true); updateGo(); }); };
   v.src=url; updateGo();
+}
+
+/* ============ ANY VIDEO FORMAT ============ */
+var VIDEO_EXT=/\.(mp4|m4v|mov|qt|3gp|3g2|mkv|webm|avi|wmv|flv|f4v|ts|mts|m2ts|mpg|mpeg|ogv|asf|vob)$/i;
+function looksVideo(f){ return !!((f.type&&/^video\//.test(f.type))||VIDEO_EXT.test(f.name||'')); }
+/* MP4 / MOV / M4V / 3GP all share the ISO-BMFF box layout: they go straight to the patcher core */
+function sniffIso(f){ return f.slice(0,16).arrayBuffer().then(function(ab){ if(ab.byteLength<12) return false; var u=new Uint8Array(ab); return /^(ftyp|moov|mdat|wide|free|skip|pnot)$/.test(String.fromCharCode(u[4],u[5],u[6],u[7])); }); }
+/* duration + size straight from the moov box (for files the browser cannot play, e.g. HEVC) */
+function readMp4Meta(file){
+  function rd(o,l){ return file.slice(o,o+l).arrayBuffer(); }
+  function tg(dv,o){ return String.fromCharCode(dv.getUint8(o),dv.getUint8(o+1),dv.getUint8(o+2),dv.getUint8(o+3)); }
+  function kids(dv,s,e){ var out=[],o=s; while(o+8<=e){ var sz=dv.getUint32(o),hd=8; if(sz===1){ sz=dv.getUint32(o+8)*4294967296+dv.getUint32(o+12); hd=16; } else if(sz===0) sz=e-o; if(sz<hd||o+sz>e) break; out.push({t:tg(dv,o+4),s:o+hd,e:o+sz}); o+=sz; } return out; }
+  function kid(dv,b,t){ return kids(dv,b.s,b.e).filter(function(x){return x.t===t;})[0]; }
+  var off=0,n=0;
+  function step(){ if(off+8>file.size||n++>5000) return Promise.resolve(null);
+    return rd(off,16).then(function(ab){ var dv=new DataView(ab),sz=dv.getUint32(0),hd=8;
+      if(sz===1&&ab.byteLength>=16){ sz=dv.getUint32(8)*4294967296+dv.getUint32(12); hd=16; } else if(sz===0) sz=file.size-off;
+      if(sz<hd) return null; if(tg(dv,4)==='moov') return sz>67108864?null:{off:off+hd,len:sz-hd};
+      off+=sz; return step(); }); }
+  return step().then(function(m){ if(!m) return null; return rd(m.off,m.len).then(function(ab){
+    var dv=new DataView(ab), top=kids(dv,0,ab.byteLength), mv=top.filter(function(b){return b.t==='mvhd';})[0]; if(!mv) return null;
+    var v1=dv.getUint8(mv.s)===1, ts=dv.getUint32(mv.s+(v1?20:12)), du=v1?(dv.getUint32(mv.s+24)*4294967296+dv.getUint32(mv.s+28)):dv.getUint32(mv.s+16), w=0,h=0;
+    top.filter(function(b){return b.t==='trak';}).forEach(function(t){
+      var mdia=kid(dv,t,'mdia'), hd=mdia&&kid(dv,mdia,'hdlr'); if(!hd||tg(dv,hd.s+8)!=='vide'||w) return;
+      var tk=kid(dv,t,'tkhd'); if(!tk) return; var tv1=dv.getUint8(tk.s)===1, o=tk.s+(tv1?88:76), mo=o-36;
+      w=Math.round(dv.getUint32(o)/65536); h=Math.round(dv.getUint32(o+4)/65536);
+      if(dv.getInt32(mo)===0&&dv.getInt32(mo+16)===0){ var x=w; w=h; h=x; }   /* rotated (portrait) clips */
+    });
+    if(!w||!h||!ts||!du) return null; return {w:w,h:h,d:du/ts}; }); });
+}
+/* every other container (MKV, WebM, AVI, FLV, TS ...): converted to MP4 in the browser with ffmpeg.wasm (loaded only when needed) */
+var FF={p:null};
+function blobURL(url,type){ return fetchTO(url,{},180000).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }).then(function(b){ return URL.createObjectURL(new Blob([b],{type:type})); }); }
+function loadFF(){
+  if(FF.p) return FF.p;
+  var BASE='https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/', CORE='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd/';
+  FF.p=fetchTO(BASE+'ffmpeg.js',{},60000).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); }).then(function(code){
+    var m=code.match(/(\d+\.ffmpeg\.js)/), chunk=m?m[1]:'814.ffmpeg.js';
+    var el=document.createElement('script'); el.textContent=code; document.head.appendChild(el); el.parentNode.removeChild(el);
+    if(!window.FFmpegWASM) throw new Error('ffmpeg');
+    return Promise.all([blobURL(BASE+chunk,'text/javascript'),blobURL(CORE+'ffmpeg-core.js','text/javascript'),blobURL(CORE+'ffmpeg-core.wasm','application/wasm')]).then(function(u){
+      var ff=new window.FFmpegWASM.FFmpeg(); return ff.load({classWorkerURL:u[0],coreURL:u[1],wasmURL:u[2]}).then(function(){ return ff; }); });
+  }).catch(function(e){ FF.p=null; throw e; });
+  return FF.p;
+}
+function convertToMp4(f){
+  if(f.size>1610612736) return Promise.reject(new Error(tr('tooBigConv')));
+  var mm=(f.name||'').match(/\.[A-Za-z0-9]+$/), inn='in'+(mm?mm[0].toLowerCase():'.bin'), base=(f.name||'video').replace(/\.[^.]+$/,'')||'video', ff=null, logs=[], pct=0, slow=false;
+  function hint(){ $('optHint').textContent=tr('convHint')+(pct>0?' '+pct+'%':'…'); }
+  function onLog(e){ if(logs.length<400) logs.push(String(e&&e.message||'')); }
+  function onProg(e){ var p=Math.max(0,Math.min(1,Number(e&&e.progress)||0)); pct=Math.round(p*100); hint(); try{ bar(Math.round(pct)); }catch(_){} }
+  return loadFF().then(function(x){ ff=x; ff.on('log',onLog); ff.on('progress',onProg); hint(); return f.arrayBuffer(); })
+  .then(function(ab){ return ff.writeFile(inn,new Uint8Array(ab)); })
+  .then(function(){ logs.length=0; return ff.exec(['-hide_banner','-i',inn]).catch(function(){}); })    /* probe only: ends with an error by design, but prints the streams */
+  .then(function(){
+    var txt=logs.join('\n'), v=((txt.match(/Video:\s*([a-z0-9_]+)/i)||[])[1]||'').toLowerCase(), a=((txt.match(/Audio:\s*([a-z0-9_]+)/i)||[])[1]||'').toLowerCase();
+    var cv=/^(h264|hevc)$/.test(v), ca=(a==='')||/^(aac|mp3)$/.test(a), args=['-i',inn,'-map','0:v:0','-map','0:a:0?','-sn','-dn'];
+    if(cv){ args.push('-c:v','copy'); if(v==='hevc') args.push('-tag:v','hvc1'); } else { args.push('-c:v','libx264','-preset','ultrafast','-crf','18','-pix_fmt','yuv420p'); slow=true; }
+    if(a==='') args.push('-an'); else if(ca) args.push('-c:a','copy'); else args.push('-c:a','aac','-b:a','192k');
+    args.push('-movflags','+faststart','-y','out.mp4');
+    if(slow) $('optHint').textContent=tr('convSlow'); logs.length=0; pct=0;
+    return ff.exec(args);
+  })
+  .then(function(code){ if(code!==0) throw new Error('ffmpeg '+code); return ff.readFile('out.mp4'); })
+  .then(function(data){
+    try{ ff.off&&ff.off('log',onLog); ff.off&&ff.off('progress',onProg); }catch(_){}
+    try{ ff.deleteFile(inn); ff.deleteFile('out.mp4'); }catch(_){}
+    if(!data||!data.length) throw new Error('empty output');
+    return new File([data],base+'.mp4',{type:'video/mp4'});
+  });
+}
+function setFile(f){
+  if(!f||S.converting) return;
+  if(!looksVideo(f)){ msg(tr('pickVideo'),true); return; }
+  sniffIso(f).then(function(iso){
+    if(iso) return setFileReady(f);
+    S.converting=true; S.file=null; S.meta=null; S.fps=undefined; updateGo();
+    $('optDl').style.display='none'; $('optName').textContent=f.name; $('optDrop').classList.add('has'); $('optHint').textContent=tr('convLoad');
+    setPill('busy',tr('conv')); msg(tr('convMsg')); bar(0);
+    return convertToMp4(f).then(function(m){ S.converting=false; setPill('idle',tr('idle')); setFileReady(m); },function(e){
+      S.converting=false; setPill('err',tr('err')); $('optName').textContent=tr('drop'); $('optHint').textContent=tr('dropSub'); $('optDrop').classList.remove('has');
+      msg(tr('convFail')+(e&&e.message?' ('+String(e.message).slice(0,80)+')':''),true); });
+  });
 }
 
 /* ============ RUN JOB ============ */
