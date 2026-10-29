@@ -23970,6 +23970,25 @@ function findCore(eng){
   return null;
 }
 function isMp4(u8){ return u8&&u8.byteLength>12&&String.fromCharCode(u8[4],u8[5],u8[6],u8[7])==='ftyp'; }
+/* MOON 1.2: metadata texts written by the engine are replaced with MOON's own (same length -> atom sizes stay valid) */
+var BRAND_MAP=[['Zilem Method https://zilemmethod.com local:v3.0','MOON 1.2 https://moonfull4k.xyz local:v1.2'],['www.zilemmethod.com','www.moonfull4k.xyz']];
+function moonBrand(u8){
+  try{
+    BRAND_MAP.forEach(function(pr){
+      var a=pr[0], b=pr[1]; while(b.length<a.length) b+=' ';
+      var A=[],B=[],i; for(i=0;i<a.length;i++){ A.push(a.charCodeAt(i)); B.push(b.charCodeAt(i)); }
+      var n=u8.length, LIM=4194304, ranges=n<=2*LIM?[[0,n]]:[[0,LIM],[n-LIM,n]];
+      ranges.forEach(function(r){
+        for(var p=r[0];p<=r[1]-A.length;p++){
+          if(u8[p]!==A[0]) continue;
+          var k=1; while(k<A.length&&u8[p+k]===A[k]) k++;
+          if(k===A.length){ for(var j=0;j<B.length;j++) u8[p+j]=B[j]; p+=A.length-1; }
+        }
+      });
+    });
+  }catch(e){ try{ console.warn('[optimizer] brand',e); }catch(_){} }
+  return u8;
+}
 function patchWithCore(file,fps,eng){
   return file.arrayBuffer().then(function(ab){
     var core=findCore(eng); if(!core) throw new Error('პატჩერის ბირთვი (core.js) ვერ ჩაიტვირთა');
@@ -23985,7 +24004,7 @@ function patchWithCore(file,fps,eng){
       if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
       var n=out&&(out.byteLength!=null?out.byteLength:out.length);
       try{ console.log('[optimizer] attempt',i,tries[i],'->',out&&out.constructor&&out.constructor.name,n); }catch(_){}
-      if(out&&n>0&&isMp4(out)) return new Blob([out],{type:'video/mp4'});
+      if(out&&n>0&&isMp4(out)){ if(eng==='12') out=moonBrand(out); return new Blob([out],{type:'video/mp4'}); }
       last='output '+(n||0)+' bytes';
     }
     throw new Error('პატჩერმა ცარიელი ფაილი დააბრუნა ('+last+')');
