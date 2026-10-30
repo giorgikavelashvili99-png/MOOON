@@ -27617,7 +27617,7 @@ function gateLogin(btn){
     if(!data){fail(t().cancelled);return}
     api('/tg/login',{tg:data}).then(function(j){
       return fetch(DW+'/tg-session',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:j.user.id,username:j.user.username,avatarUrl:j.user.avatarUrl,isMember:j.user.isMember,exp:j.exp,proof:j.proof})})
-        .then(function(r){if(!r.ok)throw new Error(t().err);try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}location.reload()});
+        .then(function(r){if(!r.ok)return r.json().catch(function(){return {}}).then(function(j){throw new Error('Discord-worker: '+r.status+(j&&j.error?' '+j.error:''))});try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}location.reload()});
     }).catch(function(e){fail(e&&e.data&&e.data.error==='not_linked'?t().gateNote:((e&&e.message)||t().err))});
   });
 }
