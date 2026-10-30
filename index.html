@@ -14427,6 +14427,24 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     startOrderChat(orderData, firstMessage, btn, textEl, 'mpSendChat', flashMpCopyNote);
   });
 
+  // ---- Plans page: "შეძენა" opens the order chat directly (same flow as the package orders) ----
+  window.__moonPlanBuy = function(card, btn){
+    if (!card) return false;
+    const txt = (sel) => { const e = card.querySelector(sel); return e ? String(e.textContent || '').replace(/\s+/g, ' ').trim() : ''; };
+    const name = txt('.op-pn h4') || txt('h4') || 'Plan';
+    const priceTxt = txt('.pr');
+    const num = parseFloat((priceTxt.match(/[\d]+(?:[.,]\d+)?/) || ['0'])[0].replace(',', '.')) || 0;
+    const feats = Array.prototype.map.call(card.querySelectorAll('li'), (l) => '• ' + String(l.textContent || '').replace(/\s+/g, ' ').trim());
+    const firstMessage = '🌙 ახალი შეკვეთა — MOON გეგმა\n' +
+      'გეგმა: ' + name + '\n' +
+      'ფასი: ' + priceTxt + '\n' +
+      (feats.length ? feats.join('\n') + '\n' : '') +
+      '\nვადასტურებ რომ ვეთანხმები წესებს ✅';
+    const orderData = { type: 'plan', plan: name, quality: '', duration: '30d', isSub: true, price: num, tiktok: '', videoLink: '' };
+    startOrderChat(orderData, firstMessage, btn || null, null, 'sendChat', null);
+    return true;
+  };
+
   // ---- Fixed-price "Edit Order" (same-style edit, customer's own character) ----
   const eoCopyNote = document.getElementById('eoCopyNote');
 
@@ -24213,7 +24231,7 @@ $('optFile').addEventListener('change',function(e){ setFile(e.target.files[0]); 
 ['dragleave','drop'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.remove('drag'); }); });
 drop.addEventListener('drop',function(e){ var f=e.dataTransfer&&e.dataTransfer.files[0]; if(f) setFile(f); });
 $('optGo').addEventListener('click',run);
-$('optPlans').addEventListener('click',function(e){ if(e.target.closest('[data-buy]')){ var c=document.querySelector('.mn-link[data-mn="contact"]'); if(c) c.click(); } });
+$('optPlans').addEventListener('click',function(e){ var bb=e.target.closest('[data-buy]'); if(bb){ if(window.__moonPlanBuy && window.__moonPlanBuy(bb.closest('.opt-plan'),bb)) return; var c=document.querySelector('.mn-link[data-mn="contact"]'); if(c) c.click(); } });
 $('optLoginBtn').addEventListener('click',function(){ try{ startDiscordLogin(); }catch(e){} });
 
 /* 3D tilt on dropzone (fine pointers only, rAF-throttled, transform/custom-props only) */
@@ -27795,6 +27813,40 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .dg-
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn{opacity:1!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn.primary{animation:none!important;box-shadow:none!important;transform:none!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) #discordLoginBtn.discord-btn.primary{box-shadow:none!important}
-</style>
+</style><style id="moon-plans-v2">/* ===== plans page: smooth swipe + gentle transitions ===== */
+@media (max-width:1099px){
+  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c){overflow-y:hidden!important;scroll-snap-type:x mandatory!important;touch-action:pan-x pan-y!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch;scroll-behavior:auto!important}
+  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c) .opt-plan{scroll-snap-stop:normal!important;transition:transform .45s cubic-bezier(.22,.9,.32,1),opacity .45s ease,box-shadow .45s ease!important;transform:scale(.93) translateZ(0);opacity:.62;will-change:transform,opacity}
+  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c) .opt-plan.is-cur{transform:scale(1) translateZ(0);opacity:1}
+  /* cheaper painting while swiping: no endless loops, no blur filters */
+  html body #plansView:not(#_a):not(#_b) .opt-plan::after,html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy::before{animation:none!important;display:none!important}
+  html body #plansView:not(#_a):not(#_b) .opt-plan .pr{filter:none!important}
+}
+@media (hover:none){
+  html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy:active{transform:scale(.97)!important}
+}
+html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy{transition:transform .18s ease,filter .3s ease,box-shadow .3s ease!important}
+</style><script>/* ---- plans: mark the centred card so it can scale up smoothly ---- */
+(function(){
+  var box=null,tk=0;
+  function mark(){
+    tk=0; if(!box) return;
+    var cs=box.querySelectorAll('.opt-plan'); if(!cs.length||!box.clientWidth) return;
+    var mid=box.scrollLeft+box.clientWidth/2,best=null,bd=1e9;
+    for(var i=0;i<cs.length;i++){var d=Math.abs(cs[i].offsetLeft+cs[i].offsetWidth/2-mid);if(d<bd){bd=d;best=cs[i]}}
+    for(var j=0;j<cs.length;j++) cs[j].classList.toggle('is-cur',cs[j]===best);
+  }
+  function q(){ if(!tk) tk=requestAnimationFrame(mark); }
+  function attach(){
+    var b=document.getElementById('optPlans'); if(!b||b===box) return;
+    box=b; box.addEventListener('scroll',q,{passive:true}); window.addEventListener('resize',q);
+    new MutationObserver(q).observe(box,{childList:true});
+    if(window.ResizeObserver) new ResizeObserver(q).observe(box);
+    q(); setTimeout(q,300); setTimeout(q,900);
+  }
+  setInterval(attach,500); attach();
+  document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('.mn-link[data-mn="plans"],[data-mn-go="plans"]')){ setTimeout(q,120); setTimeout(q,600); } });
+})();
+</script>
 </body>
 </html>
