@@ -8826,7 +8826,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     function applySwap(){
       toHide.forEach(el => { el.classList.remove('wiz-step-exit'); el.classList.add(HID); });
       if (midCallback) midCallback();
-      toShow.forEach(el => { el.classList.remove(HID); el.classList.remove('wiz-enter'); void el.offsetWidth; el.classList.add('wiz-enter'); });
+      toShow.forEach(el => { el.classList.remove(HID); el.classList.add('wiz-enter'); });
     }
 
     if (reduce || !container) { applySwap(); return; }
@@ -22022,7 +22022,7 @@ html body .pc-modal-scrim .wizard-confirm-btn:active:not(#_a):not(#_b){ transfor
   if (!scrim || !window.ResizeObserver || !Element.prototype.animate) return;
   var root = document.documentElement, MS = 320, EASE = 'cubic-bezier(.22,1,.36,1)';
   function still(){
-    return root.classList.contains('low-power') || root.classList.contains('pc-opening') ||
+    return true || root.classList.contains('low-power') || root.classList.contains('pc-opening') ||
       (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
   /* every opening starts centred again */
@@ -27484,6 +27484,11 @@ html body .ttdl-analyze-btn{line-height:1.5!important}
 #optView #optProg{scroll-margin-top:84px}
 #optView .opt-eng button:focus-visible{outline:2px solid var(--o-tide);outline-offset:2px}
 </style>
+<style id="moon-checker-calm">
+/* checker: one clean fade for the whole page. The per-part entrance animations (clip-path headline, glass, icon, bar) used to start at different moments and made the page flash when it opened. */
+html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-titlebar,.ttdl-icon,.ttdl-heading,.ttdl-subtext,.ttdl-glass,.ttdl-input-wrap,.ttdl-steps,.ttdl-log){animation:none!important;opacity:1!important;clip-path:none!important}
+html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-icon,.ttdl-glass)::before,html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-icon,.ttdl-glass)::after{animation:none!important}
+</style>
 <!-- MOON accounts (linked accounts + shared weekly limit) -->
 <style id="moon-accounts-css">
 #maRoot{--bg:#06060c;--card:#0f1020;--line:rgba(176,190,230,.12);--line2:rgba(176,190,230,.26);--tx:#f3f6ff;--dim:#b7c2e2;--faint:#8593bb;--g1:#7dd3fc;--g2:#a78bfa;--g3:#f0abfc;--ok:#34d399;--tk1:#25f4ee;--tk2:#fe2c55}
@@ -27643,6 +27648,7 @@ html body #hzMenu:not(#_a) .hzm-stats{border:1px solid #2a2a2e!important;border-
 
 /* ---- "მეტი" sub-menu (mobile/tablet): items open in a separate sheet ---- */
 html body #hzMenu .mm-grp{display:none}
+html body #hzMenu .mm-head{display:none}
 @media (max-width:1023px){
 html body #hzMenu .hzm-sec--more>.hzm-label{display:none}
 html body #hzMenu .mm-grp{display:block}
