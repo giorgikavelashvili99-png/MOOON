@@ -27493,6 +27493,11 @@ html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-titlebar
 html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-icon,.ttdl-icon *,.ttdl-heading,.ttdl-subtext,.ttdl-analyze-btn,.ttdl-shell){filter:none!important;text-shadow:none!important}
 html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-icon,.ttdl-glass,.ttdl-input-wrap,.ttdl-input-icon,.ttdl-paste-btn,.ttdl-analyze-btn){transition-property:border-color,background-color,color,transform!important}
 html body #checkerView:not(#_a):not(#_b):not(#_c) .ttdl-shell{border:1px solid rgba(255,255,255,.10)!important}
+/* page change without a dark dip: the old page only dims a little, the new one starts from that same level and brightens - one smooth step, no blank frame */
+@keyframes mnOut{from{opacity:1}to{opacity:.6}}
+@keyframes mnViewIn{from{opacity:.6}to{opacity:1}}
+html body .mn-out:not(#_a):not(#_b):not(#_c):not(#_d){animation-name:mnOut!important;transform:none!important}
+html body .mn-view.show:not(#_a):not(#_b):not(#_c):not(#_d){animation-name:mnViewIn!important;animation-duration:.26s!important;animation-timing-function:ease-out!important;animation-delay:0s!important}
 </style>
 <!-- MOON accounts (linked accounts + shared weekly limit) -->
 <style id="moon-accounts-css">
@@ -27934,7 +27939,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 var GATE='https://ancient-frost-1a11.giorgikavelashvili99.workers.dev',KEY='moon_opt_admin_key',ACC=[];
 function $(i){return document.getElementById(i)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function key(){var i=$('optAdmKey'),k=i&&i.value;if(!k){try{k=sessionStorage.getItem(KEY)||''}catch(e){}}return k||''}
+function key(){var i=$('aaKey')||$('optAdmKey'),k=i&&i.value;if(!k){try{k=sessionStorage.getItem(KEY)||''}catch(e){}}return k||''}
 function call(path,body){
   return fetch(GATE+path,{method:body?'POST':'GET',headers:Object.assign({'X-Admin-Key':key()},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined})
    .then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(!r.ok)throw new Error(j.message||j.error||('HTTP '+r.status));return j})});
@@ -27959,12 +27964,13 @@ function load(){
   call('/admin/accounts').then(function(r){ACC=(r.accounts||[]).sort(function(a,b){return (b.created||0)-(a.created||0)});draw()}).catch(function(e){list.innerHTML='<div class="aa-none">'+esc(e.message)+'</div>'});
 }
 function mount(){
-  var p=$('adminPanelOptimizer');if(!p||$('admAccBox'))return;
-  var b=document.createElement('div');b.id='admAccBox';b.className='aa-box';
-  b.innerHTML='<div class="aa-head"><b>🔗 მიბმული ანგარიშები</b><small id="aaCount"></small><button class="a-go" id="aaLoad">ჩატვირთვა</button></div><input class="aa-search" id="aaSearch" type="text" placeholder="ძებნა სახელით, username-ით ან ID-ით..."><div id="aaList"></div>';
-  p.appendChild(b);
-  $('aaLoad').onclick=load;$('aaSearch').oninput=draw;
-  if(key())load();
+  var p=$('adminPanelDiscordUsers');if(!p||$('admAccBox'))return;
+  var k='';try{k=sessionStorage.getItem(KEY)||''}catch(e){}
+  var b=document.createElement('div');b.id='admAccBox';b.className='aa-box';b.style.marginTop='0';b.style.marginBottom='18px';
+  b.innerHTML='<div class="aa-head"><b>🔗 მიბმული ანგარიშები</b><small id="aaCount"></small></div><div class="aa-head"><input class="aa-search" id="aaKey" type="password" placeholder="Gate admin key" value="'+esc(k)+'" style="flex:1 1 160px;margin:0;width:auto"><button class="a-go" id="aaLoad">ჩატვირთვა</button></div><input class="aa-search" id="aaSearch" type="text" placeholder="ძებნა სახელით, username-ით ან ID-ით..."><div id="aaList"><div class="aa-none">შეიყვანე გასაღები და დააჭირე „ჩატვირთვა“</div></div>';
+  p.insertBefore(b,p.firstChild);
+  $('aaLoad').onclick=function(){try{sessionStorage.setItem(KEY,$('aaKey').value)}catch(e){}load()};$('aaSearch').oninput=draw;
+  if(k)load();
 }
 document.addEventListener('click',function(e){
   var row=e.target.closest&&e.target.closest('.aa-row[data-acct]');if(!row)return;var acct=row.getAttribute('data-acct');
@@ -27979,9 +27985,8 @@ document.addEventListener('click',function(e){
     call('/admin/revoke',{acct:acct}).then(function(){ACC=ACC.filter(function(a){return a.acct!==acct});draw()}).catch(function(er){row.classList.remove('busy');alert(er.message)});
   }
 });
-var orig=window.renderAdminOptimizer;
-if(typeof orig==='function'){window.renderAdminOptimizer=function(){var r=orig.apply(this,arguments);try{mount()}catch(e){}return r}}
-else{var n=0,iv=setInterval(function(){if(typeof window.renderAdminOptimizer==='function'&&!window.__aaWrapped){window.__aaWrapped=1;clearInterval(iv);var o2=window.renderAdminOptimizer;window.renderAdminOptimizer=function(){var r=o2.apply(this,arguments);try{mount()}catch(e){}return r}}else if(++n>40)clearInterval(iv)},500)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+var tb=$('adminTabDiscordUsers');if(tb)tb.addEventListener('click',function(){setTimeout(mount,0)});
 })();
 </script>
 <script id="moon-gate-labels">
