@@ -7013,6 +7013,10 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 3c.3 2.4 1.7 3.9 4 4.1v3.1c-1.4.1-2.7-.3-4-1.1v6.2c0 3.9-3.1 6.2-6.2 5.7-2.9-.5-4.9-3.1-4.5-6.1.4-3.2 3.3-5.2 6.4-4.7v3.2c-1.5-.5-3.3.4-3.3 2.2 0 1.4 1.1 2.4 2.4 2.4 1.5 0 2.4-1.1 2.4-2.6V3h2.8z"/></svg>
       <span>შესვლა TikTok-ით</span>
     </button>
+    <button type="button" class="discord-btn outline" id="tgLoginBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.4 3.6 2.9 10.7c-1.3.5-1.3 1.2-.2 1.5l4.7 1.5 1.800 5.500c.2.600.4.800.9.800.4 0 .6-.2.9-.4l2.200-2.200 4.600 3.400c.8.500 1.500.2 1.800-.8l3-14.400c.3-1.200-.5-1.800-1.200-1.500Z"/></svg>
+      <span>შესვლა Telegram-ით</span>
+    </button>
     <a class="discord-btn outline" id="discordJoinBtn" href="https://discord.gg/mmpnEeJnXv" target="_blank" rel="noopener noreferrer">
       <svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.94,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.94,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
       <span data-i18n="authJoinBtn">შემოუერთდი ჩვენს Discord სერვერს</span>
@@ -7615,6 +7619,9 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
           <div class="dp-pill-actions">
             <button type="button" class="dp-icon-btn" id="discordRefreshBtn" aria-label="Refresh" title="განახლება">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08a5.99 5.99 0 01-5.65 4c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L14 11h7V4l-3.35 3.35z"/></svg>
+            </button>
+            <button type="button" class="dp-icon-btn" id="maPopBtn" data-ma-open="1" aria-label="Accounts" title="ანგარიშები">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3A4 4 0 0 0 13 5.3l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <button type="button" class="dp-icon-btn dp-icon-logout" id="discordLogoutBtn" aria-label="Logout" title="გამოსვლა">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17v-2H4V9h6V7l5 5-5 5zM4 3h9c1.1 0 2 .9 2 2v3h-2V5H4v14h9v-3h2v3c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2z"/></svg>
@@ -25412,6 +25419,7 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
         (s && !s.unlimited && s.resetAt ? '<div class="hzm-reset">'+esc(t('resets'))+' <span id="hzmReset">'+fmtLeft(s.resetAt-Date.now())+'</span></div>' : '')+
         '</div><div class="hzm-acct-rows">'+
         '<div class="hzm-row">'+ic('user')+'<span class="hzm-lbl">'+esc(t('discordAcc'))+'</span><span class="hzm-val">'+esc(u.username||'')+'</span></div>'+
+        '<button type="button" class="hzm-row" data-hz-act="accounts">'+ic('user')+'<span class="hzm-lbl">'+(lang()==='ka'?'ანგარიშები':lang()==='ru'?'Аккаунты':'Accounts')+'</span>'+ic('chev','hzm-chev')+'</button>'+
         '<button type="button" class="hzm-row" data-hz-act="lang">'+ic('globe')+'<span class="hzm-lbl">'+esc(t('lang'))+'</span><span class="hzm-val">'+esc(t('langName'))+'</span>'+ic('chev','hzm-chev')+'</button>'+
         '<button type="button" class="hzm-row hzm-out" data-hz-act="logout">'+ic('out')+'<span class="hzm-lbl">'+esc(t('signOut'))+'</span></button>'+
         '</div></div>';
@@ -25423,6 +25431,7 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
     var a=e.target.closest('[data-hz-act]'); if(!a) return; var k=a.getAttribute('data-hz-act');
     if(k==='toggle'){ acctOpen=!acctOpen; renderAcct(); if(acctOpen && !isDesk()){ var sc=document.getElementById('hzmScroll'); requestAnimationFrame(function(){ sc.scrollTo({top:sc.scrollHeight,behavior:'smooth'}); }); } }
     else if(k==='login'){ closeMenu(); try{ startDiscordLogin(); }catch(_){ var c=document.getElementById('discordChip'); if(c) c.click(); } }
+    else if(k==='accounts'){ closeMenu(); if(window.__moonOpenAccounts) window.__moonOpenAccounts(); }
     else if(k==='logout'){ closeMenu(); var b=document.getElementById('discordLogoutBtn'); if(b) b.click(); }
     else if(k==='refresh'){ a.classList.remove('spin'); void a.offsetWidth; a.classList.add('spin'); var r=document.getElementById('discordRefreshBtn'); if(r) r.click(); if(window.__moonOptRefresh) window.__moonOptRefresh(); }
     else if(k==='lang'){ var c=menu.querySelector('.hzm-langcard'); c.classList.add('open'); document.getElementById('hzmLangRow').setAttribute('aria-expanded','true'); c.scrollIntoView({block:'nearest',behavior:'smooth'}); }
@@ -27189,15 +27198,16 @@ html body #adminOverlay #adminLogin .a-close{-webkit-text-stroke:.3px currentCol
 </style>
 <style id="moon-tt-login">
 @media (min-width:761px){
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card{grid-template-rows:1fr auto auto auto auto auto auto auto 1fr!important;min-height:480px!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-stage{min-height:480px!important;align-self:stretch}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card{grid-template-rows:1fr auto auto auto auto auto auto auto auto 1fr!important;min-height:530px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-stage{min-height:530px!important;align-self:stretch}
 }
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > #tiktokLoginBtn{grid-row:5!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > #discordJoinBtn{grid-row:6!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-gate-skip{grid-row:7!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-gate-close{grid-row:8!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) #tiktokLoginBtn svg{fill:#fff!important;color:#fff}
-html body #discordGate[data-mode="banned"] #tiktokLoginBtn,html body #discordGate[data-mode="guild"] #tiktokLoginBtn{display:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > #tgLoginBtn{grid-row:6!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > #discordJoinBtn{grid-row:7!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-gate-skip{grid-row:8!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) .dg-card > .discord-gate-close{grid-row:9!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) #tiktokLoginBtn svg,html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d) #tgLoginBtn svg{fill:#fff!important;color:#fff}
+html body #discordGate[data-mode="banned"] #tiktokLoginBtn,html body #discordGate[data-mode="guild"] #tiktokLoginBtn,html body #discordGate[data-mode="banned"] #tgLoginBtn,html body #discordGate[data-mode="guild"] #tgLoginBtn{display:none!important}
 </style>
 <style id="moon-chat-upload-css">
 .mcu{flex:0 0 auto;margin:8px auto 0;width:calc(100% - 28px);max-width:560px;position:relative;font-family:'BPGAcademiuriU','Space Grotesk',sans-serif;color:#fff}
@@ -27382,5 +27392,243 @@ html body .ttdl-analyze-btn{line-height:1.5!important}
 #optView #optProg{scroll-margin-top:84px}
 #optView .opt-eng button:focus-visible{outline:2px solid var(--o-tide);outline-offset:2px}
 </style>
+<!-- MOON accounts (linked accounts + shared weekly limit) -->
+<style id="moon-accounts-css">
+#maRoot{--bg:#06060c;--card:#0f1020;--line:rgba(176,190,230,.12);--line2:rgba(176,190,230,.26);--tx:#f3f6ff;--dim:#b7c2e2;--faint:#8593bb;--g1:#7dd3fc;--g2:#a78bfa;--g3:#f0abfc;--ok:#34d399;--tk1:#25f4ee;--tk2:#fe2c55}
+#maRoot,#maRoot *{box-sizing:border-box}
+#maRoot{position:fixed;inset:0;z-index:2147483000;display:none;color:var(--tx);font-family:inherit;line-height:1.6}
+#maRoot.open{display:block}
+#maRoot .ma-ov{position:absolute;inset:0;background:#06060c}
+#maRoot .ma-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:22px 16px 70px;background-image:radial-gradient(900px 420px at 15% -120px,rgba(167,139,250,.20),transparent 70%),radial-gradient(700px 380px at 100% 0,rgba(37,244,238,.08),transparent 70%)}
+#maRoot .ma-page{width:100%;max-width:1020px;margin:0 auto;display:grid;gap:18px;animation:maIn .25s ease-out}
+@keyframes maIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#maRoot .ma-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+#maRoot .ma-head h2{margin:0;font-size:32px;line-height:1.5;font-weight:800;color:var(--tx);text-transform:none;letter-spacing:0}
+#maRoot .ma-head p{margin:0;color:var(--faint);font-size:14.5px;line-height:1.7}
+#maRoot .ma-x{appearance:none;flex:none;width:46px;height:46px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.06);color:var(--tx);cursor:pointer;display:grid;place-items:center;padding:0}
+#maRoot .ma-x svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+#maRoot .ma-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
+#maRoot .ma-col{display:grid;gap:18px;min-width:0}
+#maRoot .ma-card{position:relative;border-radius:30px;border:1px solid var(--line);background:linear-gradient(165deg,#15172b,#0c0d19 70%);overflow:hidden}
+#maRoot .ma-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px 180px at 0 0,rgba(125,211,252,.10),transparent 70%)}
+#maRoot .ma-pad{position:relative;padding:22px}
+#maRoot .ma-eye{margin:0 0 12px;font-size:11.5px;letter-spacing:.14em;color:var(--faint);line-height:1.6}
+#maRoot .ma-hub{display:flex;gap:16px;align-items:center}
+#maRoot .ma-ava{width:76px;height:76px;border-radius:50%;padding:3px;background:conic-gradient(from 210deg,var(--g1),var(--g2),var(--g3),var(--g1));flex:none}
+#maRoot .ma-ava span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:#0d0e1c;font-size:28px;font-weight:800;overflow:hidden}
+#maRoot .ma-ava img{width:100%;height:100%;object-fit:cover;display:block}
+#maRoot .ma-hub h3{margin:0;font-size:21px;line-height:1.5;font-weight:800;color:var(--tx);overflow-wrap:anywhere}
+#maRoot .ma-hub p{margin:0;color:var(--faint);font-size:13.5px;line-height:1.7}
+#maRoot .ma-plan{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:3px 11px 4px;border-radius:999px;font-size:12px;font-weight:700;line-height:1.6;background:rgba(52,211,153,.13);border:1px solid rgba(52,211,153,.32);color:var(--ok)}
+#maRoot .ma-meter{margin-top:20px;display:grid;gap:10px}
+#maRoot .ma-segs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#maRoot .ma-segs i{height:8px;border-radius:99px;background:rgba(176,190,230,.14)}
+#maRoot .ma-segs i.on{background:linear-gradient(90deg,var(--g1),var(--g2));box-shadow:0 0 14px rgba(125,211,252,.4)}
+#maRoot .ma-mrow{display:flex;justify-content:space-between;gap:10px;font-size:13px;line-height:1.7;color:var(--dim)}
+#maRoot .ma-mrow b{color:var(--tx)}
+#maRoot .ma-lim{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+#maRoot .ma-ring{position:relative;width:116px;height:116px}
+#maRoot .ma-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+#maRoot .ma-ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+#maRoot .ma-ring .bg{stroke:rgba(176,190,230,.13)}
+#maRoot .ma-ring .fg{stroke:url(#maRg);stroke-dasharray:289;transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)}
+#maRoot .ma-ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+#maRoot .ma-ring b{font-size:34px;line-height:1.1;font-weight:800;color:var(--tx)}
+#maRoot .ma-ring small{font-size:12px;color:var(--faint);line-height:1.5}
+#maRoot .ma-lim h4{margin:0 0 4px;font-size:17px;line-height:1.55;font-weight:700;color:var(--tx)}
+#maRoot .ma-lim p{margin:0;color:var(--dim);font-size:13.5px;line-height:1.75}
+#maRoot .ma-dots{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+#maRoot .ma-dots i{width:30px;height:8px;border-radius:99px;background:rgba(251,191,36,.9)}
+#maRoot .ma-dots i.free{background:rgba(176,190,230,.14)}
+#maRoot .ma-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+#maRoot .ma-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 6px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:12.5px;line-height:1.6;color:var(--dim)}
+#maRoot .ma-chip b{color:var(--tx)}
+#maRoot .ma-note{display:flex;gap:12px;margin-top:16px;padding:12px 14px;border-radius:20px;background:rgba(125,211,252,.07);border:1px solid rgba(125,211,252,.2);font-size:13px;line-height:1.75;color:var(--dim)}
+#maRoot .ma-note svg{width:20px;height:20px;flex:none;margin-top:3px;stroke:var(--g1);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#maRoot .ma-note b{color:var(--tx)}
+#maRoot .ma-prov{position:relative;border-radius:28px;border:1px solid var(--line);background:var(--card);padding:18px;display:grid;gap:14px;overflow:hidden}
+#maRoot .ma-prov::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(360px 150px at 0 0,var(--glow),transparent 70%)}
+#maRoot .ma-prov.dc{--glow:rgba(88,101,242,.22)}#maRoot .ma-prov.tg{--glow:rgba(42,171,238,.20)}#maRoot .ma-prov.tk{--glow:rgba(254,44,85,.16)}
+#maRoot .ma-prov.on{border-color:rgba(52,211,153,.38)}
+#maRoot .ma-row{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
+#maRoot .ma-logo{width:56px;height:56px;border-radius:19px;display:grid;place-items:center}
+#maRoot .ma-logo svg{width:29px;height:29px}
+#maRoot .dc .ma-logo{background:linear-gradient(145deg,#6d79ff,#4450e0)}#maRoot .dc .ma-logo svg{fill:#fff}
+#maRoot .tg .ma-logo{background:linear-gradient(145deg,#3bb6f2,#1d93c9)}#maRoot .tg .ma-logo svg{fill:#fff}
+#maRoot .tk .ma-logo{background:#0a0a0f;border:1px solid rgba(255,255,255,.14)}
+#maRoot .ma-who{min-width:0}
+#maRoot .ma-who h4{margin:0;font-size:17px;line-height:1.55;font-weight:700;color:var(--tx);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#maRoot .ma-who p{margin:0;font-size:13px;line-height:1.65;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#maRoot .ma-tag{font-size:11px;font-weight:700;line-height:1.6;padding:2px 9px 3px;border-radius:999px;border:1px solid var(--line2);color:var(--dim);background:rgba(255,255,255,.04)}
+#maRoot .ma-tag.ok{color:var(--ok);background:rgba(52,211,153,.13);border-color:rgba(52,211,153,.32)}
+#maRoot .ma-act{justify-self:end}
+#maRoot .ma-btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:800;font-size:14.5px;line-height:1.5;min-width:168px;height:48px;padding:0 22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;color:#fff;transition:transform .15s,filter .2s}
+#maRoot .ma-btn:hover{filter:brightness(1.08)}#maRoot .ma-btn:active{transform:scale(.97)}
+#maRoot .ma-btn.tg{background:linear-gradient(145deg,#38b8f5,#1a8fd0);box-shadow:0 10px 26px -10px rgba(42,171,238,.95)}
+#maRoot .ma-btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--dim);font-weight:600}
+#maRoot .ma-btn[disabled]{opacity:.45;cursor:not-allowed;filter:none;transform:none}
+#maRoot .ma-btn svg{width:20px;height:20px;fill:#fff;flex:none}
+#maRoot .ma-btn.ghost svg{fill:none;stroke:currentColor;stroke-width:2.2}
+#maRoot .ma-spin{width:16px;height:16px;border-radius:50%;border:2.4px solid rgba(255,255,255,.35);border-top-color:#fff;animation:maSp .7s linear infinite}
+@keyframes maSp{to{transform:rotate(360deg)}}
+#maRoot .ma-sub{position:relative;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:14px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--faint)}
+#maRoot .ma-ben{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#maRoot .ma-ben div{padding:14px;border-radius:20px;background:rgba(255,255,255,.035);border:1px solid var(--line);font-size:12.5px;line-height:1.65;color:var(--dim)}
+#maRoot .ma-ben svg{width:22px;height:22px;stroke:var(--g2);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;margin-bottom:6px;display:block}
+#maRoot .ma-ben b{display:block;color:var(--tx);font-size:13.5px;margin-bottom:2px}
+#maRoot .ma-load{display:grid;place-items:center;min-height:220px;color:var(--faint)}
+#maRoot .ma-load .ma-spin{width:30px;height:30px;border-width:3px}
+#maRoot .ma-err{padding:22px;border-radius:24px;border:1px solid rgba(254,44,85,.4);background:rgba(254,44,85,.08);color:#ffd6dd;font-size:14.5px;line-height:1.7;display:grid;gap:14px;justify-items:start}
+#maRoot .ma-toast{position:fixed;left:50%;bottom:22px;width:max-content;transform:translate(-50%,30px);opacity:0;pointer-events:none;transition:.35s cubic-bezier(.2,.8,.2,1);max-width:calc(100vw - 32px);padding:13px 18px 14px;border-radius:20px;background:#143023;border:1px solid rgba(52,211,153,.45);color:#d1fae5;font-size:14px;line-height:1.6;box-shadow:0 18px 40px -12px rgba(0,0,0,.7)}
+#maRoot .ma-toast.bad{background:#32141b;border-color:rgba(254,44,85,.5);color:#ffd6dd}
+#maRoot .ma-toast.show{opacity:1;transform:translate(-50%,0)}
+html.ma-lock,html.ma-lock body{overflow:hidden!important}
+@media (max-width:860px){#maRoot .ma-grid{grid-template-columns:1fr}#maRoot .ma-head h2{font-size:27px}}
+@media (max-width:480px){#maRoot .ma-row{grid-template-columns:auto minmax(0,1fr)}#maRoot .ma-act{grid-column:1/-1;justify-self:stretch}#maRoot .ma-btn{width:100%;min-width:0}#maRoot .ma-lim{grid-template-columns:1fr;justify-items:center;text-align:center}#maRoot .ma-dots,#maRoot .ma-chips{justify-content:center}#maRoot .ma-ben{grid-template-columns:1fr}#maRoot .ma-pad{padding:18px}#maRoot .ma-mrow{flex-direction:column;gap:0}}
+@media (prefers-reduced-motion:reduce){#maRoot *{animation:none!important;transition:none!important}}
+</style>
+<div id="maRoot" role="dialog" aria-modal="true" aria-label="Accounts">
+  <div class="ma-ov" data-ma="close"></div>
+  <div class="ma-scroll" data-ma="bg"><div class="ma-page" id="maPage"></div></div>
+  <div class="ma-toast" id="maToast"></div>
+</div>
+<script id="moon-accounts-js">
+(function(){
+'use strict';
+var GATE='https://ancient-frost-1a11.giorgikavelashvili99.workers.dev';
+var T={
+ka:{title:'ჩემი ანგარიშები',sub:'ერთი პროფილი, ერთი ლიმიტი, შესვლის სამი გზა',member:'MOON მომხმარებელი',via:'Discord-ით შესული',secure:'დაცულობა',lv:['დაბალი','კარგი','მაქსიმალური'],linked:'ანგარიში მიბმულია',weekly:'კვირის ლიმიტი',shared:'ერთი ლიმიტი ყველა ანგარიშზე',usedOf:function(u,l){return 'გამოყენებულია <b>'+u+'</b> ატვირთვა '+l+'-დან.'},left:'დარჩა',unl:'ულიმიტო პაკეტი',resets:'განახლდება',monday:'ორშაბათს 00:00',noteB:'მიბმა ლიმიტს არ ზრდის.',noteT:' Telegram-ის ან TikTok-ის დამატებით ახალი ატვირთვები არ გემატება, ყველა ერთ პროფილზეა.',main:'მთავარი',on:'მიბმულია',off:'არ არის მიბმული',connect:'დაკავშირება',discon:'გამორთვა',soon:'მალე',tgSub:'შედი ბოტით, წამებში',tkSub:'მალე დაემატება',checking:'ვამოწმებთ…',dcSub:'ძირითადი შესვლა',b1:'დაცული შესვლა',b1t:'თუ ერთ ანგარიშს დაკარგავ, სხვით შეხვალ',b2:'ერთი ისტორია',b2t:'ატვირთვები ერთ ადგილას',b3:'ერთი ლიმიტი',b3t:'ახალი ანგარიში ახალ ლიმიტს არ იძლევა',okTg:'Telegram მიბმულია. ლიმიტი იგივეა, ახალი ატვირთვა არ დაგემატა.',offTg:'Telegram გამოირთო',cancelled:'დაკავშირება გაუქმდა',err:'შეცდომა, სცადე თავიდან',retry:'თავიდან ცდა',loadErr:'ანგარიშის მონაცემები ვერ ჩაიტვირთა.',noLogin:'ჯერ შედი Discord-ით.',cfg:'Telegram ჯერ არ არის გამართული.',tgLoadFail:'Telegram-ის სკრიპტი ვერ ჩაიტვირთა',confirmOff:'გამოვრთო Telegram?',again:'მზადაა, დააჭირე ისევ',gateTg:'შესვლა Telegram-ით',gateWait:'ვამოწმებთ…',gateNote:'Telegram ჯერ არ არის მიბმული: შედი Discord-ით და ანგარიშებში მიაბი.'},
+en:{title:'My accounts',sub:'One profile, one limit, three ways to sign in',member:'MOON user',via:'Signed in with Discord',secure:'Security',lv:['Low','Good','Maximum'],linked:'accounts linked',weekly:'WEEKLY LIMIT',shared:'One limit for every account',usedOf:function(u,l){return '<b>'+u+'</b> of '+l+' uploads used.'},left:'left',unl:'Unlimited plan',resets:'Resets in',monday:'Monday 00:00',noteB:'Linking does not raise your limit.',noteT:' Adding Telegram or TikTok gives no extra uploads; everything stays on one profile.',main:'Primary',on:'Linked',off:'Not linked',connect:'Connect',discon:'Disconnect',soon:'Soon',tgSub:'Sign in with the bot',tkSub:'Coming soon',checking:'Checking…',dcSub:'Primary sign-in',b1:'Safe sign-in',b1t:'Lose one account, use another',b2:'One history',b2t:'Uploads in one place',b3:'One limit',b3t:'A new account gives no new limit',okTg:'Telegram linked. Same limit, no extra uploads.',offTg:'Telegram disconnected',cancelled:'Connection cancelled',err:'Error, try again',retry:'Retry',loadErr:'Could not load account data.',noLogin:'Sign in with Discord first.',cfg:'Telegram is not set up yet.',tgLoadFail:'Could not load the Telegram script',confirmOff:'Disconnect Telegram?',again:'Ready, tap again',gateTg:'Sign in with Telegram',gateWait:'Checking…',gateNote:'Telegram is not linked yet: sign in with Discord and link it in Accounts.'},
+ru:{title:'Мои аккаунты',sub:'Один профиль, один лимит, три способа входа',member:'Пользователь MOON',via:'Вход через Discord',secure:'Защита',lv:['Низкая','Хорошая','Максимальная'],linked:'аккаунтов привязано',weekly:'НЕДЕЛЬНЫЙ ЛИМИТ',shared:'Один лимит на все аккаунты',usedOf:function(u,l){return 'Использовано <b>'+u+'</b> из '+l+' загрузок.'},left:'осталось',unl:'Безлимитный тариф',resets:'Сброс через',monday:'Понедельник 00:00',noteB:'Привязка не увеличивает лимит.',noteT:' Telegram или TikTok не дают новых загрузок: всё на одном профиле.',main:'Основной',on:'Привязан',off:'Не привязан',connect:'Подключить',discon:'Отключить',soon:'Скоро',tgSub:'Вход через бота',tkSub:'Скоро',checking:'Проверяем…',dcSub:'Основной вход',b1:'Защищённый вход',b1t:'Потеряли один аккаунт, зайдёте с другого',b2:'Одна история',b2t:'Загрузки в одном месте',b3:'Один лимит',b3t:'Новый аккаунт не даёт нового лимита',okTg:'Telegram привязан. Лимит прежний, новых загрузок нет.',offTg:'Telegram отключён',cancelled:'Подключение отменено',err:'Ошибка, попробуйте снова',retry:'Повторить',loadErr:'Не удалось загрузить данные аккаунта.',noLogin:'Сначала войдите через Discord.',cfg:'Telegram ещё не настроен.',tgLoadFail:'Не удалось загрузить скрипт Telegram',confirmOff:'Отключить Telegram?',again:'Готово, нажмите ещё раз',gateTg:'Войти через Telegram',gateWait:'Проверяем…',gateNote:'Telegram ещё не привязан: войдите через Discord и привяжите его в разделе аккаунтов.'}
+};
+function lang(){var l=document.documentElement.lang;try{if(typeof currentLang!=='undefined'&&T[currentLang])l=currentLang}catch(e){}return T[l]?l:'ka'}
+function t(){return T[lang()]}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function user(){try{return typeof currentDiscordUser!=='undefined'?currentDiscordUser:null}catch(e){return null}}
+function ident(u){return {uid:String(u.id),username:u.username||'',sig:u.optSig||undefined,sigExp:u.optSigExp||undefined}}
+function api(path,body){
+  return fetch(GATE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){
+    return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error(j.message||j.error||('HTTP '+r.status));e.data=j;throw e}return j})});
+}
+var root=document.getElementById('maRoot'),page=document.getElementById('maPage'),toastEl=document.getElementById('maToast');
+var S={acc:null,busy:'',err:'',loading:false,tgCfg:null},tgScript=null,timer=0,toastT=0;
+var ICON={
+dc:'<svg viewBox="0 0 24 24"><path d="M19.3 5.4A17 17 0 0 0 15.1 4l-.5 1a15.700 15.700 0 0 0-5.200 0l-.5-1a17 17 0 0 0-4.200 1.400C2 9.400 1.300 13.300 1.600 17.200a17.200 17.200 0 0 0 5.200 2.600l1.100-1.800a11 11 0 0 1-1.700-.8l.4-.3a12.300 12.300 0 0 0 10.800 0l.4.3c-.5.3-1.100.6-1.700.8l1.100 1.800a17.200 17.200 0 0 0 5.200-2.600c.4-4.500-.7-8.400-3.100-11.800ZM8.700 14.800c-1 0-1.800-.9-1.800-2s.8-2 1.800-2 1.800.9 1.800 2-.8 2-1.800 2Zm6.600 0c-1 0-1.800-.9-1.800-2s.8-2 1.800-2 1.800.9 1.800 2-.8 2-1.800 2Z"/></svg>',
+tg:'<svg viewBox="0 0 24 24"><path d="M21.4 3.6 2.9 10.700c-1.300.5-1.300 1.200-.2 1.500l4.700 1.500 1.800 5.500c.2.600.4.800.9.800.4 0 .6-.2.900-.4l2.200-2.200 4.600 3.400c.8.500 1.500.2 1.800-.8l3-14.400c.3-1.200-.5-1.800-1.200-1.500ZM9 13.500l8.700-5.500c.4-.3.800-.1.500.2l-7.200 6.500-.3 3-1.700-4.200Z"/></svg>',
+tk:'<svg viewBox="0 0 24 24"><path d="M16.600 3c.3 2.300 1.700 3.900 3.900 4.100v2.900c-1.300.1-2.500-.3-3.800-1.100v6.100c0 3.100-2.400 5.500-5.500 5.500S5.700 18.100 5.700 15c0-3.100 2.500-5.600 5.800-5.400v3c-1.600-.3-2.800.9-2.800 2.400 0 1.400 1 2.500 2.400 2.500 1.400 0 2.400-1 2.400-2.600V3h3.100Z" fill="#25f4ee" transform="translate(-.7 .5)"/><path d="M16.600 3c.3 2.300 1.700 3.900 3.900 4.100v2.900c-1.300.1-2.500-.3-3.800-1.100v6.100c0 3.100-2.400 5.500-5.500 5.500S5.700 18.100 5.700 15c0-3.100 2.500-5.600 5.800-5.400v3c-1.600-.3-2.800.9-2.800 2.400 0 1.400 1 2.500 2.400 2.500 1.400 0 2.400-1 2.400-2.600V3h3.100Z" fill="#fe2c55" transform="translate(.7 -.5)"/><path d="M16.600 3c.3 2.300 1.700 3.900 3.900 4.100v2.900c-1.300.1-2.500-.3-3.800-1.100v6.100c0 3.100-2.400 5.500-5.500 5.500S5.700 18.100 5.700 15c0-3.100 2.500-5.600 5.800-5.400v3c-1.600-.3-2.800.9-2.800 2.400 0 1.400 1 2.500 2.400 2.500 1.400 0 2.400-1 2.400-2.600V3h3.100Z" fill="#fff"/></svg>'
+};
+function fmtLeft(ms){ms=Math.max(0,ms);var m=Math.floor(ms/60000),d=Math.floor(m/1440),h=Math.floor(m%1440/60),k=lang()==='ka'?['დ','სთ','წთ']:lang()==='ru'?['д','ч','м']:['d','h','m'];return d?(d+k[0]+' '+h+k[1]):(h+k[1]+' '+(m%60)+k[2])}
+function toast(msg,bad){toastEl.textContent=msg;toastEl.className='ma-toast show'+(bad?' bad':'');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},4200)}
+function providerCard(k,p){
+  var L=t(),on=!!p,busy=S.busy===k,sub,tag,act='';
+  if(k==='dc'){tag='<span class="ma-tag ok">'+L.main+'</span>';sub=esc((p&&(p.name||''))||'')+(p&&p.name?' · ':'')+L.dcSub}
+  else if(k==='tg'){
+    tag='<span class="ma-tag'+(on?' ok':'')+'">'+(on?L.on:L.off)+'</span>';
+    sub=on?esc((p.username?'@'+p.username:p.name)||'Telegram'):L.tgSub;
+    act=on?'<button class="ma-btn ghost" data-ma="unlink-tg"'+(busy?' disabled':'')+'>'+(busy?'<i class="ma-spin"></i>':'')+L.discon+'</button>'
+          :'<button class="ma-btn tg" data-ma="link-tg"'+(busy?' disabled':'')+'>'+(busy?'<i class="ma-spin"></i>'+L.checking:ICON.tg+L.connect)+'</button>';
+  } else {tag='<span class="ma-tag">'+L.soon+'</span>';sub=L.tkSub;act='<button class="ma-btn ghost" disabled>'+L.soon+'</button>'}
+  return '<article class="ma-prov '+k+(on?' on':'')+'"><div class="ma-row"><div class="ma-logo">'+ICON[k]+'</div><div class="ma-who"><h4>'+({dc:'Discord',tg:'Telegram',tk:'TikTok'})[k]+' '+tag+'</h4><p>'+sub+'</p></div><div class="ma-act">'+act+'</div></div></article>';
+}
+function render(){
+  var L=t(),u=user(),h;
+  var head='<div class="ma-head"><div><h2>'+L.title+'</h2><p>'+L.sub+'</p></div><button class="ma-x" data-ma="close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>';
+  if(S.err){page.innerHTML=head+'<div class="ma-err"><span>'+esc(S.err)+'</span><button class="ma-btn ghost" data-ma="retry">'+L.retry+'</button></div>';return}
+  if(!S.acc){page.innerHTML=head+'<div class="ma-load"><i class="ma-spin"></i></div>';return}
+  var a=S.acc,st=a.status||{},n=a.count,pv=a.providers||{};
+  var unl=!!st.unlimited,limit=unl?0:(st.limit||0),used=st.used||0,rem=unl?'∞':(st.remaining!=null?st.remaining:0);
+  var frac=unl?1:(limit?Math.max(0,Math.min(1,(st.remaining||0)/limit)):0),off=Math.round(289*(1-frac));
+  var dots='';if(!unl){for(var i=0;i<limit&&i<12;i++)dots+='<i'+(i>=used?' class="free"':'')+'></i>'}
+  var av=u&&u.avatarUrl?'<img src="'+esc(u.avatarUrl)+'" alt="">':'<span>'+esc(((u&&u.username)||'M').charAt(0).toUpperCase())+'</span>';
+  var plan=st.plan&&st.plan!=='free'?('Plan '+String(st.plan).replace(/^p/i,'')):(lang()==='ka'?'უფასო პაკეტი':lang()==='ru'?'Бесплатный':'Free');
+  var segs='';for(var s=0;s<3;s++)segs+='<i'+(s<n?' class="on"':'')+'></i>';
+  h=head+'<div class="ma-grid"><div class="ma-col">'+
+   '<section class="ma-card"><div class="ma-pad"><div class="ma-hub"><div class="ma-ava">'+(u&&u.avatarUrl?'<span>'+av+'</span>':av)+'</div><div><h3>'+esc((u&&u.username)||L.member)+'</h3><p>'+L.via+'</p><span class="ma-plan">● '+esc(plan)+'</span></div></div>'+
+   '<div class="ma-meter"><div class="ma-segs">'+segs+'</div><div class="ma-mrow"><span>'+L.secure+': <b>'+L.lv[Math.min(2,Math.max(0,n-1))]+'</b></span><span><b>'+n+'</b> / 3 '+L.linked+'</span></div></div></div></section>'+
+   '<section class="ma-card"><div class="ma-pad"><p class="ma-eye">'+L.weekly+'</p><div class="ma-lim"><div class="ma-ring"><svg viewBox="0 0 104 104"><defs><linearGradient id="maRg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset=".55" stop-color="#a78bfa"/><stop offset="1" stop-color="#f0abfc"/></linearGradient></defs><circle class="bg" cx="52" cy="52" r="46"/><circle class="fg" id="maFg" cx="52" cy="52" r="46" style="stroke-dashoffset:289" data-off="'+off+'"/></svg><div><b>'+rem+'</b><small>'+L.left+'</small></div></div>'+
+   '<div><h4>'+L.shared+'</h4><p>'+(unl?L.unl:L.usedOf(used,limit))+'</p>'+(dots?'<div class="ma-dots">'+dots+'</div>':'')+'</div></div>'+
+   (!unl&&st.resetAt?'<div class="ma-chips"><span class="ma-chip">'+L.resets+' <b id="maLeft">'+fmtLeft(st.resetAt-Date.now())+'</b></span><span class="ma-chip">'+L.monday+'</span></div>':'')+
+   '<div class="ma-note"><svg viewBox="0 0 24 24"><path d="M12 3 3 8v5c0 5 3.800 7.500 9 8 5.200-.5 9-3 9-8V8l-9-5Z"/><path d="M9 12l2 2 4-4"/></svg><div><b>'+L.noteB+'</b>'+L.noteT+'</div></div></div></section></div>'+
+   '<div class="ma-col">'+providerCard('dc',pv.discord)+providerCard('tg',pv.telegram)+providerCard('tk',pv.tiktok)+
+   '<div class="ma-ben"><div><svg viewBox="0 0 24 24"><path d="M12 3 3 8v5c0 5 3.800 7.500 9 8 5.200-.5 9-3 9-8V8l-9-5Z"/></svg><b>'+L.b1+'</b>'+L.b1t+'</div><div><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><b>'+L.b2+'</b>'+L.b2t+'</div><div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>'+L.b3+'</b>'+L.b3t+'</div></div></div></div>';
+  page.innerHTML=h;
+  var fg=document.getElementById('maFg');if(fg){requestAnimationFrame(function(){requestAnimationFrame(function(){fg.style.strokeDashoffset=fg.getAttribute('data-off')})})}
+}
+function load(){
+  var u=user();S.err='';
+  if(!u){S.err=t().noLogin;render();return}
+  S.acc=null;render();
+  var ib=ident(u);ib.avatarUrl=u.avatarUrl||'';ib.isMember=u.isMember===true;api('/account',ib).then(function(j){S.acc=j;render()}).catch(function(e){S.err=(e&&e.data&&e.data.error==='auth')?t().loadErr+' '+(e.message||''):t().loadErr;render()});
+}
+var DW='https://moon-discord-auth.giorgikavelashvili99.workers.dev';
+function prepTg(){
+  var cfg=S.tgCfg?Promise.resolve(S.tgCfg):fetch(GATE+'/tg/config').then(function(r){return r.ok?r.json():Promise.reject(new Error(t().cfg))}).then(function(c){S.tgCfg=c;return c});
+  return Promise.all([cfg,loadTgScript()]).then(function(r){return r[0]});
+}
+function tgReady(){return !!(S.tgCfg&&window.Telegram&&window.Telegram.Login)}
+function loadTgScript(){
+  if(window.Telegram&&window.Telegram.Login)return Promise.resolve();
+  if(tgScript)return tgScript;
+  tgScript=new Promise(function(res,rej){var s=document.createElement('script');s.src='https://telegram.org/js/telegram-widget.js?22';s.async=true;s.onload=function(){res()};s.onerror=function(){tgScript=null;rej(new Error(t().tgLoadFail))};document.head.appendChild(s)});
+  return tgScript;
+}
+function linkTg(){
+  var u=user();if(!u||S.busy)return;
+  var go=function(){
+    S.busy='tg';render();
+    window.Telegram.Login.auth({bot_id:Number(S.tgCfg.botId),request_access:'write'},function(data){
+      if(!data){S.busy='';render();toast(t().cancelled,true);return}
+      var b=ident(u);b.provider='telegram';b.tg=data;
+      api('/account/link',b).then(function(j){S.acc=j;S.busy='';render();toast(t().okTg)}).catch(function(e){S.busy='';render();toast(e.message||t().err,true)});
+    });
+  };
+  if(tgReady()){go();return}   /* popup-ი უნდა გაიხსნას პირდაპირ დაჭერისას */
+  S.busy='tg';render();
+  prepTg().then(function(){S.busy='';render();toast(t().again)}).catch(function(e){S.busy='';render();toast((e&&e.message)||t().err,true)});
+}
+function unlinkTg(){
+  var u=user();if(!u||S.busy)return;
+  if(!window.confirm(t().confirmOff))return;
+  S.busy='tg';render();
+  var b=ident(u);b.provider='telegram';
+  api('/account/unlink',b).then(function(j){S.acc=j;S.busy='';render();toast(t().offTg)}).catch(function(e){S.busy='';render();toast(e.message||t().err,true)});
+}
+function open(){prepTg().catch(function(){});root.classList.add('open');document.documentElement.classList.add('ma-lock');load();clearInterval(timer);timer=setInterval(function(){var el=document.getElementById('maLeft');if(el&&S.acc&&S.acc.status&&S.acc.status.resetAt)el.textContent=fmtLeft(S.acc.status.resetAt-Date.now())},30000)}
+function close(){root.classList.remove('open');document.documentElement.classList.remove('ma-lock');clearInterval(timer)}
+root.addEventListener('click',function(e){
+  var el=e.target.closest('[data-ma]');if(!el)return;var k=el.getAttribute('data-ma');
+  if(k==='close')close();else if(k==='retry')load();else if(k==='link-tg')linkTg();else if(k==='unlink-tg')unlinkTg();
+  else if(k==='bg'&&e.target===el)close();
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&root.classList.contains('open'))close()});
+/* ---- Telegram-ით შესვლა (login gate) ---- */
+var gateBusy=false;
+function gateLabel(btn,txt){var sp=btn.querySelector('span');if(sp)sp.textContent=txt}
+function gateLogin(btn){
+  if(gateBusy)return;
+  var base=t().gateTg;
+  var fail=function(msg){gateBusy=false;btn.disabled=false;gateLabel(btn,msg);setTimeout(function(){gateLabel(btn,base)},5000)};
+  if(!tgReady()){gateBusy=true;btn.disabled=true;gateLabel(btn,t().gateWait);prepTg().then(function(){gateBusy=false;btn.disabled=false;gateLabel(btn,t().again);setTimeout(function(){gateLabel(btn,base)},4000)}).catch(function(e){fail((e&&e.message)||t().err)});return}
+  gateBusy=true;btn.disabled=true;gateLabel(btn,t().gateWait);
+  window.Telegram.Login.auth({bot_id:Number(S.tgCfg.botId),request_access:'write'},function(data){
+    if(!data){fail(t().cancelled);return}
+    api('/tg/login',{tg:data}).then(function(j){
+      return fetch(DW+'/tg-session',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:j.user.id,username:j.user.username,avatarUrl:j.user.avatarUrl,isMember:j.user.isMember,exp:j.exp,proof:j.proof})})
+        .then(function(r){if(!r.ok)throw new Error(t().err);try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}location.reload()});
+    }).catch(function(e){fail(e&&e.data&&e.data.error==='not_linked'?t().gateNote:((e&&e.message)||t().err))});
+  });
+}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#tgLoginBtn');if(b){e.preventDefault();gateLogin(b)}});
+(function(){var g=document.getElementById('discordGate');if(!g)return;var started=false;
+  function chk(){if(!started&&g.classList.contains('open')){started=true;prepTg().catch(function(){})}}
+  new MutationObserver(chk).observe(g,{attributes:true,attributeFilter:['class']});chk();
+  /* ენის შეცვლისას ღილაკის ტექსტი */
+  var b=document.getElementById('tgLoginBtn');if(b)gateLabel(b,t().gateTg);
+})();
+window.__moonOpenAccounts=open;
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-ma-open]');if(b){e.preventDefault();open()}});
+})();
+</script>
+
 </body>
 </html>
