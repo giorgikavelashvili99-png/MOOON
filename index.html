@@ -7069,9 +7069,9 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
   /* ---- TikTok Login Kit (web) ---- */
   window.__moonStartTikTokLogin = function(){
     var st = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (String(Date.now()) + Math.random().toString(36).slice(2));
-    try{ sessionStorage.setItem('tt_state', st); }catch(e){}
+    try{ sessionStorage.setItem('tt_state', st); localStorage.setItem('moon_tt', JSON.stringify({state:st,mode:window.__ttMode||'login',t:Date.now()})); window.__ttMode=''; }catch(e){}
     var p = new URLSearchParams({
-      client_key: 'sbaw3jppjdzum017uq',
+      client_key: 'awe2hsnn9rzbz29n',
       scope: 'user.info.basic',
       response_type: 'code',
       redirect_uri: 'https://moonfull4k.xyz/tiktok-callback.html',
@@ -27522,6 +27522,7 @@ html body .ttdl-analyze-btn{line-height:1.5!important}
 #maRoot .ma-act{justify-self:end}
 #maRoot .ma-btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:800;font-size:14.5px;line-height:1.5;min-width:168px;height:48px;padding:0 22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;color:#fff;transition:transform .15s,filter .2s}
 #maRoot .ma-btn:hover{filter:brightness(1.08)}#maRoot .ma-btn:active{transform:scale(.97)}
+#maRoot .ma-btn.tk{background:#0a0a0f;border:1px solid rgba(255,255,255,.22);box-shadow:0 10px 26px -12px rgba(254,44,85,.8)}#maRoot .ma-btn.tk svg{width:18px;height:18px}
 #maRoot .ma-btn.tg{background:linear-gradient(145deg,#38b8f5,#1a8fd0);box-shadow:0 10px 26px -10px rgba(42,171,238,.95)}
 #maRoot .ma-btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--dim);font-weight:600}
 #maRoot .ma-btn[disabled]{opacity:.45;cursor:not-allowed;filter:none;transform:none}
@@ -27643,6 +27644,13 @@ ru:{title:'Мои аккаунты',sub:'Один профиль, один ли�
 };
 function lang(){var l=document.documentElement.lang;try{if(typeof currentLang!=='undefined'&&T[currentLang])l=currentLang}catch(e){}return T[l]?l:'ka'}
 function t(){return T[lang()]}
+var TKX={
+ka:{sub:'შედი TikTok-ით, წამებში',via:'TikTok-ით შესული',ok:'TikTok მიბმულია. ლიმიტი იგივეა, ახალი ატვირთვა არ დაგემატა.',off:'TikTok გამოირთო',confirmOff:'TikTok-ის გამორთვა?',err:'TikTok-ით დადასტურება ვერ მოხერხდა, სცადე თავიდან',denied:'TikTok-ზე წვდომა გაუქმდა',wait:'ვამოწმებთ…',needLogin:'TikTok-ის მისაბმელად ჯერ შედი ანგარიშში'},
+en:{sub:'Sign in with TikTok, in seconds',via:'Signed in with TikTok',ok:'TikTok linked. Same limit, no extra uploads.',off:'TikTok disconnected',confirmOff:'Disconnect TikTok?',err:'TikTok sign-in failed, try again',denied:'TikTok access was cancelled',wait:'Checking…',needLogin:'Sign in first to link TikTok'},
+ru:{sub:'Вход через TikTok, за секунды',via:'Вход через TikTok',ok:'TikTok привязан. Лимит прежний, новых загрузок нет.',off:'TikTok отключён',confirmOff:'Отключить TikTok?',err:'Не удалось войти через TikTok, попробуйте снова',denied:'Доступ к TikTok отменён',wait:'Проверяем…',needLogin:'Сначала войдите, чтобы привязать TikTok'}
+};
+function tkx(){return TKX[lang()]}
+T.ka.tkSub=TKX.ka.sub;T.en.tkSub=TKX.en.sub;T.ru.tkSub=TKX.ru.sub;
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function user(){try{return typeof currentDiscordUser!=='undefined'?currentDiscordUser:null}catch(e){return null}}
 function ident(u){return {uid:String(u.id),username:u.username||'',sig:u.optSig||undefined,sigExp:u.optSigExp||undefined}}
@@ -27669,7 +27677,12 @@ function providerCard(k,p){
     sub=on?esc((p.username?'@'+p.username:p.name)||'Telegram'):L.tgSub;
     act=on?'<button class="ma-btn ghost" data-ma="unlink-tg"'+((busy||S.acc.count<2)?' disabled':'')+'>'+(busy?'<i class="ma-spin"></i>':'')+L.discon+'</button>'
           :'<button class="ma-btn tg" data-ma="link-tg"'+(busy?' disabled':'')+'>'+(busy?'<i class="ma-spin"></i>'+L.checking:ICON.tg+L.connect)+'</button>';
-  } else {tag='<span class="ma-tag">'+L.soon+'</span>';sub=L.tkSub;act='<button class="ma-btn ghost" disabled>'+L.soon+'</button>'}
+  } else {
+    tag='<span class="ma-tag'+(on?' ok':'')+'">'+(on?L.on:L.off)+'</span>';
+    sub=on?esc(p.name||p.username||'TikTok'):L.tkSub;
+    act=on?'<button class="ma-btn ghost" data-ma="unlink-tk"'+((busy||S.acc.count<2)?' disabled':'')+'>'+(busy?'<i class="ma-spin"></i>':'')+L.discon+'</button>'
+          :'<button class="ma-btn tk" data-ma="link-tk"'+(busy?' disabled':'')+'>'+(busy?'<i class="ma-spin"></i>'+L.checking:ICON.tk+L.connect)+'</button>';
+  }
   return '<article class="ma-prov '+k+(on?' on':'')+'"><div class="ma-row"><div class="ma-logo">'+ICON[k]+'</div><div class="ma-who"><h4>'+({dc:'Discord',tg:'Telegram',tk:'TikTok'})[k]+' '+tag+'</h4><p>'+sub+'</p></div><div class="ma-act">'+act+'</div></div></article>';
 }
 function render(){
@@ -27685,7 +27698,7 @@ function render(){
   var plan=st.plan&&st.plan!=='free'?('Plan '+String(st.plan).replace(/^p/i,'')):(lang()==='ka'?'უფასო პაკეტი':lang()==='ru'?'Бесплатный':'Free');
   var segs='';for(var s=0;s<3;s++)segs+='<i'+(s<n?' class="on"':'')+'></i>';
   h=head+'<div class="ma-grid"><div class="ma-col">'+
-   '<section class="ma-card"><div class="ma-pad"><div class="ma-hub"><div class="ma-ava">'+(u&&u.avatarUrl?'<span>'+av+'</span>':av)+'</div><div><h3>'+esc((u&&u.username)||L.member)+'</h3><p>'+(pv.discord?L.via:L.viaTg)+'</p><span class="ma-plan">● '+esc(plan)+'</span></div></div>'+
+   '<section class="ma-card"><div class="ma-pad"><div class="ma-hub"><div class="ma-ava">'+(u&&u.avatarUrl?'<span>'+av+'</span>':av)+'</div><div><h3>'+esc((u&&u.username)||L.member)+'</h3><p>'+(pv.discord?L.via:((pv.tiktok&&!pv.telegram)?tkx().via:L.viaTg))+'</p><span class="ma-plan">● '+esc(plan)+'</span></div></div>'+
    '</div></section>'+
    '<section class="ma-card"><div class="ma-pad"><p class="ma-eye">'+L.weekly+'</p><div class="ma-lim"><div class="ma-ring"><svg viewBox="0 0 104 104"><defs><linearGradient id="maRg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset=".55" stop-color="#a78bfa"/><stop offset="1" stop-color="#f0abfc"/></linearGradient></defs><circle class="bg" cx="52" cy="52" r="46"/><circle class="fg" id="maFg" cx="52" cy="52" r="46" style="stroke-dashoffset:289" data-off="'+off+'"/></svg><div><b>'+rem+'</b><small>'+L.left+'</small></div></div>'+
    '<div><h4>'+L.shared+'</h4><p>'+(unl?L.unl:L.usedOf(used,limit))+'</p>'+(dots?'<div class="ma-dots">'+dots+'</div>':'')+'</div></div>'+
@@ -27728,6 +27741,19 @@ function linkTg(){
   S.busy='tg';render();
   prepTg().then(function(){S.busy='';render();toast(t().again)}).catch(function(e){S.busy='';render();toast((e&&e.message)||t().err,true)});
 }
+function linkTk(){
+  var u=user();if(!u||S.busy)return;
+  if(typeof window.__moonStartTikTokLogin!=='function'){toast(tkx().err,true);return}
+  S.busy='tk';render();window.__ttMode='link';
+  try{window.__moonStartTikTokLogin()}catch(e){S.busy='';render();toast(tkx().err,true)}
+}
+function unlinkTk(){
+  var u=user();if(!u||S.busy)return;
+  if(!window.confirm(tkx().confirmOff))return;
+  S.busy='tk';render();
+  var b=ident(u);b.provider='tiktok';
+  api('/account/unlink',b).then(function(j){setAcc(j);S.busy='';render();toast(tkx().off)}).catch(function(e){S.busy='';render();toast(e.message||t().err,true)});
+}
 function unlinkTg(){
   var u=user();if(!u||S.busy)return;
   if(!window.confirm(t().confirmOff))return;
@@ -27744,7 +27770,7 @@ function open(){prepTg().catch(function(){});root.classList.add('open');document
 function close(){root.classList.remove('open');document.documentElement.classList.remove('ma-lock');clearInterval(timer)}
 root.addEventListener('click',function(e){
   var el=e.target.closest('[data-ma]');if(!el)return;var k=el.getAttribute('data-ma');
-  if(k==='close')close();else if(k==='retry')load();else if(k==='link-tg')linkTg();else if(k==='unlink-tg')unlinkTg();
+  if(k==='close')close();else if(k==='retry')load();else if(k==='link-tg')linkTg();else if(k==='unlink-tg')unlinkTg();else if(k==='link-tk')linkTk();else if(k==='unlink-tk')unlinkTk();
   else if(k==='bg'&&e.target===el)close();
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&root.classList.contains('open'))close()});
@@ -27771,6 +27797,37 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   new MutationObserver(chk).observe(g,{attributes:true,attributeFilter:['class']});chk();
   /* ენის შეცვლისას ღილაკის ტექსტი */
   var b=document.getElementById('tgLoginBtn');if(b)gateLabel(b,t().gateTg);
+})();
+/* ---- TikTok: დაბრუნება tiktok-callback.html-იდან (?tt_code=&tt_state=) ---- */
+(function(){
+  var q=new URLSearchParams(location.search),code=q.get('tt_code'),st=q.get('tt_state'),er=q.get('tt_err');
+  if(!code&&!er)return;
+  ['tt_code','tt_state','tt_err'].forEach(function(k){q.delete(k)});
+  try{history.replaceState({},document.title,location.pathname+(q.toString()?'?'+q.toString():'')+location.hash)}catch(e){}
+  var rec=null;try{rec=JSON.parse(localStorage.getItem('moon_tt')||'null');localStorage.removeItem('moon_tt')}catch(e){}
+  var okState=!!(rec&&rec.state&&st&&rec.state===st&&Date.now()-rec.t<20*60000);
+  var mode=okState&&rec.mode==='link'?'link':'login';
+  function gateMsg(msg){var b=document.getElementById('tiktokLoginBtn'),sp=b&&b.querySelector('span');if(!sp)return;var base=sp.getAttribute('data-base')||sp.textContent;sp.setAttribute('data-base',base);sp.textContent=msg;clearTimeout(gateMsg.t);if(msg!==tkx().wait)gateMsg.t=setTimeout(function(){sp.textContent=base},7000)}
+  if(!okState||er||!code){
+    if(mode==='link')setTimeout(function(){open();toast(er?tkx().denied:tkx().err,true)},700);else gateMsg(er?tkx().denied:tkx().err);
+    return;
+  }
+  if(mode==='link'){
+    var tries=0,iv=setInterval(function(){
+      var u=user();
+      if(!u||!u.optSig){if(++tries>40){clearInterval(iv);toast(tkx().needLogin,true)}return}
+      clearInterval(iv);
+      var b=ident(u);b.provider='tiktok';b.ttcode=code;b.username=u.username||'';
+      open();S.busy='tk';render();
+      api('/account/link',b).then(function(j){setAcc(j);S.busy='';render();toast(tkx().ok)}).catch(function(e){S.busy='';load();toast(e.message||tkx().err,true)});
+    },300);
+    return;
+  }
+  gateMsg(tkx().wait);
+  api('/tt/login',{code:code}).then(function(j){
+    return fetch(DW+'/tg-session',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:j.user.id,username:j.user.username,avatarUrl:j.user.avatarUrl,isMember:j.user.isMember,via:j.user.via||'',exp:j.exp,proof:j.proof})})
+      .then(function(r){if(!r.ok)return r.json().catch(function(){return {}}).then(function(j){throw new Error('Discord-worker: '+r.status+(j&&j.error?' '+j.error:''))});try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}location.reload()});
+  }).catch(function(e){gateMsg((e&&e.message)||tkx().err)});
 })();
 /* ---- "მეტი" sub-menu ---- */
 (function(){var mn=document.getElementById('hzMenu');if(!mn)return;
@@ -27827,23 +27884,25 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .tg-
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .dg-card::before{text-align:left!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .dg-top{justify-content:flex-end!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn::before,html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn::after{display:none!important;content:none!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn.primary{box-shadow:none!important;outline:0!important;opacity:1!important;visibility:visible!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn.primary{box-shadow:none!important;outline:0!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) #discordJoinBtn{background:#18181c!important;border:1px solid #2c2c32!important;color:#f1f1f3!important;-webkit-text-fill-color:#f1f1f3!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) #discordJoinBtn>span{color:#f1f1f3!important;-webkit-text-fill-color:#f1f1f3!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) #discordJoinBtn:active{background:#222228!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .dg-card::after{display:none!important;content:none!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn{opacity:1!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn.primary{animation:none!important;box-shadow:none!important;transform:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn.primary{box-shadow:none!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) #discordLoginBtn.discord-btn.primary{box-shadow:none!important}
+
+/* a closed sign-in sheet must never catch a touch */
+html body #discordGate:not(.open):not(#_a):not(#_b),html body #discordGate:not(.open):not(#_a):not(#_b) *{pointer-events:none!important}
 </style><style id="moon-plans-v2">/* ===== plans page: light, transform-only swipe ===== */
 @media (max-width:1099px){
   html body #plansView:not(#_a):not(#_b) .opt-plan::after,html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy::before{animation:none!important;display:none!important}
   html body #plansView:not(#_a):not(#_b) .opt-plan .pr{filter:none!important}
 }
 @media (hover:none) and (pointer:coarse){
-  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c){overflow-x:hidden!important;overflow-y:hidden!important;scroll-snap-type:none!important;touch-action:pan-y!important;overscroll-behavior:auto!important}
-  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c) .opt-plan{scroll-snap-align:none!important;transform:translate3d(var(--tx,0px),0,0)!important;will-change:transform;transition:none!important}
-  html body #plansView #optPlans.pl-anim:not(#_a):not(#_b):not(#_c) .opt-plan{transition:transform .38s cubic-bezier(.22,.9,.32,1)!important}
+  /* native compositor scrolling: the browser moves the cards itself, JS is not involved while the finger moves */
+  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c){overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important;touch-action:pan-x pan-y!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important;scroll-behavior:auto!important}
+  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c) .opt-plan{scroll-snap-align:center!important;scroll-snap-stop:always;transform:none!important;will-change:auto;transition:none!important}
 }
 html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy{transition:transform .18s ease,filter .3s ease!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-sec--tools{margin-bottom:14px!important}
@@ -27852,49 +27911,12 @@ html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-scroll{touch-action:pan-y!impo
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-scroll *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-tap-highlight-color:transparent!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-group,html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-acct-body{overflow:visible!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .mz-bar i{transition:none!important}
-</style><script>/* ---- plans on touch screens: cards follow the finger with transforms only (no scrolling / layout while dragging) ---- */
+/* ---- automatic light mode: switched on only when this device really is slow while swiping / scrolling ---- */
+html.moon-lite *,html.moon-lite *::before,html.moon-lite *::after{-webkit-text-stroke:0!important;text-shadow:none!important;filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;mix-blend-mode:normal!important}
+html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.moon-lite .op-fx{display:none!important}
+</style><script>/* ---- diagnostics: open the site with ?fps=1 to see a small frame-rate meter ---- */
 (function(){
-  if(!(window.matchMedia&&matchMedia('(hover:none) and (pointer:coarse)').matches)) return;
-  var box=null,sx,sy,s0,i0,mode=0,lx,lt,vx,tx=0,busy=0;
-  function cards(){return box.querySelectorAll('.opt-plan');}
-  function maxS(){return Math.max(0,box.scrollWidth-box.clientWidth);}
-  function left(el){return Math.max(0,Math.min(maxS(),el.offsetLeft-(box.clientWidth-el.offsetWidth)/2));}
-  function near(x){var c=cards(),bi=0,bd=1e9;for(var i=0;i<c.length;i++){var d=Math.abs(left(c[i])-x);if(d<bd){bd=d;bi=i}}return bi;}
-  function setTx(v){tx=v;box.style.setProperty('--tx',v.toFixed(1)+'px');}
-  function curTx(){var c=cards()[0];if(!c)return 0;var m=/matrix.*\((.+)\)/.exec(getComputedStyle(c).transform||'');if(!m)return 0;var p=m[1].split(',');return parseFloat(p.length>=6?p[4]:p[12])||0;}
-  function pt(e){return (e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0]);}
-  function settle(j,fromTx){
-    var c=cards();if(!c.length)return;j=Math.max(0,Math.min(c.length-1,j));
-    var L=left(c[j]),cs=box.scrollLeft;
-    box.scrollLeft=L;                       /* one jump... */
-    setTx(fromTx+(cs-L)*-1);                /* ...and the transform keeps every card exactly where the finger left it */
-    void box.offsetWidth;
-    box.classList.add('pl-anim');busy=1;
-    setTx(0);
-    clearTimeout(box.__pt);box.__pt=setTimeout(function(){box.classList.remove('pl-anim');busy=0;},420);
-  }
-  function attach(){
-    var b=document.getElementById('optPlans'); if(!b||b===box) return; box=b;
-    box.addEventListener('touchstart',function(e){var t=pt(e);if(!t)return;
-      if(busy){var v=curTx();box.classList.remove('pl-anim');clearTimeout(box.__pt);busy=0;setTx(v);}
-      sx=lx=t.clientX;sy=t.clientY;lt=Date.now();vx=0;mode=0;s0=box.scrollLeft;i0=near(s0);},{passive:true});
-    box.addEventListener('touchmove',function(e){var t=pt(e);if(!t)return;var dx=t.clientX-sx,dy=t.clientY-sy;
-      if(!mode){if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))mode=1;else if(Math.abs(dy)>8)mode=2;}
-      if(mode===1){var n=Date.now();vx=(t.clientX-lx)/Math.max(1,n-lt);lx=t.clientX;lt=n;
-        var last=cards().length-1,d=dx;if((i0<=0&&dx>0)||(i0>=last&&dx<0))d=dx*.3;setTx(d);}
-    },{passive:true});
-    box.addEventListener('touchend',function(e){if(mode!==1){mode=0;return;}mode=0;
-      var t=pt(e),dx=t?t.clientX-sx:0,step=0;
-      if(dx<-40||vx<-.35)step=1;else if(dx>40||vx>.35)step=-1;
-      settle(i0+step,tx);},{passive:true});
-    box.addEventListener('touchcancel',function(){if(mode===1){mode=0;settle(i0,tx);}},{passive:true});
-  }
-  setInterval(attach,500);attach();
-})();
-
-/* ---- diagnostics: open the site with ?fps=1 to see a small frame-rate meter ---- */
-(function(){
-  try{ if(!/[?&]fps=1/.test(location.search)) return; }catch(e){ return; }
+  try{ if(/[?&]fps=1/.test(location.search)) localStorage.setItem('moonFpsOn','1'); if(/[?&]fps=0/.test(location.search)) localStorage.removeItem('moonFpsOn'); if(localStorage.getItem('moonFpsOn')!=='1') return; }catch(e){ return; }
   var d=document.createElement('div');
   d.style.cssText='position:fixed;left:6px;bottom:70px;z-index:2147483647;padding:6px 9px;border-radius:8px;background:rgba(0,0,0,.82);color:#a3e635;font:700 12px/1.4 monospace;pointer-events:none;white-space:pre';
   document.documentElement.appendChild(d);
@@ -27905,8 +27927,29 @@ html body #hzMenu:not(#_a):not(#_b):not(#_c) .mz-bar i{transition:none!important
   setInterval(function(){
     var s=fr.slice().sort(function(a,b){return a-b}); if(!s.length) return;
     var avg=fr.reduce(function(a,b){return a+b},0)/fr.length;
-    d.textContent='FPS '+Math.round(1000/avg)+'\nworst frame '+Math.round(s[s.length-1])+' ms\nlong task '+lt+' ms\ntouch ev '+ev;
+    d.textContent=(document.documentElement.classList.contains('moon-lite')?'LITE ON\n':'')+'FPS '+Math.round(1000/avg)+'\nworst frame '+Math.round(s[s.length-1])+' ms\nlong task '+lt+' ms\ntouch ev '+ev;
   },500);
+})();
+/* ---- automatic light mode ---- */
+(function(){
+  var root=document.documentElement, q=location.search, KEY='moonLite';
+  function set(on){ root.classList.toggle('moon-lite',!!on); }
+  try{
+    if(/[?&]lite=1/.test(q)){ localStorage.setItem(KEY,'1'); }
+    else if(/[?&]lite=0/.test(q)){ localStorage.removeItem(KEY); localStorage.setItem(KEY+'Off','1'); }
+    if(localStorage.getItem(KEY)==='1') set(true);
+  }catch(e){}
+  try{ if(localStorage.getItem(KEY+'Off')==='1') return; }catch(e){}
+  if(root.classList.contains('moon-lite')) return;
+  /* measure frame time only while a finger is moving: idle frames say nothing about smoothness */
+  var active=0,last=0,slow=0,total=0,timer=null;
+  function frame(t){
+    if(!active){ last=0; return; }
+    if(last){ var d=t-last; total++; if(d>34) slow++; if(total>=24){ if(slow/total>.35){ set(true); try{localStorage.setItem(KEY,'1');}catch(e){} active=0; return; } slow=0; total=0; } }
+    last=t; requestAnimationFrame(frame);
+  }
+  function start(){ if(!active){ active=1; last=0; requestAnimationFrame(frame); } clearTimeout(timer); timer=setTimeout(function(){active=0;},350); }
+  window.addEventListener('touchmove',start,{passive:true,capture:true});
 })();
 </script>
 </body>
