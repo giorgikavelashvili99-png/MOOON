@@ -25472,7 +25472,11 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
       h='<button type="button" class="hzm-acct-head" data-hz-act="toggle" aria-expanded="'+acctOpen+'">'+av(u,40)+'<span class="hzm-lbl">'+esc(t('account'))+'</span>'+ic('chev','hzm-chev')+'</button>'+
         '<div class="hzm-acct-body">'+mzHtml(u,s)+'</div>';
     }
-    if(box.__h!==h){ box.__h=h; box.innerHTML=h; }
+    var __k=h.replace(/id="hzmReset">[^<]*/,'id="hzmReset">');
+    if(box.__k!==__k){
+      if(window.__hzTouching){ window.__hzPend=1; return; }   /* never swap the DOM under a finger: it stalls the scroll gesture */
+      box.__k=__k; box.__h=h; box.innerHTML=h;
+    }
     box.classList.toggle('open', !!u && acctOpen);
   }
   document.getElementById('hzmAcct').addEventListener('click',function(e){
@@ -25513,6 +25517,11 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
   var mqDesk=window.matchMedia('(min-width:1024px)');
   (mqDesk.addEventListener ? mqDesk.addEventListener.bind(mqDesk,'change') : mqDesk.addListener.bind(mqDesk))(function(){ closeMenu(); });
 
+  (function(){ var sc=document.getElementById('hzmScroll'); if(!sc) return;
+    function on(){ window.__hzTouching=true; }
+    function off(){ window.__hzTouching=false; if(window.__hzPend){ window.__hzPend=0; setTimeout(function(){ if(isOpen()) renderAcct(); },60); } }
+    sc.addEventListener('touchstart',on,{passive:true}); sc.addEventListener('touchend',off,{passive:true}); sc.addEventListener('touchcancel',off,{passive:true});
+  })();
   document.addEventListener('moon:user',function(){ renderPill(); if(isOpen()) renderAcct(); });
   document.addEventListener('moon:optstatus',function(){ renderPill(); if(isOpen()) renderAcct(); });
   document.addEventListener('moon:acct',function(){ if(isOpen()) renderAcct(); });
@@ -27840,6 +27849,12 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not
 }
 html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy{transition:transform .18s ease,filter .3s ease,box-shadow .3s ease!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-sec--tools{margin-bottom:14px!important}
+
+/* ---- menu: calm touch handling ---- */
+html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-scroll{touch-action:pan-y!important;scroll-snap-type:none!important;scroll-behavior:auto!important;-webkit-overflow-scrolling:touch!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-scroll *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-tap-highlight-color:transparent!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-group,html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-acct-body{overflow:visible!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c) .mz-bar i{transition:none!important}
 </style><script>/* ---- plans: mark the centred card so it can scale up smoothly ---- */
 (function(){
   var box=null,tk=0;
