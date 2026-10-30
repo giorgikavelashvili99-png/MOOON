@@ -22355,7 +22355,7 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     if(!req){ busy=false; return; }
     if(req.tab && req.tab===shown){ pending=null; busy=false; return; }   /* already showing what was asked for */
     var outs=view ? [document.querySelector('.mn-view.show')].filter(Boolean) : blocks();
-    var __ck=(req.tab==='checker');
+    var __ck=true;
     if(!__ck) stagger(outs,'mn-out',0);
     if(outs.length){ var wt=req.tab; warmT=setTimeout(function(){ warm(wt); },20); }
     setTimeout(function(){ swap(outs); }, (outs.length && !__ck) ? 150 : 0);
@@ -27504,6 +27504,8 @@ html body #optView :is(.opt-drop,.opt-stats,.opt-quota,.opt-card,.opt-prog):not(
 html body #checkerView.mn-view.show:not(#_a):not(#_b):not(#_c):not(#_d){animation:none!important;opacity:1!important;transform:none!important}
 html body #checkerView:not(#_a):not(#_b):not(#_c):not(#_d) *{animation:none!important}
 html body #checkerView:not(#_a):not(#_b):not(#_c):not(#_d) .ttdl-step{transition:none!important}
+html body .mn-view.show:not(#_a):not(#_b):not(#_c):not(#_d){animation:none!important;opacity:1!important;transform:none!important}
+html body :is(.mn-out,.mn-in):not(#_a):not(#_b):not(#_c):not(#_d){animation:none!important;opacity:1!important}
 </style>
 <!-- MOON accounts (linked accounts + shared weekly limit) -->
 <style id="moon-accounts-css">
@@ -28007,6 +28009,15 @@ function apply(){var d=D[lg()],l=lg();set('tgLoginBtn',d.tg);set('tiktokLoginBtn
   var h=document.querySelector('#plansView .pl-hd h2');if(h&&h.children.length===0&&h.textContent!==P[l])h.textContent=P[l];
   document.querySelectorAll('.ttdl-log').forEach(function(lg2){var w=document.createTreeWalker(lg2,NodeFilter.SHOW_TEXT),n;while(n=w.nextNode()){var v=n.nodeValue;if(v.indexOf('მზადაა.')>-1||/(^|\s)(Ready\.|Готово\.)\s*$/.test(v)){var nv=v.replace(/მზადაა\.|Ready\.|Готово\./,R[l]);if(nv!==v)n.nodeValue=nv}}})}
 apply();document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-btn,[data-lang]'))setTimeout(apply,80)},true);setInterval(apply,1200);
+})();
+</script>
+<script id="moon-clean-cut">
+(function(){
+/* every page change is a clean cut: one-shot entrance animations inside a freshly shown page jump straight to their end state (loops and spinners keep running) */
+function settle(v){try{v.getAnimations({subtree:true}).forEach(function(a){var t=a.effect&&a.effect.getComputedTiming();if(t&&t.iterations!==Infinity&&a.playState==='running'){try{a.finish()}catch(e){}}})}catch(e){}}
+function run(v){requestAnimationFrame(function(){settle(v);setTimeout(function(){settle(v)},60);setTimeout(function(){settle(v)},220)})}
+var seen=new WeakMap();
+new MutationObserver(function(ms){ms.forEach(function(m){var v=m.target;if(v.classList&&v.classList.contains('mn-view')&&v.classList.contains('show')&&!seen.get(v)){seen.set(v,1);run(v)}else if(v.classList&&v.classList.contains('mn-view')&&!v.classList.contains('show')){seen.delete(v)}})}).observe(document.documentElement,{attributes:true,attributeFilter:['class'],subtree:true});
 })();
 </script>
 
