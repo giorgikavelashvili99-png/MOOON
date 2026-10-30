@@ -27835,46 +27835,78 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .dg-
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn{opacity:1!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not([data-mode="banned"]) .discord-btn.primary{animation:none!important;box-shadow:none!important;transform:none!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) #discordLoginBtn.discord-btn.primary{box-shadow:none!important}
-</style><style id="moon-plans-v2">/* ===== plans page: smooth swipe + gentle transitions ===== */
+</style><style id="moon-plans-v2">/* ===== plans page: light, transform-only swipe ===== */
 @media (max-width:1099px){
-  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c){overflow-y:hidden!important;scroll-snap-type:x mandatory!important;touch-action:pan-x pan-y!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch;scroll-behavior:auto!important}
-  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c) .opt-plan{scroll-snap-stop:normal!important;transition:transform .45s cubic-bezier(.22,.9,.32,1),opacity .45s ease,box-shadow .45s ease!important;transform:scale(.94);opacity:.7}
-  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c) .opt-plan.is-cur{transform:none;opacity:1}
-  /* cheaper painting while swiping: no endless loops, no blur filters */
   html body #plansView:not(#_a):not(#_b) .opt-plan::after,html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy::before{animation:none!important;display:none!important}
   html body #plansView:not(#_a):not(#_b) .opt-plan .pr{filter:none!important}
 }
-@media (hover:none){
-  html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy:active{transform:scale(.97)!important}
+@media (hover:none) and (pointer:coarse){
+  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c){overflow-x:hidden!important;overflow-y:hidden!important;scroll-snap-type:none!important;touch-action:pan-y!important;overscroll-behavior:auto!important}
+  html body #plansView #optPlans:not(#_a):not(#_b):not(#_c) .opt-plan{scroll-snap-align:none!important;transform:translate3d(var(--tx,0px),0,0)!important;will-change:transform;transition:none!important}
+  html body #plansView #optPlans.pl-anim:not(#_a):not(#_b):not(#_c) .opt-plan{transition:transform .38s cubic-bezier(.22,.9,.32,1)!important}
 }
-html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy{transition:transform .18s ease,filter .3s ease,box-shadow .3s ease!important}
+html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy{transition:transform .18s ease,filter .3s ease!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-sec--tools{margin-bottom:14px!important}
-
 /* ---- menu: calm touch handling ---- */
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-scroll{touch-action:pan-y!important;scroll-snap-type:none!important;scroll-behavior:auto!important;-webkit-overflow-scrolling:touch!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-scroll *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-tap-highlight-color:transparent!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-group,html body #hzMenu:not(#_a):not(#_b):not(#_c) .hzm-acct-body{overflow:visible!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c) .mz-bar i{transition:none!important}
-</style><script>/* ---- plans: mark the centred card so it can scale up smoothly ---- */
+</style><script>/* ---- plans on touch screens: cards follow the finger with transforms only (no scrolling / layout while dragging) ---- */
 (function(){
-  var box=null,tk=0;
-  function mark(){
-    tk=0; if(!box) return;
-    var cs=box.querySelectorAll('.opt-plan'); if(!cs.length||!box.clientWidth) return;
-    var mid=box.scrollLeft+box.clientWidth/2,best=null,bd=1e9;
-    for(var i=0;i<cs.length;i++){var d=Math.abs(cs[i].offsetLeft+cs[i].offsetWidth/2-mid);if(d<bd){bd=d;best=cs[i]}}
-    for(var j=0;j<cs.length;j++) cs[j].classList.toggle('is-cur',cs[j]===best);
+  if(!(window.matchMedia&&matchMedia('(hover:none) and (pointer:coarse)').matches)) return;
+  var box=null,sx,sy,s0,i0,mode=0,lx,lt,vx,tx=0,busy=0;
+  function cards(){return box.querySelectorAll('.opt-plan');}
+  function maxS(){return Math.max(0,box.scrollWidth-box.clientWidth);}
+  function left(el){return Math.max(0,Math.min(maxS(),el.offsetLeft-(box.clientWidth-el.offsetWidth)/2));}
+  function near(x){var c=cards(),bi=0,bd=1e9;for(var i=0;i<c.length;i++){var d=Math.abs(left(c[i])-x);if(d<bd){bd=d;bi=i}}return bi;}
+  function setTx(v){tx=v;box.style.setProperty('--tx',v.toFixed(1)+'px');}
+  function curTx(){var c=cards()[0];if(!c)return 0;var m=/matrix.*\((.+)\)/.exec(getComputedStyle(c).transform||'');if(!m)return 0;var p=m[1].split(',');return parseFloat(p.length>=6?p[4]:p[12])||0;}
+  function pt(e){return (e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0]);}
+  function settle(j,fromTx){
+    var c=cards();if(!c.length)return;j=Math.max(0,Math.min(c.length-1,j));
+    var L=left(c[j]),cs=box.scrollLeft;
+    box.scrollLeft=L;                       /* one jump... */
+    setTx(fromTx+(cs-L)*-1);                /* ...and the transform keeps every card exactly where the finger left it */
+    void box.offsetWidth;
+    box.classList.add('pl-anim');busy=1;
+    setTx(0);
+    clearTimeout(box.__pt);box.__pt=setTimeout(function(){box.classList.remove('pl-anim');busy=0;},420);
   }
-  function q(){ if(!tk) tk=requestAnimationFrame(mark); }
   function attach(){
-    var b=document.getElementById('optPlans'); if(!b||b===box) return;
-    box=b; box.addEventListener('scroll',q,{passive:true}); window.addEventListener('resize',q);
-    new MutationObserver(q).observe(box,{childList:true});
-    if(window.ResizeObserver) new ResizeObserver(q).observe(box);
-    q(); setTimeout(q,300); setTimeout(q,900);
+    var b=document.getElementById('optPlans'); if(!b||b===box) return; box=b;
+    box.addEventListener('touchstart',function(e){var t=pt(e);if(!t)return;
+      if(busy){var v=curTx();box.classList.remove('pl-anim');clearTimeout(box.__pt);busy=0;setTx(v);}
+      sx=lx=t.clientX;sy=t.clientY;lt=Date.now();vx=0;mode=0;s0=box.scrollLeft;i0=near(s0);},{passive:true});
+    box.addEventListener('touchmove',function(e){var t=pt(e);if(!t)return;var dx=t.clientX-sx,dy=t.clientY-sy;
+      if(!mode){if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy))mode=1;else if(Math.abs(dy)>8)mode=2;}
+      if(mode===1){var n=Date.now();vx=(t.clientX-lx)/Math.max(1,n-lt);lx=t.clientX;lt=n;
+        var last=cards().length-1,d=dx;if((i0<=0&&dx>0)||(i0>=last&&dx<0))d=dx*.3;setTx(d);}
+    },{passive:true});
+    box.addEventListener('touchend',function(e){if(mode!==1){mode=0;return;}mode=0;
+      var t=pt(e),dx=t?t.clientX-sx:0,step=0;
+      if(dx<-40||vx<-.35)step=1;else if(dx>40||vx>.35)step=-1;
+      settle(i0+step,tx);},{passive:true});
+    box.addEventListener('touchcancel',function(){if(mode===1){mode=0;settle(i0,tx);}},{passive:true});
   }
-  setInterval(attach,500); attach();
-  document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('.mn-link[data-mn="plans"],[data-mn-go="plans"]')){ setTimeout(q,120); setTimeout(q,600); } });
+  setInterval(attach,500);attach();
+})();
+
+/* ---- diagnostics: open the site with ?fps=1 to see a small frame-rate meter ---- */
+(function(){
+  try{ if(!/[?&]fps=1/.test(location.search)) return; }catch(e){ return; }
+  var d=document.createElement('div');
+  d.style.cssText='position:fixed;left:6px;bottom:70px;z-index:2147483647;padding:6px 9px;border-radius:8px;background:rgba(0,0,0,.82);color:#a3e635;font:700 12px/1.4 monospace;pointer-events:none;white-space:pre';
+  document.documentElement.appendChild(d);
+  var last=performance.now(),fr=[],lt=0,ev=0;
+  try{ new PerformanceObserver(function(l){l.getEntries().forEach(function(e){lt=Math.max(lt,Math.round(e.duration));});}).observe({entryTypes:['longtask']}); }catch(e){}
+  ['touchstart','touchmove'].forEach(function(n){ window.addEventListener(n,function(){ev++;},{passive:true,capture:true}); });
+  (function f(t){ fr.push(t-last); last=t; if(fr.length>180)fr.shift(); requestAnimationFrame(f); })(last);
+  setInterval(function(){
+    var s=fr.slice().sort(function(a,b){return a-b}); if(!s.length) return;
+    var avg=fr.reduce(function(a,b){return a+b},0)/fr.length;
+    d.textContent='FPS '+Math.round(1000/avg)+'\nworst frame '+Math.round(s[s.length-1])+' ms\nlong task '+lt+' ms\ntouch ev '+ev;
+  },500);
 })();
 </script>
 </body>
