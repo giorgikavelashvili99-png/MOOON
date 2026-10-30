@@ -25471,7 +25471,7 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
   /* ---------- account section ---------- */
   var acctOpen=true, tick=0;
   function fmtLeft(ms){ ms=Math.max(0,ms||0); var s=Math.floor(ms/1000), d=Math.floor(s/86400), h=Math.floor(s%86400/3600), m=Math.floor(s%3600/60), x=s%60;
-    function p(v){ return String(v).padStart(2,'0'); } return (d ? d+(lang()==='ka'?'დ ':'d ') : '')+p(h)+':'+p(m)+':'+p(x); }
+    function p(v){ return String(v).padStart(2,'0'); } return p(Math.floor(s/3600))+':'+p(m)+':'+p(x); }
   function mzHtml(u,s){
     var K=lang(),D={
       ka:{via:'Discord-ით შესული',viaTg:'Telegram-ით შესული',left:'ატვირთვა დარჩა',weekly:'კვირაში',resets:'განახლდება',plans:'გეგმები',acc:'ანგარიშები',linked:'მიბმულია',lang:'ენა',out:'გამოსვლა',unl:'ულიმიტო',of:'სულ'},
@@ -28066,6 +28066,18 @@ html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-row>.hzm-chev{width:16
 html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-out{justify-content:center!important;margin-top:6px!important;border:1px solid rgba(255,120,140,.34)!important;background:rgba(255,90,120,.06)!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-out>span{flex:0 1 auto!important;text-align:center!important}
 
+
+/* ---- account card: simpler ---- */
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) :is(.mz-pill,.mz-big,.mz-get){display:none!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-up-top{justify-content:center!important;text-align:center!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-cap{text-align:center!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-reset{font-size:13px!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-row:not(.mz-out){justify-content:center!important;gap:8px!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-row:not(.mz-out)>span{flex:0 0 auto!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-row:not(.mz-out) em{margin-left:2px!important;color:#8fb4c9!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-row:not(.mz-out)>.hzm-chev{margin-left:0!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-out{border:0!important;background:linear-gradient(135deg,#ff4d6d 0%,#e11d5a 55%,#b91c8c 100%)!important;color:#fff!important;font-weight:700!important;letter-spacing:.02em}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-out>span{color:#fff!important}
 /* visitors pill */
 html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-stats{justify-content:center!important;gap:16px!important;padding:11px 14px!important;margin-top:10px!important;border-radius:16px!important;border:1px solid rgba(110,200,255,.13)!important;background:rgba(255,255,255,.025)!important}
 html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-stats .vb-moon{background:#38d5ff!important}
