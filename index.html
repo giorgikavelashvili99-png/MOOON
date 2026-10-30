@@ -5,7 +5,7 @@ function ok(){if(done)return;done=true;window.__moonFontsOk=true;r.classList.add
 function go(){try{var t='Abc 0123456789 ₾€•აბგ';var L=[];['400','500','600','700'].forEach(function(w){L.push(d.fonts.load(w+' 16px BPGAcademiuriU',t));L.push(d.fonts.load(w+' 16px "Space Grotesk"',t))});['400','500','700','800'].forEach(function(w){L.push(d.fonts.load(w+' 16px "JetBrains Mono"',t))});
 Promise.all(L.map(function(p){return p.catch(function(){})})).then(function(){return d.fonts.ready}).then(ok,ok)}catch(e){ok()}}
 if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',go);else go();
-setTimeout(ok,1500)})();</script>
+setTimeout(function(){if(d.readyState!=='loading')ok()},1500);setTimeout(ok,7000)})();</script>
 <style id="moon-fontgate-css">html:not(.moon-fonts-ok) body>*:not(#mi5):not(script):not(style){visibility:hidden!important}</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -3697,6 +3697,7 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   @media (min-width:901px){
     html{ zoom:1.15; }
   }
+  @media (min-width:901px) and ((max-width:1500px) or (max-height:820px)){html{zoom:.9;max-width:none!important}body{max-width:none!important}}
   .contact-online{
     display:inline-flex; align-items:center; gap:5px; margin-top:2px;
     font-family:'BPGAcademiuriU', sans-serif; font-size:10.5px; font-weight:700;
