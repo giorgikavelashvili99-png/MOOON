@@ -28183,6 +28183,30 @@ function init(){var z=document.querySelector('.hz-bar .hz-zap');if(!z)return;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+<style id="moon-lang-inline">
+@media (min-width:1024px){
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-langcard{display:none!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-langs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px 4px 8px}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-langs .hzm-langopt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:9px 4px;font-size:12.5px;line-height:1.3;text-align:center;border-radius:12px;position:relative;isolation:isolate}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-langs .hz-flag{width:26px;height:18px;border-radius:3px}
+}
+</style>
+<script id="moon-lang-inline-js">
+(function(){
+var F={ka:['ge','ქართული'],en:['gb','English'],ru:['ru','Русский']};
+function cur(){var l='ka';try{if(typeof currentLang!=='undefined'&&F[currentLang])l=currentLang}catch(e){}return l}
+document.addEventListener('click',function(e){
+  var r=e.target.closest&&e.target.closest('#hzMenu .mz-row[data-hz-act="lang"]');
+  if(!r||window.innerWidth<1024)return;
+  e.stopImmediatePropagation();e.preventDefault();
+  var nx=r.nextElementSibling;
+  if(nx&&nx.classList.contains('mz-langs')){nx.remove();return}
+  var d=document.createElement('div');d.className='mz-langs';var c=cur();
+  d.innerHTML=Object.keys(F).map(function(k){return '<button type="button" class="hzm-langopt'+(k===c?' is-on':'')+'" data-lang="'+k+'"><svg class="hz-flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#flag-'+F[k][0]+'"/></svg>'+F[k][1]+'</button>'}).join('');
+  r.parentNode.insertBefore(d,r.nextSibling);
+},true);
+})();
+</script>
 
 <style id="moon-gate-v2">
 /* ===== sign-in sheet (Zilem-like) ===== */
