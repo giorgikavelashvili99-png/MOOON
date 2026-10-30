@@ -27489,6 +27489,10 @@ html body .ttdl-analyze-btn{line-height:1.5!important}
 /* checker: one clean fade for the whole page. The per-part entrance animations (clip-path headline, glass, icon, bar) used to start at different moments and made the page flash when it opened. */
 html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-titlebar,.ttdl-icon,.ttdl-heading,.ttdl-subtext,.ttdl-glass,.ttdl-input-wrap,.ttdl-steps,.ttdl-log){animation:none!important;opacity:1!important;clip-path:none!important}
 html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-icon,.ttdl-glass)::before,html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-icon,.ttdl-glass)::after{animation:none!important}
+html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-titlebar,.ttdl-glass,.ttdl-input-wrap,.ttdl-input-icon,.ttdl-paste-btn,.ttdl-analyze-btn,.ttdl-log,.ttdl-step,.ttdl-status-chip){box-shadow:none!important}
+html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-icon,.ttdl-icon *,.ttdl-heading,.ttdl-subtext,.ttdl-analyze-btn,.ttdl-shell){filter:none!important;text-shadow:none!important}
+html body #checkerView:not(#_a):not(#_b):not(#_c) :is(.ttdl-shell,.ttdl-icon,.ttdl-glass,.ttdl-input-wrap,.ttdl-input-icon,.ttdl-paste-btn,.ttdl-analyze-btn){transition-property:border-color,background-color,color,transform!important}
+html body #checkerView:not(#_a):not(#_b):not(#_c) .ttdl-shell{border:1px solid rgba(255,255,255,.10)!important}
 </style>
 <!-- MOON accounts (linked accounts + shared weekly limit) -->
 <style id="moon-accounts-css">
@@ -27900,6 +27904,100 @@ window.__moonOpenAccounts=open;
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-ma-open]');if(b){e.preventDefault();open()}});
 })();
 </script>
+<style id="moon-adm-acc">
+.aa-box{margin-top:18px;padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09)}
+.aa-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.aa-head b{font-size:16px;flex:1 1 auto}
+.aa-head small{color:#9aa0b4}
+.aa-search{width:100%;box-sizing:border-box;margin-bottom:10px;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);color:#fff;font:inherit}
+.aa-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border-radius:14px;background:rgba(255,255,255,.04);margin-bottom:8px}
+.aa-av{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#5865f2,#25f4ee);color:#fff;overflow:hidden}
+.aa-av img{width:100%;height:100%;object-fit:cover}
+.aa-who{flex:1 1 150px;min-width:130px;display:flex;flex-direction:column;line-height:1.5}
+.aa-who small{color:#8f95aa;font-size:12px;word-break:break-all}
+.aa-chips{display:flex;flex-wrap:wrap;gap:6px;flex:2 1 220px}
+.aa-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 4px 4px 8px;border-radius:999px;font-size:12.5px;line-height:1.5;border:1px solid transparent;max-width:100%}
+.aa-chip i{font-style:normal;font-weight:800;font-size:11px}
+.aa-chip em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}
+.aa-chip.discord{background:rgba(88,101,242,.18);border-color:rgba(88,101,242,.5);color:#c8cdff}
+.aa-chip.telegram{background:rgba(42,171,238,.16);border-color:rgba(42,171,238,.5);color:#bfe8fb}
+.aa-chip.tiktok{background:rgba(254,44,85,.13);border-color:rgba(37,244,238,.45);color:#ffd0da}
+.aa-x{border:0;cursor:pointer;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:11px;line-height:22px;padding:0}
+.aa-x:hover{background:rgba(255,80,100,.55)}
+.aa-none{color:#8f95aa;font-size:12.5px}
+.aa-rev{border:1px solid rgba(255,90,110,.5);background:rgba(255,90,110,.12);color:#ffb3bd;border-radius:10px;padding:8px 12px;cursor:pointer;font:inherit;font-size:13px}
+.aa-rev:hover{background:rgba(255,90,110,.28)}
+.aa-row.busy{opacity:.5;pointer-events:none}
+</style>
+<script id="moon-adm-acc-js">
+(function(){
+var GATE='https://ancient-frost-1a11.giorgikavelashvili99.workers.dev',KEY='moon_opt_admin_key',ACC=[];
+function $(i){return document.getElementById(i)}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function key(){var i=$('optAdmKey'),k=i&&i.value;if(!k){try{k=sessionStorage.getItem(KEY)||''}catch(e){}}return k||''}
+function call(path,body){
+  return fetch(GATE+path,{method:body?'POST':'GET',headers:Object.assign({'X-Admin-Key':key()},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined})
+   .then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(!r.ok)throw new Error(j.message||j.error||('HTTP '+r.status));return j})});
+}
+var PN={discord:'Discord',telegram:'Telegram',tiktok:'TikTok'},PI={discord:'D',telegram:'T',tiktok:'♪'};
+function nameOf(a){var i=a.ids||{},p=a.profile||{};return p.username||(i.discord&&i.discord.name)||(i.telegram&&(i.telegram.username?'@'+i.telegram.username:i.telegram.name))||(i.tiktok&&(i.tiktok.name||i.tiktok.username))||a.acct}
+function draw(){
+  var list=$('aaList');if(!list)return;
+  var q=(($('aaSearch')||{}).value||'').toLowerCase();
+  var rows=ACC.filter(function(a){if(!q)return true;var hay=[a.acct,nameOf(a)];Object.keys(a.ids||{}).forEach(function(p){var x=a.ids[p];hay.push(x.id,x.name,x.username)});return hay.join(' ').toLowerCase().indexOf(q)>-1}).slice(0,300);
+  $('aaCount').textContent=ACC.length?(rows.length+' / '+ACC.length):'';
+  list.innerHTML=rows.map(function(a){
+    var p=a.profile||{},nm=nameOf(a);
+    var av=p.avatarUrl?'<img src="'+esc(p.avatarUrl)+'" alt="">':esc(String(nm).charAt(0).toUpperCase());
+    var chips=Object.keys(a.ids||{}).map(function(k){var x=a.ids[k];var t=x.username?'@'+x.username:(x.name||x.id);
+      return '<span class="aa-chip '+k+'"><i>'+PI[k]+'</i><b style="font-weight:600">'+PN[k]+'</b><em title="'+esc(x.id)+'">'+esc(t)+'</em><button class="aa-x" data-prov="'+k+'" title="'+PN[k]+' – მოხსნა">✕</button></span>'}).join('')||'<span class="aa-none">მიბმული ანგარიში არ აქვს</span>';
+    return '<div class="aa-row" data-acct="'+esc(a.acct)+'"><div class="aa-av">'+av+'</div><div class="aa-who"><b>'+esc(nm)+'</b><small>'+esc(a.acct)+'</small></div><div class="aa-chips">'+chips+'</div><button class="aa-rev" title="ყველა მიბმის მოხსნა. მომხმარებელი ახლიდან შეძლებს შესვლას">გაუქმება</button></div>';
+  }).join('')||'<div class="aa-none">—</div>';
+}
+function load(){
+  var list=$('aaList');if(!list)return;list.innerHTML='<div class="aa-none">…</div>';
+  call('/admin/accounts').then(function(r){ACC=(r.accounts||[]).sort(function(a,b){return (b.created||0)-(a.created||0)});draw()}).catch(function(e){list.innerHTML='<div class="aa-none">'+esc(e.message)+'</div>'});
+}
+function mount(){
+  var p=$('adminPanelOptimizer');if(!p||$('admAccBox'))return;
+  var b=document.createElement('div');b.id='admAccBox';b.className='aa-box';
+  b.innerHTML='<div class="aa-head"><b>🔗 მიბმული ანგარიშები</b><small id="aaCount"></small><button class="a-go" id="aaLoad">ჩატვირთვა</button></div><input class="aa-search" id="aaSearch" type="text" placeholder="ძებნა სახელით, username-ით ან ID-ით..."><div id="aaList"></div>';
+  p.appendChild(b);
+  $('aaLoad').onclick=load;$('aaSearch').oninput=draw;
+  if(key())load();
+}
+document.addEventListener('click',function(e){
+  var row=e.target.closest&&e.target.closest('.aa-row[data-acct]');if(!row)return;var acct=row.getAttribute('data-acct');
+  var x=e.target.closest('.aa-x'),rv=e.target.closest('.aa-rev');
+  if(x){
+    var prov=x.getAttribute('data-prov');if(!confirm(PN[prov]+' — მოვხსნა ამ მომხმარებლისგან?\nმას შემდეგ ისევ შეეძლება მიბმა.'))return;
+    row.classList.add('busy');
+    call('/admin/unlink',{acct:acct,prov:prov}).then(function(){ACC.forEach(function(a){if(a.acct===acct&&a.ids)delete a.ids[prov]});draw()}).catch(function(er){row.classList.remove('busy');alert(er.message)});
+  } else if(rv){
+    if(!confirm('ანგარიშის გაუქმება?\nყველა მიბმა მოიხსნება. მომხმარებელი შეძლებს ახლიდან შესვლას და მიბმას (გეგმა და ლიმიტი ინახება).'))return;
+    row.classList.add('busy');
+    call('/admin/revoke',{acct:acct}).then(function(){ACC=ACC.filter(function(a){return a.acct!==acct});draw()}).catch(function(er){row.classList.remove('busy');alert(er.message)});
+  }
+});
+var orig=window.renderAdminOptimizer;
+if(typeof orig==='function'){window.renderAdminOptimizer=function(){var r=orig.apply(this,arguments);try{mount()}catch(e){}return r}}
+else{var n=0,iv=setInterval(function(){if(typeof window.renderAdminOptimizer==='function'&&!window.__aaWrapped){window.__aaWrapped=1;clearInterval(iv);var o2=window.renderAdminOptimizer;window.renderAdminOptimizer=function(){var r=o2.apply(this,arguments);try{mount()}catch(e){}return r}}else if(++n>40)clearInterval(iv)},500)}
+})();
+</script>
+<script id="moon-gate-labels">
+(function(){
+var D={ka:{tg:'შესვლა Telegram-ით',tt:'შესვლა TikTok-ით'},en:{tg:'Log in with Telegram',tt:'Log in with TikTok'},ru:{tg:'Войти через Telegram',tt:'Войти через TikTok'}};
+function lg(){var l=document.documentElement.lang;try{if(typeof currentLang!=='undefined'&&D[currentLang])l=currentLang}catch(e){}return D[l]?l:'ka'}
+function set(id,txt){var b=document.getElementById(id),sp=b&&b.querySelector('span');if(!sp||b.classList.contains('tg-msg'))return;
+  if(sp.hasAttribute('data-base')){if(sp.textContent!==sp.getAttribute('data-base'))return;sp.setAttribute('data-base',txt)}
+  if(sp.textContent!==txt)sp.textContent=txt}
+var P={ka:'გეგმები',en:'Plans',ru:'Тарифы'},R={ka:'მზადაა.',en:'Ready.',ru:'Готово.'};
+function apply(){var d=D[lg()],l=lg();set('tgLoginBtn',d.tg);set('tiktokLoginBtn',d.tt);
+  var h=document.querySelector('#plansView .pl-hd h2');if(h&&h.children.length===0&&h.textContent!==P[l])h.textContent=P[l];
+  document.querySelectorAll('.ttdl-log').forEach(function(lg2){var w=document.createTreeWalker(lg2,NodeFilter.SHOW_TEXT),n;while(n=w.nextNode()){var v=n.nodeValue;if(v.indexOf('მზადაა.')>-1||/(^|\s)(Ready\.|Готово\.)\s*$/.test(v)){var nv=v.replace(/მზადაა\.|Ready\.|Готово\./,R[l]);if(nv!==v)n.nodeValue=nv}}})}
+apply();document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-btn,[data-lang]'))setTimeout(apply,80)},true);setInterval(apply,1200);
+})();
+</script>
 
 <style id="moon-gate-v2">
 /* ===== sign-in sheet (Zilem-like) ===== */
@@ -27945,6 +28043,43 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not
 
 /* a closed sign-in sheet must never catch a touch */
 html body #discordGate:not(.open):not(#_a):not(#_b),html body #discordGate:not(.open):not(#_a):not(#_b) *{pointer-events:none!important}
+</style><style id="moon-gate-v3">/* sign-in v3b: clean card, solid brand-coloured buttons */
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]){background:#070708!important;background-image:radial-gradient(60% 40% at 50% 0%,rgba(255,255,255,.04),transparent 70%)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-card{background:#0e0e11!important;border:1px solid #26262b!important;border-radius:28px!important;box-shadow:0 30px 80px rgba(0,0,0,.6)!important;padding:0 22px 22px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-gate-sub .dg-spec{display:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn{justify-content:center!important;text-align:center!important;gap:12px!important;min-height:56px!important;padding:12px 20px!important;border-radius:16px!important;margin:0 0 12px!important;border:0!important;overflow:visible!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn>span{flex:0 1 auto!important;text-align:center!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-weight:600!important;font-size:17px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn svg{width:24px!important;height:24px!important;padding:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;filter:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn svg path{fill:#fff!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn::after{display:none!important;content:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #discordLoginBtn{background:#5865f2!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #discordLoginBtn:active{background:#4752c4!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #tgLoginBtn{background:#229ed9!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #tgLoginBtn:active{background:#1b84b6!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #tiktokLoginBtn{background:#fe2c55!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #tiktokLoginBtn:active{background:#d81f47!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #discordJoinBtn{background:#18181c!important;border:1px solid #2c2c32!important;min-height:56px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #discordJoinBtn svg path{fill:#8b94fa!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #discordJoinBtn>span{color:#f1f1f3!important;-webkit-text-fill-color:#f1f1f3!important;font-weight:600!important;font-size:16px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-gate-skip{align-self:center!important;margin:6px 0 0!important;padding:10px 14px!important;background:none!important;border:0!important;border-radius:0!important;color:#8d8d94!important;text-decoration:underline!important;font-weight:500!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-pill,html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .lang-switch.dg-lang{background:#131316!important;border:1px solid #26262b!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-logo-wrap{display:flex!important;justify-content:center!important;margin:0 0 18px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-logo{display:block!important;width:min(230px,58vw)!important;height:auto!important;opacity:1!important;filter:none!important;animation:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-card{position:relative!important;padding:26px 22px 22px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-card::before{content:''!important;display:block!important;position:absolute!important;left:50%!important;top:-1px!important;transform:translateX(-50%)!important;width:46%!important;height:3px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0 0 6px 6px!important;background:linear-gradient(90deg,#5865f2,#25f4ee,#fe2c55)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-gate-title{text-align:center!important;font-size:clamp(23px,6.6vw,29px)!important;line-height:1.45!important;font-weight:800!important;margin:2px 0 10px!important;background:linear-gradient(100deg,#ffffff 30%,#b9c2ff 70%,#9ff7f3 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;color:transparent!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-gate-sub{text-align:center!important;margin:0 0 22px!important;display:block!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-gate-sub .dg-cta{display:block!important;text-align:center!important;color:#aeb4cc!important;font-size:15px!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn{position:relative!important;overflow:visible!important;isolation:isolate!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn::before{display:none!important;content:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn::after{content:''!important;display:block!important;position:absolute!important;inset:0!important;width:auto!important;height:auto!important;margin:0!important;border:0!important;border-radius:inherit!important;background:none!important;transform:none!important;z-index:-1!important;pointer-events:none!important;opacity:0!important;transition:opacity .45s ease!important;box-shadow:0 0 9px 1px rgba(var(--gl),.85),0 0 22px 3px rgba(var(--gl),.5)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #discordLoginBtn{--gl:88,101,242}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #tgLoginBtn{--gl:34,158,217}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #tiktokLoginBtn{--gl:254,44,85}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) #discordJoinBtn{--gl:139,148,250}
+@media (hover:hover){html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .discord-btn:hover::after{opacity:1!important}}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-card{box-shadow:none!important;filter:none!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-main,html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not([data-mode="banned"]) .dg-logo-wrap{box-shadow:none!important;filter:none!important}
 </style><style id="moon-plans-v2">/* ===== plans page: light, transform-only swipe ===== */
 @media (max-width:1099px){
   html body #plansView:not(#_a):not(#_b) .opt-plan::after,html body #plansView:not(#_a):not(#_b) .opt-plan .opt-buy::before{animation:none!important;display:none!important}
