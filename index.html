@@ -22355,9 +22355,10 @@ html body .mn-view.show .mn-cta::after{content:"";position:absolute;top:0;bottom
     if(!req){ busy=false; return; }
     if(req.tab && req.tab===shown){ pending=null; busy=false; return; }   /* already showing what was asked for */
     var outs=view ? [document.querySelector('.mn-view.show')].filter(Boolean) : blocks();
-    stagger(outs,'mn-out',0);
+    var __ck=(req.tab==='checker');
+    if(!__ck) stagger(outs,'mn-out',0);
     if(outs.length){ var wt=req.tab; warmT=setTimeout(function(){ warm(wt); },20); }
-    setTimeout(function(){ swap(outs); }, outs.length ? 150 : 0);
+    setTimeout(function(){ swap(outs); }, (outs.length && !__ck) ? 150 : 0);
   }
   function swap(outs){
     unstagger(outs,'mn-out');
@@ -27500,6 +27501,9 @@ html body .mn-out:not(#_a):not(#_b):not(#_c):not(#_d){animation-name:mnOut!impor
 html body .mn-view.show:not(#_a):not(#_b):not(#_c):not(#_d){animation-name:mnViewIn!important;animation-duration:.26s!important;animation-timing-function:ease-out!important;animation-delay:0s!important}
 /* optimizer: no inner/outer shadow glow on the upload box and info cards */
 html body #optView :is(.opt-drop,.opt-stats,.opt-quota,.opt-card,.opt-prog):not(#_a):not(#_b):not(#_c),html body #optView .opt-drop:is(:hover,.drag,.has,:focus-within):not(#_a):not(#_b):not(#_c){box-shadow:none!important}
+html body #checkerView.mn-view.show:not(#_a):not(#_b):not(#_c):not(#_d){animation:none!important;opacity:1!important;transform:none!important}
+html body #checkerView:not(#_a):not(#_b):not(#_c):not(#_d) *{animation:none!important}
+html body #checkerView:not(#_a):not(#_b):not(#_c):not(#_d) .ttdl-step{transition:none!important}
 </style>
 <!-- MOON accounts (linked accounts + shared weekly limit) -->
 <style id="moon-accounts-css">
