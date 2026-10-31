@@ -23851,6 +23851,7 @@ var T = {
 };
 T.ka.engBest='საუკეთესო'; T.ka.engBackup='რეზერვი'; T.ka.tryBackup='MOON 2.1 ვერ იმუშავა — სცადეთ MOON 1.2 (რეზერვი)';
 T.en.engBest='Best'; T.en.engBackup='Backup'; T.en.tryBackup='MOON 2.1 did not work — try MOON 1.2 (backup)';
+T.ka.tut='ტუტორიალი'; T.en.tut='Tutorial'; T.ru.tut='Туториал';
 T.ru.engBest='Лучший'; T.ru.engBackup='Резерв'; T.ru.tryBackup='MOON 2.1 не сработал — попробуйте MOON 1.2 (резерв)';
 T.ka.conv='გარდაიქმნება'; T.ka.convHint='გადადის MP4 ფორმატში'; T.ka.convLoad='ფორმატის გადაყვანის მომზადება…'; T.ka.convSlow='გადაყვანა რამდენიმე წუთს გასტანს…'; T.ka.convMsg='ვიდეო MP4 ფორმატში გადადის — დაელოდე, გვერდი არ დახურო'; T.ka.convFail='ამ ფორმატის გადაყვანა ვერ მოხერხდა. სცადე MP4 ან MOV'; T.ka.pickVideo='აირჩიე ვიდეო ფაილი'; T.ka.tooBigConv='ფაილი ძალიან დიდია გადასაყვანად (მაქს. 1.5 GB)';
 T.en.conv='Converting'; T.en.convHint='Converting to MP4'; T.en.convLoad='Preparing the converter…'; T.en.convSlow='Conversion will take a few minutes…'; T.en.convMsg='Converting the video to MP4 — please wait and keep this page open'; T.en.convFail='This format could not be converted. Try MP4 or MOV'; T.en.pickVideo='Choose a video file'; T.en.tooBigConv='File is too large to convert (max 1.5 GB)';
@@ -23877,7 +23878,7 @@ view.innerHTML =
   '<div class="op-col">'+
       '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 2.1</b><small data-k="engBest"></small></button><button type="button" data-eng="12"><b>MOON 1.2</b><small data-k="engBackup"></small></button></div>'+
    '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
-   '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a></div>'+
+   '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><div class="opt-dlrow" id="optDlRow"><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a><button type="button" class="opt-tut" id="optTut"><span data-k="tut"></span></button></div></div>'+
   '</div>'+
  '</div>'+
  '<div class="opt-h3" data-k="plans"></div><div class="opt-plans" id="optPlans"></div>'+
@@ -28928,6 +28929,84 @@ function watch(){
 watch();
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-btn'))setTimeout(function(){tabLabel();if(active())draw()},80)});
 setInterval(function(){tabLabel();if(!active())return;document.querySelectorAll('#adminPanelActivity .act-ts[data-ts]').forEach(function(s){var x=rel(+s.getAttribute('data-ts'));if(s.textContent!==x)s.textContent=x})},30000);
+})();
+</script>
+<style id="moon-no-reset-at-q">
+/* the "send the uploaded video to our team? yes / no" question: the small ✕ (cancel · re-upload) is not needed there */
+html body :is(.scan-result,.simple-scan-result):has(:is(.sr-transfer,.mooon-prompt).show) .sr-reset-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){display:none!important}
+</style>
+<style id="moon-opt-tutorial">
+html body #optView .opt-prog .opt-dlrow{display:flex;align-items:stretch;gap:10px;width:100%;box-sizing:border-box;margin-top:2px}
+html body #optView .opt-prog .opt-dlrow:has(#optDl[style*="display:none"]),html body #optView .opt-prog .opt-dlrow:has(#optDl[style*="display: none"]){display:none}
+html body #optView .opt-prog .opt-dlrow .opt-dl{flex:1.15 1 0;width:auto;min-width:0;margin-top:0!important;padding-left:10px!important;padding-right:10px!important;gap:7px}
+html body #optView .opt-prog .opt-dlrow .opt-tut{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;padding:0 8px;border-radius:20px;border:2.25px solid rgba(150,180,230,.30);background:#0e1626;color:#dfe4f1;font-family:inherit;font-size:14px;font-weight:700;line-height:1.2;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:background-color .18s,border-color .18s}
+html body #optView .opt-prog .opt-dlrow .opt-tut:hover{background:#131d33;border-color:rgba(150,180,230,.48)}
+html body #optView .opt-prog .opt-dlrow .opt-tut:active{background:#0b1220}
+html body #optView .opt-prog .opt-dlrow .opt-tut:focus-visible{outline:2px solid #38d5ff;outline-offset:3px}
+html body #optView .opt-prog .opt-dlrow .opt-tut::before{content:"";flex:0 0 16px;width:16px;height:16px;background:#56d6ff;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9.5'/><path d='M10 8.2l5.6 3.8-5.6 3.8z'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9.5'/><path d='M10 8.2l5.6 3.8-5.6 3.8z'/></svg>") center/contain no-repeat}
+html body #optView .opt-prog .opt-dlrow .opt-tut span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:350px){html body #optView .opt-prog .opt-dlrow{flex-direction:column}html body #optView .opt-prog .opt-dlrow .opt-tut{min-height:48px}}
+#optTutAsk{position:fixed;inset:0;z-index:5200;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(3,7,16,.74);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility 0s .2s}
+#optTutAsk.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s}
+#optTutAsk .ota-box:focus,#optTutAsk .ota-box:focus-visible{outline:none!important;box-shadow:none!important}
+#optTutAsk .ota-box{width:min(380px,100%);box-sizing:border-box;padding:26px 22px 22px;border-radius:26px;background:#0a1020;border:2.25px solid rgba(150,180,230,.30);text-align:center;transform:translate3d(0,10px,0);transition:transform .22s cubic-bezier(.2,.8,.2,1);will-change:transform}
+#optTutAsk.on .ota-box{transform:translate3d(0,0,0)}
+#optTutAsk .ota-ic{width:54px;height:54px;margin:0 auto 14px;border-radius:50%;background:#12345a;display:grid;place-items:center}
+#optTutAsk .ota-ic svg{width:26px;height:26px;display:block}
+#optTutAsk .ota-q{margin:0 0 20px;font-size:17px;line-height:1.55;font-weight:600;color:#e4e8f2}
+#optTutAsk .ota-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#optTutAsk .ota-btn{height:50px;border-radius:16px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color .18s,border-color .18s}
+#optTutAsk .ota-yes{border:0;background:#38b6ff;color:#04141f}
+#optTutAsk .ota-yes:hover{background:#5cc4ff}
+#optTutAsk .ota-no{border:2.25px solid rgba(150,180,230,.30);background:#0e1626;color:#dfe4f1}
+#optTutAsk .ota-no:hover{background:#131d33}
+#optTutAsk .ota-btn:focus-visible{outline:2px solid #38d5ff;outline-offset:3px}
+#optTutToast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));z-index:5300;max-width:calc(100% - 32px);padding:12px 18px;border-radius:16px;background:#0e1a2e;border:2px solid rgba(86,214,255,.45);color:#e4e8f2;font-size:14.5px;line-height:1.4;font-weight:600;text-align:center;transform:translate3d(-50%,140%,0);opacity:0;pointer-events:none;transition:transform .25s cubic-bezier(.2,.8,.2,1),opacity .2s}
+#optTutToast.on{transform:translate3d(-50%,0,0);opacity:1}
+</style>
+<script id="moon-opt-tutorial-js">
+(function(){
+var FILE='moon-tutorial.mp4';
+var TX={
+ ka:{q:'გსურთ ატვირთვის ტუტორიალის ნახვა?',yes:'დიახ',no:'არა',go:'ტუტორიალი იწერება…',name:'MOONFULL 4K - ატვირთვის ტუტორიალი.mp4'},
+ en:{q:'Do you want to watch the upload tutorial?',yes:'Yes',no:'No',go:'Downloading the tutorial…',name:'MOONFULL 4K - upload tutorial.mp4'},
+ ru:{q:'Хотите посмотреть обучающее видео по загрузке?',yes:'Да',no:'Нет',go:'Видео скачивается…',name:'MOONFULL 4K - upload tutorial.mp4'}
+};
+function lang(){var l='ka';try{l=(typeof currentLang!=='undefined'&&currentLang)||document.documentElement.lang||'ka'}catch(e){}l=String(l).slice(0,2);return TX[l]?l:'en'}
+var box=null,toast=null,tT=0,lastFocus=null;
+function build(){
+ if(box)return;
+ box=document.createElement('div');box.id='optTutAsk';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');
+ box.innerHTML='<div class="ota-box"><div class="ota-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#7fd8ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M10 8.2l5.6 3.8-5.6 3.8z" fill="#7fd8ff"/></svg></div><p class="ota-q" id="optTutQ"></p><div class="ota-row"><button type="button" class="ota-btn ota-yes" id="optTutYes"></button><button type="button" class="ota-btn ota-no" id="optTutNo"></button></div></div>';
+ document.body.appendChild(box);
+ box.addEventListener('click',function(e){if(e.target===box)close()});
+ document.getElementById('optTutNo').addEventListener('click',close);
+ document.getElementById('optTutYes').addEventListener('click',go);
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&box.classList.contains('on'))close()});
+}
+function open(){
+ build();var t=TX[lang()];
+ document.getElementById('optTutQ').textContent=t.q;
+ document.getElementById('optTutYes').textContent=t.yes;
+ document.getElementById('optTutNo').textContent=t.no;
+ lastFocus=document.activeElement;
+ box.classList.add('on');
+ setTimeout(function(){var bx=box.querySelector('.ota-box');if(bx){bx.setAttribute('tabindex','-1');bx.style.outline='none';bx.focus({preventScroll:true})}},30);
+}
+function close(){if(!box)return;box.classList.remove('on');try{if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true})}catch(e){}}
+function say(msg){
+ if(!toast){toast=document.createElement('div');toast.id='optTutToast';toast.setAttribute('role','status');document.body.appendChild(toast)}
+ toast.textContent=msg;toast.classList.add('on');clearTimeout(tT);tT=setTimeout(function(){toast.classList.remove('on')},3200);
+}
+function go(){
+ var t=TX[lang()];
+ try{
+  var a=document.createElement('a');a.href=FILE;a.download=t.name;a.rel='noopener';a.style.display='none';
+  document.body.appendChild(a);a.click();setTimeout(function(){try{a.remove()}catch(e){}},1000);
+ }catch(e){window.location.href=FILE}
+ close();say(t.go);
+}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#optTut');if(b){e.preventDefault();open()}});
 })();
 </script>
 <style id="moon-ask-css">
