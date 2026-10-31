@@ -27346,9 +27346,9 @@ html body #discordGate[data-mode="banned"] #tiktokLoginBtn,html body #discordGat
 (function(){
 var LINK_RE=/^🎬\s*(?:ვიდეო|Video|Видео)\s*:\s*((?:https?:\/\/)?mooontransferr\.onrender\.com\/\S+)\s*$/i;
 var TX={
- ka:{title:'ატვირთე ვიდეო',sub:'ნებისმიერი ზომა · რამდენიც გინდა',btn:'არჩევა',up:'იტვირთება…',fin:'ბმულის მომზადება…',stay:'დატოვე გვერდი ღია და ეკრანი ჩართული',done:'ვიდეო გაგზავნილია',doneN:function(n){return 'გაგზავნილია '+n+' ვიდეო';},doneSub:'',more:'+ კიდევ',err:'ატვირთვა ვერ მოხერხდა',errSub:'შეამოწმე ინტერნეტი და სცადე ხელახლა',retry:'ხელახლა',notVideo:'აირჩიე ვიდეო ფაილი',sent:'ვიდეო გაგზავნილია',sentSub:'ვიდეო მიღებულია',adm:'კლიენტის ვიდეო'},
- en:{title:'Upload your video',sub:'Any size · as many as you like',btn:'Choose',up:'Uploading…',fin:'Preparing link…',stay:'Keep this page open and your screen on',done:'Video sent',doneN:function(n){return n+' videos sent';},doneSub:'',more:'+ Add more',err:'Upload failed',errSub:'Check your connection and try again',retry:'Retry',notVideo:'Please choose a video file',sent:'Video sent',sentSub:'Video received',adm:'Customer video'},
- ru:{title:'Загрузи видео',sub:'Любой размер · сколько нужно',btn:'Выбрать',up:'Загрузка…',fin:'Готовим ссылку…',stay:'Держи страницу открытой и экран включённым',done:'Видео отправлено',doneN:function(n){return 'Отправлено видео: '+n;},doneSub:'',more:'+ Ещё',err:'Не удалось загрузить',errSub:'Проверь интернет и попробуй снова',retry:'Повторить',notVideo:'Выбери видеофайл',sent:'Видео отправлено',sentSub:'Видео получено',adm:'Видео клиента'}};
+ ka:{title:'ატვირთე ვიდეო',sub:'',btn:'არჩევა',up:'იტვირთება…',fin:'ბმულის მომზადება…',stay:'დატოვე გვერდი ღია და ეკრანი ჩართული',done:'ვიდეო გაგზავნილია',doneN:function(n){return 'გაგზავნილია '+n+' ვიდეო';},doneSub:'',more:'+ კიდევ',err:'ატვირთვა ვერ მოხერხდა',errSub:'შეამოწმე ინტერნეტი და სცადე ხელახლა',retry:'ხელახლა',notVideo:'აირჩიე ვიდეო ფაილი',sent:'ვიდეო გაგზავნილია',sentSub:'ვიდეო მიღებულია',adm:'კლიენტის ვიდეო'},
+ en:{title:'Upload your video',sub:'',btn:'Choose',up:'Uploading…',fin:'Preparing link…',stay:'Keep this page open and your screen on',done:'Video sent',doneN:function(n){return n+' videos sent';},doneSub:'',more:'+ Add more',err:'Upload failed',errSub:'Check your connection and try again',retry:'Retry',notVideo:'Please choose a video file',sent:'Video sent',sentSub:'Video received',adm:'Customer video'},
+ ru:{title:'Загрузи видео',sub:'',btn:'Выбрать',up:'Загрузка…',fin:'Готовим ссылку…',stay:'Держи страницу открытой и экран включённым',done:'Видео отправлено',doneN:function(n){return 'Отправлено видео: '+n;},doneSub:'',more:'+ Ещё',err:'Не удалось загрузить',errSub:'Проверь интернет и попробуй снова',retry:'Повторить',notVideo:'Выбери видеофайл',sent:'Видео отправлено',sentSub:'Видео получено',adm:'Видео клиента'}};
 function T(){var l=(typeof currentLang==='string'&&TX[currentLang])?currentLang:((document.documentElement.lang||'ka').slice(0,2));return TX[l]||TX.ka;}
 var IFILM='<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9.5 5 2.5-5 2.5z"/></svg>';
 var IUP='<svg viewBox="0 0 24 24"><path d="M12 16V5"/><path d="M7.5 9.5 12 5l4.5 4.5"/><path d="M4.5 16v2a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2"/></svg>';
@@ -28621,6 +28621,32 @@ html body{text-rendering:geometricPrecision}
 .mic-flame{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M12 2.5c1 4.2-2.4 5.4-2.4 8.8a2.4 2.4 0 0 0 4.8 0c2.2 1.6 4 3.8 4 6.5a6.4 6.4 0 0 1-12.8 0c0-5.2 4.2-7 6.4-15.3z%22/%3E%3C/svg%3E")}
 .mic-warn{color:#ffc247}.mic-ok{color:#35d99a}.mic-ban,.mic-excl{color:#ff6b7d}.mic-bolt,.mic-crown,.mic-spark,.mic-flame{color:#ffc247}
 .scan-result .sr-warn,.scan-result .sr-info{line-height:1.5}
+
+/* stepper: finished steps keep their number (no check mark on top of it) */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step.is-done .wizard-step-dot::before,html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step.is-done .wizard-step-dot::after{content:none!important;display:none!important;background:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step.is-done .wizard-step-dot,html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step.is-active .wizard-step-dot{font-size:12.5px!important;color:#fff!important}
+
+/* account pill text: soft white, smaller, medium contrast (no neon cyan, no heavy outline) */
+html body .hz-acct .hz-accw:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){color:rgba(238,243,250,.9)!important;-webkit-text-fill-color:rgba(238,243,250,.9)!important;font-size:13px!important;font-weight:600!important;letter-spacing:.01em!important;-webkit-text-stroke:.25px currentColor!important}
+
+/* quality pills: small, crisp (no smeared outline text), exactly centred */
+html body .pc-card .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){height:21px!important;min-width:0!important;padding:0 11px!important;gap:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;border-width:1px!important;line-height:1!important;font-size:10.5px!important}
+html body .pc-card .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) > span:not(#_a):not(#_b):not(#_c):not(#_d){font-size:10.5px!important;font-weight:700!important;line-height:1!important;letter-spacing:.04em!important;-webkit-text-stroke:0!important;display:block;position:relative;top:1.5px;text-rendering:geometricPrecision}
+
+/* card titles: softer white, no extra outline (it smeared the heavy letters into pixels) */
+html body .pc-card .pc-title:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){color:rgba(238,242,251,.9)!important;-webkit-text-fill-color:rgba(238,242,251,.9)!important;-webkit-text-stroke:0!important;text-shadow:none!important;letter-spacing:.015em!important;text-rendering:geometricPrecision}
+
+/* English / Russian: same calm look as Georgian - no outline on letters (every letter the same weight), softer white, lighter bold */
+html:not([lang="ka"]){-webkit-text-stroke:0!important}
+html:not([lang="ka"]) body :is(.hz-bar,.hz-bar *,#hzMenu,#hzMenu *):not(#_a):not(#_b):not(#_c){-webkit-text-stroke:0!important}
+html:not([lang="ka"]) body :is(#optView .opt-head h2,#optView .opt-h3,#optView .opt-prog .opt-pct b,#moonIntro .mx-name,#moonIntro .mx-h1,input,textarea,select):not(#_a):not(#_b):not(#_c){-webkit-text-stroke:0!important}
+html:not([lang="ka"]) body :is(#hzMenu .hzm-promo b,#hzMenu .hzm-name,#hzMenu .hzm-row .hzm-nm):not(#_a):not(#_b):not(#_c){color:rgba(238,242,251,.92)!important;font-weight:600!important}
+html:not([lang="ka"]) body :is(.pc-card .pc-title,.hz-link,.hz-accw):not(#_a):not(#_b):not(#_c){-webkit-text-stroke:0!important;font-weight:600!important;color:rgba(238,242,251,.9)!important}
+html:not([lang="ka"]) body .hz-link.is-active:not(#_a):not(#_b):not(#_c){color:#7ff0c6!important}
+
+/* English / Russian: letters never touch */
+html:not([lang="ka"]) body :is(.hz-bar,.hz-bar *,#hzMenu,#hzMenu *):not(#_a):not(#_b):not(#_c){letter-spacing:.012em!important}
+html:not([lang="ka"]) body :is(.pc-card .pc-title,.pc-card .pc-desc):not(#_a):not(#_b):not(#_c){letter-spacing:.015em!important}
 </style>
 <script id="moon-icons-js">(function(){try{
 var MAP={'\u26A0':'warn','\u2705':'ok','\uD83D\uDCF1':'phone','\uD83D\uDD17':'link','\u2601':'cloud','\uD83C\uDFAC':'film','\uD83D\uDCCB':'clip','\uD83D\uDEAB':'ban','\u23F1':'timer','\uD83D\uDCA1':'bulb','\uD83D\uDC51':'crown','\u26A1':'bolt','\uD83D\uDDA5':'mon','\u2757':'excl','\u2728':'spark','\uD83D\uDD25':'flame'};
