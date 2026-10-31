@@ -18272,10 +18272,21 @@ TikTok პროფილი: ${getTiktokValue('mp')}
                 const stbl = readMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl');
                 const stts = stbl ? readMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stts') : null;
                 if (stts && stts.start + 16 <= buf.length) {
-                  const sampleDelta = readUint32(buf, stts.start + 12);
-                  if (sampleDelta && timescale) {
-                    const rawFps = timescale / sampleDelta;
-                    if (isFinite(rawFps) && rawFps > 0 && rawFps <= 300) fps = Math.round(rawFps * 100) / 100;
+                  let rawFps = null;
+                  const nEnt = readUint32(buf, stts.start + 4);
+                  let totS = 0, totD = 0;
+                  for (let ei = 0; ei < nEnt; ei++) {
+                    const eo = stts.start + 8 + ei * 8;
+                    if (eo + 8 > stts.end || eo + 8 > buf.length) break;
+                    totS += readUint32(buf, eo); totD += readUint32(buf, eo) * readUint32(buf, eo + 4);
+                  }
+                  if (totS > 1 && totD > 0 && timescale) rawFps = totS / (totD / timescale);
+                  else { const sampleDelta = readUint32(buf, stts.start + 12); if (sampleDelta && timescale) rawFps = timescale / sampleDelta; }
+                  if (rawFps != null && isFinite(rawFps) && rawFps > 0 && rawFps <= 1000) {
+                    let snapped = null;
+                    [23.976, 29.97, 59.94, 119.88].forEach(function(r){ if (snapped == null && Math.abs(rawFps - r) / r < 0.0005) snapped = r; });
+                    if (snapped == null) [24, 25, 30, 48, 50, 60, 72, 90, 100, 120, 144, 165, 240].forEach(function(r){ if (snapped == null && Math.abs(rawFps - r) / r < 0.006) snapped = r; });
+                    fps = snapped != null ? snapped : Math.round(rawFps * 100) / 100;
                   }
                 }
               }
@@ -25502,7 +25513,7 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
   function renderAcct(){
     var box=document.getElementById('hzmAcct'), u=user(), s=st(), h;
     if(!u){
-      h='<button type="button" class="hzm-login" data-hz-act="login">'+DC.replace('hz-dc','')+'<span>'+esc(t('login'))+'</span></button><div class="hzm-login-sub">'+esc(t('loginSub'))+'</div>';
+      h='<button type="button" class="hzm-login" data-hz-act="login">'+DC.replace('hz-dc','')+'<span>'+esc(t('login'))+'</span></button><div class="hzm-alt"><button type="button" class="hzm-alt-btn hzm-tg" data-hz-act="login-tg"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.4 3.6 2.9 10.7c-1.3.5-1.3 1.2-.2 1.5l4.7 1.5 1.800 5.500c.2.600.4.800.9.800.4 0 .6-.2.9-.4l2.200-2.200 4.600 3.400c.8.500 1.500.2 1.800-.8l3-14.400c.3-1.200-.5-1.800-1.200-1.500Z"/></svg><span>Telegram</span></button><button type="button" class="hzm-alt-btn hzm-tk" data-hz-act="login-tk"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 3c.3 2.4 1.7 3.9 4 4.1v3.1c-1.4.1-2.7-.3-4-1.1v6.2c0 3.9-3.1 6.2-6.2 5.7-2.9-.5-4.9-3.1-4.5-6.1.4-3.2 3.3-5.2 6.4-4.7v3.2c-1.5-.5-3.3.4-3.3 2.2 0 1.4 1.1 2.4 2.4 2.4 1.5 0 2.4-1.1 2.4-2.6V3h2.8z"/></svg><span>TikTok</span></button></div><div class="hzm-login-sub">'+esc(t('loginSub'))+'</div>';
     } else {
       var limit = s && !s.unlimited ? (s.limit||0) : 0, rem = s ? (s.unlimited ? '∞' : (s.remaining!=null ? s.remaining : '—')) : '—';
       var pct = s ? (s.unlimited ? 100 : (limit ? Math.max(0,Math.min(100, Math.round((s.remaining||0)/limit*100))) : 0)) : 0;
@@ -25520,6 +25531,8 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
     var a=e.target.closest('[data-hz-act]'); if(!a) return; var k=a.getAttribute('data-hz-act');
     if(k==='toggle'){ acctOpen=!acctOpen; renderAcct(); if(acctOpen && !isDesk()){ var sc=document.getElementById('hzmScroll'); requestAnimationFrame(function(){ sc.scrollTo({top:sc.scrollHeight,behavior:'smooth'}); }); } }
     else if(k==='login'){ closeMenu(); try{ startDiscordLogin(); }catch(_){ var c=document.getElementById('discordChip'); if(c) c.click(); } }
+    else if(k==='login-tg'){ if(window.__moonDrawerTg && window.__moonDrawerTg(a)) closeMenu(); }
+    else if(k==='login-tk'){ closeMenu(); try{ window.__ttMode=''; window.__moonStartTikTokLogin(); }catch(_){} }
     else if(k==='accounts'){ closeMenu(); if(window.__moonOpenAccounts) window.__moonOpenAccounts(); }
     else if(k==='logout'){ closeMenu(); var b=document.getElementById('discordLogoutBtn'); if(b) b.click(); }
     else if(k==='refresh'){ a.classList.remove('spin'); void a.offsetWidth; a.classList.add('spin'); var r=document.getElementById('discordRefreshBtn'); if(r) r.click(); if(window.__moonOptRefresh) window.__moonOptRefresh(); }
@@ -27858,6 +27871,7 @@ function gateLogin(btn){
   });
 }
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#tgLoginBtn');if(b){e.preventDefault();gateLogin(b)}});
+window.__moonTgReady=tgReady;window.__moonPrepTg=function(){return prepTg()};
 (function(){var g=document.getElementById('discordGate');if(!g)return;var started=false;
   function chk(){if(!started&&g.classList.contains('open')){started=true;prepTg().catch(function(){})}}
   new MutationObserver(chk).observe(g,{attributes:true,attributeFilter:['class']});chk();
@@ -28685,6 +28699,422 @@ function start(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 }catch(e){}})();</script>
+<style id="moon-drawer-login">
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-alt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 0;padding:0}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-alt-btn{display:flex;align-items:center;justify-content:center;gap:9px;height:48px;min-height:48px;margin:0;padding:0 12px;box-sizing:border-box;border:1.5px solid rgba(150,180,255,.32);border-radius:14px;background:#0e1626;color:rgba(238,243,250,.92);-webkit-text-fill-color:rgba(238,243,250,.92);font-family:var(--moon-lat),var(--moon-lat),'BPGAcademiuriU',sans-serif;font-size:14.5px;font-weight:600;letter-spacing:.01em;line-height:1;cursor:pointer;box-shadow:none;-webkit-text-stroke:0;transition:background .15s ease,border-color .15s ease;-webkit-tap-highlight-color:transparent}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-alt-btn:hover{background:#142038;border-color:rgba(190,210,255,.55)}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-alt-btn:active{background:#18274a}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-alt-btn:disabled{opacity:.6;cursor:default}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-alt-btn svg{width:19px;height:19px;flex:none;display:block;margin:0}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-tg svg{fill:#2aabee;color:#2aabee}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-tk svg{fill:#fff;color:#fff}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-alt-btn>span{display:block;line-height:1;white-space:nowrap}
+/* slightly thicker outlines: header account pill + dropdown menu */
+html body .hz-acct:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){border-width:2.25px!important;border-color:rgba(56,213,255,.46)!important}
+html body #hzMenu.hz-menu:not(#_a):not(#_b):not(#_c):not(#_d){border:2.25px solid rgba(150,180,230,.30)!important}
+html body .hz-menubtn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){border:2.25px solid rgba(150,180,230,.30)!important}
+</style>
+<script id="moon-drawer-login-js">(function(){
+var AG={ka:'ხელახლა დააჭირე',en:'Tap again',ru:'Нажмите ещё'};
+window.__moonDrawerTg=function(btn){
+  var gb=document.getElementById('tgLoginBtn');if(!gb)return false;
+  if(window.__moonTgReady&&window.__moonTgReady()){gb.click();return true}
+  var sp=btn.querySelector('span'),old=sp?sp.textContent:'';
+  if(window.__moonPrepTg&&sp){btn.disabled=true;sp.textContent='…';
+    window.__moonPrepTg().then(function(){btn.disabled=false;var l=(document.documentElement.lang||'ka').slice(0,2);sp.textContent=AG[l]||AG.en;setTimeout(function(){sp.textContent=old},3500)},function(){btn.disabled=false;sp.textContent=old})}
+  return false};
+var done=false;function pre(){if(done)return;done=true;try{if(window.__moonPrepTg)window.__moonPrepTg().catch(function(){})}catch(e){}}
+document.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('#hzAcctBtn,#hzMenuBtn,.hz-acct,.hz-menubtn'))pre()},true);
+})();</script>
+<style id="moon-ask-css">
+#mfask-btn,#mfask-panel,#mfask-panel *{box-sizing:border-box;box-shadow:none;text-shadow:none;-webkit-tap-highlight-color:transparent}
+#mfask-btn{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:200;width:54px;height:54px;margin:0;padding:0;border-radius:50%;border:1px solid rgba(150,180,255,.32);background:#0a1020;cursor:pointer;display:block;overflow:visible;transition:transform .16s ease,border-color .16s ease;animation:mfaskIn .35s ease-out .5s both}
+#mfask-btn img{position:absolute;inset:0;width:100%;height:100%;display:block;border-radius:50%;pointer-events:none;-webkit-user-drag:none}
+#mfask-btn i{position:absolute;right:0;bottom:0;width:13px;height:13px;border-radius:50%;background:#38bdf8;border:2.5px solid #070c18;pointer-events:none}
+#mfask-btn:hover{transform:translateY(-2px);border-color:rgba(190,210,255,.6)}
+#mfask-btn:active{transform:scale(.94)}
+#mfask-btn:focus-visible,#mfask-send:focus-visible,.mfask-x:focus-visible,.mfask-chip:focus-visible{outline:2px solid #4c7dff!important;outline-offset:3px}
+#mfask-panel{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:210;width:380px;max-width:calc(100vw - 24px);height:min(580px,calc(100vh - 110px));height:min(580px,calc(100dvh - 110px));display:none;flex-direction:column;background:#0a1020;border:1px solid rgba(150,180,255,.22);border-radius:16px;overflow:hidden;color:#dbe3f5;font-family:var(--moon-lat),var(--moon-lat),'BPGAcademiuriU',system-ui,sans-serif;font-size:14px;font-weight:500;line-height:1.5;letter-spacing:0;text-align:left;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+#mfask-panel.mfask-open{display:flex;animation:mfaskPanel .18s ease-out}
+.mfask-head{display:flex;align-items:center;gap:11px;padding:13px 14px 13px 16px;border-bottom:1px solid rgba(150,180,255,.13);flex:0 0 auto}
+.mfask-avatar{width:34px;height:34px;border-radius:50%;flex:0 0 auto;border:1px solid rgba(150,180,255,.32);background:#0a1020;overflow:hidden}
+.mfask-avatar img{display:block;width:100%;height:100%;border-radius:50%}
+.mfask-htx{min-width:0;flex:1 1 auto}
+.mfask-title{font-size:14px;font-weight:600;line-height:1.3;color:#e6ecfb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mfask-sub{display:flex;align-items:center;gap:6px;margin-top:1px;font-size:11.5px;font-weight:500;color:#8793b3;line-height:1.3}
+.mfask-dot{width:6px;height:6px;border-radius:50%;background:#38bdf8;flex:0 0 auto}
+.mfask-x{flex:0 0 auto;width:30px;height:30px;margin:0;padding:0;border:0;border-radius:8px;background:none;color:#8793b3;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s ease,background .15s ease}
+.mfask-x:hover{color:#e6ecfb;background:rgba(150,180,255,.10)}
+.mfask-x svg{width:16px;height:16px;display:block;pointer-events:none}
+.mfask-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px 14px 8px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(150,180,255,.28) transparent}
+.mfask-msg{max-width:88%;padding:9px 12px;border-radius:12px;font-size:14px;font-weight:500;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;animation:mfaskMsg .16s ease-out both}
+.mfask-msg b{font-weight:700;color:#eef2ff}
+.mfask-bot{align-self:flex-start;background:#111a30;border:1px solid rgba(150,180,255,.13);border-bottom-left-radius:4px;color:#dbe3f5}
+.mfask-user{align-self:flex-end;background:#2b5fe0;border:1px solid #2b5fe0;border-bottom-right-radius:4px;color:#f4f7ff}
+.mfask-acts,.mfask-sugg{display:flex;flex-wrap:wrap;gap:7px}
+.mfask-acts{align-self:flex-start;margin-top:-2px;max-width:92%}
+.mfask-sugg{padding:2px 0 6px}
+.mfask-chip{margin:0;font-family:inherit;font-size:12.5px;font-weight:500;line-height:1.3;letter-spacing:0;color:#cfd9f2;background:#0e1630;border:1px solid rgba(150,180,255,.26);border-radius:999px;padding:7px 12px;cursor:pointer;text-align:left;transition:border-color .15s ease,background .15s ease;animation:mfaskChip .2s ease-out both}
+.mfask-chip:hover{background:#152043;border-color:rgba(190,210,255,.5)}
+.mfask-chip:active{background:#1a2750}
+.mfask-act{color:#9be3fb;border-color:rgba(56,189,248,.5);background:#0b1a2e}
+.mfask-act:hover{background:#0f2540;border-color:rgba(56,189,248,.8)}
+.mfask-typing{align-self:flex-start;display:flex;gap:4px;padding:12px 13px;background:#111a30;border:1px solid rgba(150,180,255,.13);border-radius:12px;border-bottom-left-radius:4px}
+.mfask-typing i{width:5px;height:5px;border-radius:50%;background:#8793b3;animation:mfaskB 1.1s infinite ease-in-out}
+.mfask-typing i:nth-child(2){animation-delay:.15s}.mfask-typing i:nth-child(3){animation-delay:.3s}
+.mfask-foot{flex:0 0 auto;border-top:1px solid rgba(150,180,255,.13);padding:10px 12px 9px}
+.mfask-row{display:flex;align-items:flex-end;gap:8px}
+#mfask-in{flex:1 1 auto;display:block;width:auto;min-width:0;height:42px;min-height:42px;max-height:96px;margin:0;padding:10px 12px;resize:none;overflow-y:hidden;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(150,180,255,.3) transparent;border-radius:12px;background:#0d1530;border:1px solid rgba(150,180,255,.24);color:#e6ecfb;font-family:inherit;font-size:14px;font-weight:500;line-height:1.35;letter-spacing:0;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none}
+#mfask-panel #mfask-in:focus,#mfask-panel #mfask-in:focus-visible{border-color:#4c7dff!important;outline:none!important;box-shadow:none!important}
+#mfask-in::placeholder{color:#6b7798;opacity:1}
+#mfask-send{flex:0 0 auto;width:38px;height:38px;margin:0 0 1px;padding:0;border:0;border-radius:50%;background:#e9eefc;color:#0a1020;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s ease}
+#mfask-send:disabled{opacity:.4;cursor:default}
+#mfask-send svg{width:17px;height:17px;display:block;pointer-events:none}
+.mfask-opt{display:flex;align-items:center;justify-content:center;gap:7px;margin:9px 0 6px;font-size:11.5px;font-weight:500;color:#a6b2cf;cursor:pointer;user-select:none;-webkit-user-select:none}
+.mfask-opt input{-webkit-appearance:none;appearance:none;width:14px;height:14px;margin:0;border-radius:4px;border:1px solid rgba(190,210,255,.42);background:#0d1530;cursor:pointer;position:relative;flex:0 0 auto}
+.mfask-opt input:checked{background:#2b5fe0;border-color:#2b5fe0}
+.mfask-opt input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:7px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+.mfask-note{margin:0 2px;font-size:10.5px;font-weight:500;line-height:1.45;color:#6b7798;text-align:center}
+.mfask-note a{color:#8793b3;text-decoration:underline;text-underline-offset:2px}
+@keyframes mfaskIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes mfaskPanel{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes mfaskMsg{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes mfaskChip{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+@keyframes mfaskB{0%,60%,100%{opacity:.35}30%{opacity:1}}
+@media (max-width:480px){
+#mfask-btn{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));width:50px;height:50px}
+#mfask-panel{left:8px;right:8px;width:auto;max-width:none;bottom:calc(76px + env(safe-area-inset-bottom,0px));height:min(78vh,620px);height:min(78dvh,620px);border-radius:14px}
+#mfask-in{font-size:16px}
+}
+</style>
+<script id="moon-ask-js">
+(function(){'use strict';
+if(window.__mfAskLoaded)return;window.__mfAskLoaded=true;
+var API='https://api.moonfull4k.xyz/api/ask';
+var DISCORD='https://discord.gg/mmpnEeJnXv';
+var LOGO='data:image/png;base64,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';
+var MAX_USER_MSGS=40,MAX_LEN=500;
+
+/* ---------- i18n (UI) ---------- */
+var UI={
+ka:{title:'ჰკითხე Moonfull4K-ს',sub:'AI მხარდაჭერის ასისტენტი',ph:'დაწერე შეკითხვა…',aria:'AI მხარდაჭერა',close:'დახურვა',send:'გაგზავნა',
+ improve:'დაგვეხმარე AI-ის გაუმჯობესებაში',improveTip:'ანონიმური ტრანსკრიპტები ინახება პასუხების გასაუმჯობესებლად. ანგარიში ან IP არ ინახება.',
+ note:'AI-ს შეიძლება შეეშალოს. შეკვეთა/გადახდა — მენეჯერთან ',noteLink:'Discord-ზე',
+ hello:'გამარჯობა! მე Moonfull4K-ის მხარდაჭერის ასისტენტი ვარ. მკითხე პაკეტებზე, ფასებზე, შეკვეთაზე, ვადებზე ან გადახდაზე.',
+ chips:['რომელი პაკეტი მჭირდება?','როგორ შევუკვეთო?','რამდენი ღირს?','რა ვადაში ჩამაბარებთ?']},
+en:{title:'Ask Moonfull4K',sub:'AI support helper',ph:'Message Moonfull4K',aria:'Ask Moonfull4K — AI support',close:'Close',send:'Send',
+ improve:'Help improve Moonfull4K AI',improveTip:'Anonymous transcripts are stored to improve answers. No account or IP is kept.',
+ note:'AI answers can be wrong. Orders or payment issues: ask a manager on ',noteLink:'Discord',
+ hello:"Hi — I'm Moonfull4K's support helper. Ask me about packages, prices, ordering, delivery or payment.",
+ chips:['Which plan do I need?','How do I order?','How much does it cost?','How fast is delivery?']},
+ru:{title:'Спросить Moonfull4K',sub:'AI-помощник поддержки',ph:'Напишите вопрос…',aria:'AI-поддержка Moonfull4K',close:'Закрыть',send:'Отправить',
+ improve:'Помочь улучшить AI Moonfull4K',improveTip:'Анонимные диалоги сохраняются для улучшения ответов. Аккаунт и IP не сохраняются.',
+ note:'AI может ошибаться. Заказ или оплата — спросите менеджера в ',noteLink:'Discord',
+ hello:'Привет! Я помощник поддержки Moonfull4K. Спросите про пакеты, цены, заказ, сроки или оплату.',
+ chips:['Какой пакет мне нужен?','Как сделать заказ?','Сколько это стоит?','Как быстро сдаёте?']}
+};
+var ACT={
+discord:{ka:'Discord-ზე მოწერა',en:'Open Discord',ru:'Написать в Discord',u:DISCORD},
+home:{ka:'პაკეტები',en:'Packages',ru:'Пакеты',g:'home'},
+plans:{ka:'გეგმები',en:'Plans',ru:'Планы',g:'plans'},
+method:{ka:'მეთოდი',en:'Method',ru:'Метод',g:'optimizer'},
+checker:{ka:'ჩექერი',en:'Checker',ru:'Чекер',g:'checker'},
+contact:{ka:'კონტაქტი',en:'Contact',ru:'Контакты',g:'contact'}
+};
+
+/* ---------- knowledge base ---------- */
+function K(s,w){return [new RegExp(s,'i'),w]}
+var KB=[
+{id:'greet',p:0,k:[],
+ a:{ka:'გამარჯობა! რით შემიძლია დაგეხმარო? მკითხე პაკეტებზე, ფასებზე, შეკვეთაზე ან გადახდაზე.',en:'Hi! How can I help? Ask me about packages, prices, ordering or payment.',ru:'Привет! Чем помочь? Спросите про пакеты, цены, заказ или оплату.'}},
+{id:'thanks',p:0,k:[],
+ a:{ka:'ყოველთვის გენაცვალე! თუ კიდევ რამე გაინტერესებს — მკითხე.',en:"You're welcome! Ask me anything else you need.",ru:'Пожалуйста! Если что-то ещё нужно — спрашивайте.'}},
+{id:'about',p:0,k:[K('რა არის (moonfull|ეს საიტი|ეს სერვის|ეს)\\b|ვინ ხართ|რას აკეთებთ|რას სთავაზობთ|what is (this|moonfull)|who are you|what do you (do|offer)|что это|кто вы|что вы делаете|чем занимаетесь',3)],
+ a:{ka:'MOONFULL 4K — TikTok-ისთვის ვიდეოს მაღალი ხარისხით (1080p/60fps ან 4K) დამუშავება, რომ ატვირთვისას ხარისხი არ დაიკარგოს. ყველა ვიდეო მუშავდება ხელით After Effects-ში, ჩაბარება — მაქსიმუმ 24 საათში.',
+    en:'MOONFULL 4K processes your videos in high quality (1080p/60fps or 4K) so they upload to TikTok without losing quality. Every video is edited by hand in After Effects and delivered within 24 hours.',
+    ru:'MOONFULL 4K обрабатывает ваши видео в высоком качестве (1080p/60fps или 4K), чтобы при загрузке в TikTok качество не терялось. Каждое видео монтируется вручную в After Effects и сдаётся максимум за 24 часа.'},b:['home']},
+{id:'which',p:1,k:[K('რომელი (პაკეტ|გეგმ|ტარიფ|ავირჩიო|ავიღო|ჯობია)|რა პაკეტ|რა გეგმ|რეკომენდ|რჩევა|which (plan|package|one|option|should)|what (plan|package)|recommend|suggest|\\bplans?\\b|какой (пакет|план|тариф|выбрать)|какую|что выбрать|посоветуй|подойд',3),K('პაკეტ|package|пакет',1)],
+ a:{ka:'**რომელი პაკეტი?**\n• 1 ვიდეო → ცალობითი (1.49₾-დან)\n• სხვა ფორმატის ვიდეო → ნებისმიერი ფორმატი (2.99₾-დან)\n• რეგულარულად ტვირთავ → კვირის (5 ვიდეო) ან თვის (20 ვიდეო) პაკეტი, 4K-ც შესაძლებელია\n• ედითი შენი პერსონაჟით → ედითის შეკვეთა (9.99₾-დან)\n• ვიდეოს თვითონ ოპტიმიზაცია → MOON METHOD (გეგმები 5.99₾-დან)',
+    en:'**Which one?**\n• 1 video → Single package (from 1.49₾)\n• A video in another format → Any-format order (from 2.99₾)\n• You post regularly → Weekly (5 videos) or Monthly (20 videos) package, 4K available\n• An edit with your character → Edit order (from 9.99₾)\n• Optimizing videos yourself → MOON METHOD (plans from 5.99₾)',
+    ru:'**Какой выбрать?**\n• 1 видео → Разовый пакет (от 1.49₾)\n• Видео в другом формате → Любой формат (от 2.99₾)\n• Публикуете регулярно → Недельный (5 видео) или месячный (20 видео) пакет, доступен 4K\n• Эдит с вашим персонажем → Заказ эдита (от 9.99₾)\n• Оптимизация видео самостоятельно → MOON METHOD (планы от 5.99₾)'},b:['home','plans']},
+{id:'price',p:0,k:[K('ფას(?!დაკლ)|ღირს|ღირებულ|რამდენი|რამდენად|price|pricing|cost|how much|tariff|цен[аыуе]|стоим|сколько|тариф|₾|\\bgel\\b|lari',2)],
+ a:{ka:'**ფასები (₾)**\n• ცალობითი — 1.49-დან (ხანგრძლივობის მიხედვით)\n• ნებისმიერი ფორმატი — 2.99-დან\n• კვირის პაკეტი (5 ვიდეო) — 24.99 (1080p) · 35.99 (4K)\n• თვის პაკეტი (20 ვიდეო) — 49.99 (1080p) · 69.99 (4K)\n• ედითის შეკვეთა — 9.99-დან (1080p) · 14.99-დან (4K)\nზუსტ ფასს კალკულატორი აჩვენებს შეკვეთამდე.',
+    en:'**Prices (₾)**\n• Single — from 1.49 (depends on duration)\n• Any format — from 2.99\n• Weekly (5 videos) — 24.99 (1080p) · 35.99 (4K)\n• Monthly (20 videos) — 49.99 (1080p) · 69.99 (4K)\n• Edit order — from 9.99 (1080p) · from 14.99 (4K)\nThe calculator shows the exact price before you order.',
+    ru:'**Цены (₾)**\n• Разовый — от 1.49 (зависит от длительности)\n• Любой формат — от 2.99\n• Недельный (5 видео) — 24.99 (1080p) · 35.99 (4K)\n• Месячный (20 видео) — 49.99 (1080p) · 69.99 (4K)\n• Заказ эдита — от 9.99 (1080p) · от 14.99 (4K)\nТочную цену покажет калькулятор до заказа.'},b:['home']},
+{id:'single',p:1,k:[K('ცალობით|ერთი ვიდეო|ერთ ვიდეო|1 ვიდეო|single|one video|1 video|одно видео|одного видео|1 видео|разов|поштучн',2)],
+ a:{ka:'**ცალობითი პაკეტი** — 1 ვიდეო, 1080p/60fps. ფასი 1.49₾-დან და ხანგრძლივობაზეა დამოკიდებული (დაახლ.: 10 წმ ≈ 3.55₾, 30 წმ ≈ 10.03₾, 59 წმ ≈ 17.98₾). ჩვენი TikTok არხის გამომწერებს −10%. ჩაბარება — მაქს. 24 საათში. ზუსტი ფასი კალკულატორშია.',
+    en:'**Single package** — 1 video, 1080p/60fps. Price starts from 1.49₾ and depends on duration (approx.: 10 s ≈ 3.55₾, 30 s ≈ 10.03₾, 59 s ≈ 17.98₾). Subscribers of our TikTok channel get −10%. Delivered within 24 hours. The calculator shows the exact price.',
+    ru:'**Разовый пакет** — 1 видео, 1080p/60fps. Цена от 1.49₾ и зависит от длительности (примерно: 10 с ≈ 3.55₾, 30 с ≈ 10.03₾, 59 с ≈ 17.98₾). Подписчикам нашего TikTok-канала −10%. Сдача — до 24 часов. Точную цену покажет калькулятор.'},b:['home']},
+{id:'anyformat',p:1,k:[K('ნებისმიერი ფორმატ|ნებისმიერ ფორმატ|სხვა ფორმატ|any[ -]?format|other format|любой формат|другой формат|2\\.99',2)],
+ a:{ka:'**ნებისმიერი ფორმატი** — ატვირთე ნებისმიერი ფორმატის/გარჩევადობის ვიდეო და ჩვენ მას TikTok-ისთვის მოვამზადებთ. ფასი 2.99₾-დან, ჩაბარება — მაქს. 24 საათში. ზუსტი ფასი კალკულატორშია.',
+    en:'**Any-format order** — upload a video in any format/resolution and we prepare it for TikTok. From 2.99₾, delivered within 24 hours. The calculator shows the exact price.',
+    ru:'**Любой формат** — загрузите видео в любом формате/разрешении, и мы подготовим его для TikTok. От 2.99₾, сдача — до 24 часов. Точную цену покажет калькулятор.'},b:['home']},
+{id:'weekly',p:1,k:[K('კვირ|week|недел',2)],
+ a:{ka:'**კვირის პაკეტი** — 5 ვიდეო 7 დღის განმავლობაში: 24.99₾ (1080p/60fps) ან 35.99₾ (4K). ხარისხს ყოველი ატვირთვისას ირჩევ. არხის გამომწერებს −3₾.',
+    en:'**Weekly package** — 5 videos within 7 days: 24.99₾ (1080p/60fps) or 35.99₾ (4K). You pick the quality on every upload. Channel subscribers get −3₾.',
+    ru:'**Недельный пакет** — 5 видео за 7 дней: 24.99₾ (1080p/60fps) или 35.99₾ (4K). Качество выбирается при каждой загрузке. Подписчикам канала −3₾.'},b:['home']},
+{id:'monthly',p:1,k:[K('თვი[სუ]რ|თვეში|თვის პაკ|თვე\\b|month|месяц|месяч',2)],
+ a:{ka:'**თვის პაკეტი** — 20 ვიდეო 1 თვის განმავლობაში: 49.99₾ (1080p/60fps) ან 69.99₾ (4K). ხარისხს ყოველი ატვირთვისას ირჩევ.',
+    en:'**Monthly package** — 20 videos within 1 month: 49.99₾ (1080p/60fps) or 69.99₾ (4K). You pick the quality on every upload.',
+    ru:'**Месячный пакет** — 20 видео в течение месяца: 49.99₾ (1080p/60fps) или 69.99₾ (4K). Качество выбирается при каждой загрузке.'},b:['home']},
+{id:'edit',p:1,k:[K('ედით|edit|эдит|პერსონაჟ|character|персонаж|ანიმე|anime|аниме|რეფერენს|reference',2)],
+ a:{ka:'**ედითის შეკვეთა** — მსგავსი ედითი შენი პერსონაჟით (ანიმე, თამაშის გმირი, ფილმის პერსონაჟი…). ფასი: 9.99₾ (1080p) / 14.99₾ (4K); ერთ-ერთ სტილზე 12.99₾ / 17.99₾. შეკვეთის შემდეგ ჩატში გამოგვიგზავნე პერსონაჟის ფოტო/რეფერენსი. ჩაბარება — მაქს. 24 საათში.',
+    en:'**Edit order** — a similar edit with your character (anime, game hero, movie character…). Price: 9.99₾ (1080p) / 14.99₾ (4K); one of the styles is 12.99₾ / 17.99₾. After ordering, send the character photo/reference in the chat. Delivered within 24 hours.',
+    ru:'**Заказ эдита** — похожий эдит с вашим персонажем (аниме, герой игры, персонаж фильма…). Цена: 9.99₾ (1080p) / 14.99₾ (4K); один из стилей — 12.99₾ / 17.99₾. После заказа пришлите в чат фото/референс персонажа. Сдача — до 24 часов.'},b:['home']},
+{id:'howorder',p:1,k:[K('როგორ (შევუკვეთო|შევუკვეთ|ვიყიდო|დავუკვეთო|დავაკვეთო|შეიძლება შეკვეთა)|შეკვეთ|ორდერ|how (to|do i|can i) (order|buy)|\\border\\b|\\bbuy\\b|заказ|купить|как (заказать|купить)',2),K('ატვირთვ|upload|загруз',1)],
+ a:{ka:'**როგორ შევუკვეთო**\n1) აირჩიე პაკეტი და კალკულატორში მონიშნე ხანგრძლივობა/ხარისხი (ან ატვირთე ვიდეო VIDEO SCANNER-ში);\n2) ჩასვი TikTok პროფილის ლინკი (შეგიძლია ბუფერიდან ავტო-ამოცნობა);\n3) დააჭირე „შეკვეთა — ჩატში";\n4) მენეჯერი ჩატში დაგიდასტურებს შეკვეთას, ვადას და გადახდის დეტალებს.',
+    en:'**How to order**\n1) Pick a package and set duration/quality in the calculator (or upload your video in VIDEO SCANNER);\n2) Paste your TikTok profile link (you can auto-detect it from the clipboard);\n3) Press "Send order";\n4) A manager confirms the order, deadline and payment details in the chat.',
+    ru:'**Как заказать**\n1) Выберите пакет и укажите длительность/качество в калькуляторе (или загрузите видео в VIDEO SCANNER);\n2) Вставьте ссылку на TikTok-профиль (можно определить из буфера обмена);\n3) Нажмите «Отправить заказ»;\n4) Менеджер подтвердит в чате заказ, срок и реквизиты для оплаты.'},b:['home','contact']},
+{id:'scanner',p:2,k:[K('scanner|სკანერ|сканер',3)],
+ a:{ka:'**VIDEO SCANNER** — ვიდეოს ატვირთვა პირდაპირ საიტზე: ფაილი ფონურად გადაეცემა ჩვენს გუნდს, ცალკე საიტზე გადასვლა საჭირო არაა. ატვირთვისას ვიდეო უნდა იყოს 1080p/60fps.',
+    en:'**VIDEO SCANNER** — upload your video right on the site: the file is passed to our team in the background, no extra site needed. The video must be 1080p/60fps.',
+    ru:'**VIDEO SCANNER** — загрузка видео прямо на сайте: файл в фоне передаётся нашей команде, переходить на другой сайт не нужно. Видео должно быть 1080p/60fps.'},b:['home']},
+{id:'req',p:0,k:[K('requirements?|მოთხოვნ|требован|ფორმატ|fps|1080|გარჩევადობ|კადრ|resolution|format|формат|разрешен|кадр|tiktok-ისთვის|მხოლოდ tiktok|only tiktok|только tiktok',2)],
+ a:{ka:'**ვიდეოს მოთხოვნები**\n• ატვირთვისას ვიდეო უნდა იყოს ზუსტად 1080p/60fps; გამომავალ ხარისხს (1080p ან 4K) შეკვეთისას ირჩევ\n• სხვა ფორმატი? აიღე „ნებისმიერი ფორმატი" (2.99₾-დან)\n• მაქს. ხანგრძლივობა — 59.59 წმ; მეტი ინდივიდუალურად ფასდება\n• ვიდეო მონტაჟდება მხოლოდ TikTok-ისთვის, საჭიროა TikTok პროფილის ლინკი',
+    en:'**Video requirements**\n• The uploaded video must be exactly 1080p/60fps; you choose the output quality (1080p or 4K) when ordering\n• Another format? Take the "Any format" order (from 2.99₾)\n• Max duration — 59.59 s; longer videos are priced individually\n• Videos are edited for TikTok only; a TikTok profile link is required',
+    ru:'**Требования к видео**\n• Загружаемое видео должно быть ровно 1080p/60fps; выходное качество (1080p или 4K) выбирается при заказе\n• Другой формат? Возьмите «Любой формат» (от 2.99₾)\n• Макс. длительность — 59.59 с; более длинные оцениваются отдельно\n• Видео монтируется только для TikTok, нужна ссылка на TikTok-профиль'},b:['home']},
+{id:'duration',p:1,k:[K('ხანგრძლივობ|length|წამი|წამის|წამ\\b|seconds?|duration|how long is|длительн|секунд|59',2)],
+ a:{ka:'მაქს. ხანგრძლივობა — 59.59 წამი, მეტი ინდივიდუალურად ფასდება. მინიმუმ 5 წამად ითვლება. ფასი ხანგრძლივობაზეა დამოკიდებული (მაგ. 10 წმ ≈ 3.55₾, 30 წმ ≈ 10.03₾, 59 წმ ≈ 17.98₾ ცალობითზე).',
+    en:'Max duration is 59.59 s; longer videos are priced individually. The minimum billed is 5 s. Price depends on duration (e.g. 10 s ≈ 3.55₾, 30 s ≈ 10.03₾, 59 s ≈ 17.98₾ for a single order).',
+    ru:'Макс. длительность — 59.59 с, более длинные оцениваются отдельно. Минимум считается как 5 с. Цена зависит от длительности (напр. 10 с ≈ 3.55₾, 30 с ≈ 10.03₾, 59 с ≈ 17.98₾ для разового заказа).'},b:['home']},
+{id:'fourk',p:1,k:[K('4k|4კ|4к|uhd|2160|ულტრა|ultra',2)],
+ a:{ka:'4K ხარისხი ხელმისაწვდომია კვირის (35.99₾), თვის (69.99₾) პაკეტებში და ედითის შეკვეთაში (14.99₾-დან). ხარისხს ატვირთვისას/შეკვეთისას ირჩევ. ცალობითი პაკეტი 1080p/60fps-ია. MOON METHOD-ში 4K — Plan 3 (14.99₾/თვე).',
+    en:'4K is available in the Weekly (35.99₾) and Monthly (69.99₾) packages and in the Edit order (from 14.99₾). You choose quality when uploading/ordering. The Single package is 1080p/60fps. In MOON METHOD, 4K is Plan 3 (14.99₾/month).',
+    ru:'4K доступен в недельном (35.99₾) и месячном (69.99₾) пакетах и в заказе эдита (от 14.99₾). Качество выбирается при загрузке/заказе. Разовый пакет — 1080p/60fps. В MOON METHOD 4K — это Plan 3 (14.99₾/мес).'},b:['home','plans']},
+{id:'delivery',p:1,k:[K('ჩაბარ|რა ვადა|ვადაში|ვადა|როდის მივიღებ|რამდენ ხანში|დრო დასჭირდება|24 საათ|deliver|turnaround|how (fast|long)|when will|how soon|срок|когда|как быстро|доставк|сдач',2)],
+ a:{ka:'მზა ვიდეო ჩაბარდება მაქსიმუმ 24 საათში (ცალობითი, ნებისმიერი ფორმატი, ედითი). კვირის/თვის პაკეტში ვიდეოები მზადდება პაკეტის ვადის განმავლობაში. სისტემური ცვლილების შემთხვევაში — როგორც კი შესაძლებელი გახდება. მენეჯერი ვადას ჩატში დაგიდასტურებს.',
+    en:'Finished videos are delivered within 24 hours (Single, Any-format, Edit). In Weekly/Monthly packages videos are made during the package period. In case of a system change — as soon as possible. A manager confirms the deadline in the chat.',
+    ru:'Готовое видео сдаётся максимум за 24 часа (разовый, любой формат, эдит). В недельном/месячном пакете видео делаются в течение срока пакета. При системных изменениях — как только возможно. Срок подтвердит менеджер в чате.'}},
+{id:'payment',p:1,k:[K('გადახდ|გადავიხდი|გადარიცხვ|ბანკ|ბარათ|ფული|\\bpay\\b|payment|bank|transfer|card|оплат|перевод|карт|банк',2)],
+ a:{ka:'გადახდის დეტალებს მენეჯერი გიგზავნის ჩატში შეკვეთის დადასტურების შემდეგ. გადახდის მეთოდს ჩატში ირჩევ (მაგ. ბანკის გადარიცხვა). დამალული საკომისიო არ არის — ფასს წინასწარ ხედავ კალკულატორში.',
+    en:'A manager sends the payment details in the chat after confirming your order. You pick the payment method in the chat (e.g. bank transfer). No hidden fees — you see the price in the calculator beforehand.',
+    ru:'Реквизиты для оплаты менеджер присылает в чате после подтверждения заказа. Способ оплаты выбирается в чате (напр. банковский перевод). Скрытых комиссий нет — цену видно в калькуляторе заранее.'},b:['contact','discord']},
+{id:'refund',p:2,k:[K('დაბრუნ|დამიბრუნ|ბრუნ|გაუქმებ|refund|money back|cancel|возврат|вернуть|отмен',2)],
+ a:{ka:'თანხის დაბრუნება შესაძლებელია მხოლოდ ჩაბარებიდან 24 საათის განმავლობაში. თუ TikTok-მა ჩაბარების შემდეგ თავად წაშალა ან შეზღუდა ვიდეო — ეს მისი ალგორითმის ბრალია და ამ მიზეზით თანხა არ ბრუნდება. თუ ვიდეო არ დაემთხვა შეთანხმებულს — ერთხელ უფასო შესწორება გეკუთვნის.',
+    en:'Refunds are possible only within 24 hours after delivery. If TikTok itself deletes or restricts the video after delivery, that is its algorithm and no refund is given for it. If the video does not match what was agreed — you get one free correction.',
+    ru:'Возврат возможен только в течение 24 часов после сдачи. Если TikTok сам удалил или ограничил видео после сдачи — это его алгоритм, и возврат по этой причине не делается. Если видео не совпало с договорённостью — положена одна бесплатная правка.'},b:['discord']},
+{id:'fix',p:1,k:[K('შესწორ|გასწორ|ვერ მომეწონა|არ მომეწონა|არ დაემთხვა|fix|revision|correction|redo|not (what|as)|(do not|don.t) like|dislike|not happy|unhappy|не нравится|правк|исправ|переделат|не понравил',2)],
+ a:{ka:'თუ პირველი ვერსია არ დაემთხვა შეთანხმებულს, ერთხელ სრულიად უფასოდ შეგისწორებთ — დამატებითი გადახდის გარეშე. მიწერე მენეჯერს ჩატში, რა უნდა შეიცვალოს.',
+    en:'If the first version does not match what was agreed, we fix it once completely free — no extra payment. Tell the manager in the chat what should change.',
+    ru:'Если первая версия не совпала с договорённостью, мы один раз полностью бесплатно её исправим — без доплаты. Напишите менеджеру в чате, что нужно изменить.'},b:['discord']},
+{id:'deleted',p:2,k:[K('წაშალ|წაიშალ|შეზღუდ|ბანი|deleted|removed|restricted|banned|удал|заблок|ограничил',2)],
+ a:{ka:'თუ TikTok-მა ჩაბარების შემდეგ თავად წაშალა ან შეზღუდა ვიდეო — ეს მისი ალგორითმის ბრალია და ამ მიზეზით თანხა არ ბრუნდება.',
+    en:'If TikTok deletes or restricts the video after delivery, that is caused by its algorithm and no refund is given for that reason.',
+    ru:'Если TikTok удалил или ограничил видео после сдачи — это вина его алгоритма, и возврат по этой причине не делается.'}},
+{id:'discount',p:1,k:[K('გამომწერ|არხ|ფასდაკლ|subscriber|channel|discount|подписчик|канал|скидк',2)],
+ a:{ka:'ჩვენი TikTok არხის გამომწერებს: ცალობით შეკვეთაზე −10%, კვირის პაკეტზე −3₾ (შეკვეთისას მონიშნე „ვარ არხის გამომწერი"). დამატებით შეგიძლია პრომო კოდი გამოიყენო.',
+    en:'Subscribers of our TikTok channel get −10% on single orders and −3₾ on the Weekly package (tick "I am a channel subscriber" when ordering). You can also use a promo code.',
+    ru:'Подписчикам нашего TikTok-канала: −10% на разовый заказ и −3₾ на недельный пакет (отметьте «Я подписчик канала» при заказе). Также можно использовать промокод.'},b:['home']},
+{id:'promo',p:2,k:[K('პრომო|კოდი|promo|coupon|\\bcode\\b|промокод|купон',3)],
+ a:{ka:'პრომო კოდი შეიყვანე შეკვეთისას ველში „პრომო კოდი გაქვს?". ფასდაკლება კოდზეა დამოკიდებული: კვირის/თვის პაკეტზე ფიქსირებული ₾, ცალკეულ შეკვეთაზე — %. თუ კოდი არასწორია, საიტი შეგატყობინებს.',
+    en:'Enter your promo code in the "Have a promo code?" field when ordering. The discount depends on the code: a fixed ₾ amount on Weekly/Monthly packages and a % on single orders. If a code is invalid, the site tells you.',
+    ru:'Введите промокод при заказе в поле «Есть промокод?». Скидка зависит от кода: фиксированная сумма в ₾ на недельный/месячный пакет и % на разовый заказ. Если код неверный, сайт сообщит.'},b:['home']},
+{id:'method',p:1,k:[K('მეთოდ|ოპტიმიზ|optimi|moon method|метод|оптимиз|120 ?fps',2)],
+ a:{ka:'**MOON METHOD** — ვიდეოს ოპტიმიზაციის ხელსაწყო: ატვირთე ვიდეო და წამებში მიიღე დამუშავებული. უფასოდ — 3 ატვირთვა კვირაში; Plan 1 — 5.99₾/თვე (1080p/60fps), Plan 2 — 7.99₾/თვე (1080p/120fps), Plan 3 — 14.99₾/თვე (4K/120fps), ულიმიტო ატვირთვით. გამოსაყენებლად შედი ანგარიშში.',
+    en:'**MOON METHOD** — a video optimization tool: upload a video and get it processed in seconds. Free — 3 uploads per week; Plan 1 — 5.99₾/month (1080p/60fps), Plan 2 — 7.99₾/month (1080p/120fps), Plan 3 — 14.99₾/month (4K/120fps), with unlimited uploads. Sign in to use it.',
+    ru:'**MOON METHOD** — инструмент оптимизации видео: загрузите видео и получите результат за секунды. Бесплатно — 3 загрузки в неделю; Plan 1 — 5.99₾/мес (1080p/60fps), Plan 2 — 7.99₾/мес (1080p/120fps), Plan 3 — 14.99₾/мес (4K/120fps), с безлимитом загрузок. Для работы войдите в аккаунт.'},b:['method','plans']},
+{id:'plans',p:2,k:[K('plan ?[123]|5\\.99|7\\.99|14\\.99|გეგმ|план[ыа]?\\b',3)],
+ a:{ka:'**MOON METHOD-ის გეგმები**\n• უფასო — 3 ატვირთვა კვირაში (1080p/60fps)\n• Plan 1 — 5.99₾/თვე, 1080p/60fps\n• Plan 2 — 7.99₾/თვე, 1080p/120fps\n• Plan 3 — 14.99₾/თვე, 4K/120fps\nფასიან გეგმებში ატვირთვა ულიმიტოა. შესაძენად გახსენი „გეგმები".',
+    en:'**MOON METHOD plans**\n• Free — 3 uploads per week (1080p/60fps)\n• Plan 1 — 5.99₾/month, 1080p/60fps\n• Plan 2 — 7.99₾/month, 1080p/120fps\n• Plan 3 — 14.99₾/month, 4K/120fps\nPaid plans have unlimited uploads. Open "Plans" to get one.',
+    ru:'**Планы MOON METHOD**\n• Бесплатный — 3 загрузки в неделю (1080p/60fps)\n• Plan 1 — 5.99₾/мес, 1080p/60fps\n• Plan 2 — 7.99₾/мес, 1080p/120fps\n• Plan 3 — 14.99₾/мес, 4K/120fps\nВ платных планах загрузки безлимитные. Для покупки откройте «Планы».'},b:['plans']},
+{id:'checker',p:2,k:[K('ჩექერ|checker|downloader|ჩამოტვირთ|download|скачат|чекер|проверить качество',2)],
+ a:{ka:'**MOON TT DOWNLOADER / CHECKER** — ჩასვი TikTok ვიდეოს ლინკი: ჩამოტვირთავს უმაღლესი ხარისხით და გაჩვენებს, რა ხარისხშია ატვირთული შენი ვიდეო. მუსიკის ჩამოტვირთვაც შეგიძლია. იპოვი გვერდზე „ჩექერი".',
+    en:'**MOON TT DOWNLOADER / CHECKER** — paste a TikTok video link: it downloads in the highest quality and shows what quality your video was uploaded in. You can also download the music. Find it on the "Checker" page.',
+    ru:'**MOON TT DOWNLOADER / CHECKER** — вставьте ссылку на TikTok-видео: оно скачается в максимальном качестве, а также покажет, в каком качестве загружено ваше видео. Можно скачать и музыку. Раздел «Чекер».'},b:['checker']},
+{id:'contact',p:1,k:[K('კონტაქტ|დაგიკავშირ|მენეჯერ|ადმინ|ოპერატორ|ადამიან|დისკორდ|discord|contact|manager|admin|human|operator|support|связаться|менеджер|поддержк|дискорд|оператор',2)],
+ a:{ka:'მენეჯერს ჩატში ან Discord-ზე მოგვწერე — ჩვეულებრივ სწრაფად ვპასუხობთ და პირადად გიპასუხებთ.',
+    en:'Write to a manager in the chat or on Discord — we usually reply quickly and personally.',
+    ru:'Напишите менеджеру в чате или в Discord — обычно отвечаем быстро и лично.'},b:['discord','contact']},
+{id:'trust',p:1,k:[K('სანდო|ნდობ|გარანტი|სკამ|თაღლით|ფეიკ|trust|legit|scam|fake|guarantee|safe|надежн|гарант|мошенн|доверя|обман',2)],
+ a:{ka:'**რატომ ჩვენ**\n• ნამდვილი შეფასებები — გვერდის ბოლოში\n• ხელით მონტაჟი After Effects-ში, შაბლონების გარეშე\n• შეკვეთას ადასტურებს რეალური ადამიანი ჩატში\n• ფასი წინასწარ ჩანს, დამალული საკომისიო არ არის\n• გარანტია — ერთხელ უფასო შესწორება',
+    en:'**Why us**\n• Real reviews — at the bottom of the page\n• Hand-made edits in After Effects, no templates\n• A real person confirms your order in the chat\n• Price is visible upfront, no hidden fees\n• Guarantee — one free correction',
+    ru:'**Почему мы**\n• Настоящие отзывы — внизу страницы\n• Ручной монтаж в After Effects, без шаблонов\n• Заказ подтверждает реальный человек в чате\n• Цена видна заранее, скрытых комиссий нет\n• Гарантия — одна бесплатная правка'}},
+{id:'howmade',p:1,k:[K('after effects|როგორ მუშავდება|ხელით|შაბლონ|template|manual|how (do you|is it) (edit|process|make)|как (вы )?(обрабатываете|делаете)|вручную|шаблон',2)],
+ a:{ka:'თითოეული ვიდეო მუშავდება ინდივიდუალურად, ხელით, After Effects ტექნოლოგიით — ავტომატური შაბლონების გარეშე. შედეგად ვიდეო TikTok-ზე ხარისხის დაკარგვის გარეშე აიტვირთება.',
+    en:'Every video is processed individually, by hand, with After Effects — no automatic templates. As a result the video uploads to TikTok without quality loss.',
+    ru:'Каждое видео обрабатывается индивидуально, вручную, в After Effects — без автоматических шаблонов. В итоге видео загружается в TikTok без потери качества.'}},
+{id:'login',p:1,k:[K('შესვლ|შევიდ|ავტორიზ|რეგისტრაც|ანგარიშ|login|log in|sign in|sign up|account|войти|вход|регистрац|аккаунт|ტელეგრამ|telegram|телеграм',2)],
+ a:{ka:'საიტზე შესვლა შეგიძლია Discord-ით, Telegram-ით ან TikTok-ით. რამდენიმე ანგარიშის დაკავშირება შესაძლებელია ზედა მარჯვენა პროფილის მენიუდან („ანგარიშები").',
+    en:'You can sign in with Discord, Telegram or TikTok. You can link several accounts from the profile menu at the top right ("Accounts").',
+    ru:'Войти можно через Discord, Telegram или TikTok. Несколько аккаунтов можно связать в меню профиля справа вверху («Аккаунты»).'}},
+{id:'lang',p:1,k:[K('ენა|ენაზე|ქართულ|english|русск|language|язык|по-русски|in english',2)],
+ a:{ka:'საიტი ქართულად, ინგლისურად და რუსულად მუშაობს — ენა გადართე დროშით ზედა მენიუში.',
+    en:'The site works in Georgian, English and Russian — switch the language with the flag in the top menu.',
+    ru:'Сайт работает на грузинском, английском и русском — язык переключается флагом в верхнем меню.'}},
+{id:'reviews',p:1,k:[K('შეფასებ|კომენტარ|review|rating|comments?|отзыв|оценк|комментар',2)],
+ a:{ka:'ყველა შეფასება და კომენტარი რეალური კლიენტებისაა — გვერდის ბოლოშია, საშუალო შეფასებასთან ერთად.',
+    en:'All ratings and comments are from real customers — at the bottom of the page, together with the average rating.',
+    ru:'Все оценки и комментарии — от реальных клиентов, внизу страницы вместе со средней оценкой.'}}
+];
+var ME_RE=new RegExp('ჩემი (პაკეტ|გეგმ|ანგარიშ|ლიმიტ|ატვირთვ|სტატუს|გამოწერ)|რამდენი (ატვირთვა|ლიმიტი) (დამრჩა|მაქვს)|რა პაკეტი მაქვს|\\bmy (account|plan|package|limit|uploads?|status|subscription)\\b|am i (logged|signed)|how many uploads|мо(й|я|и|ё) (аккаунт|план|пакет|лимит|загрузк|статус|подписк)|сколько (у меня )?загрузок','i');
+
+/* ---------- helpers ---------- */
+function lang(){var l=(document.documentElement.getAttribute('lang')||'ka').slice(0,2).toLowerCase();return UI[l]?l:'ka'}
+function T(o){return o[lang()]||o.en}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fmt(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')}
+function norm(s){return String(s||'').toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ').trim()}
+var GREET_RE=/^\s*(გამარჯობა|გაუმარჯოს|სალამი|ჰეი|hello|hey|hi(?![a-zа-я])|привет|здравствуй(те)?|добрый (день|вечер|утро))[\s,!.?:;-]*/i;
+var THANKS_RE=/მადლობა|გმადლობ|thanks|thank you|спасибо|благодар/i;
+function kbById(id){for(var i=0;i<KB.length;i++)if(KB[i].id===id)return KB[i]}
+function bestMatch(q){
+  q=norm(q);var best=null,bs=0;
+  var g=q.match(GREET_RE);
+  if(g){q=q.slice(g[0].length).trim();if(!q)return kbById('greet')}
+  if(q.length<=32&&THANKS_RE.test(q))return kbById('thanks');
+  for(var i=0;i<KB.length;i++){
+    var e=KB[i],s=0;
+    for(var j=0;j<e.k.length;j++)if(e.k[j][0].test(q))s+=e.k[j][1];
+    if(s>0)s+=e.p||0;
+    if(s>bs){bs=s;best=e}
+  }
+  return bs>=2?best:null;
+}
+window.__mfAskMatch=function(q){if(ME_RE.test(q))return 'me';var e=bestMatch(q);return e?e.id:null};
+
+/* ---------- account (local, no network) ---------- */
+function cachedUser(){try{var r=localStorage.getItem('moon_discord_user_cache');return r?JSON.parse(r):null}catch(e){return null}}
+function userName(){var a=window.__moonAcct,u=cachedUser();
+  if(u&&(u.username||u.name))return u.username||u.name;
+  try{var pv=a&&a.providers;if(pv){var k=pv.discord||pv.telegram||pv.tiktok;if(k)return k.name||k.username||''}}catch(e){}
+  return ''}
+function isIn(){var u=cachedUser();if(u&&(u.id||u.username))return true;try{return !!(window.__moonAcct&&window.__moonAcct.accountId)}catch(e){return false}}
+function resetIn(ms){var d=ms-Date.now();if(!(d>0))return '';var days=Math.floor(d/864e5),h=Math.floor((d%864e5)/36e5);
+  var L=lang();var D=L==='ka'?'დღე':L==='ru'?'д':'d',H=L==='ka'?'სთ':L==='ru'?'ч':'h';return days?days+' '+D+' '+h+' '+H:h+' '+H}
+function accountAnswer(){
+  var L=lang();
+  if(!isIn()){
+    return {t:{ka:'ამ ბრაუზერში შესული არ ხარ, ამიტომ შენს ანგარიშს ვერ ვხედავ. შედი ანგარიშში (Discord / Telegram / TikTok) და თავიდან მკითხე.',en:"You're not signed in in this browser, so I can't see your account. Sign in (Discord / Telegram / TikTok) and ask me again.",ru:'Вы не вошли в аккаунт в этом браузере, поэтому я не вижу ваши данные. Войдите (Discord / Telegram / TikTok) и спросите снова.'}[L],b:['contact']};
+  }
+  var st=window.__moonOptStatus,nm=userName(),bits=[];
+  var head={ka:'შესული ხარ'+(nm?' როგორც **'+nm+'**':'')+'.',en:'You are signed in'+(nm?' as **'+nm+'**':'')+'.',ru:'Вы вошли'+(nm?' как **'+nm+'**':'')+'.'}[L];
+  if(st&&st.plan){
+    var pl=st.plan==='free'?{ka:'უფასო',en:'Free',ru:'Бесплатный'}[L]:('Plan '+String(st.plan).replace(/^p/i,''));
+    var line='MOON METHOD: '+pl;
+    if(st.unlimited)line+=' · '+{ka:'ულიმიტო ატვირთვა',en:'unlimited uploads',ru:'безлимитные загрузки'}[L];
+    else if(st.limit!=null){var rem=st.remaining!=null?st.remaining:0;
+      line+=' · '+{ka:'დარჩენილია ',en:'',ru:'осталось '}[L]+rem+'/'+st.limit+{ka:' ატვირთვა',en:' uploads left',ru:' загрузок'}[L];
+      var r=st.resetAt?resetIn(+st.resetAt):'';if(r)line+=' · '+{ka:'განახლდება ',en:'resets in ',ru:'обновится через '}[L]+r}
+    bits.push(line);
+  }
+  var tail={ka:'შეკვეთების და 1-კვირიანი/1-თვიანი პაკეტის სტატუსს მენეჯერი გიჩვენებს ჩატში.',en:'A manager shows your orders and Weekly/Monthly package status in the chat.',ru:'Статус заказов и недельного/месячного пакета покажет менеджер в чате.'}[L];
+  return {t:head+(bits.length?'\n'+bits.join('\n'):'')+'\n'+tail,b:['method','contact']};
+}
+
+/* ---------- DOM ---------- */
+var btn=document.createElement('button');btn.id='mfask-btn';btn.type='button';btn.setAttribute('aria-expanded','false');
+btn.innerHTML='<img src="'+LOGO+'" alt="" width="54" height="54" decoding="async" draggable="false"><i></i>';
+var panel=document.createElement('div');panel.id='mfask-panel';panel.setAttribute('role','dialog');
+panel.innerHTML='<div class="mfask-head"><div class="mfask-avatar"><img src="'+LOGO+'" alt="" width="34" height="34" decoding="async" draggable="false"></div>'
+ +'<div class="mfask-htx"><div class="mfask-title"></div><div class="mfask-sub"><span class="mfask-dot"></span><span class="mfask-subt"></span></div></div>'
+ +'<button class="mfask-x" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'
+ +'<div class="mfask-body" id="mfask-body" aria-live="polite"></div>'
+ +'<div class="mfask-foot"><div class="mfask-row"><textarea id="mfask-in" rows="1" maxlength="'+MAX_LEN+'" autocomplete="off" autocapitalize="sentences"></textarea>'
+ +'<button id="mfask-send" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>'
+ +'<label class="mfask-opt"><input type="checkbox" id="mfask-improve" checked><span class="mfask-imp"></span></label>'
+ +'<div class="mfask-note"><span class="mfask-nt"></span><a class="mfask-nl" href="'+DISCORD+'" target="_blank" rel="noopener noreferrer"></a></div></div>';
+function mount(){document.body.appendChild(btn);document.body.appendChild(panel);applyLang();}
+var body=panel.querySelector('#mfask-body'),input=panel.querySelector('#mfask-in'),sendBtn=panel.querySelector('#mfask-send'),improve=panel.querySelector('#mfask-improve');
+try{if(localStorage.getItem('moonfull4k_ask_improve')==='0')improve.checked=false}catch(e){}
+improve.addEventListener('change',function(){try{localStorage.setItem('moonfull4k_ask_improve',improve.checked?'1':'0')}catch(e){}});
+
+function applyLang(){
+  var u=UI[lang()];
+  btn.setAttribute('aria-label',u.aria);btn.title=u.aria;panel.setAttribute('aria-label',u.title);
+  panel.querySelector('.mfask-title').textContent=u.title;panel.querySelector('.mfask-subt').textContent=u.sub;
+  panel.querySelector('.mfask-x').setAttribute('aria-label',u.close);sendBtn.setAttribute('aria-label',u.send);
+  input.placeholder=u.ph;panel.querySelector('.mfask-imp').textContent=u.improve;panel.querySelector('.mfask-opt').title=u.improveTip;
+  panel.querySelector('.mfask-nt').textContent=u.note;panel.querySelector('.mfask-nl').textContent=u.noteLink;
+  if(started&&!history.length){body.innerHTML='';greet()}
+}
+var history=[],busy=false,started=false,userCount=0,lastSend=0;
+
+function scrollDown(){body.scrollTop=body.scrollHeight}
+function bubble(role,text){var el=document.createElement('div');el.className='mfask-msg '+(role==='user'?'mfask-user':'mfask-bot');
+  el.innerHTML=fmt(text);body.appendChild(el);scrollDown();return el}
+function actions(keys){
+  if(!keys||!keys.length)return;
+  var w=document.createElement('div');w.className='mfask-acts';
+  keys.forEach(function(k,i){var a=ACT[k];if(!a)return;
+    var c=document.createElement('button');c.type='button';c.className='mfask-chip mfask-act';c.textContent=T(a);c.style.animationDelay=(60+i*40)+'ms';
+    c.addEventListener('click',function(){
+      if(a.u){window.open(a.u,'_blank','noopener,noreferrer')}
+      else if(a.g){var b=document.querySelector('.mn-link[data-mn="'+a.g+'"]');if(b){b.click();if(window.matchMedia('(max-width:480px)').matches)close()}}
+    });w.appendChild(c)});
+  if(w.children.length){body.appendChild(w);scrollDown()}
+}
+function typing(on){var t=body.querySelector('.mfask-typing');
+  if(on&&!t){t=document.createElement('div');t.className='mfask-typing';t.innerHTML='<i></i><i></i><i></i>';body.appendChild(t);scrollDown()}
+  else if(!on&&t)t.remove()}
+function chips(){
+  if(body.querySelector('.mfask-sugg'))return;
+  var w=document.createElement('div');w.className='mfask-sugg';
+  UI[lang()].chips.forEach(function(q,i){var c=document.createElement('button');c.type='button';c.className='mfask-chip';c.textContent=q;c.style.animationDelay=(80+i*45)+'ms';
+    c.addEventListener('click',function(){ask(q)});w.appendChild(c)});
+  body.appendChild(w)}
+function dropChips(){var s=body.querySelector('.mfask-sugg');if(s)s.remove()}
+function greet(){bubble('assistant',UI[lang()].hello);chips()}
+
+function open(){
+  panel.classList.add('mfask-open');btn.setAttribute('aria-expanded','true');
+  if(!started){started=true;greet()}
+  setTimeout(function(){try{input.focus({preventScroll:true})}catch(e){}},50);
+}
+function close(){panel.classList.remove('mfask-open');btn.setAttribute('aria-expanded','false');resetVV()}
+
+function finish(text,b,store){typing(false);bubble('assistant',text);if(store!==false)history.push({role:'assistant',content:text});actions(b);busy=false;sendBtn.disabled=false;
+  if(!window.matchMedia('(pointer:coarse)').matches)try{input.focus({preventScroll:true})}catch(e){}}
+function fallbackText(){return {ka:'ზუსტი პასუხი ვერ მოვძებნე. მენეჯერს Discord-ზე ან საიტის ჩატში მოწერე — სწრაფად გიპასუხებს.',en:"I couldn't find an exact answer. Ask a manager on Discord or in the site chat — they'll reply quickly.",ru:'Точного ответа не нашёл. Напишите менеджеру в Discord или в чате на сайте — он быстро ответит.'}[lang()]}
+
+function ask(text){
+  var q=String(text||input.value||'').trim().slice(0,MAX_LEN);
+  if(!q||busy)return;
+  var now=Date.now();if(now-lastSend<500)return;lastSend=now;
+  dropChips();bubble('user',q);input.value='';input.style.height='';input.style.overflowY='hidden';history.push({role:'user',content:q});
+  userCount++;
+  busy=true;sendBtn.disabled=true;typing(true);
+  if(userCount>MAX_USER_MSGS){setTimeout(function(){finish({ka:'ამ საუბრისთვის შეკითხვების ლიმიტი ამოიწურა. გააგრძელე მენეჯერთან Discord-ზე.',en:'The question limit for this chat is reached. Please continue with a manager on Discord.',ru:'Лимит вопросов в этом чате исчерпан. Продолжите с менеджером в Discord.'}[lang()],['discord'])},250);return}
+  if(ME_RE.test(q)){var A=accountAnswer();
+    var go=function(){setTimeout(function(){finish(A.t,A.b)},320)};
+    if(isIn()&&!window.__moonOptStatus&&window.__moonOptRefresh){try{Promise.race([window.__moonOptRefresh(),new Promise(function(r){setTimeout(r,1500)})]).then(function(){A=accountAnswer();go()},function(){go()})}catch(e){go()}}else go();
+    return}
+  var e=bestMatch(q);
+  if(e){setTimeout(function(){finish(T(e.a),e.b)},300+Math.min(500,T(e.a).length*1.2));return}
+  /* no local match -> backend (LLM with the same knowledge), with a safe fallback */
+  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort()},25000);
+  var view='';try{var a=document.querySelector('.mn-link.active');view=a?a.getAttribute('data-mn')||'':''}catch(e2){}
+  fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl?ctl.signal:undefined,
+    body:JSON.stringify({messages:history.slice(-8),page:(location.pathname||'/')+(view?'#'+view:''),lang:lang(),improve:improve.checked===true})})
+  .then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d}},function(){return{ok:false,d:null}})})
+  .then(function(res){clearTimeout(tm);var rp=res.d&&res.d.reply?String(res.d.reply):'';
+    if(!res.ok||!rp){finish(fallbackText(),['discord','contact'],false);history.pop();return}
+    finish(rp.slice(0,1500),['discord'].filter(function(){return /discord|manager|მენეჯერ|менеджер/i.test(rp)}))})
+  .catch(function(){clearTimeout(tm);finish(fallbackText(),['discord','contact'],false);history.pop()});
+}
+
+/* ---------- iOS keyboard / small screens ---------- */
+var vv=window.visualViewport;
+function fitVV(){
+  if(!vv||!panel.classList.contains('mfask-open')||!window.matchMedia('(max-width:480px)').matches)return;
+  var kb=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+  if(kb>80){panel.style.bottom=(kb+8)+'px';panel.style.height=Math.max(220,vv.height-20)+'px'}else resetVV();
+}
+function resetVV(){panel.style.bottom='';panel.style.height=''}
+if(vv){vv.addEventListener('resize',fitVV);vv.addEventListener('scroll',fitVV)}
+
+/* ---------- events ---------- */
+btn.addEventListener('click',function(){panel.classList.contains('mfask-open')?close():open()});
+panel.querySelector('.mfask-x').addEventListener('click',function(){close();btn.focus({preventScroll:true})});
+sendBtn.addEventListener('click',function(){ask()});
+input.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();ask()}e.stopPropagation()});
+input.addEventListener('keyup',function(e){e.stopPropagation()});
+function fitIn(){input.style.height='auto';var h=input.scrollHeight;input.style.height=Math.max(42,Math.min(h,96))+'px';input.style.overflowY=h>96?'auto':'hidden'}
+input.addEventListener('input',fitIn);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&panel.classList.contains('mfask-open')){close()}});
+try{new MutationObserver(function(){applyLang()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']})}catch(e){}
+if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
+})();
+</script>
 
 <style id="moon-gate-v2">
 /* ===== sign-in sheet (Zilem-like) ===== */
