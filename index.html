@@ -18203,6 +18203,114 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       }
       return boxes;
     }
+    // ---- Real ENCODED size of a video track (what the pictures really are), read from the SPS inside
+    // avcC / hvcC (cropping applied), else from the sample entry. tkhd only holds the size a muxer
+    // chose to DISPLAY -- it can say 1080x1080 for a file that is really 576p. ----
+    function ttdlBits(d){
+      return {
+        d: d, p: 0,
+        bit: function(){ const i = this.p >> 3; if (i >= this.d.length) throw new Error('eof'); const b = (this.d[i] >> (7 - (this.p & 7))) & 1; this.p++; return b; },
+        u: function(n){ let v = 0; for (let i = 0; i < n; i++) v = v * 2 + this.bit(); return v; },
+        skip: function(n){ this.p += n; },
+        ue: function(){ let z = 0; while (this.bit() === 0) { if (++z > 31) throw new Error('ue'); } return z === 0 ? 0 : (Math.pow(2, z) - 1 + this.u(z)); },
+        se: function(){ const k = this.ue(); return (k & 1) ? (k + 1) / 2 : -(k / 2); }
+      };
+    }
+    function ttdlUnescape(buf, from, to){
+      const out = []; let z = 0;
+      for (let i = from; i < to; i++) { const b = buf[i]; if (z >= 2 && b === 3) { z = 0; continue; } out.push(b); z = b === 0 ? z + 1 : 0; }
+      return Uint8Array.from(out);
+    }
+    function ttdlAvcSize(buf, s, e){
+      try {
+        if (s + 8 > e || (buf[s + 5] & 31) < 1) return null;
+        const len = (buf[s + 6] << 8) | buf[s + 7], ns = s + 8;
+        if (len < 4 || ns + len > e || ns + len > buf.length) return null;
+        const r = ttdlBits(ttdlUnescape(buf, ns + 1, ns + len));
+        const profile = r.u(8); r.skip(16); r.ue();
+        let chroma = 1;
+        if ([100, 110, 122, 244, 44, 83, 86, 118, 128, 138, 139, 134, 135].indexOf(profile) >= 0) {
+          chroma = r.ue(); if (chroma === 3) r.skip(1);
+          r.ue(); r.ue(); r.skip(1);
+          if (r.bit() === 1) {
+            const n = chroma !== 3 ? 8 : 12;
+            for (let i = 0; i < n; i++) if (r.bit() === 1) {
+              const size = i < 6 ? 16 : 64; let last = 8, next = 8;
+              for (let j = 0; j < size; j++) { if (next !== 0) next = (last + r.se() + 256) % 256; last = next === 0 ? last : next; }
+            }
+          }
+        }
+        r.ue(); const poc = r.ue();
+        if (poc === 0) r.ue();
+        else if (poc === 1) { r.skip(1); r.se(); r.se(); const n = r.ue(); for (let i = 0; i < n; i++) r.se(); }
+        r.ue(); r.skip(1);
+        const wm = r.ue() + 1, hm = r.ue() + 1, fmo = r.bit();
+        if (fmo === 0) r.skip(1);
+        r.skip(1);
+        let cl = 0, cr = 0, ct = 0, cb = 0;
+        if (r.bit() === 1) { cl = r.ue(); cr = r.ue(); ct = r.ue(); cb = r.ue(); }
+        const subW = (chroma === 1 || chroma === 2) ? 2 : 1, subH = chroma === 1 ? 2 : 1;
+        const cx = chroma === 0 ? 1 : subW, cy = (chroma === 0 ? 1 : subH) * (2 - fmo);
+        const w = wm * 16 - cx * (cl + cr), h = (2 - fmo) * hm * 16 - cy * (ct + cb);
+        return (w > 0 && h > 0) ? [w, h] : null;
+      } catch (e) { return null; }
+    }
+    function ttdlHevcSize(buf, s, e){
+      try {
+        if (s + 23 > e) return null;
+        const arrays = buf[s + 22]; let p = s + 23;
+        for (let a = 0; a < arrays; a++) {
+          if (p + 3 > e) return null;
+          const type = buf[p] & 63, count = (buf[p + 1] << 8) | buf[p + 2]; p += 3;
+          for (let n = 0; n < count; n++) {
+            if (p + 2 > e) return null;
+            const len = (buf[p] << 8) | buf[p + 1]; p += 2;
+            if (p + len > e) return null;
+            if (type === 33 && len > 6) {
+              const r = ttdlBits(ttdlUnescape(buf, p + 2, p + len));
+              r.skip(4); const maxSub = r.u(3); r.skip(1); r.skip(96);
+              const sp = [], sl = [];
+              for (let i = 0; i < maxSub; i++) { sp[i] = r.bit() === 1; sl[i] = r.bit() === 1; }
+              if (maxSub > 0) for (let i = maxSub; i < 8; i++) r.skip(2);
+              for (let i = 0; i < maxSub; i++) { if (sp[i]) r.skip(88); if (sl[i]) r.skip(8); }
+              r.ue(); const chroma = r.ue(); if (chroma === 3) r.skip(1);
+              const w0 = r.ue(), h0 = r.ue();
+              let cl = 0, cr = 0, ct = 0, cb = 0;
+              if (r.bit() === 1) { cl = r.ue(); cr = r.ue(); ct = r.ue(); cb = r.ue(); }
+              const subW = (chroma === 1 || chroma === 2) ? 2 : 1, subH = chroma === 1 ? 2 : 1;
+              const w = w0 - subW * (cl + cr), h = h0 - subH * (ct + cb);
+              return (w > 0 && h > 0) ? [w, h] : null;
+            }
+            p += len;
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+    function ttdlCodedSize(buf, mdiaBoxes){
+      try {
+        const minf = mdiaBoxes.find(b => b.type === 'minf'); if (!minf) return null;
+        const stbl = readMp4Boxes(buf, minf.start, minf.end).find(b => b.type === 'stbl'); if (!stbl) return null;
+        const stsd = readMp4Boxes(buf, stbl.start, stbl.end).find(b => b.type === 'stsd'); if (!stsd) return null;
+        const e = stsd.start + 8;
+        if (e + 36 > stsd.end || e + 36 > buf.length) return null;
+        const esz = readUint32(buf, e);
+        const eend = Math.min(esz >= 36 ? e + esz : stsd.end, stsd.end, buf.length);
+        const sw = (buf[e + 32] << 8) | buf[e + 33], sh = (buf[e + 34] << 8) | buf[e + 35];
+        if (e + 86 < eend) {
+          for (const c of readMp4Boxes(buf, e + 86, eend)) {
+            let r = null;
+            if (c.type === 'avcC') r = ttdlAvcSize(buf, c.start, c.end);
+            else if (c.type === 'hvcC') r = ttdlHevcSize(buf, c.start, c.end);
+            else continue;
+            if (r) return r;
+            break;
+          }
+        }
+        if (sw > 0 && sh > 0) return [sw, sh];
+      } catch (e) {}
+      return null;
+    }
     // Reads BOTH the real pixel width/height AND the frame rate straight
     // from the MP4 container's own structure (moov > trak > tkhd for
     // dimensions, ...stbl > stts for frame rate) -- pure box-parsing, no
@@ -18246,6 +18354,20 @@ TikTok პროფილი: ${getTiktokValue('mp')}
               if (w > 0 && h > 0) { width = w; height = h; }
             }
           }
+
+          // ---- the real encoded size wins over tkhd (display size only); 90/270 degree rotation swaps it ----
+          try {
+            let rotated = false;
+            if (tkhd && tkhd.start < buf.length) {
+              const mo = tkhd.start + 4 + (buf[tkhd.start] === 1 ? 32 : 20) + 8 + 4 + 4;
+              if (mo + 8 <= buf.length) {
+                const ma = (readUint32(buf, mo) | 0) / 65536, mb = (readUint32(buf, mo + 4) | 0) / 65536;
+                rotated = Math.abs(ma) < 0.01 && Math.abs(mb) > 0.5;
+              }
+            }
+            const cs = ttdlCodedSize(buf, mdiaBoxes);
+            if (cs) { width = rotated ? cs[1] : cs[0]; height = rotated ? cs[0] : cs[1]; }
+          } catch (e) {}
 
           // ---- fps from stbl > stts, and precise duration from mdhd
           // itself. mdhd stores duration in "timescale" units (not
@@ -18367,11 +18489,10 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     async function probeMp4Info(url){
       const empty = { width: null, height: null, fps: null, durationSec: null };
       if (!url) return empty;
-      if (ttdlProbeCache.has(url)) return ttdlProbeCache.get(url);
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 15000);
       try {
-        const res = await fetch(url, { signal: controller.signal });
+        const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
         if (!res.ok || !res.body) return empty;
         let r = await ttdlReadUntilMoov(res, controller, 4 * 1024 * 1024);
         if (r && r.jump) {
@@ -18385,7 +18506,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         }
         if (!r || !r.done) return empty;
         const info = parseTrackInfoFromMp4Buffer(r.done);
-        if (info.width || info.fps != null) ttdlProbeCache.set(url, info);
         return info;
       } catch (e) {
         return empty;
@@ -18401,17 +18521,16 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     async function ttdlFetchMeta(url){
       const key = url.replace(/[?#].*$/, '').replace(/\/+$/, '');
       const hit = ttdlMetaCache.get(key);
-      if (hit && Date.now() - hit.t < 600000) return hit.json;
       const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
       let lastErr = null;
       for (let attempt = 0; attempt < 4; attempt++) {
         const ctl = new AbortController();
         const timer = setTimeout(() => ctl.abort(), 12000);
         try {
-          const res = await fetch(api, { signal: ctl.signal });
+          const res = await fetch(api, { signal: ctl.signal, cache: 'no-store' });
           const json = await res.json();
           clearTimeout(timer);
-          if (json && json.code === 0 && json.data) { ttdlMetaCache.set(key, { t: Date.now(), json }); return json; }
+          if (json && json.code === 0 && json.data) { return json; }
           const msg = String((json && json.msg) || '');
           if (/limit/i.test(msg) && attempt < 3) { await new Promise(r => setTimeout(r, 1100)); continue; }
           return json;
