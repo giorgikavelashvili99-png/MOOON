@@ -13168,6 +13168,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       setTimeout(closeMessengerPage, 2500);
     });
     messengerSocket.on('order_cancelled', () => {
+      if (window.__moonLocalCancel) return;
       appendSystemMessage(currentLang === 'ka' ? 'შეკვეთა გაუქმდა' : 'Order cancelled');
       setTimeout(closeMessengerPage, 2500);
     });
@@ -13978,6 +13979,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     //    only while it is quick; a slow/asleep server never blocks them
     //    -- the queue keeps retrying after the reload.
     try{
+      window.__moonLocalCancel = true;
       if (messengerSocket) messengerSocket.emit('cancel_order', { orderId: orderId });
     }catch(e){ console.error('[MOON] cancel_order emit failed', e); }
     try{
@@ -27369,7 +27371,7 @@ function build(){
  el.innerHTML='<input type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv" multiple hidden>'+
   '<div class="mcu-card"><span class="mcu-ic"></span><div class="mcu-tx"><b></b><span></span></div><span class="mcu-pct">0%</span><button type="button" class="mcu-btn mcu-pick"></button><button type="button" class="mcu-btn mcu-retry" hidden></button><div class="mcu-bar"><i></i></div></div>'+
   '';
- row.parentNode.insertBefore(el,row);
+ var __ms=page.querySelector('#messengerMessages'); if(__ms&&__ms.parentNode===page) page.insertBefore(el,__ms); else row.parentNode.insertBefore(el,row);
  var inp=el.querySelector('input'),card=el.querySelector('.mcu-card');
  el.querySelector('.mcu-pick').addEventListener('click',function(){inp.click();});
  el.querySelector('.mcu-retry').addEventListener('click',function(){if(pendingFiles.length)startMany(pendingFiles);else inp.click();});
@@ -28291,7 +28293,7 @@ html body .pc-modal-scrim .pc-modal-close:not(#_a):not(#_b):not(#_c):not(#_d){wi
 html body .pc-modal-scrim .wizard-step-dot:not(#_a):not(#_b){display:grid!important;place-items:center;position:relative;padding:0!important;line-height:1!important;box-sizing:border-box}
 html body .wizard-step.is-done .wizard-step-dot:not(#_a):not(#_b){font-size:0!important}
 html body .wizard-step.is-done .wizard-step-dot:not(#_a):not(#_b)::before{content:""!important;display:block;position:absolute;inset:0;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23042b04' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 12.8l4.2 4.2L18.5 7.5'/%3E%3C/svg%3E") center/56% no-repeat}
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 12.8l4.2 4.2L18.5 7.5'/%3E%3C/svg%3E") center/56% no-repeat}
 
 html body .pc-feature .pc-check:not(#_a):not(#_b)::before,html body .pc-feature .pc-check:not(#_a):not(#_b)::after{display:none!important;content:none!important}
 html body .pricing-cards.pc-scroll-mode .pc-scroll-track:not(#_a):not(#_b){overscroll-behavior-x:contain}
@@ -28320,8 +28322,9 @@ html body .pricing-cards .pc-dot:not(#_a):not(#_b){width:8px;height:8px;backgrou
 html body .pricing-cards .pc-dot.is-active:not(#_a):not(#_b){width:26px;background:#38d5ff;box-shadow:0 0 10px rgba(56,213,255,.7)}
 
 /* account pill: logo/avatar + label centred */
-html body .hz-acct:not(#_a):not(#_b):not(#_c){justify-content:center!important;padding:0 36px!important;min-width:132px;position:relative}
+html body .hz-acct:not(#_a):not(#_b):not(#_c){justify-content:flex-start!important;padding:0 34px 0 11px!important;min-width:0!important;position:relative}
 html body .hz-acct .hz-acct-chev:not(#_a):not(#_b){position:absolute;right:12px;top:50%;margin-top:-8px}
+html body .hz-acct:has(.hz-pv):not(#_a):not(#_b):not(#_c):not(#_d){justify-content:flex-start!important;padding:0 34px 0 8px!important;min-width:0!important}
 </style>
 
 <style id="moon-fonts-latin">
@@ -28404,6 +28407,9 @@ html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-card,html bo
 </style>
 <style id="moon-modal-pin">
 /* phone order window: fixed position - no dependence on header height / viewport units that can change after opening */
+@media (min-width:701px) and (max-height:980px){
+html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)>.pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){margin-top:66px!important}
+}
 @media (max-width:700px){
 html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c):not(#_d){padding-top:88px!important}
 html body .pc-modal-scrim>.pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d){margin-top:clamp(36px,8svh,84px)!important}
@@ -28411,8 +28417,8 @@ html body .pc-modal-scrim>.pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):no
 </style>
 <style id="moon-gate-cosmic">
 /* login window: cosmic colours, buttons on one grid (icon column | centred text | balance column), clean "continue as guest" */
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]){background-color:#07051a!important;background-image:radial-gradient(90% 55% at 50% -5%,rgba(118,78,255,.34),transparent 70%),radial-gradient(75% 55% at 100% 100%,rgba(34,195,255,.20),transparent 70%),radial-gradient(60% 45% at 0% 70%,rgba(200,70,255,.14),transparent 70%)!important}
-html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) .dg-card:not(#_a):not(#_b):not(#_c):not(#_d){background:radial-gradient(120% 60% at 10% 0%,rgba(124,92,255,.40),transparent 62%),radial-gradient(90% 70% at 100% 100%,rgba(34,195,255,.24),transparent 64%),radial-gradient(70% 45% at 50% 55%,rgba(190,80,255,.10),transparent 72%),linear-gradient(180deg,#130d30,#0a0822)!important;border:1px solid rgba(150,130,255,.34)!important;box-shadow:0 0 44px -14px rgba(124,92,255,.55),inset 0 1px 0 rgba(255,255,255,.08)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]){background-color:#07051a!important;background-image:radial-gradient(90% 50% at 50% -5%,rgba(118,78,255,.24),transparent 70%)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) .dg-card:not(#_a):not(#_b):not(#_c):not(#_d){background:radial-gradient(120% 60% at 10% 0%,rgba(124,92,255,.40),transparent 62%),radial-gradient(70% 45% at 50% 55%,rgba(190,80,255,.10),transparent 72%),linear-gradient(180deg,#130d30,#0a0822)!important;border:1px solid rgba(150,130,255,.34)!important;box-shadow:none!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d){display:grid!important;grid-template-columns:24px minmax(0,1fr) 24px!important;align-items:center!important;justify-content:stretch!important;column-gap:12px!important;gap:0 12px!important;padding:0 18px!important;min-height:54px!important;height:54px!important;box-sizing:border-box!important;text-align:center!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d)>svg{grid-column:1!important;width:24px!important;height:24px!important;justify-self:center!important;margin:0!important}
 html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d)>span{grid-column:2!important;text-align:center!important;white-space:nowrap!important;min-width:0!important;overflow:hidden!important;text-overflow:clip!important;margin:0!important}
@@ -28425,6 +28431,234 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not
 html:not([lang="ka"]) html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) #discordJoinBtn>span{white-space:normal!important;line-height:1.2!important;font-size:12.5px!important}
 html:not([lang="ka"]) html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not([data-mode="banned"]) #discordJoinBtn{height:auto!important;min-height:54px!important;padding-top:7px!important;padding-bottom:7px!important}
 </style>
+<style id="moon-gate-cosmic2">
+/* login buttons v2: cosmic glass-gradient buttons, glossy edge, light sweep on hover, icon chip */
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){position:relative!important;overflow:hidden!important;height:58px!important;min-height:58px!important;border-radius:20px!important;border:1px solid rgba(255,255,255,.30)!important;background-origin:border-box!important;background-clip:border-box!important;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.4);grid-template-columns:38px minmax(0,1fr) 38px!important;padding:0 10px!important;column-gap:10px!important;filter:none!important;transition:transform .2s ease,box-shadow .25s ease,filter .25s ease!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,0) 52%) border-box,linear-gradient(180deg,#5663e8,#3a45c4) border-box!important;box-shadow:0 14px 30px -12px rgba(88,101,242,.85),0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.38)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,0) 52%) border-box,linear-gradient(180deg,#269ad2,#1377ad) border-box!important;box-shadow:0 14px 30px -12px rgba(34,158,217,.75),0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.38)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,0) 52%) border-box,linear-gradient(180deg,#e63457,#c4133b) border-box!important;box-shadow:0 14px 30px -12px rgba(254,44,85,.7),0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.38)!important}
+
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){background:linear-gradient(180deg,rgba(17,24,58,.9),rgba(8,12,32,.9)) padding-box,linear-gradient(140deg,rgba(125,225,255,.6),rgba(80,130,255,.45) 50%,rgba(34,195,255,.3)) border-box!important;border:1px solid transparent!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important;color:#e6edff!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)>svg{width:38px!important;height:38px!important;padding:8px!important;box-sizing:border-box!important;border-radius:13px!important;background:rgba(255,255,255,.18)!important;fill:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)>svg{background:rgba(70,120,255,.22)!important;fill:#bcd0ff!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::after{content:""!important;display:block!important;position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.34) 50%,transparent 62%);transform:translateX(-130%);pointer-events:none;border-radius:inherit;will-change:transform;animation:dgIdleSheen 5.2s ease-in-out infinite!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)>span{position:relative!important;top:.085em!important}
+html:not([lang="ka"]) body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)>span{top:-.01em!important}
+
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::after{animation-delay:1.3s!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::after{animation-delay:2.6s!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::after{animation-delay:3.9s!important}
+@keyframes dgIdleSheen{0%,58%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+@keyframes dgHoverSheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):active::after{animation:dgHoverSheen .7s cubic-bezier(.22,.8,.3,1) 1 both!important}
+@media (hover:hover){html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover::after{animation:dgHoverSheen .8s cubic-bezier(.22,.8,.3,1) 1 both!important}html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover{filter:brightness(1.07)!important;transform:translateY(-1px)!important}}
+</style>
+<style id="moon-modal-cosmic">
+/* ===== order windows v2: aurora-border glass, orb icon, tall glossy buttons, calm hover shine ===== */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){--mc:var(--pc-accent,#7c8fff);border:1.5px solid transparent!important;border-radius:28px!important;background:radial-gradient(120% 48% at 8% 0%,color-mix(in srgb,var(--mc) 28%,transparent),transparent 64%) padding-box,radial-gradient(100% 55% at 100% 100%,rgba(56,189,248,.20),transparent 64%) padding-box,radial-gradient(60% 36% at 50% 52%,rgba(60,120,255,.08),transparent 74%) padding-box,linear-gradient(180deg,#0f1636,#070a1f) padding-box,linear-gradient(140deg,rgba(125,225,255,.55),rgba(80,130,255,.45) 48%,rgba(34,195,255,.30)) border-box!important;box-shadow:0 34px 90px -26px rgba(0,0,0,.8),0 0 64px -24px color-mix(in srgb,var(--mc) 60%,transparent),inset 0 1px 0 rgba(255,255,255,.09)!important}
+html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round'%3E%3Cpath d='M6.5 6.5l11 11M17.5 6.5l-11 11'/%3E%3C/svg%3E"),linear-gradient(135deg,#1d2a66,#0e1640)!important;border:1px solid rgba(130,170,255,.5)!important;box-shadow:0 0 20px -4px rgba(60,120,255,.7)!important}
+/* stepper */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-steps{align-items:center!important;gap:0!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step{gap:0!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step-dot{width:26px!important;height:26px!important;font-size:12.5px!important;border:1.5px solid transparent!important;background:linear-gradient(180deg,rgba(17,24,58,.96),rgba(8,12,32,.96)) padding-box,linear-gradient(140deg,rgba(125,225,255,.55),rgba(80,130,255,.45) 48%,rgba(34,195,255,.30)) border-box!important;color:#c5d2f5!important;box-shadow:none!important;filter:none!important;animation:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.wizard-step.is-active,.wizard-step.is-done) .wizard-step-dot{background:var(--mc) border-box!important;background-origin:border-box!important;background-clip:border-box!important;border-color:transparent!important;color:#fff!important;box-shadow:none!important;animation:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step-dot::after{display:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step-line{height:3px!important;margin:0!important;align-self:center!important;border-radius:0!important;background:rgba(140,170,255,.22)!important;box-shadow:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wizard-step-line.is-done{background:var(--mc)!important;box-shadow:none!important}
+/* info rows */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.simple-scan-ok,.tt-skip-note,.wizard-question){border:1px solid transparent!important;border-radius:18px!important;background:linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(120deg,color-mix(in srgb,var(--mc) 70%,transparent),rgba(80,130,255,.45),rgba(56,189,248,.45)) border-box!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 12px 28px -18px color-mix(in srgb,var(--mc) 60%,transparent)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .simple-scan-ok-check{background:linear-gradient(145deg,var(--mc),color-mix(in srgb,var(--mc) 78%,#000))!important;color:#fff!important;box-shadow:0 0 16px color-mix(in srgb,var(--mc) 60%,transparent)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .sr-reset-btn{background:rgba(255,255,255,.07)!important;border:1px solid rgba(140,170,255,.4)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .sr-transfer-q{color:#ecf1ff!important;font-size:15.5px!important;line-height:1.5!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wc-price-label{color:#c5d2f5!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wc-price-value{color:#fff!important;font-size:30px!important;text-shadow:0 0 24px color-mix(in srgb,var(--mc) 80%,transparent)!important}
+/* inputs */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.link-input-wrap,.num-input){border:1px solid transparent!important;border-radius:16px!important;background:linear-gradient(180deg,rgba(8,6,28,.82),rgba(8,6,28,.82)) padding-box,linear-gradient(120deg,rgba(140,170,255,.45),rgba(56,189,248,.3)) border-box!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.link-input-wrap:focus-within,.num-input:focus){background:linear-gradient(180deg,rgba(8,6,28,.9),rgba(8,6,28,.9)) padding-box,linear-gradient(140deg,color-mix(in srgb,var(--mc) 88%,#fff),color-mix(in srgb,var(--mc) 78%,#000) 50%,rgba(56,189,248,.8)) border-box!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--mc) 18%,transparent)!important}
+/* drop zone = glowing portal */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .drop-zone{border:1.5px solid transparent!important;border-radius:26px!important;background:radial-gradient(85% 70% at 50% 0%,color-mix(in srgb,var(--mc) 30%,transparent),transparent 70%) padding-box,radial-gradient(70% 60% at 50% 120%,rgba(56,189,248,.16),transparent 70%) padding-box,linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(140deg,rgba(125,225,255,.55),rgba(80,130,255,.45) 48%,rgba(34,195,255,.30)) border-box!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 40px -22px color-mix(in srgb,var(--mc) 60%,transparent)!important;transition:box-shadow .3s ease,filter .3s ease}
+@media (hover:hover){html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .drop-zone:hover{background:radial-gradient(85% 70% at 50% 0%,color-mix(in srgb,var(--mc) 40%,transparent),transparent 70%) padding-box,radial-gradient(70% 60% at 50% 120%,rgba(56,189,248,.22),transparent 70%) padding-box,linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(140deg,color-mix(in srgb,var(--mc) 88%,#fff),color-mix(in srgb,var(--mc) 78%,#000) 50%,rgba(56,189,248,.8)) border-box!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 4px color-mix(in srgb,var(--mc) 14%,transparent),0 22px 48px -20px color-mix(in srgb,var(--mc) 75%,transparent)!important}}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .dz-icon{width:48px!important;height:48px!important;border:0!important;border-radius:50%!important;background:var(--mc)!important;background-image:none!important;box-shadow:none!important;filter:none!important;animation:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .dz-icon::before,html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .dz-icon::after{display:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .dz-icon svg{width:22px!important;height:22px!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .dz-title{color:#f1eeff!important;font-size:16px!important;font-weight:700!important;line-height:1.45!important}
+/* primary buttons: tall, glossy, aurora fill, light sweep */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-yes,.wizard-confirm-btn,.order-btn.chat){position:relative!important;overflow:hidden!important;min-height:56px!important;border:1px solid rgba(255,255,255,.30)!important;border-radius:18px!important;background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 52%) border-box,linear-gradient(180deg,color-mix(in srgb,var(--mc) 90%,#fff),color-mix(in srgb,var(--mc) 92%,#000)) border-box!important;background-origin:border-box!important;background-clip:border-box!important;color:#fff!important;font-weight:700!important;text-shadow:0 1px 2px rgba(0,0,0,.45)!important;box-shadow:0 14px 30px -12px color-mix(in srgb,var(--mc) 80%,transparent),0 0 0 1px color-mix(in srgb,var(--mc) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.35)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-yes,.wizard-confirm-btn,.order-btn.chat)::after{content:""!important;display:block!important;position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.36) 50%,transparent 62%);transform:translateX(-130%);transition:transform .8s cubic-bezier(.22,.8,.3,1);pointer-events:none;border-radius:inherit}
+@media (hover:hover){html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-yes,.wizard-confirm-btn,.order-btn.chat):hover::after{transform:translateX(130%)}html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-yes,.wizard-confirm-btn,.order-btn.chat):hover{box-shadow:0 18px 38px -12px color-mix(in srgb,var(--mc) 90%,transparent),0 0 0 1px color-mix(in srgb,var(--mc) 55%,transparent),0 0 30px -4px color-mix(in srgb,var(--mc) 60%,transparent),inset 0 1px 0 rgba(255,255,255,.45)!important;filter:brightness(1.06)}}
+/* secondary buttons: glass with aurora edge */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-no,.tt-auto-btn,.tt-skip-note button){min-height:56px!important;border:1px solid transparent!important;border-radius:18px!important;background:linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(140deg,rgba(125,225,255,.55),rgba(80,130,255,.45) 48%,rgba(34,195,255,.30)) border-box!important;color:#ecf1ff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .tt-skip-note button{min-height:0!important;border-radius:12px!important}
+@media (hover:hover){html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-no,.tt-auto-btn,.tt-skip-note button):hover{background:linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(140deg,color-mix(in srgb,var(--mc) 88%,#fff),color-mix(in srgb,var(--mc) 78%,#000) 50%,rgba(56,189,248,.8)) border-box!important;box-shadow:0 0 26px -6px color-mix(in srgb,var(--mc) 65%,transparent)!important;color:#fff!important}}
+/* quality cards: fill the window, aurora edge, glow on hover */
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) #qualityFieldWrap:not(.wizard-step-hidden){display:flex!important;flex-direction:column;flex:1 1 auto;margin:0!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) #qualityFieldWrap .field-top{flex:none;margin-bottom:12px!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) #qualityGrid{flex:1 1 auto;grid-auto-rows:minmax(150px,1fr)!important;gap:12px!important;grid-template-columns:1fr 1fr!important;width:100%!important;max-width:none!important;margin:0!important;justify-content:stretch!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .quality-btn{position:relative;overflow:hidden;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:12px!important;padding-top:8px!important;min-height:150px!important;width:100%!important;max-width:none!important;border-radius:22px!important;border:1.5px solid transparent!important;background:radial-gradient(90% 75% at 50% 0%,color-mix(in srgb,var(--mc) 26%,transparent),transparent 72%) padding-box,linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(140deg,rgba(125,225,255,.55),rgba(80,130,255,.45) 48%,rgba(34,195,255,.30)) border-box!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;transform:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .quality-btn .q-res{font-size:32px!important;font-weight:800!important;line-height:1!important;color:#fff!important;text-shadow:0 0 24px color-mix(in srgb,var(--mc) 70%,transparent)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .quality-btn .q-fps{background:rgba(255,255,255,.08)!important;border:1px solid rgba(190,175,255,.38)!important;color:#e4ebff!important;border-radius:999px!important;padding:4px 13px!important;font-size:11px!important;letter-spacing:.06em!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .quality-btn::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.2) 50%,transparent 62%);transform:translateX(-130%);transition:transform .8s cubic-bezier(.22,.8,.3,1);pointer-events:none}
+@media (hover:hover){html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .quality-btn:hover{background:radial-gradient(90% 75% at 50% 0%,color-mix(in srgb,var(--mc) 38%,transparent),transparent 72%) padding-box,linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(140deg,color-mix(in srgb,var(--mc) 88%,#fff),color-mix(in srgb,var(--mc) 78%,#000) 50%,rgba(56,189,248,.8)) border-box!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--mc) 40%,transparent),0 16px 36px -14px color-mix(in srgb,var(--mc) 78%,transparent)!important}html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .quality-btn:hover::after{transform:translateX(130%)}}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .quality-btn:is(.active,.selected){background:radial-gradient(90% 75% at 50% 0%,color-mix(in srgb,var(--mc) 40%,transparent),transparent 72%) padding-box,linear-gradient(180deg,rgba(17,24,58,.94),rgba(8,12,32,.94)) padding-box,linear-gradient(140deg,color-mix(in srgb,var(--mc) 88%,#fff),color-mix(in srgb,var(--mc) 78%,#000) 50%,rgba(56,189,248,.8)) border-box!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--mc) 20%,transparent)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .field-top label{color:#dbe4ff!important;font-weight:600!important}
+</style>
+<style id="moon-chat-upload-v2">
+/* edit-order chat: big upload card at the top of the chat (not beside the message box) */
+html body .mcu:not(#_a):not(#_b){width:calc(100% - 28px);max-width:560px;margin:12px auto 6px;flex:0 0 auto}
+html body .mcu .mcu-card:not(#_a):not(#_b){flex-direction:column;align-items:stretch;gap:12px;padding:22px 18px 18px;border-radius:26px;border:1px solid transparent;text-align:center;background:radial-gradient(90% 70% at 50% 0%,rgba(59,109,255,.30),transparent 70%) padding-box,linear-gradient(180deg,rgba(18,22,52,.96),rgba(9,12,32,.96)) padding-box,linear-gradient(140deg,rgba(125,225,255,.62),rgba(59,109,255,.5) 50%,rgba(34,195,255,.3)) border-box;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 20px 44px -26px rgba(59,109,255,.8)}
+html body .mcu .mcu-ic:not(#_a):not(#_b){width:68px;height:68px;border-radius:50%;margin:0 auto 4px;background:radial-gradient(circle at 30% 22%,rgba(255,255,255,.55),transparent 44%) border-box,linear-gradient(145deg,#3b6dff,#22c3ff) border-box;box-shadow:0 0 0 8px rgba(59,109,255,.14),0 0 0 17px rgba(59,109,255,.07),0 16px 34px -8px rgba(59,109,255,.8),inset 0 1px 0 rgba(255,255,255,.45)}
+html body .mcu .mcu-ic:not(#_a):not(#_b)::after{display:none}
+html body .mcu .mcu-ic svg:not(#_a):not(#_b){width:28px;height:28px}
+html body .mcu .mcu-tx b:not(#_a):not(#_b){font-size:17px;white-space:normal;line-height:1.35}
+html body .mcu .mcu-tx span:not(#_a):not(#_b){font-size:12.5px;opacity:.72;white-space:normal;line-height:1.45}
+html body .mcu .mcu-btn:not(#_a):not(#_b){position:relative;overflow:hidden;display:block;width:100%;padding:14px 18px;border-radius:16px;font-size:15px;font-weight:700;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 52%) border-box,linear-gradient(115deg,#3b6dff,#22c3ff) border-box;box-shadow:0 14px 28px -12px rgba(59,109,255,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+html body .mcu .mcu-btn:not(#_a):not(#_b)::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.36) 50%,transparent 62%);transform:translateX(-130%);transition:transform .8s cubic-bezier(.22,.8,.3,1);pointer-events:none}
+@media (hover:hover){html body .mcu .mcu-btn:not(#_a):not(#_b):hover::after{transform:translateX(130%)}html body .mcu:not(#_a):not(#_b) .mcu-card:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 24px 50px -22px rgba(59,109,255,.95)}}
+html body .mcu.drag .mcu-card:not(#_a):not(#_b){background:radial-gradient(90% 70% at 50% 0%,rgba(34,195,255,.42),transparent 70%) padding-box,linear-gradient(180deg,rgba(18,22,52,.96),rgba(9,12,32,.96)) padding-box,linear-gradient(140deg,#7de1ff,#3b6dff 55%,#22c3ff) border-box;transform:none}
+/* uploading / done / error: compact horizontal strip */
+html body .mcu:is([data-state="up"],[data-state="done"],[data-state="err"]) .mcu-card:not(#_a):not(#_b){flex-direction:row;align-items:center;gap:12px;padding:14px 16px;text-align:left;border-radius:22px}
+html body .mcu:is([data-state="up"],[data-state="done"],[data-state="err"]) .mcu-ic:not(#_a):not(#_b){width:46px;height:46px;margin:0;flex:none;box-shadow:0 0 0 5px rgba(59,109,255,.14),0 10px 22px -8px rgba(59,109,255,.8),inset 0 1px 0 rgba(255,255,255,.45)}
+html body .mcu:is([data-state="up"],[data-state="done"],[data-state="err"]) .mcu-ic svg:not(#_a):not(#_b){width:21px;height:21px}
+html body .mcu:is([data-state="up"],[data-state="done"],[data-state="err"]) .mcu-tx b:not(#_a):not(#_b){font-size:14.5px;white-space:nowrap}
+html body .mcu:is([data-state="up"],[data-state="done"],[data-state="err"]) .mcu-btn:not(#_a):not(#_b){width:auto;flex:none;padding:9px 16px;border-radius:999px;font-size:13px}
+html body .mcu[data-state="up"] .mcu-bar:not(#_a):not(#_b){height:4px;background:rgba(255,255,255,.08)}
+html body .mcu[data-state="up"] .mcu-bar i:not(#_a):not(#_b){background:linear-gradient(90deg,#3b6dff,#22c3ff);box-shadow:0 0 12px rgba(34,195,255,.8)}
+html body .mcu[data-state="done"] .mcu-card:not(#_a):not(#_b){background:radial-gradient(90% 120% at 0% 0%,rgba(52,211,153,.24),transparent 70%) padding-box,linear-gradient(180deg,rgba(10,30,28,.96),rgba(8,20,22,.96)) padding-box,linear-gradient(140deg,rgba(110,231,183,.7),rgba(52,211,153,.4)) border-box}
+html body .mcu[data-state="done"] .mcu-ic:not(#_a):not(#_b){background:radial-gradient(circle at 30% 22%,rgba(255,255,255,.5),transparent 44%) border-box,linear-gradient(145deg,#34d399,#059669) border-box;box-shadow:0 0 0 5px rgba(52,211,153,.14),0 10px 22px -8px rgba(16,185,129,.9),inset 0 1px 0 rgba(255,255,255,.45)}
+html body .mcu[data-state="done"] .mcu-btn:not(#_a):not(#_b){background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.24)}
+html body .mcu[data-state="err"] .mcu-card:not(#_a):not(#_b){background:radial-gradient(90% 120% at 0% 0%,rgba(248,113,113,.22),transparent 70%) padding-box,linear-gradient(180deg,rgba(34,12,16,.96),rgba(22,8,12,.96)) padding-box,linear-gradient(140deg,rgba(252,165,165,.7),rgba(248,113,113,.4)) border-box}
+html body .mcu[data-state="err"] .mcu-ic:not(#_a):not(#_b){background:radial-gradient(circle at 30% 22%,rgba(255,255,255,.5),transparent 44%) border-box,linear-gradient(145deg,#f87171,#dc2626) border-box}
+@media (max-width:420px){html body .mcu:not(#_a):not(#_b){width:calc(100% - 20px)}}
+</style>
+<style id="moon-trim-v3">
+/* no "video received" row (redundant) - the small round X stays so the video can still be replaced */
+html body .pc-modal-scrim .simple-scan-ok:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){display:none!important}
+html body .pc-modal-scrim .scan-result:not(#_a):not(#_b):not(#_c):not(#_d) .sr-reset-btn{top:0!important;right:0!important;width:28px!important;height:28px!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .sr-transfer-q{padding-left:34px!important;padding-right:34px!important}
+/* menu drawer: height follows its content (no empty slab under the items) */
+@media (max-width:1023px){html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d){bottom:auto!important;height:auto!important;max-height:calc(100dvh - var(--hz-h,66px) - 24px)!important}}
+</style>
+
+<style id="moon-fix-v4">
+/* drawer login button (cyan-blue): fixed height, fixed icon, text line-height 1 -> same sizes in every language */
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-login{height:54px!important;min-height:54px!important;box-sizing:border-box!important;padding:0 18px!important;gap:12px!important;line-height:1!important;font-size:16.5px!important;font-weight:700!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-login svg{width:24px!important;height:18px!important;flex:none!important;display:block!important;margin:0!important}
+html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-login>span{display:block;line-height:1!important;white-space:nowrap;position:relative;top:.085em}
+html:not([lang="ka"]) html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .hzm-login>span{top:-.01em}
+/* plan prices: one solid colour per plan (no white gradient, no pale outline, no glow) */
+html body #plansView:not(#_a):not(#_b):not(#_c):not(#_d) .opt-plan .pr{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;filter:none!important;text-shadow:none!important;color:var(--pc,#2fe074)!important;-webkit-text-fill-color:var(--pc,#2fe074)!important;-webkit-text-stroke:.5px var(--pc,#2fe074)!important}
+html body #plansView:not(#_a):not(#_b):not(#_c):not(#_d) .opt-plan:nth-child(1){--pc:#2fe074}
+html body #plansView:not(#_a):not(#_b):not(#_c):not(#_d) .opt-plan:nth-child(2){--pc:#5b7bff}
+html body #plansView:not(#_a):not(#_b):not(#_c):not(#_d) .opt-plan:nth-child(3){--pc:#b66cff}
+html body #plansView:not(#_a):not(#_b):not(#_c):not(#_d) .opt-plan:nth-child(4){--pc:#f5bd0a}
+html body #plansView:not(#_a):not(#_b):not(#_c):not(#_d) .opt-plan .pr small{-webkit-text-fill-color:var(--pc)!important;color:var(--pc)!important;-webkit-text-stroke:0!important;opacity:.85}
+
+/* gate buttons: real "lights up" on hover / press (whole-button light + quick sweep), idle sheen stays */
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::before{content:""!important;display:block!important;position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;z-index:0;background:linear-gradient(90deg,rgba(255,255,255,.34),rgba(255,255,255,.10) 70%,rgba(255,255,255,.02));transition:opacity .22s ease}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)>svg,html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)>span{position:relative;z-index:1}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::after{z-index:2}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):active::before{opacity:1}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):active{filter:brightness(1.12)!important}
+@media (hover:hover){html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover::before{opacity:1}html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover{filter:brightness(1.16) saturate(1.08)!important;transform:none!important}html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover::after{animation:dgHoverSheen .6s cubic-bezier(.22,.8,.3,1) 1 both!important}}
+
+/* NO coloured glow / outer shadow anywhere: flat fills, only a thin inner highlight */
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}
+html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover,html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) .discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):active{box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}
+@media (hover:hover){html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}}
+@media (hover:hover){html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}}
+@media (hover:hover){html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){box-shadow:0 26px 60px -34px rgba(0,0,0,.75)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-yes,.wizard-confirm-btn,.order-btn.chat){box-shadow:inset 0 1px 0 rgba(255,255,255,.32)!important}
+@media (hover:hover){html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.st-yes,.wizard-confirm-btn,.order-btn.chat):hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.4)!important}html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .drop-zone:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important}}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .drop-zone{box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) :is(.simple-scan-ok,.tt-skip-note,.wizard-question){box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .simple-scan-ok-check{box-shadow:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .wc-price-value{text-shadow:none!important}
+html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close{box-shadow:none!important}
+
+/* "N spots left" badge: readable on computers, no shadow */
+html body .pc-card-wrap > .pc-badge:not(#_a):not(#_b):not(#_c):not(#_d){box-shadow:none!important}
+@media (min-width:900px){
+html body .pc-card-wrap > .pc-badge:not(#_a):not(#_b):not(#_c):not(#_d){font-size:13px!important;padding:6px 14px 6px 12px!important;gap:6px!important;bottom:calc(100% - 9px)!important;right:22px!important;line-height:1.2!important;letter-spacing:.01em!important}
+html body .pc-card-wrap > .pc-badge:not(#_a):not(#_b):not(#_c):not(#_d)::before{font-size:12px!important}
+html body .pc-card-wrap > .pc-badge--urgency:not(#_a):not(#_b):not(#_c):not(#_d) svg{width:13px!important;height:13px!important}
+}
+
+/* modal close X: no rotate / lift / tilt on hover or after leaving - only a calm brightness change */
+html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close,html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close:hover,html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close:active,html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close:focus,html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close:focus-visible{rotate:none!important;transform:none!important;scale:none!important;translate:none!important;transition:filter .2s ease,border-color .2s ease!important}
+@media (hover:hover){html body .pc-modal-scrim:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e) .pc-modal-close:hover{filter:brightness(1.25)!important}}
+</style>
+
+<style id="moon-polish-v5">
+/* ===== polish v5 ===== */
+/* header: logo / badge / menu / account share one optical centre line */
+html body .hz-wm:not(#_a):not(#_b):not(#_c):not(#_d){position:relative;top:-3.5px}
+html body .hz-badge:not(#_a):not(#_b):not(#_c):not(#_d){padding:8px 9px 5px!important;line-height:1!important}
+/* the two quality pills: whole-pixel height, text exactly centred */
+html body .pc-card .pc-feature:nth-child(-n+2):not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){height:24px!important;box-sizing:border-box!important;padding-top:8px!important;padding-bottom:2px!important}
+/* smoother glyph placement (no whole-pixel snapping of letters) */
+html body{text-rendering:geometricPrecision}
+/* clean line icons instead of system emoji */
+.mic{display:inline-block;width:1.1em;height:1.1em;vertical-align:-.2em;margin:0 .3em 0 0;background:currentColor;-webkit-mask:var(--mi) center/contain no-repeat;mask:var(--mi) center/contain no-repeat;flex:none}
+.mic-solo>.mic{margin:0}
+.mic-warn{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z%22/%3E%3Cpath d=%22M12 9.5v4%22/%3E%3Cpath d=%22M12 17h.01%22/%3E%3C/svg%3E")}
+.mic-ok{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229.5%22/%3E%3Cpath d=%22m7.8 12.3 3 3 5.6-6.4%22/%3E%3C/svg%3E")}
+.mic-phone{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x=%226.5%22 y=%222%22 width=%2211%22 height=%2220%22 rx=%222.6%22/%3E%3Cpath d=%22M10.5 18.4h3%22/%3E%3C/svg%3E")}
+.mic-link{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M10 13.5a4.6 4.6 0 0 0 6.5.4l3-3a4.6 4.6 0 0 0-6.5-6.5l-1.7 1.7%22/%3E%3Cpath d=%22M14 10.5a4.6 4.6 0 0 0-6.5-.4l-3 3a4.6 4.6 0 0 0 6.5 6.5l1.7-1.7%22/%3E%3C/svg%3E")}
+.mic-cloud{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M17.5 19H7a4 4 0 0 1-.6-7.96A6 6 0 0 1 18 9.6 4.7 4.7 0 0 1 17.5 19z%22/%3E%3C/svg%3E")}
+.mic-film{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2216%22 rx=%222.4%22/%3E%3Cpath d=%22M7.5 4v16M16.5 4v16M3 9h4.5M3 15h4.5M16.5 9H21M16.5 15H21%22/%3E%3C/svg%3E")}
+.mic-clip{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x=%225%22 y=%224%22 width=%2214%22 height=%2217.5%22 rx=%222.4%22/%3E%3Cpath d=%22M9 2.5h6v3.6H9z%22/%3E%3Cpath d=%22M9 12h6M9 16h4%22/%3E%3C/svg%3E")}
+.mic-ban{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229.5%22/%3E%3Cpath d=%22m5.3 5.3 13.4 13.4%22/%3E%3C/svg%3E")}
+.mic-timer{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx=%2212%22 cy=%2213.2%22 r=%228%22/%3E%3Cpath d=%22M12 9v4.4l2.6 1.8M9.5 2h5%22/%3E%3C/svg%3E")}
+.mic-bulb{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M9.2 18h5.6M10 21.2h4%22/%3E%3Cpath d=%22M12 2.8a6 6 0 0 0-3.5 10.9c.7.6 1 1.3 1 2.1h5c0-.8.3-1.5 1-2.1A6 6 0 0 0 12 2.8z%22/%3E%3C/svg%3E")}
+.mic-crown{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22m3 7.5 4.6 4L12 4.2l4.4 7.3 4.6-4-1.9 11.8H4.9z%22/%3E%3C/svg%3E")}
+.mic-bolt{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M13.2 2.2 4.5 14h6.8l-.9 7.8 8.7-11.8h-6.8z%22/%3E%3C/svg%3E")}
+.mic-mon{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x=%222.5%22 y=%223.5%22 width=%2219%22 height=%2213.5%22 rx=%222.4%22/%3E%3Cpath d=%22M8 21h8M12 17v4%22/%3E%3C/svg%3E")}
+.mic-excl{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M12 4v10%22/%3E%3Cpath d=%22M12 19.2h.01%22/%3E%3C/svg%3E")}
+.mic-spark{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M11 3.5l1.9 5.4 5.4 1.9-5.4 1.9L11 18.1l-1.9-5.4-5.4-1.9 5.4-1.9z%22/%3E%3Cpath d=%22M19 3v4M17 5h4%22/%3E%3C/svg%3E")}
+.mic-flame{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d=%22M12 2.5c1 4.2-2.4 5.4-2.4 8.8a2.4 2.4 0 0 0 4.8 0c2.2 1.6 4 3.8 4 6.5a6.4 6.4 0 0 1-12.8 0c0-5.2 4.2-7 6.4-15.3z%22/%3E%3C/svg%3E")}
+.mic-warn{color:#ffc247}.mic-ok{color:#35d99a}.mic-ban,.mic-excl{color:#ff6b7d}.mic-bolt,.mic-crown,.mic-spark,.mic-flame{color:#ffc247}
+.scan-result .sr-warn,.scan-result .sr-info{line-height:1.5}
+</style>
+<script id="moon-icons-js">(function(){try{
+var MAP={'\u26A0':'warn','\u2705':'ok','\uD83D\uDCF1':'phone','\uD83D\uDD17':'link','\u2601':'cloud','\uD83C\uDFAC':'film','\uD83D\uDCCB':'clip','\uD83D\uDEAB':'ban','\u23F1':'timer','\uD83D\uDCA1':'bulb','\uD83D\uDC51':'crown','\u26A1':'bolt','\uD83D\uDDA5':'mon','\u2757':'excl','\u2728':'spark','\uD83D\uDD25':'flame'};
+var RE=/(\u26A0|\u2705|\uD83D\uDCF1|\uD83D\uDD17|\u2601|\uD83C\uDFAC|\uD83D\uDCCB|\uD83D\uDEAB|\u23F1|\uD83D\uDCA1|\uD83D\uDC51|\u26A1|\uD83D\uDDA5|\u2757|\u2728|\uD83D\uDD25)\uFE0F?/g;
+var SKIP='#messengerMessages,#commentList,#commentEmojiPanel,#adminPanelChats,#adminPanelComments,#commentText,textarea,input,select,script,style,noscript,[contenteditable],.mcu,.moon-noico';
+function fix(t){
+ var s=t.nodeValue; if(!s||!RE.test(s)){RE.lastIndex=0;return} RE.lastIndex=0;
+ var p=t.parentNode; if(!p||(p.closest&&p.closest(SKIP)))return;
+ var f=document.createDocumentFragment(),last=0,m;
+ while((m=RE.exec(s))){ if(m.index>last)f.appendChild(document.createTextNode(s.slice(last,m.index)));
+  var i=document.createElement('i');i.className='mic mic-'+MAP[m[1]];i.setAttribute('aria-hidden','true');f.appendChild(i);last=RE.lastIndex;
+  /* swallow one space right after the icon: the icon has its own margin */
+  if(s.charAt(last)===' ')last++; }
+ RE.lastIndex=0;
+ if(last<s.length)f.appendChild(document.createTextNode(s.slice(last)));
+ p.replaceChild(f,t);
+ if(!p.textContent.replace(/\s+/g,'')) p.classList.add('mic-solo');
+}
+function walk(n){
+ if(n.nodeType===3){fix(n);return}
+ if(n.nodeType!==1)return;
+ if(n.matches&&n.matches(SKIP))return;
+ var w=document.createTreeWalker(n,4,null),a=[],x; while((x=w.nextNode()))a.push(x);
+ for(var k=0;k<a.length;k++)fix(a[k]);
+}
+var q=[],raf=0;
+function flush(){raf=0;var l=q;q=[];for(var i=0;i<l.length;i++){try{walk(l[i])}catch(e){}}}
+function push(n){q.push(n);if(!raf)raf=requestAnimationFrame(flush)}
+function start(){
+ walk(document.body);
+ new MutationObserver(function(ms){
+  for(var i=0;i<ms.length;i++){var m=ms[i];
+   if(m.type==='characterData'){push(m.target)}
+   else for(var j=0;j<m.addedNodes.length;j++)push(m.addedNodes[j]);}
+ }).observe(document.body,{childList:true,subtree:true,characterData:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+}catch(e){}})();</script>
 
 <style id="moon-gate-v2">
 /* ===== sign-in sheet (Zilem-like) ===== */
