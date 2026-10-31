@@ -24040,13 +24040,23 @@ function updateGo(){
 function setFileReady(f){
   S.meta=null; S.fps=undefined; S.resTxt=''; S.file=f; (function(ff){ readMp4Fps(ff).then(function(v){ if(S.file!==ff) return; S.fps=v; showRes(); updateGo(); }); })(f); $('optProg').style.display='none'; $('optDl').style.display='none'; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); $('oSize').textContent=fmtSize(f.size);
   $('oRes').textContent='…'; $('oDur').textContent='…';
-  var v=document.createElement('video'), url=URL.createObjectURL(f); v.preload='metadata'; v.muted=true;
-  function applyMeta(w,h,d){ if(S.file!==f) return; S.meta={w:w,h:h,d:d}; var mx=Math.max(w,h), mn=Math.min(w,h);
+  var doneMeta=false, wd=null;
+  function applyMeta(w,h,d){ if(S.file!==f||doneMeta) return; doneMeta=true; if(wd){ clearTimeout(wd); wd=null; } S.meta={w:w,h:h,d:d}; var mx=Math.max(w,h), mn=Math.min(w,h);
     S.resTxt=(mx>=3000?'4K':(mn+'p'))+' · '+w+'×'+h; showRes(); $('oDur').textContent=fmtDur(d); updateGo(); }
-  v.onloadedmetadata=function(){ if(!v.videoWidth||!isFinite(v.duration)){ v.onerror(); return; } URL.revokeObjectURL(url); applyMeta(v.videoWidth,v.videoHeight,v.duration); };
-  v.onerror=function(){ URL.revokeObjectURL(url);
-    readMp4Meta(f).then(function(m){ if(m&&S.file===f) applyMeta(m.w,m.h,m.d); else if(S.file===f){ $('oRes').textContent='—'; $('oDur').textContent='—'; msg(tr('noMeta'),true); updateGo(); } },function(){ $('oRes').textContent='—'; $('oDur').textContent='—'; msg(tr('noMeta'),true); updateGo(); }); };
-  v.src=url; updateGo();
+  function noMeta(){ if(S.file!==f||doneMeta) return; doneMeta=true; if(wd){ clearTimeout(wd); wd=null; } $('oRes').textContent='—'; $('oDur').textContent='—'; msg(tr('noMeta'),true); updateGo(); }
+  /* iPad / iPhone Safari (large .mov, Low Power Mode) may never fire loadedmetadata for a detached <video>, which left
+     resolution + duration on "…" forever and the optimise button locked. The size and length are therefore read straight
+     from the file header first (instant, no decoding); the <video> element is only the fallback, and it has a time limit. */
+  function viaElement(){
+    var v=document.createElement('video'), url=URL.createObjectURL(f); v.preload='metadata'; v.muted=true; v.playsInline=true; v.setAttribute('playsinline','');
+    function rel(){ try{ URL.revokeObjectURL(url); }catch(e){} try{ v.removeAttribute('src'); v.load(); }catch(e){} }
+    v.onloadedmetadata=function(){ var w=v.videoWidth,h=v.videoHeight,d=v.duration; rel(); if(!w||!h||!isFinite(d)||d<=0) noMeta(); else applyMeta(w,h,d); };
+    v.onerror=function(){ rel(); noMeta(); };
+    wd=setTimeout(function(){ rel(); noMeta(); },8000);
+    v.src=url;
+  }
+  readMp4Meta(f).then(function(m){ if(S.file!==f) return; if(m&&m.w>0&&m.h>0&&m.d>0) applyMeta(m.w,m.h,m.d); else viaElement(); },function(){ if(S.file===f) viaElement(); });
+  updateGo();
 }
 
 /* ============ ANY VIDEO FORMAT ============ */
@@ -24073,6 +24083,9 @@ function readMp4Meta(file){
       var mdia=kid(dv,t,'mdia'), hd=mdia&&kid(dv,mdia,'hdlr'); if(!hd||tg(dv,hd.s+8)!=='vide'||w) return;
       var tk=kid(dv,t,'tkhd'); if(!tk) return; var tv1=dv.getUint8(tk.s)===1, o=tk.s+(tv1?88:76), mo=o-36;
       w=Math.round(dv.getUint32(o)/65536); h=Math.round(dv.getUint32(o+4)/65536);
+      /* the real encoded size (sample entry) wins over tkhd, which is only the display size a muxer wrote */
+      try{ var mn2=kid(dv,mdia,'minf'), sb2=mn2&&kid(dv,mn2,'stbl'), sd2=sb2&&kid(dv,sb2,'stsd');
+        if(sd2&&sd2.s+44<=sd2.e){ var cw2=dv.getUint16(sd2.s+40), ch2=dv.getUint16(sd2.s+42); if(cw2>0&&ch2>0){ w=cw2; h=ch2; } } }catch(e2){}
       if(dv.getInt32(mo)===0&&dv.getInt32(mo+16)===0){ var x=w; w=h; h=x; }   /* rotated (portrait) clips */
     });
     if(!w||!h||!ts||!du) return null; return {w:w,h:h,d:du/ts}; }); });
