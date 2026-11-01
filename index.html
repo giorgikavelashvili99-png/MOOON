@@ -8841,7 +8841,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     let applied = false, tA = null;
     function apply(){ if (applied) return; applied = true; clearTimeout(tA); container._wizSwapDone = null; applySwap(); }
     container._wizSwapDone = apply;
-    tA = window.setTimeout(apply, 130);
+    tA = window.setTimeout(apply, 175);
   }
 
   // ============================================================
@@ -29144,6 +29144,140 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 <style id="moon-acct-label-soft">
 html body .hz-acct .hz-accw:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f){color:rgba(228,236,247,.62)!important;-webkit-text-fill-color:rgba(228,236,247,.62)!important;-webkit-text-stroke:0!important;position:relative!important;top:2px!important}
 </style>
+<style id="moon-press-css">
+/* ===== tactile press for every button of the order flow (flat: no shadow, no glow - a soft light spreads inside the button from the touch point and the button gently sinks) ===== */
+html body moon-rw:not(#_a):not(#_b){display:block!important;position:absolute!important;inset:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:inherit!important;overflow:hidden!important;pointer-events:none!important;z-index:3;background:none!important;contain:paint}
+html body moon-rp:not(#_a):not(#_b){display:block!important;position:absolute!important;margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;pointer-events:none!important;opacity:0;transform:scale(.1);will-change:transform,opacity;
+ background:radial-gradient(circle,rgba(255,255,255,.5) 0,rgba(255,255,255,.26) 42%,rgba(255,255,255,0) 72%)!important;animation:moonRipS .7s cubic-bezier(.2,.65,.25,1) forwards,moonRipO .7s cubic-bezier(.4,0,.8,.5) forwards!important}
+html body moon-rp.g:not(#_a):not(#_b){background:radial-gradient(circle,rgba(255,255,255,.28) 0,rgba(255,255,255,.13) 42%,rgba(255,255,255,0) 72%)!important}
+@keyframes moonRipS{0%{transform:scale(.1)}100%{transform:scale(1)}}@keyframes moonRipO{0%{opacity:1}100%{opacity:0}}
+html body .moon-pr-on:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g){scale:var(--moon-pr,.97)!important;transform:none!important}
+
+/* ===== order window: everything fades, nothing slides (the rise-from-below on the cards / progress / prompts is now a plain fade) ===== */
+@keyframes moonSoftIn{from{opacity:0}to{opacity:1}}
+html body .pc-modal-scrim :is(.scan-progress.show,.simple-scan-ok.show,.sr-reject.show,.simple-scan-reject.show,.sr-transfer.show,.mooon-prompt.show,.mooon-auto.show,.mp-box,.quality-btn,.wp-box,.wizard-question):not(#_a):not(#_b):not(#_c){animation-name:moonSoftIn!important}
+/* order window opens with one soft fade (no movement, no scaling) */
+@keyframes moonModalIn{from{opacity:0}to{opacity:1}}
+html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f){animation:moonModalIn .26s cubic-bezier(.4,0,.2,1) backwards!important}
+/* step change: the old step leaves a little more gently, the new one settles in smoothly */
+html body .pc-modal-scrim .wiz-step-exit:not(#_a):not(#_b):not(#_c):not(#_d){animation:wizardStepOut .17s cubic-bezier(.4,0,1,1) forwards!important}
+html body .pc-modal-scrim .wiz-enter:not(#_a):not(#_b):not(#_c):not(#_d){animation:wizardStepIn .34s cubic-bezier(.2,.7,.2,1) both!important}
+
+/* accounts page: appears in place, nothing travels up from below */
+html body #maRoot .ma-page:not(#_a):not(#_b):not(#_c){animation:moonSoftIn .3s ease-out both!important;transform:none!important}
+</style>
+<script id="moon-press-js">
+(function(){
+'use strict';
+if(window.__moonPress) return; window.__moonPress=1;
+var SEL='.pc-toggle-btn,.drop-zone,.st-btn,.mooon-prompt-yes,.mooon-prompt-no,.sr-reject-retry,.quality-btn,.wp-box,.mp-box,.eo-style-tab,.wizard-confirm-btn,.tt-auto-btn,.order-btn,.scan-progress-cancel';
+var GLASS='.drop-zone,.quality-btn,.wp-box,.mp-box,.eo-style-tab,.st-no,.mooon-prompt-no,.tt-auto-btn,.scan-progress-cancel,.sr-reject-retry';
+var cur=[];
+function amt(el){
+  if(el.matches('.drop-zone')) return .992;
+  if(el.matches('.quality-btn,.wp-box,.mp-box')) return .976;
+  if(el.matches('.pc-toggle-btn')) return .974;
+  return .965;
+}
+/* the button's own transition list (hover colours etc.) is kept; only "scale" is added to it while the press runs */
+function lists(el){
+  var cs=getComputedStyle(el);
+  var p=cs.transitionProperty.split(',').map(function(s){return s.trim()});
+  var d=cs.transitionDuration.split(',').map(function(s){return s.trim()});
+  var f=cs.transitionTimingFunction.match(/cubic-bezier\([^)]*\)|steps\([^)]*\)|linear|ease-in-out|ease-in|ease-out|ease/g)||['ease'];
+  var l=cs.transitionDelay.split(',').map(function(s){return s.trim()});
+  if(p.length===1&&(p[0]==='none'||p[0]==='')) p=[];
+  function fit(a,n,def){var o=[],i;for(i=0;i<n;i++)o.push(a.length?a[i%a.length]:def);return o}
+  return {p:p,d:fit(d,p.length,'0s'),f:fit(f,p.length,'ease'),l:fit(l,p.length,'0s')};
+}
+function setT(el,mode){
+  var b=el.__mp.b,s=el.style,inn=mode==='in';
+  s.setProperty('transition-property',b.p.concat('scale').join(','),'important');
+  s.setProperty('transition-duration',b.d.concat(inn?'.1s':'.46s').join(','),'important');
+  s.setProperty('transition-timing-function',b.f.concat(inn?'cubic-bezier(.2,0,.2,1)':'cubic-bezier(.16,1,.3,1)').join(','),'important');
+  s.setProperty('transition-delay',b.l.concat('0s').join(','),'important');
+}
+function clearT(el){
+  var s=el.style;
+  s.removeProperty('transition-property');s.removeProperty('transition-duration');
+  s.removeProperty('transition-timing-function');s.removeProperty('transition-delay');
+}
+function ripple(el,x,y){
+  var w=null,k=el.children,i;
+  for(i=0;i<k.length;i++) if(k[i].tagName==='MOON-RW'){w=k[i];break}
+  if(!w){
+    w=document.createElement('moon-rw');w.setAttribute('aria-hidden','true');el.appendChild(w);
+    if(getComputedStyle(el).position==='static') el.style.position='relative';
+  }
+  var r=el.getBoundingClientRect();
+  if(!r.width||!r.height) return;
+  var px=x-r.left,py=y-r.top;
+  if(!isFinite(px)||!isFinite(py)||(!x&&!y)){px=r.width/2;py=r.height/2}
+  var d=Math.ceil(2*Math.sqrt(Math.pow(Math.max(px,r.width-px),2)+Math.pow(Math.max(py,r.height-py),2)));
+  var rp=document.createElement('moon-rp');
+  if(el.matches(GLASS)) rp.className='g';
+  rp.style.cssText='left:'+(px-d/2).toFixed(1)+'px;top:'+(py-d/2).toFixed(1)+'px;width:'+d+'px;height:'+d+'px';
+  w.appendChild(rp);
+  rp.addEventListener('animationend',function(){ if(rp.parentNode) rp.parentNode.removeChild(rp) });
+  setTimeout(function(){ if(rp.parentNode) rp.parentNode.removeChild(rp) },1200);
+}
+function down(el,e){
+  if(el.disabled||el.getAttribute('aria-disabled')==='true') return;
+  var st=el.__mp||(el.__mp={});
+  clearTimeout(st.t);clearTimeout(st.c);
+  if(!st.busy){st.b=lists(el);st.busy=true}
+  el.style.setProperty('--moon-pr',String(amt(el)));
+  setT(el,'in');
+  el.classList.add('moon-pr-on');
+  st.down=performance.now();
+  if(cur.indexOf(el)<0) cur.push(el);
+  ripple(el,e.clientX,e.clientY);
+}
+function release(el){
+  var st=el.__mp;
+  if(!st||!el.classList.contains('moon-pr-on')) return;
+  clearTimeout(st.t);
+  var wait=Math.max(0,120-(performance.now()-st.down));   /* even a very quick tap is seen to sink */
+  st.t=setTimeout(function(){
+    setT(el,'out');
+    el.classList.remove('moon-pr-on');
+    st.c=setTimeout(function(){ clearT(el);st.busy=false },560);
+  },wait);
+}
+function relAll(){ var a=cur.splice(0),i; for(i=0;i<a.length;i++) release(a[i]) }
+document.addEventListener('pointerdown',function(e){
+  if(e.pointerType==='mouse'&&e.button!==0) return;
+  var el=e.target&&e.target.closest?e.target.closest(SEL):null;
+  if(el) down(el,e);
+},true);
+document.addEventListener('pointerup',relAll,true);
+document.addEventListener('pointercancel',relAll,true);
+document.addEventListener('dragstart',relAll,true);
+window.addEventListener('blur',relAll);
+document.addEventListener('pointerout',function(e){
+  var el=e.target&&e.target.closest?e.target.closest(SEL):null;
+  if(el&&(!e.relatedTarget||!el.contains(e.relatedTarget))){ var i=cur.indexOf(el); if(i>=0) cur.splice(i,1); release(el) }
+},true);
+/* closing the order window: one soft fade instead of an instant cut */
+window.moAnimClose=function(card,done){
+  var sc=document.getElementById('pcModalScrim');
+  if(!sc||!sc.classList.contains('open')||!sc.animate){ done(); return }
+  if(sc.__moFade) return;
+  sc.__moFade=true;sc.style.pointerEvents='none';
+  var a=null;
+  try{ a=sc.animate([{opacity:1},{opacity:0}],{duration:170,easing:'cubic-bezier(.4,0,.6,1)',fill:'forwards'}) }
+  catch(e){ sc.__moFade=false;sc.style.pointerEvents='';done();return }
+  var fin=false;
+  function end(){
+    if(fin) return; fin=true;
+    try{ done() }finally{
+      requestAnimationFrame(function(){ try{a.cancel()}catch(_){} sc.style.pointerEvents='';sc.__moFade=false });
+    }
+  }
+  a.onfinish=end;setTimeout(end,320);
+};
+})();
+</script>
 <style id="moon-ask-css">
 #mfask-btn,#mfask-panel,#mfask-panel *{box-sizing:border-box;box-shadow:none;text-shadow:none;-webkit-tap-highlight-color:transparent}
 #mfask-btn{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:200;width:54px;height:54px;margin:0;padding:0;border-radius:50%;border:1px solid rgba(150,180,255,.32);background:#0a1020;cursor:pointer;display:block;overflow:visible;transition:transform .16s ease,border-color .16s ease;animation:mfaskIn .35s ease-out .5s both}
