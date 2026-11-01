@@ -29280,14 +29280,16 @@ window.moAnimClose=function(card,done){
 </script>
 <style id="moon-ask-css">
 #mfask-btn,#mfask-panel,#mfask-panel *{box-sizing:border-box;box-shadow:none;text-shadow:none;-webkit-tap-highlight-color:transparent}
-#mfask-btn{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:200;width:54px;height:54px;margin:0;padding:0;border-radius:50%;border:1px solid rgba(150,180,255,.32);background:#0a1020;cursor:pointer;display:block;overflow:visible;transition:transform .16s ease,border-color .16s ease;animation:mfaskIn .35s ease-out .5s both}
+#mfask-btn{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:200;width:54px;height:54px;margin:0;padding:0;border-radius:50%;border:1px solid rgba(150,180,255,.32);background:#0a1020;cursor:grab;display:block;overflow:visible;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;translate:var(--mfx,0px) var(--mfy,0px);transition:transform .16s ease,border-color .16s ease;animation:mfaskIn .35s ease-out .5s both}
+#mfask-btn.mfask-drag{cursor:grabbing;border-color:rgba(190,210,255,.6)}
 #mfask-btn img{position:absolute;inset:0;width:100%;height:100%;display:block;border-radius:50%;pointer-events:none;-webkit-user-drag:none}
 #mfask-btn i{position:absolute;right:0;bottom:0;width:13px;height:13px;border-radius:50%;background:#38bdf8;border:2.5px solid #070c18;pointer-events:none}
 #mfask-btn:hover{transform:translateY(-2px);border-color:rgba(190,210,255,.6)}
 #mfask-btn:active{transform:scale(.94)}
 #mfask-btn:focus-visible,#mfask-send:focus-visible,.mfask-x:focus-visible,.mfask-chip:focus-visible{outline:2px solid #4c7dff!important;outline-offset:3px}
-#mfask-panel{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:210;width:380px;max-width:calc(100vw - 24px);height:min(580px,calc(100vh - 110px));height:min(580px,calc(100dvh - 110px));display:none;flex-direction:column;background:#0a1020;border:1px solid rgba(150,180,255,.22);border-radius:16px;overflow:hidden;color:#dbe3f5;font-family:var(--moon-lat),var(--moon-lat),'BPGAcademiuriU',system-ui,sans-serif;font-size:14px;font-weight:500;line-height:1.5;letter-spacing:0;text-align:left;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
-#mfask-panel.mfask-open{display:flex;animation:mfaskPanel .18s ease-out}
+#mfask-panel{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:210;width:380px;max-width:calc(100vw - 24px);height:min(580px,calc(100vh - 110px));height:min(580px,calc(100dvh - 110px));display:flex;flex-direction:column;visibility:hidden;opacity:0;pointer-events:none;transform:translate3d(0,10px,0) scale(.94);transform-origin:var(--mfo,100% 100%);transition:opacity .2s cubic-bezier(.4,0,.2,1),transform .26s cubic-bezier(.4,0,.2,1),visibility 0s linear .26s;background:#0a1020;border:1px solid rgba(150,180,255,.22);border-radius:16px;overflow:hidden;color:#dbe3f5;font-family:var(--moon-lat),var(--moon-lat),'BPGAcademiuriU',system-ui,sans-serif;font-size:14px;font-weight:500;line-height:1.5;letter-spacing:0;text-align:left;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+#mfask-panel.mfask-open{visibility:visible;opacity:1;pointer-events:auto;transform:none;transition:opacity .28s cubic-bezier(.4,0,.2,1),transform .42s cubic-bezier(.16,1,.3,1),visibility 0s}
+@media (min-width:99999px){#mfask-panel,#mfask-panel.mfask-open{transition:opacity .15s linear,visibility 0s}}
 .mfask-head{display:flex;align-items:center;gap:11px;padding:13px 14px 13px 16px;border-bottom:1px solid rgba(150,180,255,.13);flex:0 0 auto}
 .mfask-avatar{width:34px;height:34px;border-radius:50%;flex:0 0 auto;border:1px solid rgba(150,180,255,.32);background:#0a1020;overflow:hidden}
 .mfask-avatar img{display:block;width:100%;height:100%;border-radius:50%}
@@ -29381,7 +29383,7 @@ var KB=[
  a:{ka:'გამარჯობა! რით შემიძლია დაგეხმარო? მკითხე პაკეტებზე, ფასებზე, შეკვეთაზე ან გადახდაზე.',en:'Hi! How can I help? Ask me about packages, prices, ordering or payment.',ru:'Привет! Чем помочь? Спросите про пакеты, цены, заказ или оплату.'}},
 {id:'thanks',p:0,k:[],
  a:{ka:'ყოველთვის გენაცვალე! თუ კიდევ რამე გაინტერესებს — მკითხე.',en:"You're welcome! Ask me anything else you need.",ru:'Пожалуйста! Если что-то ещё нужно — спрашивайте.'}},
-{id:'about',p:0,k:[K('რა არის (moonfull|ეს საიტი|ეს სერვის|ეს)\\b|ვინ ხართ|რას აკეთებთ|რას სთავაზობთ|what is (this|moonfull)|who are you|what do you (do|offer)|что это|кто вы|что вы делаете|чем занимаетесь',3)],
+{id:'about',p:0,k:[K('რა არის (moonfull|ეს საიტი|ეს სერვის|ეს[ ?!.]*$)|ვინ ხართ|რას აკეთებთ|რას სთავაზობთ|what is (this|moonfull)|who are you|what do you (do|offer)|что это|кто вы|что вы делаете|чем занимаетесь',3)],
  a:{ka:'MOONFULL 4K — TikTok-ისთვის ვიდეოს მაღალი ხარისხით (1080p/60fps ან 4K) დამუშავება, რომ ატვირთვისას ხარისხი არ დაიკარგოს. ყველა ვიდეო მუშავდება ხელით After Effects-ში, ჩაბარება — მაქსიმუმ 24 საათში.',
     en:'MOONFULL 4K processes your videos in high quality (1080p/60fps or 4K) so they upload to TikTok without losing quality. Every video is edited by hand in After Effects and delivered within 24 hours.',
     ru:'MOONFULL 4K обрабатывает ваши видео в высоком качестве (1080p/60fps или 4K), чтобы при загрузке в TikTok качество не терялось. Каждое видео монтируется вручную в After Effects и сдаётся максимум за 24 часа.'},b:['home']},
@@ -29509,11 +29511,158 @@ function norm(s){return String(s||'').toLowerCase().replace(/ё/g,'е').replace(
 var GREET_RE=/^\s*(გამარჯობა|გაუმარჯოს|სალამი|ჰეი|hello|hey|hi(?![a-zа-я])|привет|здравствуй(те)?|добрый (день|вечер|утро))[\s,!.?:;-]*/i;
 var THANKS_RE=/მადლობა|გმადლობ|thanks|thank you|спасибо|благодар/i;
 function kbById(id){for(var i=0;i<KB.length;i++)if(KB[i].id===id)return KB[i]}
-function bestMatch(q){
-  q=norm(q);var best=null,bs=0;
-  var g=q.match(GREET_RE);
-  if(g){q=q.slice(g[0].length).trim();if(!q)return kbById('greet')}
-  if(q.length<=32&&THANKS_RE.test(q))return kbById('thanks');
+/* ---------- glossary + smart intent (offline, general terms) ---------- */
+function G(id,r,o){o.id=id;o.r=new RegExp(r,'i');return o}
+var GL=[
+G('g-optimizer','ოპტიმ(ა?ი)?[ზს]|ოპტიმაიზ|optimi[sz]|optimaiz|оптимиз',{f:['ოპტიმიზატორ','ოპტიმიზაცი','optimizer','optimization','оптимизатор','оптимизаци'],b:['method'],
+ a:{ka:'**ოპტიმიზატორი** — ხელსაწყო ან პროგრამა, რომელიც რამეს ავტომატურად აუმჯობესებს, რომ უკეთ და უფრო სწრაფად იმუშაოს. **ოპტიმიზაცია** არის ამის პროცესი: ვიდეოს შემთხვევაში — გარჩევადობის, კადრების წამში და ბიტრეიტის ისე მორგება, რომ პლატფორმამ ხარისხი ნაკლებად გააფუჭოს.',
+    en:'An **optimizer** is a tool or program that automatically tunes something so it works better and faster. **Optimization** is that process — for video it means adjusting resolution, frames per second and bitrate so the platform degrades the quality less.',
+    ru:'**Оптимизатор** — инструмент или программа, которая автоматически настраивает что-то так, чтобы оно работало лучше и быстрее. **Оптимизация** — сам этот процесс: для видео это подбор разрешения, кадров в секунду и битрейта, чтобы платформа меньше портила качество.'},
+ s:{ka:'ჩვენთან ამას აკეთებს **MOON METHOD** — TikTok-ისთვის ვიდეოს ოპტიმიზატორი: ატვირთე ვიდეო და წამებში მიიღე დამუშავებული.',
+    en:'On our site that is **MOON METHOD** — a video optimizer for TikTok: upload a video and get it processed in seconds.',
+    ru:'У нас этим занимается **MOON METHOD** — оптимизатор видео для TikTok: загрузите видео и получите результат за секунды.'}}),
+G('g-fps','fps|ფპს|ფეპეს|კადრ|кадр|frames? ?per ?second|frame ?rate|frames?\\b',{f:[],b:['plans'],
+ a:{ka:'**FPS** (კადრი წამში) — რამდენ კადრს აჩვენებს ვიდეო ერთ წამში. რაც მეტია, მით უფრო გლუვია მოძრაობა: 30fps ჩვეულებრივია, 60fps — უფრო გლუვი, 120fps — ძალიან გლუვი, განსაკუთრებით სწრაფ მოძრაობაზე.',
+    en:'**FPS** (frames per second) is how many frames a video shows each second. The higher it is, the smoother the motion: 30fps is standard, 60fps is smoother, 120fps is very smooth, especially for fast movement.',
+    ru:'**FPS** (кадры в секунду) — сколько кадров видео показывает за секунду. Чем больше, тем плавнее движение: 30fps — обычное, 60fps — плавнее, 120fps — очень плавное, особенно при быстром движении.'},
+ s:{ka:'ჩვენთან შეკვეთისთვის ვიდეო უნდა იყოს 1080p/60fps, MOON METHOD-ის Plan 2 და Plan 3 კი 120fps-ს იძლევა.',
+    en:'For orders the source video must be 1080p/60fps, and MOON METHOD Plan 2 and Plan 3 give 120fps.',
+    ru:'Для заказа исходное видео должно быть 1080p/60fps, а Plan 2 и Plan 3 в MOON METHOD дают 120fps.'}}),
+G('g-resolution','გარჩევადობ|resolution|1080 ?p|full ?hd|\\bfhd\\b|разрешени|пиксел|pixel|პიქსელ|720 ?p|\\bhd\\b',{f:['გარჩევადობ','resolution','разрешени'],b:['home'],
+ a:{ka:'**გარჩევადობა** — ვიდეოს სიგანე×სიმაღლე პიქსელებში: რაც მეტია, მით მეტი დეტალი ჩანს. **1080p (Full HD)** — 1920×1080, **4K (UHD)** — 3840×2160, ანუ 4-ჯერ მეტი პიქსელი. TikTok-ზე ვიდეო ვერტიკალურია, ამიტომ 1080p ჩვეულებრივ 1080×1920-ია.',
+    en:'**Resolution** is a video\'s width×height in pixels — the more pixels, the more detail you see. **1080p (Full HD)** is 1920×1080, **4K (UHD)** is 3840×2160, i.e. 4× more pixels. TikTok video is vertical, so 1080p is usually 1080×1920.',
+    ru:'**Разрешение** — ширина×высота видео в пикселях: чем больше, тем больше деталей. **1080p (Full HD)** — 1920×1080, **4K (UHD)** — 3840×2160, то есть в 4 раза больше пикселей. Видео в TikTok вертикальное, поэтому 1080p обычно 1080×1920.'},
+ s:{ka:'ჩვენთან ამოსავალი ვიდეო 1080p/60fps უნდა იყოს, შედეგის ხარისხს კი შეკვეთისას ირჩევ — 1080p ან 4K.',
+    en:'On our site the source video must be 1080p/60fps, and you pick the result quality when ordering — 1080p or 4K.',
+    ru:'У нас исходное видео должно быть 1080p/60fps, а качество результата вы выбираете при заказе — 1080p или 4K.'}}),
+G('g-4k','(^|[^a-z0-9])4 ?k($|[^a-z])|4კ|4к|uhd|2160|ულტრა ?hd|ultra ?hd',{f:[],b:['home','plans'],
+ a:{ka:'**4K (UHD)** — 3840×2160 პიქსელი, Full HD-ზე 4-ჯერ მეტი. სურათი უფრო მკვეთრი და დეტალურია, ფაილი კი უფრო დიდი.',
+    en:'**4K (UHD)** is 3840×2160 pixels — 4× more than Full HD. The picture is sharper and more detailed, but the file is bigger.',
+    ru:'**4K (UHD)** — 3840×2160 пикселей, в 4 раза больше Full HD. Картинка чётче и детальнее, но файл больше.'},
+ s:{ka:'ჩვენთან 4K ცალკე არჩევანია შეკვეთისას (მაგ. კვირის პაკეტი 24.99₾ → 35.99₾) და MOON METHOD-ის Plan 3-შიცაა.',
+    en:'On our site 4K is a separate choice when ordering (e.g. Weekly package 24.99₾ → 35.99₾) and is also in MOON METHOD Plan 3.',
+    ru:'У нас 4K — отдельный выбор при заказе (например, недельный пакет 24.99₾ → 35.99₾), а также он есть в Plan 3 MOON METHOD.'}}),
+G('g-bitrate','ბიტრეიტ|ბიტ ?რეიტ|bit ?rate|битрейт|mbps|kbps',{f:['ბიტრეიტ','bitrate','битрейт'],b:[],
+ a:{ka:'**ბიტრეიტი** — რამდენ მონაცემს იყენებს ვიდეო ერთ წამში (მაგ. Mbps). რაც მეტია, მით მეტ დეტალს ინახავს; დაბალი ბიტრეიტი სურათს ბუნდოვანს ან „კუბურებიანს" ხდის.',
+    en:'**Bitrate** is how much data a video uses per second (e.g. Mbps). The higher it is, the more detail is kept; a low bitrate makes the picture blurry or blocky.',
+    ru:'**Битрейт** — сколько данных использует видео за секунду (например, Мбит/с). Чем он выше, тем больше деталей сохраняется; низкий битрейт делает картинку размытой или «квадратной».'},
+ s:{ka:'TikTok ატვირთვისას ვიდეოს თავად ჰკუმშავს და ბიტრეიტს ამცირებს — ამიტომ ვიდეოს სწორი დამუშავება მნიშვნელოვანია.',
+    en:'TikTok recompresses every upload and lowers the bitrate — that is why proper processing matters.',
+    ru:'TikTok пережимает каждое загруженное видео и снижает битрейт — поэтому важна правильная обработка.'}}),
+G('g-codec','კოდეკ|codec|h ?\\.?26[45]|hevc|кодек|კოდირებ|mp4|\\bmov\\b',{f:['კოდეკ','codec','кодек'],b:[],
+ a:{ka:'**კოდეკი** — წესი, რომლითაც ვიდეო იკუმშება და ფაილში ინახება (მაგ. H.264, HEVC/H.265). **ფორმატი** (MP4, MOV) კი „კონტეინერია", რომელშიც ვიდეო და ხმა ერთად ინახება. TikTok-ისთვის ყველაზე გავრცელებულია MP4 + H.264.',
+    en:'A **codec** is the method used to compress and store video (e.g. H.264, HEVC/H.265). A **format** (MP4, MOV) is the "container" that holds the video and audio together. For TikTok, MP4 + H.264 is the most common.',
+    ru:'**Кодек** — способ сжатия и хранения видео (например, H.264, HEVC/H.265). **Формат** (MP4, MOV) — «контейнер», в котором лежат видео и звук. Для TikTok чаще всего используют MP4 + H.264.'}}),
+G('g-compression','შეკუმშვ|კომპრესი|compress|сжати|сжима',{f:['შეკუმშვ','compression','сжатие'],b:['home'],
+ a:{ka:'**შეკუმშვა** — ვიდეო ფაილის ზომის შემცირება მონაცემების ნაწილის გამოტოვებით. რაც უფრო ძლიერია, მით მეტი დეტალი იკარგება. TikTok ყველა ატვირთულ ვიდეოს ჰკუმშავს, ამიტომ ხარისხი ეცემა.',
+    en:'**Compression** shrinks a video file by dropping part of the data. The stronger it is, the more detail is lost. TikTok compresses every upload, which is why quality drops.',
+    ru:'**Сжатие** уменьшает размер видеофайла за счёт отбрасывания части данных. Чем оно сильнее, тем больше деталей теряется. TikTok сжимает каждое загруженное видео, поэтому качество падает.'},
+ s:{ka:'სწორად დამუშავებული ვიდეო (1080p/60fps ან 4K) შეკუმშვის შემდეგაც უკეთ ინარჩუნებს სიმკვეთრეს.',
+    en:'A properly processed video (1080p/60fps or 4K) keeps its sharpness better after compression.',
+    ru:'Правильно обработанное видео (1080p/60fps или 4K) лучше сохраняет чёткость после сжатия.'}}),
+G('g-aspect','თანაფარდობ|aspect ?ratio|9 ?: ?16|9\\/16|соотношени.{0,12}сторон|ვერტიკალ|vertical video|вертикальн',{f:[],b:[],
+ a:{ka:'**გვერდების თანაფარდობა** — სიგანისა და სიმაღლის შეფარდება. TikTok-ის სტანდარტი ვერტიკალური **9:16**-ია (მაგ. 1080×1920 პიქსელი).',
+    en:'**Aspect ratio** is the proportion between width and height. TikTok\'s standard is vertical **9:16** (e.g. 1080×1920 pixels).',
+    ru:'**Соотношение сторон** — пропорция ширины и высоты. Стандарт TikTok — вертикальное **9:16** (например, 1080×1920 пикселей).'}}),
+G('g-render','რენდერ|render|рендер',{f:[],b:[],
+ a:{ka:'**რენდერი** — პროცესი, როცა პროგრამა მონტაჟს და ეფექტებს ერთ საბოლოო ვიდეო ფაილად აქცევს. რაც უფრო მაღალია გარჩევადობა და მეტია ეფექტი, მით დიდხანს გრძელდება.',
+    en:'**Rendering** is when software turns the edit and effects into one final video file. The higher the resolution and the more effects, the longer it takes.',
+    ru:'**Рендер** — процесс, когда программа превращает монтаж и эффекты в один готовый видеофайл. Чем выше разрешение и больше эффектов, тем дольше он идёт.'},
+ s:{ka:'ჩვენთან ვიდეოს ხელით ვამუშავებთ After Effects-ში და იქვე ვარენდერებთ საბოლოო ხარისხში.',
+    en:'We edit videos by hand in After Effects and render them in the final quality there.',
+    ru:'Мы обрабатываем видео вручную в After Effects и там же рендерим в финальном качестве.'}}),
+G('g-ae','after ?effects|აფტერ ?ეფექტ|афтер ?э[фф]|афтер ?эффект',{f:[],b:[],
+ a:{ka:'**Adobe After Effects** — პროფესიონალური პროგრამა ვიზუალური ეფექტების, ანიმაციისა და ვიდეოს დამუშავებისთვის.',
+    en:'**Adobe After Effects** is professional software for visual effects, animation and video processing.',
+    ru:'**Adobe After Effects** — профессиональная программа для визуальных эффектов, анимации и обработки видео.'},
+ s:{ka:'ჩვენთან ყველა ვიდეო ხელით მუშავდება After Effects-ში, ავტომატური შაბლონების გარეშე.',
+    en:'Every video on our site is edited by hand in After Effects, with no automatic templates.',
+    ru:'У нас каждое видео обрабатывается вручную в After Effects, без автоматических шаблонов.'}}),
+G('g-upscale','აპსკეილ|upscal|ups ?cale|апскейл',{f:[],b:[],
+ a:{ka:'**აპსკეილი (upscaling)** — ვიდეოს გარჩევადობის ხელოვნურად გაზრდა (მაგ. 1080p-დან 4K-მდე). სურათი უფრო მკვეთრი და სუფთა ჩანს, თუმცა ორიგინალში არარსებულ დეტალებს სრულად ვერ აღადგენს.',
+    en:'**Upscaling** artificially increases a video\'s resolution (e.g. 1080p to 4K). The picture looks sharper and cleaner, but details that were never in the original cannot be fully restored.',
+    ru:'**Апскейл (upscaling)** — искусственное увеличение разрешения видео (например, с 1080p до 4K). Картинка выглядит чётче и чище, но детали, которых не было в оригинале, полностью не восстановить.'}}),
+G('g-hdr','hdr|ჰდრ',{f:[],b:[],
+ a:{ka:'**HDR** — ფართო დინამიკური დიაპაზონი: ერთ კადრში უფრო ნათელი ნათელი უბნები, უფრო ღრმა ჩრდილები და მდიდარი ფერები.',
+    en:'**HDR** (high dynamic range) gives brighter highlights, deeper shadows and richer colours in the same frame.',
+    ru:'**HDR** — расширенный динамический диапазон: в одном кадре более яркие света, более глубокие тени и насыщенные цвета.'}}),
+G('g-watermark','ვოტერმარკ|წყლის ნიშან|watermark|водян(ой|ые|ых)? знак|вотермарк|ватермарк',{f:[],b:[],
+ a:{ka:'**ვოტერმარკი** — ვიდეოზე დატანილი ლოგო ან წარწერა, რომელიც ავტორობას ან წყაროს აჩვენებს (მაგ. TikTok-ის ლოგო ჩამოტვირთულ ვიდეოზე).',
+    en:'A **watermark** is a logo or text placed over a video to show its author or source (e.g. the TikTok logo on a downloaded video).',
+    ru:'**Водяной знак** — логотип или надпись поверх видео, показывающие автора или источник (например, логотип TikTok на скачанном видео).'}}),
+G('g-sharp','სიმკვეთრ|sharpness|sharpen|резкост',{f:[],b:[],
+ a:{ka:'**სიმკვეთრე** — რამდენად მკაფიოდ ჩანს სურათში კონტურები და წვრილი დეტალები. მას განსაზღვრავს გარჩევადობა, ბიტრეიტი და შეკუმშვის ხარისხი.',
+    en:'**Sharpness** is how clearly edges and fine details show up in the picture. It depends on resolution, bitrate and how strongly the video is compressed.',
+    ru:'**Резкость** — насколько чётко в кадре видны контуры и мелкие детали. Зависит от разрешения, битрейта и силы сжатия.'}}),
+G('g-hz','(^|[^a-z])hz($|[^a-z])|ჰერც|refresh rate|განახლების სიხშირ|герц|частота обновлени',{f:[],b:[],
+ a:{ka:'**Hz (ჰერცი)** — რამდენჯერ განახლდება ეკრანი წამში (მაგ. 60Hz, 120Hz, 240Hz); რაც მეტია, მით გლუვია მოძრაობა. ეს ეკრანის მახასიათებელია და ვიდეოს fps-ისგან განსხვავდება — მაღალი Hz-იანი ეკრანი ბევრკადრიან ვიდეოს უკეთ აჩვენებს.',
+    en:'**Hz (hertz)** is how many times per second the screen refreshes (e.g. 60Hz, 120Hz, 240Hz); the higher, the smoother the motion. It is a property of the screen and differs from a video\'s fps — a high-Hz screen shows high-fps video better.',
+    ru:'**Гц (герц)** — сколько раз в секунду обновляется экран (например, 60, 120, 240 Гц); чем больше, тем плавнее движение. Это свойство экрана, а не fps видео — экран с высокой частотой лучше показывает видео с большим fps.'}}),
+G('g-montage','მონტაჟ|video ?editing|монтаж|ვიდეო ?ედიტინგ',{f:['მონტაჟ'],b:[],
+ a:{ka:'**მონტაჟი** — ვიდეოს კადრების დაჭრა, გადაწყობა და ეფექტების დამატება ერთ საბოლოო ვიდეოდ.',
+    en:'**Video editing** means cutting and rearranging footage and adding effects to make one final video.',
+    ru:'**Монтаж** — нарезка и перестановка кадров и добавление эффектов, чтобы получить один готовый ролик.'},
+ s:{ka:'ჩვენთან მონტაჟი/დამუშავება ხელით ხდება After Effects-ში.',
+    en:'On our site editing/processing is done by hand in After Effects.',
+    ru:'У нас монтаж/обработка делается вручную в After Effects.'}}),
+G('g-ai','(^|[^a-z])ai($|[^a-z])|ხელოვნურ(ი|ს)? ინტელექტ|искусственн.{0,3} интеллект|нейросет|chatgpt',{f:[],w:1,b:[],
+ a:{ka:'**AI (ხელოვნური ინტელექტი)** — კომპიუტერული სისტემა, რომელიც ადამიანის მსგავს ამოცანებს ასრულებს: გებულობს ტექსტს, პასუხობს კითხვებს, ცნობს სურათებს და სხვა.',
+    en:'**AI (artificial intelligence)** is a computer system that performs human-like tasks: understanding text, answering questions, recognising images and more.',
+    ru:'**AI (искусственный интеллект)** — компьютерная система, выполняющая задачи, похожие на человеческие: понимает текст, отвечает на вопросы, распознаёт изображения и т. д.'},
+ s:{ka:'მე Moonfull4K-ის AI ასისტენტი ვარ და საიტზე, პაკეტებსა და ვიდეოს ტერმინებზე გპასუხობ.',
+    en:'I am Moonfull4K\'s AI assistant and I answer about the site, packages and video terms.',
+    ru:'Я AI-ассистент Moonfull4K и отвечаю про сайт, пакеты и видео-термины.'}}),
+G('g-tiktok','tiktok|tik tok|ტიკტოკ|თიკთოკ|тикток',{f:[],w:1,b:['home'],
+ a:{ka:'**TikTok** — მოკლე ვერტიკალური ვიდეოების სოციალური პლატფორმა, სადაც მომხმარებლები ვიდეოებს ტვირთავენ, უყურებენ და უზიარებენ.',
+    en:'**TikTok** is a social platform for short vertical videos, where users upload, watch and share clips.',
+    ru:'**TikTok** — социальная платформа коротких вертикальных видео, где пользователи загружают, смотрят и делятся роликами.'},
+ s:{ka:'MOONFULL 4K ვიდეოებს სწორედ TikTok-ისთვის ამუშავებს, რომ ატვირთვისას ხარისხი არ დაიკარგოს.',
+    en:'MOONFULL 4K processes videos specifically for TikTok so quality is not lost on upload.',
+    ru:'MOONFULL 4K обрабатывает видео именно для TikTok, чтобы при загрузке не терялось качество.'}})
+];
+GL.forEach(function(e){e.a2={};['ka','en','ru'].forEach(function(l){e.a2[l]=e.a[l]+(e.s?'\n\n'+e.s[l]:'')});e.a=e.a2});
+function F(id,r,o){o.id=id;o.r=new RegExp(r,'i');return o}
+var FAQ=[
+F('g-self','ვინ ხარ|შენ ვინ|რა ხარ შენ|are you (a |an )?(bot|ai|human|real|robot|person)|who are you|ты (кто|бот|человек|робот)|кто ты',{b:['contact'],
+ a:{ka:'მე Moonfull4K-ის **AI მხარდაჭერის ასისტენტი** ვარ (ბოტი, ადამიანი არა). გპასუხობ პაკეტებზე, ფასებზე, ვადებზე, საიტის ხელსაწყოებზე და ვიდეოს ტერმინებზე. შეკვეთასა და გადახდას მენეჯერი ადასტურებს.',
+    en:'I am Moonfull4K\'s **AI support assistant** (a bot, not a human). I answer about packages, prices, delivery, site tools and video terms. A manager confirms orders and payment.',
+    ru:'Я **AI-ассистент поддержки** Moonfull4K (бот, не человек). Отвечаю про пакеты, цены, сроки, инструменты сайта и видео-термины. Заказ и оплату подтверждает менеджер.'}}),
+F('g-whyloss','(რატომ|რის გამო|why|почему).{0,40}(ხარისხ|ბუნდოვან|იფუჭება|ეცემა|ვარდება|quality|blur|pixel|размыт|качеств)|ხარისხი (ეცემა|ვარდება|იკარგება|უარესდება|ფუჭდება)|(quality|video) (drops|gets worse|loses|is blurry)|падает качество|теряет(ся)? качество',{b:['home','method'],
+ a:{ka:'TikTok ყველა ატვირთულ ვიდეოს თავად ჰკუმშავს (ბიტრეიტსა და დეტალებს ამცირებს), ამიტომ ხარისხი ეცემა. თუ ვიდეო სწორ პარამეტრებზეა დამუშავებული (1080p/60fps ან 4K), შეკუმშვის შემდეგაც უფრო მკვეთრი რჩება — ამას აკეთებს MOONFULL 4K.',
+    en:'TikTok recompresses every uploaded video (it lowers the bitrate and detail), so quality drops. If the video is processed with the right settings (1080p/60fps or 4K), it stays sharper after compression — that is what MOONFULL 4K does.',
+    ru:'TikTok пережимает каждое загруженное видео (снижает битрейт и детали), поэтому качество падает. Если видео обработано с правильными параметрами (1080p/60fps или 4K), оно остаётся чётче после сжатия — этим и занимается MOONFULL 4K.'}}),
+F('g-diff','(განსხვავებ|სხვაობ|difference|\\bvs\\b|versus|სჯობია|უკეთესია|better|разниц|отличи|лучше).{0,30}(4 ?k|1080)|(4 ?k|1080).{0,30}(განსხვავებ|სხვაობ|difference|\\bvs\\b|versus|სჯობია|უკეთესია|better|разниц|отличи|лучше)',{b:['home'],
+ a:{ka:'4K-ს Full HD-ზე (1080p) 4-ჯერ მეტი პიქსელი აქვს, ამიტომ უფრო მკვეთრია, ფაილიც უფრო დიდია. ტელეფონის ეკრანზე 1080p უკვე კარგად ჩანს, 4K კი ჩვეულებრივ მეტ დეტალს ინარჩუნებს შეკუმშვის შემდეგ. 4K უფრო ძვირია (მაგ. კვირის პაკეტი: 24.99₾ → 35.99₾).',
+    en:'4K has 4× more pixels than Full HD (1080p), so it is sharper and the file is bigger. 1080p already looks good on a phone screen, while 4K usually keeps more detail after compression. 4K costs more (e.g. Weekly package: 24.99₾ → 35.99₾).',
+    ru:'У 4K в 4 раза больше пикселей, чем у Full HD (1080p), поэтому он чётче, а файл больше. На экране телефона 1080p уже выглядит хорошо, а 4K обычно сохраняет больше деталей после сжатия. 4K дороже (например, недельный пакет: 24.99₾ → 35.99₾).'}}),
+F('g-improve','(როგორ|how|как).{0,30}(გავაუმჯობესო|გავზარდო|ავწიო|ავამაღლო|გავხადო უკეთესი|improve|increase|boost|raise|улучш|повысить|поднять).{0,30}(ხარისხ|quality|качеств)|ხარისხის (გაუმჯობესებ|გაზრდ|ამაღლებ)',{b:['home','method'],
+ a:{ka:'ხარისხისთვის: ატვირთე ვიდეო 1080p/60fps ან 4K-ზე, მაღალი ბიტრეიტით, და დაამუშავე ისე, რომ TikTok-ის შეკუმშვას გაუძლოს. უმარტივესია შეუკვეთო ჩვენთან ან გამოიყენო MOON METHOD.',
+    en:'For better quality: record or export at 1080p/60fps or 4K with a high bitrate, and process it so it survives TikTok\'s compression. The easiest way is to order from us or use MOON METHOD.',
+    ru:'Для лучшего качества: снимайте или экспортируйте в 1080p/60fps или 4K с высоким битрейтом и обработайте видео так, чтобы оно пережило сжатие TikTok. Проще всего заказать у нас или использовать MOON METHOD.'}}),
+F('g-help','რა შეგიძლია|რაში დამეხმარ|რით დამეხმარ|what can you (do|help)|how can you help|чем (ты )?(можешь|поможешь)|что (ты )?умеешь|^(help|დახმარება|помощь)[\\s!?.]*$',{b:['home','method','checker'],
+ a:{ka:'შემიძლია გიპასუხო პაკეტებზე და ფასებზე, შეკვეთაზე, ვადებზე, გადახდასა და დაბრუნებაზე, საიტის ხელსაწყოებზე (Method, Checker) და ვიდეოს ტერმინებზე — მაგ. რა არის FPS, ბიტრეიტი, 4K ან ოპტიმიზატორი.',
+    en:'I can answer about packages and prices, ordering, delivery, payment and refunds, the site tools (Method, Checker) and video terms — e.g. what FPS, bitrate, 4K or an optimizer is.',
+    ru:'Могу ответить про пакеты и цены, заказ, сроки, оплату и возврат, инструменты сайта (Method, Checker) и видео-термины — например, что такое FPS, битрейт, 4K или оптимизатор.'}})
+];
+var DEF_RE=new RegExp('რა არის|რა არი\\b|რაა\\b|რა ჯანდაბა|რას ნიშნავს|რა ნიშნავს|რას ნიშნავ|მნიშვნელობ|განმარტ|განსაზღვრ|რას გულისხმობ|რას წარმოადგენ|ახსენ|ახსნ|ამიხსენ|ამიხსნ|აგიხსენ|მიხსენ|მიხსნ|გამიმარტ|მიამბ|მასწავლ|მითხარ|მითხრ|რას აკეთებს|რისთვისაა|რისთვის არის|რისთვის გამოიყენ|რა დანიშნულებ|როგორ მუშაობს|შესახებ|what is|what\'s|whats|what are|what does|mean(s|ing|t)?\\b|definition|define\\b|explain|tell me (about|what)|describe|how does .* work|purpose of|что так(ое|ой|ая)|что значит|что означает|значение|объясни|расскажи|определение|для чего|зачем|что делает|как работает','i');
+var EXP_RE=new RegExp('მნიშვნელობ|რას ნიშნავს|რა ნიშნავს|განმარტ|განსაზღვრ|\\bmean(s|ing|t)?\\b|definition|define\\b|значени|что значит|что означает|определени','i');
+function lev(a,b){var m=a.length,n=b.length,i,j,p=[],c,pv;for(j=0;j<=n;j++)p[j]=j;
+  for(i=1;i<=m;i++){pv=p[0];p[0]=i;for(j=1;j<=n;j++){c=p[j];p[j]=Math.min(p[j]+1,p[j-1]+1,pv+(a.charAt(i-1)===b.charAt(j-1)?0:1));pv=c}}return p[n]}
+function glossFind(q){
+  var best=null,bi=1e9,i,m;
+  for(i=0;i<GL.length;i++){m=GL[i].r.exec(q);if(m&&m.index<bi){bi=m.index;best=GL[i]}}
+  return best;
+}
+function glossFuzzy(q){
+  var t=q.split(/[^a-zа-яё0-9ა-ჿ]+/).filter(function(x){return x.length>=5}),i,j,k,w,cut,lim;
+  for(i=0;i<GL.length;i++){var f=GL[i].f||[];
+    for(j=0;j<f.length;j++){w=f[j];if(w.length<7)continue;lim=w.length>=10?2:1;
+      for(k=0;k<t.length;k++){if(t[k].length<w.length-2)continue;cut=t[k].slice(0,w.length);if(lev(cut,w)<=lim)return GL[i]}}}
+  return null;
+}
+function faqFind(q){for(var i=0;i<FAQ.length;i++)if(FAQ[i].r.test(q))return FAQ[i];return null}
+function kbMatch(q){
+  var best=null,bs=0;
   for(var i=0;i<KB.length;i++){
     var e=KB[i],s=0;
     for(var j=0;j<e.k.length;j++)if(e.k[j][0].test(q))s+=e.k[j][1];
@@ -29521,6 +29670,21 @@ function bestMatch(q){
     if(s>bs){bs=s;best=e}
   }
   return bs>=2?best:null;
+}
+function bestMatch(q){
+  q=norm(q);
+  var g0=q.match(GREET_RE);
+  if(g0){q=q.slice(g0[0].length).trim();if(!q)return kbById('greet')}
+  if(q.length<=32&&THANKS_RE.test(q))return kbById('thanks');
+  var f=faqFind(q);if(f)return f;
+  var def=DEF_RE.test(q),exp=EXP_RE.test(q),one=q.replace(/[^a-zа-яё0-9ა-ჿ]+/g,' ').trim().split(' ').length===1;
+  var g=glossFind(q);if(!g&&(def||one))g=glossFuzzy(q);
+  var kb=kbMatch(q);
+  if(g){
+    if(exp)return g;
+    if((def||one)&&(!g.w||!kb))return g;
+  }
+  return kb;
 }
 window.__mfAskMatch=function(q){if(ME_RE.test(q))return 'me';var e=bestMatch(q);return e?e.id:null};
 
@@ -29565,7 +29729,7 @@ panel.innerHTML='<div class="mfask-head"><div class="mfask-avatar"><img src="'+L
  +'<button id="mfask-send" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>'
  +'<label class="mfask-opt"><input type="checkbox" id="mfask-improve" checked><span class="mfask-imp"></span></label>'
  +'<div class="mfask-note"><span class="mfask-nt"></span><a class="mfask-nl" href="'+DISCORD+'" target="_blank" rel="noopener noreferrer"></a></div></div>';
-function mount(){document.body.appendChild(btn);document.body.appendChild(panel);applyLang();}
+function mount(){document.body.appendChild(btn);document.body.appendChild(panel);applyLang();if(want.x||want.y)applyPos();}
 var body=panel.querySelector('#mfask-body'),input=panel.querySelector('#mfask-in'),sendBtn=panel.querySelector('#mfask-send'),improve=panel.querySelector('#mfask-improve');
 try{if(localStorage.getItem('moonfull4k_ask_improve')==='0')improve.checked=false}catch(e){}
 improve.addEventListener('change',function(){try{localStorage.setItem('moonfull4k_ask_improve',improve.checked?'1':'0')}catch(e){}});
@@ -29579,7 +29743,7 @@ function applyLang(){
   panel.querySelector('.mfask-nt').textContent=u.note;panel.querySelector('.mfask-nl').textContent=u.noteLink;
   if(started&&!history.length){body.innerHTML='';greet()}
 }
-var history=[],busy=false,started=false,userCount=0,lastSend=0;
+var history=[],busy=false,started=false,userCount=0,lastSend=0,refocus=false;
 
 function scrollDown(){body.scrollTop=body.scrollHeight}
 function bubble(role,text){var el=document.createElement('div');el.className='mfask-msg '+(role==='user'?'mfask-user':'mfask-bot');
@@ -29607,22 +29771,47 @@ function chips(){
 function dropChips(){var s=body.querySelector('.mfask-sugg');if(s)s.remove()}
 function greet(){bubble('assistant',UI[lang()].hello);chips()}
 
-function open(){
-  panel.classList.add('mfask-open');btn.setAttribute('aria-expanded','true');
-  if(!started){started=true;greet()}
-  setTimeout(function(){try{input.focus({preventScroll:true})}catch(e){}},50);
+function isMob(){return window.matchMedia('(max-width:480px)').matches}
+function isOpen(){return panel.classList.contains('mfask-open')}
+var cur={x:0,y:0};
+function zf(){var r=btn.getBoundingClientRect(),o=btn.offsetWidth;return(o&&r.width)?r.width/o:1}
+function geom(){
+  var z=zf(),r=btn.getBoundingClientRect(),cs=getComputedStyle(btn),bl=r.left-cur.x*z,bt=r.top-cur.y*z;
+  return {z:z,bl:bl,bt:bt,w:r.width,h:r.height,vr:bl+r.width+(parseFloat(cs.right)||0)*z,vb:bt+r.height+(parseFloat(cs.bottom)||0)*z,r:r}}
+function placePanel(){
+  var ps=panel.style,g=geom(),z=g.z,r=g.r,bx=r.left/z,by=r.top/z,bw=r.width/z,bh=r.height/z,VW=g.vr/z,VH=g.vb/z;
+  if(isMob()){
+    ps.left=ps.top=ps.width=ps.right=ps.bottom=ps.height='';
+    panel.style.setProperty('--mfo',Math.round(Math.min(Math.max(bx+bw/2-8,0),VW-16))+'px 100%');
+    if(isOpen())fitVV();return;
+  }
+  var M=12,G=12,w=Math.min(380,VW-2*M),left,top,h,cx=bx+bw/2;
+  left=cx>VW/2?bx+bw-w:bx;left=Math.max(M,Math.min(left,VW-M-w));
+  var up=by-G-M,down=VH-(by+bh)-G-M;
+  if(up>=360||up>=down){h=Math.max(200,Math.min(580,up));top=by-G-h}
+  else{h=Math.max(200,Math.min(580,down));top=by+bh+G}
+  top=Math.max(M,Math.min(top,VH-M-h));
+  ps.right='auto';ps.bottom='auto';ps.left=Math.round(left)+'px';ps.top=Math.round(top)+'px';ps.width=w+'px';ps.height=Math.round(h)+'px';
+  panel.style.setProperty('--mfo',Math.round(cx-left)+'px '+Math.round(by+bh/2-top)+'px');
 }
-function close(){panel.classList.remove('mfask-open');btn.setAttribute('aria-expanded','false');resetVV()}
+function open(){
+  if(!started){started=true;greet()}
+  placePanel();void panel.offsetWidth;
+  panel.classList.add('mfask-open');btn.setAttribute('aria-expanded','true');
+}
+function close(){
+  if(document.activeElement===input)try{input.blur()}catch(e){}
+  panel.classList.remove('mfask-open');btn.setAttribute('aria-expanded','false');resetVV()}
 
 function finish(text,b,store){typing(false);bubble('assistant',text);if(store!==false)history.push({role:'assistant',content:text});actions(b);busy=false;sendBtn.disabled=false;
-  if(!window.matchMedia('(pointer:coarse)').matches)try{input.focus({preventScroll:true})}catch(e){}}
+  if(refocus&&!window.matchMedia('(pointer:coarse)').matches)try{input.focus({preventScroll:true})}catch(e){}}
 function fallbackText(){return {ka:'ზუსტი პასუხი ვერ მოვძებნე. მენეჯერს Discord-ზე ან საიტის ჩატში მოწერე — სწრაფად გიპასუხებს.',en:"I couldn't find an exact answer. Ask a manager on Discord or in the site chat — they'll reply quickly.",ru:'Точного ответа не нашёл. Напишите менеджеру в Discord или в чате на сайте — он быстро ответит.'}[lang()]}
 
 function ask(text){
   var q=String(text||input.value||'').trim().slice(0,MAX_LEN);
   if(!q||busy)return;
   var now=Date.now();if(now-lastSend<500)return;lastSend=now;
-  dropChips();bubble('user',q);input.value='';input.style.height='';input.style.overflowY='hidden';history.push({role:'user',content:q});
+  refocus=document.activeElement===input;dropChips();bubble('user',q);input.value='';input.style.height='';input.style.overflowY='hidden';history.push({role:'user',content:q});
   userCount++;
   busy=true;sendBtn.disabled=true;typing(true);
   if(userCount>MAX_USER_MSGS){setTimeout(function(){finish({ka:'ამ საუბრისთვის შეკითხვების ლიმიტი ამოიწურა. გააგრძელე მენეჯერთან Discord-ზე.',en:'The question limit for this chat is reached. Please continue with a manager on Discord.',ru:'Лимит вопросов в этом чате исчерпан. Продолжите с менеджером в Discord.'}[lang()],['discord'])},250);return}
@@ -29655,7 +29844,34 @@ function resetVV(){panel.style.bottom='';panel.style.height=''}
 if(vv){vv.addEventListener('resize',fitVV);vv.addEventListener('scroll',fitVV)}
 
 /* ---------- events ---------- */
-btn.addEventListener('click',function(){panel.classList.contains('mfask-open')?close():open()});
+/* ---------- draggable button ---------- */
+var PK='moonfull4k_ask_pos',want={x:0,y:0},drag=null,dragEnd=0;
+try{var sp=JSON.parse(localStorage.getItem(PK)||'null');if(sp&&isFinite(sp.x)&&isFinite(sp.y)){want.x=+sp.x;want.y=+sp.y}}catch(e){}
+function clampXY(x,y){var g=geom(),M=6,z=g.z;
+  return {x:Math.min(Math.max(x,(M-g.bl)/z),(g.vr-M-g.w-g.bl)/z),y:Math.min(Math.max(y,(M-g.bt)/z),(g.vb-M-g.h-g.bt)/z)}}
+function applyPos(){var c=clampXY(want.x,want.y);cur.x=c.x;cur.y=c.y;btn.style.setProperty('--mfx',c.x+'px');btn.style.setProperty('--mfy',c.y+'px');return c}
+btn.addEventListener('pointerdown',function(e){
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  drag={id:e.pointerId,sx:e.clientX,sy:e.clientY,px:cur.x,py:cur.y,z:zf(),moved:false};
+  try{btn.setPointerCapture(e.pointerId)}catch(_){}
+});
+btn.addEventListener('pointermove',function(e){
+  if(!drag||e.pointerId!==drag.id)return;
+  var dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
+  if(!drag.moved){if(dx*dx+dy*dy<49)return;drag.moved=true;btn.classList.add('mfask-drag')}
+  var c=clampXY(drag.px+dx/drag.z,drag.py+dy/drag.z);want.x=c.x;want.y=c.y;applyPos();
+  if(isOpen())placePanel();
+});
+function endDrag(e){
+  if(!drag||(e&&e.pointerId!==drag.id))return;
+  var mv=drag.moved;drag=null;btn.classList.remove('mfask-drag');
+  if(mv){dragEnd=Date.now();try{localStorage.setItem(PK,JSON.stringify({x:Math.round(want.x),y:Math.round(want.y)}))}catch(_){}}
+}
+btn.addEventListener('pointerup',endDrag);btn.addEventListener('pointercancel',endDrag);
+btn.addEventListener('lostpointercapture',endDrag);
+btn.addEventListener('contextmenu',function(e){e.preventDefault()});
+window.addEventListener('resize',function(){applyPos();if(isOpen())placePanel()});
+btn.addEventListener('click',function(){if(Date.now()-dragEnd<150)return;isOpen()?close():open()});
 panel.querySelector('.mfask-x').addEventListener('click',function(){close();btn.focus({preventScroll:true})});
 sendBtn.addEventListener('click',function(){ask()});
 input.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();ask()}e.stopPropagation()});
