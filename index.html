@@ -23957,14 +23957,15 @@ var PRESETS = [
   {id:'4k60',    label:'4K · 60',    h:2160, fps:60},
   {id:'4k120',   label:'4K · 120',   h:2160, fps:120}
 ];
+var MAX_MB = 1000;
 var PLANS = {
-  free:{h:1080,fps:60,price:0},
-  p1:{h:1080,fps:60,price:'5.99'},
-  p2:{h:1080,fps:120,price:'7.99'},
-  p3:{h:2160,fps:120,price:'14.99'}
+  free:{h:1080,fps:60,price:0,mb:200,up:3},
+  p1:{h:1080,fps:60,price:'5.99',mb:450,up:7},
+  p2:{h:1080,fps:120,price:'7.99',mb:750,up:0},
+  p3:{h:2160,fps:120,price:'14.99',mb:0,up:0}
 };
 var T = {
- ka:{"nav": "მეთოდი", "title": "მუნის მეთოდი", "sub": "ატვირთე ვიდეო და მიიღე წამებში", "idle": "მზადაა", "busy": "მუშავდება", "done": "დასრულდა", "err": "შეცდომა", "drop": "ატვირთე ვიდეო", "dropSub": "გადმოაგდე ან დააჭირე ასარჩევად", "hint": "", "size": "ზომა", "res": "გარჩევადობა", "dur": "ხანგრძლივობა", "preset": "ხარისხი", "go": "ოპტიმიზაცია", "left": "დარჩენილი ატვირთვა", "week": "ამ კვირაში", "unl": "ულიმიტო", "resets": "ლიმიტი განახლდება", "plans": "გეგმები", "buy": "შეძენა", "cur": "შენი გეგმა", "perMonth": "/თვე", "freeNote": "გადახდა არ არის საჭირო", "curNote": "მიმდინარე გეგმა", "free": "უფასო", "freeL": "3 ატვირთვა კვირაში", "unlimited": "ულიმიტო ატვირთვა", "upTo": "მაქს. ", "lock": "ამ გეგმაში მიუწვდომელია", "login": "გამოსაყენებლად შედი Discord-ით", "loginBtn": "Discord-ით შესვლა", "noGate": "სერვისი ჯერ არ არის დაკავშირებული (GATE URL).", "blocked": "შენი წვდომა შეზღუდულია.", "noQuota": "ამ კვირის ლიმიტი ამოწურულია. განახლდება: ", "expired": "გეგმა ვადაგასულია — გადართულია უფასოზე.", "up": "იტვირთება", "queue": "რიგშია", "proc": "მუშავდება", "ready": "მზადაა! ჩამოტვირთე ქვემოთ", "dl": "ჩამოტვირთვა", "tooFps": "ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება", "noFps": "ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი", "tooBig": "ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია", "noMeta": "ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)", "pickMp4": "აირჩიე mp4 ფაილი", "d": "დ", "h": "სთ", "m": "წთ", "wake": "კავშირი ვერ დამყარდა, ვცდილობ თავიდან…", "slow": "ვიდეო მუშავდება, ცოტა ხანი დასჭირდება…"},
+ ka:{"nav": "მეთოდი", "title": "მუნის მეთოდი", "sub": "ატვირთე ვიდეო და მიიღე წამებში", "idle": "მზადაა", "busy": "მუშავდება", "done": "დასრულდა", "err": "შეცდომა", "drop": "ატვირთე ვიდეო", "dropSub": "გადმოიტანე ან დააჭირეთ ასარჩევად", "hint": "", "size": "ზომა", "res": "გარჩევადობა", "dur": "ხანგრძლივობა", "preset": "ხარისხი", "go": "ოპტიმიზაცია", "left": "დარჩენილი ატვირთვა", "week": "ამ კვირაში", "unl": "ულიმიტო", "resets": "ლიმიტი განახლდება", "plans": "გეგმები", "buy": "შეძენა", "cur": "შენი გეგმა", "perMonth": "/თვე", "freeNote": "გადახდა არ არის საჭირო", "curNote": "მიმდინარე გეგმა", "free": "უფასო", "freeL": "3 ატვირთვა კვირაში", "unlimited": "ულიმიტო ატვირთვა", "upTo": "მაქს. ", "lock": "ამ გეგმაში მიუწვდომელია", "login": "გამოსაყენებლად შედი Discord-ით", "loginBtn": "Discord-ით შესვლა", "noGate": "სერვისი ჯერ არ არის დაკავშირებული (GATE URL).", "blocked": "შენი წვდომა შეზღუდულია.", "noQuota": "ამ კვირის ლიმიტი ამოწურულია. განახლდება: ", "expired": "გეგმა ვადაგასულია — გადართულია უფასოზე.", "up": "იტვირთება", "queue": "რიგშია", "proc": "მუშავდება", "ready": "მზადაა! ჩამოტვირთე ქვემოთ", "dl": "ჩამოტვირთვა", "tooFps": "ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება", "noFps": "ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი", "tooBig": "ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია", "noMeta": "ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)", "pickMp4": "აირჩიე mp4 ფაილი", "d": "დ", "h": "სთ", "m": "წთ", "wake": "კავშირი ვერ დამყარდა, ვცდილობ თავიდან…", "slow": "ვიდეო მუშავდება, ცოტა ხანი დასჭირდება…"},
  en:{"nav": "METHOD", "title": "MOON METHOD", "sub": "Upload a video and get it in seconds", "idle": "ready", "busy": "processing", "done": "done", "err": "error", "drop": "Upload a video", "dropSub": "Drag & drop or tap to choose", "hint": "", "size": "Size", "res": "Resolution", "dur": "Duration", "preset": "Quality", "go": "Optimize", "left": "Uploads left", "week": "this week", "unl": "Unlimited", "resets": "Limit resets in", "plans": "Plans", "buy": "Get plan", "cur": "Your plan", "perMonth": "/month", "freeNote": "No payment needed", "curNote": "Current plan", "free": "Free", "freeL": "3 uploads per week", "unlimited": "Unlimited uploads", "upTo": "Up to ", "lock": "Not available on your plan", "login": "Sign in with Discord to use MOON METHOD", "loginBtn": "Sign in with Discord", "noGate": "Service not connected yet (GATE URL).", "blocked": "Your access is restricted.", "noQuota": "Weekly limit reached. Resets in: ", "expired": "Plan expired — switched to free.", "up": "Uploading", "queue": "Queued", "proc": "Processing", "ready": "Done! Download below", "dl": "Download", "tooFps": "Video frame rate ({f} fps) is above your plan limit (max {n} fps). 120 fps videos need Plan 2 or Plan 3", "noFps": "Could not read the video fps. Try another mp4 file", "tooBig": "This video is above your plan limit (max 1080p). 4K is only on the 14.99 ₾ plan", "noMeta": "Could not read the video resolution. Try another mp4 (H.264)", "pickMp4": "Choose an mp4 file", "d": "d", "h": "h", "m": "m", "wake": "Connection failed, trying again…", "slow": "Processing your video, this may take a moment…"},
  ru:{"nav": "МЕТОД", "title": "МЕТОД MOON", "sub": "Загрузите видео и получите результат за секунды", "idle": "готово", "busy": "обработка", "done": "готово", "err": "ошибка", "drop": "Загрузите видео", "dropSub": "Перетащите сюда или нажмите, чтобы выбрать", "hint": "", "size": "Размер", "res": "Разрешение", "dur": "Длительность", "preset": "Качество", "go": "Оптимизировать", "left": "Осталось загрузок", "week": "на этой неделе", "unl": "Безлимит", "resets": "Лимит обновится через", "plans": "Тарифы", "buy": "Купить", "cur": "Ваш тариф", "perMonth": "/мес", "freeNote": "Оплата не требуется", "curNote": "Текущий тариф", "free": "Бесплатно", "freeL": "3 загрузки в неделю", "unlimited": "Безлимитные загрузки", "upTo": "До ", "lock": "Недоступно на вашем тарифе", "login": "Войдите через Discord, чтобы пользоваться MOON METHOD", "loginBtn": "Войти через Discord", "noGate": "Сервис ещё не подключён (GATE URL).", "blocked": "Ваш доступ ограничен.", "noQuota": "Недельный лимит исчерпан. Обновится через: ", "expired": "Тариф истёк — переключено на бесплатный.", "up": "Загрузка", "queue": "В очереди", "proc": "Обработка", "ready": "Готово! Скачайте ниже", "dl": "Скачать", "tooFps": "Частота кадров видео ({f} fps) выше лимита вашего тарифа (макс. {n} fps). Видео 120 fps доступно только на Plan 2 и Plan 3", "noFps": "Не удалось определить fps видео. Попробуйте другой mp4-файл", "tooBig": "Разрешение видео выше лимита вашего тарифа (макс. 1080p). 4K доступно только на тарифе за 14.99 ₾", "noMeta": "Не удалось определить разрешение видео. Попробуйте другой mp4 (H.264)", "pickMp4": "Выберите mp4-файл", "d": "д", "h": "ч", "m": "мин", "wake": "Не удалось подключиться, пробую снова…", "slow": "Видео обрабатывается, это может занять немного времени…"}
 };
@@ -23972,6 +23973,10 @@ T.ka.engBest='საუკეთესო'; T.ka.engBackup='რეზერვ�
 T.en.engBest='Best'; T.en.engBackup='Backup'; T.en.tryBackup='MOON 2.1 did not work — try MOON 1.2 (backup)';
 T.ka.tut='ტუტორიალი'; T.en.tut='Tutorial'; T.ru.tut='Туториал';
 T.ru.engBest='Лучший'; T.ru.engBackup='Резерв'; T.ru.tryBackup='MOON 2.1 не сработал — попробуйте MOON 1.2 (резерв)';
+T.ka.plUp='{n} ატვირთვა / კვირაში'; T.ka.plUpU='ულიმიტო ატვირთვა / კვირაში'; T.ka.plMb='{n}MB მაქს. მოცულობა'; T.ka.plMbU='ულიმიტო მოცულობა'; T.ka.plMethod='მუნის მეთოდი'; T.ka.plCheck='ტიკტოკ ვიდეო ჩექერი'; T.ka.plRed='4K / 120FPS'; T.ka.plFull='სრული მხარდაჭერა'; T.ka.tooBigSize='ვიდეო ძალიან დიდია ({s}). თქვენს გეგმაში მაქსიმუმ {n} MB-ია'; T.ka.tooBigMax='ვიდეო ძალიან დიდია ({s}). მაქსიმალური მოცულობა {n} MB-ია';
+T.en.plUp='{n} uploads / week'; T.en.plUpU='Unlimited uploads / week'; T.en.plMb='{n}MB max size'; T.en.plMbU='Unlimited size'; T.en.plMethod='MOON Method'; T.en.plCheck='TikTok video checker'; T.en.plRed='4K / 120FPS'; T.en.plFull='Full support'; T.en.tooBigSize='The video is too large ({s}). Your plan allows up to {n} MB'; T.en.tooBigMax='The video is too large ({s}). The maximum is {n} MB';
+T.ru.plUp='{n} загрузок / неделя'; T.ru.plUpU='Безлимитные загрузки / неделя'; T.ru.plMb='Макс. размер {n} МБ'; T.ru.plMbU='Без ограничения размера'; T.ru.plMethod='Метод MOON'; T.ru.plCheck='TikTok-чекер видео'; T.ru.plRed='4K / 120FPS'; T.ru.plFull='Полная поддержка'; T.ru.tooBigSize='Видео слишком большое ({s}). В вашем плане максимум {n} МБ'; T.ru.tooBigMax='Видео слишком большое ({s}). Максимум — {n} МБ';
+T.ka.dropMax='1000მბ მაქს'; T.en.dropMax='1000MB max'; T.ru.dropMax='макс. 1000 МБ';
 T.ka.conv='გარდაიქმნება'; T.ka.convHint='გადადის MP4 ფორმატში'; T.ka.convLoad='ფორმატის გადაყვანის მომზადება…'; T.ka.convSlow='გადაყვანა რამდენიმე წუთს გასტანს…'; T.ka.convMsg='ვიდეო MP4 ფორმატში გადადის — დაელოდე, გვერდი არ დახურო'; T.ka.convFail='ამ ფორმატის გადაყვანა ვერ მოხერხდა. სცადე MP4 ან MOV'; T.ka.pickVideo='აირჩიე ვიდეო ფაილი'; T.ka.tooBigConv='ფაილი ძალიან დიდია გადასაყვანად (მაქს. 1.5 GB)';
 T.en.conv='Converting'; T.en.convHint='Converting to MP4'; T.en.convLoad='Preparing the converter…'; T.en.convSlow='Conversion will take a few minutes…'; T.en.convMsg='Converting the video to MP4 — please wait and keep this page open'; T.en.convFail='This format could not be converted. Try MP4 or MOV'; T.en.pickVideo='Choose a video file'; T.en.tooBigConv='File is too large to convert (max 1.5 GB)';
 T.ru.conv='Конвертация'; T.ru.convHint='Конвертация в MP4'; T.ru.convLoad='Подготовка конвертера…'; T.ru.convSlow='Конвертация займёт несколько минут…'; T.ru.convMsg='Видео конвертируется в MP4 — подождите и не закрывайте страницу'; T.ru.convFail='Не удалось конвертировать этот формат. Попробуйте MP4 или MOV'; T.ru.pickVideo='Выберите видеофайл'; T.ru.tooBigConv='Файл слишком большой для конвертации (макс. 1.5 GB)';
@@ -23991,7 +23996,7 @@ view.innerHTML =
  '<div id="optMain">'+
   '<div class="opt-quota" id="optQuota"></div>'+
   '<div class="op-col">'+
-   '<label class="opt-drop" id="optDrop" for="optFile"><span class="opt-ic"><svg viewBox="0 0 48 48"><path d="M24 6v24M14 21l10 10 10-10M8 34v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4"/></svg></span><b id="optName" data-k="drop"></b><span id="optHint" data-k="dropSub"></span><input id="optFile" type="file" accept="video/*,.mp4,.mov,.m4v,.mkv,.webm,.avi,.flv,.wmv,.ts,.mts,.m2ts,.3gp,.mpg,.mpeg" hidden></label>'+
+   '<label class="opt-drop" id="optDrop" for="optFile"><span class="opt-ic"><svg viewBox="0 0 48 48"><path d="M24 6v24M14 21l10 10 10-10M8 34v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4"/></svg></span><b id="optName" data-k="drop"></b><span id="optHint" data-k="dropSub"></span><span id="optMax" class="opt-max" data-k="dropMax"></span><input id="optFile" type="file" accept="video/*,.mp4,.mov,.m4v,.mkv,.webm,.avi,.flv,.wmv,.ts,.mts,.m2ts,.3gp,.mpg,.mpeg" hidden></label>'+
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
@@ -24029,7 +24034,7 @@ function eff(){ var pl=PLANS[(S.status&&S.status.plan)||'free']; var st=S.status
 function allowed(p){ var pl=eff(); return p.h<=pl.h && p.fps<=pl.fps; }
 function setHTML(el,h){ if(el._h!==h){ el._h=h; el.innerHTML=h; } }
 function renderPresets(){ var first=PRESETS.filter(allowed).pop(); S.preset=first?first.id:null; updateGo(); }
-function fmtCd(ms){ var t=Math.max(0,Math.floor(ms/1000)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sc=t%60; function p(n){return String(n).padStart(2,'0');} return p(h)+':'+p(m)+':'+p(sc); }
+function fmtCd(ms){ if(!isFinite(ms)) return '--:--:--'; var t=Math.max(0,Math.floor(ms/1000)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sc=t%60; function p(n){return String(n).padStart(2,'0');} return p(h)+':'+p(m)+':'+p(sc); }
 function planLabel(st){ return st.plan==='free'?tr('free'):('Plan '+String(st.plan).replace(/^p/i,'')); }
 function upWord(){ var l=L(); try{ if(typeof currentLang!=='undefined'&&currentLang==='ka') l='ka'; }catch(e){} return l==='ka'?'ატვირთვა':(l==='ru'?'Загрузки':'Uploads'); }
 function renderChips(){
@@ -24053,7 +24058,7 @@ function renderQuota(){
   var q=$('optQuota'); if(!q) return; var st=S.status;
   renderChips();
   if(!st){ q.style.display='none'; return; }
-  if(st.unlimited){ q.style.display='none'; return; }
+  if(st.unlimited||!isFinite(st.resetAt)){ q.style.display='none'; return; }
   q.style.display='';
   setHTML(q,'<div class="opt-q-main"><div class="opt-q-lab">'+tr('resets')+'</div><div class="opt-q-cd" id="optCd">'+fmtCd(st.resetAt-Date.now())+'</div></div>');
 }
@@ -24066,6 +24071,15 @@ function planSpecs(id){
   });
   return out;
 }
+function planLines(id){
+  var pl=PLANS[id]||PLANS.free, out=[];
+  out.push((pl.h>=2160?'4K':'1080P')+' / '+pl.fps+'FPS');
+  out.push(pl.up?tr('plUp').replace('{n}',pl.up):tr('plUpU'));
+  out.push(pl.mb?tr('plMb').replace('{n}',pl.mb):tr('plMbU'));
+  out.push(tr('plMethod')); out.push(tr('plCheck'));
+  out.push(id==='p3'?tr('plFull'):'~'+tr('plRed'));
+  return out;
+}
 function renderPlans(){
   var box=$('optPlans'); if(!box) return; var cur=(S.status&&S.status.plan)||'free';
   var items=[
@@ -24075,10 +24089,10 @@ function renderPlans(){
    ['p3','Plan 3','14.99',[tr('unlimited')]]
   ];
   var __plH=items.map(function(x){
-    var lines=x[3].concat(planSpecs(x[0])), isCur=x[0]===cur;
+    var lines=planLines(x[0]), isCur=x[0]===cur;
     return '<div class="opt-plan'+(isCur?' cur':'')+'"><div class="op-pn"><h4>'+esc(x[1])+'</h4>'+(isCur?'<span class="opt-badge">'+tr('cur')+'</span>':'')+'</div>'+
       '<div class="pr">'+(x[2]?x[2]+' ₾<small> '+tr('perMonth')+'</small>':'0 ₾')+'</div>'+
-      '<ul>'+lines.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>'+
+      '<ul>'+lines.map(function(l){return l.charAt(0)==='~'?'<li class="pl-no"><s>'+esc(l.slice(1))+'</s></li>':'<li>'+esc(l)+'</li>';}).join('')+'</ul>'+
       (isCur||!x[2]?'<span class="op-slot">'+(!x[2]?tr('freeNote'):tr('curNote'))+'</span>':'<button type="button" class="opt-buy" data-buy="1">'+tr('buy')+'</button>')+'</div>';
   }).join('');
   /* anti double-animation: identical markup -> keep the existing cards; a rebuild while the page is open must not replay the entrance */
@@ -24143,8 +24157,10 @@ function readMp4Fps(file){
   }).catch(function(){ return null; });
 }
 function showRes(){ if(!S.resTxt) return; var pr=S.resTxt.split(' · '); var q=pr[0]+(S.fps>0?' · '+Math.round(S.fps)+'fps':''); var d=pr[1]||''; $('oRes').innerHTML='<span class="rl">'+esc(q)+'</span>'+(d?'<span class="rl rs">'+esc(d)+'</span>':''); }
+function capMB(){ var st=S.status, pl=PLANS[(st&&st.plan)||'free']||PLANS.free, mb=(st&&typeof st.maxMB==='number')?st.maxMB:pl.mb; return (mb>0&&mb<MAX_MB)?mb:MAX_MB; }
 function limitKey(){
   var pl=eff(), m=S.meta;
+  if(S.file){ var cm=capMB(); if(S.file.size>cm*1048576) return cm>=MAX_MB?'tooBigMax':'tooBigSize'; }
   if(m){ var mx=Math.max(m.w,m.h), mn=Math.min(m.w,m.h); if(pl.h<2160&&(mn>1088||mx>1930)) return 'tooBig'; }
   if(S.fps===undefined) return '';
   if(S.fps===null) return pl.fps<120?'noFps':'';
@@ -24153,7 +24169,7 @@ function limitKey(){
 function overLimit(){ return !!limitKey(); }
 function updateGo(){
   var st=S.status, lk=limitKey(), pl=eff();
-  if(lk&&S.file&&!S.busy) msg(tr(lk).replace('{n}',pl.fps).replace('{f}',S.fps>0?Math.round(S.fps):'?'),true);
+  if(lk&&S.file&&!S.busy) msg(/^tooBig(Size|Max)$/.test(lk)?tr(lk).replace('{s}',fmtSize(S.file.size)).replace('{n}',capMB()):tr(lk).replace('{n}',pl.fps).replace('{f}',S.fps>0?Math.round(S.fps):'?'),true);
   var ok=S.file&&S.meta&&S.fps!==undefined&&!lk&&S.preset&&!S.busy&&st&&!st.blocked&&(st.unlimited||st.remaining>0); $('optGo').disabled=!ok;
 }
 function setFileReady(f){
@@ -24253,6 +24269,7 @@ function convertToMp4(f){
 function setFile(f){
   if(!f||S.converting) return;
   if(!looksVideo(f)){ msg(tr('pickVideo'),true); return; }
+  if(f.size>MAX_MB*1048576){ S.file=null; S.meta=null; S.fps=undefined; $('optDl').style.display='none'; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); ['oSize','oRes','oDur'].forEach(function(i){ var e=$(i); if(e) e.textContent='—'; }); updateGo(); msg(tr('tooBigMax').replace('{s}',fmtSize(f.size)).replace('{n}',MAX_MB),true); return; }
   sniffIso(f).then(function(iso){
     if(iso) return setFileReady(f);
     S.converting=true; S.file=null; S.meta=null; S.fps=undefined; updateGo();
@@ -24267,10 +24284,10 @@ function setFile(f){
 /* ============ RUN JOB ============ */
 function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); var pr=$('optProg'); if(pr) pr.style.setProperty('--mpp',p); }
 var _outN=0;
-function nextOutName(){
+function nextOutName(f){
   var n=0; try{ n=parseInt(localStorage.getItem('moonOutN')||'0',10)||0; }catch(e){ n=_outN; }
   n++; _outN=n; try{ localStorage.setItem('moonOutN',String(n)); }catch(e){}
-  return 'www.moonfull4k.xyz '+n+'.mp4';
+  return 'www.moonfull4k.xyz '+n+(/\.(mov|qt)$/i.test((f&&f.name)||'')?'.mov':'.mp4');
 }
 function scrollToProg(blockMode){
   try{ var p=$('optProg'); if(!p||p.style.display==='none') return;
@@ -24329,7 +24346,7 @@ function patchWithCore(file,fps,eng){
       if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
       var n=out&&(out.byteLength!=null?out.byteLength:out.length);
       try{ console.log('[optimizer] attempt',i,tries[i],'->',out&&out.constructor&&out.constructor.name,n); }catch(_){}
-      if(out&&n>0&&isMp4(out)){ if(eng==='12') out=moonBrand(out); return new Blob([out],{type:'video/mp4'}); }
+      if(out&&n>0&&isMp4(out)){ if(eng==='12') out=moonBrand(out); return new Blob([out],{type:(/\.(mov|qt)$/i.test(file.name||'')?'video/quicktime':'video/mp4')}); }
       last='output '+(n||0)+' bytes';
     }
     throw new Error('პატჩერმა ცარიელი ფაილი დააბრუნა ('+last+')');
@@ -24415,7 +24432,7 @@ function run(){
     bar(100); S.busy=false; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
     if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} }
     S.dlUrl=URL.createObjectURL(blob);
-    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(); a.style.display=''; updateGo(); setTimeout(function(){ scrollToProg('nearest'); },120);
+    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(S.file); a.style.display=''; updateGo(); setTimeout(function(){ scrollToProg('nearest'); },120);
   }).catch(function(e){
     if(tk){ return finishFail(tk.ticket,e.message||String(e)); }
     S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):e.message),true); refreshStatus();
@@ -24740,13 +24757,13 @@ html body #optView .opt-stats,html body #optView .opt-prog{margin-inline:auto}
 <script id="plans-page-js">
 (function(){
  var ARW='<svg viewBox="0 0 24 24"><path d="%P"/></svg>';
- var FALLBACK=[['უფასო','0 ₾','',['3 ატვირთვა კვირაში','1080p · 60 fps'],0],
-  ['Plan 1','5.99 ₾','/თვე',['ულიმიტო ატვირთვა','1080p · 60 fps'],1],
-  ['Plan 2','7.99 ₾','/თვე',['ულიმიტო ატვირთვა','1080p · 120 / 60 fps'],1],
-  ['Plan 3','14.99 ₾','/თვე',['ულიმიტო ატვირთვა','4K · 120 / 60 fps'],1]];
+ var FALLBACK=[['უფასო','0 ₾','',['1080P / 60FPS','3 ატვირთვა / კვირაში','200MB მაქს. მოცულობა','მუნის მეთოდი','ტიკტოკ ვიდეო ჩექერი','~4K / 120FPS'],0],
+  ['Plan 1','5.99 ₾','/თვე',['1080P / 60FPS','7 ატვირთვა / კვირაში','450MB მაქს. მოცულობა','მუნის მეთოდი','ტიკტოკ ვიდეო ჩექერი','~4K / 120FPS'],1],
+  ['Plan 2','7.99 ₾','/თვე',['1080P / 120FPS','ულიმიტო ატვირთვა / კვირაში','750MB მაქს. მოცულობა','მუნის მეთოდი','ტიკტოკ ვიდეო ჩექერი','~4K / 120FPS'],1],
+  ['Plan 3','14.99 ₾','/თვე',['4K / 120FPS','ულიმიტო ატვირთვა / კვირაში','ულიმიტო მოცულობა','მუნის მეთოდი','ტიკტოკ ვიდეო ჩექერი','სრული მხარდაჭერა'],1]];
  function fallback(box){
   box.innerHTML=FALLBACK.map(function(p){
-   return '<div class="opt-plan"><div class="op-pn"><h4>'+p[0]+'</h4></div><div class="pr">'+p[1]+(p[2]?'<small> '+p[2]+'</small>':'')+'</div><ul>'+p[3].map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul>'+(p[4]?'<button type="button" class="opt-buy" data-buy="1">შეძენა</button>':'<span class="op-slot">გადახდა არ არის საჭირო</span>')+'</div>';
+   return '<div class="opt-plan"><div class="op-pn"><h4>'+p[0]+'</h4></div><div class="pr">'+p[1]+(p[2]?'<small> '+p[2]+'</small>':'')+'</div><ul>'+p[3].map(function(l){return l.charAt(0)==='~'?'<li class="pl-no"><s>'+l.slice(1)+'</s></li>':'<li>'+l+'</li>';}).join('')+'</ul>'+(p[4]?'<button type="button" class="opt-buy" data-buy="1">შეძენა</button>':'<span class="op-slot">გადახდა არ არის საჭირო</span>')+'</div>';
   }).join('');
  }
  function build(){
@@ -29183,6 +29200,23 @@ html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-pct:not(#_a)
 html body #optView .opt-prog .opt-pct b:not(#_a):not(#_b):not(#_c){-webkit-text-stroke:0!important}
 /* header: page text no longer shows through it */
 html body #hzBar.hz-bar:not(#_a):not(#_b):not(#_c):not(#_d){background:rgba(10,7,16,.96)!important}
+/* plan cards now have six lines: the last three appear in the same rhythm as the first three */
+#plansView .opt-plan li:nth-child(4){animation-delay:calc(var(--i,0)*140ms + .71s)}
+#plansView .opt-plan li:nth-child(5){animation-delay:calc(var(--i,0)*140ms + .78s)}
+#plansView .opt-plan li:nth-child(6){animation-delay:calc(var(--i,0)*140ms + .85s)}
+/* a feature that is NOT in the plan: red cross, text struck through with a red line (no green tick) */
+html body #plansView .opt-plan li.pl-no:not(#_a):not(#_b):not(#_c){color:rgba(226,214,226,.5)!important}
+html body #plansView .opt-plan li.pl-no>s:not(#_a):not(#_b):not(#_c){position:relative;text-decoration:none!important}
+html body #plansView .opt-plan li.pl-no:not(#_a):not(#_b):not(#_c)::before{border-color:rgba(255,77,94,.7)!important;background:rgba(255,59,78,.16)!important}
+/* plan lines: the tick / cross is drawn as a shape (not a font character), so it sits exactly in the middle of its circle on every phone; icon and text share one centre line */
+html body :is(#plansView,#optView) .opt-plan li:not(#_a):not(#_b):not(#_c){display:flex!important;align-items:center!important;gap:10px!important;padding-left:0!important;min-height:22px;line-height:1.35!important;text-align:left}
+html body :is(#plansView,#optView) .opt-plan li:not(#_a):not(#_b):not(#_c)>s{min-width:0}
+html body :is(#plansView,#optView) .opt-plan li:not(#_a):not(#_b):not(#_c)::before{content:""!important;display:block!important;position:static!important;flex:0 0 22px!important;box-sizing:border-box!important;width:22px!important;height:22px!important;margin:0!important;font-size:0!important;line-height:0!important;transform:translateY(-1px)!important}
+html body :is(#plansView,#optView) .opt-plan li:not(#_a):not(#_b):not(#_c)::after{content:"";position:absolute;left:0;top:calc(50% - 12px);width:22px;height:22px;pointer-events:none;background:#eafff0;background:color-mix(in srgb,var(--pc,#2fe074) 45%,#fff);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat}
+html body :is(#plansView,#optView) .opt-plan li.pl-no:not(#_a):not(#_b):not(#_c)::after{background:#ff7a88;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 6.5l11 11M17.5 6.5l-11 11' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") center/12px 12px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 6.5l11 11M17.5 6.5l-11 11' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") center/12px 12px no-repeat}
+/* upload card: "1000MB max" is its own pill on the second line (no dot) */
+html body #optView .opt-drop #optMax:not(#_a):not(#_b):not(#_c){display:inline-flex!important;align-items:center;justify-content:center;align-self:center!important;margin:6px 0 0!important;padding:6px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.62);background:rgba(125,211,252,.14);color:#e6f7ff!important;font-size:13px!important;font-weight:700;letter-spacing:.03em;line-height:1.2;white-space:nowrap!important;box-shadow:none!important}
+html body #optView .opt-drop.has #optMax:not(#_a):not(#_b):not(#_c){display:none!important}
 /* result card: nothing inside may be wider than the card (it used to push the whole content to the right and clip the buttons) */
 html body #optView .opt-prog:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr)!important}
 html body #optView .opt-prog>*:not(#_a):not(#_b){min-width:0;max-width:100%}
@@ -29502,13 +29536,13 @@ var KB=[
     en:'Enter your promo code in the "Have a promo code?" field when ordering. The discount depends on the code: a fixed ₾ amount on Weekly/Monthly packages and a % on single orders. If a code is invalid, the site tells you.',
     ru:'Введите промокод при заказе в поле «Есть промокод?». Скидка зависит от кода: фиксированная сумма в ₾ на недельный/месячный пакет и % на разовый заказ. Если код неверный, сайт сообщит.'},b:['home']},
 {id:'method',p:1,k:[K('მეთოდ|ოპტიმიზ|optimi|moon method|метод|оптимиз|120 ?fps',2)],
- a:{ka:'**MOON METHOD** — ვიდეოს ოპტიმიზაციის ხელსაწყო: ატვირთე ვიდეო და წამებში მიიღე დამუშავებული. უფასოდ — 3 ატვირთვა კვირაში; Plan 1 — 5.99₾/თვე (1080p/60fps), Plan 2 — 7.99₾/თვე (1080p/120fps), Plan 3 — 14.99₾/თვე (4K/120fps), ულიმიტო ატვირთვით. გამოსაყენებლად შედი ანგარიშში.',
-    en:'**MOON METHOD** — a video optimization tool: upload a video and get it processed in seconds. Free — 3 uploads per week; Plan 1 — 5.99₾/month (1080p/60fps), Plan 2 — 7.99₾/month (1080p/120fps), Plan 3 — 14.99₾/month (4K/120fps), with unlimited uploads. Sign in to use it.',
-    ru:'**MOON METHOD** — инструмент оптимизации видео: загрузите видео и получите результат за секунды. Бесплатно — 3 загрузки в неделю; Plan 1 — 5.99₾/мес (1080p/60fps), Plan 2 — 7.99₾/мес (1080p/120fps), Plan 3 — 14.99₾/мес (4K/120fps), с безлимитом загрузок. Для работы войдите в аккаунт.'},b:['method','plans']},
+ a:{ka:'**MOON METHOD** — ვიდეოს ოპტიმიზაციის ხელსაწყო: ატვირთე ვიდეო და წამებში მიიღე დამუშავებული. უფასოდ — 3 ატვირთვა კვირაში (200MB-მდე); Plan 1 — 5.99₾/თვე (1080p/60fps, 7 ატვირთვა კვირაში, 450MB-მდე), Plan 2 — 7.99₾/თვე (1080p/120fps, ულიმიტო ატვირთვა, 750MB-მდე), Plan 3 — 14.99₾/თვე (4K/120fps, ულიმიტო ატვირთვა). ერთი ვიდეოს მაქსიმუმი 1000MB-ია. გამოსაყენებლად შედი ანგარიშში.',
+    en:'**MOON METHOD** — a video optimization tool: upload a video and get it processed in seconds. Free — 3 uploads per week (up to 200MB); Plan 1 — 5.99₾/month (1080p/60fps, 7 uploads per week, up to 450MB), Plan 2 — 7.99₾/month (1080p/120fps, unlimited uploads, up to 750MB), Plan 3 — 14.99₾/month (4K/120fps, unlimited uploads). One video can be up to 1000MB. Sign in to use it.',
+    ru:'**MOON METHOD** — инструмент оптимизации видео: загрузите видео и получите результат за секунды. Бесплатно — 3 загрузки в неделю (до 200 МБ); Plan 1 — 5.99₾/мес (1080p/60fps, 7 загрузок в неделю, до 450 МБ), Plan 2 — 7.99₾/мес (1080p/120fps, безлимит загрузок, до 750 МБ), Plan 3 — 14.99₾/мес (4K/120fps, безлимит загрузок). Одно видео — до 1000 МБ. Для работы войдите в аккаунт.'},b:['method','plans']},
 {id:'plans',p:2,k:[K('plan ?[123]|5\\.99|7\\.99|14\\.99|გეგმ|план[ыа]?\\b',3)],
- a:{ka:'**MOON METHOD-ის გეგმები**\n• უფასო — 3 ატვირთვა კვირაში (1080p/60fps)\n• Plan 1 — 5.99₾/თვე, 1080p/60fps\n• Plan 2 — 7.99₾/თვე, 1080p/120fps\n• Plan 3 — 14.99₾/თვე, 4K/120fps\nფასიან გეგმებში ატვირთვა ულიმიტოა. შესაძენად გახსენი „გეგმები".',
-    en:'**MOON METHOD plans**\n• Free — 3 uploads per week (1080p/60fps)\n• Plan 1 — 5.99₾/month, 1080p/60fps\n• Plan 2 — 7.99₾/month, 1080p/120fps\n• Plan 3 — 14.99₾/month, 4K/120fps\nPaid plans have unlimited uploads. Open "Plans" to get one.',
-    ru:'**Планы MOON METHOD**\n• Бесплатный — 3 загрузки в неделю (1080p/60fps)\n• Plan 1 — 5.99₾/мес, 1080p/60fps\n• Plan 2 — 7.99₾/мес, 1080p/120fps\n• Plan 3 — 14.99₾/мес, 4K/120fps\nВ платных планах загрузки безлимитные. Для покупки откройте «Планы».'},b:['plans']},
+ a:{ka:'**MOON METHOD-ის გეგმები**\n• უფასო — 1080p/60fps, 3 ატვირთვა კვირაში, 200MB-მდე\n• Plan 1 — 5.99₾/თვე, 1080p/60fps, 7 ატვირთვა კვირაში, 450MB-მდე\n• Plan 2 — 7.99₾/თვე, 1080p/120fps, ულიმიტო ატვირთვა, 750MB-მდე\n• Plan 3 — 14.99₾/თვე, 4K/120fps, ულიმიტო ატვირთვა\nერთი ვიდეოს მაქსიმუმი ყველა გეგმაზე 1000MB-ია. შესაძენად გახსენი „გეგმები".',
+    en:'**MOON METHOD plans**\n• Free — 1080p/60fps, 3 uploads per week, up to 200MB\n• Plan 1 — 5.99₾/month, 1080p/60fps, 7 uploads per week, up to 450MB\n• Plan 2 — 7.99₾/month, 1080p/120fps, unlimited uploads, up to 750MB\n• Plan 3 — 14.99₾/month, 4K/120fps, unlimited uploads\nOne video can be up to 1000MB on every plan. Open "Plans" to get one.',
+    ru:'**Планы MOON METHOD**\n• Бесплатный — 1080p/60fps, 3 загрузки в неделю, до 200 МБ\n• Plan 1 — 5.99₾/мес, 1080p/60fps, 7 загрузок в неделю, до 450 МБ\n• Plan 2 — 7.99₾/мес, 1080p/120fps, безлимит загрузок, до 750 МБ\n• Plan 3 — 14.99₾/мес, 4K/120fps, безлимит загрузок\nОдно видео — до 1000 МБ в любом плане. Для покупки откройте «Планы».'},b:['plans']},
 {id:'checker',p:2,k:[K('ჩექერ|checker|downloader|ჩამოტვირთ|download|скачат|чекер|проверить качество',2)],
  a:{ka:'**MOON TT DOWNLOADER / CHECKER** — ჩასვი TikTok ვიდეოს ლინკი: ჩამოტვირთავს უმაღლესი ხარისხით და გაჩვენებს, რა ხარისხშია ატვირთული შენი ვიდეო. მუსიკის ჩამოტვირთვაც შეგიძლია. იპოვი გვერდზე „ჩექერი".',
     en:'**MOON TT DOWNLOADER / CHECKER** — paste a TikTok video link: it downloads in the highest quality and shows what quality your video was uploaded in. You can also download the music. Find it on the "Checker" page.',
@@ -29661,6 +29695,10 @@ G('g-tiktok','tiktok|tik tok|ტიკტოკ|თიკთოკ|тикток'
 GL.forEach(function(e){e.a2={};['ka','en','ru'].forEach(function(l){e.a2[l]=e.a[l]+(e.s?'\n\n'+e.s[l]:'')});e.a=e.a2});
 function F(id,r,o){o.id=id;o.r=new RegExp(SP(r),'i');return o}
 var FAQ=[
+F('g-methodsize','(მაქს|მაქსიმ|რამდენ|რა).{0,25}(მბ|mb|მეგაბაიტ|მოცულობ).{0,40}(ვიდეო|ატვირთ|მეთოდ|ფაილ)|(მაქს|მაქსიმ).{0,25}ზომ.{0,40}(ვიდეო|ატვირთ|მეთოდ|ფაილ)|(ვიდეო|ფაილ|ატვირთ).{0,25}(მოცულობ|მბ|mb\\b)|(რამდენ|რა).{0,12}(მბ|მოცულობ)|(max|maximum|biggest|largest).{0,20}(file|video|upload).{0,15}size|file size limit|how (big|large).{0,20}(video|file)|(макс|максимальн).{0,20}(размер|объем|объём)|размер (видео|файла)|сколько (мб|мегабайт)',{b:['plans','method'],
+ a:{ka:'**ერთი ვიდეოს მაქსიმალური მოცულობა MOON METHOD-ში**\n• უფასო — 200MB\n• Plan 1 — 450MB\n• Plan 2 — 750MB\n• Plan 3 — ულიმიტო გეგმა, ერთი ვიდეო მაქს. 1000MB',
+    en:'**Max size of one video in MOON METHOD**\n• Free — 200MB\n• Plan 1 — 450MB\n• Plan 2 — 750MB\n• Plan 3 — unlimited plan, one video up to 1000MB',
+    ru:'**Максимальный размер одного видео в MOON METHOD**\n• Бесплатный — 200 МБ\n• Plan 1 — 450 МБ\n• Plan 2 — 750 МБ\n• Plan 3 — безлимитный план, одно видео до 1000 МБ'}}),
 F('g-self','ვინ ხარ|შენ ვინ|ხარ ბოტი|ბოტი ხარ|ადამიანი ხარ|ცოცხალი ხარ|რობოტი ხარ|რა ხარ შენ|are you (a |an )?(bot|ai|human|real|robot|person)|who are you|ты (кто|бот|человек|робот)|кто ты',{b:['contact'],
  a:{ka:'მე Moonfull4K-ის **AI მხარდაჭერის ასისტენტი** ვარ (ბოტი, ადამიანი არა). გპასუხობ პაკეტებზე, ფასებზე, ვადებზე, საიტის ხელსაწყოებზე და ვიდეოს ტერმინებზე. შეკვეთასა და გადახდას მენეჯერი ადასტურებს.',
     en:'I am Moonfull4K\'s **AI support assistant** (a bot, not a human). I answer about packages, prices, delivery, site tools and video terms. A manager confirms orders and payment.',
