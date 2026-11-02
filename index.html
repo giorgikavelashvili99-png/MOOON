@@ -29166,6 +29166,14 @@ html body .pc-modal-scrim .wiz-enter:not(#_a):not(#_b):not(#_c):not(#_d){animati
 /* accounts page: appears in place, nothing travels up from below */
 html body #maRoot .ma-page:not(#_a):not(#_b):not(#_c){animation:moonSoftIn .3s ease-out!important;transform:none!important}
 </style>
+<style id="moon-opt-fit">
+/* Method page: the column must never be wider than its box (a wide nowrap button used to stretch the whole column, then it "snapped" back) */
+html body #optView #optMain:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr)!important}
+html body #optView .op-col:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr)!important;min-width:0!important;max-width:100%!important}
+html body #optView .op-col>*:not(#_a):not(#_b){min-width:0!important}
+html body #optView .opt-go:not(#_a):not(#_b){width:100%!important;max-width:560px!important;min-width:0!important}
+html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+</style>
 <style id="moon-ma-fix">
 /* phones: the account page must always cover the LARGE viewport (browser bars hiding/showing must never reveal the site behind it) */
 @media (max-width:900px){
