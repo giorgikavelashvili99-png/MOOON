@@ -29174,6 +29174,21 @@ html body #optView .op-col>*:not(#_a):not(#_b){min-width:0!important}
 html body #optView .opt-go:not(#_a):not(#_b){width:100%!important;max-width:560px!important;min-width:0!important}
 html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 </style>
+<style id="moon-opt-polish">
+/* progress ring starts at 12 o'clock (it used to start at 9) */
+html body #optView .opt-prog .opt-pct:not(#_a):not(#_b){background:conic-gradient(from 0deg,#7dd3fc 0,#a78bfa calc(var(--mpp)*.55%),#f0abfc calc(var(--mpp)*1%),rgba(255,255,255,.08) calc(var(--mpp)*1%))}
+html body #optView .opt:has(#optPill[data-s="err"]) .opt-prog .opt-pct:not(#_a):not(#_b):not(#_c){background:conic-gradient(from 0deg,#ff7d96 0,#f0abfc calc(var(--mpp)*1%),rgba(255,255,255,.08) calc(var(--mpp)*1%))}
+html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-pct:not(#_a):not(#_b):not(#_c){background:conic-gradient(from -90deg,#34d399,#22d3ee,#34d399)}
+/* the big number: no outline (it doubled the contours of the "1") */
+html body #optView .opt-prog .opt-pct b:not(#_a):not(#_b):not(#_c){-webkit-text-stroke:0!important}
+/* header: page text no longer shows through it */
+html body #hzBar.hz-bar:not(#_a):not(#_b):not(#_c):not(#_d){background:rgba(10,7,16,.96)!important}
+@media (max-width:700px){
+/* footer: even two lines, and clear of the round AI button at the end of the page */
+html body footer:not(#_a):not(#_b){line-height:1.65!important;text-wrap:balance;padding-bottom:90px!important}
+html body #optView .opt:not(#_a):not(#_b){padding-bottom:14px}
+}
+</style>
 <style id="moon-ma-fix">
 /* phones: the account page must always cover the LARGE viewport (browser bars hiding/showing must never reveal the site behind it) */
 @media (max-width:900px){
