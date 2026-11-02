@@ -29183,6 +29183,12 @@ html body #optView .opt:has(#optPill[data-s="done"]) .opt-prog .opt-pct:not(#_a)
 html body #optView .opt-prog .opt-pct b:not(#_a):not(#_b):not(#_c){-webkit-text-stroke:0!important}
 /* header: page text no longer shows through it */
 html body #hzBar.hz-bar:not(#_a):not(#_b):not(#_c):not(#_d){background:rgba(10,7,16,.96)!important}
+/* result card: nothing inside may be wider than the card (it used to push the whole content to the right and clip the buttons) */
+html body #optView .opt-prog:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr)!important}
+html body #optView .opt-prog>*:not(#_a):not(#_b){min-width:0;max-width:100%}
+/* the two buttons sit side by side when they fit; otherwise the second one drops below at full width (labels are never cut) */
+html body #optView .opt-prog .opt-dlrow:not(#_a):not(#_b){flex-wrap:wrap}
+html body #optView .opt-prog .opt-dlrow>*:not(#_a):not(#_b){flex:1 1 auto;min-width:max-content;min-height:52px}
 @media (max-width:700px){
 /* footer: even two lines, and clear of the round AI button at the end of the page */
 html body footer:not(#_a):not(#_b){line-height:1.65!important;text-wrap:balance;padding-bottom:90px!important}
