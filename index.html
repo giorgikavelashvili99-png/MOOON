@@ -10883,6 +10883,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     if (qualityGridEl) {
       qualityGridEl.querySelectorAll('.quality-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          try{ selectQuality(btn.getAttribute('data-quality')); }catch(e){}
           if (getTiktokValue('main')) { ttSkipTo({key:'main',from:[qualityWrap],tiktokWrap:tiktokWrap,sendWrap:sendConfirmWrap,channels:channelsPanel,stagesId:'wizardStepsMain',doneStage:4,backStage:3,priceFn:function(){const priceEl=document.getElementById('wizardFinalPrice');if(priceEl){const { s, ms, quality } = currentValues();priceEl.textContent = calculateExactPrice(s, ms, subToggle.checked, quality) + ' ₾';}}}); return; }
           wizStepSwap([qualityWrap], [tiktokWrap]);
           setWizardStage('wizardStepsMain', 3);
