@@ -30696,6 +30696,39 @@ setInterval(tick,2000);
 window.__moonSpinTick=tick;
 })();
 </script>
+<style id="moon-maint-css">
+html body #optView.mx-maint-on{position:relative}
+html body #optView.mx-maint-on>.opt{filter:blur(9px);-webkit-filter:blur(9px);pointer-events:none;-webkit-user-select:none;user-select:none}
+html body #optView>.mx-maint{position:absolute;left:0;right:0;top:0;bottom:0;z-index:30;background:rgba(3,8,20,.5);cursor:default}
+html body #optView>.mx-maint .mx-maint-in{position:sticky;top:max(24vh,150px);max-width:560px;margin:0 auto;padding:0 22px;text-align:center;box-sizing:border-box}
+html body #optView>.mx-maint .mx-maint-h{margin:0;font-size:21px;line-height:1.35;font-weight:700;color:#eef3ff;letter-spacing:0}
+html body #optView>.mx-maint .mx-maint-p{margin:12px 0 0;font-size:16px;line-height:1.65;font-weight:500;color:rgba(226,236,255,.84)}
+@media (max-width:480px){html body #optView>.mx-maint .mx-maint-h{font-size:19px}html body #optView>.mx-maint .mx-maint-p{font-size:15px}}
+</style>
+<script id="moon-maint">
+(function(){
+ var ON=true;   /* false = the Method page works as before */
+ var TXT={
+  ka:{h:'მიმდინარეობს ტექნიკური სამუშაოები',p:'პრობლემა არის ტიკტოკის მხრიდან და ვასწორებთ, გეგმების მქონე ხალხს თითოეული გამოუყენებელი დღე აუნაზღაურდებათ'},
+  en:{h:'Maintenance in progress',p:'The problem is on TikTok’s side and we are fixing it. Every unused day will be compensated to people with plans.'},
+  ru:{h:'Ведутся технические работы',p:'Проблема на стороне TikTok, мы её устраняем. Каждый неиспользованный день будет компенсирован пользователям с тарифами.'}
+ };
+ var v=document.getElementById('optView');if(!ON||!v)return;
+ function lang(){var l=document.documentElement.lang;return TXT[l]?l:'ka'}
+ function put(){
+  var t=TXT[lang()],el=null,k=v.children,i,h,p,o=null;
+  for(i=0;i<k.length;i++){if(k[i].classList.contains('mx-maint'))el=k[i];else if(k[i].classList.contains('opt'))o=k[i]}
+  if(!el){el=document.createElement('div');el.className='mx-maint';el.setAttribute('role','status');el.innerHTML='<div class="mx-maint-in"><div class="mx-maint-h"></div><p class="mx-maint-p"></p></div>';v.appendChild(el)}
+  h=el.querySelector('.mx-maint-h');p=el.querySelector('.mx-maint-p');
+  if(h.textContent!==t.h)h.textContent=t.h;
+  if(p.textContent!==t.p)p.textContent=t.p;
+  if(o&&!o.hasAttribute('inert'))o.setAttribute('inert','');
+ }
+ v.classList.add('mx-maint-on');put();
+ try{new MutationObserver(put).observe(v,{childList:true})}catch(e){}
+ try{new MutationObserver(put).observe(document.documentElement,{attributes:true,attributeFilter:['lang']})}catch(e){}
+})();
+</script>
 
 <style id="moon-gate-v2">
 /* ===== sign-in sheet (Zilem-like) ===== */
