@@ -30697,12 +30697,15 @@ window.__moonSpinTick=tick;
 })();
 </script>
 <style id="moon-maint-css">
+/* the cover must also work when the site's automatic light mode (html.moon-lite) has switched filters off, hence !important and the longer selector */
 html body #optView.mx-maint-on{position:relative}
-html body #optView.mx-maint-on>.opt{filter:blur(9px);-webkit-filter:blur(9px);pointer-events:none;-webkit-user-select:none;user-select:none}
-html body #optView>.mx-maint{position:absolute;left:0;right:0;top:0;bottom:0;z-index:30;background:rgba(3,8,20,.5);cursor:default}
-html body #optView>.mx-maint .mx-maint-in{position:sticky;top:max(24vh,150px);max-width:560px;margin:0 auto;padding:0 22px;text-align:center;box-sizing:border-box}
+html body #optView.mx-maint-on>.opt{filter:blur(8px)!important;-webkit-filter:blur(8px)!important;pointer-events:none;-webkit-user-select:none;user-select:none;max-height:max(420px,calc(100vh - 150px));overflow:hidden}
+/* the page behind the blur is static: park its animations so the blur is drawn once, not on every frame */
+html body #optView.mx-maint-on>.opt *,html body #optView.mx-maint-on>.opt *::before,html body #optView.mx-maint-on>.opt *::after{animation-play-state:paused!important}
+html body #optView>.mx-maint{position:absolute;left:0;right:0;top:0;bottom:0;z-index:30;background:rgba(3,8,20,.5);cursor:default;display:flex;align-items:center;justify-content:center}
+html body #optView>.mx-maint .mx-maint-in{width:100%;max-width:560px;padding:0 22px;text-align:center;box-sizing:border-box}
 html body #optView>.mx-maint .mx-maint-h{margin:0;font-size:21px;line-height:1.35;font-weight:700;color:#eef3ff;letter-spacing:0}
-html body #optView>.mx-maint .mx-maint-p{margin:12px 0 0;font-size:16px;line-height:1.65;font-weight:500;color:rgba(226,236,255,.84)}
+html body #optView>.mx-maint .mx-maint-p{margin:12px 0 0;font-size:16px;line-height:1.65;font-weight:500;color:rgba(226,236,255,.86)}
 @media (max-width:480px){html body #optView>.mx-maint .mx-maint-h{font-size:19px}html body #optView>.mx-maint .mx-maint-p{font-size:15px}}
 </style>
 <script id="moon-maint">
