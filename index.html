@@ -17043,6 +17043,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       console.log('[admin-auth] status:', res.status, 'body:', data);
       if (res.ok && data && data.ok === true) {
         adminAuthenticated = true;
+        try{ sessionStorage.setItem('moon_maint_admin','1'); }catch(_){}
+        try{ window.dispatchEvent(new Event('moon-admin-ok')); }catch(_){}
         initAdminModeCheckbox();
         applyAdminNameLock();
         adminLogin.style.display = 'none';
@@ -24409,9 +24411,10 @@ function findCore(eng){
 function isMp4(u8){ return u8&&u8.byteLength>12&&String.fromCharCode(u8[4],u8[5],u8[6],u8[7])==='ftyp'; }
 /* MOON 1.2: metadata texts written by the engine are replaced with MOON's own (same length -> atom sizes stay valid) */
 var BRAND_MAP=[['Zilem Method https://zilemmethod.com local:v3.0','MOON 1.2 https://moonfull4k.xyz local:v1.2'],['www.zilemmethod.com','www.moonfull4k.xyz'],['zeta-coded','moon-coded'],['Zeta-v3.0','MOON-v1.2']];
-function moonBrand(u8){
+var BRAND_MAP21=[['Zilem Method https://zilemmethod.com local:v3.0','MOON 2.1 https://moonfull4k.xyz local:v2.1'],['www.zilemmethod.com','www.moonfull4k.xyz'],['zeta-coded','moon-coded'],['Zeta-v3.0','MOON-v2.1']];
+function moonBrand(u8,eng){
   try{
-    BRAND_MAP.forEach(function(pr){
+    (eng==='12'?BRAND_MAP:BRAND_MAP21).forEach(function(pr){
       var a=pr[0], b=pr[1]; while(b.length<a.length) b+=' ';
       var A=[],B=[],i; for(i=0;i<a.length;i++){ A.push(a.charCodeAt(i)); B.push(b.charCodeAt(i)); }
       var n=u8.length, LIM=4194304, ranges=n<=2*LIM?[[0,n]]:[[0,LIM],[n-LIM,n]];
@@ -24441,7 +24444,7 @@ function patchWithCore(file,fps,eng){
       if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
       var n=out&&(out.byteLength!=null?out.byteLength:out.length);
       try{ console.log('[optimizer] attempt',i,tries[i],'->',out&&out.constructor&&out.constructor.name,n); }catch(_){}
-      if(out&&n>0&&isMp4(out)){ if(eng==='12') out=moonBrand(out); return new Blob([out],{type:(/\.(mov|qt)$/i.test(file.name||'')?'video/quicktime':'video/mp4')}); }
+      if(out&&n>0&&isMp4(out)){ out=moonBrand(out,eng); return new Blob([out],{type:(/\.(mov|qt)$/i.test(file.name||'')?'video/quicktime':'video/mp4')}); }
       last='output '+(n||0)+' bytes';
     }
     throw new Error('პატჩერმა ცარიელი ფაილი დააბრუნა ('+last+')');
@@ -30707,27 +30710,69 @@ html body #optView>.mx-maint .mx-maint-in{width:100%;max-width:560px;padding:0 2
 html body #optView>.mx-maint .mx-maint-h{margin:0;font-size:21px;line-height:1.35;font-weight:700;color:#eef3ff;letter-spacing:0}
 html body #optView>.mx-maint .mx-maint-p{margin:12px 0 0;font-size:16px;line-height:1.65;font-weight:500;color:rgba(226,236,255,.86)}
 @media (max-width:480px){html body #optView>.mx-maint .mx-maint-h{font-size:19px}html body #optView>.mx-maint .mx-maint-p{font-size:15px}}
+html body #optView>.mx-maint .mx-maint-l{margin:22px 0 0;font-size:13px;line-height:1.4;font-weight:600;letter-spacing:.03em;color:rgba(226,236,255,.62)}
+html body #optView>.mx-maint .mx-maint-t{margin:6px 0 0;font-size:44px;line-height:1.1;font-weight:700;color:#eef3ff;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+html body #optView>.mx-maint .mx-maint-t:empty{display:none}
+html body #optView>.mx-maint .mx-maint-e{margin:12px 0 0;font-size:14px;line-height:1.5;font-weight:500;color:rgba(226,236,255,.78)}
+html body #optView>.mx-maint .mx-maint-e:empty{display:none}
+@media (max-width:480px){html body #optView>.mx-maint .mx-maint-t{font-size:36px}html body #optView>.mx-maint .mx-maint-e{font-size:13px}}
 </style>
 <script id="moon-maint">
 (function(){
- var ON=false;   /* false = the Method page works as before */
+ var ON=true;   /* false = the Method page works as before */
+ var END=1794371280000;   /* estimated return, ms since epoch (2026-11-11 04:28 UTC = 2026-11-11 08:28 Tbilisi). Put a new value here to change the countdown */
  var TXT={
-  ka:{h:'მიმდინარეობს ტექნიკური სამუშაოები',p:'პრობლემა არის ტიკტოკის მხრიდან და ვასწორებთ, გეგმების მქონე ხალხს თითოეული გამოუყენებელი დღე აუნაზღაურდებათ'},
-  en:{h:'Maintenance in progress',p:'The problem is on TikTok’s side and we are fixing it. Every unused day will be compensated to people with plans.'},
-  ru:{h:'Ведутся технические работы',p:'Проблема на стороне TikTok, мы её устраняем. Каждый неиспользованный день будет компенсирован пользователям с тарифами.'}
+  ka:{h:'მიმდინარეობს ტექნიკური სამუშაოები',p:'პრობლემა არის ტიკტოკის მხრიდან და ვასწორებთ, გეგმების მქონე ხალხს თითოეული გამოუყენებელი დღე აუნაზღაურდებათ',l:'სავარაუდო დაბრუნებამდე',e:'სავარაუდო დაბრუნება',z:' (თბილისის დროით)',s:'მალე დაბრუნდება',loc:'ka-GE'},
+  en:{h:'Maintenance in progress',p:'The problem is on TikTok’s side and we are fixing it. Every unused day will be compensated to people with plans.',l:'Estimated time until it is back',e:'Expected back',z:' (Tbilisi time)',s:'Back very soon',loc:'en-GB'},
+  ru:{h:'Ведутся технические работы',p:'Проблема на стороне TikTok, мы её устраняем. Каждый неиспользованный день будет компенсирован пользователям с тарифами.',l:'До предполагаемого возвращения',e:'Ориентировочное возвращение',z:' (по времени Тбилиси)',s:'Скоро вернётся',loc:'ru-RU'}
  };
  var v=document.getElementById('optView');if(!ON||!v)return;
+ /* only a verified admin (admin panel password accepted by the server) sees the real Method page; add ?preview=1 to the address to see the visitor view */
+ function isAdmin(){
+  try{ if(/[?&]preview=1/.test(location.search)) return false; }catch(e){}
+  try{ return sessionStorage.getItem('moon_maint_admin')==='1'; }catch(e){ return false; }
+ }
  function lang(){var l=document.documentElement.lang;return TXT[l]?l:'ka'}
+ function pad(n){return n<10?'0'+n:''+n}
+ function eta(l){
+  var d=new Date(END),o={timeZone:'Asia/Tbilisi',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',hour12:false};
+  try{return new Intl.DateTimeFormat(TXT[l].loc,o).format(d)}catch(e){}
+  try{return new Intl.DateTimeFormat('en-GB',o).format(d)}catch(e2){}
+  return d.toISOString();
+ }
+ function cover(){var k=v.children,i;for(i=0;i<k.length;i++){if(k[i].classList.contains('mx-maint'))return k[i]}return null}
+ function lift(){
+  v.classList.remove('mx-maint-on');
+  var k=v.children,i;
+  for(i=k.length-1;i>=0;i--){
+   if(k[i].classList.contains('mx-maint'))v.removeChild(k[i]);
+   else if(k[i].classList.contains('opt')&&k[i].hasAttribute('inert'))k[i].removeAttribute('inert');
+  }
+ }
+ function tick(){
+  var el=cover();if(!el)return;
+  var l=lang(),t=TXT[l],s=Math.max(0,Math.floor((END-Date.now())/1000)),
+   lb=el.querySelector('.mx-maint-l'),tm=el.querySelector('.mx-maint-t'),ee=el.querySelector('.mx-maint-e'),
+   a=s>0?t.l:t.s,b=s>0?pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60):'',c=s>0?t.e+': '+eta(l)+t.z:'';
+  if(lb.textContent!==a)lb.textContent=a;
+  if(tm.textContent!==b)tm.textContent=b;
+  if(ee.textContent!==c)ee.textContent=c;
+ }
  function put(){
-  var t=TXT[lang()],el=null,k=v.children,i,h,p,o=null;
-  for(i=0;i<k.length;i++){if(k[i].classList.contains('mx-maint'))el=k[i];else if(k[i].classList.contains('opt'))o=k[i]}
-  if(!el){el=document.createElement('div');el.className='mx-maint';el.setAttribute('role','status');el.innerHTML='<div class="mx-maint-in"><div class="mx-maint-h"></div><p class="mx-maint-p"></p></div>';v.appendChild(el)}
+  if(isAdmin()){lift();return}
+  var t=TXT[lang()],el=cover(),k=v.children,i,h,p,o=null;
+  for(i=0;i<k.length;i++){if(k[i].classList.contains('opt'))o=k[i]}
+  if(!el){el=document.createElement('div');el.className='mx-maint';el.setAttribute('role','status');el.innerHTML='<div class="mx-maint-in"><div class="mx-maint-h"></div><p class="mx-maint-p"></p><div class="mx-maint-l"></div><div class="mx-maint-t" aria-hidden="true"></div><div class="mx-maint-e"></div></div>';v.appendChild(el)}
   h=el.querySelector('.mx-maint-h');p=el.querySelector('.mx-maint-p');
   if(h.textContent!==t.h)h.textContent=t.h;
   if(p.textContent!==t.p)p.textContent=t.p;
+  v.classList.add('mx-maint-on');
   if(o&&!o.hasAttribute('inert'))o.setAttribute('inert','');
+  tick();
  }
- v.classList.add('mx-maint-on');put();
+ put();
+ setInterval(function(){if(isAdmin()){lift();return}if(!cover())put();else tick()},1000);
+ window.addEventListener('moon-admin-ok',put);
  try{new MutationObserver(put).observe(v,{childList:true})}catch(e){}
  try{new MutationObserver(put).observe(document.documentElement,{attributes:true,attributeFilter:['lang']})}catch(e){}
 })();
