@@ -23976,6 +23976,9 @@ T.ka.engBest='საუკეთესო'; T.ka.engBackup='რეზერვ�
 T.en.engBest='Best'; T.en.engBackup='Backup'; T.en.tryBackup='MOON 2.1 did not work — try MOON 1.2 (backup)';
 T.ka.tut='ტუტორიალი'; T.en.tut='Tutorial'; T.ru.tut='Туториал';
 T.ru.engBest='Лучший'; T.ru.engBackup='Резерв'; T.ru.tryBackup='MOON 2.1 не сработал — попробуйте MOON 1.2 (резерв)';
+T.ka.backP='თუ Chrome-იდან ვერ ატვირთე, ჯერჯერობით გამოიყენე ამ ორიდან ერთ-ერთი ბრაუზერი:'; T.en.backP="If you couldn't upload from Chrome, please use one of these two browsers for now:"; T.ru.backP='Если не удалось загрузить из Chrome, пока воспользуйтесь одним из этих браузеров:';
+T.ka.backTh='დიდი მადლობა მოთმინებისთვის'; T.en.backTh='Thank you so much for your patience'; T.ru.backTh='Большое спасибо за терпение';
+T.ka.backOk='გასაგებია'; T.en.backOk='Got it'; T.ru.backOk='Понятно';
 T.ka.plUp='{n} ატვირთვა / კვირაში'; T.ka.plUpU='ულიმიტო ატვირთვა / კვირაში'; T.ka.plMb='{n}MB მაქს. მოცულობა'; T.ka.plMbU='ულიმიტო მოცულობა'; T.ka.plMethod='მუნის მეთოდი'; T.ka.plCheck='ტიკტოკ ვიდეო ჩექერი'; T.ka.plRed='4K / 120FPS'; T.ka.plFull='სრული მხარდაჭერა'; T.ka.tooBigSize='ვიდეო ({s}) აღემატება ამ კვირის დარჩენილ მოცულობას. დარჩენილია {n} MB'; T.ka.tooBigMax='ვიდეო ძალიან დიდია ({s}). მაქსიმალური მოცულობა {n} MB-ია';
 T.en.plUp='{n} uploads / week'; T.en.plUpU='Unlimited uploads / week'; T.en.plMb='{n}MB max size'; T.en.plMbU='Unlimited size'; T.en.plMethod='MOON Method'; T.en.plCheck='TikTok video checker'; T.en.plRed='4K / 120FPS'; T.en.plFull='Full support'; T.en.tooBigSize='This video ({s}) is larger than your remaining weekly volume. {n} MB left'; T.en.tooBigMax='The video is too large ({s}). The maximum is {n} MB';
 T.ru.plUp='{n} загрузок / неделя'; T.ru.plUpU='Безлимитные загрузки / неделя'; T.ru.plMb='Макс. размер {n} МБ'; T.ru.plMbU='Без ограничения размера'; T.ru.plMethod='Метод MOON'; T.ru.plCheck='TikTok-чекер видео'; T.ru.plRed='4K / 120FPS'; T.ru.plFull='Полная поддержка'; T.ru.tooBigSize='Видео ({s}) больше оставшегося недельного объёма. Осталось {n} МБ'; T.ru.tooBigMax='Видео слишком большое ({s}). Максимум — {n} МБ';
@@ -24389,6 +24392,59 @@ function upsellOnce(){
   upsellOpen();
 }
 document.addEventListener('click',function(e){ var l=e.target.closest&&e.target.closest('[data-mn],[data-hz-go]'); if(l&&(l.getAttribute('data-mn')||l.getAttribute('data-hz-go'))!=='plans') plansLightOff(); },true);
+/* ---- "WE ARE BACK" შეტყობინება: დაპატჩვის შემდეგ, მხოლოდ BACK_MAX ჯერ თითო ბრაუზერზე ---- */
+var BACK_KEY='moonBackN1', BACK_MAX=2, _backN=0;
+function backCount(){ var n=0; try{ n=parseInt(localStorage.getItem(BACK_KEY)||'0',10)||0; }catch(e){} return Math.max(n,_backN); }
+function backCss(){
+  if(document.getElementById('moonBackCss')) return;
+  var st=document.createElement('style'); st.id='moonBackCss';
+  st.textContent=[
+  '@keyframes mbIn{from{opacity:0}to{opacity:1}}',
+  '@keyframes mbPop{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}',
+  '@keyframes mbBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1)}42%{transform:scale(1.12)}70%{transform:scale(1)}}',
+  '@keyframes mbTw{0%,100%{opacity:.25;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.15) rotate(18deg)}}',
+  'html body #moonBack:not(#_a):not(#_b){position:fixed;inset:0;z-index:2147483001;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(2,6,18,.78);animation:mbIn .25s ease both}',
+  'html body #moonBack:not(#_a):not(#_b) .mb-card{position:relative;overflow:hidden;width:min(92vw,400px);box-sizing:border-box;padding:30px 22px 20px;border-radius:24px;background:radial-gradient(120% 70% at 50% -10%,rgba(255,92,170,.28),transparent 62%),#0b1228;border:1px solid rgba(255,120,190,.30);color:#eef2ff;text-align:center;box-shadow:none;animation:mbPop .38s cubic-bezier(.22,.9,.32,1) both}',
+  'html body #moonBack .mb-heart{font-size:50px;line-height:1.1;margin:0 0 6px;display:inline-block;animation:mbBeat 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 18px rgba(255,80,170,.55))}',
+  'html body #moonBack .mb-sp{position:absolute;font-size:16px;line-height:1;pointer-events:none;animation:mbTw 2.4s ease-in-out infinite}',
+  'html body #moonBack .mb-t{font-size:25px;font-weight:900;letter-spacing:.06em;line-height:1.25;margin:0 0 10px;background:linear-gradient(90deg,#ff7ac8,#ffd27a,#7ad8ff);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}',
+  'html body #moonBack .mb-p{font-size:14.5px;line-height:1.6;margin:0 0 14px;color:rgba(238,242,255,.84)}',
+  'html body #moonBack .mb-br{display:flex;gap:10px;justify-content:center;margin:0 0 16px;flex-wrap:wrap}',
+  'html body #moonBack .mb-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);font-size:16px;font-weight:800;color:#fff}',
+  'html body #moonBack .mb-chip i{width:12px;height:12px;border-radius:50%;display:inline-block}',
+  'html body #moonBack .mb-brave i{background:#fb542b;box-shadow:0 0 10px rgba(251,84,43,.8)}',
+  'html body #moonBack .mb-opera i{background:#ff1b2d;box-shadow:0 0 10px rgba(255,27,45,.8)}',
+  'html body #moonBack .mb-th{font-size:13.5px;line-height:1.5;margin:0 0 18px;color:rgba(238,242,255,.7)}',
+  'html body #moonBack .mb-ok{width:100%;padding:13px 10px;border-radius:14px;border:0;font:inherit;font-size:15px;font-weight:800;cursor:pointer;color:#2a0517;background:linear-gradient(180deg,#ff9bd6,#ff5fae);box-shadow:none;transform:none}',
+  '@media (prefers-reduced-motion:reduce){html body #moonBack,html body #moonBack *{animation:none!important}}'
+  ].join('\n');
+  document.head.appendChild(st);
+}
+function backOpen(){
+  if(document.getElementById('moonBack')) return;
+  backCss();
+  var o=document.createElement('div'); o.id='moonBack'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true');
+  o.innerHTML='<div class="mb-card">'
+    +'<span class="mb-sp" style="top:16px;left:20px">✨</span><span class="mb-sp" style="top:30px;right:24px;animation-delay:.8s">✨</span><span class="mb-sp" style="top:92px;right:46px;animation-delay:1.5s;font-size:12px">✨</span><span class="mb-sp" style="top:84px;left:42px;animation-delay:1.1s;font-size:12px">✨</span>'
+    +'<div class="mb-heart">💖</div>'
+    +'<div class="mb-t">WE ARE BACK</div>'
+    +'<div class="mb-p">'+esc(tr('backP'))+'</div>'
+    +'<div class="mb-br"><span class="mb-chip mb-brave"><i></i>Brave</span><span class="mb-chip mb-opera"><i></i>Opera</span></div>'
+    +'<div class="mb-th">'+esc(tr('backTh'))+' 💖</div>'
+    +'<button type="button" class="mb-ok">'+esc(tr('backOk'))+'</button></div>';
+  document.body.appendChild(o);
+  function close(){ try{ o.remove(); }catch(e){} document.removeEventListener('keydown',kd); }
+  function kd(e){ if(e.key==='Escape') close(); }
+  document.addEventListener('keydown',kd);
+  o.addEventListener('click',function(e){ if(e.target===o||e.target.closest('.mb-ok')) close(); });
+  try{ o.querySelector('.mb-ok').focus(); }catch(e){}
+}
+function backNoticeOnce(){
+  if(document.getElementById('moonBack')||document.getElementById('moonUps')) return;
+  var n=backCount(); if(n>=BACK_MAX) return;
+  _backN=n+1; try{ localStorage.setItem(BACK_KEY,String(n+1)); }catch(e){}
+  backOpen();
+}
 function finishFail(ticket,text){
   holdStop(); S.hold=null;
   if(S.engine==='21'&&S.stage==='patch'){ text=text+' · '+tr('tryBackup'); try{ var bb=document.querySelector('#optEng [data-eng="12"]'); if(bb){ bb.classList.add('eng-warn'); } }catch(e){} }
@@ -24531,7 +24587,7 @@ function run(){
     bar(100); S.busy=false; S.doneFile=S.file; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
     if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} }
     S.dlUrl=URL.createObjectURL(blob); S.dlSize=blob.size; if(S.hold) S.hold.until=Date.now()+HB_IDLE;
-    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(S.file); a.style.display=''; updateGo(); setTimeout(function(){ scrollToProg('nearest'); },120);
+    var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(S.file); a.style.display=''; updateGo(); setTimeout(function(){ scrollToProg('nearest'); },120); setTimeout(backNoticeOnce,900);
   }).catch(function(e){
     if(tk){ return finishFail(tk.ticket,e.message||String(e)); }
     if(e.data&&e.data.error==='mb'){ S.upsFor=null; setTimeout(upsellOnce,400); }
@@ -30659,7 +30715,7 @@ function api(path,body){
     return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error(j.message||j.error||('HTTP '+r.status));e.data=j;throw e}return j})});
 }
 function homeVisible(){return !document.body.classList.contains('mn-view-on')}
-function blocked(){return !!document.querySelector('#pcModalScrim.open,#adminOverlay.open,#maRoot.open,#mfask-panel.mfask-open,#moonUps,#hzMenu[aria-hidden="false"],#moonSpin')}
+function blocked(){return !!document.querySelector('#pcModalScrim.open,#adminOverlay.open,#maRoot.open,#mfask-panel.mfask-open,#moonUps,#moonBack,#hzMenu[aria-hidden="false"],#moonSpin')}
 function skipped(uid){try{return Date.now()-(+localStorage.getItem(SKIP+uid)||0)<3*3600e3}catch(e){return false}}
 var S={uid:'',can:null,nextAt:0,retryAt:0,hours:24,busy:false};
 function show(u){
@@ -30917,5 +30973,121 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
   window.addEventListener('touchmove',start,{passive:true,capture:true});
 })();
 </script>
+
+<!-- ===== WE ARE BACK — post-patch notice (self-contained, safe to remove) ===== -->
+<style id="wab-css">
+#wab-root{position:fixed;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;font-family:inherit}
+#wab-root.wab-on{display:flex}
+#wab-root *{box-sizing:border-box}
+.wab-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(59,109,255,.28),rgba(5,8,16,.88) 70%);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);opacity:0;transition:opacity .35s ease}
+.wab-card{position:relative;width:100%;max-width:440px;max-height:92vh;overflow:auto;padding:34px 26px 26px;border-radius:26px;text-align:center;color:#eef3ff;
+  background:linear-gradient(160deg,rgba(28,34,58,.96),rgba(10,13,24,.98));border:1px solid rgba(91,109,255,.45);
+  box-shadow:0 0 0 1px rgba(34,195,255,.12),0 30px 80px rgba(0,0,0,.65),0 0 70px rgba(59,109,255,.35);
+  opacity:0;transform:translateY(22px) scale(.94);transition:opacity .4s ease,transform .45s cubic-bezier(.2,1.2,.3,1)}
+#wab-root.wab-show .wab-bg{opacity:1}
+#wab-root.wab-show .wab-card{opacity:1;transform:none}
+.wab-card::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(120deg,#22c3ff,#3b6dff,#ff3860,#ffd23f,#22c3ff);background-size:300% 300%;animation:wabBorder 6s linear infinite;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.75}
+@keyframes wabBorder{0%{background-position:0 50%}100%{background-position:300% 50%}}
+.wab-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(169,184,221,.25);background:rgba(255,255,255,.05);color:#a9b8dd;font-size:18px;line-height:1;cursor:pointer;transition:.2s}
+.wab-x:hover{background:rgba(255,255,255,.12);color:#fff;transform:rotate(90deg)}
+.wab-face{position:relative;display:inline-block;font-size:78px;line-height:1;margin-bottom:6px;animation:wabBeat 1.6s ease-in-out infinite;
+  filter:drop-shadow(0 0 14px rgba(255,210,63,.75)) drop-shadow(0 0 34px rgba(255,56,96,.55))}
+@keyframes wabBeat{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.13) rotate(3deg)}}
+.wab-face i{position:absolute;font-style:normal;font-size:18px;opacity:0;animation:wabFloat 2.4s ease-in infinite}
+.wab-face i:nth-child(1){left:-6px;top:6px;animation-delay:0s}
+.wab-face i:nth-child(2){right:-10px;top:14px;animation-delay:.7s}
+.wab-face i:nth-child(3){left:50%;top:-6px;animation-delay:1.4s}
+@keyframes wabFloat{0%{opacity:0;transform:translateY(8px) scale(.6)}25%{opacity:1}100%{opacity:0;transform:translateY(-34px) scale(1.15)}}
+.wab-title{margin:8px 0 4px;font-size:30px;font-weight:800;letter-spacing:.06em;line-height:1.15;
+  background:linear-gradient(90deg,#22c3ff,#7c8fff,#ff6f91,#ffd23f,#22c3ff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:wabShine 4s linear infinite}
+@keyframes wabShine{to{background-position:250% 0}}
+.wab-sub{margin:0 0 16px;font-size:14px;color:#a9b8dd}
+.wab-txt{margin:0 0 14px;font-size:15px;line-height:1.6;color:#dbe4ff}
+.wab-br{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 16px}
+.wab-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:14px;font-weight:800;letter-spacing:.08em;font-size:15px;color:#fff;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
+.wab-chip b{width:10px;height:10px;border-radius:50%;display:inline-block}
+.wab-chip.brave{box-shadow:0 0 18px rgba(251,84,43,.35)}.wab-chip.brave b{background:#fb542b;box-shadow:0 0 8px #fb542b}
+.wab-chip.opera{box-shadow:0 0 18px rgba(255,27,45,.35)}.wab-chip.opera b{background:#ff1b2d;box-shadow:0 0 8px #ff1b2d}
+.wab-thx{margin:0 0 20px;font-size:14px;color:#ffd23f}
+.wab-btn{width:100%;padding:14px 18px;border:0;border-radius:14px;font:inherit;font-size:16px;font-weight:800;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,#3b6dff,#22c3ff);box-shadow:0 8px 26px rgba(59,109,255,.5);transition:transform .15s ease,box-shadow .2s ease}
+.wab-btn:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(34,195,255,.55)}
+.wab-btn:active{transform:scale(.98)}
+@media (max-width:420px){.wab-card{padding:30px 18px 20px}.wab-title{font-size:25px}.wab-face{font-size:66px}}
+@media (prefers-reduced-motion:reduce){.wab-card::before,.wab-face,.wab-face i,.wab-title{animation:none}.wab-face i{display:none}}
+</style>
+<div id="wab-root" role="dialog" aria-modal="true" aria-labelledby="wab-title">
+  <div class="wab-bg" data-wab-close></div>
+  <div class="wab-card">
+    <button class="wab-x" type="button" aria-label="დახურვა" data-wab-close>✕</button>
+    <div class="wab-face">🥰<i>💖</i><i>✨</i><i>💙</i></div>
+    <h2 class="wab-title" id="wab-title">WE ARE BACK</h2>
+    <p class="wab-sub">განახლება წარმატებით დასრულდა</p>
+    <p class="wab-txt">ჯერჯერობით გთხოვთ გამოიყენოთ ეს ორი ბრაუზერი, თუ <b>Chrome</b>-იდან ვერ ატვირთეთ:</p>
+    <div class="wab-br">
+      <span class="wab-chip brave"><b></b>BRAVE</span>
+      <span class="wab-chip opera"><b></b>OPERA</span>
+    </div>
+    <p class="wab-thx">დიდი მადლობა მოთმინებისთვის 💛</p>
+    <button class="wab-btn" type="button" data-wab-close>გასაგებია</button>
+  </div>
+</div>
+<script id="wab-js">
+(function(){
+  /* ============ SETTINGS — edit these for every new patch ============ */
+  var CAMPAIGN_ID  = 'wab-2026-11-10';              // new patch => new ID => everyone sees it again
+  var START        = '2026-11-10T00:00:00+04:00';   // when the notice opens (Georgia time)
+  var WINDOW_HOURS = 30;                             // notice stays "open" this long
+  var MAX_SHOWS    = 2;                              // max times per visitor
+  var GAP_HOURS    = 24;                             // min gap between two showings
+  var DELAY_MS     = 1400;                           // wait after page load
+  /* =================================================================== */
+  var H = 3600000, key = 'moonWab:' + CAMPAIGN_ID, mem = null;
+  var t0 = Date.parse(START), now = Date.now();
+  if (isNaN(t0) || now < t0 || now > t0 + WINDOW_HOURS * H) return;
+
+  function read(){
+    try { var v = JSON.parse(localStorage.getItem(key) || 'null'); if (v && typeof v.n === 'number') return v; } catch(e){}
+    return mem || {n:0, last:0};
+  }
+  function write(v){ mem = v; try { localStorage.setItem(key, JSON.stringify(v)); } catch(e){} }
+
+  var st = read();
+  if (st.n >= MAX_SHOWS) return;
+  if (st.n > 0 && now - st.last < GAP_HOURS * H) return;
+
+  function init(){
+    var root = document.getElementById('wab-root');
+    if (!root) return;
+    var shown = false;
+    function open(){
+      if (shown) return; shown = true;
+      write({n: st.n + 1, last: Date.now()});
+      root.classList.add('wab-on');
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ root.classList.add('wab-show'); }); });
+      var b = root.querySelector('.wab-btn'); if (b) try { b.focus({preventScroll:true}); } catch(e){}
+    }
+    function close(){
+      root.classList.remove('wab-show');
+      setTimeout(function(){ root.classList.remove('wab-on'); }, 380);
+      document.removeEventListener('keydown', onKey);
+    }
+    function onKey(e){ if (e.key === 'Escape') close(); }
+    root.addEventListener('click', function(e){ if (e.target.closest('[data-wab-close]')) close(); });
+    document.addEventListener('keydown', onKey);
+    // wait until the site's own boot/font cover is gone so the notice never flashes under it
+    var tries = 0;
+    (function wait(){
+      var r = document.documentElement;
+      var ready = r.classList.contains('moon-fonts-ok') && !r.classList.contains('moon-boot');
+      if (ready || ++tries > 40) setTimeout(open, DELAY_MS); else setTimeout(wait, 150);
+    })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+<!-- ===== /WE ARE BACK ===== -->
 </body>
 </html>
