@@ -24006,7 +24006,7 @@ view.innerHTML =
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
-      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 3.1</b><small data-k="engBest"></small></button></div>'+
+      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 3.1</b><small data-k="engBest"></small></button><button type="button" data-eng="20"><b>MOON 2.1</b><small data-k="engBackup"></small></button></div>'+
    '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
    '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><div class="opt-dlrow" id="optDlRow"><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a><button type="button" class="opt-tut" id="optTut"><span data-k="tut"></span></button></div></div>'+
   '</div>'+
@@ -24458,14 +24458,15 @@ function findCore(eng){
     var reg=window.ZilemPatchEngines;
     if(reg){
       if(eng==='12'){ var e12=reg[ENGINE_KEY['12']]; return (e12&&e12.quickPatch)?e12:null; }
-      var ks=Object.keys(reg); for(var i=ks.length-1;i>=0;i--){ if(ks[i]===ENGINE_KEY['12']) continue; if(reg[ks[i]]&&reg[ks[i]].quickPatch) return reg[ks[i]]; }
+      if(eng==='20'){ var e20=reg['2.0']; return (e20&&e20.quickPatch)?e20:null; }   /* MOON 2.1 = Zeta 2 (registry key 2.0) */
+      var ks=Object.keys(reg); for(var i=ks.length-1;i>=0;i--){ if(ks[i]===ENGINE_KEY['12']||ks[i]==='2.0') continue; if(reg[ks[i]]&&reg[ks[i]].quickPatch) return reg[ks[i]]; }
     }
   }catch(e){}
   return null;
 }
 function isMp4(u8){ return u8&&u8.byteLength>12&&String.fromCharCode(u8[4],u8[5],u8[6],u8[7])==='ftyp'; }
 /* MOON 3.1: metadata texts written by the engine are replaced with MOON's own (same length -> atom sizes stay valid) */
-var BRAND_MAP21=[['Zeta Engine 3 \u00e2\u0080\u0094 https://www.zilemmethod.com/','MOON 3.1 https://moonfull4k.xyz local:v3.1'],['Zilem Method https://zilemmethod.com local:v3.0','MOON 3.1 https://moonfull4k.xyz local:v3.1'],['www.zilemmethod.com','www.moonfull4k.xyz'],['zeta-coded','moon-coded'],['Zeta-v3.0','MOON-v3.1']];
+var BRAND_MAP21=[['Zeta Engine 2 https://www.zilemmethod.com/','MOON 2.1 https://moonfull4k.xyz local:v2.1'],['Zeta Engine 3 \u00e2\u0080\u0094 https://www.zilemmethod.com/','MOON 3.1 https://moonfull4k.xyz local:v3.1'],['Zilem Method https://zilemmethod.com local:v3.0','MOON 3.1 https://moonfull4k.xyz local:v3.1'],['www.zilemmethod.com','www.moonfull4k.xyz'],['zeta-coded','moon-coded'],['Zeta-v3.0','MOON-v3.1']];
 function moonBrand(u8,eng){
   try{
     BRAND_MAP21.forEach(function(pr){
@@ -24595,7 +24596,7 @@ function run(){
 
 /* ============ EVENTS ============ */
 var engBox=$('optEng');
-function setEngine(v){ if(S.busy) return; S.engine='21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
+function setEngine(v){ if(S.busy) return; S.engine=(v==='20')?'20':'21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
   engBox.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-eng')===S.engine; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); if(on) b.classList.remove('eng-warn'); }); }
 engBox.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-eng]'); if(b) setEngine(b.getAttribute('data-eng')); });
 setEngine('21');
@@ -30893,7 +30894,7 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 })();
 </script>
 
-<style id="moon-engine-31">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr)}</style>
+<style id="moon-engine-31">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}</style>
 <style id="plans-shell-css">
 /* plans: same "shell" as the notice card — neon frame glow + animated top bar. The order button is NOT touched. */
 @keyframes plShellBar{0%{background-position:0 0}100%{background-position:200% 0}}
