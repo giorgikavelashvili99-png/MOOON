@@ -23976,6 +23976,7 @@ T.ka.engBest='საუკეთესო'; T.ka.engBackup='რეზერვ�
 T.en.engBest='Best'; T.en.engBackup='Backup'; T.en.tryBackup='';
 T.ka.tut='ტუტორიალი'; T.en.tut='Tutorial'; T.ru.tut='Туториал';
 T.ru.engBest='Лучший'; T.ru.engBackup='Резерв'; T.ru.tryBackup='';
+T.ka.engNew='ახალი'; T.en.engNew='New'; T.ru.engNew='Новый'; T.ka.m4Load='MOON 4.0 იტვირთება'; T.en.m4Load='Loading MOON 4.0'; T.ru.m4Load='Загрузка MOON 4.0'; T.ka.m4Run='MOON 4.0 მუშაობს'; T.en.m4Run='MOON 4.0 working'; T.ru.m4Run='MOON 4.0 обрабатывает';
 T.ka.backP='თუ Chrome-იდან ვერ ატვირთე, ჯერჯერობით გამოიყენე ამ ორიდან ერთ-ერთი ბრაუზერი:'; T.en.backP="If you couldn't upload from Chrome, please use one of these two browsers for now:"; T.ru.backP='Если не удалось загрузить из Chrome, пока воспользуйтесь одним из этих браузеров:';
 T.ka.backTh='დიდი მადლობა მოთმინებისთვის'; T.en.backTh='Thank you so much for your patience'; T.ru.backTh='Большое спасибо за терпение';
 T.ka.backOk='გასაგებია'; T.en.backOk='Got it'; T.ru.backOk='Понятно';
@@ -24006,7 +24007,7 @@ view.innerHTML =
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
-      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 3.1</b><small data-k="engBest"></small></button><button type="button" data-eng="20"><b>MOON 2.1</b><small data-k="engBackup"></small></button></div>'+
+      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 3.1</b><small data-k="engBest"></small></button><button type="button" data-eng="20"><b>MOON 2.1</b><small data-k="engBackup"></small></button><button type="button" data-eng="40"><b>MOON 4.0</b><small data-k="engNew"></small></button></div>'+
    '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
    '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><div class="opt-dlrow" id="optDlRow"><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a><button type="button" class="opt-tut" id="optTut"><span data-k="tut"></span></button></div></div>'+
   '</div>'+
@@ -24506,6 +24507,89 @@ function patchWithCore(file,fps,eng){
   });
 }
 
+/* ============ MOON 4.0 — ffmpeg.wasm engine. worker + core come from the gate (GET /m4?ticket=...) ============ */
+var M4={p:null};
+function m4Strip(s){ return s.replace(/^[ \t]*export\s+/gm,''); }
+function m4Consts(src){ return (new Function(m4Strip(src.const)+'\n;return {FFMessageType:FFMessageType,CORE_URL:CORE_URL};'))(); }   /* single source of truth: const.js */
+function m4WorkerSrc(src){ return m4Strip(src.const)+'\n'+m4Strip(src.errors)+'\n'+src.worker.replace(/^[ \t]*import\s[^;]*?from\s*["'][^"']+["']\s*;?[ \t]*$/gm,''); }   /* const.js + errors.js + worker.js -> one classic worker script */
+function m4CoreSrc(src){ return src.core.replace(/import\.meta\.url/g,'(self.location&&self.location.href||"")').replace(/\bexport\s+default\s+createFFmpegCore\s*;?/,''); }   /* ESM core -> classic script, so importScripts() in the worker works in every browser */
+function M4Client(workerSrc,T){
+  var url=URL.createObjectURL(new Blob([workerSrc],{type:'text/javascript'})), w=new Worker(url), seq=0, pend={}, me=this;
+  me.logs=[]; me.onProgress=null; me.dead=false;
+  function failAll(err){ me.dead=true; Object.keys(pend).forEach(function(k){ var p=pend[k]; delete pend[k]; p.rej(err); }); }
+  w.onmessage=function(e){
+    var m=e.data||{};
+    if(m.type===T.LOG){ if(me.logs.length<600) me.logs.push(String(m.data&&m.data.message||'')); return; }
+    if(m.type===T.PROGRESS){ if(me.onProgress) me.onProgress(m.data); return; }
+    var p=pend[m.id]; if(!p) return; delete pend[m.id];
+    if(m.type===T.ERROR) p.rej(new Error(String(m.data))); else p.res(m.data);
+  };
+  w.onerror=function(e){ failAll(new Error((e&&e.message)||'worker error')); };
+  function send(type,data,trans){ return new Promise(function(res,rej){
+    if(me.dead) return rej(new Error('worker is not running'));
+    var id=++seq; pend[id]={res:res,rej:rej};
+    try{ w.postMessage({id:id,type:type,data:data},trans||[]); }catch(err){ delete pend[id]; rej(err); }
+  }); }
+  me.load=function(core,wasm){ return send(T.LOAD,{coreURL:core,wasmURL:wasm}); };
+  me.exec=function(args){ return send(T.EXEC,{args:args,timeout:-1}); };
+  me.writeFile=function(path,u8){ return send(T.WRITE_FILE,{path:path,data:u8},[u8.buffer]); };
+  me.readFile=function(path){ return send(T.READ_FILE,{path:path,encoding:'binary'}); };
+  me.deleteFile=function(path){ return send(T.DELETE_FILE,{path:path}); };
+  me.terminate=function(){ failAll(new Error('terminated')); try{ w.terminate(); }catch(e){} try{ URL.revokeObjectURL(url); }catch(e){} };
+}
+function m4Wasm(url){
+  return fetchTO(url,{},300000).then(function(r){
+    if(!r.ok) throw new Error('wasm HTTP '+r.status);
+    var total=Number(r.headers.get('content-length'))||0;
+    if(!r.body||!r.body.getReader||!total) return r.blob();
+    var rd=r.body.getReader(), got=0, parts=[];
+    return (function pump(){ return rd.read().then(function(x){
+      if(x.done) return new Blob(parts,{type:'application/wasm'});
+      parts.push(x.value); got+=x.value.length; var q=Math.min(1,got/total); msg(tr('m4Load')+' '+Math.round(q*100)+'%'); bar(25+Math.round(q*35)); return pump();
+    }); })();
+  }).then(function(b){ return URL.createObjectURL(b.type==='application/wasm'?b:new Blob([b],{type:'application/wasm'})); });
+}
+function m4Load(ticket){
+  if(M4.p) return M4.p.then(function(c){ if(!c.dead) return c; M4.p=null; return m4Load(ticket); });
+  if(!ticket) return Promise.reject(new Error('core ticket missing'));
+  msg(tr('m4Load')+'…');
+  M4.p=fetchTO(CFG.GATE+'/m4?ticket='+encodeURIComponent(ticket)+'&f=all',{cache:'no-store'},30000).then(function(r){
+    if(!r.ok) return r.json().catch(function(){return {};}).then(function(j){ throw new Error('m4: '+(j.error||('HTTP '+r.status))); });
+    return r.json();
+  }).then(function(src){
+    var cli=new M4Client(m4WorkerSrc(src),m4Consts(src).FFMessageType), coreURL=URL.createObjectURL(new Blob([m4CoreSrc(src)],{type:'text/javascript'}));
+    return m4Wasm(src.wasm).then(function(wasmURL){ return cli.load(coreURL,wasmURL); }).then(function(){ return cli; },function(e){ cli.terminate(); throw e; });
+  }).catch(function(e){ M4.p=null; throw e; });
+  return M4.p;
+}
+function m4Probe(txt){ var v=txt.match(/Video:\s*([a-z0-9_]+)/i), a=txt.match(/Audio:\s*([a-z0-9_]+)/i); return {v:v?v[1].toLowerCase():'', a:a?a[1].toLowerCase():''}; }
+/* >>> MOON 4.0 ffmpeg command. DEFAULT = lossless remux (stream copy) + faststart + silent AAC track when the clip has no audio.
+   info={v,a} (codecs), fps = preset fps, h = preset height. Put your real command here (e.g. re-encode: '-vf','scale=-2:'+h+',fps='+fps,'-c:v','libx264' ...). */
+function moon4Args(info,fps,h,inn,out){
+  var noA=!info.a, a=['-i',inn];
+  if(noA) a.push('-f','lavfi','-i','anullsrc=channel_layout=stereo:sample_rate=48000');
+  a.push('-map','0:v:0','-map',noA?'1:a:0':'0:a:0?','-sn','-dn','-c:v','copy');
+  if(info.v==='hevc') a.push('-tag:v','hvc1');
+  if(noA) a.push('-c:a','aac','-b:a','128k','-shortest'); else a.push('-c:a','copy');
+  a.push('-metadata','comment=MOON 4.0 https://moonfull4k.xyz','-movflags','+faststart','-y',out);
+  return a;
+}
+function patchWithFF(file,fps,ticket){
+  var ff=null, pr=PRESETS.filter(function(p){return p.id===S.preset;})[0], inn=/\.(mov|qt)$/i.test(file.name||'')?'in.mov':'in.mp4', out='out.mp4';
+  return m4Load(ticket).then(function(c){
+    ff=c; ff.onProgress=function(e){ var q=Math.max(0,Math.min(1,Number(e&&e.progress)||0)); bar(60+Math.round(q*35)); };
+    msg(tr('m4Run')+'…'); bar(60); return file.arrayBuffer();
+  }).then(function(ab){ return ff.writeFile(inn,new Uint8Array(ab)); })
+  .then(function(){ ff.logs.length=0; return ff.exec(['-hide_banner','-i',inn]); })   /* probe only (ends with an error by design, but prints the streams) */
+  .then(function(){ var info=m4Probe(ff.logs.join('\n')); if(!info.v) throw new Error('ვიდეო არ არის თავსებადი'); ff.logs.length=0; return ff.exec(moon4Args(info,fps,pr?pr.h:0,inn,out)); })
+  .then(function(code){ if(code!==0) throw new Error('ffmpeg '+code); return ff.readFile(out); })
+  .then(function(data){
+    ff.onProgress=null; try{ ff.deleteFile(inn); ff.deleteFile(out); }catch(_){}
+    if(!isMp4(data)) throw new Error('MOON 4.0: ცარიელი შედეგი');
+    return new Blob([data],{type:(inn==='in.mov'?'video/quicktime':'video/mp4')});
+  }).catch(function(e){ try{ if(ff) ff.terminate(); }catch(_){} M4.p=null; throw e; });   /* any failure -> fresh worker next time */
+}
+
 /* core.js is no longer a public file: it is fetched from the gate with a ticket, once per page session */
 function ensureCore(ticket,eng){
   if(findCore(eng)) return Promise.resolve();                 /* already loaded (this session, or still served by the page) */
@@ -24519,6 +24603,7 @@ function ensureCore(ticket,eng){
   });
 }
 function patchInBrowser(file,fps,ticket,eng){
+  if(eng==='40') return patchWithFF(file,fps,ticket);
   return ensureCore(ticket,eng).then(function(){ return patchWithCore(file,fps,eng); });
 }
 /* ---- patcher-ის გამოძახება: გაღვიძება (Render cold start) + retry + დიაგნოსტიკა ---- */
@@ -24596,7 +24681,7 @@ function run(){
 
 /* ============ EVENTS ============ */
 var engBox=$('optEng');
-function setEngine(v){ if(S.busy) return; S.engine=(v==='20')?'20':'21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
+function setEngine(v){ if(S.busy) return; S.engine=(v==='20'||v==='40')?v:'21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
   engBox.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-eng')===S.engine; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); if(on) b.classList.remove('eng-warn'); }); }
 engBox.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-eng]'); if(b) setEngine(b.getAttribute('data-eng')); });
 setEngine('21');
@@ -30895,6 +30980,7 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 </script>
 
 <style id="moon-engine-31">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}</style>
+<style id="moon-engine-40">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:repeat(3,minmax(0,1fr));max-width:560px;gap:8px}</style>
 <style id="plans-shell-css">
 /* plans: same "shell" as the notice card — neon frame glow + animated top bar. The order button is NOT touched. */
 @keyframes plShellBar{0%{background-position:0 0}100%{background-position:200% 0}}
