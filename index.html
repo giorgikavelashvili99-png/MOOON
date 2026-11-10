@@ -24393,7 +24393,7 @@ function upsellOnce(){
 }
 document.addEventListener('click',function(e){ var l=e.target.closest&&e.target.closest('[data-mn],[data-hz-go]'); if(l&&(l.getAttribute('data-mn')||l.getAttribute('data-hz-go'))!=='plans') plansLightOff(); },true);
 /* ---- "WE ARE BACK" შეტყობინება: დაპატჩვის შემდეგ, მხოლოდ BACK_MAX ჯერ თითო ბრაუზერზე ---- */
-var BACK_KEY='moonBackN1', BACK_MAX=2, _backN=0;
+var BACK_KEY='moonBackN2', BACK_MAX=2, _backN=0;
 function backCount(){ var n=0; try{ n=parseInt(localStorage.getItem(BACK_KEY)||'0',10)||0; }catch(e){} return Math.max(n,_backN); }
 function backCss(){
   if(document.getElementById('moonBackCss')) return;
@@ -24404,18 +24404,18 @@ function backCss(){
   '@keyframes mbBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1)}42%{transform:scale(1.12)}70%{transform:scale(1)}}',
   '@keyframes mbTw{0%,100%{opacity:.25;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.15) rotate(18deg)}}',
   'html body #moonBack:not(#_a):not(#_b){position:fixed;inset:0;z-index:2147483001;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(2,6,18,.78);animation:mbIn .25s ease both}',
-  'html body #moonBack:not(#_a):not(#_b) .mb-card{position:relative;overflow:hidden;width:min(92vw,400px);box-sizing:border-box;padding:30px 22px 20px;border-radius:24px;background:radial-gradient(120% 70% at 50% -10%,rgba(255,92,170,.28),transparent 62%),#0b1228;border:1px solid rgba(255,120,190,.30);color:#eef2ff;text-align:center;box-shadow:none;animation:mbPop .38s cubic-bezier(.22,.9,.32,1) both}',
-  'html body #moonBack .mb-heart{font-size:50px;line-height:1.1;margin:0 0 6px;display:inline-block;animation:mbBeat 1.8s ease-in-out infinite;filter:drop-shadow(0 6px 18px rgba(255,80,170,.55))}',
+  'html body #moonBack:not(#_a):not(#_b) .mb-card{position:relative;overflow-x:hidden;overflow-y:auto;max-height:calc(100vh - 32px);width:min(92vw,400px);box-sizing:border-box;padding:30px 22px 20px;border-radius:14px;background:linear-gradient(180deg,rgba(56,189,248,.10),transparent 45%),#080d18;border:1px solid rgba(56,189,248,.35);color:#eef2ff;text-align:center;box-shadow:none;animation:mbPop .38s cubic-bezier(.22,.9,.32,1) both}',
+  'html body #moonBack .mb-heart{width:54px;height:54px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.4);color:#38bdf8;font-size:28px;line-height:1;box-shadow:0 0 22px rgba(56,189,248,.25)}',
   'html body #moonBack .mb-sp{position:absolute;font-size:16px;line-height:1;pointer-events:none;animation:mbTw 2.4s ease-in-out infinite}',
-  'html body #moonBack .mb-t{font-size:25px;font-weight:900;letter-spacing:.06em;line-height:1.25;margin:0 0 10px;background:linear-gradient(90deg,#ff7ac8,#ffd27a,#7ad8ff);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}',
+  'html body #moonBack .mb-t{font-size:25px;font-weight:900;letter-spacing:.06em;line-height:1.35;padding-bottom:.08em;margin:0 0 10px;background:linear-gradient(90deg,#e0f2fe,#38bdf8,#818cf8);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}',
   'html body #moonBack .mb-p{font-size:14.5px;line-height:1.6;margin:0 0 14px;color:rgba(238,242,255,.84)}',
   'html body #moonBack .mb-br{display:flex;gap:10px;justify-content:center;margin:0 0 16px;flex-wrap:wrap}',
-  'html body #moonBack .mb-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);font-size:16px;font-weight:800;color:#fff}',
+  'html body #moonBack .mb-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);font-size:16px;font-weight:800;color:#fff}',
   'html body #moonBack .mb-chip i{width:12px;height:12px;border-radius:50%;display:inline-block}',
   'html body #moonBack .mb-brave i{background:#fb542b;box-shadow:0 0 10px rgba(251,84,43,.8)}',
   'html body #moonBack .mb-opera i{background:#ff1b2d;box-shadow:0 0 10px rgba(255,27,45,.8)}',
   'html body #moonBack .mb-th{font-size:13.5px;line-height:1.5;margin:0 0 18px;color:rgba(238,242,255,.7)}',
-  'html body #moonBack .mb-ok{width:100%;padding:13px 10px;border-radius:14px;border:0;font:inherit;font-size:15px;font-weight:800;cursor:pointer;color:#2a0517;background:linear-gradient(180deg,#ff9bd6,#ff5fae);box-shadow:none;transform:none}',
+  'html body #moonBack .mb-ok{width:100%;padding:13px 10px;border-radius:10px;border:0;font:inherit;font-size:15px;font-weight:800;cursor:pointer;color:#04121f;background:linear-gradient(180deg,#67d4ff,#2ea6e8);box-shadow:none;transform:none}',
   '@media (prefers-reduced-motion:reduce){html body #moonBack,html body #moonBack *{animation:none!important}}'
   ].join('\n');
   document.head.appendChild(st);
@@ -24425,12 +24425,11 @@ function backOpen(){
   backCss();
   var o=document.createElement('div'); o.id='moonBack'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true');
   o.innerHTML='<div class="mb-card">'
-    +'<span class="mb-sp" style="top:16px;left:20px">✨</span><span class="mb-sp" style="top:30px;right:24px;animation-delay:.8s">✨</span><span class="mb-sp" style="top:92px;right:46px;animation-delay:1.5s;font-size:12px">✨</span><span class="mb-sp" style="top:84px;left:42px;animation-delay:1.1s;font-size:12px">✨</span>'
-    +'<div class="mb-heart">💖</div>'
+    +'<div class="mb-heart">⚡</div>'
     +'<div class="mb-t">WE ARE BACK</div>'
     +'<div class="mb-p">'+esc(tr('backP'))+'</div>'
     +'<div class="mb-br"><span class="mb-chip mb-brave"><i></i>Brave</span><span class="mb-chip mb-opera"><i></i>Opera</span></div>'
-    +'<div class="mb-th">'+esc(tr('backTh'))+' 💖</div>'
+    +'<div class="mb-th">'+esc(tr('backTh'))+'</div>'
     +'<button type="button" class="mb-ok">'+esc(tr('backOk'))+'</button></div>';
   document.body.appendChild(o);
   function close(){ try{ o.remove(); }catch(e){} document.removeEventListener('keydown',kd); }
@@ -24440,6 +24439,7 @@ function backOpen(){
   try{ o.querySelector('.mb-ok').focus(); }catch(e){}
 }
 function backNoticeOnce(){
+  if(!(window.__moonDropActive&&window.__moonDropActive())) return;   /* only inside the visitor's 48h window */
   if(document.getElementById('moonBack')||document.getElementById('moonUps')) return;
   var n=backCount(); if(n>=BACK_MAX) return;
   _backN=n+1; try{ localStorage.setItem(BACK_KEY,String(n+1)); }catch(e){}
@@ -30896,91 +30896,76 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 <style id="moon-engine-31">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr)}</style>
 <!-- ===== WE ARE BACK — post-patch notice (self-contained, safe to remove) ===== -->
 <style id="wab-css">
-#wab-root{--g1:#2fe36a;--g2:#0f9d3f;--gl:#8dffb0;--gold:#ffd23f;position:fixed;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:22px;box-sizing:border-box;font-family:var(--moon-lat),'BPGAcademiuriU','Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+#wab-root{--c1:#38bdf8;--c2:#6366f1;--c3:#22d3ee;position:fixed;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;font-family:var(--moon-lat),'BPGAcademiuriU','Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
 #wab-root.wab-on{display:flex}
 html body>#wab-root#wab-root,html.mi5-lock body>#wab-root#wab-root{content-visibility:visible!important}
-#wab-root *{box-sizing:border-box}
-.wab-bg{position:absolute;inset:0;background:rgba(4,6,10,.78);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);opacity:0;transition:opacity .4s ease}
-.wab-card{position:relative;width:100%;max-width:430px;max-height:92vh;overflow:visible;margin-top:14px;padding:38px 28px 26px;border-radius:30px;color:#eef3ff;
-  background:
-    radial-gradient(120% 60% at 50% -10%,rgba(47,227,106,.22),transparent 60%),
-    linear-gradient(180deg,#0d1a12 0%,#0a0f0c 55%,#090a0a 100%);
-  border:2px solid rgba(141,255,176,.78);
-  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 38px rgba(47,227,106,.28),0 40px 90px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.12);
-  opacity:0;transform:translateY(26px) scale(.95);transition:opacity .45s ease,transform .55s cubic-bezier(.22,1,.36,1)}
+#wab-root *{box-sizing:border-box;text-transform:none}
+.wab-bg{position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 30%,rgba(56,189,248,.14),transparent 70%),rgba(3,5,10,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);opacity:0;transition:opacity .35s ease}
+.wab-card{position:relative;width:100%;max-width:440px;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-x:hidden;overflow-y:auto;padding:30px 24px 22px;border-radius:18px;color:#e8eefc;text-align:center;
+  background:linear-gradient(180deg,rgba(56,189,248,.08),transparent 38%),#070b14;
+  border:1px solid rgba(56,189,248,.45);
+  box-shadow:0 0 0 1px rgba(0,0,0,.7),0 0 60px rgba(56,189,248,.22),0 40px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);
+  opacity:0;transform:translateY(22px) scale(.96);transition:opacity .4s ease,transform .5s cubic-bezier(.22,1,.36,1)}
 #wab-root.wab-show .wab-bg{opacity:1}
 #wab-root.wab-show .wab-card{opacity:1;transform:none}
-.wab-card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.06) 48%,transparent 60%);background-size:250% 100%;animation:wabSheen 5.5s ease-in-out infinite}
+.wab-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,transparent,var(--c1),var(--c2),var(--c3),transparent);background-size:200% 100%;animation:wabBar 3.2s linear infinite}
+.wab-card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.05) 50%,transparent 62%);background-size:250% 100%;animation:wabSheen 6s ease-in-out infinite}
+@keyframes wabBar{0%{background-position:0 0}100%{background-position:200% 0}}
 @keyframes wabSheen{0%{background-position:130% 0}60%,100%{background-position:-60% 0}}
-.wab-badge{position:absolute;top:-17px;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:999px;background:#f4f7ff;color:#0b1220;font-weight:800;font-size:13px;letter-spacing:.04em;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.45)}
-.wab-badge i{font-style:normal;color:#17b648}
-.wab-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#a9b8dd;font-size:14px;line-height:1;cursor:pointer;transition:.2s}
-.wab-x:hover{background:rgba(255,255,255,.13);color:#fff}
-.wab-head{display:flex;align-items:center;gap:16px;margin:0 0 18px}
-.wab-ico{position:relative;flex:none;width:76px;height:76px;border-radius:22px;display:grid;place-items:center;font-size:42px;line-height:1;
-  background:linear-gradient(145deg,#33f071,#0b7d31);border:1px solid rgba(190,255,210,.7);
-  box-shadow:0 0 0 4px rgba(47,227,106,.12),0 0 34px rgba(47,227,106,.65),inset 0 2px 0 rgba(255,255,255,.4);animation:wabGlow 2.6s ease-in-out infinite}
-.wab-ico span{display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35));animation:wabBob 2.6s ease-in-out infinite}
-.wab-ico b{position:absolute;color:#fff;font-weight:400;font-size:13px;text-shadow:0 0 8px #fff;opacity:0;animation:wabTw 2.4s ease-in-out infinite}
-.wab-ico b:nth-of-type(1){top:-8px;right:-6px}.wab-ico b:nth-of-type(2){bottom:-6px;left:-8px;animation-delay:1.1s;font-size:11px}
-@keyframes wabGlow{0%,100%{box-shadow:0 0 0 4px rgba(47,227,106,.12),0 0 26px rgba(47,227,106,.5),inset 0 2px 0 rgba(255,255,255,.4)}50%{box-shadow:0 0 0 7px rgba(47,227,106,.18),0 0 48px rgba(47,227,106,.85),inset 0 2px 0 rgba(255,255,255,.4)}}
-@keyframes wabBob{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-@keyframes wabTw{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1.2)}}
-.wab-title{margin:0;font-size:31px;font-weight:800;letter-spacing:.05em;line-height:1.05;color:#fff;text-shadow:0 0 22px rgba(47,227,106,.45)}
-.wab-sub{margin:6px 0 0;font-size:14px;line-height:1.35;color:#9fb3a6}
-.wab-line{height:1px;margin:0 0 16px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent)}
-.wab-txt{margin:0 0 14px;font-size:15px;line-height:1.55;color:#d3dcd6}
-.wab-txt b{color:#fff}
-.wab-list{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}
-.wab-list li{display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);font-weight:800;font-size:16px;letter-spacing:.08em;color:#fff}
-.wab-list li .wab-ck{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#0a0f0c;border:1.5px solid var(--gl);color:var(--gl);font-size:13px}
-.wab-list li small{margin-left:auto;font-weight:700;font-size:11px;letter-spacing:.1em;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.35);color:#e9f2ec}
-.wab-thx{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 18px;font-size:14px;color:var(--gold)}
-.wab-btn{position:relative;width:100%;padding:16px 18px;border:0;border-radius:20px;font:inherit;font-size:16px;font-weight:800;letter-spacing:.06em;color:#04210e;cursor:pointer;overflow:hidden;
-  background:linear-gradient(180deg,#46f27f,#14b84a);border:1px solid rgba(190,255,210,.8);box-shadow:0 10px 28px rgba(30,210,90,.4),inset 0 2px 0 rgba(255,255,255,.55);transition:transform .18s cubic-bezier(.22,1,.36,1),filter .2s}
-.wab-btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.wab-x{position:absolute;top:12px;right:12px;z-index:2;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#9fb0d4;font-size:13px;line-height:1;cursor:pointer;transition:.2s}
+.wab-x:hover{background:rgba(255,255,255,.12);color:#fff}
+.wab-tag{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px 14px;line-height:1.5;border-radius:6px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.4);color:#7dd3fc;font-weight:800;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase}
+.wab-tag i{width:7px;height:7px;border-radius:50%;background:#22d3ee;box-shadow:0 0 10px #22d3ee;animation:wabPulse 1.4s ease-in-out infinite}
+@keyframes wabPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+.wab-eng{margin:0;font-size:13px;font-weight:800;letter-spacing:.32em;color:#8aa0c8}
+.wab-ver{margin:2px 0 0;padding:.06em .08em .1em;font-size:84px;font-weight:900;line-height:1.1;letter-spacing:-.02em;background:linear-gradient(180deg,#fff 10%,#7dd3fc 55%,#6366f1 105%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 28px rgba(56,189,248,.45))}
+.wab-ver .wab-dot{display:inline-block;margin:0 .02em;font-weight:900}
+.wab-drop{display:inline-block;margin:8px 0 20px;padding:8px 22px;line-height:1.5;border-radius:6px;background:linear-gradient(90deg,#0ea5e9,#6366f1);color:#fff;font-weight:900;font-size:15px;letter-spacing:.18em;box-shadow:0 8px 26px rgba(56,189,248,.35)}
+.wab-title{margin:0 0 22px;font-size:34px;font-weight:900;letter-spacing:.08em;line-height:1.2;color:#fff;text-shadow:0 0 26px rgba(56,189,248,.5)}
+.wab-title em{font-style:normal;color:#38bdf8}
+.wab-btn{position:relative;width:100%;padding:15px 18px;line-height:1.5;border:0;border-radius:10px;font:inherit;font-size:15px;font-weight:900;letter-spacing:.12em;color:#031018;cursor:pointer;background:linear-gradient(180deg,#67d4ff,#2ea6e8);box-shadow:0 10px 28px rgba(56,189,248,.35),inset 0 1px 0 rgba(255,255,255,.5);transition:transform .18s cubic-bezier(.22,1,.36,1),filter .2s}
+.wab-btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
 .wab-btn:active{transform:scale(.97)}
-.wab-btn:focus{outline:none}.wab-btn:focus-visible{outline:2px solid rgba(190,255,210,.9);outline-offset:3px}
-.wab-head{padding-right:26px}
-@media (max-width:420px){.wab-card{padding:36px 18px 20px}.wab-title{font-size:23px;letter-spacing:.04em}.wab-ico{width:64px;height:64px;font-size:35px;border-radius:19px}.wab-head{gap:13px}}
-@media (prefers-reduced-motion:reduce){.wab-card::after,.wab-ico,.wab-ico span,.wab-ico b{animation:none}}
+.wab-btn:focus{outline:none}.wab-btn:focus-visible{outline:2px solid #bae6fd;outline-offset:3px}
+@media (max-width:420px){.wab-card{padding:26px 16px 18px}.wab-ver{font-size:72px}.wab-title{font-size:27px}}
+@media (max-height:620px){.wab-card{padding:20px 18px 16px}.wab-ver{font-size:60px}.wab-drop{margin:4px 0 14px}.wab-title{margin-bottom:16px;font-size:26px}.wab-tag{margin-bottom:10px}}
+@media (prefers-reduced-motion:reduce){.wab-card::before,.wab-card::after,.wab-tag i{animation:none}}
 </style>
 <div id="wab-root" role="dialog" aria-modal="true" aria-labelledby="wab-title">
   <div class="wab-bg" data-wab-close></div>
   <div class="wab-card">
-    <div class="wab-badge"><i>✦</i> განახლება დასრულდა</div>
     <button class="wab-x" type="button" aria-label="დახურვა" data-wab-close>✕</button>
-    <div class="wab-head">
-      <div class="wab-ico"><span>🥰</span><b>✦</b><b>✦</b></div>
-      <div>
-        <h2 class="wab-title" id="wab-title">WE ARE BACK</h2>
-        <p class="wab-sub">ისევ ერთად ვართ 💚</p>
-      </div>
-    </div>
-    <div class="wab-line"></div>
-    <p class="wab-txt">ჯერჯერობით, თუ <b>Chrome</b>-იდან ვერ ატვირთეთ, გთხოვთ გამოიყენოთ ეს ორი ბრაუზერი:</p>
-    <ul class="wab-list">
-      <li><span class="wab-ck">✓</span>BRAVE<small>BROWSER</small></li>
-      <li><span class="wab-ck">✓</span>OPERA<small>BROWSER</small></li>
-    </ul>
-    <p class="wab-thx">დიდი მადლობა მოთმინებისთვის 💛</p>
-    <button class="wab-btn" type="button" data-wab-close>გასაგებია</button>
+    <div class="wab-tag"><i></i><span data-wab="tag">ახალი განახლება</span></div>
+    <p class="wab-eng">MOON ENGINE</p>
+    <div class="wab-ver">3<span class="wab-dot">.</span>1</div>
+    <div class="wab-drop" data-wab="drop">დაიდროპა</div>
+    <h2 class="wab-title" id="wab-title">WE ARE <em>BACK</em>!</h2>
+    <button class="wab-btn" type="button" data-wab-close data-wab="ok">გასაგებია</button>
   </div>
 </div>
 <script id="wab-js">
 (function(){
   /* ============ SETTINGS — edit these for every new patch ============ */
-  var CAMPAIGN_ID  = 'wab-2026-11-10';              // new patch => new ID => everyone sees it again
-  var START        = '2026-11-10T00:00:00+04:00';   // when the notice opens (Georgia time)
-  var WINDOW_HOURS = 30;                             // notice stays "open" this long
-  var MAX_SHOWS    = 2;                              // max times per visitor
-  var GAP_HOURS    = 24;                             // min gap between two showings
-  var DELAY_MS     = 1400;                           // wait after page load
+  var CAMPAIGN_ID  = 'wab-engine31-2026-11-10';     // new patch => new ID => everyone sees it again
+  var WINDOW_HOURS = 48;                             // each visitor sees it for 48h, counted from THEIR first visit
+  var MAX_SHOWS    = 9999;                           // show on every visit while the window is open
+  var GAP_HOURS    = 0;                              // no minimum gap between showings
+  var DELAY_MS     = 150;                            // almost instantly after page load
   /* =================================================================== */
-  var H = 3600000, key = 'moonWab:' + CAMPAIGN_ID, mem = null;
-  var t0 = Date.parse(START), now = Date.now();
-  if (isNaN(t0) || now < t0 || now > t0 + WINDOW_HOURS * H) return;
+  var H = 3600000, key = 'moonWab:' + CAMPAIGN_ID, fkey = 'moonWabFirst:' + CAMPAIGN_ID, mem = null, firstMem = 0;
+  var now = Date.now(), t0 = 0;
+  try { t0 = parseInt(localStorage.getItem(fkey) || '0', 10) || 0; } catch(e){}
+  if (!t0) { t0 = firstMem || now; firstMem = t0; try { localStorage.setItem(fkey, String(t0)); } catch(e){} }
+  var tEnd = t0 + WINDOW_HOURS * H;
+  /* shared with the "after optimization" notice: true only inside this visitor's 48h window */
+  window.__moonDropActive = function(){ return Date.now() < tEnd; };
+  if (now > tEnd) return;
 
+  var TXT = {
+    ka:{tag:'ახალი განახლება', drop:'დაიდროპა', ok:'გასაგებია'},
+    en:{tag:'New update', drop:'has dropped', ok:'Got it'},
+    ru:{tag:'Новое обновление', drop:'вышел', ok:'Понятно'}
+  };
   function read(){
     try { var v = JSON.parse(localStorage.getItem(key) || 'null'); if (v && typeof v.n === 'number') return v; } catch(e){}
     return mem || {n:0, last:0};
@@ -30994,6 +30979,9 @@ html body>#wab-root#wab-root,html.mi5-lock body>#wab-root#wab-root{content-visib
   function init(){
     var root = document.getElementById('wab-root');
     if (!root) return;
+    var lang = 'ka'; try { lang = localStorage.getItem('moon_lang') || 'ka'; } catch(e){}
+    var D = TXT[lang] || TXT.ka;
+    Array.prototype.forEach.call(root.querySelectorAll('[data-wab]'), function(el){ var k = el.getAttribute('data-wab'); if (D[k] != null) el.innerHTML = D[k]; });
     var shown = false;
     function open(){
       if (shown) return; shown = true;
@@ -31014,7 +31002,7 @@ html body>#wab-root#wab-root,html.mi5-lock body>#wab-root#wab-root{content-visib
     (function wait(){
       var r = document.documentElement;
       var ready = r.classList.contains('moon-fonts-ok') && !r.classList.contains('moon-boot');
-      if (ready || ++tries > 40) setTimeout(open, DELAY_MS); else setTimeout(wait, 150);
+      if (ready || ++tries > 40) setTimeout(open, DELAY_MS); else setTimeout(wait, 100);
     })();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
