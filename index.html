@@ -24439,13 +24439,7 @@ function backOpen(){
   o.addEventListener('click',function(e){ if(e.target===o||e.target.closest('.mb-ok')) close(); });
   try{ o.querySelector('.mb-ok').focus(); }catch(e){}
 }
-function backNoticeOnce(){
-  if(!(window.__moonDropActive&&window.__moonDropActive())) return;   /* only inside the visitor's 48h window */
-  if(document.getElementById('moonBack')||document.getElementById('moonUps')) return;
-  var n=backCount(); if(n>=BACK_MAX) return;
-  _backN=n+1; try{ localStorage.setItem(BACK_KEY,String(n+1)); }catch(e){}
-  backOpen();
-}
+function backNoticeOnce(){}   /* "WE ARE BACK" notice removed */
 function finishFail(ticket,text){
   holdStop(); S.hold=null;
   S.busy=false; setPill('err',tr('err')); msg(text,true);
@@ -30867,120 +30861,78 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 @media (prefers-reduced-motion:reduce){#plansView .opt-plan::before{animation:none}}
 html.moon-lite #plansView .opt-plan::before{animation:none}
 </style>
-<!-- ===== WE ARE BACK — post-patch notice (self-contained, safe to remove) ===== -->
-<style id="wab-css">
-#wab-root{--c1:#38bdf8;--c2:#6366f1;--c3:#22d3ee;position:fixed;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;font-family:var(--moon-lat),'BPGAcademiuriU','Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
-#wab-root.wab-on{display:flex}
-html body>#wab-root#wab-root,html.mi5-lock body>#wab-root#wab-root{content-visibility:visible!important}
-#wab-root *{box-sizing:border-box;text-transform:none}
-.wab-bg{position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 30%,rgba(56,189,248,.14),transparent 70%),rgba(3,5,10,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);opacity:0;transition:opacity .35s ease}
-.wab-card{position:relative;width:100%;max-width:440px;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-x:hidden;overflow-y:auto;padding:30px 24px 22px;border-radius:18px;color:#e8eefc;text-align:center;
-  background:linear-gradient(180deg,rgba(56,189,248,.08),transparent 38%),#070b14;
-  border:1px solid rgba(56,189,248,.45);
-  box-shadow:0 0 0 1px rgba(0,0,0,.7),0 0 60px rgba(56,189,248,.22),0 40px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);
-  opacity:0;transform:translateY(22px) scale(.96);transition:opacity .4s ease,transform .5s cubic-bezier(.22,1,.36,1)}
-#wab-root.wab-show .wab-bg{opacity:1}
-#wab-root.wab-show .wab-card{opacity:1;transform:none}
-.wab-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,transparent,var(--c1),var(--c2),var(--c3),transparent);background-size:200% 100%;animation:wabBar 3.2s linear infinite}
-.wab-card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.05) 50%,transparent 62%);background-size:250% 100%;animation:wabSheen 6s ease-in-out infinite}
-@keyframes wabBar{0%{background-position:0 0}100%{background-position:200% 0}}
-@keyframes wabSheen{0%{background-position:130% 0}60%,100%{background-position:-60% 0}}
-.wab-x{position:absolute;top:12px;right:12px;z-index:2;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#9fb0d4;font-size:13px;line-height:1;cursor:pointer;transition:.2s}
-.wab-x:hover{background:rgba(255,255,255,.12);color:#fff}
-.wab-tag{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px 14px;line-height:1.5;border-radius:6px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.4);color:#7dd3fc;font-weight:800;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase}
-.wab-tag i{width:7px;height:7px;border-radius:50%;background:#22d3ee;box-shadow:0 0 10px #22d3ee;animation:wabPulse 1.4s ease-in-out infinite}
-@keyframes wabPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
-.wab-eng{margin:0;font-size:13px;font-weight:800;letter-spacing:.32em;color:#8aa0c8}
-.wab-ver{margin:2px 0 0;padding:.06em .08em .1em;font-size:84px;font-weight:900;line-height:1.1;letter-spacing:-.02em;background:linear-gradient(180deg,#fff 10%,#7dd3fc 55%,#6366f1 105%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 28px rgba(56,189,248,.45))}
-.wab-ver .wab-dot{display:inline-block;margin:0 .02em;font-weight:900}
-.wab-drop{display:inline-block;margin:8px 0 20px;padding:8px 22px;line-height:1.5;border-radius:6px;background:linear-gradient(90deg,#0ea5e9,#6366f1);color:#fff;font-weight:900;font-size:15px;letter-spacing:.18em;box-shadow:0 8px 26px rgba(56,189,248,.35)}
-.wab-title{margin:0 0 22px;font-size:34px;font-weight:900;letter-spacing:.08em;line-height:1.2;color:#fff;text-shadow:0 0 26px rgba(56,189,248,.5)}
-.wab-title em{font-style:normal;color:#38bdf8}
-.wab-btn{position:relative;width:100%;padding:15px 18px;line-height:1.5;border:0;border-radius:10px;font:inherit;font-size:15px;font-weight:900;letter-spacing:.12em;color:#031018;cursor:pointer;background:linear-gradient(180deg,#67d4ff,#2ea6e8);box-shadow:0 10px 28px rgba(56,189,248,.35),inset 0 1px 0 rgba(255,255,255,.5);transition:transform .18s cubic-bezier(.22,1,.36,1),filter .2s}
-.wab-btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
-.wab-btn:active{transform:scale(.97)}
-.wab-btn:focus{outline:none}.wab-btn:focus-visible{outline:2px solid #bae6fd;outline-offset:3px}
-@media (max-width:420px){.wab-card{padding:26px 16px 18px}.wab-ver{font-size:72px}.wab-title{font-size:27px}}
-@media (max-height:620px){.wab-card{padding:20px 18px 16px}.wab-ver{font-size:60px}.wab-drop{margin:4px 0 14px}.wab-title{margin-bottom:16px;font-size:26px}.wab-tag{margin-bottom:10px}}
-@media (prefers-reduced-motion:reduce){.wab-card::before,.wab-card::after,.wab-tag i{animation:none}}
+
+<style id="moon-maint-css">
+html body #optView.moon-maint-on{position:relative;overflow:hidden;min-height:520px}
+html body #moonMaint{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:rgba(8,6,16,.38);-webkit-backdrop-filter:blur(16px) saturate(1.1);backdrop-filter:blur(16px) saturate(1.1);text-align:center}
+html body #moonMaint .mm-card{width:min(440px,100%);padding:28px 22px;border-radius:22px;border:1px solid rgba(160,180,255,.28);
+  background:linear-gradient(180deg,rgba(28,32,66,.86),rgba(12,12,30,.9));box-shadow:0 24px 70px rgba(0,0,0,.55);color:#eef2ff}
+html body #moonMaint .mm-ic{font-size:34px;line-height:1;margin-bottom:10px}
+html body #moonMaint .mm-t{margin:0 0 6px;font-size:20px;font-weight:800;letter-spacing:.02em}
+html body #moonMaint .mm-s{margin:0 0 16px;font-size:13px;color:rgba(214,226,250,.72)}
+html body #moonMaint .mm-time{display:flex;justify-content:center;gap:8px;margin:0 0 6px}
+html body #moonMaint .mm-time div{min-width:68px;padding:10px 8px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(170,195,255,.18)}
+html body #moonMaint .mm-time b{display:block;font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;
+  background:linear-gradient(180deg,#fff,#9ec5ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+html body #moonMaint .mm-time small{font-size:10px;letter-spacing:.14em;color:rgba(214,226,250,.55)}
+html body #moonMaint .mm-note{margin:12px 0 0;font-size:12px;color:rgba(214,226,250,.55)}
 </style>
-<div id="wab-root" role="dialog" aria-modal="true" aria-labelledby="wab-title">
-  <div class="wab-bg" data-wab-close></div>
-  <div class="wab-card">
-    <button class="wab-x" type="button" aria-label="დახურვა" data-wab-close>✕</button>
-    <div class="wab-tag"><i></i><span data-wab="tag">ახალი განახლება</span></div>
-    <p class="wab-eng">MOON ENGINE</p>
-    <div class="wab-ver">4<span class="wab-dot">.</span>0</div>
-    <div class="wab-drop" data-wab="drop">დაიდროპა</div>
-    <h2 class="wab-title" id="wab-title">WE ARE <em>BACK</em>!</h2>
-    <button class="wab-btn" type="button" data-wab-close data-wab="ok">გასაგებია</button>
-  </div>
-</div>
-<script id="wab-js">
+<script id="moon-maint-js">
 (function(){
-  /* ============ SETTINGS — edit these for every new patch ============ */
-  var CAMPAIGN_ID  = 'wab-engine40-2026-11-11';     // new patch => new ID => everyone sees it again
-  var WINDOW_HOURS = 48;                             // each visitor sees it for 48h, counted from THEIR first visit
-  var MAX_SHOWS    = 9999;                           // show on every visit while the window is open
-  var GAP_HOURS    = 0;                              // no minimum gap between showings
-  var DELAY_MS     = 150;                            // almost instantly after page load
-  /* =================================================================== */
-  var H = 3600000, key = 'moonWab:' + CAMPAIGN_ID, fkey = 'moonWabFirst:' + CAMPAIGN_ID, mem = null, firstMem = 0;
-  var now = Date.now(), t0 = 0;
-  try { t0 = parseInt(localStorage.getItem(fkey) || '0', 10) || 0; } catch(e){}
-  if (!t0) { t0 = firstMem || now; firstMem = t0; try { localStorage.setItem(fkey, String(t0)); } catch(e){} }
-  var tEnd = t0 + WINDOW_HOURS * H;
-  /* shared with the "after optimization" notice: true only inside this visitor's 48h window */
-  window.__moonDropActive = function(){ return Date.now() < tEnd; };
-  if (now > tEnd) return;
-
-  var TXT = {
-    ka:{tag:'ახალი განახლება', drop:'დაიდროპა', ok:'გასაგებია'},
-    en:{tag:'New update', drop:'has dropped', ok:'Got it'},
-    ru:{tag:'Новое обновление', drop:'вышел', ok:'Понятно'}
-  };
-  function read(){
-    try { var v = JSON.parse(localStorage.getItem(key) || 'null'); if (v && typeof v.n === 'number') return v; } catch(e){}
-    return mem || {n:0, last:0};
+  /* ===== SETTINGS ===== */
+  var END_AT = 1794447849000;   /* ms timestamp when the method comes back (now + 28h). Change this number to extend/shorten */
+  var ENABLED = true;   /* false = method is open again */
+  /* ==================== */
+  function isAdmin(){ try{ return sessionStorage.getItem('moon_maint_admin')==='1'; }catch(e){ return false; } }
+  var host=null, ov=null, tick=null, obs=null;
+  function pad(n){ return (n<10?'0':'')+n; }
+  function build(){
+    ov=document.createElement('div'); ov.id='moonMaint'; ov.setAttribute('role','status');
+    ov.innerHTML='<div class="mm-card"><div class="mm-ic">🌙</div><h3 class="mm-t">მეთოდი დროებით მიუწვდომელია</h3>'+
+      '<p class="mm-s">სავარაუდო დაბრუნების დრო</p>'+
+      '<div class="mm-time"><div><b id="mmH">--</b><small>საათი</small></div><div><b id="mmM">--</b><small>წუთი</small></div><div><b id="mmS">--</b><small>წამი</small></div></div>'+
+      '<p class="mm-note" id="mmNote">მიმდინარეობს განახლება</p></div>';
   }
-  function write(v){ mem = v; try { localStorage.setItem(key, JSON.stringify(v)); } catch(e){} }
-
-  var st = read();
-  if (st.n >= MAX_SHOWS) return;
-  if (st.n > 0 && now - st.last < GAP_HOURS * H) return;
-
+  function update(){
+    var left=Math.max(0,END_AT-Date.now()), s=Math.floor(left/1000);
+    var H=document.getElementById('mmH'), M=document.getElementById('mmM'), S=document.getElementById('mmS');
+    if(H) H.textContent=pad(Math.floor(s/3600)); if(M) M.textContent=pad(Math.floor(s%3600/60)); if(S) S.textContent=pad(s%60);
+    var n=document.getElementById('mmNote'); if(n) n.textContent = left>0 ? 'მიმდინარეობს განახლება' : 'მალე დაბრუნდება';
+  }
+  function lockKids(on){
+    if(!host) return;
+    Array.prototype.forEach.call(host.children,function(k){
+      if(k===ov) return;
+      if(on){ k.setAttribute('inert',''); k.setAttribute('aria-hidden','true'); } else { k.removeAttribute('inert'); k.removeAttribute('aria-hidden'); }
+    });
+  }
+  function apply(){
+    host=document.getElementById('optView'); if(!host) return;
+    if(!ENABLED || isAdmin()){ remove(); return; }
+    host.classList.add('moon-maint-on');
+    if(!ov) build();
+    if(ov.parentNode!==host) host.appendChild(ov);
+    lockKids(true); update();
+  }
+  function remove(){
+    if(obs){ obs.disconnect(); obs=null; }
+    if(tick){ clearInterval(tick); tick=null; }
+    if(host){ lockKids(false); host.classList.remove('moon-maint-on'); }
+    if(ov&&ov.parentNode) ov.parentNode.removeChild(ov);
+  }
   function init(){
-    var root = document.getElementById('wab-root');
-    if (!root) return;
-    var lang = 'ka'; try { lang = localStorage.getItem('moon_lang') || 'ka'; } catch(e){}
-    var D = TXT[lang] || TXT.ka;
-    Array.prototype.forEach.call(root.querySelectorAll('[data-wab]'), function(el){ var k = el.getAttribute('data-wab'); if (D[k] != null) el.innerHTML = D[k]; });
-    var shown = false;
-    function open(){
-      if (shown) return; shown = true;
-      write({n: st.n + 1, last: Date.now()});
-      root.classList.add('wab-on');
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){ root.classList.add('wab-show'); }); });
-    }
-    function close(){
-      root.classList.remove('wab-show');
-      setTimeout(function(){ root.classList.remove('wab-on'); }, 400);
-      document.removeEventListener('keydown', onKey);
-    }
-    function onKey(e){ if (e.key === 'Escape') close(); }
-    root.addEventListener('click', function(e){ if (e.target.closest('[data-wab-close]')) close(); });
-    document.addEventListener('keydown', onKey);
-    // wait until the site's own boot/font cover is gone so the notice never flashes under it
-    var tries = 0;
-    (function wait(){
-      var r = document.documentElement;
-      var ready = r.classList.contains('moon-fonts-ok') && !r.classList.contains('moon-boot');
-      if (ready || ++tries > 40) setTimeout(open, DELAY_MS); else setTimeout(wait, 100);
-    })();
+    host=document.getElementById('optView'); if(!host) return;
+    if(!ENABLED || isAdmin()) return;
+    apply();
+    tick=setInterval(update,1000);
+    /* the method view is (re)built by script: re-attach the overlay and re-lock new children whenever it changes */
+    obs=new MutationObserver(function(){ if(!ov||ov.parentNode!==host||host.querySelector(':scope > *:not(#moonMaint):not([inert])')){ obs.disconnect(); apply(); obs.observe(host,{childList:true}); } });
+    obs.observe(host,{childList:true});
+    window.addEventListener('moon-admin-ok',function(){ remove(); });
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(init,0); }); else setTimeout(init,0);
 })();
 </script>
-<!-- ===== /WE ARE BACK ===== -->
 </body>
 </html>
