@@ -23784,7 +23784,7 @@ html body #optView.mn-view{max-width:1040px}
 .opt-adm-row select,.opt-adm-row input{padding:7px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:inherit;font-family:inherit;width:auto;max-width:110px}
 .opt-adm-row button{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
 </style>
-<!-- MOON 4.0 (ffmpeg.wasm) is served by the gate worker (GET /m4?ticket=...) -->
+<!-- MOON 4.0 engine is served by the gate worker (GET /m4?ticket=...) -->
 <style id="opt-redesign">
 #optView .opt{position:relative;isolation:isolate;overflow:hidden;display:grid;gap:30px;justify-items:center;padding:clamp(24px,5vw,56px) clamp(14px,4vw,40px) 60px;border-radius:32px;background:radial-gradient(120% 80% at 50% 0,#0b1030 0,#05060f 60%,#020208);border:1px solid rgba(255,255,255,.08);box-shadow:none;filter:none;backdrop-filter:none}
 /* aurora + 3D neon grid floor (no moon) */
@@ -24453,92 +24453,41 @@ function finishFail(ticket,text){
   refreshStatus();
 }
 function isMp4(u8){ return u8&&u8.byteLength>12&&String.fromCharCode(u8[4],u8[5],u8[6],u8[7])==='ftyp'; }
-/* ============ MOON 4.0 — ffmpeg.wasm engine. worker + core come from the gate (GET /m4?ticket=...) ============ */
+/* ============ MOON 4.0 — patch engine. Served by the gate (GET /m4?ticket=...), runs in the tab, no re-encoding ============ */
 var M4={p:null};
-function m4Strip(s){ return s.replace(/^[ \t]*export\s+/gm,''); }
-function m4Consts(src){ return (new Function(m4Strip(src.const)+'\n;return {FFMessageType:FFMessageType,CORE_URL:CORE_URL};'))(); }   /* single source of truth: const.js */
-function m4WorkerSrc(src){ return m4Strip(src.const)+'\n'+m4Strip(src.errors)+'\n'+src.worker.replace(/^[ \t]*import\s[^;]*?from\s*["'][^"']+["']\s*;?[ \t]*$/gm,''); }   /* const.js + errors.js + worker.js -> one classic worker script */
-function m4CoreSrc(src){ return src.core.replace(/import\.meta\.url/g,'(self.location&&self.location.href||"")').replace(/\bexport\s+default\s+createFFmpegCore\s*;?/,''); }   /* ESM core -> classic script, so importScripts() in the worker works in every browser */
-function M4Client(workerSrc,T){
-  var url=URL.createObjectURL(new Blob([workerSrc],{type:'text/javascript'})), w=new Worker(url), seq=0, pend={}, me=this;
-  me.logs=[]; me.onProgress=null; me.dead=false;
-  function failAll(err){ me.dead=true; Object.keys(pend).forEach(function(k){ var p=pend[k]; delete pend[k]; p.rej(err); }); }
-  w.onmessage=function(e){
-    var m=e.data||{};
-    if(m.type===T.LOG){ if(me.logs.length<600) me.logs.push(String(m.data&&m.data.message||'')); return; }
-    if(m.type===T.PROGRESS){ if(me.onProgress) me.onProgress(m.data); return; }
-    var p=pend[m.id]; if(!p) return; delete pend[m.id];
-    if(m.type===T.ERROR) p.rej(new Error(String(m.data))); else p.res(m.data);
-  };
-  w.onerror=function(e){ failAll(new Error((e&&e.message)||'worker error')); };
-  function send(type,data,trans){ return new Promise(function(res,rej){
-    if(me.dead) return rej(new Error('worker is not running'));
-    var id=++seq; pend[id]={res:res,rej:rej};
-    try{ w.postMessage({id:id,type:type,data:data},trans||[]); }catch(err){ delete pend[id]; rej(err); }
-  }); }
-  me.load=function(core,wasm){ return send(T.LOAD,{coreURL:core,wasmURL:wasm}); };
-  me.exec=function(args){ return send(T.EXEC,{args:args,timeout:-1}); };
-  me.writeFile=function(path,u8){ return send(T.WRITE_FILE,{path:path,data:u8},[u8.buffer]); };
-  me.readFile=function(path){ return send(T.READ_FILE,{path:path,encoding:'binary'}); };
-  me.deleteFile=function(path){ return send(T.DELETE_FILE,{path:path}); };
-  me.terminate=function(){ failAll(new Error('terminated')); try{ w.terminate(); }catch(e){} try{ URL.revokeObjectURL(url); }catch(e){} };
-}
-function m4Wasm(url){
-  return fetchTO(url,{},300000).then(function(r){
-    if(!r.ok) throw new Error('wasm HTTP '+r.status);
-    var total=Number(r.headers.get('content-length'))||0;
-    if(!r.body||!r.body.getReader||!total) return r.blob();
-    var rd=r.body.getReader(), got=0, parts=[];
-    return (function pump(){ return rd.read().then(function(x){
-      if(x.done) return new Blob(parts,{type:'application/wasm'});
-      parts.push(x.value); got+=x.value.length; var q=Math.min(1,got/total); msg(tr('m4Load')+' '+Math.round(q*100)+'%'); bar(25+Math.round(q*35)); return pump();
-    }); })();
-  }).then(function(b){ return URL.createObjectURL(b.type==='application/wasm'?b:new Blob([b],{type:'application/wasm'})); });
-}
+function m4Engine(){ try{ var r=window.ZilemPatchEngines; return (r&&r['2.0']&&r['2.0'].quickPatch)?r['2.0']:null; }catch(e){ return null; } }
 function m4Load(ticket){
-  if(M4.p) return M4.p.then(function(c){ if(!c.dead) return c; M4.p=null; return m4Load(ticket); });
+  var eng=m4Engine(); if(eng) return Promise.resolve(eng);
+  if(M4.p) return M4.p;
   if(!ticket) return Promise.reject(new Error('core ticket missing'));
   msg(tr('m4Load')+'…');
-  M4.p=fetchTO(CFG.GATE+'/m4?ticket='+encodeURIComponent(ticket)+'&f=all',{cache:'no-store'},30000).then(function(r){
+  M4.p=fetchTO(CFG.GATE+'/m4?ticket='+encodeURIComponent(ticket),{cache:'no-store'},30000).then(function(r){
     if(!r.ok) return r.json().catch(function(){return {};}).then(function(j){ throw new Error('m4: '+(j.error||('HTTP '+r.status))); });
-    return r.json();
-  }).then(function(src){
-    var cli=new M4Client(m4WorkerSrc(src),m4Consts(src).FFMessageType), coreURL=URL.createObjectURL(new Blob([m4CoreSrc(src)],{type:'text/javascript'}));
-    return m4Wasm(src.wasm).then(function(wasmURL){ return cli.load(coreURL,wasmURL); }).then(function(){ return cli; },function(e){ cli.terminate(); throw e; });
+    return r.text();
+  }).then(function(code){
+    var el=document.createElement('script'); el.textContent=code; document.head.appendChild(el); el.parentNode.removeChild(el);
+    var e=m4Engine(); if(!e) throw new Error('MOON 4.0 engine failed to load');
+    return e;
   }).catch(function(e){ M4.p=null; throw e; });
   return M4.p;
 }
-function m4Probe(txt){ var v=txt.match(/Video:\s*([a-z0-9_]+)/i), a=txt.match(/Audio:\s*([a-z0-9_]+)/i); return {v:v?v[1].toLowerCase():'', a:a?a[1].toLowerCase():''}; }
-/* >>> MOON 4.0 ffmpeg command: re-encode to the preset fps only (resolution is never changed), H.264 High, yuv420p, faststart.
-   info={v,a} (codecs), fps = preset fps, h = preset height. Clips without audio get a silent AAC track. */
-function moon4Args(info,fps,h,inn,out){
-  var noA=!info.a, a=['-i',inn];
-  if(noA) a.push('-f','lavfi','-i','anullsrc=channel_layout=stereo:sample_rate=48000');
-  var vf=[]; if(fps>0) vf.push('fps='+fps); vf.push('format=yuv420p');   /* NO scaling: resolution stays exactly as the source */
-  a.push('-map','0:v:0','-map',noA?'1:a:0':'0:a:0?','-sn','-dn','-vf',vf.join(','),
-    '-c:v','libx264','-preset','veryfast','-crf','18','-profile:v','high','-pix_fmt','yuv420p');
-  if(fps>0) a.push('-r',String(fps));
-  if(noA) a.push('-c:a','aac','-b:a','128k','-shortest'); else if(info.a==='aac') a.push('-c:a','copy'); else a.push('-c:a','aac','-b:a','192k');
-  a.push('-metadata','comment=MOON 4.0 https://moonfull4k.xyz','-movflags','+faststart','-y',out);
-  return a;
-}
-function patchWithFF(file,fps,ticket){
-  var ff=null, pr=PRESETS.filter(function(p){return p.id===S.preset;})[0], inn=/\.(mov|qt)$/i.test(file.name||'')?'in.mov':'in.mp4', out='out.mp4';
-  return m4Load(ticket).then(function(c){
-    ff=c; ff.onProgress=function(e){ var q=Math.max(0,Math.min(1,Number(e&&e.progress)||0)); bar(60+Math.round(q*35)); };
-    msg(tr('m4Run')+'…'); bar(60); return file.arrayBuffer();
-  }).then(function(ab){ return ff.writeFile(inn,new Uint8Array(ab)); })
-  .then(function(){ ff.logs.length=0; return ff.exec(['-hide_banner','-i',inn]); })   /* probe only (ends with an error by design, but prints the streams) */
-  .then(function(){ var info=m4Probe(ff.logs.join('\n')); if(!info.v) throw new Error('ვიდეო არ არის თავსებადი'); ff.logs.length=0; return ff.exec(moon4Args(info,fps,pr?pr.h:0,inn,out)); })
-  .then(function(code){ if(code!==0) throw new Error('ffmpeg '+code); return ff.readFile(out); })
-  .then(function(data){
-    ff.onProgress=null; try{ ff.deleteFile(inn); ff.deleteFile(out); }catch(_){}
-    if(!isMp4(data)) throw new Error('MOON 4.0: ცარიელი შედეგი');
-    return new Blob([data],{type:(inn==='in.mov'?'video/quicktime':'video/mp4')});
-  }).catch(function(e){ try{ if(ff) ff.terminate(); }catch(_){} M4.p=null; throw e; });   /* any failure -> fresh worker next time */
+function patchWithMoon4(file,fps,ticket){
+  var inMov=/\.(mov|qt)$/i.test(file.name||'');
+  return m4Load(ticket).then(function(eng){
+    msg(tr('m4Run')+'…'); bar(40);
+    return file.arrayBuffer().then(function(ab){
+      var u8=new Uint8Array(ab), c=eng.checkCompatibility(u8,{});
+      if(c&&c.compatible===false) throw new Error('ვიდეო არ არის თავსებადი: '+(c.reason||''));
+      bar(60);
+      var out=eng.quickPatch(u8,{});
+      if(!isMp4(out)) throw new Error('MOON 4.0: ცარიელი შედეგი');
+      bar(95);
+      return new Blob([out],{type:(inMov?'video/quicktime':'video/mp4')});
+    });
+  });
 }
 
-function patchInBrowser(file,fps,ticket){ return patchWithFF(file,fps,ticket); }   /* MOON 4.0 (ffmpeg.wasm) is the only engine */
+function patchInBrowser(file,fps,ticket){ return patchWithMoon4(file,fps,ticket); }   /* MOON 4.0 is the only engine */
 /* ---- patcher-ის გამოძახება: გაღვიძება (Render cold start) + retry + დიაგნოსტიკა ---- */
 function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
 function fetchTO(url,opt,ms){
