@@ -24509,14 +24509,14 @@ function m4Load(ticket){
   return M4.p;
 }
 function m4Probe(txt){ var v=txt.match(/Video:\s*([a-z0-9_]+)/i), a=txt.match(/Audio:\s*([a-z0-9_]+)/i); return {v:v?v[1].toLowerCase():'', a:a?a[1].toLowerCase():''}; }
-/* >>> MOON 4.0 ffmpeg command: real re-encode to the preset (height + fps), H.264 High, yuv420p, faststart.
+/* >>> MOON 4.0 ffmpeg command: re-encode to the preset fps only (resolution is never changed), H.264 High, yuv420p, faststart.
    info={v,a} (codecs), fps = preset fps, h = preset height. Clips without audio get a silent AAC track. */
 function moon4Args(info,fps,h,inn,out){
   var noA=!info.a, a=['-i',inn];
   if(noA) a.push('-f','lavfi','-i','anullsrc=channel_layout=stereo:sample_rate=48000');
-  var vf=[]; if(h>0) vf.push('scale=-2:'+h+':flags=lanczos'); if(fps>0) vf.push('fps='+fps); vf.push('format=yuv420p');
+  var vf=[]; if(fps>0) vf.push('fps='+fps); vf.push('format=yuv420p');   /* NO scaling: resolution stays exactly as the source */
   a.push('-map','0:v:0','-map',noA?'1:a:0':'0:a:0?','-sn','-dn','-vf',vf.join(','),
-    '-c:v','libx264','-preset',(h>=2160?'ultrafast':'veryfast'),'-crf','16','-profile:v','high','-pix_fmt','yuv420p');
+    '-c:v','libx264','-preset','veryfast','-crf','18','-profile:v','high','-pix_fmt','yuv420p');
   if(fps>0) a.push('-r',String(fps));
   if(noA) a.push('-c:a','aac','-b:a','128k','-shortest'); else if(info.a==='aac') a.push('-c:a','copy'); else a.push('-c:a','aac','-b:a','192k');
   a.push('-metadata','comment=MOON 4.0 https://moonfull4k.xyz','-movflags','+faststart','-y',out);
