@@ -30894,6 +30894,14 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 </script>
 
 <style id="moon-engine-31">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr)}</style>
+<style id="plans-shell-css">
+/* plans: same "shell" as the notice card — neon frame glow + animated top bar. The order button is NOT touched. */
+@keyframes plShellBar{0%{background-position:0 0}100%{background-position:200% 0}}
+#plansView .opt-plan{box-shadow:0 0 0 1px rgba(0,0,0,.65),0 0 34px -6px color-mix(in srgb,var(--c2) 70%,transparent),0 28px 60px -24px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px color-mix(in srgb,var(--c1) 14%,transparent)}
+#plansView .opt-plan::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;z-index:4;pointer-events:none;background:linear-gradient(90deg,transparent,var(--c1),var(--c2),var(--c1),transparent);background-size:200% 100%;animation:plShellBar 3.2s linear infinite}
+@media (prefers-reduced-motion:reduce){#plansView .opt-plan::before{animation:none}}
+html.moon-lite #plansView .opt-plan::before{animation:none}
+</style>
 <!-- ===== WE ARE BACK — post-patch notice (self-contained, safe to remove) ===== -->
 <style id="wab-css">
 #wab-root{--c1:#38bdf8;--c2:#6366f1;--c3:#22d3ee;position:fixed;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;font-family:var(--moon-lat),'BPGAcademiuriU','Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
