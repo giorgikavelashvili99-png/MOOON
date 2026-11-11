@@ -23976,7 +23976,7 @@ T.ka.engBest='საუკეთესო'; T.ka.engBackup='რეზერვ�
 T.en.engBest='Best'; T.en.engBackup='Backup'; T.en.tryBackup='';
 T.ka.tut='ტუტორიალი'; T.en.tut='Tutorial'; T.ru.tut='Туториал';
 T.ru.engBest='Лучший'; T.ru.engBackup='Резерв'; T.ru.tryBackup='';
-T.ka.engNew='ახალი'; T.en.engNew='New'; T.ru.engNew='Новый'; T.ka.m4Load='MOON 4.0 იტვირთება'; T.en.m4Load='Loading MOON 4.0'; T.ru.m4Load='Загрузка MOON 4.0'; T.ka.m4Run='MOON 4.0 მუშაობს'; T.en.m4Run='MOON 4.0 working'; T.ru.m4Run='MOON 4.0 обрабатывает';
+T.ka.engNew='ახალი'; T.en.engNew='New'; T.ru.engNew='Новый'; T.ka.m4Load='MOON 4.0 იტვირთება'; T.en.m4Load='Loading MOON 4.0'; T.ru.m4Load='Загрузка MOON 4.0'; T.ka.m4Run='MOON 4.0 მუშაობს'; T.en.m4Run='MOON 4.0 working'; T.ru.m4Run='MOON 4.0 обрабатывает'; T.ka.m4Bad='ამ ვიდეოს დამუშავება ვერ მოხერხდა. სცადე სხვა ვიდეო (MP4/MOV) ან თავიდან ჩაწერე.'; T.en.m4Bad='This video could not be processed. Please try another video (MP4/MOV) or re-record it.'; T.ru.m4Bad='Не удалось обработать это видео. Попробуйте другое видео (MP4/MOV) или запишите заново.';
 T.ka.backP='თუ Chrome-იდან ვერ ატვირთე, ჯერჯერობით გამოიყენე ამ ორიდან ერთ-ერთი ბრაუზერი:'; T.en.backP="If you couldn't upload from Chrome, please use one of these two browsers for now:"; T.ru.backP='Если не удалось загрузить из Chrome, пока воспользуйтесь одним из этих браузеров:';
 T.ka.backTh='დიდი მადლობა მოთმინებისთვის'; T.en.backTh='Thank you so much for your patience'; T.ru.backTh='Большое спасибо за терпение';
 T.ka.backOk='გასაგებია'; T.en.backOk='Got it'; T.ru.backOk='Понятно';
@@ -24533,12 +24533,20 @@ function patchWith40(file,fps,ticket){
   }).then(function(ab){
     return new Promise(function(res){ setTimeout(function(){ res(ab); },30); });   /* let the UI paint before the synchronous patch */
   }).then(function(ab){
-    var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
-    if(c&&c.compatible===false) throw new Error('ვიდეო არ არის თავსებადი: '+(c.reason||''));
-    var out=core.quickPatch(new Uint8Array(ab));
-    if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
-    var n=out&&(out.byteLength!=null?out.byteLength:out.length);
-    if(!(out&&n>0&&isMp4(out))) throw new Error('MOON 4.0: ცარიელი შედეგი');
+    /* MOON 4.0 itself now accepts any mono/stereo AAC rate, H.264/H.265, extra tracks and silent clips.
+       Whatever is still impossible (damaged / fragmented / exotic audio) gets one neutral message, never the engine's raw English text. */
+    var out=null, n=0;
+    try{
+      var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
+      if(c&&c.compatible===false){ try{ console.warn('[optimizer] 4.0 compat:',c.reason); }catch(_){} throw new Error('compat'); }
+      out=core.quickPatch(new Uint8Array(ab));
+      if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
+      n=out&&(out.byteLength!=null?out.byteLength:out.length);
+      if(!(out&&n>0&&isMp4(out))) throw new Error('empty');
+    }catch(err){
+      try{ console.warn('[optimizer] 4.0 patch failed:',err&&err.message); }catch(_){}
+      throw new Error(tr('m4Bad'));
+    }
     bar(95);
     out=moonBrand(out,'40');
     return new Blob([out],{type:(/\.(mov|qt)$/i.test(file.name||'')?'video/quicktime':'video/mp4')});
