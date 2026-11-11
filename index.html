@@ -31215,9 +31215,46 @@ html body #tfView:not(#_a):not(#_b) .tf-ico{width:56px!important;height:56px!imp
 html body #tfView:not(#_a):not(#_b) .tf-ico svg{width:24px!important;height:24px!important}
 html body #tfView:not(#_a):not(#_b) .tf-ds{display:flex!important;flex-direction:column!important;align-items:center!important;gap:6px!important;font-size:0!important}
 html body #tfView:not(#_a):not(#_b) .tf-ds::before{content:"აირჩიე ფაილი";display:block;font-size:16px;line-height:1.3;font-weight:600;color:#f4f4f5}
-html[lang="en"] html body #tfView:not(#_a):not(#_b) .tf-ds::before{content:"Choose a file"}
-html[lang="ru"] html body #tfView:not(#_a):not(#_b) .tf-ds::before{content:"Выбери файл"}
-html body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="en"] html body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="ru"] html body #tfView:not(#_a):not(#_b) .tf-ds::after{content:"max 1024 MB";font-size:12.5px;line-height:1.3;font-weight:500;color:#8b8b93}
+html[lang="en"] body #tfView:not(#_a):not(#_b) .tf-ds::before{content:"Choose a file"}
+html[lang="ru"] body #tfView:not(#_a):not(#_b) .tf-ds::before{content:"Выбери файл"}
+html body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="en"] body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="ru"] body #tfView:not(#_a):not(#_b) .tf-ds::after{content:"max 1024 MB";font-size:12.5px;line-height:1.3;font-weight:500;color:#8b8b93}
+
+/* upload card: ring progress + success check */
+html body #tfView:not(#_a):not(#_b) .tf-it{padding:16px!important;border-radius:20px!important;background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.1)!important;animation:tfRise .5s cubic-bezier(.16,1,.3,1) both!important;transition:border-color .4s,box-shadow .4s!important}
+@keyframes tfRise{from{opacity:0;transform:translateY(14px) scale(.97)}}
+html body #tfView:not(#_a):not(#_b) .tf-top{gap:14px!important}
+html body #tfView:not(#_a):not(#_b) .tf-fi{position:relative;flex:0 0 52px!important;width:52px!important;height:52px!important;border-radius:50%!important;background:none!important;display:grid;place-items:center}
+html body #tfView:not(#_a):not(#_b) .tf-ring{position:absolute;inset:0;width:100%!important;height:100%!important;overflow:visible;transform:rotate(-90deg);animation:tfSpin 1.2s linear infinite!important}
+@keyframes tfSpin{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
+html body #tfView:not(#_a):not(#_b) .tf-ring circle{fill:none;stroke-width:3}
+html body #tfView:not(#_a):not(#_b) .tf-rb{stroke:rgba(255,255,255,.1)}
+html body #tfView:not(#_a):not(#_b) .tf-rp{stroke:#c4b5fd;stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:112;transition:stroke-dashoffset .35s ease,stroke .4s;filter:drop-shadow(0 0 5px rgba(167,139,250,.9))}
+html body #tfView:not(#_a):not(#_b) .tf-ck{opacity:0;display:grid;place-items:center;transform:scale(.6);transition:opacity .3s,transform .4s cubic-bezier(.34,1.56,.64,1)}
+html body #tfView:not(#_a):not(#_b) .tf-ck svg{width:22px!important;height:22px!important;fill:none;stroke:#34d399;stroke-width:3;stroke-dasharray:24;stroke-dashoffset:24}
+html body #tfView:not(#_a):not(#_b) .tf-it.ok .tf-ring,html body #tfView:not(#_a):not(#_b) .tf-it.err .tf-ring{animation:none!important;transform:rotate(-90deg)}
+html body #tfView:not(#_a):not(#_b) .tf-it.ok .tf-rp{stroke:#34d399;stroke-dashoffset:0!important;filter:drop-shadow(0 0 6px rgba(52,211,153,.8))}
+html body #tfView:not(#_a):not(#_b) .tf-it.err .tf-rp{stroke:#f87171;stroke-dashoffset:0!important;filter:none}
+html body #tfView:not(#_a):not(#_b) .tf-it.ok .tf-ck{opacity:1;transform:scale(1)}
+html body #tfView:not(#_a):not(#_b) .tf-it.ok .tf-ck svg{animation:tfDraw .5s .15s ease forwards!important}
+@keyframes tfDraw{to{stroke-dashoffset:0}}
+html body #tfView:not(#_a):not(#_b) .tf-it.ok{border-color:rgba(52,211,153,.4)!important;box-shadow:0 0 44px -18px rgba(52,211,153,.7)}
+html body #tfView:not(#_a):not(#_b) .tf-it.err{border-color:rgba(248,113,113,.4)!important}
+html body #tfView:not(#_a):not(#_b) .tf-bar{display:none!important}
+html body #tfView:not(#_a):not(#_b) .tf-pc{font-size:14px!important;font-weight:700!important;color:#e4e4e7!important}
+
+/* v2 drop zone: solid glass panel + white button with soft ripples */
+html body #tfView:not(#_a):not(#_b) .tf-drop,html body #tfView:not(#_a):not(#_b) .tf-drop:hover,html body #tfView:not(#_a):not(#_b) .tf-drop:focus-visible,html body #tfView:not(#_a):not(#_b) .tf-drop.drag{min-height:300px!important;justify-content:center!important;gap:22px!important;padding:36px 20px!important;border-radius:28px!important;border:1px solid rgba(255,255,255,.1)!important;background:linear-gradient(165deg,rgba(255,255,255,.075),rgba(255,255,255,.015))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 60px -34px rgba(0,0,0,.9)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transform:none!important;overflow:hidden!important;transition:border-color .3s,box-shadow .3s!important}
+html body #tfView:not(#_a):not(#_b) .tf-drop:hover,html body #tfView:not(#_a):not(#_b) .tf-drop.drag{border-color:rgba(255,255,255,.28)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 60px -20px rgba(196,181,253,.55)!important}
+html body #tfView:not(#_a):not(#_b) .tf-ico{position:relative!important;width:84px!important;height:84px!important;border-radius:50%!important;background:#fff!important;color:#0b0b0d!important;border:0!important;box-shadow:0 14px 34px -10px rgba(196,181,253,.6)!important;overflow:visible!important;transition:transform .3s cubic-bezier(.34,1.56,.64,1)!important}
+html body #tfView:not(#_a):not(#_b) .tf-drop:hover .tf-ico,html body #tfView:not(#_a):not(#_b) .tf-drop.drag .tf-ico{transform:scale(1.07)!important}
+html body #tfView:not(#_a):not(#_b) .tf-drop:active .tf-ico{transform:scale(.95)!important}
+html body #tfView:not(#_a):not(#_b) .tf-ico svg{width:32px!important;height:32px!important;stroke-width:2.2!important;color:#0b0b0d!important}
+html body #tfView:not(#_a):not(#_b) .tf-ico::before,html body #tfView:not(#_a):not(#_b) .tf-ico::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.45);opacity:0;animation:tfRip 3s ease-out infinite!important;pointer-events:none}
+html body #tfView:not(#_a):not(#_b) .tf-ico::after{animation-delay:1.5s!important}
+@keyframes tfRip{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.3);opacity:0}}
+html body #tfView:not(#_a):not(#_b) .tf-drop.drag .tf-ico::before,html body #tfView:not(#_a):not(#_b) .tf-drop.drag .tf-ico::after{animation-duration:1.2s!important}
+html body #tfView:not(#_a):not(#_b) .tf-ds::before{font-size:18px!important;letter-spacing:.2px}
+html body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="en"] body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="ru"] body #tfView:not(#_a):not(#_b) .tf-ds::after{padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px!important}
 </style>
 <script id="tf-js">
 (function(){
@@ -31260,16 +31297,16 @@ html body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="en"] html body #tfV
   }
   function card(file){
     var el=document.createElement('div'); el.className='tf-it';
-    el.innerHTML='<div class="tf-top"><span class="tf-fi">'+ICON+'</span><div class="tf-meta"><div class="tf-nm">'+esc(file.name)+'</div><div class="tf-st">'+size(file.size)+'</div></div><div class="tf-pc">0%</div></div><div class="tf-bar"><i></i></div><div class="tf-res"><a class="tf-link" target="_blank" rel="noopener"></a><button type="button" class="tf-cp"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span></span></button><a class="tf-op" target="_blank" rel="noopener" aria-label="open"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></a></div>';
+    el.innerHTML='<div class="tf-top"><span class="tf-fi"><svg class="tf-ring" viewBox="0 0 44 44"><circle class="tf-rb" cx="22" cy="22" r="19"/><circle class="tf-rp" cx="22" cy="22" r="19"/></svg><span class="tf-ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><div class="tf-meta"><div class="tf-nm">'+esc(file.name)+'</div><div class="tf-st">'+size(file.size)+'</div></div><div class="tf-pc">0%</div></div><div class="tf-bar"><i></i></div><div class="tf-res"><a class="tf-link" target="_blank" rel="noopener"></a><button type="button" class="tf-cp"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span></span></button><a class="tf-op" target="_blank" rel="noopener" aria-label="open"><svg viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></a></div>';
     list.insertBefore(el,list.firstChild); return el;
   }
   function run(){
     if(running) return; var job=queue.shift(); if(!job){ setStay(); if(lock){try{lock.release();}catch(e){} lock=null;} return; }
     running=true; setStay();
     try{ if(navigator.wakeLock&&!lock) navigator.wakeLock.request('screen').then(function(l){lock=l;}).catch(function(){}); }catch(e){}
-    var el=job.el, st=el.querySelector('.tf-st'), pc=el.querySelector('.tf-pc'), bar=el.querySelector('.tf-bar i');
+    var el=job.el, st=el.querySelector('.tf-st'), pc=el.querySelector('.tf-pc'), bar=el.querySelector('.tf-bar i'), ring=el.querySelector('.tf-rp');
     st.textContent=t('up'); el.classList.remove('err');
-    upload(job.file,function(p){ pc.textContent=p+'%'; bar.style.width=p+'%'; if(p>=100) st.textContent=t('fin'); })
+    upload(job.file,function(p){ pc.textContent=p+'%'; bar.style.width=p+'%'; ring.style.strokeDashoffset=(119.4*(1-Math.max(p,6)/100)).toFixed(1); if(p>=100) st.textContent=t('fin'); })
     .then(function(link){
       if(job.gen!==gen) return;
       el.classList.add('ok'); st.textContent=size(job.file.size)+' · '+t('ok'); pc.textContent='';
