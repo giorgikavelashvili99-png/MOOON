@@ -31313,6 +31313,7 @@ html body #tfView:not(#_a):not(#_b) .tf-ds::after,html[lang="en"] body #tfView:n
       var a=el.querySelector('.tf-link'); a.href=link; a.textContent=link.replace(/^https?:\/\//,'');
       el.querySelector('.tf-op').href=link; var cp=el.querySelector('.tf-cp'); cp.lastChild.textContent=t('copy'); cp.onclick=function(){copy(link,cp);};
       copy(link,cp);
+      setTimeout(function(){ if(job.gen!==gen) return; try{ el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){ el.scrollIntoView(); } },350);
     }).catch(function(){
       if(job.gen!==gen) return;
       el.classList.add('err'); st.textContent=t('err'); pc.textContent='';
