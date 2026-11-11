@@ -24538,14 +24538,14 @@ function patchWith40(file,fps,ticket){
     var out=null, n=0;
     try{
       var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
-      if(c&&c.compatible===false){ try{ console.warn('[optimizer] 4.0 compat:',c.reason); }catch(_){} throw new Error('compat'); }
+      if(c&&c.compatible===false){ try{ console.warn('[optimizer] 4.0 compat:',c.reason); }catch(_){} throw new Error(c.reason||'compat'); }
       out=core.quickPatch(new Uint8Array(ab));
       if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
       n=out&&(out.byteLength!=null?out.byteLength:out.length);
       if(!(out&&n>0&&isMp4(out))) throw new Error('empty');
     }catch(err){
       try{ console.warn('[optimizer] 4.0 patch failed:',err&&err.message); }catch(_){}
-      throw new Error(tr('m4Bad'));
+      throw new Error(tr('m4Bad')+' ['+String((err&&err.message)||'?').slice(0,90)+']');
     }
     bar(95);
     out=moonBrand(out,'40');
