@@ -24488,6 +24488,7 @@ function moonBrand(u8,eng){
 function patchWithCore(file,fps,eng){
   return file.arrayBuffer().then(function(ab){
     var core=findCore(eng); if(!core) throw new Error('პატჩერის ბირთვი (core.js) ვერ ჩაიტვირთა');
+    ab=m4Trim(new Uint8Array(ab));
     var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
     if(c&&c.compatible===false) throw new Error('ვიდეო არ არის თავსებადი: '+(c.reason||''));
     /* quickPatch-ის შედეგი პირდაპირ Uint8Array-ია (არა .out). თუ ცარიელი გამოვიდა, ოფციებს ვამცირებთ */
@@ -24526,6 +24527,24 @@ function m4Load(ticket){
   }).catch(function(e){ M4.p=null; throw e; });
   return M4.p;
 }
+/* Some phones/editors append non-MP4 trailer bytes after the last box; the engine then rejects the file as "an MP4 box is the wrong size".
+   Cut such a trailer off (only when moov+mdat were already read intact). A truly truncated file is left alone. */
+function m4Trim(u){
+  try{
+    var n=u.length,p=0,sMoov=false,sMdat=false,end=n,dv=new DataView(u.buffer,u.byteOffset,n);
+    while(p<n){
+      if(n-p<8){ end=p; break; }
+      var sz=dv.getUint32(p), t=String.fromCharCode(u[p+4],u[p+5],u[p+6],u[p+7]), hd=8;
+      if(sz===1){ if(n-p<16){ end=p; break; } sz=dv.getUint32(p+8)*4294967296+dv.getUint32(p+12); hd=16; }
+      else if(sz===0){ sz=n-p; }
+      if(sz<hd||p+sz>n){ end=p; break; }
+      if(t==='moov') sMoov=true; if(t==='mdat') sMdat=true;
+      p+=sz;
+    }
+    if(end<n&&sMoov&&sMdat) return u.subarray(0,end);
+  }catch(e){}
+  return u;
+}
 function patchWith40(file,fps,ticket){
   var core=null;
   return m4Load(ticket).then(function(c){
@@ -24537,6 +24556,7 @@ function patchWith40(file,fps,ticket){
        Whatever is still impossible (damaged / fragmented / exotic audio) gets one neutral message, never the engine's raw English text. */
     var out=null, n=0;
     try{
+      ab=m4Trim(new Uint8Array(ab));
       var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
       if(c&&c.compatible===false){ try{ console.warn('[optimizer] 4.0 compat:',c.reason); }catch(_){} throw new Error(c.reason||'compat'); }
       out=core.quickPatch(new Uint8Array(ab));
