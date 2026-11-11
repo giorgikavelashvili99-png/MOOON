@@ -7213,7 +7213,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 <header class="hz-bar" id="hzBar">
   <div class="hz-in">
     <a class="hz-brand" id="hzBrand" href="#" aria-label="MOONFULL4K"><span class="hz-wm" role="img" aria-label="MOONFULL4K"></span></a>
-    <span class="hz-badge">MOON · ENGINE 4.0</span>
+    <span class="hz-badge">MOON · ENGINE 3.1</span>
     <span class="hz-sep" aria-hidden="true"></span>
     <nav class="hz-links" id="hzLinks" aria-label="Main"><i class="hz-ind" aria-hidden="true"></i><button type="button" class="hz-link" data-hz-go="home"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span data-hz="nav_home">მთავარი</span></button><button type="button" class="hz-link" data-hz-go="optimizer"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 9h6v6"/><path d="m9 15 6-6"/></svg><span data-hz="nav_optimizer">მეთოდი</span></button><button type="button" class="hz-link" data-hz-go="checker"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span data-hz="nav_checker">ჩექერი</span></button><button type="button" class="hz-link" data-hz-go="plans"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2A2 2 0 0 1 15.8 21H8.2a2 2 0 0 1-2-1.8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span data-hz="nav_plans">გეგმები</span></button><button type="button" class="hz-link" data-hz-go="contact"><svg class="hz-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg><span data-hz="nav_contact">კონტაქტი</span></button></nav>
     <div class="hz-right">
@@ -23784,7 +23784,7 @@ html body #optView.mn-view{max-width:1040px}
 .opt-adm-row select,.opt-adm-row input{padding:7px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:inherit;font-family:inherit;width:auto;max-width:110px}
 .opt-adm-row button{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
 </style>
-<!-- MOON 4.0 engine is served by the gate worker (GET /m4?ticket=...) -->
+<!-- core.js is served by the gate worker (GET /core?ticket=...) -->
 <style id="opt-redesign">
 #optView .opt{position:relative;isolation:isolate;overflow:hidden;display:grid;gap:30px;justify-items:center;padding:clamp(24px,5vw,56px) clamp(14px,4vw,40px) 60px;border-radius:32px;background:radial-gradient(120% 80% at 50% 0,#0b1030 0,#05060f 60%,#020208);border:1px solid rgba(255,255,255,.08);box-shadow:none;filter:none;backdrop-filter:none}
 /* aurora + 3D neon grid floor (no moon) */
@@ -24007,7 +24007,7 @@ view.innerHTML =
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
-      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="40"><b>MOON 4.0</b><small data-k="engNew"></small></button></div>'+
+      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 3.1</b><small data-k="engBest"></small></button><button type="button" data-eng="20"><b>MOON 2.1</b><small data-k="engBackup"></small></button><button type="button" data-eng="40"><b>MOON 4.0</b><small data-k="engNew"></small></button></div>'+
    '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
    '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><div class="opt-dlrow" id="optDlRow"><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a><button type="button" class="opt-tut" id="optTut"><span data-k="tut"></span></button></div></div>'+
   '</div>'+
@@ -24023,7 +24023,7 @@ function applyLang(){
 }
 
 /* ============ STATE ============ */
-var S = {file:null, meta:null, preset:null, status:null, busy:false, jid:null, engine:'40', stage:'', converting:false};
+var S = {file:null, meta:null, preset:null, status:null, busy:false, jid:null, engine:'21', stage:'', converting:false};
 var $ = function(id){ return document.getElementById(id); };
 function setPill(s,txt){ var p=$('optPill'); p.setAttribute('data-s',s); p.querySelector('em').textContent=txt; }
 function fmtSize(b){ return b>=1073741824?(b/1073741824).toFixed(2)+' GB':(b/1048576).toFixed(1)+' MB'; }
@@ -24439,49 +24439,128 @@ function backOpen(){
   o.addEventListener('click',function(e){ if(e.target===o||e.target.closest('.mb-ok')) close(); });
   try{ o.querySelector('.mb-ok').focus(); }catch(e){}
 }
-function backNoticeOnce(){}   /* "WE ARE BACK" notice removed */
+function backNoticeOnce(){
+  if(!(window.__moonDropActive&&window.__moonDropActive())) return;   /* only inside the visitor's 48h window */
+  if(document.getElementById('moonBack')||document.getElementById('moonUps')) return;
+  var n=backCount(); if(n>=BACK_MAX) return;
+  _backN=n+1; try{ localStorage.setItem(BACK_KEY,String(n+1)); }catch(e){}
+  backOpen();
+}
 function finishFail(ticket,text){
   holdStop(); S.hold=null;
   S.busy=false; setPill('err',tr('err')); msg(text,true);
   if(ticket) api('/refund',{method:'POST',body:JSON.stringify({ticket:ticket,uid:ident().uid})}).catch(function(){}).then(function(){ refreshStatus(); });
   refreshStatus();
 }
+/* ---- ვიდეოს დაპატჩვა ბრაუზერში (core.js) ---- */
+var ENGINE_KEY={'12':'3.0'};   /* MOON 3.1 = the registered engine (3.5 key). MOON 1.2 backup is disabled for now */
+function findCore(eng){
+  try{
+    var reg=window.ZilemPatchEngines;
+    if(reg){
+      if(eng==='12'){ var e12=reg[ENGINE_KEY['12']]; return (e12&&e12.quickPatch)?e12:null; }
+      if(eng==='20'){ var e20=reg['2.0']; return (e20&&e20.quickPatch)?e20:null; }   /* MOON 2.1 = Zeta 2 (registry key 2.0) */
+      var ks=Object.keys(reg); for(var i=ks.length-1;i>=0;i--){ if(ks[i]===ENGINE_KEY['12']||ks[i]==='2.0') continue; if(reg[ks[i]]&&reg[ks[i]].quickPatch) return reg[ks[i]]; }
+    }
+  }catch(e){}
+  return null;
+}
 function isMp4(u8){ return u8&&u8.byteLength>12&&String.fromCharCode(u8[4],u8[5],u8[6],u8[7])==='ftyp'; }
-/* ============ MOON 4.0 — patch engine. Served by the gate (GET /m4?ticket=...), runs in the tab, no re-encoding ============ */
-var M4={p:null};
-function m4Engine(){ try{ var r=window.ZilemPatchEngines; return (r&&r['2.0']&&r['2.0'].quickPatch)?r['2.0']:null; }catch(e){ return null; } }
+/* MOON 3.1: metadata texts written by the engine are replaced with MOON's own (same length -> atom sizes stay valid) */
+var BRAND_MAP21=[['ZILEM_OPTIMIZED/1 Zeta Engine 3 https://www.zilemmethod.com/','MOON_OPTIMIZED/1 MOON 4.0 https://moonfull4k.xyz/'],['Zeta Engine 2 https://www.zilemmethod.com/','MOON 2.1 https://moonfull4k.xyz local:v2.1'],['Zeta Engine 3 \u00e2\u0080\u0094 https://www.zilemmethod.com/','MOON 3.1 https://moonfull4k.xyz local:v3.1'],['Zilem Method https://zilemmethod.com local:v3.0','MOON 3.1 https://moonfull4k.xyz local:v3.1'],['www.zilemmethod.com','www.moonfull4k.xyz'],['zeta-coded','moon-coded'],['Zeta-v3.0','MOON-v3.1']];
+function moonBrand(u8,eng){
+  try{
+    BRAND_MAP21.forEach(function(pr){
+      var a=pr[0], b=pr[1]; while(b.length<a.length) b+=' ';
+      var A=[],B=[],i; for(i=0;i<a.length;i++){ A.push(a.charCodeAt(i)); B.push(b.charCodeAt(i)); }
+      var n=u8.length, LIM=4194304, ranges=n<=2*LIM?[[0,n]]:[[0,LIM],[n-LIM,n]];
+      ranges.forEach(function(r){
+        for(var p=r[0];p<=r[1]-A.length;p++){
+          if(u8[p]!==A[0]) continue;
+          var k=1; while(k<A.length&&u8[p+k]===A[k]) k++;
+          if(k===A.length){ for(var j=0;j<B.length;j++) u8[p+j]=B[j]; p+=A.length-1; }
+        }
+      });
+    });
+  }catch(e){ try{ console.warn('[optimizer] brand',e); }catch(_){} }
+  return u8;
+}
+function patchWithCore(file,fps,eng){
+  return file.arrayBuffer().then(function(ab){
+    var core=findCore(eng); if(!core) throw new Error('პატჩერის ბირთვი (core.js) ვერ ჩაიტვირთა');
+    var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
+    if(c&&c.compatible===false) throw new Error('ვიდეო არ არის თავსებადი: '+(c.reason||''));
+    /* quickPatch-ის შედეგი პირდაპირ Uint8Array-ია (არა .out). თუ ცარიელი გამოვიდა, ოფციებს ვამცირებთ */
+    var tries=[{useTmcd:true,useAlt:true,useDur:true},{useTmcd:true,useAlt:false,useDur:true},{useTmcd:false,useAlt:false,useDur:true},{useTmcd:false,useAlt:false,useDur:false}];
+    var last='';
+    for(var i=0;i<tries.length;i++){
+      var out;
+      try{ out=core.quickPatch(new Uint8Array(ab.slice(0)),Object.assign({fpsOverride:fps},tries[i])); }
+      catch(e){ last=e.message; try{ console.warn('[optimizer] patch attempt',i,e); }catch(_){} continue; }
+      if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
+      var n=out&&(out.byteLength!=null?out.byteLength:out.length);
+      try{ console.log('[optimizer] attempt',i,tries[i],'->',out&&out.constructor&&out.constructor.name,n); }catch(_){}
+      if(out&&n>0&&isMp4(out)){ out=moonBrand(out,eng); return new Blob([out],{type:(/\.(mov|qt)$/i.test(file.name||'')?'video/quicktime':'video/mp4')}); }
+      last='output '+(n||0)+' bytes';
+    }
+    throw new Error('პატჩერმა ცარიელი ფაილი დააბრუნა ('+last+')');
+  });
+}
+
+/* ============ MOON 4.0 — Zeta 3.5 engine (zeta35.js). Comes from the gate (GET /m4?ticket=...) and runs in an isolated scope, so it never touches the MOON 3.1 registry ============ */
+var M4={p:null,core:null};
 function m4Load(ticket){
-  var eng=m4Engine(); if(eng) return Promise.resolve(eng);
+  if(M4.core) return Promise.resolve(M4.core);
   if(M4.p) return M4.p;
   if(!ticket) return Promise.reject(new Error('core ticket missing'));
   msg(tr('m4Load')+'…');
   M4.p=fetchTO(CFG.GATE+'/m4?ticket='+encodeURIComponent(ticket),{cache:'no-store'},30000).then(function(r){
     if(!r.ok) return r.json().catch(function(){return {};}).then(function(j){ throw new Error('m4: '+(j.error||('HTTP '+r.status))); });
     return r.text();
-  }).then(function(code){
-    var el=document.createElement('script'); el.textContent=code; document.head.appendChild(el); el.parentNode.removeChild(el);
-    var e=m4Engine(); if(!e) throw new Error('MOON 4.0 engine failed to load');
-    return e;
+  }).then(function(src){
+    var box={};
+    (new Function('window','self','globalThis',src+'\n;'))(box,box,box);   /* own scope: registers into box.ZilemPatchEngines, not window */
+    var eng=box.ZilemPatchEngines&&box.ZilemPatchEngines['3.5'];
+    if(!eng||typeof eng.quickPatch!=='function') throw new Error('m4: engine missing');
+    M4.core=eng; return eng;
   }).catch(function(e){ M4.p=null; throw e; });
   return M4.p;
 }
-function patchWithMoon4(file,fps,ticket){
-  var inMov=/\.(mov|qt)$/i.test(file.name||'');
-  return m4Load(ticket).then(function(eng){
-    msg(tr('m4Run')+'…'); bar(40);
-    return file.arrayBuffer().then(function(ab){
-      var u8=new Uint8Array(ab), c=eng.checkCompatibility(u8,{});
-      if(c&&c.compatible===false) throw new Error('ვიდეო არ არის თავსებადი: '+(c.reason||''));
-      bar(60);
-      var out=eng.quickPatch(u8,{});
-      if(!isMp4(out)) throw new Error('MOON 4.0: ცარიელი შედეგი');
-      bar(95);
-      return new Blob([out],{type:(inMov?'video/quicktime':'video/mp4')});
-    });
+function patchWith40(file,fps,ticket){
+  var core=null;
+  return m4Load(ticket).then(function(c){
+    core=c; msg(tr('m4Run')+'…'); bar(60); return file.arrayBuffer();
+  }).then(function(ab){
+    return new Promise(function(res){ setTimeout(function(){ res(ab); },30); });   /* let the UI paint before the synchronous patch */
+  }).then(function(ab){
+    var c=core.checkCompatibility(new Uint8Array(ab.slice(0)));
+    if(c&&c.compatible===false) throw new Error('ვიდეო არ არის თავსებადი: '+(c.reason||''));
+    var out=core.quickPatch(new Uint8Array(ab));
+    if(out&&!(out instanceof Uint8Array)&&out.out) out=out.out;
+    var n=out&&(out.byteLength!=null?out.byteLength:out.length);
+    if(!(out&&n>0&&isMp4(out))) throw new Error('MOON 4.0: ცარიელი შედეგი');
+    bar(95);
+    out=moonBrand(out,'40');
+    return new Blob([out],{type:(/\.(mov|qt)$/i.test(file.name||'')?'video/quicktime':'video/mp4')});
   });
 }
 
-function patchInBrowser(file,fps,ticket){ return patchWithMoon4(file,fps,ticket); }   /* MOON 4.0 is the only engine */
+/* core.js is no longer a public file: it is fetched from the gate with a ticket, once per page session */
+function ensureCore(ticket,eng){
+  if(findCore(eng)) return Promise.resolve();                 /* already loaded (this session, or still served by the page) */
+  if(!ticket) return Promise.reject(new Error('core ticket missing'));
+  return fetchTO(CFG.GATE+'/core?ticket='+encodeURIComponent(ticket)+(eng==='12'?'&engine=12':''),{cache:'no-store'},30000).then(function(r){
+    if(!r.ok) return r.json().catch(function(){return {};}).then(function(j){ throw new Error('core: '+(j.error||('HTTP '+r.status))); });
+    return r.text();
+  }).then(function(code){
+    var el=document.createElement('script'); el.textContent=code; document.head.appendChild(el); el.parentNode.removeChild(el);
+    if(!findCore(eng)) throw new Error('core load failed');
+  });
+}
+function patchInBrowser(file,fps,ticket,eng){
+  if(eng==='40') return patchWith40(file,fps,ticket);
+  return ensureCore(ticket,eng).then(function(){ return patchWithCore(file,fps,eng); });
+}
 /* ---- patcher-ის გამოძახება: გაღვიძება (Render cold start) + retry + დიაგნოსტიკა ---- */
 function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
 function fetchTO(url,opt,ms){
@@ -24541,7 +24620,7 @@ function run(){
   }).then(function(srv){
     bar(25); msg(tr('proc')+'…');
     var fps=Math.min(preset.fps, Number(srv.fps)>0?Number(srv.fps):preset.fps);
-    S.stage='patch'; return patchInBrowser(S.file,fps,tk&&tk.ticket);
+    S.stage='patch'; return patchInBrowser(S.file,fps,tk&&tk.ticket,S.engine);
   }).then(function(blob){
     if(S.hold&&S.hold.state==='lost') return;
     bar(100); S.busy=false; S.doneFile=S.file; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
@@ -24556,7 +24635,11 @@ function run(){
 }
 
 /* ============ EVENTS ============ */
-S.engine='40'; try{ localStorage.removeItem('moonEngine'); }catch(e){}
+var engBox=$('optEng');
+function setEngine(v){ if(S.busy) return; S.engine=(v==='20'||v==='40')?v:'21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
+  engBox.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-eng')===S.engine; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); if(on) b.classList.remove('eng-warn'); }); }
+engBox.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-eng]'); if(b) setEngine(b.getAttribute('data-eng')); });
+setEngine('21');
 var drop=$('optDrop');
 $('optFile').addEventListener('change',function(e){ setFile(e.target.files[0]); });
 ['dragenter','dragover'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.add('drag'); }); });
@@ -30852,7 +30935,7 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 </script>
 
 <style id="moon-engine-31">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}</style>
-<style id="moon-engine-40">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr);max-width:280px;gap:8px}</style>
+<style id="moon-engine-40">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:repeat(3,minmax(0,1fr));max-width:560px;gap:8px}</style>
 <style id="plans-shell-css">
 /* plans: same "shell" as the notice card — neon frame glow + animated top bar. The order button is NOT touched. */
 @keyframes plShellBar{0%{background-position:0 0}100%{background-position:200% 0}}
@@ -30861,78 +30944,120 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 @media (prefers-reduced-motion:reduce){#plansView .opt-plan::before{animation:none}}
 html.moon-lite #plansView .opt-plan::before{animation:none}
 </style>
-
-<style id="moon-maint-css">
-html body #optView.moon-maint-on{position:relative;overflow:hidden;min-height:520px}
-html body #moonMaint{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;
-  background:rgba(8,6,16,.38);-webkit-backdrop-filter:blur(16px) saturate(1.1);backdrop-filter:blur(16px) saturate(1.1);text-align:center}
-html body #moonMaint .mm-card{width:min(440px,100%);padding:28px 22px;border-radius:22px;border:1px solid rgba(160,180,255,.28);
-  background:linear-gradient(180deg,rgba(28,32,66,.86),rgba(12,12,30,.9));box-shadow:0 24px 70px rgba(0,0,0,.55);color:#eef2ff}
-html body #moonMaint .mm-ic{font-size:34px;line-height:1;margin-bottom:10px}
-html body #moonMaint .mm-t{margin:0 0 6px;font-size:20px;font-weight:800;letter-spacing:.02em}
-html body #moonMaint .mm-s{margin:0 0 16px;font-size:13px;color:rgba(214,226,250,.72)}
-html body #moonMaint .mm-time{display:flex;justify-content:center;gap:8px;margin:0 0 6px}
-html body #moonMaint .mm-time div{min-width:68px;padding:10px 8px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(170,195,255,.18)}
-html body #moonMaint .mm-time b{display:block;font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;
-  background:linear-gradient(180deg,#fff,#9ec5ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-html body #moonMaint .mm-time small{font-size:10px;letter-spacing:.14em;color:rgba(214,226,250,.55)}
-html body #moonMaint .mm-note{margin:12px 0 0;font-size:12px;color:rgba(214,226,250,.55)}
+<!-- ===== WE ARE BACK — post-patch notice (self-contained, safe to remove) ===== -->
+<style id="wab-css">
+#wab-root{--c1:#38bdf8;--c2:#6366f1;--c3:#22d3ee;position:fixed;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;font-family:var(--moon-lat),'BPGAcademiuriU','Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+#wab-root.wab-on{display:flex}
+html body>#wab-root#wab-root,html.mi5-lock body>#wab-root#wab-root{content-visibility:visible!important}
+#wab-root *{box-sizing:border-box;text-transform:none}
+.wab-bg{position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 30%,rgba(56,189,248,.14),transparent 70%),rgba(3,5,10,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);opacity:0;transition:opacity .35s ease}
+.wab-card{position:relative;width:100%;max-width:440px;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-x:hidden;overflow-y:auto;padding:30px 24px 22px;border-radius:18px;color:#e8eefc;text-align:center;
+  background:linear-gradient(180deg,rgba(56,189,248,.08),transparent 38%),#070b14;
+  border:1px solid rgba(56,189,248,.45);
+  box-shadow:0 0 0 1px rgba(0,0,0,.7),0 0 60px rgba(56,189,248,.22),0 40px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);
+  opacity:0;transform:translateY(22px) scale(.96);transition:opacity .4s ease,transform .5s cubic-bezier(.22,1,.36,1)}
+#wab-root.wab-show .wab-bg{opacity:1}
+#wab-root.wab-show .wab-card{opacity:1;transform:none}
+.wab-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,transparent,var(--c1),var(--c2),var(--c3),transparent);background-size:200% 100%;animation:wabBar 3.2s linear infinite}
+.wab-card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.05) 50%,transparent 62%);background-size:250% 100%;animation:wabSheen 6s ease-in-out infinite}
+@keyframes wabBar{0%{background-position:0 0}100%{background-position:200% 0}}
+@keyframes wabSheen{0%{background-position:130% 0}60%,100%{background-position:-60% 0}}
+.wab-x{position:absolute;top:12px;right:12px;z-index:2;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#9fb0d4;font-size:13px;line-height:1;cursor:pointer;transition:.2s}
+.wab-x:hover{background:rgba(255,255,255,.12);color:#fff}
+.wab-tag{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px 14px;line-height:1.5;border-radius:6px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.4);color:#7dd3fc;font-weight:800;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase}
+.wab-tag i{width:7px;height:7px;border-radius:50%;background:#22d3ee;box-shadow:0 0 10px #22d3ee;animation:wabPulse 1.4s ease-in-out infinite}
+@keyframes wabPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+.wab-eng{margin:0;font-size:13px;font-weight:800;letter-spacing:.32em;color:#8aa0c8}
+.wab-ver{margin:2px 0 0;padding:.06em .08em .1em;font-size:84px;font-weight:900;line-height:1.1;letter-spacing:-.02em;background:linear-gradient(180deg,#fff 10%,#7dd3fc 55%,#6366f1 105%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 28px rgba(56,189,248,.45))}
+.wab-ver .wab-dot{display:inline-block;margin:0 .02em;font-weight:900}
+.wab-drop{display:inline-block;margin:8px 0 20px;padding:8px 22px;line-height:1.5;border-radius:6px;background:linear-gradient(90deg,#0ea5e9,#6366f1);color:#fff;font-weight:900;font-size:15px;letter-spacing:.18em;box-shadow:0 8px 26px rgba(56,189,248,.35)}
+.wab-title{margin:0 0 22px;font-size:34px;font-weight:900;letter-spacing:.08em;line-height:1.2;color:#fff;text-shadow:0 0 26px rgba(56,189,248,.5)}
+.wab-title em{font-style:normal;color:#38bdf8}
+.wab-btn{position:relative;width:100%;padding:15px 18px;line-height:1.5;border:0;border-radius:10px;font:inherit;font-size:15px;font-weight:900;letter-spacing:.12em;color:#031018;cursor:pointer;background:linear-gradient(180deg,#67d4ff,#2ea6e8);box-shadow:0 10px 28px rgba(56,189,248,.35),inset 0 1px 0 rgba(255,255,255,.5);transition:transform .18s cubic-bezier(.22,1,.36,1),filter .2s}
+.wab-btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.wab-btn:active{transform:scale(.97)}
+.wab-btn:focus{outline:none}.wab-btn:focus-visible{outline:2px solid #bae6fd;outline-offset:3px}
+@media (max-width:420px){.wab-card{padding:26px 16px 18px}.wab-ver{font-size:72px}.wab-title{font-size:27px}}
+@media (max-height:620px){.wab-card{padding:20px 18px 16px}.wab-ver{font-size:60px}.wab-drop{margin:4px 0 14px}.wab-title{margin-bottom:16px;font-size:26px}.wab-tag{margin-bottom:10px}}
+@media (prefers-reduced-motion:reduce){.wab-card::before,.wab-card::after,.wab-tag i{animation:none}}
 </style>
-<script id="moon-maint-js">
+<div id="wab-root" role="dialog" aria-modal="true" aria-labelledby="wab-title">
+  <div class="wab-bg" data-wab-close></div>
+  <div class="wab-card">
+    <button class="wab-x" type="button" aria-label="დახურვა" data-wab-close>✕</button>
+    <div class="wab-tag"><i></i><span data-wab="tag">ახალი განახლება</span></div>
+    <p class="wab-eng">MOON ENGINE</p>
+    <div class="wab-ver">3<span class="wab-dot">.</span>1</div>
+    <div class="wab-drop" data-wab="drop">დაიდროპა</div>
+    <h2 class="wab-title" id="wab-title">WE ARE <em>BACK</em>!</h2>
+    <button class="wab-btn" type="button" data-wab-close data-wab="ok">გასაგებია</button>
+  </div>
+</div>
+<script id="wab-js">
 (function(){
-  /* ===== SETTINGS ===== */
-  var END_AT = 1794447849000;   /* ms timestamp when the method comes back (now + 28h). Change this number to extend/shorten */
-  var ENABLED = true;   /* false = method is open again */
-  /* ==================== */
-  function isAdmin(){ try{ return sessionStorage.getItem('moon_maint_admin')==='1'; }catch(e){ return false; } }
-  var host=null, ov=null, tick=null, obs=null;
-  function pad(n){ return (n<10?'0':'')+n; }
-  function build(){
-    ov=document.createElement('div'); ov.id='moonMaint'; ov.setAttribute('role','status');
-    ov.innerHTML='<div class="mm-card"><div class="mm-ic">🌙</div><h3 class="mm-t">მეთოდი დროებით მიუწვდომელია</h3>'+
-      '<p class="mm-s">სავარაუდო დაბრუნების დრო</p>'+
-      '<div class="mm-time"><div><b id="mmH">--</b><small>საათი</small></div><div><b id="mmM">--</b><small>წუთი</small></div><div><b id="mmS">--</b><small>წამი</small></div></div>'+
-      '<p class="mm-note" id="mmNote">მიმდინარეობს განახლება</p></div>';
+  /* ============ SETTINGS — edit these for every new patch ============ */
+  var CAMPAIGN_ID  = 'wab-engine31-2026-11-10';     // new patch => new ID => everyone sees it again
+  var WINDOW_HOURS = 48;                             // each visitor sees it for 48h, counted from THEIR first visit
+  var MAX_SHOWS    = 9999;                           // show on every visit while the window is open
+  var GAP_HOURS    = 0;                              // no minimum gap between showings
+  var DELAY_MS     = 150;                            // almost instantly after page load
+  /* =================================================================== */
+  var H = 3600000, key = 'moonWab:' + CAMPAIGN_ID, fkey = 'moonWabFirst:' + CAMPAIGN_ID, mem = null, firstMem = 0;
+  var now = Date.now(), t0 = 0;
+  try { t0 = parseInt(localStorage.getItem(fkey) || '0', 10) || 0; } catch(e){}
+  if (!t0) { t0 = firstMem || now; firstMem = t0; try { localStorage.setItem(fkey, String(t0)); } catch(e){} }
+  var tEnd = t0 + WINDOW_HOURS * H;
+  /* shared with the "after optimization" notice: true only inside this visitor's 48h window */
+  window.__moonDropActive = function(){ return Date.now() < tEnd; };
+  if (now > tEnd) return;
+
+  var TXT = {
+    ka:{tag:'ახალი განახლება', drop:'დაიდროპა', ok:'გასაგებია'},
+    en:{tag:'New update', drop:'has dropped', ok:'Got it'},
+    ru:{tag:'Новое обновление', drop:'вышел', ok:'Понятно'}
+  };
+  function read(){
+    try { var v = JSON.parse(localStorage.getItem(key) || 'null'); if (v && typeof v.n === 'number') return v; } catch(e){}
+    return mem || {n:0, last:0};
   }
-  function update(){
-    var left=Math.max(0,END_AT-Date.now()), s=Math.floor(left/1000);
-    var H=document.getElementById('mmH'), M=document.getElementById('mmM'), S=document.getElementById('mmS');
-    if(H) H.textContent=pad(Math.floor(s/3600)); if(M) M.textContent=pad(Math.floor(s%3600/60)); if(S) S.textContent=pad(s%60);
-    var n=document.getElementById('mmNote'); if(n) n.textContent = left>0 ? 'მიმდინარეობს განახლება' : 'მალე დაბრუნდება';
-  }
-  function lockKids(on){
-    if(!host) return;
-    Array.prototype.forEach.call(host.children,function(k){
-      if(k===ov) return;
-      if(on){ k.setAttribute('inert',''); k.setAttribute('aria-hidden','true'); } else { k.removeAttribute('inert'); k.removeAttribute('aria-hidden'); }
-    });
-  }
-  function apply(){
-    host=document.getElementById('optView'); if(!host) return;
-    if(!ENABLED || isAdmin()){ remove(); return; }
-    host.classList.add('moon-maint-on');
-    if(!ov) build();
-    if(ov.parentNode!==host) host.appendChild(ov);
-    lockKids(true); update();
-  }
-  function remove(){
-    if(obs){ obs.disconnect(); obs=null; }
-    if(tick){ clearInterval(tick); tick=null; }
-    if(host){ lockKids(false); host.classList.remove('moon-maint-on'); }
-    if(ov&&ov.parentNode) ov.parentNode.removeChild(ov);
-  }
+  function write(v){ mem = v; try { localStorage.setItem(key, JSON.stringify(v)); } catch(e){} }
+
+  var st = read();
+  if (st.n >= MAX_SHOWS) return;
+  if (st.n > 0 && now - st.last < GAP_HOURS * H) return;
+
   function init(){
-    host=document.getElementById('optView'); if(!host) return;
-    if(!ENABLED || isAdmin()) return;
-    apply();
-    tick=setInterval(update,1000);
-    /* the method view is (re)built by script: re-attach the overlay and re-lock new children whenever it changes */
-    obs=new MutationObserver(function(){ if(!ov||ov.parentNode!==host||host.querySelector(':scope > *:not(#moonMaint):not([inert])')){ obs.disconnect(); apply(); obs.observe(host,{childList:true}); } });
-    obs.observe(host,{childList:true});
-    window.addEventListener('moon-admin-ok',function(){ remove(); });
+    var root = document.getElementById('wab-root');
+    if (!root) return;
+    var lang = 'ka'; try { lang = localStorage.getItem('moon_lang') || 'ka'; } catch(e){}
+    var D = TXT[lang] || TXT.ka;
+    Array.prototype.forEach.call(root.querySelectorAll('[data-wab]'), function(el){ var k = el.getAttribute('data-wab'); if (D[k] != null) el.innerHTML = D[k]; });
+    var shown = false;
+    function open(){
+      if (shown) return; shown = true;
+      write({n: st.n + 1, last: Date.now()});
+      root.classList.add('wab-on');
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ root.classList.add('wab-show'); }); });
+    }
+    function close(){
+      root.classList.remove('wab-show');
+      setTimeout(function(){ root.classList.remove('wab-on'); }, 400);
+      document.removeEventListener('keydown', onKey);
+    }
+    function onKey(e){ if (e.key === 'Escape') close(); }
+    root.addEventListener('click', function(e){ if (e.target.closest('[data-wab-close]')) close(); });
+    document.addEventListener('keydown', onKey);
+    // wait until the site's own boot/font cover is gone so the notice never flashes under it
+    var tries = 0;
+    (function wait(){
+      var r = document.documentElement;
+      var ready = r.classList.contains('moon-fonts-ok') && !r.classList.contains('moon-boot');
+      if (ready || ++tries > 40) setTimeout(open, DELAY_MS); else setTimeout(wait, 100);
+    })();
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(init,0); }); else setTimeout(init,0);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
+<!-- ===== /WE ARE BACK ===== -->
 </body>
 </html>
