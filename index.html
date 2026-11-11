@@ -11658,7 +11658,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       body: JSON.stringify({ file_id })
     }, API_TIMEOUT_MS))
     .then(res => { if (!res.ok) throw new Error('finalize-failed'); return res.json(); })
-    .then(data => { if (!data.link) throw new Error('finalize-bad-response'); return data; })
+    .then(data => { if (!data.link) throw new Error('finalize-bad-response'); (function(){ var l=String(data.link).trim(),H='mooontransferr.onrender.com',i=l.toLowerCase().lastIndexOf(H); if(i>=0){ l=l.slice(i+H.length); } else if(/^https?:/i.test(l)){ data.link=l; return; } data.link=VIDEO_REVIEW_TRANSFER_URL+(l.charAt(0)==='/'?'':'/')+l; })(); return data; })
     .then(data => { cleanupTracking(); return data; })
     .catch(err => {
       cleanupTracking();
@@ -12782,7 +12782,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     const avatar = document.createElement('span');
     avatar.className = 'msg-bubble-avatar';
     if (msg.from === 'admin') {
-      avatar.textContent = '🌕';
+      avatar.textContent = '';
     } else if (messengerCustomerAvatarUrl) {
       const av = document.createElement('img');
       av.src = messengerCustomerAvatarUrl;
@@ -12807,7 +12807,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     if (msg.replyTo && msg.replyTo.preview) {
       const quote = document.createElement('div');
       quote.className = 'msg-bubble-reply-quote';
-      const who = msg.replyTo.from === 'admin' ? '🌕' : (currentLang === 'ka' ? 'თქვენ' : 'You');
+      const who = msg.replyTo.from === 'admin' ? '' : (currentLang === 'ka' ? 'თქვენ' : 'You');
       quote.innerHTML = '<b></b><span></span>';
       quote.querySelector('b').textContent = who;
       quote.querySelector('span').textContent = msg.replyTo.preview;
@@ -13016,7 +13016,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       if (inputRow) inputRow.classList.remove('has-reply-preview');
       return;
     }
-    const who = messengerReplyTarget.from === 'admin' ? '🌕 MOON' : (currentLang === 'ka' ? 'თქვენ' : 'You');
+    const who = messengerReplyTarget.from === 'admin' ? ' MOON' : (currentLang === 'ka' ? 'თქვენ' : 'You');
     row.innerHTML = '<div class="mrp-text"><b></b><span></span></div><button type="button" class="mrp-cancel" aria-label="Cancel reply">✕</button>';
     row.querySelector('b').textContent = who;
     row.querySelector('span').textContent = messengerReplyTarget.preview;
@@ -14511,7 +14511,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     const priceTxt = txt('.pr');
     const num = parseFloat((priceTxt.match(/[\d]+(?:[.,]\d+)?/) || ['0'])[0].replace(',', '.')) || 0;
     const feats = Array.prototype.map.call(card.querySelectorAll('li'), (l) => '• ' + String(l.textContent || '').replace(/\s+/g, ' ').trim());
-    const firstMessage = '🌙 ახალი შეკვეთა — MOON გეგმა\n' +
+    const firstMessage = ' ახალი შეკვეთა — MOON გეგმა\n' +
       'გეგმა: ' + name + '\n' +
       'ფასი: ' + priceTxt + '\n' +
       (feats.length ? feats.join('\n') + '\n' : '') +
@@ -15222,11 +15222,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     const replies = Array.isArray(comment.replies) ? comment.replies : [];
     if (!replies.length) return '';
     return '<div class="c-replies">' + replies.map((r, i) => {
-      const avatarIcon = r.isAdmin ? '🌙' : discordLogoAvatar(i);
+      const avatarIcon = r.isAdmin ? '' : discordLogoAvatar(i);
       const avatarInner = (!r.isAdmin && r.avatarUrl) ? '<img class="c-avatar-img" src="' + escapeHtml(r.avatarUrl) + '" alt="">' : avatarIcon;
       const av = C_AVATAR_COLORS[(String(r.name || '').length + i + 3) % C_AVATAR_COLORS.length];
       return '<div class="c-reply-item"><div class="c-reply-avatar' + (r.isAdmin ? ' c-avatar-admin' : '') + '" style="--av:' + av + '">' + avatarInner + '</div><div class="c-reply-body-wrap"><div class="c-head"><span class="c-author">' + (r.isAdmin ? '' : escapeHtml(r.name)) +
-      (r.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
+      (r.isAdmin ? '<span class="admin-badge"> ADMIN</span>' : '') +
       '</span><span class="c-date" title="' + escapeHtml(formatCommentDate(r.ts)) + '">' + formatCommentAgo(r.ts) + '</span></div>' +
       '<div class="c-body c-clamped">' + cMention(escapeHtml(r.text)) + '</div>' +
       '<button type="button" class="c-more-btn">' + t('commentReadMore') + '</button></div></div>';
@@ -15247,13 +15247,13 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const start = (commentsPage - 1) * COMMENTS_PER_PAGE;
       const pageItems = displayList.slice(start, start + COMMENTS_PER_PAGE);
       commentList.innerHTML = pageItems.map((c, i) => {
-        const avatarIcon = c.isAdmin ? '🌙' : discordLogoAvatar(start + i);
+        const avatarIcon = c.isAdmin ? '' : discordLogoAvatar(start + i);
         const avatarClass = 'c-avatar' + (c.isAdmin ? ' c-avatar-admin' : '');
         const avatarInner = (!c.isAdmin && c.avatarUrl) ? '<img class="c-avatar-img" src="' + escapeHtml(c.avatarUrl) + '" alt="">' : avatarIcon;
         const cAv = C_AVATAR_COLORS[(String(c.name || '').length + start + i) % C_AVATAR_COLORS.length];
         const hasRep = Array.isArray(c.replies) && c.replies.length;
         return '<div class="c-item' + (c.pinned ? ' c-pinned' : '') + (hasRep ? ' c-has-replies' : '') + '" data-id="' + c.id + '"><div class="c-top"><div class="' + avatarClass + '" style="--av:' + cAv + '">' + avatarInner + '</div><div class="c-head"><span class="c-author">' + (c.isAdmin ? '' : escapeHtml(c.name)) +
-        (c.isAdmin ? '<span class="admin-badge">🌙 ADMIN</span>' : '') +
+        (c.isAdmin ? '<span class="admin-badge"> ADMIN</span>' : '') +
         (c.pinned ? '<span class="pin-badge">📌</span>' : '') +
         (c.rating ? '<span class="c-stars">' + starsString(c.rating) + '</span>' : '') +
         '</span><span class="c-date" title="' + escapeHtml(formatCommentDate(c.ts)) + '">' + formatCommentAgo(c.ts) + '</span></div></div>' +
@@ -31170,6 +31170,38 @@ html body .mn-view[data-view="transfer"]{max-width:720px}
 #tfView .tf-toast{position:fixed;left:50%;bottom:28px;z-index:9999;transform:translate(-50%,30px);opacity:0;pointer-events:none;padding:12px 20px;border-radius:999px;font-weight:600;font-size:14px;color:#fff;background:rgba(16,185,129,.95);box-shadow:0 14px 40px -10px rgba(16,185,129,.7);transition:.35s cubic-bezier(.16,1,.3,1)}
 #tfView .tf-toast.on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:560px){#tfView .tf-card{padding:12px;border-radius:22px}#tfView .tf-drop{padding:34px 14px}#tfView .tf-res{flex-wrap:wrap}#tfView .tf-link{flex:1 1 100%}#tfView .tf-cp{flex:1;justify-content:center}#tfView .tf-feats{grid-template-columns:1fr}#tfView .tf-feats div{flex-direction:row;justify-content:center}}
+
+#tfView{position:relative;font-family:'Inter',system-ui,sans-serif;max-width:560px;margin:0 auto;padding:34px 22px;color:#f4f4f5;background:none;border:0}
+#tfView *{animation:none!important}
+#tfView .tf-pill,#tfView .tf-btn,#tfView .tf-dt,#tfView .tf-glow{display:none!important}
+#tfView .tf-hero{text-align:center;margin-bottom:24px}
+#tfView .tf-hero h2{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.1;color:#fff;background:none;-webkit-text-fill-color:#fff}
+#tfView .tf-sub{color:#9b9ba3;font-size:15px;line-height:1.6;margin:12px auto 0;max-width:420px}
+#tfView .tf-card{padding:14px;border-radius:24px;background:#0f0f11;border:1px solid #26262b;box-shadow:0 30px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05)}
+#tfView .tf-drop{display:flex;flex-direction:column;align-items:center;gap:18px;padding:48px 20px;border-radius:16px;border:1px dashed #3a3a42;background:#141417;cursor:pointer;transition:border-color .2s,background-color .2s}
+#tfView .tf-drop:hover,#tfView .tf-drop.drag{border-color:#a1a1aa;background:#18181c}
+#tfView .tf-drop *{pointer-events:none}
+#tfView .tf-ico{display:grid;place-items:center;width:72px;height:72px;border-radius:22px;background:linear-gradient(180deg,#26262c,#18181c);border:1px solid #34343c;color:#fff;box-shadow:0 10px 30px -10px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.12),0 0 0 6px rgba(255,255,255,.03)}
+#tfView .tf-ico svg{width:30px;height:30px;stroke-width:1.8}
+#tfView .tf-ds{font-size:0;line-height:0;color:#e4e4e7}
+#tfView .tf-ds::after{content:"აირჩიე ფაილი · max 1024 MB";font-size:15px;line-height:1.4;font-weight:600;color:#e4e4e7}
+html[lang="en"] #tfView .tf-ds::after{content:"Choose a file · max 1024 MB"}
+html[lang="ru"] #tfView .tf-ds::after{content:"Выбери файл · max 1024 MB"}
+#tfView .tf-it{margin-top:12px;padding:14px 16px;border-radius:14px;background:#141417;border:1px solid #26262b}
+#tfView .tf-nm{font-size:14px;font-weight:600;color:#fff}
+#tfView .tf-st{font-size:12px;color:#8b8b93}
+#tfView .tf-pc{font-size:13px;font-weight:700;color:#fff}
+#tfView .tf-bar{height:6px;border-radius:99px;background:#26262b;overflow:hidden}
+#tfView .tf-bar i{border-radius:99px;background:#fff;box-shadow:none}
+#tfView .tf-it.ok{border-color:rgba(52,211,153,.45)}
+#tfView .tf-it.err{border-color:rgba(248,113,113,.5)}
+#tfView .tf-it.err .tf-st{color:#fca5a5}
+#tfView .tf-link{color:#e4e4e7;font-size:13px}
+#tfView .tf-cp,#tfView .tf-op,#tfView .tf-rt{background:#1f1f24;border:1px solid #34343c;border-radius:10px;color:#fff;font-weight:600;transition:background-color .2s}
+#tfView .tf-cp:hover,#tfView .tf-op:hover,#tfView .tf-rt:hover{background:#2a2a31}
+#tfView .tf-feats{margin-top:16px;gap:10px}
+#tfView .tf-feats div{padding:13px;border-radius:12px;background:#0f0f11;border:1px solid #26262b;color:#b4b4bb;font-size:13px}
+#tfView .tf-feats svg{color:#e4e4e7}
 </style>
 <script id="tf-js">
 (function(){
@@ -31208,7 +31240,7 @@ html body .mn-view[data-view="transfer"]{max-width:720px}
         x.onload=function(){ x.status>=200&&x.status<300?res(d.file_id):rej(new Error('put')); }; x.onerror=function(){rej(new Error('net'));}; x.ontimeout=function(){rej(new Error('to'));}; x.send(file); }); })
     .then(function(id){ return ftimeout(URL_+'/api/finalize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({file_id:id})},90000); })
     .then(function(r){ if(!r.ok) throw new Error('fin'); return r.json(); })
-    .then(function(d){ if(!d.link) throw new Error('nolink'); return /^https?:/i.test(d.link)?d.link:URL_+(d.link.charAt(0)==='/'?'':'/')+d.link; });
+    .then(function(d){ if(!d.link) throw new Error('nolink'); return (function(l){ l=String(l).trim(); var H='mooontransferr.onrender.com'; var i=l.toLowerCase().lastIndexOf(H); if(i>=0){ l=l.slice(i+H.length); } else if(/^https?:/i.test(l)){ return l; } return URL_+(l.charAt(0)==='/'?'':'/')+l; })(d.link); });
   }
   function card(file){
     var el=document.createElement('div'); el.className='tf-it';
@@ -31232,7 +31264,8 @@ html body .mn-view[data-view="transfer"]{max-width:720px}
       if(!el.querySelector('.tf-rt')){ var r=document.createElement('button'); r.type='button'; r.className='tf-rt'; r.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg><span>'+t('retry')+'</span>'; r.onclick=function(){ r.remove(); bar.style.width='0'; pc.textContent='0%'; queue.push(job); run(); }; el.appendChild(r); }
     }).finally(function(){ running=false; run(); });
   }
-  function add(files){ wake(); [].slice.call(files).forEach(function(f){ queue.push({file:f,el:card(f)}); }); run(); }
+  var MAX=1024*1024*1024, LIM={ka:'ფაილი აღემატება ლიმიტს — მაქს. 1024 MB',en:'File exceeds the limit — max 1024 MB',ru:'Файл превышает лимит — макс. 1024 MB'};
+  function add(files){ wake(); [].slice.call(files).forEach(function(f){ var el=card(f); if(f.size>MAX){ el.classList.add('err'); el.querySelector('.tf-st').textContent=LIM[L()]||LIM.en; el.querySelector('.tf-pc').textContent=''; return; } queue.push({file:f,el:el}); }); run(); }
   input.addEventListener('change',function(){ if(input.files.length) add(input.files); input.value=''; });
   ['dragenter','dragover'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.add('drag'); wake(); }); });
   ['dragleave','drop'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.remove('drag'); }); });
