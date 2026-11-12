@@ -31383,5 +31383,11 @@ html body.mn-view-on .wrap>*:not(.topbar):not(.mn-views):not(.mn-tx):not(.site-m
 html.mx-sw .pc-section,html.mx-sw .pc-section *,html.mx-sw .pc-section *::before,html.mx-sw .pc-section *::after{transition:none!important}
 html.mx-sw body.mn-view-on .mn-views,html.mx-sw body.mn-view-on .mn-view.show{animation:none!important}
 </style>
+
+<style id="moon-warm-fix">
+/* the pre-built target page must never take space in the layout (it pushed the current page down for a moment) */
+html body #mnViews .mn-view.mn-warm:not(#_a):not(#_b){position:fixed!important;left:0!important;right:0!important;top:0!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;contain:layout!important}
+html body #mnViews .mn-view.mn-warm.show:not(#_a):not(#_b){position:relative!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+</style>
 </body>
 </html>
