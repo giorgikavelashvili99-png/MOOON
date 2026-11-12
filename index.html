@@ -32472,5 +32472,58 @@ html body .cm-plus.on:not(#_a){background:#25f4ee!important;color:#021014!import
 /* TikTok checker: while the page is open, do not let animated glide / hold loops fight the user's own scroll */
 (function(){var d=document.documentElement;['wheel','touchstart','pointerdown'].forEach(function(ev){addEventListener(ev,function(){d.classList.remove('ttdl-gliding');},{passive:true,capture:true});});})();
 </script>
+
+<style id="moon-check-v2">
+/* + button: never rotates, never animates, in any state */
+html body .cm-plus,html body .cm-plus.on,html body .cm-plus:hover,html body .cm-plus:active,html body .cm-plus:focus,html body #communityView .cm-plus,html body #communityView .cm-plus.on,html body #communityView .cm-plus.on::after,html body #communityView .cm-plus::after{transform:none!important;rotate:none!important;animation:none!important;transition:none!important}
+html body #communityView .cm-plus.on{background:#25f4ee!important;color:#021014!important}
+/* MOON CHECK card v2 */
+html body .cm-bubble.cm-tt.cm-ttg:not(#_a):not(#_b):not(#_c){position:relative;width:min(340px,100%)!important;padding:16px 16px 14px 18px!important;border:1px solid #232840!important;border-left:0!important;border-radius:0!important;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);background:linear-gradient(180deg,#0d0f17,#07080c)!important;overflow:hidden}
+html body .cm-ttg::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#25f4ee,#fe2c55)}
+html body .cm-ttg::after{content:"";position:absolute;right:0;top:0;width:16px;height:16px;background:linear-gradient(225deg,#25f4ee 50%,transparent 50%);opacity:.9}
+html body .cm-ttg-k:not(#_a){display:inline-block;padding:3px 8px;margin-bottom:8px!important;background:#25f4ee;color:#021014!important;font-size:10px!important;font-weight:900!important;letter-spacing:.22em!important;border-radius:2px}
+html body .cm-ttg-big{align-items:flex-end!important;gap:10px!important}
+html body .cm-ttg-big b:not(#_a){font-size:clamp(50px,15vw,66px)!important;font-weight:900!important;line-height:.95;letter-spacing:-.03em!important;background:linear-gradient(90deg,#fff 30%,#25f4ee);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent!important}
+html body .cm-ttg-big span:not(#_a){padding:2px 7px;margin-bottom:6px;border:1px solid #fe2c55;color:#ff6b88!important;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+html body .cm-ttg-u:not(#_a){margin-top:10px!important;padding-top:10px;border-top:1px dashed #2b3044;color:#c3c9dc!important;font-size:13px!important;line-height:1.45}
+html body .cm-ttg-chips:not(#_a){gap:6px!important;margin-top:12px!important}
+html body .cm-ttg-chip:not(#_a):not(#_b){position:relative;padding:7px 10px 7px 14px!important;border:1px solid #232840!important;border-radius:0!important;background:#10121c!important;font-size:12px!important;font-weight:700;color:#e8ecf8!important}
+html body .cm-ttg-chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#5b6fff}
+html body .cm-ttg-chip b:not(#_a){color:#8d96b5!important;font-size:9px!important;letter-spacing:.14em;margin-right:6px}
+html body .cm-ttg-chip.cm-ttg-ok:not(#_a):not(#_b){background:#0c1d14!important;border-color:#1f5a35!important;color:#a8f5c2!important}
+html body .cm-ttg-chip.cm-ttg-ok::before{background:#37d67a}
+html body .cm-ttg-a:not(#_a){display:inline-flex;align-items:center;margin-top:12px!important;padding:8px 14px;background:#fe2c55;color:#fff!important;font-size:11px!important;font-weight:900;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border-radius:2px}
+</style>
+
+<style id="moon-modal-solid">
+/* while the order window is open, nothing behind it is painted at all (orbs/gradients were the pixelated, laggy layer) */
+html.pc-modal-on body>.orb,html.pc-modal-on .orb,html.pc-modal-on body>canvas,html.pc-modal-on .qn-stars{visibility:hidden!important;animation:none!important;filter:none!important}
+html.pc-modal-on body .wrap>*:not(#pcModalScrim):not(.topbar):not(.site-menu):not(.site-menu-scrim):not(.hz-bar):not(script):not(style){visibility:hidden!important}
+html.pc-modal-on,html.pc-modal-on body{background:#05060b!important}
+html.pc-modal-on body #pcModalScrim.open:not(#_a):not(#_b){background:#05060b!important;opacity:1}
+/* the panel itself: cheaper to paint */
+html.pc-modal-on body #pcModalScrim .pc-accordion-body.panel:not(#_a):not(#_b){box-shadow:0 12px 40px rgba(0,0,0,.55)!important}
+html.pc-modal-on body #pcModalScrim .pc-accordion-body *:not(#_a):not(#_b){text-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+</style>
+
+<style id="moon-modal-exit">
+html body #pcModalScrim.mo-exit:not(#_a):not(#_b){background:transparent!important;pointer-events:none}
+html body #pcModalScrim.mo-exit>.pc-accordion-body.panel:not(#_a):not(#_b){animation:moExitPanel .16s cubic-bezier(.4,0,1,1) forwards!important}
+@keyframes moExitPanel{to{opacity:0;transform:translate3d(0,18px,0) scale(.96)}}
+</style>
+<script id="moon-modal-exit-js">
+/* closing the order window: the page behind is visible at once, only the panel itself plays a short exit */
+window.moAnimClose=function(card,done){
+  var sc=document.getElementById('pcModalScrim');
+  if(!sc||!sc.classList.contains('open')){ done(); return; }
+  var fin=false;
+  function end(){ if(fin) return; fin=true; sc.classList.remove('mo-exit'); try{ done(); }catch(e){} }
+  document.documentElement.classList.remove('pc-modal-on');
+  sc.classList.add('mo-exit');
+  var pn=sc.querySelector('.pc-accordion-body');
+  if(pn) pn.addEventListener('animationend',end,{once:true});
+  setTimeout(end,220);
+};
+</script>
 </body>
 </html>
