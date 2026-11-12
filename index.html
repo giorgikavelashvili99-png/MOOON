@@ -32259,7 +32259,7 @@ html body #communityView .cm-title{font-size:clamp(22px,6.4vw,30px)!important;ma
 html body #communityView .cm-head,html body #communityView .cm-sub{margin-bottom:6px!important;flex:0 0 auto}
 html body #communityView .cm-list{flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important;contain:none!important}
 html body #communityView .cm-panel>*:not(.cm-list){flex:0 0 auto}
-html body.mn-view-on:has(#communityView.show) footer{display:none!important}
+html.cm-open footer{display:none!important}
 
 /* ===== PATCH 8: narrower, taller community ===== */
 html body .mn-view[data-view="community"]{max-width:400px!important;margin-left:auto!important;margin-right:auto!important}
@@ -32268,52 +32268,34 @@ html body #communityView .cm-panel{width:100%!important;padding-left:12px!import
 /* ===== PATCH 9: community = fixed full-height layer (stable, no page scroll, no JS height) ===== */
 html body #communityView.show{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:var(--cm-top,96px)!important;max-width:none!important;width:auto!important;margin:0!important;padding:6px 12px calc(10px + env(safe-area-inset-bottom,0px))!important;box-sizing:border-box;overflow:hidden!important;z-index:30;display:block}
 html body #communityView.show .cm-panel{height:100%!important;min-height:0!important;max-width:440px;margin:0 auto!important;width:100%!important}
-html:has(#communityView.show),html body:has(#communityView.show){overflow:hidden!important}
+html.cm-open,html.cm-open body{overflow:hidden!important}
+
+/* ===== PATCH 10: keyboard-aware community + prettier checker popup ===== */
+html body #communityView.show{bottom:var(--cm-kb,0px)!important;padding-bottom:calc(var(--cm-kbp,10px))!important}
+html body .cm-chk{padding:16px 16px 14px!important;border-radius:26px!important;
+  background:radial-gradient(120% 100% at 0% 0%,rgba(120,200,255,.42),rgba(120,200,255,0) 55%),
+             radial-gradient(100% 90% at 100% 100%,rgba(255,90,150,.28),rgba(255,90,150,0) 60%),
+             linear-gradient(150deg,rgba(110,150,255,.55),rgba(60,90,220,.5))!important;
+  -webkit-backdrop-filter:blur(24px) saturate(190%) brightness(1.3);backdrop-filter:blur(24px) saturate(190%) brightness(1.3);
+  border:1px solid rgba(255,255,255,.42)!important;
+  box-shadow:0 18px 44px -14px rgba(10,20,90,.8),inset 0 1px 0 rgba(255,255,255,.6)!important;z-index:20}
+html body .cm-chk-h{margin-bottom:12px!important;font-size:15px!important;letter-spacing:.01em}
+html body .cm-chk-h b{display:inline-flex;align-items:center;gap:8px;color:#fff;font-weight:800}
+html body .cm-chk-h b::before{content:"";width:22px;height:22px;border-radius:8px;background:linear-gradient(135deg,#25f4ee,#fe2c55);box-shadow:0 4px 12px -3px rgba(254,44,85,.7),inset 0 1px 0 rgba(255,255,255,.6)}
+html body .cm-chk-x{width:30px!important;height:30px!important;background:rgba(255,255,255,.22)!important;border:1px solid rgba(255,255,255,.4)!important;color:#fff!important;font-size:16px;line-height:1}
+html body .cm-chk-row{gap:10px!important}
+html body .cm-chk-in{height:48px!important;border-radius:16px!important;background:rgba(255,255,255,.2)!important;border:1px solid rgba(255,255,255,.4)!important;color:#fff!important;box-shadow:inset 0 2px 6px rgba(20,30,110,.25)}
+html body .cm-chk-in::placeholder{color:rgba(255,255,255,.75)}
+html body .cm-chk-in:focus{border-color:#fff!important;box-shadow:0 0 0 3px rgba(255,255,255,.22),inset 0 2px 6px rgba(20,30,110,.2)}
+html body .cm-chk-go{height:48px!important;padding:0 20px!important;border-radius:16px!important;border:0!important;color:#fff!important;font-weight:800!important;
+  background:linear-gradient(135deg,#25c8f4,#6a5cff 55%,#fe2c55)!important;box-shadow:0 8px 20px -8px rgba(254,44,85,.8),inset 0 1px 0 rgba(255,255,255,.5)!important}
+html body .cm-chk-go:active{transform:scale(.97)}
+html body .cm-chk-st{color:#fff!important;font-weight:600}
+html body .cm-chk-st.err{color:#ffd0d0!important}
+html body .cm-chk-st.ok{color:#eaffd0!important}
 </style>
-<script>
-/* PATCH: scroll fixes. (1) page never jumps back while the finger/wheel is scrolling it
-   (2) community list passes the scroll on to the page at its top/bottom edge */
-(function(){
-  var last=0, clickAt=0, now=function(){return Date.now();};
-  ['touchstart','touchmove','wheel'].forEach(function(e){window.addEventListener(e,function(){last=now();},{passive:true,capture:true});});
-  ['click','keydown'].forEach(function(e){window.addEventListener(e,function(){clickAt=now();},{capture:true,passive:true});});
-  function userBusy(){return now()-last<500 && now()-clickAt>900;}
-  var st=window.scrollTo, sb=window.scrollBy;
-  window.scrollTo=function(){ if(userBusy()) return; return st.apply(window,arguments); };
-  var si=Element.prototype.scrollIntoView;
-  Element.prototype.scrollIntoView=function(){
-    if(userBusy() && !this.closest('#cmList,.pc-modal-scroll,.messenger-page,.ttdl-log')) return;
-    return si.apply(this,arguments);
-  };
-})();
-</script>
-<script>
-/* PATCH 3: undo sudden upward page jumps that nobody asked for (layout re-measure / keyboard / address bar) */
-(function(){
-  var st=window.scrollTo, prev=window.pageYOffset, lastUser=0, lastClick=0, fixing=0, now=Date.now;
-  ['touchstart','touchmove','wheel','keydown','mousedown'].forEach(function(e){addEventListener(e,function(){lastUser=now();fixing=0;},{passive:true,capture:true});});
-  ['click','pointerup'].forEach(function(e){addEventListener(e,function(){lastClick=now();},{passive:true,capture:true});});
-  function restore(y){
-    fixing=y; var t0=now();
-    (function step(){
-      if(!fixing||now()-t0>1800||now()-lastUser<150){fixing=0;return;}
-      var cur=window.pageYOffset;
-      if(cur<y-60) st.call(window,0,y); else {fixing=0;return;}
-      requestAnimationFrame(step);
-    })();
-  }
-  addEventListener('scroll',function(){
-    var y=window.pageYOffset, d=y-prev;
-    var userRecent=now()-lastUser<350, clickRecent=now()-lastClick<2500;
-    if(!userRecent && !clickRecent && !fixing && d<-120 && prev>400){
-      restore(prev); return;                /* keep prev: the jump is not accepted */
-    }
-    if(!fixing) prev=y;
-  },{passive:true});
-  /* when the user is clearly scrolling, always accept the position */
-  setInterval(function(){ if(!fixing && now()-lastUser<350) prev=window.pageYOffset; },100);
-})();
-</script>
+
+
 <script>
 /* community page: open at the newest message */
 document.addEventListener('click',function(e){
@@ -32365,12 +32347,37 @@ document.addEventListener('click',function(e){
     if(!b) return;
     document.documentElement.style.setProperty('--cm-top',Math.max(0,Math.round((b+6)/z))+'px');
   }
-  addEventListener('resize',setTop,{passive:true});addEventListener('scroll',setTop,{passive:true});
+  addEventListener('resize',setTop,{passive:true});
   document.addEventListener('click',function(e){
     if(e.target.closest&&e.target.closest('[data-hz-go="community"],[data-mn="community"]')) [50,300,700,1400,2500].forEach(function(t){setTimeout(setTop,t);});
   },true);
   new MutationObserver(setTop).observe(document.body,{attributes:true,attributeFilter:['class']});
 })();
+</script>
+<script>
+/* keyboard: the community layer ends exactly where the keyboard begins */
+(function(){
+  var vv=window.visualViewport; if(!vv) return;
+  function z(){var pr=document.createElement('div');pr.style.cssText='position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden';document.body.appendChild(pr);var k=(pr.getBoundingClientRect().width/100)||1;document.body.removeChild(pr);return k;}
+  var raf=0;
+  function upd(){
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(function(){
+      var kb=Math.max(0,window.innerHeight-vv.height-vv.offsetTop), r=document.documentElement.style;
+      if(kb>80){ r.setProperty('--cm-kb',Math.round(kb/z())+'px'); r.setProperty('--cm-kbp','6px'); }
+      else { r.removeProperty('--cm-kb'); r.removeProperty('--cm-kbp'); }
+      var l=document.getElementById('cmList'); if(l&&kb>80&&document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.cm-bar,.cm-chk')){ /* keep newest message visible */ }
+    });
+  }
+  vv.addEventListener('resize',upd); vv.addEventListener('scroll',upd); addEventListener('resize',upd);
+  document.addEventListener('focusin',function(){setTimeout(upd,120);setTimeout(upd,400);});
+  document.addEventListener('focusout',function(){setTimeout(upd,120);setTimeout(upd,400);});
+})();
+</script>
+<script>
+(function(){var v=document.getElementById('communityView');if(!v)return;
+function t(){document.documentElement.classList.toggle('cm-open',v.classList.contains('show'));}
+new MutationObserver(t).observe(v,{attributes:true,attributeFilter:['class']});t();})();
 </script>
 </body>
 </html>
