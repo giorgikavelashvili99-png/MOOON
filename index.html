@@ -8595,10 +8595,20 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     <div class="cm-pinned" id="cmPinned" hidden></div>
     <div class="cm-list" id="cmList" role="log" aria-live="polite"></div>
     <div class="cm-composer">
+      <div class="cm-newwrap"><button type="button" class="cm-new" id="cmNew" hidden></button></div>
       <div class="cm-gate" id="cmGate" hidden></div>
+      <div class="cm-chk" id="cmChk" hidden>
+        <div class="cm-chk-h"><b id="cmChkTitle">TikTok ვიდეო ჩექერი</b><button type="button" class="cm-chk-x" id="cmChkX" aria-label="close">✕</button></div>
+        <div class="cm-chk-row">
+          <input type="text" class="cm-chk-in" id="cmChkIn" inputmode="url" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="ჩასვი TikTok ვიდეოს ლინკი">
+          <button type="button" class="cm-chk-go" id="cmChkGo">გაანალიზება</button>
+        </div>
+        <div class="cm-chk-st" id="cmChkSt" role="status"></div>
+      </div>
       <div class="cm-bar" id="cmBar" hidden>
-        <button type="button" class="cm-plus" id="cmEmojiBtn" aria-label="emoji">+</button>
+        <button type="button" class="cm-plus" id="cmPlusBtn" aria-label="TikTok checker">+</button>
         <input type="text" class="cm-input" id="cmInput" maxlength="300" autocomplete="off" autocapitalize="sentences" enterkeyhint="send" placeholder="დაწერე რამე...">
+        <button type="button" class="cm-smile" id="cmSmileBtn" aria-label="emoji"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4.2 4.2 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/></svg></button>
         <button type="button" class="cm-send" id="cmSend" aria-label="send"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
         <div class="cm-emojis" id="cmEmojis" hidden></div>
       </div>
@@ -15529,38 +15539,63 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     if (!panel || !listEl) return;
     const titleEl = $('cmTitle'), onlineEl = $('cmOnline'), countEl = $('cmCount'), pinEl = $('cmPinned');
     const gateEl = $('cmGate'), barEl = $('cmBar'), inputEl = $('cmInput'), sendBtn = $('cmSend');
-    const errEl = $('cmErr'), emojiBtn = $('cmEmojiBtn'), emojiBox = $('cmEmojis');
-    const KEY = 'community', MAX = 150, POLL_MS = 5000, MAX_LEN = 300;
+    const errEl = $('cmErr'), plusBtn = $('cmPlusBtn'), smileBtn = $('cmSmileBtn'), emojiBox = $('cmEmojis');
+    const chkEl = $('cmChk'), chkIn = $('cmChkIn'), chkGo = $('cmChkGo'), chkSt = $('cmChkSt'), chkX = $('cmChkX');
+    const newBtn = $('cmNew');
+    const KEY = 'community', MAX = 150, POLL_MS = 1500, MAX_LEN = 300;
     const LBL = {
       ka: { title:'საზოგადოება', active:'აქტიური', today:'დღეს', yday:'გუშინ', empty:'ჯერ არავის დაუწერია — დაიწყე საუბარი!', ph:'დაწერე რამე...', gate:'ჩატში დასაწერად საჭიროა Discord-ით შესვლა.', login:'შესვლა Discord-ით', needLogin:'ჩატში დასაწერად შედი Discord-ით.', profanity:'შეტყობინება შეიცავს დაუშვებელ სიტყვას.', blocked:'შენ ჩატში წერის უფლება არ გაქვს.', fail:'ვერ გაიგზავნა, სცადე თავიდან.', slow:'ცოტა ნელა 🙂', pinned:'დამაგრებული' },
       en: { title:'Community', active:'active', today:'Today', yday:'Yesterday', empty:'No messages yet — start the conversation!', ph:'Say something...', gate:'Log in with Discord to chat.', login:'Log in with Discord', needLogin:'Log in with Discord to chat.', profanity:'Your message contains a blocked word.', blocked:'You are not allowed to chat.', fail:'Could not send, please try again.', slow:'Slow down 🙂', pinned:'Pinned' },
       ru: { title:'Сообщество', active:'активно', today:'Сегодня', yday:'Вчера', empty:'Пока нет сообщений — начни разговор!', ph:'Напиши что-нибудь...', gate:'Войдите через Discord, чтобы писать в чат.', login:'Войти через Discord', needLogin:'Войдите через Discord, чтобы писать.', profanity:'Сообщение содержит запрещённое слово.', blocked:'Вам запрещено писать в чат.', fail:'Не удалось отправить, попробуйте ещё раз.', slow:'Помедленнее 🙂', pinned:'Закреплено' }
     };
+    const XL = {
+      ka: { chkTitle:'TikTok ვიდეო ჩექერი', chkPh:'ჩასვი TikTok ვიდეოს ლინკი', chkGo:'გაანალიზება', chkBusy:'ვამოწმებ ხარისხს…', chkBad:'ჩასვი სწორი TikTok ლინკი', chkFail:'ვერ გავაანალიზე, სცადე თავიდან', chkPhoto:'ეს ფოტო პოსტია — ხარისხის შემოწმება მხოლოდ ვიდეოზეა', chkDone:'გაზიარდა საზოგადოებაში ✓', chkWait:'ჩექერი ახლა დაკავებულია, სცადე რამდენიმე წამში', newMsg:'ახალი შეტყობინება', delSure:'წაშლა?', ttHead:'TikTok ხარისხი', video:'ვიდეო', react:'რეაქცია', del:'წაშლა' },
+      en: { chkTitle:'TikTok video checker', chkPh:'Paste a TikTok video link', chkGo:'Analyze', chkBusy:'Checking quality…', chkBad:'Paste a valid TikTok link', chkFail:'Could not analyze, try again', chkPhoto:'This is a photo post — only videos can be checked', chkDone:'Shared to the community ✓', chkWait:'The checker is busy, try again in a few seconds', newMsg:'New message', delSure:'Delete?', ttHead:'TikTok quality', video:'Video', react:'React', del:'Delete' },
+      ru: { chkTitle:'TikTok чекер видео', chkPh:'Вставь ссылку на TikTok видео', chkGo:'Анализ', chkBusy:'Проверяю качество…', chkBad:'Вставь корректную ссылку TikTok', chkFail:'Не удалось проанализировать, попробуй снова', chkPhoto:'Это фото-пост — проверка только для видео', chkDone:'Отправлено в сообщество ✓', chkWait:'Чекер занят, попробуй через пару секунд', newMsg:'Новое сообщение', delSure:'Удалить?', ttHead:'Качество TikTok', video:'Видео', react:'Реакция', del:'Удалить' }
+    };
     const lng = () => { try { return LBL[currentLang] ? currentLang : 'ka'; } catch(e){ return 'ka'; } };
-    const tx = k => LBL[lng()][k];
+    const tx = k => (LBL[lng()][k] != null ? LBL[lng()][k] : LBL.ka[k]);
+    const xt = k => XL[lng()][k];
     const EMOJIS = ['😀','😂','😍','🔥','👍','❤️','🙏','😎','🎬','✨','🌙','💯','😢','😡','🤝','👏','🥳','😅','🤔','👀','💪','🙌','🚀','🎉'];
-    let touching = false;
-    listEl.addEventListener('touchstart', () => { touching = true; }, { passive: true });
-    ['touchend','touchcancel'].forEach(ev => listEl.addEventListener(ev, () => { setTimeout(() => { touching = false; }, 600); }, { passive: true }));
-    let cache = [], sending = false, lastSig = '', lastSend = 0, inView = true, loaded = false, loading = false;
+    const REACTS = ['👍','❤️','😂','🔥','😮','😢'];
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const reduced = () => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){ return false; } };
+
+    let cache = [], loaded = false, loading = false, inView = true, lastSig = '', lastSend = 0, rendered = false;
+    let flushing = false, wantFlush = false, dirty = false;
+    let openPick = null, confirmDel = null, confirmTimer = 0, unread = 0, atBottom = true, busyUntil = 0, touching = false, anim = 0;
+    const outbox = new Map();   // id -> entry waiting to be written
+    const recent = new Map();   // id -> { entry, at }  (self-heal for 60 s after a verified write)
+    let ops = [];               // pending changes: { id, all?, apply(m), ok(m) }
+    const nodes = new Map();    // key -> { el, html }
 
     function me(){ try { return currentDiscordUser || null; } catch(e){ return null; } }
     function admin(){ try { return !!isAdminUser(); } catch(e){ return false; } }
     function esc(s){ return escapeHtml(String(s == null ? '' : s)); }
-    function sigOf(list){ return list.map(m => m.id + (m.pinned ? '*' : '')).join('|'); }
+    function userKey(){ const u = me(); if (u && u.id) return 'd' + u.id; return admin() ? 'admin' : ''; }
+    function rxSig(r){ return r ? Object.keys(r).sort().map(k => k + ':' + (r[k] || []).join('.')).join(',') : ''; }
+    function sigOf(list){ return JSON.stringify(list.map(m => [m.id, m.pinned ? 1 : 0, m.del ? 1 : 0, rxSig(m.r)])); }
     function normalize(list){
       const seen = {}, out = [];
       (list || []).forEach(m => {
-        if (!m || !m.id || seen[m.id] || typeof m.text !== 'string') return;
+        if (!m || !m.id || seen[m.id]) return;
+        if (!m.del && typeof m.text !== 'string') return;
         seen[m.id] = 1; out.push(m);
       });
       out.sort((a, b) => (b.ts || 0) - (a.ts || 0));
-      if (out.length > MAX) {
-        const keep = out.filter((m, i) => i < MAX || m.pinned);
-        return keep;
-      }
-      return out;
+      const now = Date.now(); let live = 0;
+      return out.filter(m => {
+        if (m.del) return now - (m.ts || 0) < 3 * 86400000;
+        live++; return live <= MAX || m.pinned;
+      });
     }
+    function overlay(list){
+      let out = list.slice();
+      if (outbox.size) { const ids = new Set(out.map(m => m.id)); outbox.forEach(e => { if (!ids.has(e.id)) out.push(e); }); }
+      if (ops.length) out = out.map(m => { let x = m; ops.forEach(o => { if (o.all || o.id === m.id) x = o.apply(x); }); return x; });
+      return normalize(out);
+    }
+    function display(){ return overlay(cache).filter(m => !m.del).sort((a, b) => (a.ts || 0) - (b.ts || 0)); }
     function initials(name){
       const p = String(name || '?').trim().split(/\s+/).filter(Boolean);
       let a = (p[0] || '?').charAt(0), b = p.length > 1 ? p[1].charAt(0) : (p[0] || '').charAt(1);
@@ -15576,139 +15611,371 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       try { return new Date(ts).toLocaleDateString(locale(), { day:'2-digit', month:'long' }); } catch(e){ return ''; }
     }
     function who(m){ return m.did ? 'd' + m.did : (m.isAdmin ? 'admin' : 'n' + String(m.name || '').toLowerCase()); }
-    function nearBottom(){ return listEl.scrollHeight - listEl.scrollTop - listEl.clientHeight < 90; }
-
-    function avatarHtml(m){
-      if (m.isAdmin) return '<div class="cm-av cm-av-admin">' + esc(initials(m.name)) + '</div>';
-      if (m.avatarUrl && /^https:\/\//i.test(m.avatarUrl)) return '<div class="cm-av"><img src="' + esc(m.avatarUrl) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></div>';
-      return '<div class="cm-av">' + esc(initials(m.name)) + '</div>';
+    function maxTop(){ return Math.max(0, listEl.scrollHeight - listEl.clientHeight); }
+    function nearBottom(){ return maxTop() - listEl.scrollTop < 120; }
+    function canDelete(m){
+      if (admin()) return true;
+      const u = me(); return !!(u && u.id && m.did && String(m.did) === String(u.id));
     }
 
-    function renderChrome(){
+    // ---------- smooth scrolling ----------
+    function stopAnim(){ cancelAnimationFrame(anim); anim = 0; }
+    function animateTo(getTarget, dur){
+      stopAnim();
+      if (reduced()) { listEl.scrollTop = getTarget(); return; }
+      const start = listEl.scrollTop, t0 = performance.now(); dur = dur || 460;
+      (function step(now){
+        const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        const target = getTarget();
+        listEl.scrollTop = start + (target - start) * e;
+        if (p < 1) anim = requestAnimationFrame(step); else { anim = 0; listEl.scrollTop = getTarget(); }
+      })(t0);
+    }
+    function toBottom(){ animateTo(maxTop); unread = 0; updatePill(); }
+    function updatePill(){
+      if (!newBtn) return;
+      newBtn.hidden = unread <= 0;
+      if (unread > 0) newBtn.textContent = '↓ ' + xt('newMsg') + (unread > 1 ? ' (' + unread + ')' : '');
+    }
+    let scrollTick = 0;
+    listEl.addEventListener('scroll', () => {
+      if (scrollTick) return;
+      scrollTick = requestAnimationFrame(() => {
+        scrollTick = 0; atBottom = nearBottom();
+        if (atBottom && unread) { unread = 0; updatePill(); }
+      });
+    }, { passive: true });
+    const userInput = () => { stopAnim(); busyUntil = Date.now() + 700; };
+    listEl.addEventListener('touchstart', () => { touching = true; userInput(); }, { passive: true });
+    ['touchend','touchcancel'].forEach(ev => listEl.addEventListener(ev, () => { touching = false; busyUntil = Date.now() + 900; setTimeout(flushDirty, 950); }, { passive: true }));
+    listEl.addEventListener('wheel', () => { userInput(); setTimeout(flushDirty, 750); }, { passive: true });
+    listEl.addEventListener('mousedown', stopAnim, { passive: true });
+    listEl.addEventListener('load', () => { if (atBottom && !anim) listEl.scrollTop = maxTop(); }, true);
+    function flushDirty(){ if (dirty && !touching && Date.now() >= busyUntil) { dirty = false; render(); } }
+    if (newBtn) newBtn.addEventListener('click', toBottom);
+
+    // ---------- html ----------
+    function avatarHtml(m){
+      if (m.isAdmin) return '<div class="cm-av cm-av-admin">' + esc(initials(m.name)) + '</div>';
+      if (m.avatarUrl && /^https:\/\//i.test(m.avatarUrl)) return '<div class="cm-av"><img src="' + esc(m.avatarUrl) + '" alt="" width="44" height="44" loading="lazy" referrerpolicy="no-referrer"></div>';
+      return '<div class="cm-av">' + esc(initials(m.name)) + '</div>';
+    }
+    function ttHtml(m){
+      const t = m.tt || {};
+      const tiers = (Array.isArray(t.tiers) ? t.tiers : []).slice(0, 4).map(x =>
+        '<div class="cm-tt-tier"><span class="cm-tt-l">' + esc(String(x.l || '').slice(0, 24)) + '</span>' +
+        '<span class="cm-tt-r">' + esc([x.r, x.f != null ? Math.round(x.f) + 'fps' : ''].filter(Boolean).join(' · ')) + '</span>' +
+        '<span class="cm-tt-s">' + esc([x.b != null ? x.b + 'Mbps' : '', x.m != null ? x.m + 'MB' : ''].filter(Boolean).join(' · ')) + '</span></div>').join('');
+      const link = (typeof t.u === 'string' && /^https:\/\/([a-z0-9-]+\.)*tiktok\.com\//i.test(t.u))
+        ? '<a class="cm-tt-a" href="' + esc(t.u) + '" target="_blank" rel="noopener noreferrer">' + esc(xt('video')) + ' ↗</a>' : '';
+      return '<div class="cm-bubble cm-tt"><div class="cm-tt-h"><span aria-hidden="true">🎬</span><b>' + esc(xt('ttHead')) + '</b></div>' +
+        (t.t ? '<div class="cm-tt-t">' + esc(String(t.t).slice(0, 90)) + '</div>' : '') +
+        tiers +
+        '<div class="cm-tt-f"><span>' + esc([t.o ? 'Original ' + t.o : '', t.vq != null ? 'VQ ' + t.vq : ''].filter(Boolean).join(' · ')) + '</span>' + link + '</div></div>';
+    }
+    const ICON_SMILE = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4.2 4.2 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>';
+    const ICON_TRASH = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+    function underHtml(m, isAdm, key){
+      const r = m.r || {};
+      let chips = '';
+      Object.keys(r).forEach(e => {
+        const arr = Array.isArray(r[e]) ? r[e] : []; if (!arr.length) return;
+        chips += '<button type="button" class="cm-rx-chip' + (key && arr.indexOf(key) >= 0 ? ' on' : '') + '" data-act="rx" data-id="' + esc(m.id) + '" data-e="' + esc(e) + '"><span>' + esc(e) + '</span><i>' + arr.length + '</i></button>';
+      });
+      let acts = '<button type="button" class="cm-act" data-act="rxopen" data-id="' + esc(m.id) + '" aria-label="' + esc(xt('react')) + '">' + ICON_SMILE + '</button>';
+      if (isAdm) acts += '<button type="button" class="cm-act" data-act="pin" data-id="' + esc(m.id) + '" aria-label="pin">' + (m.pinned ? '📍' : '📌') + '</button>';
+      if (canDelete(m)) acts += '<button type="button" class="cm-act cm-del' + (confirmDel === m.id ? ' sure' : '') + '" data-act="del" data-id="' + esc(m.id) + '" aria-label="' + esc(xt('del')) + '">' + (confirmDel === m.id ? esc(xt('delSure')) : ICON_TRASH) + '</button>';
+      const pick = openPick === m.id ? '<div class="cm-rx-pick">' + REACTS.map(e => '<button type="button" data-act="rx" data-id="' + esc(m.id) + '" data-e="' + e + '">' + e + '</button>').join('') + '</div>' : '';
+      return '<div class="cm-under">' + chips + acts + '</div>' + pick;
+    }
+    function rowHtml(m, first, last, isAdm, key){
+      const body = (m.kind === 'tt' && m.tt) ? ttHtml(m) : '<div class="cm-bubble">' + cMention(esc(m.text)) + '</div>';
+      return '<div class="cm-row' + (first ? ' cm-first' : '') + (m.isAdmin ? ' cm-admin' : '') + (m.kind === 'tt' ? ' cm-kind-tt' : '') + (outbox.has(m.id) ? ' cm-pending' : '') + '" data-id="' + esc(m.id) + '">' +
+        '<div class="cm-av-col">' + (last ? avatarHtml(m) : '') + '</div>' +
+        '<div class="cm-main">' +
+          (first ? '<div class="cm-meta"><span class="cm-name">' + esc(m.name) + '</span>' + (m.isAdmin ? '<span class="cm-badge">ADMIN</span>' : '') + '<span class="cm-time">' + esc(hm(m.ts)) + '</span></div>' : '') +
+          body + underHtml(m, isAdm, key) +
+        '</div></div>';
+    }
+
+    function renderChrome(msgs){
       titleEl.textContent = tx('title');
       inputEl.placeholder = tx('ph');
+      if (chkIn) chkIn.placeholder = xt('chkPh');
+      if (chkGo) chkGo.textContent = xt('chkGo');
+      const ct = $('cmChkTitle'); if (ct) ct.textContent = xt('chkTitle');
       const now = Date.now(), act = {};
-      cache.forEach(m => { if (now - (m.ts || 0) < 10 * 60 * 1000) act[who(m)] = 1; });
+      msgs.forEach(m => { if (now - (m.ts || 0) < 10 * 60 * 1000) act[who(m)] = 1; });
       const u = me(); if (u) act['d' + u.id] = 1; else if (admin()) act.admin = 1;
       onlineEl.textContent = Math.max(1, Object.keys(act).length) + ' ' + tx('active');
-      countEl.textContent = '💬 ' + cache.length;
-      const pm = cache.find(m => m.pinned);
+      countEl.textContent = '💬 ' + msgs.length;
+      const pm = msgs.find(m => m.pinned);
       if (pm) {
-        pinEl.hidden = false;
-        pinEl.setAttribute('data-id', pm.id);
+        pinEl.hidden = false; pinEl.setAttribute('data-id', pm.id);
         pinEl.innerHTML = '<span aria-hidden="true">📌</span><b>' + esc(pm.name) + '</b><span>' + esc(pm.text) + '</span>';
       } else { pinEl.hidden = true; pinEl.innerHTML = ''; }
     }
 
-    function render(forceBottom){
-      const stick = forceBottom || nearBottom() || !loaded;
-      const prevTop = listEl.scrollTop;
-      renderChrome();
-      const msgs = cache.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    // incremental render: untouched rows stay in the DOM, so scrolling never jumps or flickers
+    function render(force){
+      dirty = false;
+      const msgs = display();
+      renderChrome(msgs);
       if (!msgs.length) {
-        listEl.innerHTML = '<div class="cm-empty">' + esc(tx('empty')) + '</div>';
-        return;
+        if (!loaded) return;
+        if (!listEl.querySelector('.cm-empty')) { nodes.clear(); listEl.innerHTML = '<div class="cm-empty">' + esc(tx('empty')) + '</div>'; }
+        rendered = true; return;
       }
-      const isAdm = admin();
-      let html = '';
+      const emptyEl = listEl.querySelector('.cm-empty'); if (emptyEl) emptyEl.remove();
+      const stick = !rendered || force === 'own' || atBottom || nearBottom();
+      let anchor = null, anchorOff = 0;
+      if (!stick) {
+        const top = listEl.scrollTop;
+        for (let c = listEl.firstElementChild; c; c = c.nextElementSibling) {
+          if (c.offsetTop + c.offsetHeight > top + 1) { anchor = c; anchorOff = c.offsetTop - top; break; }
+        }
+      }
+      const isAdm = admin(), key = userKey();
+      const items = [];
       msgs.forEach((m, i) => {
         const prev = msgs[i - 1], next = msgs[i + 1];
         const newDay = !prev || dayKey(prev.ts) !== dayKey(m.ts);
-        if (newDay) html += '<div class="cm-day">' + esc(dayLabel(m.ts)) + '</div>';
+        if (newDay) items.push({ k: 'day:' + dayKey(m.ts), html: '<div class="cm-day">' + esc(dayLabel(m.ts)) + '</div>' });
         const first = newDay || who(prev) !== who(m) || (m.ts - prev.ts) > 5 * 60 * 1000;
         const last = !next || dayKey(next.ts) !== dayKey(m.ts) || who(next) !== who(m) || (next.ts - m.ts) > 5 * 60 * 1000;
-        html += '<div class="cm-row' + (first ? ' cm-first' : '') + (m.isAdmin ? ' cm-admin' : '') + '" data-id="' + esc(m.id) + '">' +
-          '<div class="cm-av-col">' + (last ? avatarHtml(m) : '') + '</div>' +
-          '<div class="cm-main">' +
-            (first ? '<div class="cm-meta"><span class="cm-name">' + esc(m.name) + '</span>' + (m.isAdmin ? '<span class="cm-badge">ADMIN</span>' : '') + '<span class="cm-time">' + esc(hm(m.ts)) + '</span></div>' : '') +
-            '<div class="cm-bubble">' + cMention(esc(m.text)) + '</div>' +
-          '</div>' +
-          (isAdm ? '<div class="cm-tools"><button type="button" data-act="pin" data-id="' + esc(m.id) + '" title="pin">' + (m.pinned ? '📍' : '📌') + '</button><button type="button" data-act="del" data-id="' + esc(m.id) + '" title="delete">✕</button></div>' : '') +
-        '</div>';
+        items.push({ k: 'm:' + m.id, m: m, html: rowHtml(m, first, last, isAdm, key) });
       });
-      listEl.innerHTML = html;
-      if (stick) listEl.scrollTop = listEl.scrollHeight; else listEl.scrollTop = prevTop;
+      const keep = new Set(items.map(x => x.k));
+      nodes.forEach((v, k) => { if (!keep.has(k)) { v.el.remove(); nodes.delete(k); } });
+      let added = 0, addedOthers = 0, ref = listEl.firstElementChild;
+      items.forEach(it => {
+        let rec = nodes.get(it.k);
+        if (!rec || rec.html !== it.html) {
+          const tpl = document.createElement('template'); tpl.innerHTML = it.html;
+          const el = tpl.content.firstElementChild;
+          if (!rec) {
+            if (rendered && it.m) { el.classList.add('cm-in'); added++; if (!(it.m.did && key && 'd' + it.m.did === key) && !(it.m.isAdmin && key === 'admin')) addedOthers++; }
+          } else { if (ref === rec.el) ref = el; rec.el.replaceWith(el); }
+          rec = { el: el, html: it.html }; nodes.set(it.k, rec);
+        }
+        if (rec.el !== ref) listEl.insertBefore(rec.el, ref); else ref = ref.nextElementSibling;
+      });
+      if (!rendered) { rendered = true; listEl.scrollTop = maxTop(); atBottom = true; return; }
+      if (stick) {
+        if (added || force) toBottom(); else if (!anim) listEl.scrollTop = maxTop();
+      } else {
+        if (anchor && anchor.isConnected) listEl.scrollTop = anchor.offsetTop - anchorOff;
+        if (addedOthers) { unread += addedOthers; updatePill(); }
+      }
     }
 
     function renderComposer(){
       const u = me(), ok = !!u || admin();
       gateEl.hidden = ok; barEl.hidden = !ok;
       if (!ok) {
+        if (chkEl) chkEl.hidden = true;
         gateEl.innerHTML = '<div class="cm-gate-t">' + esc(tx('gate')) + '</div><button type="button" class="cm-login" id="cmLogin"><svg viewBox="0 0 127.14 96.36" aria-hidden="true"><path d="' + DISCORD_LOGO_PATH + '"/></svg><span>' + esc(tx('login')) + '</span></button>';
       }
-      renderChrome();
+      renderChrome(display());
     }
-
     function showErr(msg){ errEl.textContent = msg || ''; errEl.classList.toggle('show', !!msg); }
 
+    // ---------- storage: optimistic UI + verified, self-healing writes ----------
+    function tgMsg(m){
+      return '💬 <b>საზოგადოება — MOON</b>\n\n' + '👤 <b>' + escTg(m.name) + '</b>' + (m.isAdmin ? ' (ADMIN)' : '') + '\n\n' + '<i>' + escTg(m.text) + '</i>';
+    }
+    async function flush(){
+      if (flushing) { wantFlush = true; return; }
+      flushing = true;
+      try {
+        let round = 0, nullReads = 0;
+        while ((outbox.size || ops.length) && round < 10) {
+          round++;
+          const fresh = await mdbRead(KEY);
+          let base;
+          if (fresh && Array.isArray(fresh.list)) base = fresh.list;
+          else { if (++nullReads < 3) { await sleep(250 * round); continue; } base = cache.slice(); }
+          const snapOut = Array.from(outbox.values()), snapOps = ops.slice();
+          let list = base.slice();
+          const ids = new Set(list.map(m => m.id));
+          snapOut.forEach(e => { if (!ids.has(e.id)) list.push(e); });
+          snapOps.forEach(o => { list = list.map(m => (o.all || o.id === m.id) ? o.apply(m) : m); });
+          list = normalize(list);
+          const ok = await mdbWrite(KEY, { list: list });
+          if (!ok) { await sleep(120 * round + Math.random() * 180); continue; }
+          await sleep(40 + Math.random() * 110);
+          const chk = await mdbRead(KEY);
+          if (!chk || !Array.isArray(chk.list)) continue;
+          const byId = {}; chk.list.forEach(m => { byId[m.id] = m; });
+          const good = snapOut.every(e => byId[e.id]) && snapOps.every(o => o.all || o.ok(byId[o.id]));
+          if (good) {
+            snapOut.forEach(e => { outbox.delete(e.id); recent.set(e.id, { entry: e, at: Date.now() }); try { sendTelegramNotification(tgMsg(e)); } catch(err){} });
+            ops = ops.filter(o => snapOps.indexOf(o) < 0);
+            cache = normalize(chk.list); lastSig = sigOf(cache);
+            render();
+          } else { await sleep(30 + Math.random() * 220); }
+        }
+        if (outbox.size || ops.length) {
+          // gave up: roll back what could not be saved
+          const failed = Array.from(outbox.values());
+          outbox.clear(); ops = [];
+          const mine = failed.filter(e => e.did === (me() || {}).id + '' || e.isAdmin);
+          if (mine.length && !inputEl.value) inputEl.value = (mine[mine.length - 1].kind === 'tt') ? '' : mine[mine.length - 1].text;
+          showErr(tx('fail')); render();
+        }
+      } catch(e){ showErr(tx('fail')); }
+      flushing = false;
+      if (wantFlush) { wantFlush = false; if (outbox.size || ops.length) flush(); }
+    }
     async function load(force){
       if (loading) return; loading = true;
       try {
         const d = await mdbRead(KEY);
         if (d && Array.isArray(d.list)) {
-          const list = normalize(d.list), sig = sigOf(list);
-          const first = !loaded; loaded = true;
-          if (force || first || sig !== lastSig) { lastSig = sig; if (!sending) { cache = list; render(first); } }
-        } else if (!loaded) { loaded = true; render(true); }
+          const list = normalize(d.list);
+          const ids = new Set(list.map(m => m.id)), now = Date.now(); let heal = false;
+          recent.forEach((r, id) => {
+            if (now - r.at > 60000) { recent.delete(id); return; }
+            if (!ids.has(id) && !outbox.has(id)) { outbox.set(id, r.entry); heal = true; }
+          });
+          const sig = sigOf(list), first = !loaded; loaded = true;
+          if (force || first || sig !== lastSig) {
+            lastSig = sig; cache = list;
+            if (touching || Date.now() < busyUntil) dirty = true; else render();
+          }
+          if (heal) flush();
+        } else if (!loaded) { loaded = true; render(); }
       } catch(e){ /* keep what we have */ }
       loading = false;
     }
 
-    async function writeList(mutator){
-      const fresh = await mdbRead(KEY);
-      const base = (fresh && Array.isArray(fresh.list)) ? fresh.list : cache.slice();
-      const next = normalize(mutator(base.slice()));
-      const ok = await mdbWrite(KEY, { list: next });
-      if (ok) { cache = next; lastSig = sigOf(next); }
-      return ok;
+    // ---------- actions ----------
+    function mkEntry(extra){
+      const u = me(), asAdmin = admin();
+      const name = asAdmin ? adminDisplayName() : String((u && u.username) || '').trim().slice(0, 40);
+      if (!name) return null;
+      return Object.assign({
+        id: Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+        name: name, ts: Date.now(), isAdmin: asAdmin, pinned: false,
+        did: asAdmin ? null : (u && u.id ? String(u.id) : null),
+        avatarUrl: asAdmin ? '' : ((u && u.avatarUrl) || '')
+      }, extra);
     }
-
-    function tgMsg(m){
-      return '💬 <b>საზოგადოება — MOON</b>\n\n' + '👤 <b>' + escTg(m.name) + '</b>' + (m.isAdmin ? ' (ADMIN)' : '') + '\n\n' + '<i>' + escTg(m.text) + '</i>';
+    function post(entry){
+      outbox.set(entry.id, entry);
+      lastSend = Date.now();
+      render('own');
+      flush();
     }
-
-    async function send(){
-      if (sending) return;
+    function send(){
       showErr('');
       const u = me(), asAdmin = admin();
       if (!u && !asAdmin) { showErr(tx('needLogin')); return; }
       const text = (inputEl.value || '').replace(/\s*\n\s*/g, ' ').trim().slice(0, MAX_LEN);
       if (!text) return;
-      if (Date.now() - lastSend < 1200) { showErr(tx('slow')); return; }
-      const name = asAdmin ? adminDisplayName() : String(u.username || '').trim().slice(0, 40);
-      if (!name) { showErr(tx('needLogin')); return; }
+      if (Date.now() - lastSend < 500) { showErr(tx('slow')); return; }
+      const entry = mkEntry({ text: text });
+      if (!entry) { showErr(tx('needLogin')); return; }
       if (containsProfanity(text)) { showErr(tx('profanity')); return; }
-      sending = true; sendBtn.disabled = true;
-      try {
-        if (!asAdmin) {
-          await loadBlockedCommenters();
-          if (isCommenterBlocked(name, u.id)) { showErr(tx('blocked')); sending = false; sendBtn.disabled = false; return; }
-        }
-        const entry = {
-          id: Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-          name: name, text: text, ts: Date.now(), isAdmin: asAdmin, pinned: false,
-          did: asAdmin ? null : (u.id ? String(u.id) : null),
-          avatarUrl: asAdmin ? '' : (u.avatarUrl || '')
-        };
-        lastSend = Date.now();
-        inputEl.value = '';
-        cache = normalize([entry].concat(cache)); render(true);
-        const ok = await writeList(list => [entry].concat(list.filter(m => m.id !== entry.id)));
-        if (!ok) {
-          cache = cache.filter(m => m.id !== entry.id); lastSig = sigOf(cache);
-          inputEl.value = text; render(); showErr(tx('fail'));
-        } else {
-          render(true);
-          sendTelegramNotification(tgMsg(entry));
-        }
-      } catch(e){
-        showErr(tx('fail'));
-      }
-      sending = false; sendBtn.disabled = false;
+      if (!asAdmin && isCommenterBlocked(entry.name, u && u.id)) { showErr(tx('blocked')); return; }
+      inputEl.value = '';
+      post(entry);
       try { inputEl.focus({ preventScroll: true }); } catch(e){}
     }
+    function shareTT(d, url){
+      const u = me(), asAdmin = admin();
+      if (!u && !asAdmin) return;
+      const tiers = (Array.isArray(d.tiers) ? d.tiers : []).slice(0, 4).map(t => ({
+        l: String(t.label || '').slice(0, 24), r: String(t.res || '').slice(0, 14),
+        f: (t.fps != null && isFinite(t.fps)) ? Math.round(t.fps) : null,
+        b: (t.br != null && isFinite(t.br)) ? t.br : null, m: (t.mb != null && isFinite(t.mb)) ? t.mb : null
+      }));
+      let title = String(d.title || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+      if (title && containsProfanity(title)) title = '';
+      const best = tiers.slice().sort((a, b) => (parseInt(b.r, 10) || 0) - (parseInt(a.r, 10) || 0))[0];
+      const summary = '🎬 TikTok ' + (best ? [best.r, best.f != null ? best.f + 'fps' : ''].filter(Boolean).join(' · ') : '') + (d.vq != null ? ' · VQ ' + d.vq : '');
+      const entry = mkEntry({
+        kind: 'tt', text: summary.slice(0, MAX_LEN),
+        tt: { t: title, u: String(url || '').slice(0, 220), o: String(d.original || '').slice(0, 16), vq: d.vq != null ? d.vq : null, tiers: tiers }
+      });
+      if (!entry) return;
+      post(entry);
+    }
+    function react(id, e){
+      const key = userKey(); if (!key) { showErr(tx('needLogin')); return; }
+      if (REACTS.indexOf(e) < 0) return;
+      const m = display().find(x => x.id === id); if (!m) return;
+      const has = !!(m.r && Array.isArray(m.r[e]) && m.r[e].indexOf(key) >= 0), on = !has;
+      ops = ops.filter(o => !(o.id === id && o.e === e && o.key === key));
+      ops.push({
+        id: id, e: e, key: key,
+        apply: x => {
+          const r = Object.assign({}, x.r || {});
+          const arr = (Array.isArray(r[e]) ? r[e] : []).filter(k => k !== key);
+          if (on) arr.push(key);
+          if (arr.length) r[e] = arr; else delete r[e];
+          return Object.assign({}, x, { r: r });
+        },
+        ok: x => { if (!x || x.del) return true; const arr = (x.r && Array.isArray(x.r[e])) ? x.r[e] : []; return (arr.indexOf(key) >= 0) === on; }
+      });
+      openPick = null; render(); flush();
+    }
+    function removeMsg(id){
+      const m = display().find(x => x.id === id); if (!m || !canDelete(m)) return;
+      outbox.delete(id); recent.delete(id);
+      ops = ops.filter(o => o.id !== id);
+      ops.push({ id: id, apply: x => ({ id: x.id, ts: x.ts, del: true, text: '' }), ok: x => !x || !!x.del });
+      render(); flush();
+    }
+    function togglePin(id){
+      const m = display().find(x => x.id === id); if (!m) return;
+      const val = !m.pinned;
+      ops = ops.filter(o => !o.all);
+      ops.push({ id: id, all: true, apply: x => Object.assign({}, x, { pinned: x.id === id ? val : false }), ok: () => true });
+      render(); flush();
+    }
 
-    // ---- events ----
+    // ---------- TikTok checker behind the "+" button ----------
+    let pend = null, pendTimer = 0;
+    function chkSet(msg, kind){ if (!chkSt) return; chkSt.textContent = msg || ''; chkSt.className = 'cm-chk-st' + (kind ? ' ' + kind : ''); }
+    function closeChk(){ if (chkEl) chkEl.hidden = true; if (plusBtn) plusBtn.classList.remove('on'); }
+    function endPend(msg, kind){ clearTimeout(pendTimer); pend = null; window.__cmDrive = false; if (chkGo) chkGo.disabled = false; chkSet(msg, kind); }
+    function startCheck(){
+      if (pend) return;
+      const raw = (chkIn.value || '').trim();
+      if (!/^(https?:\/\/)?([a-z0-9-]+\.)*tiktok\.com\/\S+/i.test(raw)) { chkSet(xt('chkBad'), 'err'); return; }
+      const url = /^https?:/i.test(raw) ? raw : 'https://' + raw;
+      const ti = $('ttdlUrlInput'), tb = $('ttdlAnalyzeBtn');
+      if (!ti || !tb) { chkSet(xt('chkFail'), 'err'); return; }
+      if (tb.disabled) { chkSet(xt('chkWait'), 'err'); return; }
+      pend = { url: url, at: Date.now() };
+      window.__cmDrive = true;
+      ti.value = url; ti.dispatchEvent(new Event('input', { bubbles: true }));
+      chkGo.disabled = true; chkSet(xt('chkBusy'), 'busy');
+      pendTimer = setTimeout(() => endPend(xt('chkFail'), 'err'), 60000);
+      tb.click();
+    }
+    document.addEventListener('moon:ttdl-result', ev => {
+      if (!pend) return;
+      const url = pend.url;
+      shareTT(ev.detail || {}, url);
+      endPend(xt('chkDone'), 'ok'); chkIn.value = '';
+      setTimeout(closeChk, 900);
+    });
+    document.addEventListener('moon:ttdl-fail', ev => {
+      if (!pend) return;
+      endPend(ev.detail && ev.detail.photo ? xt('chkPhoto') : xt('chkFail'), 'err');
+    });
+    if (plusBtn) plusBtn.addEventListener('click', e => {
+      e.stopPropagation(); emojiBox.hidden = true;
+      const open = chkEl.hidden; chkEl.hidden = !open; plusBtn.classList.toggle('on', open);
+      if (open) { if (!pend) chkSet('', ''); setTimeout(() => { try { chkIn.focus({ preventScroll: true }); } catch(err){} }, 60); }
+    });
+    if (chkX) chkX.addEventListener('click', closeChk);
+    if (chkGo) chkGo.addEventListener('click', startCheck);
+    if (chkIn) chkIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); startCheck(); } });
+
+    // ---------- events ----------
     sendBtn.addEventListener('click', send);
     inputEl.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); send(); } });
     gateEl.addEventListener('click', e => {
@@ -15716,7 +15983,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       if (typeof startDiscordLogin === 'function') startDiscordLogin();
     });
     emojiBox.innerHTML = EMOJIS.map(x => '<button type="button" data-e="' + x + '">' + x + '</button>').join('');
-    emojiBtn.addEventListener('click', e => { e.stopPropagation(); emojiBox.hidden = !emojiBox.hidden; });
+    smileBtn.addEventListener('click', e => { e.stopPropagation(); closeChk(); emojiBox.hidden = !emojiBox.hidden; });
     emojiBox.addEventListener('click', e => {
       const b = e.target.closest('button[data-e]'); if (!b) return;
       const v = inputEl.value, s = inputEl.selectionStart == null ? v.length : inputEl.selectionStart, en = inputEl.selectionEnd == null ? v.length : inputEl.selectionEnd;
@@ -15726,21 +15993,29 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       try { inputEl.setSelectionRange(pos, pos); } catch(err){}
       emojiBox.hidden = true;
     });
-    document.addEventListener('click', e => { if (!emojiBox.hidden && !e.target.closest('#cmEmojis,#cmEmojiBtn')) emojiBox.hidden = true; });
+    document.addEventListener('click', e => {
+      if (!emojiBox.hidden && !e.target.closest('#cmEmojis,#cmSmileBtn')) emojiBox.hidden = true;
+      if (openPick && !e.target.closest('.cm-rx-pick,[data-act="rxopen"]')) { openPick = null; render(); }
+    });
     pinEl.addEventListener('click', () => {
       const id = pinEl.getAttribute('data-id'); if (!id) return;
-      const row = listEl.querySelector('.cm-row[data-id="' + id.replace(/"/g, '') + '"]'); if (!row) return;
-      listEl.scrollTop = Math.max(0, row.offsetTop - 40);
-      row.classList.add('cm-flash'); setTimeout(() => row.classList.remove('cm-flash'), 1400);
+      const rec = nodes.get('m:' + id); if (!rec) return;
+      animateTo(() => Math.min(maxTop(), Math.max(0, rec.el.offsetTop - 40)));
+      rec.el.classList.add('cm-flash'); setTimeout(() => rec.el.classList.remove('cm-flash'), 1400);
     });
-    listEl.addEventListener('click', async e => {
-      const b = e.target.closest('button[data-act]'); if (!b || !admin()) return;
+    listEl.addEventListener('click', e => {
+      const b = e.target.closest('button[data-act]'); if (!b) return;
       const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
-      b.disabled = true;
-      let ok;
-      if (act === 'del') ok = await writeList(list => list.filter(m => m.id !== id));
-      else ok = await writeList(list => list.map(m => Object.assign({}, m, { pinned: m.id === id ? !m.pinned : false })));
-      if (ok) render(); else { b.disabled = false; showErr(tx('fail')); }
+      if (act === 'rxopen') { if (!userKey()) { showErr(tx('needLogin')); return; } openPick = openPick === id ? null : id; render(); return; }
+      if (act === 'rx') { react(id, b.getAttribute('data-e')); return; }
+      if (act === 'del') {
+        if (confirmDel !== id) {
+          confirmDel = id; clearTimeout(confirmTimer);
+          confirmTimer = setTimeout(() => { confirmDel = null; render(); }, 3000); render(); return;
+        }
+        confirmDel = null; clearTimeout(confirmTimer); removeMsg(id); return;
+      }
+      if (act === 'pin' && admin()) togglePin(id);
     });
     document.addEventListener('moon:user', () => { renderComposer(); render(); });
 
@@ -15748,13 +16023,13 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       new IntersectionObserver(es => { const was = inView; inView = es[0].isIntersecting; if (inView && !was) load(); }, { rootMargin: '200px' }).observe(panel);
     }
     document.addEventListener('visibilitychange', () => { if (!document.hidden && inView) load(); });
-    setInterval(() => { if (!document.hidden && inView && !sending && !touching) load(); }, POLL_MS);
+    setInterval(() => { if (!document.hidden && inView) { load(); flushDirty(); } }, POLL_MS);
+    setInterval(() => { try { loadBlockedCommenters(); } catch(e){} }, 60000);
 
     renderComposer();
     render(true);
     load(true);
     setTimeout(renderComposer, 1200);
-    // admin login/logout happens elsewhere (no event) -> notice it and refresh the composer + moderation buttons
     let lastAdm = admin(), lastUid = (me() || {}).id;
     setInterval(() => { const a = admin(), uid = (me() || {}).id; if (a !== lastAdm || uid !== lastUid) { lastAdm = a; lastUid = uid; renderComposer(); render(); } }, 1000);
   })();
@@ -18147,6 +18422,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       return ttdlLogDelta(sc);
     }
     function ttdlGlideToLog(delay, pass, mode){
+      if (window.__cmDrive){ ttdlGlideRelease(); return; }
       if (!logEl){ ttdlGlideRelease(); return; }
       clearTimeout(ttdlGlideTimer);
       ttdlGlideTimer = setTimeout(function(){
@@ -18211,6 +18487,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       });
     }
     function ttdlScheduleGlide(mode, extraReady){
+      if (window.__cmDrive) return;
       ttdlGlideBusy = true;
       Promise.all([ttdlWhenCalm(1200), extraReady || Promise.resolve()]).then(function(){
         ttdlGlideToLog(0, 0, mode);
@@ -18864,6 +19141,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           // grid with a download link per image instead of quality tiers
           // (there's no resolution/fps/bitrate to probe for a still image). ----
           if (Array.isArray(d.images) && d.images.length){
+            try { document.dispatchEvent(new CustomEvent('moon:ttdl-fail', { detail: { photo: true } })); } catch (e4) {}
             const shadow = ttdlShadowBan(d.digg_count, d.play_count);
             const music = ttdlExtractMusic(d);
             lastData = {
@@ -19085,12 +19363,20 @@ TikTok პროფილი: ${getTiktokValue('mp')}
               if (r) hdBtnLabel.textContent = r + (hdTier.fps != null ? '/' + Math.round(hdTier.fps) : '');
             }
             ttdlEndQualitySwap(ttdlSwapState);
+            try {
+              document.dispatchEvent(new CustomEvent('moon:ttdl-result', { detail: {
+                url: url, title: d.title || '', vq: vq, original: origRes,
+                tiers: tiers.map(function(t){ return { label: t.label, res: ttdlResLabel(t.width, t.height) || '', fps: t.fps, br: t.bitrateMbps, mb: t.sizeMb }; })
+              } }));
+            } catch (e2) {}
           });
         } else {
           ttdlLog(ttdlDict('logFail'));
+          try { document.dispatchEvent(new CustomEvent('moon:ttdl-fail', { detail: {} })); } catch (e3) {}
         }
       } catch(e){
         ttdlLog(ttdlDict('logFail'));
+        try { document.dispatchEvent(new CustomEvent('moon:ttdl-fail', { detail: {} })); } catch (e3) {}
       } finally {
         setBtnBusy(analyzeBtn, false);
       }
@@ -31715,6 +32001,162 @@ html body .cm-panel{-webkit-backdrop-filter:blur(10px) saturate(140%)!important;
 html body .cm-panel::before{display:none}
 html body .cm-list{height:380px;height:clamp(300px,46svh,500px)!important;min-height:300px;max-height:500px;flex:0 0 auto;overflow-anchor:none;contain:layout paint}
 @media (min-width:900px){html body .cm-list{height:460px!important}}
+
+/* ---- v6: refined glass order cards + redesigned order modal, crisp text ---- */
+html body .pc-card:not(#_a):not(#_b){
+  background:
+    radial-gradient(130% 70% at 0% 0%,rgba(255,255,255,.075),transparent 58%),
+    linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01) 55%),
+    var(--pc-bg,linear-gradient(180deg,var(--panel),var(--panel-2)))!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:24px!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.25),0 22px 46px -26px rgba(0,0,0,.75)!important;
+}
+html body .pc-card .pc-top{position:relative}
+html body .pc-card .pc-icon{
+  background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04))!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  border-radius:16px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 8px 18px -10px rgba(0,0,0,.6)!important;
+}
+html body .pc-card .pc-title{letter-spacing:.01em;font-weight:700}
+html body .pc-card .pc-desc{opacity:.72}
+html body .pc-card .pc-price-line{border:0!important}
+html body .pc-card .pc-features{border:0!important;border-top:0!important;gap:0 6px}
+html body .pc-card .pc-check{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:17px;height:17px;flex:0 0 17px;border-radius:50%;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.16);
+  font-size:9px;
+}
+html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.07) 48%,rgba(255,255,255,.02) 100%),
+    color-mix(in srgb,var(--pc-accent,#22c55e) 38%,rgba(8,12,22,.55))!important;
+  border:1px solid rgba(255,255,255,.30)!important;
+  color:#fff!important;
+  border-radius:18px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,0,0,.22),0 14px 30px -16px color-mix(in srgb,var(--pc-accent,#22c55e) 80%,transparent)!important;
+  -webkit-backdrop-filter:blur(10px) saturate(150%);backdrop-filter:blur(10px) saturate(150%);
+  letter-spacing:.02em;
+}
+html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn::before{display:none!important}
+html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn span{color:#fff!important}
+
+/* order modal */
+html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c){
+  background:radial-gradient(90% 60% at 50% 0%,rgba(40,70,160,.18),transparent 70%),rgba(4,6,12,.72)!important;
+  -webkit-backdrop-filter:blur(6px)!important;backdrop-filter:blur(6px)!important;
+}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f){
+  background:
+    radial-gradient(120% 40% at 10% 0%,color-mix(in srgb,var(--mc,#3b6dff) 20%,transparent),transparent 66%) padding-box,
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0) 30%) padding-box,
+    linear-gradient(180deg,rgba(16,20,38,.97),rgba(8,10,22,.98)) padding-box,
+    linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,.05) 40%,rgba(255,255,255,.12)) border-box!important;
+  border:1px solid transparent!important;
+  border-radius:28px!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.12)!important;
+  transform:none;will-change:auto;filter:none;
+}
+html body .pc-modal-scrim .pc-modal-scroll{padding:6px 4px 4px}
+html body .pc-modal-scrim .pc-modal-close{
+  background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:50%!important;
+}
+html body .pc-modal-scrim .wizard-step-dot{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+html body .pc-modal-scrim .wizard-step.is-active .wizard-step-dot{
+  background:linear-gradient(145deg,#4d7bff,#2c52d6);border-color:rgba(255,255,255,.35);
+  box-shadow:0 8px 20px -8px rgba(59,109,255,.8),inset 0 1px 0 rgba(255,255,255,.35);
+}
+html body .pc-modal-scrim .wizard-step-line{background:rgba(255,255,255,.1)}
+html body .pc-modal-scrim .drop-zone{
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))!important;
+  border:1.5px dashed rgba(255,255,255,.2)!important;border-radius:22px!important;
+}
+html body .pc-modal-scrim .wp-box,html body .pc-modal-scrim .mp-box,html body .pc-modal-scrim .quality-btn{
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))!important;
+  border:1px solid rgba(255,255,255,.12)!important;border-radius:18px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1)!important;
+}
+html body .pc-modal-scrim .toggle-row,html body .pc-modal-scrim .wizard-question,html body .pc-modal-scrim .scanner-stage{
+  background:rgba(255,255,255,.035)!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:18px!important;
+}
+html body .pc-modal-scrim .link-input-wrap,html body .pc-modal-scrim .num-input{
+  background:rgba(255,255,255,.045)!important;border-color:rgba(255,255,255,.12)!important;border-radius:14px!important;
+}
+html body .pc-modal-scrim .order-btn.chat,html body .pc-modal-scrim .wizard-confirm-btn{
+  border-radius:16px!important;border:1px solid rgba(255,255,255,.22)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 14px 28px -14px rgba(0,0,0,.7)!important;
+}
+
+/* crisp text: no blur/filter/transform layers over text */
+html body .pc-card,html body .pc-card *,html body .pc-modal-scrim,html body .pc-modal-scrim *{
+  text-shadow:none!important;
+  -webkit-font-smoothing:antialiased!important;-moz-osx-font-smoothing:grayscale!important;
+  text-rendering:optimizeLegibility!important;
+  image-rendering:auto;
+}
+html body .pc-card .pc-title,html body .pc-card .pc-desc,html body .pc-card .pc-feature span,
+html body .pc-modal-scrim .pc-modal-scroll{filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;will-change:auto!important;transform:none}
+
+/* v6b: remove the light grey vertical band in the green card */
+html body .pc-card.pc-card--indiv:not(#_a):not(#_b){
+  --pc-green-shine:linear-gradient(115deg,#085a08 0%,#0c7a0b 55%,#085a08 100%);
+  --pc-bg:radial-gradient(ellipse 120% 60% at 15% 0%,rgba(255,255,255,.10),transparent 55%),linear-gradient(180deg,rgba(3,10,3,.38),rgba(3,10,3,.55)),linear-gradient(115deg,#085a08 0%,#0c7a0b 55%,#085a08 100%);
+}
+
+/* ---- v7: community (stable scroll, reactions, delete, TikTok checker) ---- */
+html body .cm-panel{transform:none!important}
+html body .cm-list{scroll-behavior:auto!important;overflow-anchor:none}
+html body .cm-row.cm-in{animation:cmIn .42s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cmIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes cmSpin{to{transform:rotate(360deg)}}
+html body .cm-row.cm-pending .cm-bubble{opacity:.72}
+html body .cm-under{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:5px 0 0 4px;min-height:26px}
+html body .cm-under .cm-act{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#aeb4c2;font-size:12px;line-height:1;cursor:pointer;opacity:.7;transition:opacity .15s,background .15s,color .15s}
+html body .cm-under .cm-act:hover,html body .cm-under .cm-act:active{opacity:1;background:rgba(255,255,255,.12);color:#fff}
+html body .cm-under .cm-act.cm-del.sure{background:rgba(255,80,80,.2);border-color:rgba(255,90,90,.5);color:#ffd5d5;opacity:1;font-weight:600}
+html body .cm-rx-chip{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 9px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e8ebf2;font-size:13px;line-height:1;cursor:pointer}
+html body .cm-rx-chip i{font-style:normal;font-size:12px;opacity:.85}
+html body .cm-rx-chip.on{background:rgba(163,230,53,.14);border-color:rgba(163,230,53,.5);color:#eaffc4}
+html body .cm-rx-pick{display:flex;gap:2px;margin:6px 0 0 4px;padding:5px 6px;width:fit-content;max-width:100%;border-radius:999px;background:rgba(24,26,34,.96);border:1px solid rgba(255,255,255,.16);animation:cmIn .2s ease both}
+html body .cm-rx-pick button{border:0;background:transparent;font-size:20px;line-height:1;padding:5px 6px;border-radius:50%;cursor:pointer}
+html body .cm-rx-pick button:active{transform:scale(.88)}
+html body .cm-bubble.cm-tt{display:block;white-space:normal;min-width:min(260px,100%);padding:12px 14px;border-radius:18px}
+html body .cm-tt-h{display:flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.02em;color:#cfe7ff;margin-bottom:6px}
+html body .cm-tt-t{font-size:13px;color:#aab2c3;margin-bottom:8px;line-height:1.35;overflow-wrap:anywhere}
+html body .cm-tt-tier{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;padding:8px 10px;margin-top:6px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+html body .cm-tt-l{font-weight:700;font-size:13px;color:#fff}
+html body .cm-tt-r{justify-self:end;font-size:13px;color:#dfe6f5}
+html body .cm-tt-s{grid-column:1/-1;font-size:12px;color:#8f98ab}
+html body .cm-tt-f{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px;font-size:12px;color:#9aa3b6}
+html body .cm-tt-a{color:#8ec5ff;text-decoration:none;font-weight:600}
+html body .cm-smile{flex:0 0 auto;width:clamp(40px,11vw,50px);height:clamp(40px,11vw,50px);border-radius:50%;border:0;padding:0;display:grid;place-items:center;cursor:pointer;line-height:1;background:rgba(255,255,255,.12);color:#e4e4e7}
+html body .cm-smile:active{transform:scale(.94)}
+html body .cm-plus{transition:transform .25s ease,background .2s ease}
+html body .cm-plus.on{background:rgba(120,170,255,.38);color:#fff;transform:rotate(45deg)}
+html body .cm-newwrap{position:relative;height:0;z-index:4}
+html body .cm-new{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(30,38,60,.94);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 10px 24px -12px rgba(0,0,0,.8);animation:cmIn .25s ease both}
+html body .cm-new[hidden],html body .cm-chk[hidden]{display:none}
+html body .cm-chk{position:absolute;left:0;right:0;bottom:calc(100% + 8px);z-index:6;padding:12px;border-radius:20px;background:rgba(18,21,32,.97);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 40px -16px rgba(0,0,0,.8);animation:cmIn .25s ease both}
+html body .cm-chk-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#fff;font-size:14px}
+html body .cm-chk-x{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#c9cfdc;cursor:pointer;padding:0}
+html body .cm-chk-row{display:flex;gap:8px}
+html body .cm-chk-in{flex:1;min-width:0;height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:16px;outline:0}
+html body .cm-chk-in:focus{border-color:rgba(120,170,255,.6)}
+html body .cm-chk-go{flex:0 0 auto;height:44px;padding:0 16px;border-radius:14px;border:1px solid rgba(255,255,255,.25);background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.06)),rgba(59,109,255,.55);color:#fff;font-weight:700;cursor:pointer}
+html body .cm-chk-go:disabled{opacity:.55;cursor:default}
+html body .cm-chk-st{margin-top:8px;font-size:13px;color:#aab2c3}
+html body .cm-chk-st:empty{display:none}
+html body .cm-chk-st.err{color:#ff9d9d}
+html body .cm-chk-st.ok{color:#b7f08a}
+html body .cm-chk-st.busy::after{content:'';display:inline-block;width:12px;height:12px;margin-left:8px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;vertical-align:-2px;animation:cmSpin .8s linear infinite}
 </style>
 </body>
 </html>
