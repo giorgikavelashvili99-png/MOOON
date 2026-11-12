@@ -32298,6 +32298,59 @@ html body .cm-chk-st.ok{color:#eaffd0!important}
 html{overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto}
 html body{overflow-x:clip!important;overflow-y:visible!important;height:auto!important;min-height:0}
 html.cm-open,html.cm-open body{overflow:hidden!important}
+
+/* ===== COMMUNITY v14: stable size only (original colors untouched) ===== */
+html body #communityView.show{padding-top:8px!important;padding-left:clamp(8px,4.5vw,96px)!important;padding-right:clamp(8px,4.5vw,96px)!important;padding-bottom:var(--cm-kbp,12px)!important}
+html body #communityView.show .cm-panel{--cm-av:38px;width:100%!important;max-width:1680px!important;margin:0 auto!important;padding-left:20px!important;padding-right:20px!important;padding-top:0!important;padding-bottom:16px!important;min-width:0}
+html body #communityView .cm-head{padding:18px 0 14px!important;margin:0 0 4px!important}
+html body #communityView .cm-title{font-size:26px!important;line-height:1.2!important;margin:0!important}
+html body #communityView .cm-online,html body #communityView .cm-pill{font-size:13px!important;padding:6px 12px!important;white-space:nowrap}
+html body #communityView .cm-list{flex:1 1 auto!important;min-height:0!important;height:auto!important;max-height:none!important;padding:6px 0 10px!important;contain:layout paint!important;overscroll-behavior:contain!important}
+html body #communityView .cm-day{font-size:12px!important}
+html body #communityView .cm-row{gap:12px!important}
+html body #communityView .cm-main{min-width:0;max-width:min(88%,720px)!important}
+html body #communityView .cm-name{font-size:14px!important}
+html body #communityView .cm-time{font-size:12px!important}
+html body #communityView .cm-bubble{padding:10px 14px!important;border-radius:18px!important;font-size:15px!important;line-height:1.5!important}
+html body #communityView .cm-bubble,html body #communityView .cm-bubble *{font-family:'Segoe UI','Noto Sans Georgian','Noto Sans',system-ui,-apple-system,Arial,sans-serif!important}
+html body #communityView .cm-bubble.cm-tt.cm-ttg{width:min(300px,100%)!important}
+html body #communityView .cm-composer{margin-top:8px!important}
+html body #communityView .cm-bar{gap:8px!important;padding:6px!important}
+html body #communityView .cm-plus,html body #communityView .cm-send,html body #communityView .cm-smile{flex:0 0 44px!important;width:44px!important;height:44px!important}
+html body #communityView .cm-plus{font-size:26px!important}
+html body #communityView .cm-input{height:44px!important;font-size:16px!important}
+html body #communityView .cm-chk{left:0!important;right:auto!important;width:min(100%,520px)!important;z-index:20}
+html body #communityView .cm-chk-in,html body #communityView .cm-chk-go{height:46px!important;font-size:15px!important}
+html body #communityView .cm-chk-in{font-size:16px!important}
+html body #communityView .cm-new{left:0!important;right:0!important;margin:0 auto!important;width:fit-content!important}
+
+/* + becomes x without rotating */
+html body #communityView .cm-plus.on{font-size:0!important}
+html body #communityView .cm-plus.on::after{content:"\00d7";font-size:28px;line-height:1;font-weight:300}
+
+/* buttons never move */
+html body #communityView button,html body #communityView button:hover,html body #communityView button:active,html body #communityView button:focus,html body #communityView button:focus-visible{transform:none!important;animation:none!important;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+html body #communityView button{transition:background-color .15s ease,border-color .15s ease,color .15s ease,opacity .15s ease!important}
+html body #communityView .cm-rx-pick{animation:none!important}
+html body #communityView .cm-row.cm-in{animation:cmFade14 .18s ease both!important}
+@keyframes cmFade14{from{opacity:0}to{opacity:1}}
+
+/* fps: pause everything behind the chat */
+html.cm-open body *:not(#communityView):not(#communityView *){animation-play-state:paused!important}
+html body #communityView.show{contain:layout style;isolation:isolate}
+
+@media (min-width:900px){
+  html body #communityView.show .cm-panel{--cm-av:40px;padding-left:28px!important;padding-right:28px!important}
+}
+@media (max-width:640px){
+  html body #communityView.show{padding-top:6px!important;padding-left:6px!important;padding-right:6px!important}
+  html body #communityView.show .cm-panel{--cm-av:34px;padding-left:12px!important;padding-right:12px!important;padding-bottom:12px!important}
+  html body #communityView .cm-head{padding:14px 0 12px!important}
+  html body #communityView .cm-title{font-size:20px!important}
+  html body #communityView .cm-main{max-width:calc(100% - 46px)!important}
+  html body #communityView .cm-row{gap:10px!important}
+  html body #communityView .cm-chk{width:100%!important}
+}
 </style>
 
 
@@ -32340,7 +32393,8 @@ document.addEventListener('click',function(e){
     var pr=document.createElement('div'); pr.style.cssText='position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden';
     document.body.appendChild(pr); var z=(pr.getBoundingClientRect().width/100)||1; document.body.removeChild(pr);
     var b=0;
-    document.querySelectorAll('body *').forEach(function(el){
+    var hb=document.getElementById('hzBar'); if(hb){var hr=hb.getBoundingClientRect(); if(hr.bottom>0) b=hr.bottom;}
+    if(!b) document.querySelectorAll('body *').forEach(function(el){
       if(v.contains(el)) return;
       var cs=getComputedStyle(el); if(cs.position!=='fixed'&&cs.position!=='sticky') return;
       if(cs.display==='none'||cs.visibility==='hidden') return;
