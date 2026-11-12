@@ -32464,5 +32464,75 @@ html.pc-modal-on body .pc-card *:not(#_a):not(#_b):not(#_c){
   filter:none!important;box-shadow:none!important;animation:none!important}
 html body .pc-modal-scrim > .pc-accordion-body.panel{will-change:auto!important}
 </style>
+
+<style id="moon-final-fix">
+/* ===== 1. PERFORMANCE: keep every look, drop the expensive per-frame blur work ===== */
+/* full-width fixed nav bar: blur over scrolling content was recomputed on every scroll frame -> same look with a denser tint */
+html body #hzBar.hz-bar:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,0) 42%),rgba(6,8,13,.95)!important}
+html body #hzMenuBtn.hz-menubtn:not(#_a):not(#_b):not(#_c):not(#_d){-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* chat panel sat over the animated background with a live blur -> low FPS */
+html body .cm-panel:not(#_a):not(#_b){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(145deg,rgba(26,30,48,.97),rgba(14,17,30,.98))!important;transform:none!important}
+html body .cm-bubble,html body .cm-bar,html body .cm-gate,html body .cm-emojis{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html body .cm-bubble{background:rgba(44,50,72,.92)!important}
+html body .cm-bar,html body .cm-gate{background:rgba(34,39,58,.96)!important}
+html body .cm-emojis{background:rgba(24,26,34,.98)!important}
+/* messages: browser skips layout/paint of rows that are off-screen */
+html body .cm-row{content-visibility:auto;contain-intrinsic-size:auto 64px}
+html body #communityView .cm-list{contain:layout paint style!important;will-change:scroll-position;transform:translateZ(0)}
+/* full-screen modal scrim + upload drop zone: blur over the whole screen is the heaviest layer on a big monitor */
+html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c):not(#_d){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(4,5,10,.9)!important}
+html body #tfView:not(#_a):not(#_b) .tf-drop,html body #tfView:not(#_a):not(#_b) .tf-drop:hover,html body #tfView:not(#_a):not(#_b) .tf-drop.drag{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* the CTA "glow" animation changed nothing visible but repainted the shadow every frame, forever */
+html body .hero-cta-btn:not(#_a):not(#_b){animation:none!important}
+
+/* ===== 2. HOVER GLOW instead of movement (chat "+", home order buttons) ===== */
+html body .cm-plus:not(#_a):not(#_b),html body #communityView .cm-plus:not(#_a):not(#_b){transform:none!important;rotate:none!important;transition:background .25s ease,box-shadow .25s ease,color .25s ease!important}
+html body .cm-plus:not(#_a):not(#_b):active,html body .cm-plus.on:not(#_a):not(#_b),html body #communityView .cm-plus.on:not(#_a):not(#_b){transform:none!important}
+@media (hover:hover){
+  html body .cm-plus:not(#_a):not(#_b):hover{background:rgba(120,170,255,.4)!important;color:#fff!important;box-shadow:0 0 0 1px rgba(170,205,255,.75),0 0 22px rgba(90,140,255,.75)!important}
+  html body .order-btn:not(#_a):not(#_b):hover,html body .order-btn.chat:not(#_a):not(#_b):hover{transform:none!important;box-shadow:0 0 0 1px rgba(170,205,255,.7),0 0 26px rgba(98,141,240,.75)!important}
+  html body .hero-cta-btn:not(#_a):not(#_b):hover,html body .hero-cta-btn:not(#_a):not(#_b):focus-visible{transform:none!important;box-shadow:0 0 0 1px rgba(255,255,255,.55),0 0 34px rgba(77,141,255,.85),0 12px 34px rgba(0,0,0,.4)!important}
+}
+html body .order-btn:not(#_a):not(#_b),html body .hero-cta-btn:not(#_a):not(#_b){transition:box-shadow .25s ease,background .25s ease!important}
+html body .order-btn:not(#_a):not(#_b):active,html body .hero-cta-btn:not(#_a):not(#_b):active{transform:none!important}
+
+/* ===== 3. TikTok checker panel: full redesign - dark, sharp, "tool" look (no pastel glass) ===== */
+html body .cm-chk:not(#_a):not(#_b):not(#_c){
+  padding:14px 14px 12px!important;border-radius:10px!important;
+  background:#0a0c11!important;
+  border:1px solid #242a36!important;border-left:3px solid #25f4ee!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  box-shadow:0 20px 50px -20px rgba(0,0,0,.95)!important}
+html body .cm-chk-h:not(#_a):not(#_b){margin-bottom:12px!important;font-size:12px!important;letter-spacing:.14em;text-transform:uppercase;color:#9aa4b5!important}
+html body .cm-chk-h b:not(#_a):not(#_b){display:inline-flex;align-items:center;gap:10px;color:#e8edf5!important;font-weight:700!important}
+html body .cm-chk-h b:not(#_a):not(#_b)::before{content:""!important;width:10px!important;height:10px!important;border-radius:2px!important;background:linear-gradient(90deg,#25f4ee 50%,#fe2c55 50%)!important;box-shadow:none!important}
+html body .cm-chk-x:not(#_a):not(#_b){width:28px!important;height:28px!important;border-radius:6px!important;background:#141821!important;border:1px solid #2a3140!important;color:#9aa4b5!important;box-shadow:none!important}
+html body .cm-chk-x:not(#_a):not(#_b):hover{border-color:#fe2c55!important;color:#fff!important}
+html body .cm-chk-row:not(#_a):not(#_b){gap:8px!important}
+html body .cm-chk-in:not(#_a):not(#_b){height:44px!important;border-radius:8px!important;background:#06080c!important;border:1px solid #2a3140!important;color:#e8edf5!important;font-size:15px!important;box-shadow:none!important}
+html body .cm-chk-in:not(#_a):not(#_b)::placeholder{color:#5d6778!important}
+html body .cm-chk-in:not(#_a):not(#_b):focus{border-color:#25f4ee!important;box-shadow:0 0 0 2px rgba(37,244,238,.18)!important}
+html body .cm-chk-go:not(#_a):not(#_b){height:44px!important;padding:0 22px!important;border-radius:8px!important;border:0!important;background:#25f4ee!important;color:#03181a!important;font-weight:800!important;letter-spacing:.04em;box-shadow:none!important;transition:box-shadow .2s ease,background .2s ease!important}
+@media (hover:hover){html body .cm-chk-go:not(#_a):not(#_b):hover:not(:disabled){box-shadow:0 0 0 1px #25f4ee,0 0 22px rgba(37,244,238,.6)!important}}
+html body .cm-chk-go:not(#_a):not(#_b):active{transform:none!important}
+html body .cm-chk-st:not(#_a):not(#_b){color:#9aa4b5!important;font-weight:500!important;font-size:13px}
+html body .cm-chk-st.err:not(#_a){color:#ff7a8e!important}
+html body .cm-chk-st.ok:not(#_a){color:#7ef0a0!important}
+</style>
+
+<style id="moon-final-fix-2">
+/* same "sparkle halo" the plan order button gets on hover: fades in slowly, no movement */
+html body .hero-cta-btn:not(#_a):not(#_b),html body .order-btn:not(#_a):not(#_b){position:relative;overflow:visible!important}
+html body .hero-cta-btn:not(#_a):not(#_b)::after,html body .order-btn:not(#_a):not(#_b)::after,html body .cm-plus:not(#_a):not(#_b)::before{
+  content:""!important;display:block!important;position:absolute!important;inset:-12px -18px!important;border-radius:999px!important;pointer-events:none!important;z-index:3;
+  background:radial-gradient(2.6px 2.6px at 9% 30%,rgba(255,255,255,.95),transparent 70%),radial-gradient(2.2px 2.2px at 21% 84%,rgba(255,255,255,.8),transparent 70%),radial-gradient(2.4px 2.4px at 37% 12%,rgba(255,255,255,.85),transparent 70%),radial-gradient(2.2px 2.2px at 52% 90%,rgba(255,255,255,.75),transparent 70%),radial-gradient(2.6px 2.6px at 66% 8%,rgba(255,255,255,.9),transparent 70%),radial-gradient(2.2px 2.2px at 80% 82%,rgba(255,255,255,.8),transparent 70%),radial-gradient(2.5px 2.5px at 93% 34%,rgba(255,255,255,.9),transparent 70%)!important;opacity:0;transform:none!important;transition:opacity .9s cubic-bezier(.4,0,.2,1)!important}
+html body .cm-plus:not(#_a):not(#_b){position:relative;overflow:visible!important}
+html body .cm-plus:not(#_a):not(#_b)::before{inset:-8px -10px!important}
+@keyframes mnDots{0%,100%{opacity:.45}50%{opacity:1}}
+@media (hover:hover) and (pointer:fine){
+  html body .hero-cta-btn:not(#_a):not(#_b):hover::after,html body .order-btn:not(#_a):not(#_b):hover::after,html body .cm-plus:not(#_a):not(#_b):hover::before{opacity:1;animation:mnDots 2.2s ease-in-out .9s infinite}
+  html body .hero-cta-btn:not(#_a):not(#_b):hover{box-shadow:0 0 14px 2px rgba(77,141,255,.85),0 0 40px 8px rgba(77,141,255,.5),0 12px 34px rgba(0,0,0,.4)!important}
+}
+</style>
 </body>
 </html>
