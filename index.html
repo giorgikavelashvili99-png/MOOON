@@ -31850,8 +31850,10 @@ html body.mn-view-on .mn-views:not(#_a):not(#_b){scroll-margin-top:0}
 </style>
 <script id="mx-switch-fix-js">
 (function(){
+ /* გვერდი ზემოდან იწყება მხოლოდ რეალურ გადართვაზე (გვერდი -> გვერდი).
+    სხვა class-ის ცვლილებები (ვარიანტზე/ძრავაზე დაჭერა, TikTok-ის ბლოკები და ა.შ.) სქროლს აღარ ეხება. */
  var root=document.documentElement,T=0,orig=window.scrollTo.bind(window);
- function on(){root.classList.add('mx-sw');clearTimeout(T);T=setTimeout(function(){root.classList.remove('mx-sw')},1500);}
+ function on(){root.classList.add('mx-sw');clearTimeout(T);T=setTimeout(function(){root.classList.remove('mx-sw')},700);}
  function top(){orig({top:0,left:0,behavior:'instant'});}
  window.scrollTo=function(a,b){
   if(root.classList.contains('mx-sw')){
@@ -31860,12 +31862,24 @@ html body.mn-view-on .mn-views:not(#_a):not(#_b){scroll-margin-top:0}
   }
   return orig.apply(window,arguments);
  };
- document.addEventListener('pointerdown',function(e){ if(e.target.closest&&e.target.closest('[data-hz-go],[data-mn-go],.mn-link,.hz-link,#hzBrand')) on(); },true);
- document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('[data-hz-go],[data-mn-go],.mn-link,.hz-link,#hzBrand')) on(); },true);
- new MutationObserver(function(){ on(); top(); requestAnimationFrame(function(){ top(); requestAnimationFrame(top); }); })
-  .observe(document.body,{attributes:true,attributeFilter:['class']});
+ var SW='[data-hz-go],[data-mn-go],.mn-link,.hz-link,#hzBrand';
+ document.addEventListener('pointerdown',function(e){ if(e.target.closest&&e.target.closest(SW)) on(); },true);
+ document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest(SW)) on(); },true);
+ function has(c,n){return (c||'').split(/\s+/).indexOf(n)>-1;}
+ /* body: მხოლოდ mn-view-on-ის ჩართვა/გამორთვა */
+ new MutationObserver(function(rs){
+  var ch=false;
+  rs.forEach(function(r){ if(has(r.oldValue,'mn-view-on')!==r.target.classList.contains('mn-view-on')) ch=true; });
+  if(!ch) return;
+  on(); top(); requestAnimationFrame(function(){ top(); requestAnimationFrame(top); });
+ }).observe(document.body,{attributes:true,attributeFilter:['class'],attributeOldValue:true});
+ /* .mn-view-ზე მხოლოდ "show"-ს ცვლილება (და არა შიგნით მყოფი ელემენტების) */
  var mv=document.getElementById('mnViews');
- if(mv) new MutationObserver(function(){ on(); top(); }).observe(mv,{attributes:true,subtree:true,attributeFilter:['class']});
+ if(mv) new MutationObserver(function(rs){
+  var ch=false;
+  rs.forEach(function(r){ if(r.target.classList&&r.target.classList.contains('mn-view')&&has(r.oldValue,'show')!==r.target.classList.contains('show')) ch=true; });
+  if(ch){ on(); top(); }
+ }).observe(mv,{attributes:true,subtree:true,attributeFilter:['class'],attributeOldValue:true});
 })();
 </script>
 
