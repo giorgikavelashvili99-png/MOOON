@@ -32293,6 +32293,11 @@ html body .cm-chk-go:active{transform:scale(.97)}
 html body .cm-chk-st{color:#fff!important;font-weight:600}
 html body .cm-chk-st.err{color:#ffd0d0!important}
 html body .cm-chk-st.ok{color:#eaffd0!important}
+
+/* ===== PATCH 11: ONE page scroller (html). body must not be a second scroll container ===== */
+html{overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto}
+html body{overflow-x:clip!important;overflow-y:visible!important;height:auto!important;min-height:0}
+html.cm-open,html.cm-open body{overflow:hidden!important}
 </style>
 
 
