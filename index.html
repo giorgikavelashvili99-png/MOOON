@@ -15981,7 +15981,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     if (plusBtn) plusBtn.addEventListener('click', e => {
       e.stopPropagation(); emojiBox.hidden = true;
       const open = chkEl.hidden; chkEl.hidden = !open; plusBtn.classList.toggle('on', open);
-      if (open) { if (!pend) chkSet('', ''); setTimeout(() => { try { chkIn.focus({ preventScroll: true }); } catch(err){} }, 60); }
+      if (open) { if (!pend) chkSet('', ''); /* no autofocus: keeps the + button where it is */ }
     });
     if (chkX) chkX.addEventListener('click', closeChk);
     if (chkGo) chkGo.addEventListener('click', startCheck);
@@ -31862,10 +31862,11 @@ html body.mn-view-on .mn-views:not(#_a):not(#_b){scroll-margin-top:0}
  };
  document.addEventListener('pointerdown',function(e){ if(e.target.closest&&e.target.closest('[data-hz-go],[data-mn-go],.mn-link,.hz-link,#hzBrand')) on(); },true);
  document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('[data-hz-go],[data-mn-go],.mn-link,.hz-link,#hzBrand')) on(); },true);
- new MutationObserver(function(){ on(); top(); requestAnimationFrame(function(){ top(); requestAnimationFrame(top); }); })
+ var lastOn=document.body.classList.contains('mn-view-on');
+ new MutationObserver(function(){ var c=document.body.classList.contains('mn-view-on'); if(c===lastOn) return; lastOn=c; on(); top(); requestAnimationFrame(function(){ top(); requestAnimationFrame(top); }); })
   .observe(document.body,{attributes:true,attributeFilter:['class']});
  var mv=document.getElementById('mnViews');
- if(mv) new MutationObserver(function(){ on(); top(); }).observe(mv,{attributes:true,subtree:true,attributeFilter:['class']});
+ if(mv){ var shownSt=new WeakMap(); Array.prototype.forEach.call(mv.children,function(v){ shownSt.set(v,v.classList.contains('show')); new MutationObserver(function(){ var s=v.classList.contains('show'); if(s===shownSt.get(v)) return; shownSt.set(v,s); if(s){ on(); top(); } }).observe(v,{attributes:true,attributeFilter:['class']}); }); }
 })();
 </script>
 
@@ -32437,6 +32438,39 @@ document.addEventListener('click',function(e){
 (function(){var v=document.getElementById('communityView');if(!v)return;
 function t(){document.documentElement.classList.toggle('cm-open',v.classList.contains('show'));}
 new MutationObserver(t).observe(v,{attributes:true,attributeFilter:['class']});t();})();
+</script>
+
+<style id="moon-perf-fix">
+/* ---- order modal: nothing behind it is drawn/blurred -> no pixels, no lag ---- */
+html.pc-modal-on body .pricing-cards{visibility:hidden!important}
+html body .pc-modal-scrim.open:not(#_a):not(#_b){background:#05060b!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html body .pc-modal-scrim.open>.pc-accordion-body.panel:not(#_a):not(#_b){will-change:auto!important;filter:none!important;backface-visibility:visible}
+/* ---- community chat: cheap scrolling ---- */
+html body .cm-panel:not(#_a):not(#_b){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#0b0c11!important;border:1px solid #1d2030!important;box-shadow:none!important}
+html body .cm-bubble:not(#_a):not(#_b),html body .cm-bar:not(#_a):not(#_b),html body .cm-gate:not(#_a):not(#_b),html body .cm-emojis:not(#_a):not(#_b){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
+html body #communityView .cm-list{contain:strict!important;will-change:scroll-position;transform:translateZ(0)}
+html body #communityView .cm-list>.cm-row,html body #communityView .cm-list>.cm-day{content-visibility:auto;contain-intrinsic-size:auto 58px}
+html body #communityView .cm-list *{text-shadow:none!important;filter:none!important}
+/* ---- sharper, harder checker (+ popup and MOON CHECK card) ---- */
+html body .cm-chk:not(#_a):not(#_b){background:#0a0b10!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #2b3044!important;border-left:3px solid #25f4ee!important;border-radius:10px!important;box-shadow:0 14px 30px -12px rgba(0,0,0,.9)!important;padding:12px 14px!important}
+html body .cm-chk-h b{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}
+html body .cm-chk-h b::before{border-radius:3px!important;box-shadow:none!important;width:10px!important;height:10px!important}
+html body .cm-chk-x:not(#_a){border-radius:6px!important;background:#151826!important;border:1px solid #2b3044!important}
+html body .cm-chk-in:not(#_a){border-radius:8px!important;background:#10121b!important;border:1px solid #2b3044!important;box-shadow:none!important}
+html body .cm-chk-in:focus{border-color:#25f4ee!important;box-shadow:none!important}
+html body .cm-chk-go:not(#_a){border-radius:8px!important;background:#25f4ee!important;color:#021014!important;font-weight:900!important;letter-spacing:.06em;text-transform:uppercase;font-size:12px!important;box-shadow:none!important}
+html body .cm-chk-st{color:#aeb6cc!important;font-weight:600}
+html body .cm-bubble.cm-tt.cm-ttg:not(#_a):not(#_b){background:#0a0b10!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #2b3044!important;border-left:3px solid #25f4ee!important;border-radius:10px!important;box-shadow:none!important}
+html body .cm-ttg-k{color:#25f4ee!important;letter-spacing:.2em!important;font-size:10px!important}
+html body .cm-ttg-big b{text-shadow:none!important;color:#fff!important}
+html body .cm-ttg-chip:not(#_a){background:#141726!important;border:1px solid #2b3044!important;border-radius:6px!important;box-shadow:none!important}
+html body .cm-ttg-chip.cm-ttg-ok:not(#_a){background:#0f2418!important;border-color:#2f7a45!important;color:#b9f5c9!important}
+html body .cm-plus.on:not(#_a){background:#25f4ee!important;color:#021014!important}
+</style>
+
+<script id="moon-perf-fix-js">
+/* TikTok checker: while the page is open, do not let animated glide / hold loops fight the user's own scroll */
+(function(){var d=document.documentElement;['wheel','touchstart','pointerdown'].forEach(function(ev){addEventListener(ev,function(){d.classList.remove('ttdl-gliding');},{passive:true,capture:true});});})();
 </script>
 </body>
 </html>
