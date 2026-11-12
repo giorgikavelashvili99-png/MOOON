@@ -32452,5 +32452,17 @@ document.addEventListener('click',function(e){
 function t(){document.documentElement.classList.toggle('cm-open',v.classList.contains('show'));}
 new MutationObserver(t).observe(v,{attributes:true,attributeFilter:['class']});t();})();
 </script>
+<style id="moon-modal-fps">
+/* ფასის კალკულატორის მოდალი: ფონის blur/ჩრდილები GPU-ს ახრჩობდა -> მკვრივი ფონი, blur-ის გარეშე */
+html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c):not(#_d),
+html body .pc-modal-scrim.pc-cine-exit:not(#_a):not(#_b):not(#_c):not(#_d){
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  background:rgba(3,4,9,.97)!important}
+html.pc-modal-on body .pc-card:not(#_a):not(#_b):not(#_c),
+html.pc-modal-on body .pc-card *:not(#_a):not(#_b):not(#_c){
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  filter:none!important;box-shadow:none!important;animation:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel{will-change:auto!important}
+</style>
 </body>
 </html>
