@@ -31696,6 +31696,25 @@ html body .cm-online,html body .cm-pill{background:rgba(255,255,255,.06);border-
 html body .cm-online{background:rgba(163,230,53,.08);border-color:rgba(163,230,53,.28)}
 html body .cm-emojis{background:rgba(24,26,34,.82);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-color:rgba(255,255,255,.16)}
 html body .cm-tools button{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+
+/* ---- v4: glass order cards + order modal (colors unchanged) + removed duplicate texts ---- */
+html body .pc-card:not(#_a):not(#_b){background:linear-gradient(150deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.04) 38%,rgba(255,255,255,0) 62%),var(--pc-bg,linear-gradient(180deg,var(--panel),var(--panel-2)))!important;-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 0 0 1px rgba(255,255,255,.07),0 18px 40px -22px rgba(0,0,0,.7)!important}
+html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c){background:rgba(4,5,10,.6)!important;-webkit-backdrop-filter:blur(16px) saturate(140%)!important;backdrop-filter:blur(16px) saturate(140%)!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f){background:radial-gradient(120% 48% at 8% 0%,color-mix(in srgb,var(--mc) 28%,transparent),transparent 64%) padding-box,radial-gradient(100% 55% at 100% 100%,rgba(56,158,248,.20),transparent 64%) padding-box,radial-gradient(60% 36% at 50% 52%,rgba(60,120,255,.08),transparent 74%) padding-box,linear-gradient(150deg,rgba(255,255,255,.10),rgba(255,255,255,0) 40%) padding-box,linear-gradient(180deg,rgba(15,22,54,.72),rgba(7,10,31,.78)) padding-box,linear-gradient(140deg,rgba(125,194,255,.55),rgba(80,130,255,.45) 48%,rgba(34,152,255,.30)) border-box!important;-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);box-shadow:0 34px 90px -26px rgba(0,0,0,.8),0 0 64px -24px color-mix(in srgb,var(--mc) 60%,transparent),inset 0 1px 0 rgba(255,255,255,.18)!important}
+/* duplicate texts: quality is already stated in price line + note */
+html body .pc-card--weekly .pc-desc-spec,html body .pc-card--monthly .pc-desc-spec{display:none!important}
+html body .pc-card--weekly .pc-feature:has([data-i18n="pc1Feature1"]),html body .pc-card--weekly .pc-feature:has([data-i18n="pc2Feature2"]),
+html body .pc-card--monthly .pc-feature:has([data-i18n="pc1Feature1"]),html body .pc-card--monthly .pc-feature:has([data-i18n="pc3Feature2"]){display:none!important}
+html body .eo-caption{display:none!important}
+
+/* ---- v5: scroll performance + stable chat size ---- */
+html body .pc-card:not(#_a):not(#_b),html body .cm-bubble,html body .cm-bar,html body .cm-gate,html body .cm-emojis{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f){-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html body .pc-modal-scrim.open:not(#_a):not(#_b):not(#_c){-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}
+html body .cm-panel{-webkit-backdrop-filter:blur(10px) saturate(140%)!important;backdrop-filter:blur(10px) saturate(140%)!important;overflow-anchor:none;transform:translateZ(0)}
+html body .cm-panel::before{display:none}
+html body .cm-list{height:380px;height:clamp(300px,46svh,500px)!important;min-height:300px;max-height:500px;flex:0 0 auto;overflow-anchor:none;contain:layout paint}
+@media (min-width:900px){html body .cm-list{height:460px!important}}
 </style>
 </body>
 </html>
