@@ -11956,7 +11956,7 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
       }, 1200);
   }
 
-  function detectFrameRate(videoEl){
+  function detectFrameRateOnce(videoEl){
     return new Promise((resolve) => {
       if (typeof videoEl.requestVideoFrameCallback !== 'function') {
         resolve(null);
@@ -12069,13 +12069,22 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
     });
   }
 
+
+  async function detectFrameRate(videoEl){
+    let r = await detectFrameRateOnce(videoEl);
+    if (r != null) return r;
+    try { videoEl.pause(); const d = videoEl.duration; videoEl.currentTime = (isFinite(d) && d > 1) ? Math.min(1, d * 0.4) : 0.3; } catch (e) {}
+    await new Promise(res => setTimeout(res, 250));
+    return await detectFrameRateOnce(videoEl);
+  }
+
   // ------------------------------------------------------------------
   // Fallback reader for iPhone/iPad (and any browser whose <video> element
   // refuses to report metadata): reads duration / width / height straight
   // out of the MP4 / MOV (ISO-BMFF) header with a few tiny file.slice()
   // reads -- no decoding, so it works whatever the codec and never freezes.
   // ------------------------------------------------------------------
-  function readContainerMeta(file){
+  function readContainerMetaIso(file){
     const fourcc = (dv,o) => String.fromCharCode(dv.getUint8(o),dv.getUint8(o+1),dv.getUint8(o+2),dv.getUint8(o+3));
     function kids(dv,s,e){
       const out = []; let p = s;
@@ -12106,7 +12115,7 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
         }
         if (ms < 0 || msize <= 0 || msize > 96*1024*1024) return null;
         const dv = new DataView(await file.slice(ms, ms+msize).arrayBuffer());
-        let timescale = 0, dur = 0, w = 0, h = 0, found = false, cfps = null;
+        let timescale = 0, dur = 0, w = 0, h = 0, found = false, cfps = null, vTid = 0, vMts = 0; const trexList = [];
         for (const b of kids(dv,0,dv.byteLength)) {
           if (b.type === 'mvhd') {
             if (dv.getUint8(b.s) === 1) { timescale = dv.getUint32(b.s+20); dur = dv.getUint32(b.s+24)*4294967296 + dv.getUint32(b.s+28); }
@@ -12130,34 +12139,166 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
               if (stsd && stsd.s + 8 + 36 <= stsd.e) { cw = dv.getUint16(stsd.s+8+32); ch = dv.getUint16(stsd.s+8+34); }
               if (!cw || !ch) { cw = Math.round(dv.getUint32(tkhd.s+wo)/65536); ch = Math.round(dv.getUint32(tkhd.s+wo+4)/65536); }
               else if (Math.abs(a) < 0.01 && Math.abs(bb) > 0.5) { const t = cw; cw = ch; ch = t; } // rotated 90deg, like the browser reports it
-              w = cw; h = ch; found = true;
+              w = cw; h = ch; found = true; try { vTid = dv.getUint32(tkhd.s + (v === 1 ? 20 : 12)); } catch (e) {}
               // Real frame rate straight from the file's own sample table (stts): the most common frame duration.
               // Exact, instant, and independent of the browser's playback / decoder (which often can't measure it on phones).
               try {
                 if (sttsB && mdhdB) {
                   const mts = dv.getUint8(mdhdB.s) === 1 ? dv.getUint32(mdhdB.s+20) : dv.getUint32(mdhdB.s+12);
+                  vMts = mts;
                   const n = dv.getUint32(sttsB.s+4), byDelta = new Map();
+                  let totS = 0, totD = 0;
                   for (let i = 0; i < n && sttsB.s + 8 + i*8 + 8 <= sttsB.e; i++) {
                     const cnt = dv.getUint32(sttsB.s+8+i*8), dl = dv.getUint32(sttsB.s+12+i*8);
-                    if (dl > 0) byDelta.set(dl, (byDelta.get(dl) || 0) + cnt);
+                    if (dl > 0) { byDelta.set(dl, (byDelta.get(dl) || 0) + cnt); totS += cnt; totD += cnt * dl; }
                   }
-                  let bestD = 0, bestC = 0;
-                  byDelta.forEach((c, d) => { if (c > bestC) { bestC = c; bestD = d; } });
-                  if (mts && bestD) {
-                    const raw = mts / bestD;
-                    let snap = Math.round(raw), bd = Infinity;
-                    [24, 25, 30, 50, 60, 120].forEach(r => { const df = Math.abs(r - raw); if (df < bd) { bd = df; if (df <= 3) snap = r; } });
-                    cfps = snap;
-                  }
+                  cfps = fpsFromDeltas(byDelta, totS, totD, mts);
                 }
               } catch (e) {}
             }
           }
         }
-        if (!timescale || !dur) return null;
+        // fragmented MP4 (screen recorders, some editors): the sample table is empty - read the fragments instead
+        if (found && !cfps) {
+          try {
+            for (const b of kids(dv,0,dv.byteLength)) if (b.type === 'mvex') for (const c of kids(dv,b.s,b.e)) if (c.type === 'trex') trexList.push({ tid: dv.getUint32(c.s+4), dd: dv.getUint32(c.s+12) });
+            const tr = trexList.find(x => x.tid === vTid) || trexList[0];
+            if (vMts && trexList.length) cfps = await fragFps(file, ms + msize, vTid, vMts, tr ? tr.dd : 0);
+          } catch (e) {}
+        }
+        if (!found) return null;
+        if (!timescale || !dur) return { duration: 0, width: w, height: h, fps: cfps };
         return { duration: dur/timescale, width: w, height: h, fps: cfps };
       } catch (e) { return null; }
     })();
+  }
+
+
+  // ---- shared fps maths: most common frame duration, but a variable-frame-rate file (average far below it) reports its AVERAGE ----
+  function snapFps(raw){
+    let snap = Math.round(raw), bd = Infinity;
+    [24, 25, 30, 50, 60, 120].forEach(r => { const df = Math.abs(r - raw); if (df < bd) { bd = df; if (df <= 3) snap = r; } });
+    return snap;
+  }
+  function fpsFromDeltas(byDelta, totS, totD, mts){
+    let bestD = 0, bestC = 0;
+    byDelta.forEach((c, d) => { if (c > bestC) { bestC = c; bestD = d; } });
+    if (!mts || !bestD) return null;
+    const modeFps = mts / bestD;
+    const avgFps = (totS > 0 && totD > 0) ? (mts * totS / totD) : modeFps;
+    return snapFps(avgFps < modeFps * 0.9 ? avgFps : modeFps);
+  }
+  async function fragFps(file, startPos, trackId, mts, trexDef){
+    const fourcc = (dv,o) => String.fromCharCode(dv.getUint8(o),dv.getUint8(o+1),dv.getUint8(o+2),dv.getUint8(o+3));
+    function kids(dv,s,e){ const out = []; let p = s; while (p + 8 <= e) { let size = dv.getUint32(p); const type = fourcc(dv,p+4); let hdr = 8; if (size === 1) { if (p + 16 > e) break; size = dv.getUint32(p+8)*4294967296 + dv.getUint32(p+12); hdr = 16; } else if (size === 0) size = e - p; if (size < hdr) break; if (p + size > e) size = e - p; out.push({ type, s:p+hdr, e:p+size }); p += size; } return out; }
+    const total = file.size, byDelta = new Map(); let p = startPos, guard = 0, frags = 0, totS = 0, totD = 0;
+    while (p + 8 <= total && guard++ < 600 && frags < 12) {
+      const head = new DataView(await file.slice(p, Math.min(p+16, total)).arrayBuffer());
+      if (head.byteLength < 8) break;
+      let size = head.getUint32(0); const type = fourcc(head,4); let hdr = 8;
+      if (size === 1) { if (head.byteLength < 16) break; size = head.getUint32(8)*4294967296 + head.getUint32(12); hdr = 16; }
+      else if (size === 0) size = total - p;
+      if (size < hdr) break;
+      if (type === 'moof' && size < 8*1024*1024) {
+        const d = new DataView(await file.slice(p+hdr, p+size).arrayBuffer());
+        for (const traf of kids(d,0,d.byteLength)) {
+          if (traf.type !== 'traf') continue;
+          const ks = kids(d,traf.s,traf.e); let tfDur = 0, tid = 0;
+          for (const k of ks) if (k.type === 'tfhd') { const fl = d.getUint32(k.s) & 0xFFFFFF; tid = d.getUint32(k.s+4); let o = k.s+8; if (fl & 1) o += 8; if (fl & 2) o += 4; if (fl & 8) tfDur = d.getUint32(o); }
+          if (trackId && tid !== trackId) continue;
+          for (const k of ks) if (k.type === 'trun') {
+            const fl = d.getUint32(k.s) & 0xFFFFFF, cnt = d.getUint32(k.s+4); let o = k.s+8;
+            if (fl & 1) o += 4; if (fl & 4) o += 4;
+            for (let i = 0; i < cnt && o + 4 <= k.e + 1; i++) {
+              let dl = tfDur || trexDef;
+              if (fl & 0x100) { dl = d.getUint32(o); o += 4; }
+              if (fl & 0x200) o += 4; if (fl & 0x400) o += 4; if (fl & 0x800) o += 4;
+              if (dl > 0) { byDelta.set(dl, (byDelta.get(dl) || 0) + 1); totS++; totD += dl; }
+            }
+          }
+        }
+        frags++;
+      }
+      p += size;
+    }
+    return fpsFromDeltas(byDelta, totS, totD, mts);
+  }
+
+  // ---- WebM / MKV: frame rate from the track header (DefaultDuration) or from the block timestamps ----
+  function readContainerMetaMkv(file){
+    return (async () => {
+      try {
+        const buf = new Uint8Array(await file.slice(0, Math.min(file.size, 6*1024*1024)).arrayBuffer());
+        if (!(buf[0] === 0x1A && buf[1] === 0x45 && buf[2] === 0xDF && buf[3] === 0xA3)) return null;
+        const dvf = new DataView(buf.buffer);
+        function vint(p, keep){
+          if (p >= buf.length) return null;
+          const b = buf[p]; let len = 1, mask = 0x80;
+          while (len <= 8 && !(b & mask)) { len++; mask >>= 1; }
+          if (len > 8 || p + len > buf.length) return null;
+          let v = keep ? b : (b & (mask - 1)), ones = (b & (mask - 1)) === mask - 1;
+          for (let i = 1; i < len; i++) { v = v*256 + buf[p+i]; if (buf[p+i] !== 255) ones = false; }
+          return { v, len, unknown: !keep && ones };
+        }
+        function walk(s, e, cb){
+          let p = s;
+          while (p < e) {
+            const id = vint(p, true); if (!id) break;
+            const sz = vint(p + id.len, false); if (!sz) break;
+            const ds = p + id.len + sz.len, de = sz.unknown ? e : Math.min(ds + sz.v, e);
+            if (ds > e) break;
+            cb(id.v, ds, de);
+            p = sz.unknown ? de : ds + sz.v;
+          }
+        }
+        const uint = (s, e) => { let v = 0; for (let i = s; i < e; i++) v = v*256 + buf[i]; return v; };
+        let tsScale = 1000000, durF = 0, vTrack = 0, defDur = 0, w = 0, h = 0, clusterTc = 0;
+        const stamps = [];
+        function blockAt(s, e){
+          const t = vint(s, false); if (!t || t.v !== vTrack || s + t.len + 2 > e) return;
+          let rel = (buf[s+t.len] << 8) | buf[s+t.len+1]; if (rel & 0x8000) rel -= 0x10000;
+          stamps.push((clusterTc + rel) * tsScale / 1e9);
+        }
+        walk(0, buf.length, (id, s, e) => {
+          if (id !== 0x18538067) return;
+          walk(s, e, (id2, s2, e2) => {
+            if (id2 === 0x1549A966) walk(s2, e2, (i3, s3, e3) => { if (i3 === 0x2AD7B1) tsScale = uint(s3, e3); if (i3 === 0x4489) durF = (e3 - s3 === 4) ? dvf.getFloat32(s3) : dvf.getFloat64(s3); });
+            else if (id2 === 0x1654AE6B) walk(s2, e2, (i3, s3, e3) => {
+              if (i3 !== 0xAE) return;
+              let tn = 0, tt = 0, dd = 0, pw = 0, ph = 0;
+              walk(s3, e3, (i4, s4, e4) => {
+                if (i4 === 0xD7) tn = uint(s4, e4); else if (i4 === 0x83) tt = uint(s4, e4); else if (i4 === 0x23E383) dd = uint(s4, e4);
+                else if (i4 === 0xE0) walk(s4, e4, (i5, s5, e5) => { if (i5 === 0xB0) pw = uint(s5, e5); else if (i5 === 0xBA) ph = uint(s5, e5); });
+              });
+              if (tt === 1 && !vTrack) { vTrack = tn; defDur = dd; w = pw; h = ph; }
+            });
+            else if (id2 === 0x1F43B675) walk(s2, e2, (i3, s3, e3) => {
+              if (i3 === 0xE7) clusterTc = uint(s3, e3);
+              else if (i3 === 0xA3) blockAt(s3, e3);
+              else if (i3 === 0xA0) walk(s3, e3, (i4, s4, e4) => { if (i4 === 0xA1) blockAt(s4, e4); });
+            });
+          });
+        });
+        let fps = null;
+        if (defDur > 0) fps = snapFps(1e9 / defDur);
+        else if (stamps.length >= 8) {
+          stamps.sort((a, b) => a - b);
+          const span = stamps[stamps.length-1] - stamps[0];
+          if (span > 0) fps = snapFps((stamps.length - 1) / span);
+        }
+        return { duration: durF ? durF * tsScale / 1e9 : 0, width: w, height: h, fps };
+      } catch (e) { return null; }
+    })();
+  }
+
+  function readContainerMeta(file){
+    return readContainerMetaIso(file).then(m => {
+      if (m && m.fps) return m;
+      return readContainerMetaMkv(file).then(k => {
+        if (!k) return m;
+        return { duration: (m && m.duration) || k.duration, width: (m && m.width) || k.width, height: (m && m.height) || k.height, fps: k.fps || (m && m.fps) || null };
+      });
+    }).catch(() => null);
   }
 
   // iOS often reports videoWidth/Height = 0 (or a NaN duration) right at
