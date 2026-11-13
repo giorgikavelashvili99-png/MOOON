@@ -10239,9 +10239,9 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
     /* the dark layer fades in OVER the page first (opacity only, compositor); the page behind is switched off
        only once that layer is opaque, so there is no hard black cut and no big restyle in the click frame */
     clearTimeout(window._pcOnT);
-    window._pcOnT = setTimeout(function(){
-      if (pcModalScrim && pcModalScrim.classList.contains('open')) document.documentElement.classList.add('pc-modal-on');
-    }, 460);
+    /* FIX: switch the page behind off in the SAME frame as the open (scrim is opaque instantly),
+       so the big restyle happens once before the animation starts instead of mid-animation at 460ms (lag + flash) */
+    if (pcModalScrim && pcModalScrim.classList.contains('open')) document.documentElement.classList.add('pc-modal-on');
     lockBodyScroll();
   }
 
@@ -33179,6 +33179,25 @@ html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not
 html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"])[data-mode="guild"] #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){display:none!important}
 html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"])[data-mode="guild"] #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){display:none!important}
 }
+</style>
+
+<style id="moon-fix-login-hover-and-modal-open">
+@layer moonLoginTiles{
+/* LOGIN: tiles had backdrop-filter(blur+saturate 200%) -> hovered tile's glow got sampled/brightened by neighbours (lit band on the two lower tiles) */
+html body #discordGate:not([data-mode="banned"]):not(#_z) :is(#discordLoginBtn,#tiktokLoginBtn,#tgLoginBtn,#discordJoinBtn).discord-btn:not(#_z):not(#_y){
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;will-change:auto!important;z-index:1!important;contain:paint!important}
+@media (hover:hover) and (pointer:fine){
+html body #discordGate:not([data-mode="banned"]):not(#_z) :is(#discordLoginBtn,#tiktokLoginBtn,#tgLoginBtn,#discordJoinBtn).discord-btn:hover:not(#_z):not(#_y){
+  z-index:5!important;transform:rotate(-2deg) scale(1.04)!important;
+  background:radial-gradient(120% 100% at 50% 20%,color-mix(in srgb,var(--c) 55%,transparent),color-mix(in srgb,var(--c) 14%,transparent) 70%),#090c16!important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,transparent),inset 0 0 30px color-mix(in srgb,var(--c) 38%,transparent)!important}
+}
+}
+/* ORDER WINDOW: scrim opaque at once (no page flash), panel = opacity-only fade (no per-frame re-raster of the zoomed panel), layer kept alive */
+html body #pcModalScrim.open:not(#_a):not(#_b):not(#_c){animation:none!important;opacity:1!important}
+html body #pcModalScrim.open>.pc-accordion-body.panel:not(#_a):not(#_b):not(#_c){animation:moOpenFade .16s ease-out backwards!important;transform:none!important;backface-visibility:visible!important;will-change:opacity!important}
+html.pc-modal-on body #pcModalScrim .pc-accordion-body:not(#_a):not(#_b):not(#_c):not(#_d){will-change:opacity!important}
+@keyframes moOpenFade{from{opacity:0}to{opacity:1}}
 </style>
 </body>
 </html>
