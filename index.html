@@ -3,9 +3,9 @@
 <head><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
 function ok(){if(done)return;done=true;window.__moonFontsOk=true;r.classList.add('moon-fonts-ok');try{window.dispatchEvent(new Event('moonfontsok'))}catch(e){}}
 function go(){try{var t='Abc 0123456789 ₾€•აბგ';var L=[];['400','500','600','700'].forEach(function(w){L.push(d.fonts.load(w+' 16px BPGAcademiuriU',t));L.push(d.fonts.load(w+' 16px "Space Grotesk"',t))});['400','500','700','800'].forEach(function(w){L.push(d.fonts.load(w+' 16px "JetBrains Mono"',t))});['MoonLat','MoonLatKa','MoonMetro'].forEach(function(f){['400','500','600','700','800','900'].forEach(function(w){L.push(d.fonts.load(w+' 16px '+f,'Aa0123456789 ₾%•'))})});
-Promise.all(L.map(function(p){return p.catch(function(){})})).then(function(){return d.fonts.ready}).then(ok,ok)}catch(e){ok()}}
+Promise.all(L.map(function(p){return p.catch(function(){})})).then(function(){return d.fonts.ready}).then(function(){return new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r)})})}).then(ok,ok)}catch(e){ok()}}
 if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',go);else go();
-setTimeout(function(){if(d.readyState!=='loading')ok()},1500);setTimeout(ok,7000)})();</script>
+setTimeout(ok,8000)})();</script>
 <style id="moon-fontgate-css">html:not(.moon-fonts-ok) body>*:not(#mi5):not(script):not(style){visibility:hidden!important}</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -15673,17 +15673,22 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const bx = best ? best.x : {};
       const bigR = esc(String(bx.r || (t.o ? String(t.o).split(/[x×]/).pop() + 'p' : '—')));
       const bigF = bx.f != null ? esc(Math.round(bx.f) + ' fps') : '';
-      const chips = list.map(x =>
-        '<span class="cm-ttg-chip"><b>' + esc(String(x.l || '').slice(0, 24)) + '</b>' +
-        esc([x.r, x.b != null ? x.b + 'Mbps' : '', x.m != null ? x.m + 'MB' : ''].filter(Boolean).join(' · ')) + '</span>').join('');
-      const meta = [t.o ? 'Original ' + t.o : '', t.vq != null ? 'VQ ' + t.vq : ''].filter(Boolean).join(' · ');
+      const rows = list.map(x => {
+        const lab = esc(String(x.l || '').replace(/\s*quality\s*/i, '').slice(0, 16));
+        return '<div class="mc-t"><em>' + lab + '</em><b>' + esc(String(x.r || '—')) + '</b>' +
+          '<span>' + (x.b != null ? esc(x.b + ' Mbps') : '') + '</span><span>' + (x.m != null ? esc(x.m + ' MB') : '') + '</span></div>';
+      }).join('');
+      const vqN = t.vq != null ? Math.max(0, Math.min(100, parseFloat(t.vq) || 0)) : null;
+      const ring = vqN != null ? '<div class="mc-vq" style="--p:' + vqN + '"><b>' + esc(String(Math.round(vqN))) + '</b><small>VQ</small></div>' : '';
       const link = (typeof t.u === 'string' && /^https:\/\/([a-z0-9-]+\.)*tiktok\.com\//i.test(t.u))
-        ? '<a class="cm-ttg-a" href="' + esc(t.u) + '" target="_blank" rel="noopener noreferrer">' + esc(xt('video')) + ' ↗</a>' : '';
-      return '<div class="cm-bubble cm-tt cm-ttg"><div class="cm-ttg-k">MOON CHECK</div>' +
-        '<div class="cm-ttg-big"><b>' + bigR + '</b><span>' + bigF + '</span></div>' +
-        (t.t ? '<div class="cm-ttg-u">' + esc(String(t.t).slice(0, 90)) + '</div>' : '') +
-        '<div class="cm-ttg-chips">' + chips + (meta ? '<span class="cm-ttg-chip cm-ttg-ok">' + esc(meta) + '</span>' : '') + '</div>' +
-        link + '</div>';
+        ? '<a class="mc-go" href="' + esc(t.u) + '" target="_blank" rel="noopener noreferrer">' + esc(xt('video')) + ' <i>↗</i></a>' : '';
+      return '<div class="cm-bubble cm-tt cm-mc">' +
+        '<div class="mc-top"><span class="mc-brand"><i></i>MOON CHECK</span>' + link + '</div>' +
+        '<div class="mc-hero"><div class="mc-res"><b>' + bigR + '</b>' + (bigF ? '<span>' + bigF + '</span>' : '') + '</div>' + ring + '</div>' +
+        (t.t ? '<div class="mc-title">' + esc(String(t.t).slice(0, 90)) + '</div>' : '') +
+        (rows ? '<div class="mc-tiers">' + rows + '</div>' : '') +
+        (t.o ? '<div class="mc-orig"><span>ORIGINAL</span><b>' + esc(String(t.o)) + '</b></div>' : '') +
+        '</div>';
     }
     const ICON_SMILE = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4.2 4.2 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>';
     const ICON_TRASH = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
@@ -15753,8 +15758,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         const prev = msgs[i - 1], next = msgs[i + 1];
         const newDay = !prev || dayKey(prev.ts) !== dayKey(m.ts);
         if (newDay) items.push({ k: 'day:' + dayKey(m.ts), html: '<div class="cm-day">' + esc(dayLabel(m.ts)) + '</div>' });
-        const first = newDay || who(prev) !== who(m) || (m.ts - prev.ts) > 5 * 60 * 1000;
-        const last = !next || dayKey(next.ts) !== dayKey(m.ts) || who(next) !== who(m) || (next.ts - m.ts) > 5 * 60 * 1000;
+        const first = newDay || m.kind === 'tt' || (prev && prev.kind === 'tt') || who(prev) !== who(m) || (m.ts - prev.ts) > 5 * 60 * 1000;
+        const last = !next || m.kind === 'tt' || next.kind === 'tt' || dayKey(next.ts) !== dayKey(m.ts) || who(next) !== who(m) || (next.ts - m.ts) > 5 * 60 * 1000;
         items.push({ k: 'm:' + m.id, m: m, html: rowHtml(m, first, last, isAdm, key) });
       });
       const keep = new Set(items.map(x => x.k));
@@ -32669,6 +32674,7 @@ html body .pc-card .pc-desc .pc-desc-nw{white-space:nowrap!important}
   document.addEventListener('DOMContentLoaded',sched);
   window.addEventListener('load',function(){sched();setTimeout(sched,800);setTimeout(sched,2500);});
   window.addEventListener('resize',sched);
+  window.addEventListener('moonfontsok',fix);if(window.__moonFontsOk)sched();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sched);
   try{new MutationObserver(function(m){for(var i=0;i<m.length;i++){var n=m[i].target;if(n.nodeType===1&&n.closest&&n.closest('.pc-desc')){sched();return;}}}).observe(document.body,{childList:true,subtree:true});}catch(e){}
 })();
@@ -32808,9 +32814,19 @@ html body .pricing-cards.pc-scroll-mode .pc-scroll-track.mcp-drag:not(#_a):not(#
 html body .pricing-cards.pc-scroll-mode .pc-slide:not(#_a):not(#_b):not(#_c){
   --d:0; filter:none!important; transition:none!important; contain:none!important; perspective:none!important;
   backface-visibility:visible!important; scroll-snap-align:center!important; scroll-snap-stop:normal!important;
-  transform:translate3d(0,0,0) scale(calc(1 - .075*var(--d)))!important;
-  opacity:calc(1 - .5*var(--d))!important; will-change:transform,opacity!important; transform-origin:50% 55%;
+  transform:none!important; opacity:1!important; will-change:auto!important;
 }
+/* off-centre slides only (a transformed ancestor would break position:fixed of the order modal) */
+html body .pricing-cards.pc-scroll-mode .pc-slide.mcp-on:not(#_a):not(#_b):not(#_c){
+  transform:scale(calc(1 - .075*var(--d)))!important; opacity:calc(1 - .5*var(--d))!important; transform-origin:50% 55%;
+}
+/* order modal open: every ancestor is neutral -> modal is sized to the screen, sharp, not scaled */
+html.pc-modal-on body .pricing-cards .pc-slide:not(#_a):not(#_b):not(#_c):not(#_d),
+html body .pricing-cards .pc-slide:has(.pc-card.pc-open):not(#_a):not(#_b):not(#_c):not(#_d),
+html body .pricing-cards .pc-slide:has(.pc-modal-scrim.open):not(#_a):not(#_b):not(#_c):not(#_d){
+  transform:none!important; opacity:1!important; will-change:auto!important; filter:none!important; contain:none!important; perspective:none!important;
+}
+html.pc-modal-on body .pricing-cards .pc-scroll-track:not(#_a):not(#_b):not(#_c){contain:none!important;transform:none!important;scroll-snap-type:none!important}
 html body .pricing-cards.pc-scroll-mode .pc-slide:not(#_a):not(#_b):not(#_c)::after{display:none!important}
 html body .pricing-cards.pc-scroll-mode .pc-slide > .pc-card-wrap:not(#_a):not(#_b):not(#_c){transform:none!important;rotate:none!important;scale:none!important;will-change:auto!important}
 html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) :is(.pc-ring-spin,.pc-stars i,.pc-cine-glint){animation-play-state:paused!important}
@@ -32829,7 +32845,7 @@ html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active):not(#_a
     raf=0; if(!track)return; var c=track.scrollLeft+half;
     for(var i=0;i<slides.length;i++){
       var d=Math.min(1,Math.abs(cx[i]-c)/sw);
-      slides[i].style.setProperty('--d',d<.004?'0':d.toFixed(3));
+      slides[i].style.setProperty('--d',d<.004?'0':d.toFixed(3));slides[i].classList.toggle('mcp-on',d>=.004);
     }
   }
   function tick(){ if(!raf) raf=requestAnimationFrame(paint); }
@@ -32868,6 +32884,77 @@ html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active):not(#_a
     bindDrag();
   }
   init(0);
+})();
+</script>
+
+<style id="moon-check-pro">
+/* ===== MOON CHECK card: compact, glass, name + avatar always visible ===== */
+html body #communityView .cm-row.cm-kind-tt:not(#_a):not(#_b){align-items:flex-start!important}
+html body #communityView .cm-row.cm-kind-tt .cm-av-col:not(#_a){margin-top:1px}
+html body #communityView .cm-row.cm-kind-tt .cm-main:not(#_a):not(#_b){max-width:calc(100% - var(--cm-av,38px) - 10px)!important;width:min(272px,100%)}
+html body #communityView .cm-list .cm-bubble.cm-mc:not(#_a):not(#_b):not(#_c){
+  --mc-a:#25f4ee;--mc-b:#7a6bff;--mc-c:#fe2c55;
+  position:relative;width:100%;box-sizing:border-box;padding:11px 12px 10px!important;border-radius:18px!important;
+  font-size:12px!important;line-height:1.3!important;color:#e9edff;overflow:hidden;
+  background:radial-gradient(120% 90% at 0% 0%,rgba(122,107,255,.20),transparent 55%),radial-gradient(110% 80% at 100% 100%,rgba(37,244,238,.10),transparent 60%),linear-gradient(180deg,#121628,#0b0e19)!important;
+  border:1px solid rgba(140,160,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 24px -14px rgba(0,0,0,.9)!important}
+html body #communityView .cm-bubble.cm-mc::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--mc-a),var(--mc-b) 55%,var(--mc-c))}
+html body #communityView .cm-bubble.cm-mc *{box-sizing:border-box}
+.cm-mc .mc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:22px}
+.cm-mc .mc-brand{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;font-weight:800;letter-spacing:.2em;color:#9fb0ff}
+.cm-mc .mc-brand i{width:7px;height:7px;border-radius:50%;background:var(--mc-a);box-shadow:0 0 8px var(--mc-a)}
+.cm-mc .mc-go{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;text-decoration:none;background:rgba(122,107,255,.28);border:1px solid rgba(160,175,255,.35);white-space:nowrap}
+.cm-mc .mc-go i{font-style:normal;font-size:11px;opacity:.85}
+.cm-mc .mc-hero{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}
+.cm-mc .mc-res{display:flex;align-items:baseline;gap:8px;min-width:0}
+.cm-mc .mc-res b{font-size:30px;line-height:1;font-weight:900;letter-spacing:-.02em;background:linear-gradient(180deg,#fff,#a9c4ff);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.cm-mc .mc-res span{font-size:11px;font-weight:700;color:#bcd0ff;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.08);white-space:nowrap}
+.cm-mc .mc-vq{position:relative;flex:0 0 auto;width:44px;height:44px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  background:conic-gradient(from 0deg,var(--mc-a),var(--mc-b) calc(var(--p)*.6%),var(--mc-c) calc(var(--p)*1%),rgba(255,255,255,.10) 0)}
+.cm-mc .mc-vq::before{content:"";position:absolute;inset:4px;border-radius:50%;background:#0d1020}
+.cm-mc .mc-vq b,.cm-mc .mc-vq small{position:relative;z-index:1;display:block;text-align:center}
+.cm-mc .mc-vq b{font-size:14px;line-height:1;font-weight:900;color:#fff}
+.cm-mc .mc-vq small{font-size:7.5px;letter-spacing:.12em;font-weight:800;color:#8ea0e8}
+.cm-mc .mc-title{margin-top:8px;font-size:12.5px;font-weight:600;color:#e4e9ff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.cm-mc .mc-tiers{display:grid;gap:4px;margin-top:9px}
+.cm-mc .mc-t{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:7px;padding:6px 9px;border-radius:10px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}
+.cm-mc .mc-t em{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#93a3e6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-mc .mc-t b{font-size:12px;font-weight:800;color:#fff}
+.cm-mc .mc-t span{font-size:11px;font-weight:600;color:#b9c4ee;white-space:nowrap}
+.cm-mc .mc-orig{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding:6px 9px;border-radius:10px;background:linear-gradient(90deg,rgba(60,220,130,.16),rgba(60,220,130,.05));border:1px solid rgba(90,230,150,.35)}
+.cm-mc .mc-orig span{font-size:9px;font-weight:800;letter-spacing:.1em;color:#7fe0a8}
+.cm-mc .mc-orig b{font-size:11.5px;font-weight:800;color:#d5ffe6}
+</style>
+
+<style id="moon-no-dots">
+/* all decorative / status dots removed */
+html body :is(.pc-dots,.opt-pn-dots,.cm-dot,.ttdl-status-dot,.messenger-status-dot,.mn-dot,.hz-dot,.hzm-gdot,.tnf-user-dot,.mfask-dot,.panel-divider-dot,.ttdl-titlebar-dots,.cm-mc .mc-brand i):not(#_a):not(#_b):not(#_c){display:none!important}
+html body .pricing-cards.pc-scroll-mode .pc-scroll-shell{padding-top:0}
+html body #communityView .cm-online:not(#_a):not(#_b){gap:0!important}
+</style>
+<script id="moon-no-dots-js">
+(function(){
+  var RX=/\s*[\u2022\u00B7\u2219\u25CF]\s*/g, SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,INPUT:1,CODE:1,PRE:1,NOSCRIPT:1};
+  function clean(root){
+    if(!root)return;
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      var p=n.parentNode; if(!p||SKIP[p.nodeName]||(p.isContentEditable))return NodeFilter.FILTER_REJECT;
+      return /[\u2022\u00B7\u2219\u25CF]/.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;}});
+    var a=[],n; while((n=w.nextNode()))a.push(n);
+    a.forEach(function(t){var v=t.nodeValue.replace(RX,' ').replace(/ {2,}/g,' ');if(v!==t.nodeValue)t.nodeValue=v;});
+  }
+  var q=[],raf=0;
+  function flush(){raf=0;var l=q;q=[];l.forEach(function(n){if(n.isConnected)clean(n.nodeType===1?n:n.parentNode)})}
+  function start(){
+    clean(document.body);
+    new MutationObserver(function(ms){
+      ms.forEach(function(m){
+        if(m.type==='characterData')q.push(m.target); else m.addedNodes.forEach(function(n){q.push(n)});
+      });
+      if(!raf)raf=requestAnimationFrame(flush);
+    }).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script>
 </body>
