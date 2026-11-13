@@ -32448,8 +32448,9 @@ html body .pc-modal-scrim.open>.pc-accordion-body.panel:not(#_a):not(#_b){will-c
 /* ---- community chat: cheap scrolling ---- */
 html body .cm-panel:not(#_a):not(#_b){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#0b0c11!important;border:1px solid #1d2030!important;box-shadow:none!important}
 html body .cm-bubble:not(#_a):not(#_b),html body .cm-bar:not(#_a):not(#_b),html body .cm-gate:not(#_a):not(#_b),html body .cm-emojis:not(#_a):not(#_b){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
-html body #communityView .cm-list{contain:strict!important;will-change:scroll-position;transform:translateZ(0)}
-html body #communityView .cm-list>.cm-row,html body #communityView .cm-list>.cm-day{content-visibility:auto;contain-intrinsic-size:auto 58px}
+html body #communityView .cm-list{contain:layout paint!important;overflow-anchor:none}
+/* content-visibility removed: the 58px height guess made scrollHeight change while scrolling -> jumps */
+html body #communityView .cm-list>.cm-row,html body #communityView .cm-list>.cm-day{content-visibility:visible!important;contain-intrinsic-size:none!important}
 html body #communityView .cm-list *{text-shadow:none!important;filter:none!important}
 /* ---- sharper, harder checker (+ popup and MOON CHECK card) ---- */
 html body .cm-chk:not(#_a):not(#_b){background:#0a0b10!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #2b3044!important;border-left:3px solid #25f4ee!important;border-radius:10px!important;box-shadow:0 14px 30px -12px rgba(0,0,0,.9)!important;padding:12px 14px!important}
