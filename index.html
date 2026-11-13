@@ -6508,9 +6508,6 @@ html .pc-modal-scrim.open .pc-modal-scroll>:nth-child(3){animation-delay:.2s}
 @keyframes pcFinX{from{opacity:0;transform:scale(.6)}}
 
 
-html .pc-modal-scrim.pc-sq .pc-modal-scroll *,
-html .pc-modal-scrim.pc-sq .pc-modal-scroll *::before,
-html .pc-modal-scrim.pc-sq .pc-modal-scroll *::after{animation-duration:1ms!important;animation-delay:0s!important;animation-iteration-count:1!important}
 
 .pc-modal-scrim.open>.pc-accordion-body>.pc-cine-sweep::before{animation-duration:.9s;animation-delay:.2s}
 
@@ -10207,8 +10204,6 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     const __scrollY0 = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     card.classList.add('pc-open');
     if (btn) btn.setAttribute('aria-expanded', 'true');
-    document.documentElement.classList.add('pc-opening');
-    if (pcModalScrim) pcModalScrim.classList.add('pc-sq');
     // Remember exactly where the page was scrolled to before this modal
     // opened, so closing it (✕, scrim click, or Escape) can put the
     // visitor back at that same spot instead of wherever the page
@@ -10227,11 +10222,12 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
       pcModalScrim.appendChild(panel);
     }
     if (pcModalScrim) pcModalScrim.classList.add('open');
-    document.documentElement.classList.add('pc-modal-on');
-    document.documentElement.classList.add('pc-opening');
-    if (pcModalScrim) pcModalScrim.classList.add('pc-sq');
-    clearTimeout(window._pcOpeningT);
-    window._pcOpeningT = setTimeout(function(){ document.documentElement.classList.remove('pc-opening'); if (pcModalScrim) pcModalScrim.classList.remove('pc-sq'); }, 520);
+    /* the dark layer fades in OVER the page first (opacity only, compositor); the page behind is switched off
+       only once that layer is opaque, so there is no hard black cut and no big restyle in the click frame */
+    clearTimeout(window._pcOnT);
+    window._pcOnT = setTimeout(function(){
+      if (pcModalScrim && pcModalScrim.classList.contains('open')) document.documentElement.classList.add('pc-modal-on');
+    }, 280);
     lockBodyScroll();
   }
 
@@ -10247,6 +10243,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
   }
   function doClosePricingCard(card){
     if (!card || !card.classList.contains('pc-open')) return;
+    clearTimeout(window._pcOnT);
     const btn = card.querySelector('.pc-toggle-btn');
     // Move the panel back to its original spot in the card markup.
     const panel = pcModalScrim ? pcModalScrim.querySelector('.pc-accordion-body') : null;
@@ -32509,7 +32506,6 @@ html.pc-modal-on,html.pc-modal-on body{background:#05060b!important}
 html.pc-modal-on body #pcModalScrim.open:not(#_a):not(#_b){background:#05060b!important;opacity:1}
 /* the panel itself: cheaper to paint */
 html.pc-modal-on body #pcModalScrim .pc-accordion-body.panel:not(#_a):not(#_b){box-shadow:0 12px 40px rgba(0,0,0,.55)!important}
-html.pc-modal-on body #pcModalScrim .pc-accordion-body *:not(#_a):not(#_b){text-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 </style>
 
 <style id="moon-modal-exit">
@@ -32537,10 +32533,8 @@ window.moAnimClose=function(card,done){
 html body #pcModalScrim.open>.pc-accordion-body.panel:not(#_a):not(#_b):not(#_c){will-change:transform,opacity!important;backface-visibility:hidden;transform:translateZ(0);animation:moOpenPanel .28s cubic-bezier(.2,.8,.2,1) backwards!important}
 @keyframes moOpenPanel{from{opacity:0;transform:translate3d(0,22px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 html body #pcModalScrim.open:not(#_a):not(#_b){animation:none!important}
-/* nothing inside the panel animates while it opens */
-html body #pcModalScrim.pc-sq *,html body #pcModalScrim.pc-sq *::before,html body #pcModalScrim.pc-sq *::after{animation:none!important;transition:none!important}
 /* page behind: no running animations while the window is up */
-html.pc-modal-on body *:not(#pcModalScrim):not(#pcModalScrim *){animation-play-state:paused!important}
+html.pc-modal-on :is(.pc-slide,.pc-card,.pc-card-wrap,.pc-ring-spin,.pc-stars i,.mn-orb,.orb,.badge-float,.hero-cta-btn,.topbar-moon,.vb-moon,.qn-tab,.moon-glow-card){animation-play-state:paused!important}
 </style>
 
 <style id="moon-check-v3">
@@ -32587,7 +32581,7 @@ html body .cm-chk-go:not(#_a):not(#_b){border-radius:14px!important;background:l
 <style id="moon-modal-exit2">html body #pcModalScrim.mo-exit,html body #pcModalScrim.mo-exit>.pc-accordion-body{display:none!important;animation:none!important}</style>
 <script id="moon-modal-exit2-js">
 /* closing the order window is instant: window and dark backdrop vanish in the same frame */
-window.moAnimClose=function(card,done){ document.documentElement.classList.remove('pc-modal-on'); done(); };
+window.moAnimClose=function(card,done){ clearTimeout(window._pcOnT); document.documentElement.classList.remove('pc-modal-on'); done(); };
 </script>
 <style id="moon-hover-glow">
 html body .opt-buy,html body .discord-btn,html body .hero-cta-btn,html body .cm-chk-go,html body .cm-ttg-a,html body #optView button,html body .pc-nav{transition:filter .22s ease,box-shadow .22s ease,transform .22s ease}
@@ -32609,6 +32603,12 @@ html body #pcModalScrim .pc-modal-close:not(#_a):not(#_b){box-shadow:none!import
 html body #pcModalScrim,html body #pcModalScrim.open,html body #pcModalScrim.open:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){background:#05060b!important;background-image:none!important;box-shadow:none!important;filter:none!important}
 html body #pcModalScrim::before,html body #pcModalScrim::after,html body #pcModalScrim>.pc-cine-glint,html body #pcModalScrim .pc-fx{display:none!important}
 html body #pcModalScrim .pc-accordion-body.panel::before,html body #pcModalScrim .pc-accordion-body.panel::after{box-shadow:none!important;filter:none!important}
+</style>
+
+<style id="moon-open-smooth">
+/* order window opening: the dark layer fades in over the page (opacity only), no hard black cut */
+html body #pcModalScrim.open:not(#_a):not(#_b):not(#_c):not(#_d){animation:moScrimIn .2s ease-out backwards!important}
+@keyframes moScrimIn{from{opacity:0}to{opacity:1}}
 </style>
 
 <style id="moon-card-m-fix">
