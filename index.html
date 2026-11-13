@@ -32837,12 +32837,14 @@ html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active):not(#_a
 (function(){
   var track=null,slides=[],raf=0,cx=[],half=0,sw=0;
   function measure(){
-    if(!track)return; slides=[].slice.call(track.querySelectorAll('.pc-slide'));
+    if(!track||!track.clientWidth)return false; /* page hidden (other view open): keep the last good numbers */
+    slides=[].slice.call(track.querySelectorAll('.pc-slide'));
     cx=slides.map(function(s){return s.offsetLeft+s.offsetWidth/2}); half=track.clientWidth/2;
-    sw=slides.length?slides[0].offsetWidth+18:300;
+    sw=slides.length?slides[0].offsetWidth+18:300; return true;
   }
+  function resync(){ if(measure()){paint();tick();} }
   function paint(){
-    raf=0; if(!track)return; var c=track.scrollLeft+half;
+    raf=0; if(!track||!cx.length)return; var c=track.scrollLeft+half;
     for(var i=0;i<slides.length;i++){
       var d=Math.min(1,Math.abs(cx[i]-c)/sw);
       slides[i].style.setProperty('--d',d<.004?'0':d.toFixed(3));slides[i].classList.toggle('mcp-on',d>=.004);
@@ -32875,12 +32877,12 @@ html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active):not(#_a
   function init(n){
     track=document.querySelector('.pc-scroll-track');
     if(!track){ if(n<80)setTimeout(function(){init(n+1)},100); return; }
-    measure(); paint();
+    resync();
     track.addEventListener('scroll',tick,{passive:true});
-    window.addEventListener('resize',function(){measure();tick()});
-    if('ResizeObserver' in window)new ResizeObserver(function(){measure();tick()}).observe(track);
-    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){measure();tick()});
-    window.addEventListener('load',function(){measure();tick();setTimeout(function(){measure();tick()},600)});
+    window.addEventListener('resize',resync);
+    if('ResizeObserver' in window)new ResizeObserver(resync).observe(track);
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(resync);
+    window.addEventListener('load',function(){resync();setTimeout(resync,600)});
     bindDrag();
   }
   init(0);
@@ -32957,5 +32959,30 @@ html body #communityView .cm-online:not(#_a):not(#_b){gap:0!important}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script>
+<style id="moon-fix-home-size-and-order-modal">
+/* 1) home after returning from "Method": cards never grow / shrink again (no scale, tilt or size transition on slides / card wrappers) */
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e),
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track > .pc-slide.pc-slide--active:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){
+  transform:none!important;scale:none!important;rotate:none!important;translate:none!important;
+  transition:opacity .25s ease!important}
+html body .pricing-cards .pc-scroll-track > .pc-slide > .pc-card-wrap:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){
+  transform:none!important;scale:none!important;rotate:none!important;transition:none!important}
+html body .order-btn:not(#_a):not(#_b):not(#_c):not(#_d){transition:opacity .15s ease,box-shadow .15s ease!important}
+@media (hover:hover) and (pointer:fine){html body .order-btn:not(#_a):not(#_b):not(#_c):not(#_d):hover{transform:none!important}}
+
+/* 2) order / edit-order window: smaller (about 1.05x on screen instead of 1.35x) and always inside the screen height */
+@media (min-width:901px){
+  html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){
+    zoom:.9130!important;max-height:calc((100dvh - 24px) / 1.05)!important}
+  html body .pc-modal-scrim .pc-modal-scroll:not(#_a):not(#_b):not(#_c):not(#_d){
+    max-height:calc((100dvh - 100px) / 1.05)!important;overflow-y:auto!important}
+}
+@media (min-width:901px) and ((max-width:1500px) or (max-height:820px)){
+  html body .pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){
+    zoom:1.1667!important;max-height:calc((100dvh - 24px) / 1.05)!important}
+  html body .pc-modal-scrim .pc-modal-scroll:not(#_a):not(#_b):not(#_c):not(#_d){
+    max-height:calc((100dvh - 100px) / 1.05)!important}
+}
+</style>
 </body>
 </html>
