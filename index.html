@@ -18871,6 +18871,54 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       });
     }
 
+
+    // ---- FPS fallback by PLAYBACK. When the byte-level probe can't read the file (CDN without CORS / Range,
+    // dropped connection, odd box layout) the quality row used to say "?fps". A muted off-screen <video> has no CORS
+    // restriction, so we play it for a moment and read real frame timestamps instead. ----
+    function ttdlProbeFpsPlayback(url){
+      return new Promise((resolve) => {
+        if (!url) { resolve(null); return; }
+        const v = document.createElement('video');
+        v.muted = true; v.defaultMuted = true; v.playsInline = true; v.preload = 'auto';
+        v.setAttribute('playsinline',''); v.setAttribute('muted','');
+        v.style.cssText = 'position:fixed;left:-9999px;bottom:0;width:2px;height:2px;opacity:0.01;pointer-events:none;';
+        if (typeof v.requestVideoFrameCallback !== 'function') { resolve(null); return; }
+        let settled = false, timer = null;
+        const times = [];
+        const done = (fps) => {
+          if (settled) return; settled = true;
+          clearTimeout(timer);
+          try { v.pause(); } catch (e) {}
+          try { v.removeAttribute('src'); v.load(); } catch (e) {}
+          try { v.remove(); } catch (e) {}
+          resolve(fps);
+        };
+        const compute = () => {
+          if (times.length < 8) { done(null); return; }
+          const deltas = [];
+          for (let i = 1; i < times.length; i++) { const d = times[i] - times[i-1]; if (d > 0) deltas.push(d); }
+          if (deltas.length < 6) { done(null); return; }
+          deltas.sort((a, b) => a - b);
+          const raw = 1 / deltas[Math.floor(deltas.length * 0.2)];
+          let best = null, bd = Infinity;
+          [24, 25, 30, 48, 50, 60, 72, 90, 100, 120].forEach(r => { const df = Math.abs(r - raw); if (df < bd) { bd = df; best = r; } });
+          done(bd <= 4 ? best : null);
+        };
+        const onFrame = (now, md) => {
+          if (settled) return;
+          if (md.mediaTime >= 0.2) times.push(md.mediaTime);
+          if (times.length >= 16) compute(); else v.requestVideoFrameCallback(onFrame);
+        };
+        timer = setTimeout(compute, ttdlIsIOS() ? 14000 : 10000);
+        v.onerror = () => done(null);
+        document.body.appendChild(v);
+        v.src = url;
+        const pl = v.play();
+        v.requestVideoFrameCallback(onFrame);
+        if (pl && pl.catch) pl.catch(() => done(null));
+      });
+    }
+
     // ---- FPS: browsers have no direct API for this (unlike width/height
     // via <video>), so we read just the first few MB of the actual file
     // and parse the MP4 container ourselves to find the real frame rate
@@ -19477,6 +19525,10 @@ TikTok პროფილი: ${getTiktokValue('mp')}
               info.width = info.width || dims.width;
               info.height = info.height || dims.height;
               info.durationSec = info.durationSec || dims.durationSec;
+            }
+            // byte probe couldn't read the frame rate -> measure it by playing the tier for a moment
+            if (info.fps == null) {
+              try { const pf = await ttdlProbeFpsPlayback(u); if (pf != null) info.fps = pf; } catch (e) {}
             }
             return info;
           })).then(async (metas) => {
