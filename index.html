@@ -32984,5 +32984,180 @@ html body .order-btn:not(#_a):not(#_b):not(#_c):not(#_d){transition:opacity .15s
     max-height:calc((100dvh - 100px) / 1.05)!important}
 }
 </style>
+<style id="moon-fix-gate-flash">
+/* login gate: the white/blue "scan light" that flashed over the buttons once on open (then vanished) is gone; the gate just fades in */
+html body .discord-gate.open .discord-btn.primary:not(#_a):not(#_b):not(#_c)::before,
+html body .discord-gate.open .discord-btn.outline:not(#_a):not(#_b):not(#_c)::after{animation:none!important;opacity:0!important}
+html body .discord-gate .discord-btn.primary:not(#_a):not(#_b):not(#_c):not(:hover)::before{opacity:0!important;transition:none!important}
+</style>
+<style id="moon-login-tiles">
+/* ===== Login: glass box with 2 x 2 icon tiles (reference: "Social Media Icons") ===== */
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-main{max-width:min(100%,660px)!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:none!important;
+  grid-auto-rows:auto;gap:clamp(10px,2.2vw,16px)!important;align-content:center;align-items:stretch;justify-items:stretch;
+  width:min(100%,620px)!important;max-width:620px!important;min-height:0!important;box-sizing:border-box;
+  padding:clamp(18px,3.6vw,30px) clamp(14px,3.4vw,28px)!important;border-radius:clamp(24px,5vw,34px)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02)),rgba(9,12,22,.82)!important;
+  border:1px solid rgba(255,255,255,.11)!important;
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08)!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > *{grid-row:auto!important;grid-column:auto;margin-top:0!important;margin-bottom:0!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > .discord-gate-title,html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > .discord-gate-sub,html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > .discord-gate-skip,html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > .discord-gate-close{
+  grid-column:1/-1!important;justify-self:center;text-align:center;max-width:100%}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > .discord-gate-title{margin-bottom:2px!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > .discord-gate-sub{margin-bottom:clamp(4px,1.2vw,10px)!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card > .discord-gate-skip{margin-top:clamp(2px,1vw,8px)!important}
+
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){
+  position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:clamp(8px,1.6vw,12px)!important;column-gap:0!important;grid-template-columns:none!important;
+  box-sizing:border-box!important;width:100%!important;max-width:none!important;margin:0!important;
+  height:auto!important;min-height:clamp(116px,21vw,156px)!important;
+  padding:clamp(14px,2.6vw,20px) clamp(8px,1.8vw,14px)!important;
+  border-radius:clamp(20px,4.2vw,28px)!important;
+  background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:none!important;filter:none!important;
+  color:#aab3cb!important;text-decoration:none!important;text-align:center!important;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;overflow:hidden!important;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),background .3s ease,border-color .3s ease,box-shadow .35s ease,color .25s ease!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::before,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::before,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::before,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::before,html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::after,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::after,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::after,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::after{display:none!important;animation:none!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg{
+  position:static!important;transform:none!important;left:auto!important;top:auto!important;right:auto!important;
+  width:clamp(32px,6.4vw,46px)!important;height:clamp(32px,6.4vw,46px)!important;flex:0 0 auto;
+  padding:0!important;margin:0!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  fill:currentColor!important;color:inherit!important;transition:transform .35s cubic-bezier(.2,.8,.2,1)!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span{
+  display:block!important;position:static!important;max-width:100%!important;margin:0!important;padding:0!important;
+  font-size:clamp(12px,3.2vw,14.5px)!important;font-weight:700!important;line-height:1.28!important;letter-spacing:.01em!important;
+  text-align:center!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+  overflow-wrap:anywhere;color:inherit!important;-webkit-text-fill-color:currentColor!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a).tg-msg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a).tg-msg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a).tg-msg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a).tg-msg{min-height:clamp(116px,21vw,156px)!important;padding-top:clamp(14px,2.6vw,20px)!important;padding-bottom:clamp(14px,2.6vw,20px)!important;line-height:1.28!important}
+
+/* brand colours */
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){--c:#5865f2}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){--c:#fe2c55}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){--c:#29a9eb}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){--c:#2fd69a}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)::after{display:grid!important;place-items:center;position:absolute!important;top:10px;right:10px;width:22px;height:22px;
+  border-radius:50%;content:"+";font:800 15px/1 system-ui,sans-serif;color:#06150f;background:var(--c)!important}
+
+/* hover / keyboard focus: the tile fills with its brand colour, tilts and glows */
+@media (hover:hover) and (pointer:fine){
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover{
+  color:#fff!important;transform:rotate(-3deg) scale(1.07)!important;z-index:2;
+  border-color:color-mix(in srgb,var(--c) 85%,#fff 0%)!important;
+  background:radial-gradient(120% 100% at 50% 20%,color-mix(in srgb,var(--c) 62%,transparent),color-mix(in srgb,var(--c) 18%,transparent) 70%),rgba(8,10,18,.55)!important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,transparent),0 14px 34px -8px color-mix(in srgb,var(--c) 75%,transparent),inset 0 0 34px color-mix(in srgb,var(--c) 40%,transparent)!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover > svg{transform:scale(1.08)!important}
+}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):focus-visible,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):focus-visible,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):focus-visible,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):focus-visible{
+  color:#fff!important;outline:2px solid var(--c)!important;outline-offset:3px;
+  background:radial-gradient(120% 100% at 50% 20%,color-mix(in srgb,var(--c) 55%,transparent),color-mix(in srgb,var(--c) 16%,transparent) 70%),rgba(8,10,18,.55)!important}
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):active,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):active,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):active,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):active{transform:scale(.965)!important;transition-duration:.12s!important}
+/* touch screens have no hover: tiles carry a soft brand tint from the start */
+@media (hover:none),(pointer:coarse){
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){color:#fff!important;border-color:color-mix(in srgb,var(--c) 50%,transparent)!important;
+  background:radial-gradient(120% 100% at 50% 15%,color-mix(in srgb,var(--c) 34%,transparent),color-mix(in srgb,var(--c) 8%,transparent) 72%),rgba(255,255,255,.03)!important;
+  box-shadow:inset 0 0 26px color-mix(in srgb,var(--c) 16%,transparent)!important}
+}
+
+/* guild mode: only the "join server" tile is visible, full width */
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a)[data-mode="guild"] #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){grid-column:1/-1!important;min-height:clamp(100px,18vw,128px)!important}
+
+/* sizes for every screen */
+@media (min-width:1100px){
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){min-height:164px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg{width:50px!important;height:50px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span{font-size:15.5px!important}
+}
+@media (max-width:380px){
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card{padding:16px 10px!important;gap:8px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){min-height:108px!important;padding:12px 6px!important;border-radius:18px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span{font-size:11.5px!important}
+}
+@media (max-height:700px){
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){min-height:92px!important;gap:6px!important;padding-top:10px!important;padding-bottom:10px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg{width:28px!important;height:28px!important}
+}
+@media (max-height:520px) and (orientation:landscape){
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) .dg-card{width:min(100%,560px)!important;padding:12px 14px!important;gap:8px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){min-height:74px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > svg{width:24px!important;height:24px!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a) > span{font-size:11.5px!important}
+}
+@media (prefers-reduced-motion:reduce){
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover,
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):hover{transform:none!important}
+  html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tiktokLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #tgLoginBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a),
+html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not([data-mode="banned"]) #discordJoinBtn.discord-btn:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a){transition:none!important}
+}
+</style>
 </body>
 </html>
