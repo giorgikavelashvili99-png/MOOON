@@ -7109,10 +7109,18 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
   // of this ~500KB document has even finished parsing.
   function earlyIsBlocked(user){
     if (!user || !user.id) return Promise.resolve(false);
-    return earlyMdbRead('blockedDiscordUsers').then(function(data){
+    var p = (window.__moonEarlyBlocked || earlyMdbRead('blockedDiscordUsers')).then(function(data){
       var list = (data && Array.isArray(data.list)) ? data.list : [];
       return list.some(function(b){ return String(b.id) === String(user.id); });
     });
+    /* FIX: never keep the login screen up more than 2.5s waiting for the ban list; a late 'blocked' answer still switches to the ban screen */
+    p.then(function(b){
+      if (!b) return;
+      var g = document.getElementById('discordGate');
+      if (g){ g.setAttribute('data-mode', 'banned'); g.classList.add('open'); }
+      try{ localStorage.removeItem(CACHE_KEY); }catch(e){}
+    });
+    return Promise.race([p, new Promise(function(res){ setTimeout(function(){ res(false); }, 2500); })]);
   }
 
   function openLoginGate(){
@@ -7147,6 +7155,9 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
       // early as this fetch allows, rather than waiting for the rest of
       // this large page to finish parsing.
       openLoginGate();
+      /* FIX: start the ban/kick list reads NOW, in parallel with the token exchange (they used to start only after it finished) */
+      window.__moonEarlyBlocked = earlyMdbRead('blockedDiscordUsers');
+      window.__moonEarlyKick = earlyMdbRead('discordForceLogout');
       window.__moonEarlyExchange = fetch(WORKER_URL + '/exchange', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -18069,10 +18080,13 @@ TikTok პროფილი: ${getTiktokValue('mp')}
   async function resolveDiscordAuthState(user){
     if (!user){ setDiscordUI(null); return; }
     try{
-      const [blockedData, kickData] = await Promise.all([
-        mdbRead('blockedDiscordUsers'),
-        mdbRead('discordForceLogout')
-      ]);
+      const __bp = window.__moonEarlyBlocked || mdbRead('blockedDiscordUsers');
+      const __kp = window.__moonEarlyKick || mdbRead('discordForceLogout');
+      window.__moonEarlyBlocked = null; window.__moonEarlyKick = null;
+      const __to = () => new Promise(r => setTimeout(() => r(null), 3000));
+      /* FIX: do not hold the login for more than 3s on a slow database; a late 'blocked' answer still shows the ban screen */
+      __bp.then(d => { const l = (d && Array.isArray(d.list)) ? d.list : []; if (l.some(b => String(b.id) === String(user.id))) showBannedGate(); });
+      const [blockedData, kickData] = await Promise.all([ Promise.race([__bp, __to()]), Promise.race([__kp, __to()]) ]);
       const blockedList = (blockedData && Array.isArray(blockedData.list)) ? blockedData.list : [];
       if (blockedList.some(b => String(b.id) === String(user.id))){
         showBannedGate();
@@ -33207,5 +33221,44 @@ html body #pcModalScrim.pc-modal-scrim.open:not(#_a):not(#_b):not(#_c):not(#_d):
 /* background glows: fixed position, no drift -> identical on every load / screenshot */
 html body .orb:not(#_a):not(#_a):not(#_a):not(#_a),html body .orb.o1:not(#_a):not(#_a):not(#_a):not(#_a),html body .orb.o2:not(#_a):not(#_a):not(#_a):not(#_a),html body .orb.o3:not(#_a):not(#_a):not(#_a):not(#_a){animation:none!important;transform:none!important;translate:none!important}
 </style>
+
+<script id="moon-no-outer-shadows">
+/* removes every OUTER glow/shadow site-wide (box-shadow without "inset", and filter: drop-shadow). Inset highlights stay. Works on the stylesheets themselves, so hover/active states and later-added elements are covered too. */
+(function(){
+  function split(v){var out=[],d=0,cur='';for(var i=0;i<v.length;i++){var c=v[i];if(c==='(')d++;else if(c===')')d--;if(c===','&&d===0){out.push(cur);cur='';}else cur+=c;}if(cur.trim())out.push(cur);return out;}
+  function fixBox(v){if(!v||v==='none'||v.indexOf('var(')>-1&&v.indexOf('inset')<0&&false)return null;var parts=split(v),keep=parts.filter(function(p){return /(^|\s)inset(\s|$)/.test(p);});if(keep.length===parts.length)return null;return keep.length?keep.join(','):'none';}
+  function fixFilter(v){if(!v||v.indexOf('drop-shadow')<0)return null;var r=v.replace(/drop-shadow\((?:[^()]|\([^()]*\))*\)/g,'').replace(/\s+/g,' ').trim();return r||'none';}
+  function style(st){
+    try{
+      var b=st.getPropertyValue('box-shadow'),nb=fixBox(b);
+      if(nb!==null)st.setProperty('box-shadow',nb,st.getPropertyPriority('box-shadow'));
+      ['filter','-webkit-filter','backdrop-filter'].forEach(function(p){
+        var f=st.getPropertyValue(p),nf=fixFilter(f);
+        if(nf!==null)st.setProperty(p,nf,st.getPropertyPriority(p));
+      });
+    }catch(e){}
+  }
+  function walk(rules){
+    for(var i=0;i<rules.length;i++){
+      var r=rules[i];
+      if(r.style)style(r.style);
+      if(r.cssRules&&r.cssRules.length)walk(r.cssRules);
+    }
+  }
+  var done=new WeakSet();
+  function run(){
+    for(var i=0;i<document.styleSheets.length;i++){
+      var sh=document.styleSheets[i];
+      if(done.has(sh))continue;
+      var rules;try{rules=sh.cssRules;}catch(e){continue;}
+      done.add(sh);walk(rules);
+    }
+  }
+  run();
+  document.addEventListener('DOMContentLoaded',run);
+  window.addEventListener('load',run);
+  try{new MutationObserver(function(m){for(var i=0;i<m.length;i++)for(var j=0;j<m[i].addedNodes.length;j++){var n=m[i].addedNodes[j];if(n.tagName==='STYLE'||n.tagName==='LINK'){setTimeout(run,0);return;}}}).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
+})();
+</script>
 </body>
 </html>
