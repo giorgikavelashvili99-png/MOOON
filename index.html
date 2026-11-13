@@ -6872,6 +6872,20 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
 @media(min-width:99999px){#moonIntro .mx-sc,#moonIntro .mx-ci,#moonIntro .mx-fs{animation:none;opacity:1}}
 </style>
 <style id="moon-menu-pages">.site-menu .qn-tab--go::after{content:"›";font-size:20px}</style>
+
+<style id="modal-gutter-fix">
+/* 1) the strip on the right: scrollbar-gutter:stable keeps a gutter that a fixed scrim cannot cover.
+      While the order modal is open the gutter is painted with the scrim colour, so everything is dark. */
+html{ transition:background-color .2s ease; }
+html:has(.pc-modal-scrim.open),
+html:has(.pc-modal-scrim.pc-cine-exit){
+  background-color:#04050a !important;
+}
+/* 2) less work while the modal opens: the blurred background orbs are hidden once the panel has landed */
+html.pc-modal-on .bg-layer{ visibility:hidden; }
+/* 3) the panel animates on the GPU only */
+.pc-modal-scrim.open > .pc-accordion-body.panel{ will-change:transform,opacity; backface-visibility:hidden; }
+</style>
 </head>
 <body>
 
@@ -10227,7 +10241,7 @@ html.mi-lock body>*:not(#moonIntro){visibility:hidden!important}
     clearTimeout(window._pcOnT);
     window._pcOnT = setTimeout(function(){
       if (pcModalScrim && pcModalScrim.classList.contains('open')) document.documentElement.classList.add('pc-modal-on');
-    }, 280);
+    }, 460);
     lockBodyScroll();
   }
 
