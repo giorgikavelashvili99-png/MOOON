@@ -10239,9 +10239,11 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
     /* the dark layer fades in OVER the page first (opacity only, compositor); the page behind is switched off
        only once that layer is opaque, so there is no hard black cut and no big restyle in the click frame */
     clearTimeout(window._pcOnT);
-    /* FIX: switch the page behind off in the SAME frame as the open (scrim is opaque instantly),
-       so the big restyle happens once before the animation starts instead of mid-animation at 460ms (lag + flash) */
-    if (pcModalScrim && pcModalScrim.classList.contains('open')) document.documentElement.classList.add('pc-modal-on');
+        /* scrim is opaque + panel fade is 160ms: do the heavy page-wide restyle only AFTER the fade, so nothing moves while it runs */
+    clearTimeout(window._pcOnT);
+    window._pcOnT = setTimeout(function(){
+      if (pcModalScrim && pcModalScrim.classList.contains('open')) document.documentElement.classList.add('pc-modal-on');
+    }, 260);
     lockBodyScroll();
   }
 
@@ -33183,12 +33185,10 @@ html body #discordGate:not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not(#_a):not
 
 <style id="moon-fix-login-hover-and-modal-open">
 @layer moonLoginTiles{
-/* LOGIN: tiles had backdrop-filter(blur+saturate 200%) -> hovered tile's glow got sampled/brightened by neighbours (lit band on the two lower tiles) */
-html body #discordGate:not([data-mode="banned"]):not(#_z) :is(#discordLoginBtn,#tiktokLoginBtn,#tgLoginBtn,#discordJoinBtn).discord-btn:not(#_z):not(#_y){
-  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;will-change:auto!important;z-index:1!important;contain:paint!important}
+/* LOGIN: no backdrop-filter on tiles (neighbours sampled + brightened the hovered tile's glow); hovered tile on top, glow kept inside */
+html body #discordGate:not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not([data-mode="banned"]) :is(#discordLoginBtn,#tiktokLoginBtn,#tgLoginBtn,#discordJoinBtn).discord-btn:not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;will-change:auto!important;z-index:1!important}
 @media (hover:hover) and (pointer:fine){
-html body #discordGate:not([data-mode="banned"]):not(#_z) :is(#discordLoginBtn,#tiktokLoginBtn,#tgLoginBtn,#discordJoinBtn).discord-btn:hover:not(#_z):not(#_y){
-  z-index:5!important;transform:rotate(-2deg) scale(1.04)!important;
+html body #discordGate:not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not([data-mode="banned"]) :is(#discordLoginBtn,#tiktokLoginBtn,#tgLoginBtn,#discordJoinBtn).discord-btn:not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):not(#_z):hover{z-index:5!important;transform:rotate(-2deg) scale(1.04)!important;
   background:radial-gradient(120% 100% at 50% 20%,color-mix(in srgb,var(--c) 55%,transparent),color-mix(in srgb,var(--c) 14%,transparent) 70%),#090c16!important;
   box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,transparent),inset 0 0 30px color-mix(in srgb,var(--c) 38%,transparent)!important}
 }
@@ -33197,7 +33197,15 @@ html body #discordGate:not([data-mode="banned"]):not(#_z) :is(#discordLoginBtn,#
 html body #pcModalScrim.open:not(#_a):not(#_b):not(#_c){animation:none!important;opacity:1!important}
 html body #pcModalScrim.open>.pc-accordion-body.panel:not(#_a):not(#_b):not(#_c){animation:moOpenFade .16s ease-out backwards!important;transform:none!important;backface-visibility:visible!important;will-change:opacity!important}
 html.pc-modal-on body #pcModalScrim .pc-accordion-body:not(#_a):not(#_b):not(#_c):not(#_d){will-change:opacity!important}
+/* BIG BLACK HALO + lag: panel had box-shadow 0 40px 90px (huge blur repainted on every change) and the scrim a full-screen backdrop blur */
+html body #pcModalScrim.pc-modal-scrim > .pc-accordion-body.panel:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g){box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important}
+html body #pcModalScrim.pc-modal-scrim.open:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g){-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#05060b!important}
 @keyframes moOpenFade{from{opacity:0}to{opacity:1}}
+</style>
+
+<style id="moon-fix-static-orbs">
+/* background glows: fixed position, no drift -> identical on every load / screenshot */
+html body .orb:not(#_a):not(#_a):not(#_a):not(#_a),html body .orb.o1:not(#_a):not(#_a):not(#_a):not(#_a),html body .orb.o2:not(#_a):not(#_a):not(#_a):not(#_a),html body .orb.o3:not(#_a):not(#_a):not(#_a):not(#_a){animation:none!important;transform:none!important;translate:none!important}
 </style>
 </body>
 </html>
