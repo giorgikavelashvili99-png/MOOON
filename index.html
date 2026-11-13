@@ -2,7 +2,7 @@
 <html lang="ka">
 <head><script id="moon-fontgate">(function(){var d=document,r=d.documentElement,done=false;
 function ok(){if(done)return;done=true;window.__moonFontsOk=true;r.classList.add('moon-fonts-ok');try{window.dispatchEvent(new Event('moonfontsok'))}catch(e){}}
-function go(){try{var t='Abc 0123456789 ₾€•აბგ';var L=[];['400','500','600','700'].forEach(function(w){L.push(d.fonts.load(w+' 16px BPGAcademiuriU',t));L.push(d.fonts.load(w+' 16px "Space Grotesk"',t))});['400','500','700','800'].forEach(function(w){L.push(d.fonts.load(w+' 16px "JetBrains Mono"',t))});
+function go(){try{var t='Abc 0123456789 ₾€•აბგ';var L=[];['400','500','600','700'].forEach(function(w){L.push(d.fonts.load(w+' 16px BPGAcademiuriU',t));L.push(d.fonts.load(w+' 16px "Space Grotesk"',t))});['400','500','700','800'].forEach(function(w){L.push(d.fonts.load(w+' 16px "JetBrains Mono"',t))});['MoonLat','MoonLatKa','MoonMetro'].forEach(function(f){['400','500','600','700','800','900'].forEach(function(w){L.push(d.fonts.load(w+' 16px '+f,'Aa0123456789 ₾%•'))})});
 Promise.all(L.map(function(p){return p.catch(function(){})})).then(function(){return d.fonts.ready}).then(ok,ok)}catch(e){ok()}}
 if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',go);else go();
 setTimeout(function(){if(d.readyState!=='loading')ok()},1500);setTimeout(ok,7000)})();</script>
@@ -32795,5 +32795,80 @@ html body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not
 html.low-power body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not(#_h):not(#_i):not(#_j):not(#_k):not(#_l):not(#_m):not(#_n):not([data-mode="banned"]) .discord-btn{-webkit-backdrop-filter:none!important; backdrop-filter:none!important; background-color:rgba(var(--g,96,108,255),.58)!important}
 html.low-power body #discordGate:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not(#_h):not(#_i):not(#_j):not(#_k):not(#_l):not(#_m):not(#_n):not([data-mode="banned"]) .discord-gate-skip{-webkit-backdrop-filter:none!important; backdrop-filter:none!important}
 </style>
+
+<style id="moon-carousel-pro">
+/* ===== Packages carousel: one native snap scroller, continuous (scroll-linked) depth, nothing toggled mid-swipe ===== */
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track:not(#_a):not(#_b):not(#_c){
+  contain:none!important; overflow-x:auto!important; overflow-y:hidden!important;
+  scroll-snap-type:x mandatory!important; scroll-behavior:auto!important; overscroll-behavior-x:contain!important;
+  touch-action:pan-x pan-y!important; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  padding-top:18px!important; padding-bottom:30px!important; cursor:grab;
+}
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track.mcp-drag:not(#_a):not(#_b){scroll-snap-type:none!important; cursor:grabbing; user-select:none}
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(#_a):not(#_b):not(#_c){
+  --d:0; filter:none!important; transition:none!important; contain:none!important; perspective:none!important;
+  backface-visibility:visible!important; scroll-snap-align:center!important; scroll-snap-stop:normal!important;
+  transform:translate3d(0,0,0) scale(calc(1 - .075*var(--d)))!important;
+  opacity:calc(1 - .5*var(--d))!important; will-change:transform,opacity!important; transform-origin:50% 55%;
+}
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(#_a):not(#_b):not(#_c)::after{display:none!important}
+html body .pricing-cards.pc-scroll-mode .pc-slide > .pc-card-wrap:not(#_a):not(#_b):not(#_c){transform:none!important;rotate:none!important;scale:none!important;will-change:auto!important}
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active) :is(.pc-ring-spin,.pc-stars i,.pc-cine-glint){animation-play-state:paused!important}
+html body .pricing-cards.pc-scroll-mode .pc-slide:not(.pc-slide--active):not(#_a){pointer-events:auto}
+@media (prefers-reduced-motion:reduce){html body .pricing-cards.pc-scroll-mode .pc-slide:not(#_a):not(#_b):not(#_c){transform:none!important}}
+</style>
+<script id="moon-carousel-pro-js">
+(function(){
+  var track=null,slides=[],raf=0,cx=[],half=0,sw=0;
+  function measure(){
+    if(!track)return; slides=[].slice.call(track.querySelectorAll('.pc-slide'));
+    cx=slides.map(function(s){return s.offsetLeft+s.offsetWidth/2}); half=track.clientWidth/2;
+    sw=slides.length?slides[0].offsetWidth+18:300;
+  }
+  function paint(){
+    raf=0; if(!track)return; var c=track.scrollLeft+half;
+    for(var i=0;i<slides.length;i++){
+      var d=Math.min(1,Math.abs(cx[i]-c)/sw);
+      slides[i].style.setProperty('--d',d<.004?'0':d.toFixed(3));
+    }
+  }
+  function tick(){ if(!raf) raf=requestAnimationFrame(paint); }
+  function bindDrag(){
+    var down=false,x0=0,l0=0,moved=0;
+    track.addEventListener('pointerdown',function(e){
+      if(e.pointerType!=='mouse'||e.button!==0||e.target.closest('button,a,input,textarea'))return;
+      down=true;moved=0;x0=e.clientX;l0=track.scrollLeft;
+    });
+    window.addEventListener('pointermove',function(e){
+      if(!down)return; var dx=e.clientX-x0; moved=Math.max(moved,Math.abs(dx));
+      if(moved>4)track.classList.add('mcp-drag'); track.scrollLeft=l0-dx;
+    });
+    function up(){
+      if(!down)return; down=false;
+      if(track.classList.contains('mcp-drag')){
+        var c=track.scrollLeft+half,best=0,bd=1e9;
+        for(var i=0;i<cx.length;i++){var k=Math.abs(cx[i]-c);if(k<bd){bd=k;best=i}}
+        track.classList.remove('mcp-drag');
+        track.scrollTo({left:cx[best]-half,behavior:'smooth'});
+      }
+    }
+    window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+    track.addEventListener('click',function(e){if(moved>6){e.preventDefault();e.stopPropagation();moved=0}},true);
+    track.addEventListener('dragstart',function(e){e.preventDefault()});
+  }
+  function init(n){
+    track=document.querySelector('.pc-scroll-track');
+    if(!track){ if(n<80)setTimeout(function(){init(n+1)},100); return; }
+    measure(); paint();
+    track.addEventListener('scroll',tick,{passive:true});
+    window.addEventListener('resize',function(){measure();tick()});
+    if('ResizeObserver' in window)new ResizeObserver(function(){measure();tick()}).observe(track);
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){measure();tick()});
+    window.addEventListener('load',function(){measure();tick();setTimeout(function(){measure();tick()},600)});
+    bindDrag();
+  }
+  init(0);
+})();
+</script>
 </body>
 </html>
