@@ -33038,7 +33038,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   var el={};
   ['Drop','Input','File','Thumb','Dur','Nm','Chips','X','Msg','Set','Rf','RfV','Br','Qrf','Qbr','Act','Go','GoT','Prog','Pc','PT','PS','BarI','El','Eta','Fps','Cancel','Stay','Res','ResSub','Save','Sz0','Sz1','C1','Big','Retry','Dl','Link','LinkT','Again','Lnk','LnkA','Cp','Toast'].forEach(function(k){ el[k]=$('hb'+k); });
   var S={state:'idle',file:null,info:null,meta:null,probing:false,token:0,opt:{res:'auto',mode:'rf',rf:14,br:20000,pre:'fast'},out:null,up:null,lock:null,t0:0,fps:0};
-  var SHOW={idle:['hbDrop'],ready:['hbFile'],busy:['hbFile','hbProg','hbStay'],done:['hbFile','hbRes']};
+  var SHOW={idle:['hbDrop'],ready:['hbFile','hbAct'],busy:['hbFile','hbProg','hbStay'],done:['hbFile','hbRes']};
   var ALL=['hbDrop','hbFile','hbSet','hbAct','hbProg','hbStay','hbRes'];
 
   function apply(){ root.querySelectorAll('[data-hb]').forEach(function(n){ var v=t(n.getAttribute('data-hb')); if(v&&n.textContent!==v) n.textContent=v; }); el.X.setAttribute('aria-label',t('change')); el.X.setAttribute('title',t('change')); el.Retry.textContent=t('retry'); }
@@ -33144,11 +33144,20 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     ff.on('log',onLog);
     return ff.exec(['-hide_banner','-i',path]).catch(noop).then(function(){ try{ ff.off('log',onLog); }catch(e){} return parseProbe(logs.join('\n')); });
   }
-  function analyse(file,tk){
+  function analyse(file,tk,retry){
     S.info=null; S.probing=true; render();
+    var fin=false, wd=0;
+    /* ანალიზი თუ 25 წამში არ დასრულდა: ძრავა თავიდან იტვირთება; მეორედაც თუ ჩავარდა - შეკუმშვა მაინც იწყება */
+    function fallback(){ S.info={v:null,w:0,h:0,fps:0,dur:(S.meta&&S.meta.dur)||0,hasV:true}; S.probing=false; render(); compress(); }
+    wd=setTimeout(function(){ if(fin||tk!==S.token) return; fin=true; dropEngine(); if(!retry) analyse(file,tk,true); else fallback(); },25000);
     getEngine().then(function(ff){ if(tk!==S.token) throw new Error('stale'); return mountFile(ff,file).then(function(p){ return probe(ff,p); }); })
-    .then(function(info){ if(tk!==S.token) return; S.info=info; S.probing=false; render(); if(!info.hasV) showMsg(t('noVideo'),'err'); else compress(); })
-    .catch(function(e){ if(tk!==S.token||(e&&e.message==='stale')) return; S.probing=false; render(); });
+    .then(function(info){
+      if(fin||tk!==S.token) return; fin=true; clearTimeout(wd);
+      if(!info.hasV&&!info.dur){ fallback(); return; }   /* probe-მა არაფერი დაბეჭდა - ვცადოთ პირდაპირ */
+      S.info=info; S.probing=false; render();
+      if(!info.hasV&&!(S.meta&&S.meta.dur)) showMsg(t('noVideo'),'err'); else { if(!info.hasV) info.hasV=true; compress(); }
+    })
+    .catch(function(e){ if(fin||tk!==S.token||(e&&e.message==='stale')) return; fin=true; clearTimeout(wd); if(!retry){ dropEngine(); analyse(file,tk,true); } else fallback(); });
   }
 
   /* ---------- HandBrake "Recommended" preset → ffmpeg ---------- */
@@ -33203,7 +33212,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     .then(function(data){
       if(tk!==S.token) throw new Error('stale');
       if(!data||!data.length) throw new Error('empty output');
-      var blob=new Blob([data],{type:'video/mp4'}); ff.deleteFile('hbout.mp4').catch(noop);
+      var blob=new Blob([data],{type:'video/mp4'}); ff.deleteFile('hbout.mp4').catch(noop); setTimeout(dropEngine,0);
       var base=file.name.replace(/\.[^.]+$/,'')||'video';
       S.out={blob:blob,name:base+'_compressed.mp4',size:blob.size,url:URL.createObjectURL(blob),link:null};
       finishOK(file);
@@ -33228,7 +33237,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     if(e&&e.engine){ msg=t('engineFail')+' ['+m+']'; }
     else if(/memory|alloc|RangeError|out of bounds|Aborted|OOM/i.test(m)){ msg=t('failMem'); dropEngine(); }
     else { msg=t('fail')+' ['+m+(window.__hbLog?' · '+window.__hbLog:'')+']'; try{ console.error('HB compress failed',e,window.__hbLog); }catch(_){} }
-    setState('ready'); showMsg(msg,'err');
+    dropEngine(); setState('ready'); showMsg(msg,'err');
   }
   function cancel(){ if(S.state!=='busy') return; S.token++; dropEngine(); clearInterval(clk); releaseScreen(); setState('ready'); clearMsg(); if(S.file) analyse(S.file,S.token); }
 
