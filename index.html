@@ -32561,8 +32561,10 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
     lvl=lvl||0;
     var last=0;
     function onProg(e){ var p=Number(e&&e.progress); if(!isFinite(p)) return; p=Math.max(0,Math.min(1,p)); if(p>last){ last=p; setProg(p,false); } }
-    function off(){ try{ ff.off('progress',onProg); }catch(_){} }
+    function off(){ try{ ff.off('progress',onProg); }catch(_){} offLog(); }
     function retry(ws,l){ return ff.deleteFile('acout'+ext).catch(noop).then(function(){ return runFF(ff,path,ext,ws,l); }); }
+    var logs=[]; function onLog(e){ if(logs.length<400) logs.push(String(e&&e.message||'')); } ff.on('log',onLog);
+    function offLog(){ try{ ff.off('log',onLog); }catch(_){} window.__ffLog=logs.slice(-12).join(' | '); }
     ff.on('progress',onProg);
     return ff.exec(buildArgs(path,ext,withSubs,lvl)).then(function(code){
       off();
@@ -32592,7 +32594,7 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
       el.pT.textContent=t('pTitleRun'); el.pS.textContent=t('pSubRun'); setProg(0,false);
       return mountFile(ff,file);
     })
-    .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,ext,canSubs(file.name)); })
+    .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,ext,canSubs(file.name)).catch(function(err){ if(tk!==S.token||(err&&err.message==='stale')||E.mode!=='mount') throw err; return ff.deleteFile('acout'+ext).catch(noop).then(function(){ return unmountFile(ff); }).then(function(){ var e2=(file.name.match(/\.[A-Za-z0-9]+$/)||['.bin'])[0].toLowerCase(); return file.arrayBuffer().then(function(ab){ return ff.writeFile('acin'+e2,new Uint8Array(ab)); }).then(function(){ E.mode='mem'; E.path='acin'+e2; E.file=file; return runFF(ff,E.path,ext,canSubs(file.name)); }); }); }); })
     .then(function(){ if(tk!==S.token) throw new Error('stale'); setProg(1,false); return ff.readFile('acout'+ext); })
     .then(function(data){
       if(tk!==S.token) throw new Error('stale');
@@ -32611,7 +32613,7 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
     var m=String(e&&e.message||e), msg;
     if(e&&e.engine) msg=t('engineFail');
     else if(/memory|alloc|RangeError|out of bounds|Aborted|OOM/i.test(m)){ msg=t('failMem'); dropEngine(); }
-    else { msg=t('fail'); }
+    else { msg=t('fail')+' ['+m+(window.__ffLog?' · '+window.__ffLog:'')+']'; try{console.error('AAC convert failed',e,window.__ffLog);}catch(_){} }
     setState('ready'); showMsg(msg,'err');
   }
   function cancel(){
