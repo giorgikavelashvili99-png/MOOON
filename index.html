@@ -32501,8 +32501,22 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
   function getEngine(){
     if(E.ff) return Promise.resolve(E.ff);
     if(E.p) return E.p;
-    E.p=loadUrls().then(function(u){ var ff=new window.FFmpegWASM.FFmpeg(); return ff.load({classWorkerURL:u[0],coreURL:u[1],wasmURL:u[2]}).then(function(){ E.ff=ff; E.p=null; return ff; }); })
-      .catch(function(e){ E.p=null; try{ e.engine=true; }catch(_){} throw e; });
+    var JSD='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd/', UNP='https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/';
+    function attempt(v){
+      return loadUrls().then(function(u){
+        var c=u[1], w=u[2];
+        if(v===1){ c=JSD+'ffmpeg-core.js'; w=JSD+'ffmpeg-core.wasm'; }
+        if(v===2){ c=UNP+'ffmpeg-core.js'; w=UNP+'ffmpeg-core.wasm'; }
+        var ff=new window.FFmpegWASM.FFmpeg();
+        return ff.load({classWorkerURL:u[0],coreURL:c,wasmURL:w}).then(function(){ return ff; },function(e){
+          try{ ff.terminate(); }catch(_){}
+          if(v<2){ try{console.warn('ffmpeg load variant '+v+' failed, retrying',e);}catch(_){} return attempt(v+1); }
+          throw e;
+        });
+      });
+    }
+    E.p=attempt(0).then(function(ff){ E.ff=ff; E.p=null; return ff; })
+      .catch(function(e){ E.p=null; var x=(e instanceof Error)?e:new Error(String(e)); x.engine=true; throw x; });
     return E.p;
   }
   function dropEngine(){ try{ if(E.ff) E.ff.terminate(); }catch(e){} E.ff=null; E.file=null; E.path=null; E.mode=null; }
