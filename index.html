@@ -7862,7 +7862,8 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
     </div>
     <div class="hb-row"><div class="hb-rl"><b data-hb="rEnc"></b><small data-hb="hEnc"></small></div>
       <div class="hb-seg" data-k="pre" role="radiogroup">
-        <button type="button" role="radio" data-v="fast" aria-checked="true">Fast</button>
+        <button type="button" role="radio" data-v="ultrafast" aria-checked="true">Ultra fast</button>
+        <button type="button" role="radio" data-v="fast" aria-checked="false">Fast</button>
         <button type="button" role="radio" data-v="medium" aria-checked="false">Medium</button>
         <button type="button" role="radio" data-v="slow" aria-checked="false">Slow</button>
         <button type="button" role="radio" data-v="veryslow" aria-checked="false">Very slow</button>
@@ -33015,7 +33016,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
 
   var el={};
   ['Drop','Input','File','Thumb','Dur','Nm','Chips','X','Msg','Set','Rf','RfV','Br','Qrf','Qbr','Act','Go','GoT','Prog','Pc','PT','PS','BarI','El','Eta','Fps','Cancel','Stay','Res','ResSub','Save','Sz0','Sz1','C1','Big','Retry','Dl','Link','LinkT','Again','Lnk','LnkA','Cp','Toast'].forEach(function(k){ el[k]=$('hb'+k); });
-  var S={state:'idle',file:null,info:null,meta:null,probing:false,token:0,opt:{res:'auto',mode:'rf',rf:14,br:20000,pre:'fast'},out:null,up:null,lock:null,t0:0,fps:0};
+  var S={state:'idle',file:null,info:null,meta:null,probing:false,token:0,opt:{res:'auto',mode:'rf',rf:14,br:20000,pre:'ultrafast'},out:null,up:null,lock:null,t0:0,fps:0};
   var SHOW={idle:['hbDrop'],ready:['hbFile','hbSet','hbAct'],busy:['hbFile','hbProg','hbStay'],done:['hbFile','hbRes']};
   var ALL=['hbDrop','hbFile','hbSet','hbAct','hbProg','hbStay','hbRes'];
 
@@ -33044,7 +33045,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function target(){
     var i=S.info; if(!i||!i.w||!i.h) return null;
     var lim=S.opt.res, w=i.w, h=i.h, long_=Math.max(w,h), short_=Math.min(w,h);
-    if(lim==='auto') lim=(long_>1920||short_>1080)?'1080':'none';
+    if(lim==='auto') lim=(long_>1280||short_>720)?'720':'none';
     if(lim==='none') return {w:w,h:h,scaled:false};
     var BL=lim==='720'?1280:1920, BS=lim==='720'?720:1080, k=Math.min(1,BL/long_,BS/short_);
     return k<1?{w:Math.round(w*k),h:Math.round(h*k),scaled:true,bl:BL,bs:BS}:{w:w,h:h,scaled:false};
@@ -33134,12 +33135,12 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var o=S.opt, i=S.info||{}, tg=target(), vf=[];
     if(tg&&tg.scaled){ var even=(i.h>i.w)?{w:tg.bs,h:tg.bl}:{w:tg.bl,h:tg.bs}; vf.push('scale=w='+even.w+':h='+even.h+':force_original_aspect_ratio=decrease:flags=lanczos'); }
     vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
-    var a=['-hide_banner','-i',path,'-map','0:v:0','-map','0:a?','-vf',vf.join(','),
+    var a=['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?','-vf',vf.join(','),
       '-c:v','libx265','-preset',o.pre,'-pix_fmt','yuv420p','-tag:v','hvc1'];
     if(o.mode==='rf') a.push('-crf',String(o.rf)); else a.push('-b:v',o.br+'k');
     if(i.fps) a.push('-r',String(i.fps)); a.push('-vsync','cfr');
     a.push('-color_range','tv');
-    if(!fast) a.push('-x265-params','log-level=error');
+    a.push('-x265-params',fast?'frame-threads=1:rc-lookahead=5:bframes=2':'log-level=error:frame-threads=1:rc-lookahead=5:bframes=2');
     a.push('-c:a','aac','-b:a','320k','-ac','2','-map_metadata','0','-map_chapters','0','-dn','-sn','-movflags','+faststart','-y','hbout.mp4');
     return a;
   }
@@ -33147,7 +33148,8 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function runFF(ff,path,fast){
     var last=0, logs=[];
     function onProg(e){ var p=Number(e&&e.progress); if(!isFinite(p)) return; p=Math.max(0,Math.min(.99,p)); if(p>last){ last=p; setProg(p,false); tick(p); } }
-    function onLog(e){ var m=String(e&&e.message||''); if(logs.length<300) logs.push(m); var f=m.match(/fps=\s*([\d.]+)/); if(f){ S.fps=parseFloat(f[1]); el.Fps.textContent=S.fps>0?S.fps.toFixed(1):'—'; } }
+    function onLog(e){ var m=String(e&&e.message||''); if(logs.length<300) logs.push(m); var f=m.match(/fps=\s*([\d.]+)/); if(f){ S.fps=parseFloat(f[1]); el.Fps.textContent=S.fps>0?S.fps.toFixed(1):'—'; }
+      var fr=m.match(/frame=\s*(\d+)/); if(fr){ var n=+fr[1], inf=S.info||{}, du=inf.dur||(S.meta&&S.meta.dur)||0, tot=Math.round(du*(inf.fps||24)); if(tot>0&&n>0){ el.PS.textContent=n+' / '+tot+' frames'; var p=Math.min(.99,n/tot); if(p>last){ last=p; setProg(p,false); tick(p); } } } }
     function off(){ try{ ff.off('progress',onProg); ff.off('log',onLog); }catch(_){} window.__hbLog=logs.slice(-10).join(' | '); }
     ff.on('progress',onProg); ff.on('log',onLog);
     return ff.exec(buildArgs(path,fast)).then(function(code){
@@ -33170,7 +33172,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var file=S.file, tk=S.token, ff=null;
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
     var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=loaded?t('pSubRun'):t('pSubLoad'); setProg(0,true);
-    clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy') el.El.textContent=clock((Date.now()-S.t0)/1000); },1000);
+    clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>20&&E.ff){ el.PS.textContent='პირველი კადრები მუშავდება… ('+Math.round(sec)+'წ) — დიდ ვიდეოზე პირველი პროცენტი რამდენიმე წუთს შეიძლება დასჭირდეს'; } } },1000);
     getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,false); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
     .then(function(){ if(tk!==S.token) throw new Error('stale'); setProg(1,false); return ff.readFile('hbout.mp4'); })
