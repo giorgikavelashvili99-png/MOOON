@@ -25267,7 +25267,7 @@ function fitProbe(txt){
 /* მიზნობრივი ბიტრეიტი ზომაში ჩასატევად + საჭიროების შემთხვევაში რეზოლუციის ზომიერი შემცირება */
 function fitPlan(o,capB){
   if(!o.dur||!o.w||!o.h) return null;
-  var audK=o.aud?128:0, vk=Math.floor(capB*.92*8/o.dur/1000-audK);
+  var audK=o.aud?128:0, vk=Math.floor(capB*.95*8/o.dur/1000-audK);
   if(vk<150) return null;
   var sh=Math.min(o.w,o.h), fps=o.fps||30, tiers=[0,720,540,480], pick=0;
   for(var i=0;i<tiers.length;i++){
@@ -25305,7 +25305,7 @@ function fitToCap(f,cm){
   .then(function(){
     var o=fitProbe(logs.join('\n')), pl=fitPlan(o,capB); if(!pl) throw new Error('plan');
     pl.w=o.w; pl.h=o.h; pl.aud=o.aud; $('optHint').textContent=tr('fitHint')+' 0%';
-    return run(pl,pl.vk).then(function(d){ if(d&&d.length&&d.length<=capB) return d; return run(pl,Math.floor(pl.vk*.8)); });
+    return run(pl,pl.vk).then(function(d){ if(d&&d.length&&d.length<=capB) return d; return run(pl,Math.floor(pl.vk*.85)); });
   })
   .then(function(d){
     cleanup(); S.converting=false; setPill('idle',tr('idle'));
