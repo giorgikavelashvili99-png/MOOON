@@ -25130,7 +25130,7 @@ function limitKey(){
 function overLimit(){ return !!limitKey(); }
 function updateGo(){
   var st=S.status, lk=limitKey(), pl=eff();
-  if(lk==='tooBigSize'&&S.file&&!S.busy&&!S.converting&&S.fitTried!==S.file&&capMB()>=10){ var f0=S.file; S.fitTried=f0; fitToCap(f0,capMB()).then(function(nf){ if(nf) proceed(nf); else proceed(f0); }); return; }
+  if(lk==='tooBigSize'&&S.file&&!S.busy&&!S.converting&&S.fitTried!==S.file&&fitCapFor(S.file)>=10){ var f0=S.file; S.fitTried=f0; fitToCap(f0,fitCapFor(f0)).then(function(nf){ if(nf) proceed(nf); else proceed(f0); }); return; }
   if(lk==='tooBigSize'&&S.file&&!S.busy&&S.doneFile!==S.file) setTimeout(upsellOnce,350);
   if(lk&&S.file&&!S.busy&&!(S.doneFile===S.file&&/^tooBig(Size|Max)$/.test(lk))) msg(/^tooBig(Size|Max)$/.test(lk)?tr(lk).replace('{s}',fmtSize(S.file.size)).replace('{n}',fmtMB(capMB())):tr(lk).replace('{n}',pl.fps).replace('{f}',S.fps>0?Math.round(S.fps):'?'),true);
   var ok=S.file&&S.meta&&S.fps!==undefined&&!lk&&S.preset&&!S.busy&&st&&!st.blocked&&(st.unlimited||st.remaining>0); $('optGo').disabled=!ok;
@@ -25277,6 +25277,11 @@ function fitPlan(o,capB){
   }
   return {vk:vk,short:pick};
 }
+function fitCapFor(f){
+  var st=S.status, cm=capMB();
+  if(st&&st.pendingIn>0&&typeof st.mbLimit==='number'&&f.size<=st.mbLimit*1048576) return 0;   /* წინა შედეგის MB ჯერ დაკავებულია - ეს არ არის რეალური ლიმიტი */
+  return cm;
+}
 function fitToCap(f,cm){
   var capB=cm*1048576, ff=null, logs=[], pct=0, mode=null, path='';
   S.converting=true; S.file=null; S.meta=null; S.fps=undefined; updateGo();
@@ -25322,7 +25327,7 @@ function setFile(f){
   if(f.size>MAX_MB*1048576){ S.file=null; S.meta=null; S.fps=undefined; $('optDl').style.display='none'; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); ['oSize','oRes','oDur'].forEach(function(i){ var e=$(i); if(e) e.textContent='—'; }); updateGo(); msg(tr('tooBigMax').replace('{s}',fmtSize(f.size)).replace('{n}',MAX_MB),true); return; }
   if(f.size>capMB()*1048576){
     var chk=refreshStatus(); if(!chk||!chk.then) chk=Promise.resolve();
-    chk.then(function(){ var cm=capMB(); if(f.size>cm*1048576&&cm>=10){ S.fitTried=f; fitToCap(f,cm).then(function(nf){ proceed(nf||f); }); } else proceed(f); });
+    chk.then(function(){ var cm=fitCapFor(f); if(cm>=10&&f.size>cm*1048576){ S.fitTried=f; fitToCap(f,cm).then(function(nf){ proceed(nf||f); }); } else proceed(f); });
     return;
   }
   proceed(f);
