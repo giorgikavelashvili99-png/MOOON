@@ -33028,7 +33028,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       engineFail:'Не удалось загрузить движок — проверь интернет и повтори.',upFail:'Не удалось создать ссылку — повтори.'}
   };
   function L(){ var l=document.documentElement.lang; return D[l]?l:'ka'; }
-  var AUTO={ka:{bigger:'შედეგი ორიგინალზე დიდია. სცადე უფრო ძლიერი შეკუმშვა.',retry:'უფრო პატარა ზომით'},en:{bigger:'The result is larger than the original. Try stronger compression.',retry:'Compress harder'},ru:{bigger:'Результат больше оригинала. Попробуй сильнее сжать.',retry:'Сжать сильнее'}};
+  var AUTO={ka:{bigger:'შედეგი ორიგინალზე დიდია. სცადე უფრო ძლიერი შეკუმშვა.',retry:'უფრო პატარა ზომით',kept:'ეს ფაილი უკვე მაქსიმალურად შეკუმშულია — შეკუმშვა მას ვერ დაპატარავებდა, ამიტომ ორიგინალი დაგიბრუნდა.'},en:{bigger:'The result is larger than the original. Try stronger compression.',retry:'Compress harder',kept:'This file is already as compressed as it gets — compressing would not make it smaller, so you get the original back.'},ru:{bigger:'Результат больше оригинала. Попробуй сильнее сжать.',retry:'Сжать сильнее',kept:'Этот файл уже максимально сжат — сжатие не уменьшило бы его, поэтому возвращаем оригинал.'}};
   function t(k){ if(AUTO[L()]&&AUTO[L()][k]) return AUTO[L()][k]; var s=D[L()][k]; if(s==null) s=D.en[k]||''; return s; }
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
@@ -33165,6 +33165,19 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   var MBV='https://cdn.jsdelivr.net/npm/mediabunny@1.63.0/dist/bundles/mediabunny.min.mjs', MBP=null;
   var WCT={ka:'ჰარდვერული ენკოდერი — მაღალი სიჩქარე',en:'Hardware encoder — high speed',ru:'Аппаратный кодировщик — высокая скорость'};
   function loadMB(){ if(!MBP) MBP=import(MBV).catch(function(e){ MBP=null; throw e; }); return MBP; }
+  /* A hardware encoder works to a bitrate, not to a quality. If the source is already squeezed very hard (very few bits per pixel,
+     e.g. a 2-minute screen recording in 2 MB) it cannot get any smaller and just loops - x264 (CRF) handles those files correctly. */
+  function bppOf(){
+    var i=S.info||{}, f=S.file, dur=i.dur||(S.meta&&S.meta.dur)||0;
+    if(!f||!(i.w&&i.h&&i.fps&&dur>0)) return null;
+    return (f.size*8*0.97/dur)/(i.w*i.h*i.fps);
+  }
+  function tinySource(){ var b=bppOf(); return b!==null&&b<0.004; }   /* e.g. 2 MB for 2 min of 1080p: nothing left to squeeze */
+  function wcWorthIt(){
+    var i=S.info||{}, f=S.file, dur=i.dur||(S.meta&&S.meta.dur)||0;
+    if(!f||!(i.w&&i.h&&i.fps&&dur>0)) return true;
+    return (f.size*8*0.97/dur)/(i.w*i.h*i.fps)>=0.008;
+  }
   function stopWC(){ var c=E.conv; E.conv=null; if(c){ try{ Promise.resolve(c.cancel()).catch(noop); }catch(e){} } }
   /* fast probe without downloading the 30 MB ffmpeg engine; on any failure the old wasm analysis runs instead */
   function analyseFast(file,tk){
@@ -33221,7 +33234,8 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     })().then(function(blob){
       if(tk!==S.token) return;
       setProg(1,false);
-      if(blob.size>=file.size&&boost<3){ S.boost=boost+1; setState('ready'); setTimeout(compress,0); return; }
+      /* no real gain from the hardware encoder -> do NOT loop on it, hand over to x264 (which has its own retry) */
+      if(blob.size>=file.size*0.98){ S.wcFail=true; setState('ready'); setTimeout(compress,0); return; }
       var base=file.name.replace(/\.[^.]+$/,'')||'video';
       S.out={blob:blob,name:base+'_compressed.mp4',size:blob.size,url:URL.createObjectURL(blob),link:null};
       finishOK(file);
@@ -33279,7 +33293,8 @@ html body .mn-view[data-view="compress"]{max-width:680px}
 
   function compress(){
     if(S.state!=='ready'||!S.file||S.probing) return;
-    if(S.wcOK&&!S.wcFail) return compressWC();
+    if(tinySource()){ S.t0=Date.now(); keepOriginal(S.file); return; }
+    if(S.wcOK&&!S.wcFail&&wcWorthIt()) return compressWC();
     compressWasm();
   }
   function compressWasm(){
@@ -33296,7 +33311,10 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       if(tk!==S.token) throw new Error('stale');
       if(!data||!data.length) throw new Error('empty output');
       var blob=new Blob([data],{type:'video/mp4'}); ff.deleteFile('hbout.mp4').catch(noop);
-      if(blob.size>=file.size&&(S.boost||0)<3){ S.boost=(S.boost||0)+1; setState('ready'); setTimeout(compress,0); return; }
+      if(blob.size>=file.size){
+        if((S.boost||0)<1){ S.boost=1; setState('ready'); setTimeout(compress,0); return; }
+        setTimeout(dropEngine,0); keepOriginal(file); return;
+      }
       setTimeout(dropEngine,0);
       var base=file.name.replace(/\.[^.]+$/,'')||'video';
       S.out={blob:blob,name:base+'_compressed.mp4',size:blob.size,url:URL.createObjectURL(blob),link:null};
@@ -33306,15 +33324,22 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     .then(function(){ clearInterval(clk); releaseScreen(); });
   }
   function finishOK(file){
-    var o=S.out, ratio=o.size/file.size, saved=Math.round((1-ratio)*100), bigger=o.size>=file.size;
+    var o=S.out, kept=!!o.kept, ratio=o.size/file.size, saved=Math.round((1-ratio)*100);
     el.ResSub.textContent=o.name;
-    el.Save.textContent=bigger?'+'+Math.round((ratio-1)*100)+'%':'−'+saved+'%'; el.Save.classList.toggle('up',bigger);
+    el.Save.textContent=kept?'0%':'−'+saved+'%'; el.Save.classList.remove('up');
     el.Sz0.textContent=size(file.size); el.Sz1.textContent=size(o.size);
-    el.C1.style.width='0'; el.Big.hidden=!bigger;
+    el.C1.style.width='0'; el.Retry.hidden=true; el.Big.hidden=!kept;
+    var sp=el.Big.querySelector('span'); if(sp){ sp.setAttribute('data-hb','kept'); sp.textContent=t('kept'); }
     el.Link.disabled=false; el.LinkT.textContent=t('getLink'); el.Lnk.hidden=true;
     setState('done');
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.C1.style.width=Math.min(100,ratio*100).toFixed(1)+'%'; }); });
     setTimeout(function(){ try{ el.Res.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} },350);
+  }
+  /* a compressed file must NEVER be bigger than the original: when compression cannot help, hand the original back */
+  function keepOriginal(file){
+    var base=file.name||'video';
+    S.out={blob:file,name:base,size:file.size,url:URL.createObjectURL(file),link:null,kept:true};
+    finishOK(file);
   }
   function onErr(e,tk){
     if(tk!==S.token||(e&&e.message==='stale')) return;
