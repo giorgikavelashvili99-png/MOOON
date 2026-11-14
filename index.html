@@ -32510,13 +32510,13 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
         var ff=new window.FFmpegWASM.FFmpeg();
         return ff.load({classWorkerURL:u[0],coreURL:c,wasmURL:w}).then(function(){ return ff; },function(e){
           try{ ff.terminate(); }catch(_){}
-          if(v<2){ try{console.warn('ffmpeg load variant '+v+' failed, retrying',e);}catch(_){} return attempt(v+1); }
+          (E.errs=E.errs||[]).push('v'+v+':'+String(e&&e.message||e)); if(v<2){ try{console.warn('ffmpeg load variant '+v+' failed, retrying',e);}catch(_){} return attempt(v+1); }
           throw e;
         });
       });
     }
     E.p=attempt(0).then(function(ff){ E.ff=ff; E.p=null; return ff; })
-      .catch(function(e){ E.p=null; var x=(e instanceof Error)?e:new Error(String(e)); x.engine=true; throw x; });
+      .catch(function(e){ E.p=null; var x=(e instanceof Error)?e:new Error(String(e)); x.engine=true; x.message=x.message+(E.errs?' | '+E.errs.join(' ; '):''); E.errs=null; throw x; });
     return E.p;
   }
   function dropEngine(){ try{ if(E.ff) E.ff.terminate(); }catch(e){} E.ff=null; E.file=null; E.path=null; E.mode=null; }
@@ -32625,7 +32625,7 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
   function onErr(e,tk){
     if(tk!==S.token||(e&&e.message==='stale')) return;
     var m=String(e&&e.message||e), msg;
-    if(e&&e.engine) msg=t('engineFail');
+    if(e&&e.engine){ msg=t('engineFail')+' ['+m+']'; try{console.error('ffmpeg engine load failed',e);}catch(_){} }
     else if(/memory|alloc|RangeError|out of bounds|Aborted|OOM/i.test(m)){ msg=t('failMem'); dropEngine(); }
     else { msg=t('fail')+' ['+m+(window.__ffLog?' · '+window.__ffLog:'')+']'; try{console.error('AAC convert failed',e,window.__ffLog);}catch(_){} }
     setState('ready'); showMsg(msg,'err');
