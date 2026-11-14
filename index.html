@@ -33164,13 +33164,19 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function buildArgs(path,fast){
     var o=S.opt, i=S.info||{}, tg=target(), vf=[];
     if(tg&&tg.scaled){ var even=(i.h>i.w)?{w:tg.bs,h:tg.bl}:{w:tg.bl,h:tg.bs}; vf.push('scale=w='+even.w+':h='+even.h+':force_original_aspect_ratio=decrease:flags=lanczos'); }
-    vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
+    /* no-op even-size scale is skipped when the source is already even (saves a swscale pass on every frame) */
+    if(!(i.w&&i.h&&i.w%2===0&&i.h%2===0&&!(tg&&tg.scaled))) vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
     var f=S.file, dur=i.dur||(S.meta&&S.meta.dur)||0, boost=S.boost||0;
     var srcKbps=(f&&dur>0)?(f.size*8/dur/1000):8000;
-    var crf=26+boost*3, maxK=Math.max(64,Math.round(srcKbps*.5*Math.pow(.7,boost)));
-    var a=['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?','-vf',vf.join(','),
-      '-c:v','libx264','-preset','ultrafast','-threads','1','-profile:v','high','-pix_fmt','yuv420p',
-      '-crf',String(crf),'-maxrate',maxK+'k','-bufsize',(maxK*2)+'k'];
+    /* quality-first fast encode: ultrafast turns OFF the deblocking filter, CABAC and adaptive quantisation -> blocky "pixels".
+       superfast keeps them (about 2x slower than ultrafast, far cleaner). CRF 20 is near-visually-lossless;
+       the generous VBV cap (85% of source, 3 s buffer) only trims bitrate peaks, so it can no longer smear detail. */
+    var crf=20+boost*2, maxK=Math.max(500,Math.round(srcKbps*.85*Math.pow(.8,boost)));
+    var a=['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?'];
+    if(vf.length) a.push('-vf',vf.join(','));
+    a.push('-c:v','libx264','-preset','superfast','-threads','1','-profile:v','high','-pix_fmt','yuv420p',
+      '-x264-params','bframes=3:b-adapt=1:aq-mode=2:deblock=1,1',
+      '-crf',String(crf),'-maxrate',maxK+'k','-bufsize',(maxK*3)+'k');
     if(i.fps) a.push('-r',String(i.fps)); a.push('-vsync','cfr');
     a.push('-c:a','copy','-map_metadata','0','-map_chapters','0','-dn','-sn');
     if(f&&f.size<200*1048576) a.push('-movflags','+faststart');
