@@ -32337,7 +32337,7 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
   var noop=function(){};
 
   var D={
-    ka:{title:'ხმა AAC-LC-ად, ვიდეო უცვლელად',sub:'ვიდეო არ გადაკოდირდება და ხარისხი არ დაიკარგება — იცვლება მხოლოდ ხმა.',
+    ka:{title:'ხმა AAC-LC-ად ვიდეო უცვლელად',sub:'ვიდეო არ გადაკოდირდება და ხარისხი არ დაიკარგება — იცვლება მხოლოდ ხმა.',
       drop:'აირჩიე ვიდეო',dropSub:'ან ჩააგდე აქ',max:'max 1024 MB',
       laneV:'ვიდეო',same:'უცვლელი',laneA:'ხმა',anyVideo:'ნებისმიერი კოდეკი',anyAudio:'ნებისმიერი ხმა',analysing:'ანალიზი…',noAudioShort:'ხმა არ არის',tracks:'+{n} ტრეკი',
       rBr:'ბიტრეიტი (kbps)',rSr:'სიხშირე (kHz)',rCh:'არხები',auto:'ავტო',orig:'ორიგინალი',stereo:'სტერეო',mono:'მონო',
@@ -32545,29 +32545,33 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
   /* ---------- convert ---------- */
   function outExt(name){ var m=((name.match(/\.([A-Za-z0-9]+)$/)||[])[1]||'').toLowerCase(); return m==='mov'?'.mov':m==='mkv'?'.mkv':'.mp4'; }
   function canSubs(name){ var m=((name.match(/\.([A-Za-z0-9]+)$/)||[])[1]||'').toLowerCase(); return m==='mp4'||m==='m4v'||m==='mov'||m==='mkv'; }
-  function buildArgs(path,ext,withSubs){
+  function buildArgs(path,ext,withSubs,lvl){lvl=lvl||0;
     var p=plan(), i=S.info, a=['-hide_banner','-i',path,'-map','0:v?','-map','0:a?'];
     if(withSubs) a.push('-map','0:s?');
-    a.push('-c:v','copy','-c:a','aac','-profile:a','aac_low','-b:a',p.br+'k');
+    a.push('-c:v','copy','-c:a','aac'); if(lvl<2) a.push('-profile:a','aac_low'); a.push('-b:a',p.br+'k'); if(lvl>=1) a.push('-strict','experimental');
     if(p.sr) a.push('-ar',String(p.sr));
     if(p.ch) a.push('-ac',String(p.ch));
     if(withSubs) a.push('-c:s','copy');
-    a.push('-dn');
+    a.push('-dn'); if(lvl>=1) a.push('-map_metadata','-1','-ignore_unknown');
     if(ext!=='.mkv'){ if(i&&i.v==='hevc') a.push('-tag:v','hvc1'); a.push('-movflags','+faststart'); }
     a.push('-y','acout'+ext);
     return a;
   }
-  function runFF(ff,path,ext,withSubs){
+  function runFF(ff,path,ext,withSubs,lvl){
+    lvl=lvl||0;
     var last=0;
     function onProg(e){ var p=Number(e&&e.progress); if(!isFinite(p)) return; p=Math.max(0,Math.min(1,p)); if(p>last){ last=p; setProg(p,false); } }
+    function off(){ try{ ff.off('progress',onProg); }catch(_){} }
+    function retry(ws,l){ return ff.deleteFile('acout'+ext).catch(noop).then(function(){ return runFF(ff,path,ext,ws,l); }); }
     ff.on('progress',onProg);
-    return ff.exec(buildArgs(path,ext,withSubs)).then(function(code){
-      try{ ff.off('progress',onProg); }catch(e){}
+    return ff.exec(buildArgs(path,ext,withSubs,lvl)).then(function(code){
+      off();
       if(code!==0){
-        if(withSubs) return ff.deleteFile('acout'+ext).catch(noop).then(function(){ return runFF(ff,path,ext,false); });
+        if(withSubs) return retry(false,lvl);
+        if(lvl<2) return retry(false,lvl+1);
         throw new Error('ffmpeg '+code);
       }
-    },function(e){ try{ ff.off('progress',onProg); }catch(_){} throw e; });
+    },function(e){ off(); throw e; });
   }
   var C=175.93;
   function setProg(p,indef){ el.rp.style.strokeDashoffset=(C*(indef?.72:1-p)).toFixed(1); el.pc.textContent=indef?'':Math.round(p*100)+'%'; el.ring.classList.toggle('spin',!!indef); lightBars(indef?0:p); }
