@@ -24921,7 +24921,7 @@ T.en.plUp='{n} uploads / week'; T.en.plUpU='Unlimited uploads / week'; T.en.plMb
 T.ru.plUp='{n} загрузок / неделя'; T.ru.plUpU='Безлимитные загрузки / неделя'; T.ru.plMb='Макс. размер {n} МБ'; T.ru.plMbU='Без ограничения размера'; T.ru.plMethod='Метод MOON'; T.ru.plCheck='TikTok-чекер видео'; T.ru.plRed='4K / 120FPS'; T.ru.plFull='Полная поддержка'; T.ru.tooBigSize='Видео ({s}) больше оставшегося недельного объёма. Осталось {n} МБ'; T.ru.tooBigMax='Видео слишком большое ({s}). Максимум — {n} МБ';
 T.ka.fitLoad='შეკუმშვის მომზადება…'; T.en.fitLoad='Preparing compression…'; T.ru.fitLoad='Подготовка сжатия…';
 T.ka.fitHint='იკუმშება'; T.en.fitHint='Compressing'; T.ru.fitHint='Сжатие';
-T.ka.fitMsg='ვიდეო {s} არის, ლიმიტი {n} MB — ავტომატურად იკუმშება ზომაში ჩასატევად. დაელოდე, გვერდი არ დახურო'; T.en.fitMsg='The video is {s}, the limit is {n} MB — it is being compressed automatically to fit. Please wait and keep this page open'; T.ru.fitMsg='Видео {s}, лимит {n} МБ — оно автоматически сжимается, чтобы поместиться. Подождите и не закрывайте страницу';
+T.ka.fitMsg='ვიდეო {s} არის, შენი დარჩენილი მოცულობა {n} MB — ავტომატურად იკუმშება ზომაში ჩასატევად. დაელოდე, გვერდი არ დახურო'; T.en.fitMsg='The video is {s}, your remaining volume is {n} MB — it is being compressed automatically to fit. Please wait and keep this page open'; T.ru.fitMsg='Видео {s}, ваш остаток {n} МБ — оно автоматически сжимается, чтобы поместиться. Подождите и не закрывайте страницу';
 T.ka.fitDone='ვიდეო შეიკუმშა: {a} → {b}'; T.en.fitDone='Video compressed: {a} → {b}'; T.ru.fitDone='Видео сжато: {a} → {b}';
 T.ka.dropMax='1000 MB • MAX'; T.en.dropMax='1000 MB • MAX'; T.ru.dropMax='1000 MB • MAX'; T.ka.mbLeft='დარჩენილი მოცულობა'; T.en.mbLeft='Volume left'; T.ru.mbLeft='Осталось объёма'; T.ka.holdLost='შედეგის ვადა გავიდა და ბალანსი დაგიბრუნდა. გაუშვი ოპტიმიზაცია თავიდან'; T.en.holdLost='This result expired and your balance was returned. Run the optimization again'; T.ru.holdLost='Срок результата истёк, баланс возвращён. Запустите оптимизацию заново'; T.ka.holdWait='ერთი წამი, ვამოწმებ კავშირს…'; T.en.holdWait='One moment, checking the connection…'; T.ru.holdWait='Секунду, проверяю соединение…'; T.ka.upsT0='ამ კვირის მოცულობა ამოიწურა'; T.en.upsT0='Weekly volume used up'; T.ru.upsT0='Недельный объём исчерпан'; T.ka.ups0='გინდათ ლიმიტის გაზრდა გეგმებით?'; T.en.ups0='Want to raise your limit with a plan?'; T.ru.ups0='Хотите увеличить лимит с помощью тарифа?'; T.ka.upsT1='ვიდეო აღემატება დარჩენილ მოცულობას'; T.en.upsT1='The video exceeds your remaining volume'; T.ru.upsT1='Видео больше оставшегося объёма'; T.ka.ups1='ამ კვირაში დარჩენილია {n} MB. გინდათ ლიმიტის გაზრდა გეგმებით?'; T.en.ups1='{n} MB left this week. Want to raise your limit with a plan?'; T.ru.ups1='На этой неделе осталось {n} МБ. Хотите увеличить лимит с помощью тарифа?'; T.ka.upsYes='დიახ'; T.en.upsYes='Yes'; T.ru.upsYes='Да'; T.ka.upsNo='მოგვიანებით'; T.en.upsNo='Later'; T.ru.upsNo='Позже';
 T.ka.conv='გარდაიქმნება'; T.ka.convHint='გადადის MP4 ფორმატში'; T.ka.convLoad='ფორმატის გადაყვანის მომზადება…'; T.ka.convSlow='გადაყვანა რამდენიმე წუთს გასტანს…'; T.ka.convMsg='ვიდეო MP4 ფორმატში გადადის — დაელოდე, გვერდი არ დახურო'; T.ka.convFail='ამ ფორმატის გადაყვანა ვერ მოხერხდა. სცადე MP4 ან MOV'; T.ka.pickVideo='აირჩიე ვიდეო ფაილი'; T.ka.tooBigConv='ფაილი ძალიან დიდია გადასაყვანად (მაქს. 1.5 GB)';
@@ -25320,8 +25320,11 @@ function setFile(f){
   if(!f||S.converting) return;
   if(!looksVideo(f)){ msg(tr('pickVideo'),true); return; }
   if(f.size>MAX_MB*1048576){ S.file=null; S.meta=null; S.fps=undefined; $('optDl').style.display='none'; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); ['oSize','oRes','oDur'].forEach(function(i){ var e=$(i); if(e) e.textContent='—'; }); updateGo(); msg(tr('tooBigMax').replace('{s}',fmtSize(f.size)).replace('{n}',MAX_MB),true); return; }
-  var cm=capMB();
-  if(f.size>cm*1048576&&cm>=10){ S.fitTried=f; fitToCap(f,cm).then(function(nf){ proceed(nf||f); }); return; }
+  if(f.size>capMB()*1048576){
+    var chk=refreshStatus(); if(!chk||!chk.then) chk=Promise.resolve();
+    chk.then(function(){ var cm=capMB(); if(f.size>cm*1048576&&cm>=10){ S.fitTried=f; fitToCap(f,cm).then(function(nf){ proceed(nf||f); }); } else proceed(f); });
+    return;
+  }
   proceed(f);
 }
 function proceed(f){
