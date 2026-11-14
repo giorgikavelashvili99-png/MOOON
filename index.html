@@ -33167,7 +33167,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
     var f=S.file, dur=i.dur||(S.meta&&S.meta.dur)||0, boost=S.boost||0;
     var srcKbps=(f&&dur>0)?(f.size*8/dur/1000):8000;
-    var crf=26+boost*3, maxK=Math.max(600,Math.round(srcKbps*Math.pow(.55,boost+1)));
+    var crf=26+boost*3, maxK=Math.max(64,Math.round(srcKbps*.5*Math.pow(.7,boost)));
     var a=['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?','-vf',vf.join(','),
       '-c:v','libx264','-preset','ultrafast','-threads','1','-profile:v','high','-pix_fmt','yuv420p',
       '-crf',String(crf),'-maxrate',maxK+'k','-bufsize',(maxK*2)+'k'];
@@ -33212,7 +33212,9 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     .then(function(data){
       if(tk!==S.token) throw new Error('stale');
       if(!data||!data.length) throw new Error('empty output');
-      var blob=new Blob([data],{type:'video/mp4'}); ff.deleteFile('hbout.mp4').catch(noop); setTimeout(dropEngine,0);
+      var blob=new Blob([data],{type:'video/mp4'}); ff.deleteFile('hbout.mp4').catch(noop);
+      if(blob.size>=file.size&&(S.boost||0)<3){ S.boost=(S.boost||0)+1; setState('ready'); setTimeout(compress,0); return; }
+      setTimeout(dropEngine,0);
       var base=file.name.replace(/\.[^.]+$/,'')||'video';
       S.out={blob:blob,name:base+'_compressed.mp4',size:blob.size,url:URL.createObjectURL(blob),link:null};
       finishOK(file);
