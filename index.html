@@ -7862,15 +7862,14 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
     </div>
     <div class="hb-row"><div class="hb-rl"><b data-hb="rEnc"></b><small data-hb="hEnc"></small></div>
       <div class="hb-seg" data-k="pre" role="radiogroup">
-        <button type="button" role="radio" data-v="ultrafast" aria-checked="true">Ultra fast</button>
-        <button type="button" role="radio" data-v="fast" aria-checked="false">Fast</button>
+        <button type="button" role="radio" data-v="fast" aria-checked="true">Fast</button>
         <button type="button" role="radio" data-v="medium" aria-checked="false">Medium</button>
         <button type="button" role="radio" data-v="slow" aria-checked="false">Slow</button>
         <button type="button" role="radio" data-v="veryslow" aria-checked="false">Very slow</button>
       </div></div>
     <dl class="hb-spec">
       <div><dt data-hb="sFmt"></dt><dd>MP4 · Web Optimized</dd></div>
-      <div><dt data-hb="sVid"></dt><dd>H.265 (x265) · <span data-hb="sFps"></span> · CFR</dd></div>
+      <div><dt data-hb="sVid"></dt><dd>H.264 (x264) · <span data-hb="sFps"></span> · CFR</dd></div>
       <div><dt data-hb="sAud"></dt><dd>AAC · Stereo · 320 kbps</dd></div>
       <div><dt data-hb="sMeta"></dt><dd data-hb="sMetaV"></dd></div>
     </dl>
@@ -32964,42 +32963,42 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   var root=document.getElementById('hbView'); if(!root) return;
   var TF='https://mooontransferr.onrender.com', MAXB=1024*1024*1024, noop=function(){};
   var D={
-    ka:{title:'ვიდეოს შეკუმშვა',sub:'HandBrake-ის Recommended პრესეტი: H.265 (x265), მაღალი ხარისხი და გაცილებით პატარა ფაილი.',
+    ka:{title:'ვიდეოს შეკუმშვა',sub:'HandBrake-ის Recommended პრესეტი: H.264 (x264), მაღალი ხარისხი და გაცილებით პატარა ფაილი.',
       drop:'აირჩიე ვიდეო',dropSub:'ან ჩააგდე აქ',max:'max 1024 MB',
       presetLine:'H.265 · RF 14 · AAC 320',rRes:'გარჩევადობის ლიმიტი',hRes:'ავტო: 2K/4K ვიდეო → 1080p, დანარჩენი უცვლელი რჩება.',resAuto:'ავტო',resNone:'ლიმიტის გარეშე',
       rQ:'ხარისხი',hQ:'რაც დაბალია RF, მით მაღალი ხარისხი. თუ შედეგი ორიგინალზე დიდია, გაზარდე ~16-მდე ან აირჩიე 20000 kbps.',hiQ:'მაღალი ხარისხი',loQ:'მცირე ფაილი',
       rEnc:'Encoder Preset',hEnc:'თუ შეკუმშვის შემდეგ ხარისხი ძალიან დაიკარგა, აირჩიე Very slow.',
       sFmt:'ფორმატი',sVid:'ვიდეო',sFps:'იგივე FPS',sAud:'ხმა',sMeta:'დამატებით',sMetaV:'მეტამონაცემები · თავები',
       compress:'შეკუმშვა',analysing:'ანალიზი…',loadEng:'ძრავა იტვირთება…',priv:'ყველაფერი შენს მოწყობილობაზე სრულდება — ფაილი არსად იგზავნება',
-      pTitleLoad:'ძრავა მზადდება…',pSubLoad:'პირველად ~30 MB იტვირთება, შემდეგ უფრო სწრაფია.',pTitleRun:'ვიდეო იკუმშება…',pSubRun:'x265 ბრაუზერში მუშაობს — გრძელ ვიდეოს დრო სჭირდება.',
+      pTitleLoad:'ძრავა მზადდება…',pSubLoad:'პირველად ~30 MB იტვირთება, შემდეგ უფრო სწრაფია.',pTitleRun:'ვიდეო იკუმშება…',pSubRun:'x264 ბრაუზერში მუშაობს — გრძელ ვიდეოს დრო სჭირდება.',
       stEl:'გავიდა',stEta:'დარჩა',stFps:'კადრი/წმ',cancel:'შეწყვეტა',change:'ფაილის შეცვლა',stay:'დასრულებამდე გვერდი გახსნილი და ეკრანი ჩართული გქონდეს',
       ready:'მზადაა',orig:'ორიგინალი',newf:'შეკუმშული',bigger:'შედეგი ორიგინალზე დიდია. სცადე უფრო მაღალი RF (~16) — ფაილი პატარა გამოვა.',retry:'სცადე RF 16-ით',
       download:'ჩამოტვირთვა',getLink:'ლინკის მიღება',uploading:'იტვირთება',again:'ახალი ფაილი',copy:'კოპირება',copied:'დაკოპირდა ✓',linkCopied:'ლინკი დაკოპირდა',
       notVideo:'აირჩიე ვიდეო ფაილი (MP4, MOV, MKV, WEBM)',tooBig:'ფაილი აღემატება ლიმიტს — მაქს. 1024 MB',noVideo:'ფაილში ვიდეო ტრეკი ვერ მოიძებნა',
       fail:'შეკუმშვა ვერ მოხერხდა. სცადე თავიდან ან სხვა ფაილით.',failMem:'ფაილი ძალიან დიდია ბრაუზერისთვის. სცადე პატარა ფაილით ან კომპიუტერიდან.',
       engineFail:'ძრავა ვერ ჩაიტვირთა — შეამოწმე ინტერნეტი და სცადე თავიდან.',upFail:'ლინკის შექმნა ვერ მოხერხდა — სცადე თავიდან.'},
-    en:{title:'Video compression',sub:'The HandBrake Recommended preset: H.265 (x265), high quality and a much smaller file.',
+    en:{title:'Video compression',sub:'The HandBrake Recommended preset: H.264 (x264), high quality and a much smaller file.',
       drop:'Choose a video',dropSub:'or drop it here',max:'max 1024 MB',
       presetLine:'H.265 · RF 14 · AAC 320',rRes:'Resolution limit',hRes:'Auto: 2K/4K video → 1080p, anything else stays as it is.',resAuto:'Auto',resNone:'No limit',
       rQ:'Quality',hQ:'Lower RF means higher quality. If the result is bigger than the original, raise it to ~16 or use 20000 kbps.',hiQ:'Higher quality',loQ:'Smaller file',
       rEnc:'Encoder Preset',hEnc:'If the video lost too much quality after compression, choose Very slow.',
       sFmt:'Format',sVid:'Video',sFps:'Same FPS',sAud:'Audio',sMeta:'Also',sMetaV:'Metadata · Chapters',
       compress:'Compress',analysing:'Analysing…',loadEng:'Loading engine…',priv:'Everything runs on your device — the file is never uploaded',
-      pTitleLoad:'Preparing the engine…',pSubLoad:'~30 MB download the first time, faster afterwards.',pTitleRun:'Compressing video…',pSubRun:'x265 runs in the browser — long videos take time.',
+      pTitleLoad:'Preparing the engine…',pSubLoad:'~30 MB download the first time, faster afterwards.',pTitleRun:'Compressing video…',pSubRun:'x264 runs in the browser — long videos take time.',
       stEl:'Elapsed',stEta:'Left',stFps:'Frames/s',cancel:'Cancel',change:'Change file',stay:'Keep this page open and your screen on until it finishes',
       ready:'Ready',orig:'Original',newf:'Compressed',bigger:'The result is bigger than the original. Try a higher RF (~16) for a smaller file.',retry:'Retry with RF 16',
       download:'Download',getLink:'Get a link',uploading:'Uploading',again:'New file',copy:'Copy',copied:'Copied ✓',linkCopied:'Link copied',
       notVideo:'Choose a video file (MP4, MOV, MKV, WEBM)',tooBig:'File exceeds the limit — max 1024 MB',noVideo:'No video track found in this file',
       fail:'Compression failed. Try again or use another file.',failMem:'This file is too large for the browser. Try a smaller file or a computer.',
       engineFail:'The engine could not load — check your connection and try again.',upFail:'Could not create the link — try again.'},
-    ru:{title:'Сжатие видео',sub:'Пресет HandBrake Recommended: H.265 (x265), высокое качество и заметно меньший файл.',
+    ru:{title:'Сжатие видео',sub:'Пресет HandBrake Recommended: H.264 (x264), высокое качество и заметно меньший файл.',
       drop:'Выбери видео',dropSub:'или перетащи сюда',max:'max 1024 MB',
       presetLine:'H.265 · RF 14 · AAC 320',rRes:'Ограничение разрешения',hRes:'Авто: видео 2K/4K → 1080p, остальное без изменений.',resAuto:'Авто',resNone:'Без лимита',
       rQ:'Качество',hQ:'Чем ниже RF, тем выше качество. Если результат больше оригинала, подними до ~16 или выбери 20000 kbps.',hiQ:'Выше качество',loQ:'Меньше файл',
       rEnc:'Encoder Preset',hEnc:'Если после сжатия качество сильно упало, выбери Very slow.',
       sFmt:'Формат',sVid:'Видео',sFps:'Тот же FPS',sAud:'Звук',sMeta:'Также',sMetaV:'Метаданные · Главы',
       compress:'Сжать',analysing:'Анализ…',loadEng:'Загрузка движка…',priv:'Всё выполняется на твоём устройстве — файл никуда не отправляется',
-      pTitleLoad:'Готовим движок…',pSubLoad:'В первый раз скачивается ~30 MB, дальше быстрее.',pTitleRun:'Сжимаем видео…',pSubRun:'x265 работает в браузере — длинные видео занимают время.',
+      pTitleLoad:'Готовим движок…',pSubLoad:'В первый раз скачивается ~30 MB, дальше быстрее.',pTitleRun:'Сжимаем видео…',pSubRun:'x264 работает в браузере — длинные видео занимают время.',
       stEl:'Прошло',stEta:'Осталось',stFps:'Кадров/с',cancel:'Отмена',change:'Сменить файл',stay:'Пока идёт процесс, держи страницу открытой, а экран включённым',
       ready:'Готово',orig:'Оригинал',newf:'Сжатое',bigger:'Результат больше оригинала. Попробуй RF повыше (~16) — файл будет меньше.',retry:'Повторить с RF 16',
       download:'Скачать',getLink:'Получить ссылку',uploading:'Загрузка',again:'Новый файл',copy:'Копировать',copied:'Скопировано ✓',linkCopied:'Ссылка скопирована',
@@ -33016,7 +33015,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
 
   var el={};
   ['Drop','Input','File','Thumb','Dur','Nm','Chips','X','Msg','Set','Rf','RfV','Br','Qrf','Qbr','Act','Go','GoT','Prog','Pc','PT','PS','BarI','El','Eta','Fps','Cancel','Stay','Res','ResSub','Save','Sz0','Sz1','C1','Big','Retry','Dl','Link','LinkT','Again','Lnk','LnkA','Cp','Toast'].forEach(function(k){ el[k]=$('hb'+k); });
-  var S={state:'idle',file:null,info:null,meta:null,probing:false,token:0,opt:{res:'auto',mode:'rf',rf:14,br:20000,pre:'ultrafast'},out:null,up:null,lock:null,t0:0,fps:0};
+  var S={state:'idle',file:null,info:null,meta:null,probing:false,token:0,opt:{res:'auto',mode:'rf',rf:14,br:20000,pre:'fast'},out:null,up:null,lock:null,t0:0,fps:0};
   var SHOW={idle:['hbDrop'],ready:['hbFile','hbSet','hbAct'],busy:['hbFile','hbProg','hbStay'],done:['hbFile','hbRes']};
   var ALL=['hbDrop','hbFile','hbSet','hbAct','hbProg','hbStay','hbRes'];
 
@@ -33045,7 +33044,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function target(){
     var i=S.info; if(!i||!i.w||!i.h) return null;
     var lim=S.opt.res, w=i.w, h=i.h, long_=Math.max(w,h), short_=Math.min(w,h);
-    if(lim==='auto') lim=(long_>1280||short_>720)?'720':'none';
+    if(lim==='auto') lim=(long_>1920||short_>1080)?'1080':'none';
     if(lim==='none') return {w:w,h:h,scaled:false};
     var BL=lim==='720'?1280:1920, BS=lim==='720'?720:1080, k=Math.min(1,BL/long_,BS/short_);
     return k<1?{w:Math.round(w*k),h:Math.round(h*k),scaled:true,bl:BL,bs:BS}:{w:w,h:h,scaled:false};
@@ -33136,11 +33135,11 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     if(tg&&tg.scaled){ var even=(i.h>i.w)?{w:tg.bs,h:tg.bl}:{w:tg.bl,h:tg.bs}; vf.push('scale=w='+even.w+':h='+even.h+':force_original_aspect_ratio=decrease:flags=lanczos'); }
     vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
     var a=['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?','-vf',vf.join(','),
-      '-c:v','libx265','-preset',o.pre,'-pix_fmt','yuv420p','-tag:v','hvc1'];
-    if(o.mode==='rf') a.push('-crf',String(o.rf)); else a.push('-b:v',o.br+'k');
+      '-c:v','libx264','-preset',o.pre,'-threads','1','-profile:v','high','-pix_fmt','yuv420p'];
+    if(o.mode==='rf') a.push('-crf',String(Math.min(30,o.rf+4))); else a.push('-b:v',o.br+'k');
     if(i.fps) a.push('-r',String(i.fps)); a.push('-vsync','cfr');
     a.push('-color_range','tv');
-    a.push('-x265-params',fast?'frame-threads=1:rc-lookahead=5:bframes=2':'log-level=error:frame-threads=1:rc-lookahead=5:bframes=2');
+    
     a.push('-c:a','aac','-b:a','320k','-ac','2','-map_metadata','0','-map_chapters','0','-dn','-sn','-movflags','+faststart','-y','hbout.mp4');
     return a;
   }
@@ -33172,7 +33171,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var file=S.file, tk=S.token, ff=null;
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
     var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=loaded?t('pSubRun'):t('pSubLoad'); setProg(0,true);
-    clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>20&&E.ff){ el.PS.textContent='პირველი კადრები მუშავდება… ('+Math.round(sec)+'წ) — დიდ ვიდეოზე პირველი პროცენტი რამდენიმე წუთს შეიძლება დასჭირდეს'; } } },1000);
+    clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>30&&E.ff){ el.PS.textContent='მუშაობს… ('+Math.round(sec)+'წ) — პირველი პროცენტი ცოტა ხანში გამოჩნდება'; } } },1000);
     getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,false); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
     .then(function(){ if(tk!==S.token) throw new Error('stale'); setProg(1,false); return ff.readFile('hbout.mp4'); })
