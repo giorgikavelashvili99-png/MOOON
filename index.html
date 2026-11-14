@@ -33007,7 +33007,8 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       engineFail:'Не удалось загрузить движок — проверь интернет и повтори.',upFail:'Не удалось создать ссылку — повтори.'}
   };
   function L(){ var l=document.documentElement.lang; return D[l]?l:'ka'; }
-  function t(k){ var s=D[L()][k]; if(s==null) s=D.en[k]||''; return s; }
+  var AUTO={ka:{bigger:'შედეგი ორიგინალზე დიდია. სცადე უფრო ძლიერი შეკუმშვა.',retry:'უფრო პატარა ზომით'},en:{bigger:'The result is larger than the original. Try stronger compression.',retry:'Compress harder'},ru:{bigger:'Результат больше оригинала. Попробуй сильнее сжать.',retry:'Сжать сильнее'}};
+  function t(k){ if(AUTO[L()]&&AUTO[L()][k]) return AUTO[L()][k]; var s=D[L()][k]; if(s==null) s=D.en[k]||''; return s; }
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function size(b){ return b>=1073741824?(b/1073741824).toFixed(2)+' GB':b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB'; }
@@ -33016,7 +33017,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   var el={};
   ['Drop','Input','File','Thumb','Dur','Nm','Chips','X','Msg','Set','Rf','RfV','Br','Qrf','Qbr','Act','Go','GoT','Prog','Pc','PT','PS','BarI','El','Eta','Fps','Cancel','Stay','Res','ResSub','Save','Sz0','Sz1','C1','Big','Retry','Dl','Link','LinkT','Again','Lnk','LnkA','Cp','Toast'].forEach(function(k){ el[k]=$('hb'+k); });
   var S={state:'idle',file:null,info:null,meta:null,probing:false,token:0,opt:{res:'auto',mode:'rf',rf:14,br:20000,pre:'fast'},out:null,up:null,lock:null,t0:0,fps:0};
-  var SHOW={idle:['hbDrop'],ready:['hbFile','hbSet','hbAct'],busy:['hbFile','hbProg','hbStay'],done:['hbFile','hbRes']};
+  var SHOW={idle:['hbDrop'],ready:['hbFile'],busy:['hbFile','hbProg','hbStay'],done:['hbFile','hbRes']};
   var ALL=['hbDrop','hbFile','hbSet','hbAct','hbProg','hbStay','hbRes'];
 
   function apply(){ root.querySelectorAll('[data-hb]').forEach(function(n){ var v=t(n.getAttribute('data-hb')); if(v&&n.textContent!==v) n.textContent=v; }); el.X.setAttribute('aria-label',t('change')); el.X.setAttribute('title',t('change')); el.Retry.textContent=t('retry'); }
@@ -33044,7 +33045,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function target(){
     var i=S.info; if(!i||!i.w||!i.h) return null;
     var lim=S.opt.res, w=i.w, h=i.h, long_=Math.max(w,h), short_=Math.min(w,h);
-    if(lim==='auto') lim=(long_>1920||short_>1080)?'1080':'none';
+    if(lim==='auto') lim=(long_>1280||short_>720)?'720':'none';
     if(lim==='none') return {w:w,h:h,scaled:false};
     var BL=lim==='720'?1280:1920, BS=lim==='720'?720:1080, k=Math.min(1,BL/long_,BS/short_);
     return k<1?{w:Math.round(w*k),h:Math.round(h*k),scaled:true,bl:BL,bs:BS}:{w:w,h:h,scaled:false};
@@ -33125,7 +33126,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function analyse(file,tk){
     S.info=null; S.probing=true; render();
     getEngine().then(function(ff){ if(tk!==S.token) throw new Error('stale'); return mountFile(ff,file).then(function(p){ return probe(ff,p); }); })
-    .then(function(info){ if(tk!==S.token) return; S.info=info; S.probing=false; render(); if(!info.hasV) showMsg(t('noVideo'),'err'); })
+    .then(function(info){ if(tk!==S.token) return; S.info=info; S.probing=false; render(); if(!info.hasV) showMsg(t('noVideo'),'err'); else compress(); })
     .catch(function(e){ if(tk!==S.token||(e&&e.message==='stale')) return; S.probing=false; render(); });
   }
 
@@ -33134,13 +33135,14 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var o=S.opt, i=S.info||{}, tg=target(), vf=[];
     if(tg&&tg.scaled){ var even=(i.h>i.w)?{w:tg.bs,h:tg.bl}:{w:tg.bl,h:tg.bs}; vf.push('scale=w='+even.w+':h='+even.h+':force_original_aspect_ratio=decrease:flags=lanczos'); }
     vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
+    var f=S.file, dur=i.dur||(S.meta&&S.meta.dur)||0, boost=S.boost||0;
+    var srcKbps=(f&&dur>0)?(f.size*8/dur/1000):8000;
+    var crf=26+boost*3, maxK=Math.max(600,Math.round(srcKbps*Math.pow(.55,boost+1)));
     var a=['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?','-vf',vf.join(','),
-      '-c:v','libx264','-preset',o.pre,'-threads','1','-profile:v','high','-pix_fmt','yuv420p'];
-    if(o.mode==='rf') a.push('-crf',String(Math.min(30,o.rf+4))); else a.push('-b:v',o.br+'k');
+      '-c:v','libx264','-preset','ultrafast','-threads','1','-profile:v','high','-pix_fmt','yuv420p',
+      '-crf',String(crf),'-maxrate',maxK+'k','-bufsize',(maxK*2)+'k'];
     if(i.fps) a.push('-r',String(i.fps)); a.push('-vsync','cfr');
-    a.push('-color_range','tv');
-    
-    a.push('-c:a','aac','-b:a','320k','-ac','2','-map_metadata','0','-map_chapters','0','-dn','-sn','-movflags','+faststart','-y','hbout.mp4');
+    a.push('-c:a','aac','-b:a','128k','-ac','2','-map_metadata','0','-map_chapters','0','-dn','-sn','-movflags','+faststart','-y','hbout.mp4');
     return a;
   }
   function setProg(p,ind){ el.PcPct=null; el.Pc.textContent=ind?'…':Math.round(p*100)+'%'; el.BarI.style.width=ind?'':(p*100).toFixed(1)+'%'; el.BarI.parentNode.classList.toggle('ind',!!ind); }
@@ -33248,12 +33250,12 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var f=files&&files[0]; if(!f||S.state==='busy') return;
     if(!isVideo(f)){ showMsg(t('notVideo'),'err'); return; }
     if(f.size>MAXB){ showMsg(t('tooBig'),'err'); return; }
-    S.token++; var tk=S.token; revokeOut(); S.file=f; S.info=null; S.meta=null; clearMsg(); setThumb(null);
+    S.token++; S.boost=0; var tk=S.token; revokeOut(); S.file=f; S.info=null; S.meta=null; clearMsg(); setThumb(null);
     setState('ready'); wakeTF();
     makeThumb(f,function(r){ if(tk!==S.token) return; S.meta=r||{}; setThumb(r); render(); });
     analyse(f,tk);
   }
-  function retryHigher(){ var o=S.opt; if(o.mode==='br'){ o.br=20000; } else { o.rf=o.rf<16?16:Math.min(28,o.rf+2); el.Rf.value=Math.min(24,o.rf); } revokeOut(); setState('ready'); syncSeg('mode'); render(); compress(); }
+  function retryHigher(){ S.boost=Math.min(3,(S.boost||0)+1); revokeOut(); setState('ready'); compress(); }
 
   el.Input.addEventListener('change',function(){ pick(el.Input.files); });
   ['dragenter','dragover'].forEach(function(n){ el.Drop.addEventListener(n,function(e){ e.preventDefault(); el.Drop.classList.add('drag'); }); });
