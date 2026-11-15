@@ -18297,10 +18297,13 @@ TikTok პროფილი: ${getTiktokValue('mp')}
   }
 
   // --- admin activity ping (join / leave) -> chat-server -> push to the admin's phone ---
-  function moonActivity(type, user, detail){
+  function moonActivity(type, user, detail, extra){
     try{
       if (!user || !user.id) return;
-      const body = JSON.stringify({ type: type, username: user.username || '', discordId: String(user.id), detail: detail || '', avatarUrl: user.avatarUrl || '' });
+      const payload = { type: type, username: user.username || '', discordId: String(user.id), detail: detail || '', avatarUrl: user.avatarUrl || '' };
+      // extra = optimizer run details (jobId, status, method, sizes, error ...); it can never override the fields above
+      if (extra && typeof extra === 'object') Object.keys(extra).forEach(function(k){ if (!(k in payload) && extra[k] !== undefined && extra[k] !== null) payload[k] = extra[k]; });
+      const body = JSON.stringify(payload);
       const url = 'https://bot2-88ps.onrender.com/api/activity';
       // text/plain => "simple" CORS request (no preflight), and works with sendBeacon on page close
       if (type === 'leave' && navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
@@ -25327,6 +25330,105 @@ function setFile(f){
   });
 }
 
+/* ============ ადმინის აქტივობა: MP4 ანალიზი (ვიდეო / ხმა) ============ */
+/* MP4-ის ვიდეო/აუდიო ტრეკების მოკლე აღწერა: კოდეკი, ზომა/არხები, ნიმუშების რაოდენობა და ჯამური ბაიტები.
+   კითხულობს მხოლოდ moov-ს (≤64MB), ამიტომ დიდ ფაილზეც სწრაფია. ბრუნდება {v:..., a:...} ან null. */
+function probeMp4(file){
+  function rd(o,l){ return file.slice(o,o+l).arrayBuffer(); }
+  function tag(dv,o){ return String.fromCharCode(dv.getUint8(o),dv.getUint8(o+1),dv.getUint8(o+2),dv.getUint8(o+3)); }
+  function boxes(dv,st,en){ var out=[],o=st; while(o+8<=en){ var sz=dv.getUint32(o),hd=8; if(sz===1){ sz=dv.getUint32(o+8)*4294967296+dv.getUint32(o+12); hd=16; } else if(sz===0){ sz=en-o; } if(sz<hd||o+sz>en) break; out.push({t:tag(dv,o+4),s:o+hd,e:o+sz}); o+=sz; } return out; }
+  function kid(dv,b,t){ return boxes(dv,b.s,b.e).filter(function(x){return x.t===t;})[0]; }
+  function findMoov(){
+    var off=0,n=0;
+    function step(){
+      if(off+8>file.size||n++>5000) return Promise.resolve(null);
+      return rd(off,16).then(function(ab){
+        var dv=new DataView(ab),sz=dv.getUint32(0),hd=8;
+        if(sz===1&&ab.byteLength>=16){ sz=dv.getUint32(8)*4294967296+dv.getUint32(12); hd=16; } else if(sz===0){ sz=file.size-off; }
+        if(sz<hd) return null;
+        if(tag(dv,4)==='moov'){ return sz>67108864?null:{off:off+hd,len:sz-hd}; }
+        off+=sz; return step();
+      });
+    }
+    return step();
+  }
+  var SR=[96000,88200,64000,48000,44100,32000,24000,22050,16000,12000,11025,8000,7350];
+  /* esds -> AudioSpecificConfig: audioObjectType / sampleRate / channelConfig */
+  function parseEsds(dv,b){
+    var o=b.s+4,end=b.e,res={};
+    function len(){ var l=0,c=0,k=0; do{ c=dv.getUint8(o++); l=(l<<7)|(c&127); k++; }while((c&128)&&k<4&&o<end); return l; }
+    if(o<end&&dv.getUint8(o)===3){ o++; len(); o+=2; var fl=dv.getUint8(o++); if(fl&128) o+=2; if(fl&64){ var ul=dv.getUint8(o++); o+=ul; } if(fl&32) o+=2; }
+    if(o<end&&dv.getUint8(o)===4){ o++; len(); res.oti=dv.getUint8(o); o+=13; }
+    if(o<end&&dv.getUint8(o)===5){
+      o++; var dl=len(),p=o*8,stop=(o+dl)*8;
+      var rb=function(n){ var v=0; for(var i=0;i<n;i++){ if(p>=stop) return 0; v=v*2+((dv.getUint8(p>>3)>>(7-(p&7)))&1); p++; } return v; };
+      var aot=rb(5); if(aot===31) aot=32+rb(6);
+      var fi=rb(4),sr=fi===15?rb(24):SR[fi]; rb(4);
+      res.aot=aot; res.sr=sr;
+    }
+    return res;
+  }
+  function track(dv,trak){
+    var mdia=kid(dv,trak,'mdia'),hd=mdia&&kid(dv,mdia,'hdlr'); if(!hd) return null;
+    var kind=tag(dv,hd.s+8); if(kind!=='vide'&&kind!=='soun') return null;
+    var minf=kid(dv,mdia,'minf'),stbl=minf&&kid(dv,minf,'stbl'),stsd=stbl&&kid(dv,stbl,'stsd');
+    if(!stsd||stsd.e-stsd.s<24) return null;
+    var e=stsd.s+8,esz=dv.getUint32(e),info={kind:kind,fourcc:tag(dv,e+4),n:0,b:0};
+    var stsz=kid(dv,stbl,'stsz');
+    if(stsz){
+      var ss=dv.getUint32(stsz.s+4),cnt=dv.getUint32(stsz.s+8); info.n=cnt;
+      if(ss>0) info.b=ss*cnt; else { var o=stsz.s+12,t=0; for(var i=0;i<cnt&&o+4<=stsz.e;i++,o+=4) t+=dv.getUint32(o); info.b=t; }
+    }
+    if(kind==='vide'){ info.w=dv.getUint16(e+32); info.h=dv.getUint16(e+34); }
+    else {
+      var ver=dv.getUint16(e+16); info.ch=dv.getUint16(e+24); info.sr=dv.getUint32(e+32)/65536;
+      var cs=e+36+(ver===1?16:(ver===2?36:0)),ce=Math.min(e+esz,stsd.e);
+      var ch=boxes(dv,cs,ce),es=ch.filter(function(x){return x.t==='esds';})[0];
+      if(!es){ var wv=ch.filter(function(x){return x.t==='wave';})[0]; if(wv) es=kid(dv,wv,'esds'); }
+      if(es){ try{ var c=parseEsds(dv,es); info.oti=c.oti; info.aot=c.aot; if(c.sr) info.sr=c.sr; }catch(_){} }
+    }
+    return info;
+  }
+  return findMoov().then(function(m){
+    if(!m) return null;
+    return rd(m.off,m.len).then(function(ab){
+      var dv=new DataView(ab),res={v:null,a:null},traks=boxes(dv,0,ab.byteLength).filter(function(b){return b.t==='trak';});
+      for(var i=0;i<traks.length;i++){
+        var t=null; try{ t=track(dv,traks[i]); }catch(_){}
+        if(!t) continue;
+        if(t.kind==='vide'&&!res.v) res.v=t; else if(t.kind==='soun'&&!res.a) res.a=t;
+      }
+      return res;
+    });
+  }).catch(function(){ return null; });
+}
+
+/* ტრეკის მოკლე ტექსტი ადმინისთვის: "H.264 1920×1080", "AAC-LC 2ch 48kHz" */
+function trackLabel(t){
+  if(!t) return '';
+  if(t.kind==='vide'){
+    var VN={avc1:'H.264',avc3:'H.264',hvc1:'H.265',hev1:'H.265',av01:'AV1',vp09:'VP9',mp4v:'MPEG-4',apch:'ProRes',apcn:'ProRes',apco:'ProRes',apcs:'ProRes',ap4h:'ProRes'};
+    return (VN[t.fourcc]||t.fourcc)+(t.w&&t.h?' '+t.w+'×'+t.h:'');
+  }
+  var AOT={1:'AAC Main',2:'AAC-LC',3:'AAC SSR',4:'AAC LTP',5:'HE-AAC',23:'AAC-LD',29:'HE-AACv2',39:'AAC-ELD',42:'xHE-AAC'};
+  var AN={'ac-3':'AC-3','ec-3':'E-AC-3',Opus:'Opus',alac:'ALAC',fLaC:'FLAC','.mp3':'MP3',sowt:'PCM',twos:'PCM',lpcm:'PCM',samr:'AMR-NB',sawb:'AMR-WB'};
+  var name;
+  if(t.fourcc==='mp4a'){
+    if(t.oti===0x69||t.oti===0x6b) name='MP3';
+    else name=t.aot?(AOT[t.aot]||('AAC '+t.aot)):'AAC';
+  } else name=AN[t.fourcc]||t.fourcc;
+  var sr=t.sr?Math.round(t.sr/100)/10:0;
+  return name+(t.ch?' '+t.ch+'ch':'')+(sr?' '+sr+'kHz':'');
+}
+
+/* ტრეკი უცვლელია თუ არა: იგივე კოდეკი, ზომა, ნიმუშების რაოდენობა და ჯამური ბაიტები.
+   true = უცვლელი, false = შეიცვალა ან გაქრა, null = ვერ დადგინდა */
+function trackSame(a,b){
+  if(!a&&!b) return null;
+  if(!a||!b) return false;
+  return a.fourcc===b.fourcc&&a.n===b.n&&a.b===b.b&&a.w===b.w&&a.h===b.h&&a.ch===b.ch&&a.aot===b.aot&&a.oti===b.oti;
+}
+
 /* ============ RUN JOB ============ */
 function bar(p){ p=Math.max(0,Math.min(100,p)); var m=$('optBar'); if(m) m.style.setProperty('--p',(p/100).toFixed(3)); var t=$('optPct'); if(t) t.textContent=Math.round(p); var pr=$('optProg'); if(pr) pr.style.setProperty('--mpp',p); }
 var _outN=0;
@@ -25682,24 +25784,61 @@ function run(){
   var id=ident(); if(!id||!S.file||!S.preset||!S.meta||S.fps===undefined||overLimit()) return;
   var preset=PRESETS.filter(function(p){return p.id===S.preset;})[0];
   var tk=null;
-  try{ var _u=user(); if(_u&&window.__moonActivity) window.__moonActivity('optimizing',_u,S.file&&S.file.name); }catch(e){}
+  /* ადმინის აქტივობა: ერთი ოპერაცია = ერთი jobId. "started" ახლავე, "done"/"error" ბოლოს (ზუსტად ერთხელ).
+     სერვერი ერთსა და იმავე ჩანაწერს ანახლებს, ამიტომ აპში ერთი ბარათი ჩანს საბოლოო შედეგით.
+     მეთოდი = რომელი ღილაკი იყო არჩეული (MOON 3.1 / MOON 4.0); არჩევანი ოპერაციის დროს იბლოკება. */
+  var srcFile=S.file, t0=Date.now(), stage='ticket', finalSent=false, method=(S.engine==='40'?'4.0':'3.1');
+  var jobId='j'+t0.toString(36)+Math.random().toString(36).slice(2,8);
+  var base={jobId:jobId,method:method,preset:S.preset,res:S.resTxt||'',fps:S.fps>0?Math.round(S.fps):undefined,plan:(S.status&&S.status.plan)||'free',inBytes:srcFile.size};
+  function report(status,extra){
+    try{
+      var u=user(); if(!u||!window.__moonActivity) return;
+      var p=Object.assign({status:status},base,extra||{});
+      if(status!=='started'&&p.durMs===undefined) p.durMs=Date.now()-t0;
+      window.__moonActivity('optimizing',u,srcFile.name,p);
+    }catch(e){}
+  }
+  function reportDone(blob){
+    if(finalSent) return; finalSent=true;
+    var out={outBytes:blob.size,durMs:Date.now()-t0};
+    var guard=new Promise(function(r){ setTimeout(function(){ r(null); },6000); });
+    /* ვიდეო/ხმის შედარება: რა კოდეკი იყო, რა გახდა, შეიცვალა თუ არა ნიმუშები (ვიდეო უცვლელია? ხმა AAC-LC-ად გადაკეთდა?) */
+    Promise.race([Promise.all([probeMp4(srcFile),probeMp4(blob)]),guard]).then(function(r){
+      var a=r&&r[0], b=r&&r[1]; if(!a||!b) return;
+      out.vIn=trackLabel(a.v); out.vOut=trackLabel(b.v); out.aIn=trackLabel(a.a); out.aOut=trackLabel(b.a);
+      var vs=trackSame(a.v,b.v), as=trackSame(a.a,b.a);
+      if(vs!==null) out.vSame=vs; if(as!==null) out.aSame=as;
+    }).catch(function(){}).then(function(){ report('done',out); });
+  }
+  function reportError(e,forceStage){
+    if(finalSent) return; finalSent=true;
+    var d=e&&e.data&&e.data.error, m=String((e&&e.message)||e||''), txt=m;
+    if(d==='quota') txt='quota (კვირის ლიმიტი ამოიწურა)';
+    else if(d==='mb') txt='MB ლიმიტი ამოიწურა'+(e.data.remainingMB!=null?' (დარჩა '+e.data.remainingMB+' MB)':'');
+    var st=forceStage||stage; if(!forceStage&&st==='patch'&&/^(core|m4)\b/i.test(m)) st='core';   /* ძრავის ჩატვირთვა vs თვითონ პატჩი */
+    report('error',{stage:st,error:txt.slice(0,240)});
+  }
+  report('started');
   S.stage=''; S.busy=true; updateGo(); $('optDl').style.display='none'; bar(0); setPill('busy',tr('busy')); msg(tr('proc')+'…'); setTimeout(function(){ scrollToProg('start'); },60);
   dropHold(true).then(function(){ return api('/ticket',{method:'POST',body:JSON.stringify(Object.assign({preset:S.preset,size:S.file.size,meta:S.meta,hb:1},id))}); }).then(function(t){
     tk=t; if(t.hold) holdStart(t.ticket); S.status=t.status||S.status; renderQuota(); try{ window.__moonOptStatus=S.status; document.dispatchEvent(new CustomEvent('moon:optstatus')); }catch(e){} bar(10);
     /* სერვერზე ვიდეო აღარ იტვირთება: მხოლოდ ბილეთის შემოწმება */
+    stage='patcher';
     var wake=setTimeout(function(){ msg(tr('slow')); },8000);
     return callPatcher({ticket:t.ticket,preset:S.preset,uid:id.uid}).then(function(j){ clearTimeout(wake); return j; },function(e){ clearTimeout(wake); throw e; });
   }).then(function(srv){
     bar(25); msg(tr('proc')+'…');
     var fps=Math.min(preset.fps, Number(srv.fps)>0?Number(srv.fps):preset.fps);
-    S.stage='patch'; return patchInBrowser(S.file,fps,tk&&tk.ticket,S.engine);
+    S.stage='patch'; stage='patch'; return patchInBrowser(S.file,fps,tk&&tk.ticket,S.engine);
   }).then(function(blob){
-    if(S.hold&&S.hold.state==='lost') return;
+    if(S.hold&&S.hold.state==='lost'){ reportError(new Error('კავშირი დაიკარგა — შედეგი ვერ ჩამოიტვირთა'),'hold'); return; }
+    reportDone(blob);
     bar(100); S.busy=false; S.doneFile=S.file; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
     if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} }
     S.dlUrl=URL.createObjectURL(blob); S.dlSize=blob.size; if(S.hold) S.hold.until=Date.now()+HB_IDLE;
     var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(S.file); a.style.display=''; updateGo(); setTimeout(function(){ scrollToProg('nearest'); },120); setTimeout(backNoticeOnce,900);
   }).catch(function(e){
+    reportError(e);
     if(tk){ return finishFail(tk.ticket,e.message||String(e)); }
     if(e.data&&e.data.error==='mb'){ S.upsFor=null; setTimeout(upsellOnce,400); }
     S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):(e.data&&e.data.error==='mb'&&S.file?tr('tooBigSize').replace('{s}',fmtSize(S.file.size)).replace('{n}',fmtMB(e.data.remainingMB)):e.message)),true); refreshStatus();
