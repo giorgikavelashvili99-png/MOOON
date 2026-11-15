@@ -18650,6 +18650,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       logIosUnclear: ['გაზიარების მენიუ გაიხსნა — თუ იქიდან უკვე შეინახეთ, მზადაა. თუ არა, ქვემოთ არის პირდაპირი ლინკიც.', 'The Share Sheet opened — if you already saved it from there, you\'re done. If not, there\'s a direct link below too.'],
       logIosOpen: ['ვიდეო გაიხსნა ახალ ჩანართში (iOS-ზე ასე ჩამოიტვირთება ხმის გარეშე თამაშის თავიდან ასაცილებლად) — შეინახეთ Share ღილაკით ან თითის გრძლად დაჭერით.', 'Video opened in a new tab (this avoids an iOS bug where the audio cuts out) — save it via the Share button or by long-pressing it.'],
       logReady: ['მზადაა.', 'Ready.'],
+      logIosShareFail: ['გაზიარება ვერ მოხერხდა — დააჭირეთ ისევ პირდაპირი ჩამოტვირთვისთვის.', 'Sharing failed — tap again for a direct download.'],
       untitled: ['უსათაურო ვიდეო', 'Untitled video'],
       views: ['ნახვა', 'views'],
       statViews: ['ნახვა', 'Views'],
@@ -19534,6 +19535,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       if (musicRow) musicRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       if (iosLinkWrap) iosLinkWrap.style.display = 'none';
+      ttdlResetIosLink();
       sdBtn.disabled = true; hdBtn.disabled = true;
       if (sdBtnLabel) { sdBtnLabel.textContent = 'BROWSER QUALITY'; delete sdBtnLabel.dataset.originalText; }
       if (hdBtnLabel) { hdBtnLabel.textContent = 'MOBILE QUALITY'; delete hdBtnLabel.dataset.originalText; }
@@ -19825,9 +19827,42 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     // link the visitor taps themselves can never be blocked by anything.
     function ttdlShowIosLink(url){
       if (!iosLinkWrap || !iosLink) return;
+      ttdlResetIosLink();
       iosLink.href = url;
       iosLinkWrap.style.display = 'block';
     }
+
+    // ---- iOS: video save link state ----------------------------------
+    // On iPhone/iPad the VIDEO is fetched into memory first (the same
+    // direct fetch Android/desktop already use), then the visitor taps the
+    // "Save video" link: if the browser supports file sharing it opens the
+    // iOS Share Sheet ("Save Video" -> Photos), otherwise the link itself
+    // downloads the blob. The Worker /dl proxy is only the fallback now --
+    // it served the music track fine but not the video.
+    let ttdlIosBlobUrl = null;
+    let ttdlIosFile = null;
+
+    function ttdlResetIosLink(){
+      if (ttdlIosBlobUrl){ try{ URL.revokeObjectURL(ttdlIosBlobUrl); }catch(e){} ttdlIosBlobUrl = null; }
+      ttdlIosFile = null;
+      if (!iosLink) return;
+      iosLink.dataset.mode = '';
+      iosLink.removeAttribute('download');
+      iosLink.setAttribute('target', '_blank');
+    }
+
+    if (iosLink) iosLink.addEventListener('click', function(e){
+      if (iosLink.dataset.mode !== 'share' || !ttdlIosFile) return;
+      // navigator.share() has to be called synchronously inside the tap.
+      e.preventDefault();
+      navigator.share({ files: [ttdlIosFile] }).then(function(){
+        ttdlLog(ttdlDict('logDone'));
+      }).catch(function(err){
+        if (err && err.name === 'AbortError') return;   // visitor closed the sheet
+        iosLink.dataset.mode = 'direct';                 // next tap = plain blob download
+        ttdlLog(ttdlDict('logIosShareFail'));
+      });
+    });
 
     // The SD/HD buttons have an icon + label structure (see markup), so
     // the generic setBtnBusy() (which does btn.textContent = ...) would
@@ -19863,6 +19898,61 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       return DISCORD_TIKTOK_NOTIFY_WORKER_URL + '/dl?url=' + encodeURIComponent(tikwmUrl) + '&name=' + encodeURIComponent(filename);
     }
 
+    // iOS video download: fetch the file with live progress, then expose a
+    // tap-to-save link (Share Sheet or blob download). Falls back to the
+    // Worker proxy link if the direct fetch is blocked or stalls.
+    async function ttdlIosVideoDownload(link, quality, btn, labelSpan){
+      const filename = `tiktok_${Date.now()}_${quality}.mp4`;
+      setDlBtnBusy(btn, labelSpan, true, '0%');
+      ttdlLog(ttdlDict('logDownloading'));
+      const ctl = new AbortController();
+      let timer = null;
+      try{
+        timer = setTimeout(() => ctl.abort(), 90000);
+        const res = await fetch(link, { signal: ctl.signal });
+        if (!res.ok) throw new Error('bad response');
+        const total = Number(res.headers.get('Content-Length')) || 0;
+        const chunks = [];
+        let received = 0;
+        if (res.body && res.body.getReader){
+          const reader = res.body.getReader();
+          while (true){
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            received += value.length;
+            setDlBtnBusy(btn, labelSpan, true, total
+              ? Math.min(100, Math.round((received / total) * 100)) + '%'
+              : (received / (1024*1024)).toFixed(1) + 'MB');
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        } else {
+          chunks.push(new Uint8Array(await (await res.blob()).arrayBuffer()));
+        }
+        const blob = new Blob(chunks, { type: 'video/mp4' });
+        if (!blob.size) throw new Error('empty file');
+
+        ttdlResetIosLink();
+        ttdlIosBlobUrl = URL.createObjectURL(blob);
+        let file = null;
+        try { file = new File([blob], filename, { type: 'video/mp4' }); } catch(e){}
+        const canShare = !!(file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] }));
+        if (canShare) ttdlIosFile = file;
+        iosLink.dataset.mode = canShare ? 'share' : 'direct';
+        iosLink.removeAttribute('target');
+        iosLink.setAttribute('download', filename);
+        iosLink.href = ttdlIosBlobUrl;
+        iosLinkWrap.style.display = 'block';
+        ttdlLog(ttdlDict('logMtReady'));
+      } catch(e){
+        ttdlShowIosLink(ttdlBuildProxyDownloadUrl(link, filename));
+        ttdlLog(ttdlDict('logMtReady'));
+      } finally {
+        clearTimeout(timer);
+        setDlBtnBusy(btn, labelSpan, false);
+      }
+    }
+
     async function ttdlDownload(quality){
       if (!lastData) return;
       const link = quality === 'hd' ? lastData.hd : lastData.sd;
@@ -19871,12 +19961,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const labelSpan = quality === 'hd' ? hdBtnLabel : sdBtnLabel;
 
       if (ttdlIsIOS()){
-        // No fetch/upload/Share Sheet needed -- just hand the visitor a
-        // real link to the proxy above and let Safari's own download
-        // handling take it from there.
-        const proxyUrl = ttdlBuildProxyDownloadUrl(link, `tiktok_${Date.now()}_${quality}.mp4`);
-        ttdlShowIosLink(proxyUrl);
-        ttdlLog(ttdlDict('logMtReady'));
+        await ttdlIosVideoDownload(link, quality, btn, labelSpan);
         return;
       }
 
@@ -20093,6 +20178,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       if (musicRow) musicRow.style.display = 'none';
       if (clearBtn) clearBtn.style.display = 'none';
       if (iosLinkWrap) iosLinkWrap.style.display = 'none';
+      ttdlResetIosLink();
       sdBtn.disabled = true;
       hdBtn.disabled = true;
       if (sdBtnLabel) { sdBtnLabel.textContent = 'BROWSER QUALITY'; delete sdBtnLabel.dataset.originalText; }
