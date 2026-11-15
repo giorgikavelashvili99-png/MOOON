@@ -33197,7 +33197,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     }).catch(function(e){
       if(done||tk!==S.token) return; done=true; clearTimeout(to);
       try{ console.warn('WebCodecs probe failed, using ffmpeg.wasm',e); }catch(_){}
-      S.wcOK=false; analyse(file,tk);
+      S.wcWhy='probe: '+String((e&&e.message)||e).slice(0,120); S.wcOK=false; analyse(file,tk);
     });
   }
   function compressWC(){
@@ -33242,13 +33242,27 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     }).catch(function(e){
       if(tk!==S.token||(e&&e.message==='stale')) return;
       try{ console.warn('WebCodecs path failed, falling back to ffmpeg.wasm',e); }catch(_){}
-      S.wcFail=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWasm(); },0);
+      S.wcWhy=String((e&&e.message)||e).slice(0,140); S.wcFail=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWasm(); },0);
     }).then(function(){ E.conv=null; clearInterval(clk); releaseScreen(); });
   }
 
   /* ---------- HandBrake "Recommended" preset → ffmpeg ---------- */
+  /* tidy frame-rate value: NTSC rates as exact fractions, others rounded (mediabunny gives long floats like 29.970029970029973) */
+  function fpsArg(f){
+    f=Number(f); if(!isFinite(f)||f<=0) return null;
+    var n=[[23.976,'24000/1001'],[29.97,'30000/1001'],[47.952,'48000/1001'],[59.94,'60000/1001'],[119.88,'120000/1001']];
+    for(var k=0;k<n.length;k++) if(Math.abs(f-n[k][0])<0.02) return n[k][1];
+    return String(Math.round(f*1000)/1000);
+  }
   function buildArgs(path,fast){
     var o=S.opt, i=S.info||{}, tg=target(), vf=[];
+    if(fast){   /* SAFE MODE (automatic retry): plain, widely-compatible x264 command, no custom params / fps override */
+      if(tg&&tg.scaled){ var ev=(i.h>i.w)?{w:tg.bs,h:tg.bl}:{w:tg.bl,h:tg.bs}; vf.push('scale=w='+ev.w+':h='+ev.h+':force_original_aspect_ratio=decrease:flags=lanczos'); }
+      vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
+      return ['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?','-vf',vf.join(','),
+        '-c:v','libx264','-preset','veryfast','-threads','1','-pix_fmt','yuv420p','-crf','21',
+        '-c:a','aac','-b:a','192k','-sn','-dn','-y','hbout.mp4'];
+    }
     if(tg&&tg.scaled){ var even=(i.h>i.w)?{w:tg.bs,h:tg.bl}:{w:tg.bl,h:tg.bs}; vf.push('scale=w='+even.w+':h='+even.h+':force_original_aspect_ratio=decrease:flags=lanczos'); }
     /* no-op even-size scale is skipped when the source is already even (saves a swscale pass on every frame) */
     if(!(i.w&&i.h&&i.w%2===0&&i.h%2===0&&!(tg&&tg.scaled))) vf.push('scale=trunc(iw/2)*2:trunc(ih/2)*2');
@@ -33263,7 +33277,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     a.push('-c:v','libx264','-preset','superfast','-threads','1','-profile:v','high','-pix_fmt','yuv420p',
       '-x264-params','bframes=3:b-adapt=1:aq-mode=2:deblock=1,1',
       '-crf',String(crf),'-maxrate',maxK+'k','-bufsize',(maxK*3)+'k');
-    if(i.fps) a.push('-r',String(i.fps)); a.push('-vsync','cfr');
+    var fr=fpsArg(i.fps); if(fr) a.push('-r',fr); a.push('-vsync','cfr');
     a.push('-c:a','copy','-map_metadata','0','-map_chapters','0','-dn','-sn');
     if(f&&f.size<200*1048576) a.push('-movflags','+faststart');
     a.push('-y','hbout.mp4');
@@ -33302,7 +33316,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     clearMsg(); wakeTF(); holdScreen();
     var file=S.file, tk=S.token, ff=null;
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
-    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=loaded?t('pSubRun'):t('pSubLoad'); setProg(0,true);
+    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=(loaded?t('pSubRun'):t('pSubLoad'))+(S.wcWhy?' [WC: '+S.wcWhy+']':''); setProg(0,true);
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>30&&E.ff){ el.PS.textContent='მუშაობს… ('+Math.round(sec)+'წ) — პირველი პროცენტი ცოტა ხანში გამოჩნდება'; } } },1000);
     getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,false); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
@@ -33346,10 +33360,10 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var m=String(e&&e.message||e), msg;
     if(e&&e.engine){ msg=t('engineFail')+' ['+m+']'; }
     else if(/memory|alloc|RangeError|out of bounds|Aborted|OOM/i.test(m)){ msg=t('failMem'); dropEngine(); }
-    else { msg=t('fail')+' ['+m+(window.__hbLog?' · '+window.__hbLog:'')+']'; try{ console.error('HB compress failed',e,window.__hbLog); }catch(_){} }
+    else { msg=t('fail')+' ['+m+(window.__hbLog?' · '+window.__hbLog:'')+(S.wcWhy?' · WC: '+S.wcWhy:'')+']'; try{ console.error('HB compress failed',e,window.__hbLog); }catch(_){} }
     dropEngine(); setState('ready'); showMsg(msg,'err');
   }
-  function cancel(){ if(S.state!=='busy') return; S.token++; stopWC(); dropEngine(); clearInterval(clk); releaseScreen(); setState('ready'); clearMsg(); if(S.file) analyseFast(S.file,S.token); }
+  function cancel(){ if(S.state!=='busy') return; S.token++; stopWC(); dropEngine(); clearInterval(clk); releaseScreen(); setState('ready'); clearMsg(); }
 
   /* ---------- download / link (mooontransferr) ---------- */
   function download(){ if(!S.out) return; var a=document.createElement('a'); a.href=S.out.url; a.download=S.out.name; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
@@ -33392,7 +33406,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var f=files&&files[0]; if(!f||S.state==='busy') return;
     if(!isVideo(f)){ showMsg(t('notVideo'),'err'); return; }
     if(f.size>MAXB){ showMsg(t('tooBig'),'err'); return; }
-    S.token++; S.boost=0; S.wcOK=false; S.wcFail=false; var tk=S.token; revokeOut(); S.file=f; S.info=null; S.meta=null; clearMsg(); setThumb(null);
+    S.token++; S.boost=0; S.wcOK=false; S.wcFail=false; S.wcWhy=''; var tk=S.token; revokeOut(); S.file=f; S.info=null; S.meta=null; clearMsg(); setThumb(null);
     setState('ready'); wakeTF();
     makeThumb(f,function(r){ if(tk!==S.token) return; S.meta=r||{}; setThumb(r); render(); });
     analyseFast(f,tk);
