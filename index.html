@@ -19456,37 +19456,51 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const key = url.replace(/\/+$/, '');
       const hit = ttdlMetaCache.get(key);
       if (hit && Date.now() - hit.t < 600000) return hit.json;
-            // Routes are tried ONE AFTER ANOTHER (never in parallel -- tikwm rate-limits to ~1 req/sec).
-      // 1) direct tikwm: works inside the app (no CORS there), fails instantly in a normal browser
-      // 2) our Worker: server-side call, works for the website
-      const routes = [
-        'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1',
-        TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url),
-        TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url)
-      ];
+      const enc = encodeURIComponent(url);
+      const direct = 'https://www.tikwm.com/api/?url=' + enc + '&hd=1';
+      const viaWorker = TTDL_META_WORKER + '/meta?url=' + enc;
       let lastMsg = '';
-      // Same thing the visitor would do by pressing the button again and again, but automatic.
-      for (let i = 0; i < 3; i++) {
-        const ctl = new AbortController();
-        const timer = setTimeout(() => ctl.abort(), 25000);
-        try {
-          const res = await fetch(routes[i % routes.length], { signal: ctl.signal, cache: 'no-store' });
-          const json = await res.json();
-          clearTimeout(timer);
-          if (json && json.code === 0 && json.data) {
-            ttdlMetaCache.set(key, { t: Date.now(), json: json });
-            return json;
+      const t0 = Date.now();
+      const ctl = new AbortController();
+      const deadline = setTimeout(() => ctl.abort(), 20000);
+      const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+      const one = async (u) => {
+        const res = await fetch(u, { signal: ctl.signal, cache: 'no-store' });
+        const j = await res.json();
+        if (j && j.code === 0 && j.data) return j;
+        lastMsg = String((j && j.msg) || ('code ' + (j && j.code)));
+        throw new Error(lastMsg);
+      };
+      // All routes start together (direct = works in the app, Worker = works on the website);
+      // the first valid answer wins and cancels the rest. A 2nd Worker call is "hedged" in after
+      // 2.5 s in case the first one got stuck. Direct and Worker leave from different IPs, so they
+      // do not trip tikwm's 1 request/second limit against each other.
+      const launch = (u, delay) => new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          for (let k = 0; k < 3; k++) {
+            if (ctl.signal.aborted) return reject(new Error('aborted'));
+            try { return resolve(await one(u)); }
+            catch (e) {
+              if (/limit/i.test(lastMsg) && k < 2) { await sleep(1100); continue; }
+              return reject(e);
+            }
           }
-          lastMsg = String((json && json.msg) || ('code ' + (json && json.code)));
-        } catch (e) {
-          clearTimeout(timer);
-          lastMsg = String((e && e.message) || e);
-        }
-        console.warn('[ttdl] attempt ' + (i + 1) + ' failed (route ' + (i % routes.length) + '):', lastMsg);
-        await new Promise(r => setTimeout(r, 1150));
+        }, delay);
+      });
+      try {
+        const json = await Promise.any([launch(direct, 0), launch(viaWorker, 0), launch(viaWorker, 2500)]);
+        ttdlMetaCache.set(key, { t: Date.now(), json: json });
+        console.log('[ttdl] meta ready in ' + (Date.now() - t0) + ' ms');
+        return json;
+      } catch (e) {
+        console.warn('[ttdl] analyze failed after ' + (Date.now() - t0) + ' ms:', lastMsg || (e && e.message));
+        throw new Error(lastMsg || 'tikwm');
+      } finally {
+        clearTimeout(deadline);
+        ctl.abort();
       }
-      throw new Error(lastMsg || 'tikwm');
     }
+
     // Opens the TLS connection to tikwm before the visitor presses Analyze
     // (focus / paste / opening the Checker page) -- saves ~3 round trips.
     let ttdlWarmAt = 0;
@@ -19494,6 +19508,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       if (Date.now() - ttdlWarmAt < 45000) return;
       ttdlWarmAt = Date.now();
       try { fetch('https://www.tikwm.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' }).catch(() => {}); } catch (e) {}
+      try { fetch(TTDL_META_WORKER + '/', { mode: 'no-cors', cache: 'no-store' }).catch(() => {}); } catch (e) {}
     }
     window.__ttdlWarm = ttdlWarm;
 
