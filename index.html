@@ -19448,7 +19448,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     // transparent retry on the free API's "1 request/second" answer, and a
     // 10-minute in-memory cache (the same link analysed again is instant).
     // Cloudflare Worker that calls tikwm server-side (see worker code) -- set to your worker URL.
-    const TTDL_META_WORKER = 'https://moonttcheckepro.giorgikavelashvili99.workers.dev';
+    const TTDL_META_WORKER = 'https://wispy-cherry-1c42.giorgikavelashvili99.workers.dev';
     const ttdlMetaCache = new Map();
     async function ttdlFetchMeta(url){
       // Strip tracking junk (?is_from_webapp=1&sender_device=...)
@@ -19456,17 +19456,13 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const key = url.replace(/\/+$/, '');
       const hit = ttdlMetaCache.get(key);
       if (hit && Date.now() - hit.t < 600000) return hit.json;
-      const direct = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
-      // Routes are tried ONE AFTER ANOTHER (never in parallel -- tikwm rate-limits to ~1 req/sec).
+            // Routes are tried ONE AFTER ANOTHER (never in parallel -- tikwm rate-limits to ~1 req/sec).
       const routes = [
-        TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url),
-        direct,
-        'https://tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1',
-        'https://corsproxy.io/?url=' + encodeURIComponent(direct)
+        TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url)
       ];
       let lastMsg = '';
       // Same thing the visitor would do by pressing the button again and again, but automatic.
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 4; i++) {
         const ctl = new AbortController();
         const timer = setTimeout(() => ctl.abort(), 7000);
         try {
@@ -19808,7 +19804,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           try { document.dispatchEvent(new CustomEvent('moon:ttdl-fail', { detail: {} })); } catch (e3) {}
         }
       } catch(e){
-        ttdlLog(ttdlDict('logFail'));
+        ttdlLog(ttdlDict('logFail') + ' [' + String((e && e.message) || e).slice(0,90) + ']');
         try { document.dispatchEvent(new CustomEvent('moon:ttdl-fail', { detail: {} })); } catch (e3) {}
       } finally {
         setBtnBusy(analyzeBtn, false);
