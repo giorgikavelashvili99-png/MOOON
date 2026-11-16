@@ -18307,7 +18307,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const url = 'https://bot2-88ps.onrender.com/api/activity';
       // text/plain => "simple" CORS request (no preflight), and works with sendBeacon on page close
       if (type === 'leave' && navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
-      else fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: body, keepalive: true }).catch(() => {});
+      else return fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: body, keepalive: true }).catch(() => {});
     }catch(e){}
   }
   let __moonJoinSent = false;
@@ -25790,12 +25790,15 @@ function run(){
   var srcFile=S.file, t0=Date.now(), stage='ticket', finalSent=false, method=(S.engine==='40'?'4.0':'3.1');
   var jobId='j'+t0.toString(36)+Math.random().toString(36).slice(2,8);
   var base={jobId:jobId,method:method,preset:S.preset,res:S.resTxt||'',fps:S.fps>0?Math.round(S.fps):undefined,plan:(S.status&&S.status.plan)||'free',inBytes:srcFile.size};
+  var sendQ=Promise.resolve();   /* "done"/"error" იგზავნება მხოლოდ მას მერე, რაც "started" სერვერმა მიიღო (Render-ის გაღვიძებისას რიგი ირეოდა) */
   function report(status,extra){
     try{
       var u=user(); if(!u||!window.__moonActivity) return;
       var p=Object.assign({status:status},base,extra||{});
       if(status!=='started'&&p.durMs===undefined) p.durMs=Date.now()-t0;
-      window.__moonActivity('optimizing',u,srcFile.name,p);
+      var go=function(){ try{ return window.__moonActivity('optimizing',u,srcFile.name,p); }catch(e){} };
+      if(status==='started') sendQ=Promise.resolve(go()).catch(function(){});
+      else sendQ=Promise.race([sendQ,new Promise(function(r){ setTimeout(r,20000); })]).then(go).catch(function(){});
     }catch(e){}
   }
   function reportDone(blob){
