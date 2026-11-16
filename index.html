@@ -19457,12 +19457,16 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const hit = ttdlMetaCache.get(key);
       if (hit && Date.now() - hit.t < 600000) return hit.json;
             // Routes are tried ONE AFTER ANOTHER (never in parallel -- tikwm rate-limits to ~1 req/sec).
+      // 1) direct tikwm: works inside the app (no CORS there), fails instantly in a normal browser
+      // 2) our Worker: server-side call, works for the website
       const routes = [
+        'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1',
+        TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url),
         TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url)
       ];
       let lastMsg = '';
       // Same thing the visitor would do by pressing the button again and again, but automatic.
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 3; i++) {
         const ctl = new AbortController();
         const timer = setTimeout(() => ctl.abort(), 25000);
         try {
