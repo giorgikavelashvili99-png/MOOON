@@ -19462,9 +19462,9 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       ];
       let lastMsg = '';
       // Same thing the visitor would do by pressing the button again and again, but automatic.
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 2; i++) {
         const ctl = new AbortController();
-        const timer = setTimeout(() => ctl.abort(), 7000);
+        const timer = setTimeout(() => ctl.abort(), 25000);
         try {
           const res = await fetch(routes[i % routes.length], { signal: ctl.signal, cache: 'no-store' });
           const json = await res.json();
