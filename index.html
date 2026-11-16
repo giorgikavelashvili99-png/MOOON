@@ -19447,6 +19447,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     // tikwm metadata: 12 s timeout + one quick retry on a dropped connection,
     // transparent retry on the free API's "1 request/second" answer, and a
     // 10-minute in-memory cache (the same link analysed again is instant).
+    // Cloudflare Worker that calls tikwm server-side (see worker code) -- set to your worker URL.
+    const TTDL_META_WORKER = 'https://moonttcheckepro.giorgikavelashvili99.workers.dev';
     const ttdlMetaCache = new Map();
     async function ttdlFetchMeta(url){
       // Strip tracking junk (?is_from_webapp=1&sender_device=...) -- tikwm only needs the clean link.
@@ -19459,8 +19461,9 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       // Several routes raced in parallel: if tikwm is slow/blocked on the visitor's
       // network (ISP, DNS, CORS), one of the proxies still answers.
       const routes = [
-        { u: direct1, delay: 0 },
-        { u: direct2, delay: 400 },
+        { u: TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url), delay: 0 },
+        { u: direct1, delay: 300 },
+        { u: direct2, delay: 700 },
         { u: 'https://corsproxy.io/?url=' + encodeURIComponent(direct1), delay: 2500 },
         { u: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(direct1), delay: 3500 }
       ];
