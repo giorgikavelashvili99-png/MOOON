@@ -19451,54 +19451,41 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     const TTDL_META_WORKER = 'https://moonttcheckepro.giorgikavelashvili99.workers.dev';
     const ttdlMetaCache = new Map();
     async function ttdlFetchMeta(url){
-      // Strip tracking junk (?is_from_webapp=1&sender_device=...) -- tikwm only needs the clean link.
+      // Strip tracking junk (?is_from_webapp=1&sender_device=...)
       url = String(url).trim().replace(/[?#].*$/, '');
       const key = url.replace(/\/+$/, '');
       const hit = ttdlMetaCache.get(key);
       if (hit && Date.now() - hit.t < 600000) return hit.json;
-      const direct1 = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
-      const direct2 = 'https://tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
-      // Several routes raced in parallel: if tikwm is slow/blocked on the visitor's
-      // network (ISP, DNS, CORS), one of the proxies still answers.
+      const direct = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
+      // Routes are tried ONE AFTER ANOTHER (never in parallel -- tikwm rate-limits to ~1 req/sec).
       const routes = [
-        { u: TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url), delay: 0 },
-        { u: direct1, delay: 300 },
-        { u: direct2, delay: 700 },
-        { u: 'https://corsproxy.io/?url=' + encodeURIComponent(direct1), delay: 2500 },
-        { u: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(direct1), delay: 3500 }
+        TTDL_META_WORKER + '/meta?url=' + encodeURIComponent(url),
+        direct,
+        'https://tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1',
+        'https://corsproxy.io/?url=' + encodeURIComponent(direct)
       ];
       let lastMsg = '';
-      const tryRoute = (r) => new Promise((resolve, reject) => {
-        setTimeout(async () => {
-          const ctl = new AbortController();
-          const timer = setTimeout(() => ctl.abort(), 12000);
-          try {
-            const res = await fetch(r.u, { signal: ctl.signal, cache: 'no-store' });
-            const json = await res.json();
-            clearTimeout(timer);
-            if (json && json.code === 0 && json.data) return resolve(json);
-            lastMsg = String((json && json.msg) || lastMsg || ('code ' + (json && json.code)));
-            reject(new Error(lastMsg));
-          } catch (e) {
-            clearTimeout(timer);
-            reject(e);
-          }
-        }, r.delay);
-      });
-      for (let round = 0; round < 3; round++) {
+      // Same thing the visitor would do by pressing the button again and again, but automatic.
+      for (let i = 0; i < 8; i++) {
+        const ctl = new AbortController();
+        const timer = setTimeout(() => ctl.abort(), 7000);
         try {
-          const json = await Promise.any(routes.map(tryRoute));
-          ttdlMetaCache.set(key, { t: Date.now(), json: json });
-          return json;
-        } catch (agg) {
-          // free API "1 request/second" limit -> wait a bit and run the routes again
-          if (/limit/i.test(lastMsg) && round < 2) { await new Promise(r => setTimeout(r, 1200)); continue; }
-          break;
+          const res = await fetch(routes[i % routes.length], { signal: ctl.signal, cache: 'no-store' });
+          const json = await res.json();
+          clearTimeout(timer);
+          if (json && json.code === 0 && json.data) {
+            ttdlMetaCache.set(key, { t: Date.now(), json: json });
+            return json;
+          }
+          lastMsg = String((json && json.msg) || ('code ' + (json && json.code)));
+        } catch (e) {
+          clearTimeout(timer);
+          lastMsg = String((e && e.message) || e);
         }
+        console.warn('[ttdl] attempt ' + (i + 1) + ' failed (route ' + (i % routes.length) + '):', lastMsg);
+        await new Promise(r => setTimeout(r, 1150));
       }
-      console.warn('[ttdl] analyze failed:', lastMsg || 'all routes failed');
-      const err = new Error(lastMsg || 'tikwm');
-      throw err;
+      throw new Error(lastMsg || 'tikwm');
     }
     // Opens the TLS connection to tikwm before the visitor presses Analyze
     // (focus / paste / opening the Checker page) -- saves ~3 round trips.
