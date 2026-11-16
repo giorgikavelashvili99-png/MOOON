@@ -19463,7 +19463,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       let lastMsg = '';
       const t0 = Date.now();
       const ctl = new AbortController();
-      const deadline = setTimeout(() => ctl.abort(), 20000);
+      const deadline = setTimeout(() => ctl.abort(), 24000);
       const sleep = (ms) => new Promise(r => setTimeout(r, ms));
       const one = async (u) => {
         const res = await fetch(u, { signal: ctl.signal, cache: 'no-store' });
@@ -19492,13 +19492,13 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         }, delay);
       });
       try {
-        const json = await Promise.any([launch(direct, 0), launch(viaWorker, 0), launch(viaWorker, 2500)]);
+        const json = await Promise.any([launch(direct, 0), launch(viaWorker, 0)]);
         ttdlMetaCache.set(key, { t: Date.now(), json: json });
         console.log('[ttdl] meta ready in ' + (Date.now() - t0) + ' ms');
         return json;
       } catch (e) {
         console.warn('[ttdl] analyze failed after ' + (Date.now() - t0) + ' ms:', lastMsg || (e && e.message));
-        throw new Error(lastMsg || 'tikwm');
+        throw new Error(lastMsg || (ctl.signal.aborted ? 'timeout' : 'network'));
       } finally {
         clearTimeout(deadline);
         ctl.abort();
@@ -19831,7 +19831,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         }
       } catch(e){
         var __m = String((e && e.message) || e);
-        var __srv = /HTTP 5\d\d|upstream/i.test(__m);
+        var __srv = /HTTP 5\d\d|upstream|timeout/i.test(__m);
         var __en = (document.documentElement.lang !== 'ka');
         ttdlLog(__srv ? (__en ? 'The video service (tikwm) is not answering for this video right now. Try again in a minute or try another link.' : 'tikwm-ის სერვერი ამ ვიდეოზე ახლა ვერ პასუხობს. სცადე ერთი წუთის შემდეგ ან სხვა ლინკით.') + ' [' + __m.slice(0,60) + ']'
                       : ttdlDict('logFail') + ' [' + __m.slice(0,90) + ']');
