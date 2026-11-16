@@ -7911,7 +7911,6 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
 <header class="hv-head">
  <div class="hv-titles">
   
-  <span class="hv-eyebrow">MOONFULL4K</span>
   <h1 class="hv-h1">TIKTOK VIDEO / SOUND / DOWNLOADER / CHECKER</h1>
   <p class="hv-sub">ჩასვი ლინკი და ნახე, რა ხარისხით ავრცელებს TikTok შენს ვიდეოს და ჩანს თუ არა ის For You-ში.</p>
  </div>
@@ -35364,6 +35363,23 @@ html body #checkerView #hv .hv-pb{height:5px;margin-top:14px}
 html body #checkerView #hv .hv-act{gap:10px}
 html body #checkerView #hv .hv-b{height:42px;padding:0 18px;border-radius:12px;font-size:13.5px}
 html body #checkerView #hv .hv-b.pri{font-size:14px}
+/* ===== clean flat look, title above, no frame ===== */
+html body #checkerView #hv .hv-learn{display:none!important}
+html body #checkerView #hv .hv-head{background:none!important;border:0!important;border-radius:0!important;padding:clamp(8px,1.2vw,20px) 0 0!important;overflow:visible!important;gap:clamp(16px,1.8vw,26px)}
+html body #checkerView #hv .hv-head::before,html body #checkerView #hv .hv-head::after{display:none!important}
+html body #checkerView #hv .hv-h1{font-size:clamp(15px,2.3cqw,34px)!important;font-weight:800}
+html body #checkerView #hv .hv-sub{margin-top:10px;font-size:14px}
+html body #checkerView #hv:has(.hv-out.on) .hv-head{padding:0!important}
+html body #checkerView #hv:has(.hv-out.on) .hv-h1{font-size:clamp(15px,1.9cqw,26px)!important}
+/* no spilled-paint glows: flat dark surfaces */
+html body #checkerView #hv .hv-search::after{display:none!important}
+html body #checkerView #hv .hv-search{background:rgba(255,255,255,.03)!important;border-color:rgba(150,175,255,.22)!important}
+html body #checkerView #hv .hv-side::before{display:none!important}
+html body #checkerView #hv .hv-idle-grid>div::after,html body #checkerView #hv .hv-card::after{display:none!important}
+html body #checkerView #hv .hv-idle-grid>div,html body #checkerView #hv .hv-card{background:rgba(255,255,255,.025)!important}
+html body #checkerView #hv .hv-ibox::before,html body #checkerView #hv .hv-vi::before{display:none!important}
+html body #checkerView #hv .hv-status.ok{background:rgba(67,227,148,.06)!important}
+html body #checkerView #hv .hv-status.bad{background:rgba(255,92,120,.06)!important}
 </style>
 
 <script id="hv-js">(function(){
@@ -35439,7 +35455,7 @@ function prog(){if(state!=='run')return;var vis=R.style.display!=='none',hasS=G&
  steps(!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4);var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE)tmE.textContent=el.toFixed(1)+'წმ';
  if(done&&vis)finish(true);else if(!B.disabled&&el>1.5&&!(Q&&Q.classList.contains('tt-probing')))finish(vis&&hasS);else if(el>120)finish(false,'შემოწმება ზედმეტად გაგრძელდა. სცადე თავიდან.')}
 function finish(ok,msg){if(state!=='run')return;clearInterval(tm);var el=((Date.now()-t0)/1000).toFixed(1),sh=st.querySelector('.hv-sh');
- if(ok){state='ok';st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';ap(sh,d,h('span','','შემოწმდა '+el+'წმ-ში'),h('span','hv-note','ყველაფერი მზადაა.'));setGo(false)}
+ if(ok){state='ok';st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';ap(sh,d,h('span','','შემოწმდა '+el+'წმ-ში'),h('span','hv-note','ყველაფერი მზადაა.'));setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
  else{state='bad';var a=(!R||R.style.display==='none')?0:1;st.className='hv-status on bad';steps(a,a);sh.textContent='';var b=h('button','hv-retry','თავიდან ცდა');b.type='button';b.onclick=function(){go.click()};ap(sh,h('span','hv-dot'),h('span','','ვიდეოს შემოწმება ვერ მოხერხდა'),b);
   ap(st,h('div','hv-err',msg||lastBad||'ვიდეოს გაანალიზება ვერ მოხერხდა. შეამოწმე ლინკი და სცადე თავიდან.'));setGo(true)}
  render()}
