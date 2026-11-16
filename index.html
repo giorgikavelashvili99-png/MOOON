@@ -7952,9 +7952,10 @@ html.pc-modal-on .bg-layer{ visibility:hidden; }
               </span>
               <input autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other" type="text" class="ttdl-input" id="ttdlUrlInput" data-i18n-placeholder="ttdlInputPh" placeholder="ჩასვი TikTok ვიდეოს ლინკი...">
               <button type="button" class="ttdl-paste-btn" id="ttdlPasteBtn" aria-label="Paste" title="Paste"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg></button>
+              <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
             </div>
             <div class="ttdl-action-row">
-              <button type="button" class="ttdl-analyze-btn" id="ttdlAnalyzeBtn" data-i18n="ttdlAnalyzeBtn">გაანალიზება</button>
+              
               <button type="button" class="ttdl-clear-btn" id="ttdlClearBtn" style="display:none" aria-label="გასუფთავება" title="გასუფთავება"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
             </div>
 
@@ -19466,9 +19467,10 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const sleep = (ms) => new Promise(r => setTimeout(r, ms));
       const one = async (u) => {
         const res = await fetch(u, { signal: ctl.signal, cache: 'no-store' });
-        const j = await res.json();
+        const txt = await res.text();
+        let j = null; try { j = JSON.parse(txt); } catch (e) {}
         if (j && j.code === 0 && j.data) return j;
-        lastMsg = String((j && j.msg) || ('code ' + (j && j.code)));
+        lastMsg = String((j && j.msg) || ('HTTP ' + res.status));
         throw new Error(lastMsg);
       };
       // All routes start together (direct = works in the app, Worker = works on the website);
@@ -19481,7 +19483,9 @@ TikTok პროფილი: ${getTiktokValue('mp')}
             if (ctl.signal.aborted) return reject(new Error('aborted'));
             try { return resolve(await one(u)); }
             catch (e) {
-              if (/limit/i.test(lastMsg) && k < 2) { await sleep(1100); continue; }
+              // network / CORS failure (TypeError) -> this route is dead, give up on it right away
+              if (e && e.name === 'TypeError') return reject(e);
+              if (k < 2 && !ctl.signal.aborted) { await sleep(/limit/i.test(lastMsg) ? 1100 : 600); continue; }
               return reject(e);
             }
           }
@@ -19697,6 +19701,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
               ttdlStatRow('id', '🆔', ttdlDict('statId'), d.id || '?');
           }
 
+          try { document.dispatchEvent(new CustomEvent('moon:ttdl-meta', { detail: { loading: true, url: url, vq: null, tiers: [],
+            meta: { cover: d.cover || d.origin_cover || '', author: (d.author && d.author.nickname) || '', uid: (d.author && d.author.unique_id) || '', title: d.title || '', region: d.region || '', ct: d.create_time || 0, dur: Number(d.duration) || 0, play: d.play_count, digg: d.digg_count, com: d.comment_count, col: d.collect_count, sh: d.share_count, dl: d.download_count, music: (music && music.title) || '', shadow: shadow } } })); } catch (eM) {}
           // Placeholder quality box -- swapped for the real numbers once
           // the background probe (phase 2, below) finishes.
           if (qualityBlock) {
@@ -35234,7 +35240,7 @@ html body .pc-modal-scrim .scanner-stage:not(#_s0):not(#_s1):not(#_s2):not(#_s3)
     sNo:['Shadowban არ ჩანს','Not shadowbanned'], sNoN:['ლაიქების დონე ნორმალურ გავრცელებაზე მიუთითებს.','Like count suggests normal distribution.'],
     sYes:['შესაძლო shadowban','Possible shadowban'], sYesN:['ნახვები ბევრია, ლაიქები ძალიან ცოტა.','Plenty of views but very few likes.'],
     sUn:['გაურკვეველია','Unclear'], sUnN:['მონაცემები არ კმარა დასკვნისთვის.','Not enough data to tell.'],
-    orig:['ორიგინალი','Original']
+    orig:['ორიგინალი','Original'], ql:['ანალიზი მიმდინარეობს…','Analyzing…']
   };
   function t(k){ return T[k][isEn()?1:0]; }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -35243,17 +35249,19 @@ html body .pc-modal-scrim .scanner-stage:not(#_s0):not(#_s1):not(#_s2):not(#_s3)
   function resLbl(w,h){ if(!w||!h) return ''; var s=Math.min(w,h); return s>=2160?'4K':s>=1440?'2K':s>=1080?'1080p':s>=720?'720p':s+'p'; }
   var LV=[[0,'360p'],[540,'540p'],[720,'720p'],[1080,'1080p'],[1440,'2K'],[2160,'4K']];
   function lvIdx(w,h){ var s=Math.min(w||0,h||0), k=0; if(!s) return -1; for(var i=0;i<LV.length;i++){ if(s>=LV[i][0]) k=i; } return k; }
-  function close(){ root.classList.remove('on'); root.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; }
+  var dismissed=false;
+  function close(){ dismissed=true; root.classList.remove('on'); root.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; }
   function open(){ root.classList.add('on'); root.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; root.scrollTop=0; }
   document.addEventListener('keydown',function(e){ if(e.key==='Escape' && root.classList.contains('on')) close(); });
 
-  function render(d){
-    var m = d.meta || {}, tiers = d.tiers || [];
+  function render(d, opts){
+    var m = d.meta || {}, tiers = d.tiers || [], loading = !!d.loading;
     var best = null;
     tiers.forEach(function(x){ var a=Math.min(x.w||0,x.h||0); if(!best || a>Math.min(best.w||0,best.h||0)) best=x; });
     var vq = d.vq;
     var qk = vq==null ? 'qn' : vq>=75 ? 'q4' : vq>=50 ? 'q3' : vq>=30 ? 'q2' : 'q1';
     var qc = vq==null ? 'mrep-mid' : vq>=50 ? 'mrep-good' : vq>=30 ? 'mrep-mid' : 'mrep-bad';
+    if(loading){ qk='ql'; qc='mrep-mid'; }
     var sub = (d.original && d.original.indexOf('?')<0 ? d.original : '') + (best && best.br!=null ? ' · '+best.br+' Mbps' : '') + (vq!=null ? ' · VQ '+vq+'/100' : '');
     var sh = m.shadow, sk = sh==='NO' ? ['sNo','sNoN','mrep-good','✓'] : sh==='YES' ? ['sYes','sYesN','mrep-bad','!'] : ['sUn','sUnN','mrep-mid','?'];
     var play=Number(m.play)||0, inter=(Number(m.digg)||0)+(Number(m.com)||0)+(Number(m.col)||0)+(Number(m.sh)||0);
@@ -35279,23 +35287,23 @@ html body .pc-modal-scrim .scanner-stage:not(#_s0):not(#_s1):not(#_s2):not(#_s3)
         '</aside>'+
         '<main class="mrep-main">'+
           '<div class="mrep-two">'+
-            '<section class="mrep-card"><div class="mrep-lbl">'+t('verdict')+'</div><div class="mrep-verdict"><div class="mrep-ico '+qc+'">'+(vq==null?'–':vq)+'</div><div><div class="mrep-big">'+t(qk)+'</div><div class="mrep-note">'+esc(sub)+'</div></div></div></section>'+
+            '<section class="mrep-card"><div class="mrep-lbl">'+t('verdict')+'</div><div class="mrep-verdict"><div class="mrep-ico '+qc+'">'+(loading?'…':(vq==null?'–':vq))+'</div><div><div class="mrep-big">'+t(qk)+'</div><div class="mrep-note">'+esc(sub)+'</div></div></div></section>'+
             '<section class="mrep-card"><div class="mrep-lbl">'+t('foryou')+'</div><div class="mrep-verdict"><div class="mrep-ico '+sk[2]+'">'+sk[3]+'</div><div><div class="mrep-big" style="font-size:20px">'+t(sk[0])+'</div><div class="mrep-note">'+t(sk[1])+'</div></div></div></section>'+
           '</div>'+
           '<section class="mrep-card"><div class="mrep-lbl">'+t('serves')+'</div>'+
             '<div class="mrep-stats">'+
-              '<div class="mrep-st"><b>'+esc(best&&best.res||'?')+'</b><span>'+t('res')+(d.original&&d.original.indexOf('?')<0?' · '+esc(d.original):'')+'</span></div>'+
-              '<div class="mrep-st"><b class="mrep-acc">'+(best&&best.fps!=null?Math.round(best.fps):'?')+'<small>fps</small></b><span>'+t('fps')+'</span></div>'+
-              '<div class="mrep-st"><b>'+(best&&best.mb!=null?best.mb:'?')+'<small>MB</small></b><span>'+t('size')+'</span></div>'+
+              '<div class="mrep-st"><b>'+esc(best&&best.res||(loading?'…':'?'))+'</b><span>'+t('res')+(d.original&&d.original.indexOf('?')<0?' · '+esc(d.original):'')+'</span></div>'+
+              '<div class="mrep-st"><b class="mrep-acc">'+(best&&best.fps!=null?Math.round(best.fps):(loading?'…':'?'))+'<small>fps</small></b><span>'+t('fps')+'</span></div>'+
+              '<div class="mrep-st"><b>'+(best&&best.mb!=null?best.mb:(loading?'…':'?'))+'<small>MB</small></b><span>'+t('size')+'</span></div>'+
               '<div class="mrep-st"><b>'+mmss(m.dur)+'</b><span>'+t('dur')+'</span></div>'+
             '</div>'+
-            '<div class="mrep-bars">'+rows+scale+'</div>'+
+            '<div class="mrep-bars">'+(loading?'':rows+scale)+'</div>'+
           '</section>'+
           '<section class="mrep-card"><div class="mrep-ehead"><div class="mrep-lbl" style="margin:0">'+t('eng')+'</div><em>'+t('erate')+' <b>'+rate.toFixed(1)+'%</b></em></div>'+
             '<div class="mrep-eng" style="margin-top:14px">'+
               [['views',m.play],['likes',m.digg],['comments',m.com],['favs',m.col],['shares',m.sh],['dls',m.dl]].map(function(r){return '<div><span>'+t(r[0])+'</span><b>'+fmt(r[1])+'</b></div>';}).join('')+
             '</div><div class="mrep-bar"><i style="width:'+Math.max(2,rate).toFixed(1)+'%"></i></div></section>'+
-          '<div class="mrep-act"><div style="display:flex;gap:12px;flex-wrap:wrap"><button class="mrep-btn pri" id="mrepDl">⬇ '+t('dl')+'</button><button class="mrep-btn" id="mrepAgain">⟳ '+t('another')+'</button></div></div>'+
+          '<div class="mrep-act"><div style="display:flex;gap:12px;flex-wrap:wrap"><button class="mrep-btn pri" id="mrepDl"'+(loading?' disabled style="opacity:.55;cursor:default"':'')+'>⬇ '+t('dl')+'</button><button class="mrep-btn" id="mrepAgain">⟳ '+t('another')+'</button></div></div>'+
         '</main>'+
       '</div>';
     document.getElementById('mrepX').onclick = close;
@@ -35305,9 +35313,11 @@ html body .pc-modal-scrim .scanner-stage:not(#_s0):not(#_s1):not(#_s2):not(#_s3)
       var c=document.getElementById('ttdlClearBtn'); if(c) c.click();
       var i=document.getElementById('ttdlUrlInput'); if(i){ i.value=''; i.focus(); try{ i.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
     };
-    open();
+    if(!opts||opts.open!==false) open();
   }
-  document.addEventListener('moon:ttdl-result', function(ev){ try { render(ev.detail||{}); } catch(e){ console.warn('[mrep] render failed', e); } });
+  document.addEventListener('moon:ttdl-meta', function(ev){ dismissed=false; try { render(ev.detail||{}, {open:true}); } catch(e){ console.warn('[mrep] render failed', e); } });
+  document.addEventListener('moon:ttdl-result', function(ev){ try { render(ev.detail||{}, {open:!dismissed}); } catch(e){ console.warn('[mrep] render failed', e); } });
+  document.addEventListener('moon:ttdl-fail', function(){ if(root.classList.contains('on')) close(); });
 })();
 </script>
 <style id="msrchCss">
@@ -35341,6 +35351,7 @@ html body .mfeat-dots{display:flex;gap:5px;align-items:center;height:44px}
 html body .mfeat-dots i{width:20px;height:8px;border-radius:8px;background:rgba(255,255,255,.12)}
 html body .mfeat-dots i.on{background:#2bd28f;box-shadow:0 0 12px -2px rgba(43,210,143,.6)}
 html body .ttdl-body.ttdl-expanded .mfeat,html body .ttdl-body.ttdl-expanded .mfeat-h{display:none}
+html body .ttdl-body.mrep-video #ttdlResult,html body .ttdl-body.mrep-video #ttdlDetails,html body .ttdl-body.mrep-video #ttdlDlRow{display:none!important}
 @media(max-width:560px){
   html body .ttdl-input-wrap{flex-wrap:wrap;padding:10px}
   html body .ttdl-input{flex:1 1 calc(100% - 40px)}
@@ -35380,6 +35391,14 @@ html body .ttdl-body.ttdl-expanded .mfeat,html body .ttdl-body.ttdl-expanded .mf
       return '<div class="mfeat-i">'+ic+'<b>'+x[0][i]+'</b><p>'+x[1][i]+'</p></div>';
     }).join('');
   }
+  var body = glass.closest('.ttdl-body');
+  function off(){ if (body) body.classList.remove('mrep-video'); }
+  document.addEventListener('moon:ttdl-meta', function(){ if (body) body.classList.add('mrep-video'); });
+  document.addEventListener('moon:ttdl-fail', off);
+  if (btn) btn.addEventListener('click', off, true);
+  var cb = document.getElementById('ttdlClearBtn'); if (cb) cb.addEventListener('click', off, true);
+  var inp = document.getElementById('ttdlUrlInput'); if (inp) inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') off(); }, true);
+  console.log('[moon] checker ui v4');
   paint();
   try { new MutationObserver(paint).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] }); } catch(e){}
   window.addEventListener('storage', paint);
