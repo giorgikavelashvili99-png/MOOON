@@ -19814,7 +19814,8 @@ TikTok პროფილი: ${getTiktokValue('mp')}
             try {
               document.dispatchEvent(new CustomEvent('moon:ttdl-result', { detail: {
                 url: url, title: d.title || '', vq: vq, original: origRes,
-                tiers: tiers.map(function(t){ return { label: t.label, res: ttdlResLabel(t.width, t.height) || '', fps: t.fps, br: t.bitrateMbps, mb: t.sizeMb }; })
+                meta: { cover: d.cover || d.origin_cover || '', author: (d.author && d.author.nickname) || '', uid: (d.author && d.author.unique_id) || '', title: d.title || '', region: d.region || '', ct: d.create_time || 0, dur: Number(d.duration) || 0, play: d.play_count, digg: d.digg_count, com: d.comment_count, col: d.collect_count, sh: d.share_count, dl: d.download_count, music: (music && music.title) || '', shadow: shadow },
+                tiers: tiers.map(function(t){ return { label: t.label, res: ttdlResLabel(t.width, t.height) || '', w: t.width, h: t.height, fps: t.fps, br: t.bitrateMbps, mb: t.sizeMb }; })
               } }));
             } catch (e2) {}
           });
@@ -35146,5 +35147,168 @@ k();document.addEventListener('DOMContentLoaded',k);window.addEventListener('loa
 <style id="moon-stage-frame-off">
 html body .pc-modal-scrim .scanner-stage:not(#_s0):not(#_s1):not(#_s2):not(#_s3):not(#_s4):not(#_s5):not(#_s6):not(#_s7):not(#_s8):not(#_s9):not(#_s10):not(#_s11){border:0!important;background:none!important;background-image:none!important;box-shadow:none!important;outline:0!important}
 </style>
+<style id="mrepCss">
+#mrep{position:fixed;inset:0;z-index:99999;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;color:#e8ecf5;font-family:inherit;
+  background:radial-gradient(120% 80% at 50% -10%,#0a2a8a 0%,#041552 38%,#020a2b 100%)}
+#mrep.on{display:block;animation:mrepIn .28s ease both}
+@keyframes mrepIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+#mrep *{box-sizing:border-box}
+.mrep-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:rgba(2,10,43,.82);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.07)}
+.mrep-top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,#3b82f6,#a855f7 55%,#fe2c55)}
+.mrep-path{font:13px/1 ui-monospace,Menlo,Consolas,monospace;color:#9aa6c4}
+.mrep-x{width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#e8ecf5;font-size:18px;cursor:pointer}
+.mrep-wrap{max-width:1180px;margin:0 auto;padding:22px 18px 60px;display:grid;grid-template-columns:260px 1fr;gap:22px;align-items:start}
+.mrep-card{background:rgba(16,19,28,.93);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:22px;box-shadow:0 20px 50px -24px rgba(0,0,0,.7)}
+.mrep-lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8793b3;margin-bottom:14px}
+.mrep-cover{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:9/16;background:#0b0e16;border:1px solid rgba(255,255,255,.08)}
+.mrep-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.mrep-dur{position:absolute;left:10px;bottom:10px;padding:3px 9px;border-radius:9px;background:rgba(0,0,0,.65);font-size:12px;font-weight:700}
+.mrep-auth{margin:14px 2px 6px;font-weight:800;font-size:16px}
+.mrep-sub{font-size:12px;color:#8793b3}
+.mrep-cap{margin:12px 2px;font-size:13px;line-height:1.5;color:#cbd3e6;word-break:break-word}
+.mrep-mus{margin:10px 2px;font-size:12px;color:#9aa6c4}
+.mrep-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.mrep-chip{padding:5px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);font-size:12px;color:#cbd3e6}
+.mrep-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.mrep-two{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.mrep-verdict{display:flex;gap:16px;align-items:center}
+.mrep-ico{flex:0 0 auto;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-weight:800;font-size:18px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05)}
+.mrep-big{font-size:27px;font-weight:800;line-height:1.15}
+.mrep-note{font-size:13px;color:#9aa6c4;margin-top:4px;line-height:1.4}
+.mrep-good{color:#2bd28f}.mrep-mid{color:#f5b942}.mrep-bad{color:#ff5d73}
+.mrep-ico.mrep-good{background:rgba(43,210,143,.12);border-color:rgba(43,210,143,.35)}
+.mrep-ico.mrep-mid{background:rgba(245,185,66,.12);border-color:rgba(245,185,66,.35)}
+.mrep-ico.mrep-bad{background:rgba(255,93,115,.12);border-color:rgba(255,93,115,.35)}
+.mrep-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.mrep-st b{display:block;font-size:30px;font-weight:800;line-height:1.1}
+.mrep-st b small{font-size:13px;font-weight:700;color:#9aa6c4;margin-left:3px}
+.mrep-st span{font-size:12px;color:#8793b3}
+.mrep-acc{color:#2bd28f}
+.mrep-bars{margin-top:22px;display:flex;flex-direction:column;gap:12px}
+.mrep-row{display:grid;grid-template-columns:90px 1fr 120px;gap:12px;align-items:center;font-size:13px;color:#cbd3e6}
+.mrep-seg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.mrep-seg i{height:8px;border-radius:8px;background:rgba(255,255,255,.09)}
+.mrep-seg i.on{background:linear-gradient(90deg,#27a874,#2bd28f);box-shadow:0 0 14px -2px rgba(43,210,143,.6)}
+.mrep-rr{text-align:right;line-height:1.25}.mrep-rr b{display:block;font-size:13px}.mrep-rr span{font-size:11px;color:#8793b3}
+.mrep-scale{display:grid;grid-template-columns:90px 1fr 120px;gap:12px;font-size:11px;color:#8793b3}
+.mrep-scale div{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.mrep-eng{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+.mrep-eng div{padding:14px 16px;border-right:1px solid rgba(255,255,255,.08)}
+.mrep-eng div:last-child{border-right:0}
+.mrep-eng span{display:block;font-size:12px;color:#8793b3;margin-bottom:6px}
+.mrep-eng b{font-size:22px;font-weight:800}
+.mrep-ehead{display:flex;justify-content:space-between;align-items:baseline}
+.mrep-ehead em{font-style:normal;font-size:13px;color:#9aa6c4}.mrep-ehead em b{color:#fff}
+.mrep-bar{height:4px;border-radius:4px;margin-top:14px;background:rgba(255,255,255,.08);overflow:hidden}
+.mrep-bar i{display:block;height:100%;background:linear-gradient(90deg,#27a874,#2bd28f);border-radius:4px}
+.mrep-act{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+.mrep-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#e8ecf5;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.mrep-btn:hover{background:rgba(255,255,255,.1)}
+.mrep-btn.pri{border:0;color:#fff;background:linear-gradient(180deg,#2bb67a,#1f8a60);box-shadow:0 10px 24px -12px rgba(43,182,122,.8)}
+@media(max-width:860px){
+  .mrep-wrap{grid-template-columns:1fr;padding:14px 12px 50px}
+  .mrep-lft{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:start}
+  .mrep-lft .mrep-cover{grid-row:span 3}
+  .mrep-two{grid-template-columns:1fr}
+  .mrep-stats{grid-template-columns:repeat(2,1fr)}
+  .mrep-eng{grid-template-columns:repeat(3,1fr)}
+  .mrep-eng div:nth-child(3){border-right:0}.mrep-eng div:nth-child(-n+3){border-bottom:1px solid rgba(255,255,255,.08)}
+  .mrep-row,.mrep-scale{grid-template-columns:62px 1fr 84px;gap:8px}
+  .mrep-big{font-size:22px}
+}
+</style>
+<div id="mrep" role="dialog" aria-modal="true" aria-hidden="true"></div>
+<script id="mrepJs">
+(function(){
+  var root = document.getElementById('mrep'); if(!root) return;
+  function isEn(){ var ls=''; try{ ls=localStorage.getItem('moon_lang'); }catch(e){} return (document.documentElement.lang !== 'ka') || (ls === 'en'); }
+  var T = {
+    verdict:['ხარისხის შეფასება','QUALITY VERDICT'], foryou:['რეკომენდაციები','FOR YOU'],
+    serves:['რას გასცემს TIKTOK','WHAT TIKTOK SERVES'], res:['გარჩევადობა','Resolution'], fps:['კადრები','Framerate'],
+    size:['ზომა','File size'], dur:['ხანგრძლივობა','Duration'], browser:['ბრაუზერი','Browser'], phone:['ტელეფონი','Phone'],
+    eng:['აქტივობა','ENGAGEMENT'], erate:['ჩართულობა','Engagement rate'], views:['ნახვები','Views'], likes:['მოწონებები','Likes'],
+    comments:['კომენტარები','Comments'], favs:['შენახვები','Favorites'], shares:['გაზიარებები','Shares'], dls:['გადმოწერები','Downloads'],
+    dl:['ვიდეოს გადმოწერა','Download video'], another:['სხვა ვიდეოს შემოწმება','Check another'],
+    q4:['შესანიშნავი ხარისხი','Excellent quality'], q3:['კარგი ხარისხი','Good quality'], q2:['საშუალო ხარისხი','Average quality'], q1:['დაბალი ხარისხი','Low quality'],
+    qn:['ხარისხი ვერ განისაზღვრა','Quality unknown'], score:['ქულა','score'],
+    sNo:['Shadowban არ ჩანს','Not shadowbanned'], sNoN:['ლაიქების დონე ნორმალურ გავრცელებაზე მიუთითებს.','Like count suggests normal distribution.'],
+    sYes:['შესაძლო shadowban','Possible shadowban'], sYesN:['ნახვები ბევრია, ლაიქები ძალიან ცოტა.','Plenty of views but very few likes.'],
+    sUn:['გაურკვეველია','Unclear'], sUnN:['მონაცემები არ კმარა დასკვნისთვის.','Not enough data to tell.'],
+    orig:['ორიგინალი','Original']
+  };
+  function t(k){ return T[k][isEn()?1:0]; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function fmt(n){ n=Number(n)||0; if(n>=1e6) return (n/1e6).toFixed(1)+'M'; if(n>=1e3) return (n/1e3).toFixed(1)+'K'; return String(n); }
+  function mmss(s){ s=Math.round(Number(s)||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+  function resLbl(w,h){ if(!w||!h) return ''; var s=Math.min(w,h); return s>=2160?'4K':s>=1440?'2K':s>=1080?'1080p':s>=720?'720p':s+'p'; }
+  var LV=[[0,'360p'],[540,'540p'],[720,'720p'],[1080,'1080p'],[1440,'2K'],[2160,'4K']];
+  function lvIdx(w,h){ var s=Math.min(w||0,h||0), k=0; if(!s) return -1; for(var i=0;i<LV.length;i++){ if(s>=LV[i][0]) k=i; } return k; }
+  function close(){ root.classList.remove('on'); root.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; }
+  function open(){ root.classList.add('on'); root.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; root.scrollTop=0; }
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape' && root.classList.contains('on')) close(); });
+
+  function render(d){
+    var m = d.meta || {}, tiers = d.tiers || [];
+    var best = null;
+    tiers.forEach(function(x){ var a=Math.min(x.w||0,x.h||0); if(!best || a>Math.min(best.w||0,best.h||0)) best=x; });
+    var vq = d.vq;
+    var qk = vq==null ? 'qn' : vq>=75 ? 'q4' : vq>=50 ? 'q3' : vq>=30 ? 'q2' : 'q1';
+    var qc = vq==null ? 'mrep-mid' : vq>=50 ? 'mrep-good' : vq>=30 ? 'mrep-mid' : 'mrep-bad';
+    var sub = (d.original && d.original.indexOf('?')<0 ? d.original : '') + (best && best.br!=null ? ' · '+best.br+' Mbps' : '') + (vq!=null ? ' · VQ '+vq+'/100' : '');
+    var sh = m.shadow, sk = sh==='NO' ? ['sNo','sNoN','mrep-good','✓'] : sh==='YES' ? ['sYes','sYesN','mrep-bad','!'] : ['sUn','sUnN','mrep-mid','?'];
+    var play=Number(m.play)||0, inter=(Number(m.digg)||0)+(Number(m.com)||0)+(Number(m.col)||0)+(Number(m.sh)||0);
+    var rate = play>0 ? Math.min(100, inter/play*100) : 0;
+    var tags = (String(m.title||'').match(/#[^\s#]+/g) || []).slice(0,6);
+    var when = '';
+    if (m.ct) { try { when = new Date(m.ct*1000).toLocaleString(isEn()?'en-US':'ka-GE',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); } catch(e){} }
+    var who = (m.uid || m.author || '');
+    var rows = tiers.map(function(x){
+      var lab = String(x.label||'').split(' / ').map(function(p){ return p.indexOf('BROWSER')===0 ? t('browser') : p.indexOf('MOBILE')===0 ? t('phone') : p; }).join(' / ');
+      var ix = lvIdx(x.w,x.h), seg='';
+      for(var i=0;i<6;i++) seg += '<i'+(i===ix?' class="on"':'')+'></i>';
+      return '<div class="mrep-row"><span>'+esc(lab)+'</span><div class="mrep-seg">'+seg+'</div><div class="mrep-rr"><b>'+esc(x.res||'?')+'</b><span>'+(x.fps!=null?Math.round(x.fps)+'fps':'?fps')+' · '+(x.br!=null?x.br+' Mbps':'?')+'</span></div></div>';
+    }).join('');
+    var scale = '<div class="mrep-scale"><span></span><div>'+LV.map(function(l){return '<span>'+l[1]+'</span>';}).join('')+'</div><span></span></div>';
+    root.innerHTML =
+      '<div class="mrep-top"><span class="mrep-path">~/tiktok/downloader/checker</span><button class="mrep-x" id="mrepX" aria-label="Close">✕</button></div>'+
+      '<div class="mrep-wrap">'+
+        '<aside class="mrep-lft">'+
+          '<div class="mrep-cover">'+(m.cover?'<img src="'+esc(m.cover)+'" alt="">':'')+'<span class="mrep-dur">'+mmss(m.dur)+'</span></div>'+
+          '<div><div class="mrep-auth">@'+esc(who)+'</div><div class="mrep-sub">'+esc([m.region,when].filter(Boolean).join(' · '))+'</div></div>'+
+          '<div class="mrep-cap">'+esc(m.title||'')+(m.music?'<div class="mrep-mus">♫ '+esc(m.music)+'</div>':'')+(tags.length?'<div class="mrep-chips">'+tags.map(function(x){return '<span class="mrep-chip">'+esc(x)+'</span>';}).join('')+'</div>':'')+'</div>'+
+        '</aside>'+
+        '<main class="mrep-main">'+
+          '<div class="mrep-two">'+
+            '<section class="mrep-card"><div class="mrep-lbl">'+t('verdict')+'</div><div class="mrep-verdict"><div class="mrep-ico '+qc+'">'+(vq==null?'–':vq)+'</div><div><div class="mrep-big">'+t(qk)+'</div><div class="mrep-note">'+esc(sub)+'</div></div></div></section>'+
+            '<section class="mrep-card"><div class="mrep-lbl">'+t('foryou')+'</div><div class="mrep-verdict"><div class="mrep-ico '+sk[2]+'">'+sk[3]+'</div><div><div class="mrep-big" style="font-size:20px">'+t(sk[0])+'</div><div class="mrep-note">'+t(sk[1])+'</div></div></div></section>'+
+          '</div>'+
+          '<section class="mrep-card"><div class="mrep-lbl">'+t('serves')+'</div>'+
+            '<div class="mrep-stats">'+
+              '<div class="mrep-st"><b>'+esc(best&&best.res||'?')+'</b><span>'+t('res')+(d.original&&d.original.indexOf('?')<0?' · '+esc(d.original):'')+'</span></div>'+
+              '<div class="mrep-st"><b class="mrep-acc">'+(best&&best.fps!=null?Math.round(best.fps):'?')+'<small>fps</small></b><span>'+t('fps')+'</span></div>'+
+              '<div class="mrep-st"><b>'+(best&&best.mb!=null?best.mb:'?')+'<small>MB</small></b><span>'+t('size')+'</span></div>'+
+              '<div class="mrep-st"><b>'+mmss(m.dur)+'</b><span>'+t('dur')+'</span></div>'+
+            '</div>'+
+            '<div class="mrep-bars">'+rows+scale+'</div>'+
+          '</section>'+
+          '<section class="mrep-card"><div class="mrep-ehead"><div class="mrep-lbl" style="margin:0">'+t('eng')+'</div><em>'+t('erate')+' <b>'+rate.toFixed(1)+'%</b></em></div>'+
+            '<div class="mrep-eng" style="margin-top:14px">'+
+              [['views',m.play],['likes',m.digg],['comments',m.com],['favs',m.col],['shares',m.sh],['dls',m.dl]].map(function(r){return '<div><span>'+t(r[0])+'</span><b>'+fmt(r[1])+'</b></div>';}).join('')+
+            '</div><div class="mrep-bar"><i style="width:'+Math.max(2,rate).toFixed(1)+'%"></i></div></section>'+
+          '<div class="mrep-act"><div style="display:flex;gap:12px;flex-wrap:wrap"><button class="mrep-btn pri" id="mrepDl">⬇ '+t('dl')+'</button><button class="mrep-btn" id="mrepAgain">⟳ '+t('another')+'</button></div></div>'+
+        '</main>'+
+      '</div>';
+    document.getElementById('mrepX').onclick = close;
+    document.getElementById('mrepDl').onclick = function(){ var b=document.getElementById('ttdlDlHd')||document.getElementById('ttdlDlSd'); if(b) b.click(); };
+    document.getElementById('mrepAgain').onclick = function(){
+      close();
+      var c=document.getElementById('ttdlClearBtn'); if(c) c.click();
+      var i=document.getElementById('ttdlUrlInput'); if(i){ i.value=''; i.focus(); try{ i.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
+    };
+    open();
+  }
+  document.addEventListener('moon:ttdl-result', function(ev){ try { render(ev.detail||{}); } catch(e){ console.warn('[mrep] render failed', e); } });
+})();
+</script>
 </body>
 </html>
