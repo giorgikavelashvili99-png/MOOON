@@ -19830,7 +19830,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           try { document.dispatchEvent(new CustomEvent('moon:ttdl-fail', { detail: {} })); } catch (e3) {}
         }
       } catch(e){
-        ttdlLog(ttdlDict('logFail') + ' [' + String((e && e.message) || e).slice(0,90) + ']');
+        var __m = String((e && e.message) || e);
+        var __srv = /HTTP 5\d\d|upstream/i.test(__m);
+        var __en = (document.documentElement.lang !== 'ka');
+        ttdlLog(__srv ? (__en ? 'The video service (tikwm) is not answering for this video right now. Try again in a minute or try another link.' : 'tikwm-ის სერვერი ამ ვიდეოზე ახლა ვერ პასუხობს. სცადე ერთი წუთის შემდეგ ან სხვა ლინკით.') + ' [' + __m.slice(0,60) + ']'
+                      : ttdlDict('logFail') + ' [' + __m.slice(0,90) + ']');
         try { document.dispatchEvent(new CustomEvent('moon:ttdl-fail', { detail: {} })); } catch (e3) {}
       } finally {
         setBtnBusy(analyzeBtn, false);
