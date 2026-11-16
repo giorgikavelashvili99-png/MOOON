@@ -35310,5 +35310,80 @@ html body .pc-modal-scrim .scanner-stage:not(#_s0):not(#_s1):not(#_s2):not(#_s3)
   document.addEventListener('moon:ttdl-result', function(ev){ try { render(ev.detail||{}); } catch(e){ console.warn('[mrep] render failed', e); } });
 })();
 </script>
+<style id="msrchCss">
+/* ---- Checker search section: bar-style input + "what you'll get" cards ---- */
+html body .ttdl-header{flex-direction:row!important;align-items:center!important;text-align:left!important;gap:16px!important}
+html body .ttdl-header-text{align-items:flex-start!important;width:auto!important;flex:1 1 auto!important}
+html body .ttdl-header-text::before{content:"CHECK";display:block;margin-bottom:6px;font-size:11px;font-weight:700;letter-spacing:.16em;color:#8793b3}
+html body .ttdl-heading{font-size:clamp(17px,4.6vw,27px)!important;text-transform:uppercase;letter-spacing:.01em!important;line-height:1.15!important;text-align:left!important;white-space:normal!important;margin-bottom:6px!important;background:none!important;-webkit-text-fill-color:#fff!important;color:#fff!important;animation:none!important}
+html body .ttdl-subtext{text-align:left!important;font-size:clamp(11.5px,3vw,13px)!important;color:#9aa6bd!important}
+html body .ttdl-steps{display:none!important}
+html body .ttdl-glass{padding:0!important;background:transparent!important;border:0!important;border-radius:0!important}
+html body .ttdl-input-wrap{display:flex!important;align-items:center;gap:8px;margin-bottom:12px!important;padding:8px 8px 8px 14px;border-radius:18px;background:rgba(8,10,16,.82);border:1px solid rgba(255,255,255,.11);transition:border-color .2s}
+html body .ttdl-input-wrap:focus-within{border-color:rgba(43,210,143,.55)}
+html body .ttdl-input-icon{position:static!important;transform:none!important;flex:0 0 auto;width:auto!important;height:auto!important;background:none!important;border-radius:0!important;color:#8793b3!important;opacity:1!important}
+html body .ttdl-input-wrap:focus-within .ttdl-input-icon{background:none!important;color:#2bd28f!important}
+html body .ttdl-input{flex:1 1 auto;min-width:0;width:auto!important;height:42px!important;padding:0 4px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;font-size:14px!important}
+html body .ttdl-input:focus{background:transparent!important;border:0!important}
+html body .ttdl-paste-btn{position:static!important;transform:none!important;flex:0 0 auto;width:42px!important;height:42px!important;border-radius:12px!important}
+html body .ttdl-paste-btn:active{transform:scale(.94)!important}
+html body .ttdl-input-wrap .ttdl-analyze-btn{position:relative;flex:0 0 auto;width:auto!important;min-height:42px!important;padding:0 20px!important;border-radius:13px!important;font-size:14px!important;letter-spacing:.01em!important;color:#fff!important;background:linear-gradient(180deg,#2bb67a,#1f8a60)!important;box-shadow:0 10px 22px -12px rgba(43,182,122,.85)}
+html body .ttdl-input-wrap .ttdl-analyze-btn::after,html body .ttdl-input-wrap .ttdl-analyze-btn::before{display:none!important}
+html body .ttdl-action-row:not(:has(*:not([style*="display:none"]))){display:none}
+html body .ttdl-action-row{margin-bottom:10px!important}
+html body .mfeat-h{margin:2px 0 10px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8793b3}
+html body .mfeat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;padding:20px;border:1px dashed rgba(255,255,255,.14);border-radius:20px}
+html body .mfeat-i b{display:block;margin:14px 0 6px;font-size:14px;font-weight:800;color:#fff}
+html body .mfeat-i p{margin:0;font-size:12px;line-height:1.5;color:#9aa6bd}
+html body .mfeat-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#cfd6e8}
+html body .mfeat-ic svg{width:19px;height:19px}
+html body .mfeat-dots{display:flex;gap:5px;align-items:center;height:44px}
+html body .mfeat-dots i{width:20px;height:8px;border-radius:8px;background:rgba(255,255,255,.12)}
+html body .mfeat-dots i.on{background:#2bd28f;box-shadow:0 0 12px -2px rgba(43,210,143,.6)}
+html body .ttdl-body.ttdl-expanded .mfeat,html body .ttdl-body.ttdl-expanded .mfeat-h{display:none}
+@media(max-width:560px){
+  html body .ttdl-input-wrap{flex-wrap:wrap;padding:10px}
+  html body .ttdl-input{flex:1 1 calc(100% - 40px)}
+  html body .ttdl-input-wrap .ttdl-analyze-btn{flex:1 1 auto;order:5}
+  html body .mfeat{grid-template-columns:1fr 1fr;gap:16px;padding:16px}
+}
+</style>
+<script id="msrchJs">
+(function(){
+  var glass = document.querySelector('.ttdl-glass'), wrap = document.querySelector('.ttdl-input-wrap'), btn = document.getElementById('ttdlAnalyzeBtn');
+  if (!glass || !wrap) return;
+  // one single bar: [link icon][input][paste][analyze]
+  if (btn && btn.parentNode !== wrap) wrap.appendChild(btn);
+  function isEn(){ var ls=''; try{ ls=localStorage.getItem('moon_lang'); }catch(e){} return (document.documentElement.lang !== 'ka') || (ls === 'en'); }
+  var S = function(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  var ICONS = [
+    S('<path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.3 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/>'),
+    '<span class="mfeat-dots"><i></i><i></i><i></i><i class="on"></i><i></i><i></i></span>',
+    S('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+    S('<path d="M5 20V12M12 20V5M19 20v-5"/>')
+  ];
+  var TXT = [
+    [['ხარისხის შეფასება','Quality verdict'],['VQ ქულა ბიტრეიტისა და გარჩევადობის მიხედვით.','A VQ score built from bitrate and resolution.']],
+    [['რას გასცემს TikTok','What TikTok serves'],['გარჩევადობა, fps და ზომა ბრაუზერისა და ტელეფონისთვის.','Resolution, framerate and size for browser and phone.']],
+    [['რეკომენდაციები','For You status'],['აქვს თუ არა ვიდეოს shadowban-ის ნიშნები.','Whether the video shows signs of a shadowban.']],
+    [['აქტივობა','Engagement'],['ნახვები, მოწონებები, კომენტარები და ჩართულობა.','Views, likes, comments, shares and engagement rate.']]
+  ];
+  var head = document.createElement('div'); head.className = 'mfeat-h';
+  var box = document.createElement('div'); box.className = 'mfeat';
+  glass.parentNode.insertBefore(box, glass.nextSibling);
+  glass.parentNode.insertBefore(head, box);
+  function paint(){
+    var i = isEn() ? 1 : 0;
+    head.textContent = i ? "WHAT YOU'LL GET" : 'რას მიიღებ';
+    box.innerHTML = TXT.map(function(x, k){
+      var ic = ICONS[k].indexOf('mfeat-dots') > -1 ? ICONS[k] : '<span class="mfeat-ic">'+ICONS[k]+'</span>';
+      return '<div class="mfeat-i">'+ic+'<b>'+x[0][i]+'</b><p>'+x[1][i]+'</p></div>';
+    }).join('');
+  }
+  paint();
+  try { new MutationObserver(paint).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] }); } catch(e){}
+  window.addEventListener('storage', paint);
+})();
+</script>
 </body>
 </html>
