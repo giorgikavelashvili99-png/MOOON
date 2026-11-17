@@ -35550,6 +35550,45 @@ html body #checkerView #hv .hv-act .hv-b.pri:not(.hv-dl){background:var(--g-fill
 html body #checkerView #hv.hv-busy #hvSearch,html body #checkerView #hv.hv-busy .hv-card,html body #checkerView #hv.hv-busy .hv-side,
 html body #checkerView #hv.hv-busy .hv-idle-grid>div,html body #checkerView #hv.hv-busy .hv-status,html body #checkerView #hv.hv-busy .hv-b{-webkit-backdrop-filter:none;backdrop-filter:none}
 }
+/* ===== COSMIC BLUE buttons (all screen sizes) + no background orbs on phone ===== */
+html body #checkerView #hv{--cosmic:linear-gradient(135deg,#2a1bff 0%,#2e4dff 42%,#1f86ff 100%);--cosmic-glow:0 14px 30px -12px rgba(52,84,255,.85)}
+html body #checkerView #hv::before{display:none!important}
+html body #checkerView #hv .hv-go,
+html body #checkerView #hv #hvSearch .hv-go,
+html body #checkerView #hv #hvSearch:not(.has-val) .hv-paste,
+html body #checkerView #hv #hvSearch.has-val .hv-go,
+html body #checkerView #hv .hv-act .hv-b.hv-dl{background:var(--cosmic)!important;background-clip:border-box!important;border:0!important;color:#fff!important;opacity:1!important;filter:none;
+ box-shadow:var(--cosmic-glow)!important}
+html body #checkerView #hv .hv-go::after{display:none}
+html body #checkerView #hv .hv-go:disabled{opacity:1!important;filter:saturate(.8) brightness(.9)}
+html body #checkerView #hv .hv-b.hv-dl,html body #checkerView #hv .hv-b.hv-dl:disabled{opacity:1!important;filter:none!important;position:relative;overflow:hidden;cursor:pointer}
+html body #checkerView #hv .hv-b.hv-dl::after{content:"";display:block;position:absolute;left:0;top:0;bottom:0;width:var(--p,0%);background:rgba(255,255,255,.22);pointer-events:none;transition:width .25s linear}
+/* empty field on phone: the check button stays visible but calm until a link is in */
+html body #checkerView #hv #hvSearch:not(.has-val) .hv-go{background:rgba(255,255,255,.06)!important;box-shadow:none!important;color:#8e9fc9!important}
+html body #checkerView #hv .hv-act .hv-b.hv-dl{order:-1}
+html body #checkerView #hv .hv-act .hv-b.pri:not(.hv-dl){background:rgba(255,255,255,.05)!important;border:1px solid rgba(140,175,255,.3)!important;box-shadow:none!important}
+html body #checkerView #hv .hv-act .hv-b.pri:not(.hv-dl)::before{display:none}
+html body #checkerView #hv .hv-b.hv-dl::before{display:none}
+@media(min-width:761px){
+html body #checkerView #hv .hv-act .hv-b.hv-dl{padding:0 34px}
+}
+html body #checkerView #hv #hvSearch,html body #checkerView #hv #hvSearch:focus-within{box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 18px 36px -24px rgba(0,0,0,.9)!important}
+html body #checkerView #hv .hv-vi,html body #checkerView #hv .hv-idle-grid .hv-ibox,html body #checkerView #hv .hv-idle-grid .hv-ibar{box-shadow:inset 0 1px 0 rgba(255,255,255,.3)!important}
+/* ===== CHECK PROGRESS: 4 rows, no descriptions ===== */
+html body #checkerView #hv .hv-pr{height:4px;margin-top:14px;border-radius:4px;background:rgba(255,255,255,.09);overflow:hidden}
+html body #checkerView #hv .hv-pr i{display:block;height:100%;width:var(--prog,0%);border-radius:4px;background:var(--cosmic);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+html body #checkerView #hv .hv-steps{display:flex;flex-direction:column;gap:0;margin-top:12px}
+html body #checkerView #hv .hv-st{display:flex;align-items:center;gap:14px;padding:9px 0;position:relative;min-width:0}
+html body #checkerView #hv .hv-st span{display:none}
+html body #checkerView #hv .hv-st .hv-n{margin:0;flex:none;width:32px;height:32px;font-size:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.16);color:var(--ft);animation:none}
+html body #checkerView #hv .hv-st b{font-size:15px;white-space:normal;color:#7f8fb4}
+html body #checkerView #hv .hv-st.a b,html body #checkerView #hv .hv-st.d b{color:#fff}
+html body #checkerView #hv .hv-st.a .hv-n{background:var(--cosmic);border-color:transparent;color:#fff;animation:none;box-shadow:0 0 0 5px rgba(60,90,255,.25)}
+html body #checkerView #hv .hv-st.d .hv-n{background:rgba(67,227,148,.16);border-color:rgba(67,227,148,.6);color:#7dffc0;animation:none}
+html body #checkerView #hv .hv-st.x .hv-n{background:var(--bad);border-color:transparent;color:#fff}
+html body #checkerView #hv .hv-st:not(:last-child)::before{display:block!important;content:"";position:absolute;left:15px;right:auto;top:calc(100% - 9px);width:2px;height:18px;border-radius:2px;background:rgba(255,255,255,.12)}
+html body #checkerView #hv .hv-st:not(:last-child)::after{display:none!important}
+html body #checkerView #hv .hv-st.d:not(:last-child)::after{display:block!important;content:"";position:absolute;left:15px;right:auto;top:calc(100% - 9px);width:2px;height:18px;border-radius:2px;background:rgba(67,227,148,.7);transform:none}
 @media(prefers-reduced-motion:reduce){html body #checkerView #hv #hvSearch *{transition:none!important}}
 </style>
 <script id="hv-js">(function(){
@@ -35602,7 +35641,7 @@ function render(){
  var ac=h('div','hv-act');
  function px(id,lid){var o=$(id),b=h('button','hv-b',(($(lid)||{}).textContent||'').trim()||'ჩამოტვირთვა');b.type='button';b.disabled=!!(o&&o.disabled);b.onclick=function(){o&&o.click()};return b}
  var row=$('ttdlDlRow'),mr=$('ttdlMusicRow');
- if(row&&row.style.display!=='none'){if(window.matchMedia&&matchMedia('(max-width:760px)').matches)ap(ac,bestDl());else ap(ac,px('ttdlDlSd','ttdlDlSdLabel'),px('ttdlDlHd','ttdlDlHdLabel'))}
+ if(row&&row.style.display!=='none')ap(ac,bestDl());
  if(mr&&mr.style.display!=='none')ap(ac,px('ttdlMusicBtn','ttdlMusicLabel'));
  var nw=h('button','hv-b','სხვა ვიდეოს შემოწმება');nw.type='button';nw.onclick=function(){reset();refocus();window.scrollTo({top:0,behavior:'smooth'})};
  var mt=h('button','hv-b pri','ვიდეოს გაუმჯობესება →');mt.type='button';mt.onclick=goMethod;
@@ -35612,7 +35651,7 @@ function bestDl(){var T=tiers(),b=T.filter(function(n){return n.name==='Browser'
  if(b&&p){var kb=[idx(b.res),pf(b.fps)||0,pf(b.sz)||0],kp=[idx(p.res),pf(p.fps)||0,pf(p.sz)||0];for(var i=0;i<3;i++){if(kb[i]!==kp[i]){useSd=kb[i]>kp[i];break}}}
  var id=useSd?'ttdlDlSd':'ttdlDlHd',o=$(id),l=$(id+'Label'),bt=h('button','hv-b pri hv-dl','ვიდეოს გადმოწერა');bt.type='button';bt.disabled=!!(o&&o.disabled);bt.onclick=function(){o&&o.click()};
  if(render.mo)render.mo.disconnect();
- if(l){render.mo=new MutationObserver(function(){var s=(l.textContent||'').trim();bt.textContent=/%|MB/.test(s)?'ვიდეოს გადმოწერა · '+s:'ვიდეოს გადმოწერა'});render.mo.observe(l,{childList:true,characterData:true,subtree:true})}
+ if(l){var upd=function(){var s=(l.textContent||'').trim(),m=s.match(/^(\d+(?:\.\d+)?)%$/);bt.textContent=m||/MB$/.test(s)?'ვიდეოს გადმოწერა · '+s:'ვიდეოს გადმოწერა';bt.style.setProperty('--p',m?m[1]+'%':'0%')};upd();render.mo=new MutationObserver(upd);render.mo.observe(l,{childList:true,characterData:true,subtree:true})}
  return bt}
 function bt0(){var T=tiers();return T.map(function(t){return t.res+t.fps+t.br+t.sz}).join(',')}
 function countUp(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;out.querySelectorAll('.hv-bv,.hv-eg b,.hv-eh b').forEach(function(el){var n=el.firstChild;if(!n||n.nodeType!==3)return;var m=n.nodeValue.match(/^(\d[\d.,]*)(.*)$/);if(!m)return;var dec=(m[1].split('.')[1]||'').length,v=parseFloat(m[1].replace(/,/g,'')),suf=m[2],t0=performance.now();if(!isFinite(v))return;
@@ -35623,16 +35662,16 @@ learn.addEventListener('click',goMethod);
 /* status */
 var state='idle',NM=[['ვიდეოს პოვნა','ლინკით ვეძებთ ვიდეოს'],['პოსტის წაკითხვა','ნახვები, მოწონებები და აღწერა'],['შადოუბანის შემოწმება','ვიდეო For You-ში ჩანს თუ არა'],['ხარისხის გაზომვა','გარჩევადობა, კადრები და ბიტრეიტი']],t0=0,tm=0,lastBad='',q=0;
 function setGo(retry){goL.textContent=retry?'თავიდან ცდა':'შემოწმება';$('hvGoIco').innerHTML=retry?'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>':'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'}
-function steps(a,bad){st.querySelectorAll('.hv-st').forEach(function(s,i){s.className='hv-st'+(bad===i?' x':i<a?' d':i===a?' a':'')});st.querySelectorAll('.hv-st .hv-n').forEach(function(n,i){n.textContent=bad===i?'✕':i<a?'✓':String(i+1)})}
-function build(){st.textContent='';var sh=h('div','hv-sh');ap(sh,h('span','hv-dot'),h('span','hv-tt','მოწმდება…'),h('small','hv-tm',''));var sp=h('div','hv-steps');NM.forEach(function(n,i){var s=h('div','hv-st');ap(s,h('div','hv-n',String(i+1)),h('b','',n[0]),h('span','',n[1]));sp.appendChild(s)});ap(st,sh,sp)}
+function steps(a,bad){st.style.setProperty('--prog',Math.min(100,(a+.55)/4*100)+'%');st.querySelectorAll('.hv-st').forEach(function(s,i){s.className='hv-st'+(bad===i?' x':i<a?' d':i===a?' a':'')});st.querySelectorAll('.hv-st .hv-n').forEach(function(n,i){n.textContent=bad===i?'✕':i<a?'✓':String(i+1)})}
+function build(){st.textContent='';var sh=h('div','hv-sh');ap(sh,h('span','hv-dot'),h('span','hv-tt','მოწმდება…'),h('small','hv-tm',''));var sp=h('div','hv-steps');NM.forEach(function(n,i){var s=h('div','hv-st');ap(s,h('div','hv-n',String(i+1)),h('b','',n[0]));sp.appendChild(s)});var pr=h('div','hv-pr');pr.appendChild(h('i'));ap(st,sh,pr,sp)}
 function setState(s){state=s;idle.classList.toggle('off',s!=='idle'||(R&&R.style.display!=='none'));learn.classList.toggle('off',s!=='idle'||(R&&R.style.display!=='none'));if(s==='idle'){st.className='hv-status';st.textContent='';setGo(false)}}
 var HV=$('hv');function busy(on){HV.classList.toggle('hv-busy',!!on)}
 function start(){try{inp.blur()}catch(e){}busy(1);render.sig='';state='run';build();st.className='hv-status on run';t0=Date.now();steps(0);clearInterval(tm);tm=setInterval(prog,250);out.classList.remove('on');idle.classList.add('off');learn.classList.add('off');setGo(false)}
 function prog(){if(state!=='run')return;var vis=R.style.display!=='none',hasS=G&&G.children.length>0,hasT=Q&&Q.querySelector('.ttdl-quality-tier'),done=Q&&Q.classList.contains('tt-probed');
- steps(!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4);var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE)tmE.textContent=el.toFixed(1)+'წმ';
+ var el0=(Date.now()-t0)/1000,tb=el0<.7?0:el0<1.5?1:el0<2.6?2:3,rl=!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4;steps(Math.max(rl,tb));var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE)tmE.textContent=el.toFixed(1)+'წმ';
  if(done&&vis)finish(true);else if(!B.disabled&&el>1.5&&!(Q&&Q.classList.contains('tt-probing')))finish(vis&&hasS);else if(el>120)finish(false,'შემოწმება ზედმეტად გაგრძელდა. სცადე თავიდან.')}
 function finish(ok,msg){if(state!=='run')return;busy(0);clearInterval(tm);var el=((Date.now()-t0)/1000).toFixed(1),sh=st.querySelector('.hv-sh');
- if(ok){state='ok';st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';ap(sh,d,h('span','','შემოწმდა '+el+'წმ-ში'),h('span','hv-note','ყველაფერი მზადაა.'));setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
+ if(ok){state='ok';st.style.setProperty('--prog','100%');st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';ap(sh,d,h('span','','შემოწმდა '+el+'წმ-ში'),h('span','hv-note','ყველაფერი მზადაა.'));setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
  else{state='bad';var a=(!R||R.style.display==='none')?0:1;st.className='hv-status on bad';steps(a,a);sh.textContent='';var b=h('button','hv-retry','თავიდან ცდა');b.type='button';b.onclick=function(){go.click()};ap(sh,h('span','hv-dot'),h('span','','ვიდეოს შემოწმება ვერ მოხერხდა'),b);
   ap(st,h('div','hv-err',msg||lastBad||'ვიდეოს გაანალიზება ვერ მოხერხდა. შეამოწმე ლინკი და სცადე თავიდან.'));setGo(true)}
  render()}
