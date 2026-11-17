@@ -35416,11 +35416,11 @@ html body #checkerView #hv .hv-h1{font-size:clamp(17px,5.4vw,24px)!important;lin
 html body #checkerView #hv #hvSearch{display:flex;flex-direction:column;align-items:stretch;gap:10px;width:100%;min-height:0;padding:10px;border-radius:26px;
  background:linear-gradient(180deg,rgba(24,34,68,.62),rgba(6,10,22,.92))!important;
  border:1px solid rgba(140,175,255,.26)!important;
- box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 22px 44px -26px rgba(47,208,255,.45);transition:border-color .25s,box-shadow .25s}
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 22px 44px -26px rgba(47,208,255,.45)}
 html body #checkerView #hv #hvSearch:focus-within{border-color:rgba(47,208,255,.5)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 22px 50px -22px rgba(47,208,255,.6)}
 
 html body #checkerView #hv #hvSearch .hv-field{display:flex;align-items:center;gap:10px;height:62px;padding:0 10px 0 10px;border-radius:18px;
- background:rgba(0,0,0,.5);border:1px solid rgba(140,175,255,.16);transition:border-color .2s,box-shadow .2s,background .2s}
+ background:rgba(0,0,0,.5);border:1px solid rgba(140,175,255,.16)}
 html body #checkerView #hv #hvSearch .hv-field:focus-within{border-color:rgba(47,208,255,.7);box-shadow:0 0 0 4px rgba(47,208,255,.13);background:rgba(0,0,0,.62)}
 html body #checkerView #hv #hvSearch.ok .hv-field{border-color:rgba(67,227,148,.45)}
 html body #checkerView #hv #hvSearch .hv-lnk{display:block;flex:none;width:38px;height:38px;padding:10px;border-radius:50%;box-sizing:border-box;
@@ -35440,7 +35440,7 @@ html body #checkerView #hv #hvSearch .hv-x:active{transform:scale(.9)}
 
 html body #checkerView #hv #hvSearch .hv-acts{display:flex;gap:10px}
 html body #checkerView #hv #hvSearch .hv-paste,html body #checkerView #hv #hvSearch .hv-go{height:54px;padding:0 18px;border-radius:16px;font-size:15px;font-weight:700;
- transition:flex .28s cubic-bezier(.2,.8,.2,1),background .25s,border-color .25s,color .25s,opacity .25s,transform .18s}
+ transition:transform .15s}
 html body #checkerView #hv #hvSearch .hv-paste svg{display:block;flex:none}
 html body #checkerView #hv #hvSearch .hv-go svg{width:19px;height:19px}
 
@@ -35458,11 +35458,6 @@ html body #checkerView #hv #hvSearch .hv-paste:active,html body #checkerView #hv
 html body #checkerView #hv #hvSearch .hv-tip{left:50%;right:auto;top:calc(100% + 12px);transform:translateX(-50%);max-width:94%;white-space:normal;text-align:center;font-size:13px;line-height:1.45;
  padding:8px 14px;border-radius:12px;background:rgba(10,16,34,.94);border:1px solid rgba(47,208,255,.3);z-index:5}
 
-/* when results are on screen the console gets slimmer */
-html body #checkerView #hv:has(.hv-out.on) #hvSearch{padding:8px;gap:8px}
-html body #checkerView #hv:has(.hv-out.on) #hvSearch .hv-field{height:54px}
-html body #checkerView #hv:has(.hv-out.on) #hvSearch .hv-paste,html body #checkerView #hv:has(.hv-out.on) #hvSearch .hv-go{height:48px}
-html body #checkerView #hv:has(.hv-out.on) #hvSearch.has-val .hv-paste{flex-basis:48px}
 
 /* ---- status pill ---- */
 html body #checkerView #hv .hv-status{margin:0 0 14px}
@@ -35486,16 +35481,74 @@ html body #checkerView #hv .hv-card{padding:16px;border-radius:20px}
 html body #checkerView #hv .hv-two{grid-template-columns:minmax(0,1fr);gap:14px}
 html body #checkerView #hv .hv-eg b{font-size:clamp(17px,5.2vw,22px)}
 html body #checkerView #hv .hv-bv{font-size:clamp(22px,7vw,30px)}
-html body #checkerView #hv .hv-act{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+html body #checkerView #hv .hv-act{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
 html body #checkerView #hv .hv-act .hv-sp{display:none}
-html body #checkerView #hv .hv-act .hv-b{width:100%;height:50px;padding:0 12px;border-radius:15px;font-size:14px;white-space:normal;line-height:1.2}
-html body #checkerView #hv .hv-act .hv-b.pri{grid-column:1/-1;height:54px;font-size:15px}
+html body #checkerView #hv .hv-act .hv-b{width:100%;height:50px;padding:0 14px;border-radius:15px;font-size:14.5px;white-space:nowrap;line-height:1.2}
+html body #checkerView #hv .hv-act .hv-b.hv-dl{order:-1;height:58px;font-size:16px}
+html body #checkerView #hv .hv-act .hv-b.pri:not(.hv-dl){height:50px;font-size:14.5px;background:rgba(255,255,255,.05);border-color:rgba(140,175,255,.3)}
+html body #checkerView #hv .hv-act .hv-b.pri:not(.hv-dl)::before{display:none}
 }
 /* phone: hide the resolution dot-scale and its 360p..4K labels; desktop keeps them */
 @media(max-width:760px){
 html body #checkerView #hv .hv-seg,html body #checkerView #hv .hv-tk{display:none!important}
 html body #checkerView #hv .hv-row{grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;margin-bottom:10px;padding:10px 0;border-top:1px solid var(--ln)}
 html body #checkerView #hv .hv-rt{text-align:right}
+}
+@media(max-width:760px){
+html body #checkerView #hv.hv-busy{--tg:none;--tg-s:none;--tg-c:none;--tg-g:none;--tg-r:none}
+html body #checkerView #hv .hv-status{animation:none}
+html body #checkerView #hv #hvSearch{contain:layout}
+}
+/* ===== GLASS PASS (phone) ===== */
+@media(max-width:760px){
+html body #checkerView #hv{position:relative;isolation:isolate;
+ --g-fill:linear-gradient(150deg,rgba(255,255,255,.13),rgba(255,255,255,.035) 42%,rgba(110,150,255,.07));
+ --g-line:rgba(255,255,255,.14);
+ --g-lit:inset 0 1px 0 rgba(255,255,255,.26),inset 0 -1px 0 rgba(255,255,255,.04),0 22px 44px -26px rgba(0,0,0,.9)}
+/* static colour orbs: they give the glass something to refract (no animation = no jank) */
+html body #checkerView #hv::before{content:"";display:block;position:absolute;left:0;right:0;top:-20px;bottom:0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent),linear-gradient(180deg,#000 calc(100% - 220px),transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent),linear-gradient(180deg,#000 calc(100% - 220px),transparent);mask-composite:intersect;z-index:-1;pointer-events:none;
+ background:
+  radial-gradient(260px 260px at 4% 10%,rgba(91,127,255,.75),transparent 70%),
+  radial-gradient(240px 240px at 100% 34%,rgba(47,208,255,.55),transparent 70%),
+  radial-gradient(260px 260px at 0% 62%,rgba(155,107,255,.55),transparent 70%),
+  radial-gradient(220px 220px at 100% 92%,rgba(47,208,255,.4),transparent 70%);
+ background-size:100% 760px;background-repeat:repeat-y}
+
+/* glass surfaces */
+html body #checkerView #hv #hvSearch,
+html body #checkerView #hv .hv-card,
+html body #checkerView #hv .hv-side,
+html body #checkerView #hv .hv-idle-grid>div{background:var(--g-fill)!important;border:1px solid var(--g-line)!important;box-shadow:var(--g-lit);
+ -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%)}
+html body #checkerView #hv #hvSearch{border-color:rgba(255,255,255,.2)!important;border-radius:28px}
+html body #checkerView #hv #hvSearch:focus-within{border-color:rgba(120,220,255,.65)!important}
+html body #checkerView #hv #hvSearch .hv-field{background:rgba(0,0,0,.38);border-color:rgba(255,255,255,.1);box-shadow:inset 0 2px 10px rgba(0,0,0,.5)}
+html body #checkerView #hv .hv-card,html body #checkerView #hv .hv-side{border-radius:24px}
+html body #checkerView #hv .hv-eg{background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.1)}
+html body #checkerView #hv .hv-eg div{border-color:rgba(255,255,255,.08)!important}
+html body #checkerView #hv .hv-pb{background:rgba(255,255,255,.08);border-radius:9px}
+html body #checkerView #hv .hv-status.ok{background:linear-gradient(135deg,rgba(67,227,148,.24),rgba(67,227,148,.05))!important;border-color:rgba(67,227,148,.5);box-shadow:var(--g-lit);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}
+html body #checkerView #hv .hv-status.bad{background:linear-gradient(135deg,rgba(255,92,120,.22),rgba(255,92,120,.05))!important;box-shadow:var(--g-lit);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+
+/* poster + icon chips */
+html body #checkerView #hv .hv-poster{border-color:rgba(255,255,255,.3);box-shadow:0 18px 36px -16px rgba(47,208,255,.55),inset 0 1px 0 rgba(255,255,255,.3)}
+html body #checkerView #hv .hv-vi,html body #checkerView #hv .hv-idle-grid .hv-ibox,html body #checkerView #hv .hv-idle-grid .hv-ibar{
+ background:linear-gradient(145deg,rgba(120,160,255,.42),rgba(47,208,255,.1))!important;border:1px solid rgba(180,210,255,.45)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px -10px rgba(47,208,255,.7);color:#fff}
+html body #checkerView #hv .hv-v:has(.hv-vt.good) .hv-vi{background:linear-gradient(145deg,rgba(67,227,148,.5),rgba(67,227,148,.1))!important;border-color:rgba(130,255,190,.55)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px -10px rgba(67,227,148,.8)}
+html body #checkerView #hv .hv-v:has(.hv-vt.bad) .hv-vi{background:linear-gradient(145deg,rgba(255,92,120,.5),rgba(255,92,120,.1))!important;border-color:rgba(255,150,170,.55)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px -10px rgba(255,92,120,.8)}
+
+/* buttons: glossy primary, glass secondary */
+html body #checkerView #hv #hvSearch:not(.has-val) .hv-paste,
+html body #checkerView #hv #hvSearch.has-val .hv-go,
+html body #checkerView #hv .hv-act .hv-b.hv-dl{background:linear-gradient(135deg,#6a8cff,#2fd0ff 125%)!important;border:1px solid rgba(255,255,255,.35)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -12px 20px rgba(0,70,170,.28),0 16px 32px -14px rgba(47,208,255,.8)}
+html body #checkerView #hv #hvSearch .hv-paste,html body #checkerView #hv #hvSearch .hv-go{box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+html body #checkerView #hv .hv-act .hv-b:not(.hv-dl){background:var(--g-fill);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.2);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+html body #checkerView #hv .hv-act .hv-b.pri:not(.hv-dl){background:var(--g-fill)}
+
+/* no blur work while a check runs */
+html body #checkerView #hv.hv-busy #hvSearch,html body #checkerView #hv.hv-busy .hv-card,html body #checkerView #hv.hv-busy .hv-side,
+html body #checkerView #hv.hv-busy .hv-idle-grid>div,html body #checkerView #hv.hv-busy .hv-status,html body #checkerView #hv.hv-busy .hv-b{-webkit-backdrop-filter:none;backdrop-filter:none}
 }
 @media(prefers-reduced-motion:reduce){html body #checkerView #hv #hvSearch *{transition:none!important}}
 </style>
@@ -35549,12 +35602,18 @@ function render(){
  var ac=h('div','hv-act');
  function px(id,lid){var o=$(id),b=h('button','hv-b',(($(lid)||{}).textContent||'').trim()||'ჩამოტვირთვა');b.type='button';b.disabled=!!(o&&o.disabled);b.onclick=function(){o&&o.click()};return b}
  var row=$('ttdlDlRow'),mr=$('ttdlMusicRow');
- if(row&&row.style.display!=='none')ap(ac,px('ttdlDlSd','ttdlDlSdLabel'),px('ttdlDlHd','ttdlDlHdLabel'));
+ if(row&&row.style.display!=='none'){if(window.matchMedia&&matchMedia('(max-width:760px)').matches)ap(ac,bestDl());else ap(ac,px('ttdlDlSd','ttdlDlSdLabel'),px('ttdlDlHd','ttdlDlHdLabel'))}
  if(mr&&mr.style.display!=='none')ap(ac,px('ttdlMusicBtn','ttdlMusicLabel'));
  var nw=h('button','hv-b','სხვა ვიდეოს შემოწმება');nw.type='button';nw.onclick=function(){reset();refocus();window.scrollTo({top:0,behavior:'smooth'})};
  var mt=h('button','hv-b pri','ვიდეოს გაუმჯობესება →');mt.type='button';mt.onclick=goMethod;
  ap(ac,nw,h('span','hv-sp'),mt);ap(C,ac);ap(out,L,C);
  var sig=probed?[vw,val('views'),val('likes'),bt0()].join('|'):'';if(probed&&sig!==render.sig){render.sig=sig;countUp()}}
+function bestDl(){var T=tiers(),b=T.filter(function(n){return n.name==='Browser'})[0],p=T.filter(function(n){return n.name==='Phone'})[0],useSd=false;
+ if(b&&p){var kb=[idx(b.res),pf(b.fps)||0,pf(b.sz)||0],kp=[idx(p.res),pf(p.fps)||0,pf(p.sz)||0];for(var i=0;i<3;i++){if(kb[i]!==kp[i]){useSd=kb[i]>kp[i];break}}}
+ var id=useSd?'ttdlDlSd':'ttdlDlHd',o=$(id),l=$(id+'Label'),bt=h('button','hv-b pri hv-dl','ვიდეოს გადმოწერა');bt.type='button';bt.disabled=!!(o&&o.disabled);bt.onclick=function(){o&&o.click()};
+ if(render.mo)render.mo.disconnect();
+ if(l){render.mo=new MutationObserver(function(){var s=(l.textContent||'').trim();bt.textContent=/%|MB/.test(s)?'ვიდეოს გადმოწერა · '+s:'ვიდეოს გადმოწერა'});render.mo.observe(l,{childList:true,characterData:true,subtree:true})}
+ return bt}
 function bt0(){var T=tiers();return T.map(function(t){return t.res+t.fps+t.br+t.sz}).join(',')}
 function countUp(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;out.querySelectorAll('.hv-bv,.hv-eg b,.hv-eh b').forEach(function(el){var n=el.firstChild;if(!n||n.nodeType!==3)return;var m=n.nodeValue.match(/^(\d[\d.,]*)(.*)$/);if(!m)return;var dec=(m[1].split('.')[1]||'').length,v=parseFloat(m[1].replace(/,/g,'')),suf=m[2],t0=performance.now();if(!isFinite(v))return;
   (function f(t){if(!n.parentNode)return;var p=Math.min(1,(t-t0)/1100),e=1-Math.pow(1-p,3);n.nodeValue=(v*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(f);else n.nodeValue=m[1]+suf})(t0)})}
@@ -35567,16 +35626,17 @@ function setGo(retry){goL.textContent=retry?'თავიდან ცდა':'�
 function steps(a,bad){st.querySelectorAll('.hv-st').forEach(function(s,i){s.className='hv-st'+(bad===i?' x':i<a?' d':i===a?' a':'')});st.querySelectorAll('.hv-st .hv-n').forEach(function(n,i){n.textContent=bad===i?'✕':i<a?'✓':String(i+1)})}
 function build(){st.textContent='';var sh=h('div','hv-sh');ap(sh,h('span','hv-dot'),h('span','hv-tt','მოწმდება…'),h('small','hv-tm',''));var sp=h('div','hv-steps');NM.forEach(function(n,i){var s=h('div','hv-st');ap(s,h('div','hv-n',String(i+1)),h('b','',n[0]),h('span','',n[1]));sp.appendChild(s)});ap(st,sh,sp)}
 function setState(s){state=s;idle.classList.toggle('off',s!=='idle'||(R&&R.style.display!=='none'));learn.classList.toggle('off',s!=='idle'||(R&&R.style.display!=='none'));if(s==='idle'){st.className='hv-status';st.textContent='';setGo(false)}}
-function start(){try{inp.blur()}catch(e){}render.sig='';state='run';build();st.className='hv-status on run';t0=Date.now();steps(0);clearInterval(tm);tm=setInterval(prog,250);out.classList.remove('on');idle.classList.add('off');learn.classList.add('off');setGo(false)}
+var HV=$('hv');function busy(on){HV.classList.toggle('hv-busy',!!on)}
+function start(){try{inp.blur()}catch(e){}busy(1);render.sig='';state='run';build();st.className='hv-status on run';t0=Date.now();steps(0);clearInterval(tm);tm=setInterval(prog,250);out.classList.remove('on');idle.classList.add('off');learn.classList.add('off');setGo(false)}
 function prog(){if(state!=='run')return;var vis=R.style.display!=='none',hasS=G&&G.children.length>0,hasT=Q&&Q.querySelector('.ttdl-quality-tier'),done=Q&&Q.classList.contains('tt-probed');
  steps(!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4);var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE)tmE.textContent=el.toFixed(1)+'წმ';
  if(done&&vis)finish(true);else if(!B.disabled&&el>1.5&&!(Q&&Q.classList.contains('tt-probing')))finish(vis&&hasS);else if(el>120)finish(false,'შემოწმება ზედმეტად გაგრძელდა. სცადე თავიდან.')}
-function finish(ok,msg){if(state!=='run')return;clearInterval(tm);var el=((Date.now()-t0)/1000).toFixed(1),sh=st.querySelector('.hv-sh');
+function finish(ok,msg){if(state!=='run')return;busy(0);clearInterval(tm);var el=((Date.now()-t0)/1000).toFixed(1),sh=st.querySelector('.hv-sh');
  if(ok){state='ok';st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';ap(sh,d,h('span','','შემოწმდა '+el+'წმ-ში'),h('span','hv-note','ყველაფერი მზადაა.'));setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
  else{state='bad';var a=(!R||R.style.display==='none')?0:1;st.className='hv-status on bad';steps(a,a);sh.textContent='';var b=h('button','hv-retry','თავიდან ცდა');b.type='button';b.onclick=function(){go.click()};ap(sh,h('span','hv-dot'),h('span','','ვიდეოს შემოწმება ვერ მოხერხდა'),b);
   ap(st,h('div','hv-err',msg||lastBad||'ვიდეოს გაანალიზება ვერ მოხერხდა. შეამოწმე ლინკი და სცადე თავიდან.'));setGo(true)}
  render()}
-function reset(){render.sig='';clearInterval(tm);clearTimeout(say.t);var c=$('ttdlClearBtn');if(c)c.click();inp.value='';inp.dispatchEvent(new Event('input',{bubbles:true}));st.className='hv-status';st.textContent='';tip.classList.remove('on');clr.hidden=true;R.style.display='none';out.classList.remove('on');out.textContent='';setState('idle');render();sync();try{inp.blur()}catch(e){}}
+function reset(){busy(0);render.sig='';clearInterval(tm);clearTimeout(say.t);var c=$('ttdlClearBtn');if(c)c.click();inp.value='';inp.dispatchEvent(new Event('input',{bubbles:true}));st.className='hv-status';st.textContent='';tip.classList.remove('on');clr.hidden=true;R.style.display='none';out.classList.remove('on');out.textContent='';setState('idle');render();sync();try{inp.blur()}catch(e){}}
 function refocus(){if(!(window.matchMedia&&matchMedia('(pointer:coarse)').matches))inp.focus()}
 new MutationObserver(function(){if(B.disabled&&state!=='run')start()}).observe(B,{attributes:true,attributeFilter:['disabled']});
 LG&&new MutationObserver(function(){var n=LG.lastElementChild;if(n)lastBad=n.textContent.replace(/^\s*\[[^\]]*\]\s*/,'').trim();while(LG.children.length>5)LG.removeChild(LG.firstChild)}).observe(LG,{childList:true});
@@ -35596,7 +35656,7 @@ paste.addEventListener('click',function(){
 inp.addEventListener('paste',function(e){var t=(e.clipboardData&&e.clipboardData.getData('text'))||'';if(t.trim()){e.preventDefault();setVal(t)}});
 function doClear(e){if(e){e.preventDefault();e.stopPropagation()}var had=out.classList.contains('on')||st.classList.contains('on');reset();refocus();if(had)window.scrollTo({top:0,behavior:'smooth'})}
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#hvClear'))doClear(e)},true);
-go.addEventListener('click',function(){if(!inp.value.trim()){say('ჯერ ჩასვი TikTok-ის ლინკი.');inp.focus();return}inp.blur();if(B.disabled)return;B.click()});
+go.addEventListener('click',function(){if(!inp.value.trim()){say('ჯერ ჩასვი TikTok-ის ლინკი.');inp.focus();return}inp.blur();if(B.disabled)return;requestAnimationFrame(function(){setTimeout(function(){if(!B.disabled)B.click()},90)})});
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();inp.blur()}});
 /* title size is pure CSS now (cqw): no measuring loop, so opening the tab no longer forces dozens of reflows */
 var onC=function(){document.body.classList.toggle('hv-on',cv.classList.contains('show'))};new MutationObserver(onC).observe(cv,{attributes:true,attributeFilter:['class']});onC();
