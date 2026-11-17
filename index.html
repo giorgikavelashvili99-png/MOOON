@@ -18756,7 +18756,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     let ttdlGateResolvers = [];
     function ttdlGlideGate(){
       if (!ttdlGlideBusy) return Promise.resolve();
-      return new Promise(function(r){ ttdlGateResolvers.push(r); setTimeout(r, 4500); });
+      return new Promise(function(r){ ttdlGateResolvers.push(r); setTimeout(r, 600); });
     }
     function ttdlGlideRelease(){
       ttdlGlideBusy = false;
@@ -18778,7 +18778,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
             });
           } catch(e){}
           Promise.all(anims.map(function(a){ return a.finished.catch(function(){}); })).then(function(){
-            if (window.requestIdleCallback) requestIdleCallback(fin, { timeout:200 }); else setTimeout(fin, 60);
+            if (window.requestIdleCallback) requestIdleCallback(fin, { timeout:40 }); else setTimeout(fin, 60);
           });
         });
       });
@@ -18786,7 +18786,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     function ttdlScheduleGlide(mode, extraReady){
       if (window.__cmDrive) return;
       ttdlGlideBusy = true;
-      Promise.all([ttdlWhenCalm(1200), extraReady || Promise.resolve()]).then(function(){
+      Promise.all([ttdlWhenCalm(350), extraReady || Promise.resolve()]).then(function(){
         ttdlGlideToLog(0, 0, mode);
       });
     }
@@ -18972,7 +18972,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         // Large 4K originals need real headroom on a mobile connection --
         // 8s was tuned for the much smaller SD/HD tiers and was cutting
         // off 4K probes on iOS before Safari had actually finished.
-        const timeoutMs = ttdlIsIOS() ? 20000 : 8000;
+        const timeoutMs = ttdlIsIOS() ? 8000 : 5000;
         const timer = setTimeout(() => finish({ width: v.videoWidth || null, height: v.videoHeight || null, durationSec: (isFinite(v.duration) && v.duration > 0) ? v.duration : null }), timeoutMs);
         v.onloadedmetadata = tryReport;
         v.onloadeddata = tryReport;
@@ -19021,7 +19021,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           if (md.mediaTime >= 0.2) times.push(md.mediaTime);
           if (times.length >= 16) compute(); else v.requestVideoFrameCallback(onFrame);
         };
-        timer = setTimeout(compute, ttdlIsIOS() ? 14000 : 10000);
+        timer = setTimeout(compute, ttdlIsIOS() ? 6000 : 4000);
         v.onerror = () => done(null);
         document.body.appendChild(v);
         v.src = url;
@@ -19352,14 +19352,14 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const empty = { width: null, height: null, fps: null, durationSec: null };
       if (!url) return empty;
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 15000);
+      const timer = setTimeout(() => controller.abort(), 8000);
       try {
         const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
         if (!res.ok || !res.body) return empty;
         let r = await ttdlReadUntilMoov(res, controller, 4 * 1024 * 1024);
         if (r && r.jump) {
           const c2 = new AbortController();
-          const t2 = setTimeout(() => c2.abort(), 12000);
+          const t2 = setTimeout(() => c2.abort(), 6000);
           try {
             const res2 = await fetch(url, { signal: c2.signal, headers: { Range: 'bytes=' + r.jump + '-' } });
             if (res2.status !== 206 || !res2.body) { try { c2.abort(); } catch (e) {} r = null; }
@@ -19383,23 +19383,27 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     async function ttdlFetchMeta(url){
       const key = url.replace(/[?#].*$/, '').replace(/\/+$/, '');
       const hit = ttdlMetaCache.get(key);
+      if (hit && Date.now() - hit.t < 600000) return hit.json;   // same link again = instant
       const api = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
       let lastErr = null;
+      const t0 = Date.now(), HARD_MS = 34000;                    // whole lookup never exceeds ~35 s
       for (let attempt = 0; attempt < 4; attempt++) {
+        const left = HARD_MS - (Date.now() - t0);
+        if (left < 400) break;
         const ctl = new AbortController();
-        const timer = setTimeout(() => ctl.abort(), 35000);
+        const timer = setTimeout(() => ctl.abort(), left);
         try {
           const res = await fetch(api, { signal: ctl.signal, cache: 'no-store' });
           const json = await res.json();
           clearTimeout(timer);
-          if (json && json.code === 0 && json.data) { return json; }
+          if (json && json.code === 0 && json.data) { ttdlMetaCache.set(key, { t: Date.now(), json: json }); return json; }
           const msg = String((json && json.msg) || '');
-          if (/limit/i.test(msg) && attempt < 3) { await new Promise(r => setTimeout(r, 1100)); continue; }
+          if (/limit/i.test(msg) && attempt < 3) { await new Promise(r => setTimeout(r, 1000)); continue; }
           return json;
         } catch (e) {
           clearTimeout(timer); lastErr = e;
           if (attempt >= 1) break;               // one retry on a network drop / timeout
-          await new Promise(r => setTimeout(r, 300));
+          await new Promise(r => setTimeout(r, 80));
         }
       }
       throw lastErr || new Error('tikwm');
@@ -35727,7 +35731,7 @@ html body #checkerView #hv#hv .hv-b.pri{background:linear-gradient(135deg,#3f6df
 html body.hv-on{background:#0a0a0a !important}
 html body #checkerView.mn-view{max-width:none !important;width:100% !important;padding:0 !important;background:#0a0a0a !important;box-shadow:0 0 0 100vmax #0a0a0a !important;clip-path:inset(0 -100vmax) !important;min-height:calc(100vh - 140px)}
 html body.hv-on .wrap{max-width:none !important}
-html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv{--bg:#0a0a0a !important;--cd:#101010 !important;--ln:rgba(255,255,255,.09) !important;--ln2:rgba(255,255,255,.2) !important;--tx:#fafafa !important;--dm:#a3a3a3 !important;--ft:#737373 !important;--good:#fafafa !important;--bad:#ff7b7b !important;--a1:#fff !important;--a2:#fff !important;--hv-ff:'HvInter','HvKa',system-ui,-apple-system,'Segoe UI',sans-serif !important;font-family:var(--hv-ff) !important;color:var(--tx) !important;max-width:1240px !important;margin:0 auto !important;padding:clamp(40px,6vw,88px) clamp(18px,3vw,32px) 110px !important;background:none !important;overflow:visible !important;text-align:left !important}
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv{--bg:#0a0a0a !important;--cd:#101010 !important;--ln:rgba(255,255,255,.09) !important;--ln2:rgba(255,255,255,.2) !important;--tx:#fafafa !important;--dm:#a3a3a3 !important;--ft:#737373 !important;--good:#fafafa !important;--bad:#ff7b7b !important;--a1:#fff !important;--a2:#fff !important;--hv-ff:var(--moon-lat),'BPGAcademiuriU','BPGNinoPro','Space Grotesk',system-ui,sans-serif !important;font-family:var(--hv-ff) !important;color:var(--tx) !important;max-width:1240px !important;margin:0 auto !important;padding:clamp(40px,6vw,88px) clamp(18px,3vw,32px) 110px !important;background:none !important;overflow:visible !important;text-align:left !important}
 html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv *{font-family:var(--hv-ff) !important;text-shadow:none !important;animation:none !important;filter:none !important}
 html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv *::before,html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv *::after{content:none !important;display:none !important;animation:none !important}
 html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv svg *{stroke-dasharray:none !important;stroke-dashoffset:0 !important}
@@ -36023,6 +36027,29 @@ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv
   html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-h1{white-space:normal!important}
 }
 </style>
+<style id="hv-mobile-fix">
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv,html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv *{font-family:var(--moon-lat),'BPGAcademiuriU','BPGNinoPro','Space Grotesk',system-ui,sans-serif!important;text-transform:none!important;font-synthesis:none}
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-num,html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-nd{font-family:var(--moon-lat),'BPGAcademiuriU','Space Grotesk',system-ui,sans-serif!important}
+@media (max-width:900px){
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-act{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;width:100%!important;max-width:100%!important;margin-bottom:92px!important;overflow:visible!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-dls{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;grid-column:1/-1!important;width:100%!important;max-width:100%!important;order:0!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-act>*,html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-dls>*{grid-column:1/-1!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-dlh,html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-act .hv-sp{display:none!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-b.hv-d2{width:100%!important;height:56px!important;min-height:56px!important;max-height:56px!important;padding:0 14px!important;margin:0!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-act .hv-b:not(.hv-d2){width:100%!important;height:50px!important;margin:0!important;grid-column:1/-1!important;white-space:normal!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-act .hv-b.pri:not(.hv-d2){grid-column:1/-1!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-dt{flex:1 1 auto!important;min-width:0!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-dm{flex:none!important;min-width:0!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-paste{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-paste svg{display:block!important;flex:none!important;width:20px!important;height:20px!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-acts{display:flex!important;gap:10px!important;flex:1 1 100%!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-go{flex:1 1 auto!important}
+}
+@media (max-width:560px){
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-eg{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-eg small{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.25!important}
+}
+</style>
 <script id="hv-js">(function(){
 var $=function(i){return document.getElementById(i)},cv=$('checkerView');if(!cv||!$('hv'))return;
 var inp=$('ttdlUrlInput'),B=$('ttdlAnalyzeBtn'),R=$('ttdlResult'),G=$('ttdlStatsGrid'),Q=$('ttdlQualityBlock'),LG=$('ttdlLog'),
@@ -36118,11 +36145,11 @@ function steps(a,bad){st.style.setProperty('--prog',Math.min(100,(a+.55)/4*100)+
 function build(){st.textContent='';var sh=h('div','hv-sh');ap(sh,h('span','hv-dot'),h('span','hv-tt','მოწმდება…'),h('small','hv-tm',''));var sp=h('div','hv-steps');NM.forEach(function(n,i){var s=h('div','hv-st');ap(s,h('div','hv-n',String(i+1)),h('b','',n[0]));sp.appendChild(s)});var pr=h('div','hv-pr');pr.appendChild(h('i'));ap(st,sh,pr,sp)}
 function setState(s){state=s;idle.classList.toggle('off',s!=='idle'||(R&&R.style.display!=='none'));learn.classList.toggle('off',s!=='idle'||(R&&R.style.display!=='none'));if(s==='idle'){st.className='hv-status';st.textContent='';setGo(false)}}
 var HV=$('hv');function busy(on){HV.classList.toggle('hv-busy',!!on)}
-function start(){try{inp.blur()}catch(e){}busy(1);render.sig='';state='run';build();st.className='hv-status on run';t0=Date.now();steps(0);clearInterval(tm);tm=setInterval(prog,250);out.classList.remove('on');idle.classList.add('off');learn.classList.add('off');setGo(false)}
+function start(){try{inp.blur()}catch(e){}busy(1);render.sig='';state='run';build();st.className='hv-status on run';t0=Date.now();steps(0);clearInterval(tm);tm=setInterval(prog,100);out.classList.remove('on');idle.classList.add('off');learn.classList.add('off');setGo(false)}
 function prog(){if(state!=='run')return;var vis=R.style.display!=='none',hasS=G&&G.children.length>0,hasT=Q&&Q.querySelector('.ttdl-quality-tier'),done=Q&&Q.classList.contains('tt-probed');
- var el0=(Date.now()-t0)/1000,tb=el0<.7?0:el0<1.5?1:el0<2.6?2:3,rl=!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4;steps(Math.max(rl,tb));var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE){tmE.textContent='';tmE.appendChild(h('i','hv-num',el.toFixed(1)));tmE.appendChild(document.createTextNode('წმ'))}
- if(done&&vis)finish(true);else if(!B.disabled&&el>1.5&&!(Q&&Q.classList.contains('tt-probing')))finish(vis&&hasS);else if(el>120)finish(false,'შემოწმება ზედმეტად გაგრძელდა. სცადე თავიდან.')}
-function finish(ok,msg){if(state!=='run')return;busy(0);clearInterval(tm);var el=((Date.now()-t0)/1000).toFixed(1),sh=st.querySelector('.hv-sh');
+ var el0=(Date.now()-t0)/1000,tb=el0<.15?0:el0<.4?1:el0<.8?2:3,rl=!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4;steps(Math.max(rl,tb));var el=Math.min(35,Math.max(.1,(Date.now()-t0)/1000)),tmE=st.querySelector('.hv-tm');if(tmE){tmE.textContent='';tmE.appendChild(h('i','hv-num',el.toFixed(1)));tmE.appendChild(document.createTextNode('წმ'))}
+ if(done&&vis)finish(true);else if(!B.disabled&&el>.3&&!(Q&&Q.classList.contains('tt-probing')))finish(vis&&hasS);else if(el>=35)finish(false,'შემოწმება 35 წამზე მეტხანს გაგრძელდა. სცადე თავიდან.')}
+function finish(ok,msg){if(state!=='run')return;busy(0);clearInterval(tm);var el=Math.min(35,Math.max(.1,(Date.now()-t0)/1000)).toFixed(1),sh=st.querySelector('.hv-sh');
  if(ok){state='ok';st.style.setProperty('--prog','100%');st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';var ok=h('span','','შემოწმდა ');ok.appendChild(h('i','hv-num',el));ok.appendChild(document.createTextNode('წმ-ში'));ap(sh,d,ok);setGo(false);}
  else{state='bad';var a=(!R||R.style.display==='none')?0:1;st.className='hv-status on bad';steps(a,a);sh.textContent='';var b=h('button','hv-retry','თავიდან ცდა');b.type='button';b.onclick=function(){go.click()};ap(sh,h('span','hv-dot'),h('span','','ვიდეოს შემოწმება ვერ მოხერხდა'),b);
   ap(st,h('div','hv-err',msg||lastBad||'ვიდეოს გაანალიზება ვერ მოხერხდა. შეამოწმე ლინკი და სცადე თავიდან.'));setGo(true)}
@@ -36157,7 +36184,7 @@ setState('idle');sync();
 </script>
 <script id="hv-mtavruli">(function(){var cv=document.getElementById('hv');if(!cv)return;
 var SEL='.hv-lb,.hv-bl,.hv-eg small,.hv-dlh,.hv-eh span,.hv-idle-grid b,.hv-vt,.hv-rn,.hv-b,.hv-go span,.hv-paste-l,.hv-st b,.hv-sh>span,.hv-retry',q=0;
-function up(t){return t.replace(/[ა-ჺჽ-ჿ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)+0xBC0)})}
+function up(t){return t}
 function fix(){q=0;cv.querySelectorAll(SEL).forEach(function(el){var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),n;while((n=w.nextNode())){var v=up(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v}})}
 new MutationObserver(function(){if(!q)q=requestAnimationFrame(fix)}).observe(cv,{childList:true,subtree:true,characterData:true});fix()})();</script>
 </body>
