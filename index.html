@@ -18760,7 +18760,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     let ttdlGateResolvers = [];
     function ttdlGlideGate(){
       if (!ttdlGlideBusy) return Promise.resolve();
-      return new Promise(function(r){ ttdlGateResolvers.push(r); setTimeout(r, 600); });
+      return new Promise(function(r){ ttdlGateResolvers.push(r); setTimeout(r, 100); });
     }
     function ttdlGlideRelease(){
       ttdlGlideBusy = false;
@@ -18790,7 +18790,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     function ttdlScheduleGlide(mode, extraReady){
       if (window.__cmDrive) return;
       ttdlGlideBusy = true;
-      Promise.all([ttdlWhenCalm(350), extraReady || Promise.resolve()]).then(function(){
+      Promise.all([ttdlWhenCalm(60), extraReady || Promise.resolve()]).then(function(){
         ttdlGlideToLog(0, 0, mode);
       });
     }
@@ -19541,7 +19541,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
             if (musicRow) musicRow.style.display = music ? 'block' : 'none';
             if (clearBtn) clearBtn.style.display = 'flex';
             ttdlLog(ttdlDict('logFoundPhotos').replace('{n}', d.images.length));
-            ttdlScheduleGlide('photos', ttdlWhenImagesReady(photoGrid, 4, 1300));
+            ttdlScheduleGlide('photos', ttdlWhenImagesReady(photoGrid, 4, 400));
             setBtnBusy(analyzeBtn, false);
             return;
           }
@@ -19637,7 +19637,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           // SPEED RULE: quality details must be in within ~5 s of the post data arriving
           // (the 35 s hard limit still covers a slow tikwm answer). Every probe step
           // is raced against what is left of that budget; unknown values show as "?".
-          const probeT0 = Date.now(), PROBE_BUDGET = 4500;
+          const probeT0 = Date.now(), PROBE_BUDGET = 1800;
           const left = () => Math.max(0, PROBE_BUDGET - (Date.now() - probeT0));
           const within = (p, ms, fb) => new Promise(res => { let d = false; const f = v => { if (!d) { d = true; res(v); } }; setTimeout(() => f(fb), Math.max(0, ms)); Promise.resolve(p).then(f, () => f(fb)); });
           Promise.all(urls.map(async (u) => {
@@ -20152,7 +20152,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const v = (urlInput.value || '').trim();
       if (!TTDL_LINK_RE.test(v) || v === ttdlLastAuto || analyzeBtn.disabled) return;
       clearTimeout(ttdlAutoT);
-      ttdlAutoT = setTimeout(() => { ttdlLastAuto = v; ttdlAnalyze(); }, 120);
+      ttdlAutoT = setTimeout(() => { ttdlLastAuto = v; ttdlAnalyze(); }, 30);
     }
     urlInput.addEventListener('paste', () => setTimeout(ttdlMaybeAuto, 0));
     urlInput.addEventListener('input', (e) => { if (e.isTrusted === false || e.inputType === 'insertFromPaste') ttdlMaybeAuto(); });
@@ -36354,7 +36354,7 @@ function bestDl(){var T=tiers(),b=T.filter(function(n){return n.name==='Browser'
  return bt}
 function bt0(){var T=tiers();return T.map(function(t){return t.res+t.fps+t.br+t.sz}).join(',')}
 function countUp(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;out.querySelectorAll('.hv-bv,.hv-eg b,.hv-eh b').forEach(function(el){var n=el.firstChild;if(!n||n.nodeType!==3)return;var m=n.nodeValue.match(/^(\d[\d.,]*)(.*)$/);if(!m)return;var dec=(m[1].split('.')[1]||'').length,v=parseFloat(m[1].replace(/,/g,'')),suf=m[2],t0=performance.now();if(!isFinite(v))return;
-  (function f(t){if(!n.parentNode)return;var p=Math.min(1,(t-t0)/1100),e=1-Math.pow(1-p,3);n.nodeValue=(v*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(f);else n.nodeValue=m[1]+suf})(t0)})}
+  (function f(t){if(!n.parentNode)return;var p=Math.min(1,(t-t0)/350),e=1-Math.pow(1-p,3);n.nodeValue=(v*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(f);else n.nodeValue=m[1]+suf})(t0)})}
 function goMethod(e){if(e&&e.preventDefault)e.preventDefault();var m=document.querySelector('[data-hz-go="optimizer"],[data-mn="optimizer"]');if(m)m.click()}
 var _sp=0;cv.addEventListener('pointermove',function(e){var c=e.target.closest&&e.target.closest('.hv-card,.hv-idle-grid>div');if(!c||_sp)return;_sp=requestAnimationFrame(function(){_sp=0;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')})},{passive:true});
 learn.addEventListener('click',goMethod);
@@ -36386,16 +36386,16 @@ $('ttdlThumb')&&new MutationObserver(sched).observe($('ttdlThumb'),{attributes:t
 /* input / paste / go */
 var SB=$('hvSearch');function sync(){var v=inp.value||'';clr.hidden=!v;if(SB){SB.classList.toggle('has-val',!!v.trim());SB.classList.toggle('ok',/tiktok\.com\/\S+/i.test(v))}}
 inp.addEventListener('blur',sync);inp.addEventListener('focus',sync);
-inp.addEventListener('input',function(){sync();clearTimeout(inp._at);var v=(inp.value||'').trim();if(/(vt|vm)\.tiktok\.com\/\S{5,}|tiktok\.com\/@[^\/\s]+\/(video|photo)\/\d{6,}|tiktok\.com\/t\/\S{5,}/i.test(v))inp._at=setTimeout(function(){if(!B.disabled&&state!=='run')go.click()},650)});
+inp.addEventListener('input',function(){sync();clearTimeout(inp._at);var v=(inp.value||'').trim();if(/(vt|vm)\.tiktok\.com\/\S{5,}|tiktok\.com\/@[^\/\s]+\/(video|photo)\/\d{6,}|tiktok\.com\/t\/\S{5,}/i.test(v))inp._at=setTimeout(function(){if(!B.disabled&&state!=='run')go.click()},120)});
 function say(m){tip.textContent=m;tip.classList.add('on');clearTimeout(say.t);say.t=setTimeout(function(){tip.classList.remove('on')},2600)}
-function setVal(t){inp.value=t.trim();sync();inp.dispatchEvent(new Event('input',{bubbles:true}));inp.blur();if(!B.disabled&&/tiktok\.com/i.test(inp.value))setTimeout(function(){if(!B.disabled&&state!=='run')B.click()},150)}
+function setVal(t){inp.value=t.trim();sync();inp.dispatchEvent(new Event('input',{bubbles:true}));inp.blur();if(!B.disabled&&/tiktok\.com/i.test(inp.value))setTimeout(function(){if(!B.disabled&&state!=='run')B.click()},0)}
 paste.addEventListener('click',function(){
  var fallback=function(){inp.focus();inp.select();say('ბრაუზერმა clipboard-ზე წვდომა არ მოგვცა. ჩასვი Ctrl+V-ით.')};
  if(navigator.clipboard&&navigator.clipboard.readText){navigator.clipboard.readText().then(function(t){t&&t.trim()?setVal(t):say('clipboard ცარიელია')}).catch(fallback)}else fallback()});
 inp.addEventListener('paste',function(e){var t=(e.clipboardData&&e.clipboardData.getData('text'))||'';if(t.trim()){e.preventDefault();setVal(t)}});
 function doClear(e){if(e){e.preventDefault();e.stopPropagation()}var had=out.classList.contains('on')||st.classList.contains('on');reset();refocus();if(had)window.scrollTo({top:0,behavior:'smooth'})}
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#hvClear'))doClear(e)},true);
-go.addEventListener('click',function(){if(!inp.value.trim()){say('ჯერ ჩასვი TikTok-ის ლინკი.');inp.focus();return}inp.blur();if(B.disabled)return;requestAnimationFrame(function(){setTimeout(function(){if(!B.disabled)B.click()},90)})});
+go.addEventListener('click',function(){if(!inp.value.trim()){say('ჯერ ჩასვი TikTok-ის ლინკი.');inp.focus();return}inp.blur();if(B.disabled)return;requestAnimationFrame(function(){setTimeout(function(){if(!B.disabled)B.click()},0)})});
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();inp.blur();go.click()}});
 /* title size is pure CSS now (cqw): no measuring loop, so opening the tab no longer forces dozens of reflows */
 var onC=function(){document.body.classList.toggle('hv-on',cv.classList.contains('show'))};new MutationObserver(onC).observe(cv,{attributes:true,attributeFilter:['class']});onC();
@@ -36615,6 +36615,34 @@ html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv
 html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-eg small{font-size:10.5px!important;letter-spacing:.1em!important}
 }
 </style>
+
+<style id="hv-fast">
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-poster,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-poster::after,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-side>:not(.hv-poster),
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-col>*,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-seg i.on,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-pb i,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-vi svg *,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-out.anim:not(.re) .hv-vi::after,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-idle,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-idle-grid>div,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-learn,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-sub,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-search,
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-status{animation-duration:.18s!important;animation-delay:0s!important;animation-iteration-count:1!important}
+</style>
+
+<style id="hv-zilem-ticks">
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .zq-t span:nth-child(n+5){text-transform:none!important}
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .zq-t span:nth-child(-n+4){text-transform:lowercase!important}
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-q .hv-orig{font-family:HvInter,MoonNino,HvKa,BPGNinoMtavruli,sans-serif!important}
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .zq-n{font-family:HvInter,MoonNino,HvKa,BPGNinoMtavruli,sans-serif!important}
+html body #checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-q .hv-orig{font-size:12.8px!important;font-weight:400!important}
+</style>
+<script id="hv-zilem-x">(function(){var cv=document.getElementById('hv');if(!cv)return;var q=0;
+function fx(){q=0;cv.querySelectorAll('.hv-orig').forEach(function(el){var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),n;while((n=w.nextNode())){var v=n.nodeValue.replace(/(\d)\s*[xX]\s*(\d)/g,'$1\u00D7$2');if(v!==n.nodeValue)n.nodeValue=v}})}
+new MutationObserver(function(){if(!q)q=requestAnimationFrame(fx)}).observe(cv,{childList:true,subtree:true,characterData:true});fx()})();</script>
 <script id="hv-fix-1117-js">(function(){var cv=document.getElementById('hv');if(!cv)return;
 /* every Latin letter in the checker's own labels is a capital (TIKTOK, FOR YOU, FPS, MBPS, 1080P ...); user content (@name, caption, hashtags) is left untouched */
 var UP='.hv-sub,.hv-lb,.hv-bl,.hv-bv,.hv-bv u,.hv-eg small,.hv-dlh,.hv-eh span,.hv-idle-grid b,.hv-idle-grid p,.hv-vt,.hv-vs,.hv-rn,.hv-rt b,.hv-rt span,.hv-tk span,.hv-orig,.hv-b,.hv-dt b,.hv-dt small,.hv-dm,.hv-go span,.hv-paste-l,.hv-st b,.hv-st small,.hv-sh>span,.hv-retry,.hv-err,.hv-learn';
