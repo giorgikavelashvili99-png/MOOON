@@ -35685,6 +35685,43 @@ html body #checkerView #hv#hv .hv-nd{font-size:.86em}
 html body #checkerView #hv#hv .hv-num{font-size:1.26em;line-height:1;margin:0 .3em 0 .08em}
 html body #checkerView #hv#hv .hv-tm .hv-num{font-size:1.28em;margin:0 .26em 0 0}
 </style>
+<style id="hv-glass-pro">
+/* ===== SEARCH + ANALYSIS only: glass redesign (remove this block to revert) ===== */
+html body #checkerView #hv#hv{--g-ln:rgba(255,255,255,.14);--g-fill:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));--g-hi:inset 0 1px 0 rgba(255,255,255,.14);--g-sh:0 18px 50px rgba(0,0,0,.5)}
+/* search bar */
+html body #checkerView #hv#hv .hv-search{min-height:88px;padding:12px;gap:12px;border-radius:20px;background:var(--g-fill);border:1px solid var(--g-ln);box-shadow:var(--g-hi),var(--g-sh);-webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);transition:border-color .25s,box-shadow .25s}
+html body #checkerView #hv#hv .hv-search:hover{border-color:rgba(255,255,255,.24)}
+html body #checkerView #hv#hv .hv-search:focus-within{border-color:rgba(90,160,255,.7);box-shadow:var(--g-hi),0 0 0 4px rgba(79,124,255,.16),0 0 56px rgba(41,195,255,.2),var(--g-sh)}
+html body #checkerView #hv#hv .hv-lnk{width:56px;height:56px;padding:17px;border-radius:14px;background:linear-gradient(145deg,rgba(79,124,255,.28),rgba(41,195,255,.1));border:1px solid rgba(120,175,255,.35);color:#a8dcff;box-shadow:var(--g-hi)}
+html body #checkerView #hv#hv .hv-in{height:56px;font-size:clamp(16px,1.2vw,19px);font-weight:600;letter-spacing:.01em;color:#fff}
+html body #checkerView #hv#hv .hv-in::placeholder{color:rgba(190,205,230,.55)}
+html body #checkerView #hv#hv .hv-x{width:34px;height:34px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+html body #checkerView #hv#hv .hv-paste{height:56px;padding:0 26px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);box-shadow:var(--g-hi);color:#eef3ff}
+html body #checkerView #hv#hv .hv-paste:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.28)}
+html body #checkerView #hv#hv .hv-go{height:56px;padding:0 clamp(24px,2.2vw,38px);border-radius:14px;background:linear-gradient(135deg,#3f6dff,#19b6f2);border:1px solid rgba(255,255,255,.28);box-shadow:var(--g-hi),0 10px 30px rgba(35,140,255,.38);letter-spacing:.01em}
+html body #checkerView #hv#hv .hv-go:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
+/* analysis cards */
+html body #checkerView #hv#hv .hv-card{border-radius:18px;background:var(--g-fill);border:1px solid var(--g-ln);box-shadow:var(--g-hi),var(--g-sh);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+html body #checkerView #hv#hv .hv-card:hover{border-color:rgba(255,255,255,.26)}
+html body #checkerView #hv#hv .hv-poster{border-radius:18px;border:1px solid var(--g-ln);box-shadow:var(--g-hi),0 24px 60px rgba(0,0,0,.6)}
+html body #checkerView #hv#hv .hv-lb{letter-spacing:.14em;text-transform:uppercase;font-weight:700;font-size:11.5px;color:rgba(170,195,235,.8)}
+html body #checkerView #hv#hv .hv-big{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+html body #checkerView #hv#hv .hv-big>div{padding:14px 14px 12px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);min-width:0}
+html body #checkerView #hv#hv .hv-eg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+html body #checkerView #hv#hv .hv-eg>div{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);min-width:0}
+html body #checkerView #hv#hv .hv-bv,html body #checkerView #hv#hv .hv-eg b,html body #checkerView #hv#hv .hv-eh b,html body #checkerView #hv#hv .hv-rt b,html body #checkerView #hv#hv .hv-vt,html body #checkerView #hv#hv .hv-tm,html body #checkerView #hv#hv .hv-d2 .hv-dm{font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;line-height:1.15}
+html body #checkerView #hv#hv .hv-seg{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+html body #checkerView #hv#hv .hv-seg i{height:6px;border-radius:3px;background:rgba(255,255,255,.12)}
+html body #checkerView #hv#hv .hv-seg i.on{background:linear-gradient(90deg,#4f7cff,#29c3ff);box-shadow:0 0 14px rgba(41,195,255,.5)}
+html body #checkerView #hv#hv .hv-pb{height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+html body #checkerView #hv#hv .hv-pb i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#4f7cff,#29c3ff)}
+html body #checkerView #hv#hv .hv-vi{border-radius:14px;background:linear-gradient(145deg,rgba(79,124,255,.28),rgba(41,195,255,.1));border:1px solid rgba(120,175,255,.32)}
+/* buttons in results */
+html body #checkerView #hv#hv .hv-b{border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);box-shadow:var(--g-hi)}
+html body #checkerView #hv#hv .hv-b:hover:not(:disabled){background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.28)}
+html body #checkerView #hv#hv .hv-b.pri{background:linear-gradient(135deg,#3f6dff,#19b6f2);border-color:rgba(255,255,255,.28);box-shadow:var(--g-hi),0 10px 30px rgba(35,140,255,.34)}
+@media (max-width:720px){html body #checkerView #hv#hv .hv-big{grid-template-columns:repeat(2,minmax(0,1fr))}html body #checkerView #hv#hv .hv-eg{grid-template-columns:repeat(2,minmax(0,1fr))}html body #checkerView #hv#hv .hv-search{border-radius:18px}}
+</style>
 <script id="hv-js">(function(){
 var $=function(i){return document.getElementById(i)},cv=$('checkerView');if(!cv||!$('hv'))return;
 var inp=$('ttdlUrlInput'),B=$('ttdlAnalyzeBtn'),R=$('ttdlResult'),G=$('ttdlStatsGrid'),Q=$('ttdlQualityBlock'),LG=$('ttdlLog'),
