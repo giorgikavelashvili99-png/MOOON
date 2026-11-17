@@ -35653,6 +35653,24 @@ html body #checkerView #hv#hv .hv-b.hv-d2.busy .hv-dm{color:#fff}
 @media(max-width:900px){html body #checkerView #hv#hv .hv-dls{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){html body #checkerView #hv#hv .hv-b.hv-d2::after{transition:none}}
 </style>
+<style id="hv-steady">
+html body #checkerView #hv#hv .hv-dls{grid-template-columns:minmax(0,1fr)!important}
+@media(min-width:1100px){html body #checkerView #hv#hv .hv-dls{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+html body #checkerView #hv#hv .hv-b.hv-d2{height:62px!important;min-height:62px!important;max-height:62px!important;padding:0 14px!important;contain:layout paint;transition:none!important;transform:none!important;animation:none!important;text-shadow:none!important}
+html body #checkerView #hv#hv .hv-b.hv-d2 *{text-shadow:none!important;animation:none!important;transition:none!important}
+html body #checkerView #hv#hv .hv-dt b,html body #checkerView #hv#hv .hv-dt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #checkerView #hv#hv .hv-dm{min-width:74px;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+html body #checkerView #hv#hv .hv-b.hv-d2.busy:disabled{opacity:1!important;cursor:progress}
+html body #checkerView #hv#hv .hv-b.hv-d2::after{transition:width .4s linear!important}
+html body #checkerView #hv#hv .hv-act{overflow-anchor:none}
+</style>
+<style id="hv-type">
+/* digits sit at the same height as Georgian letters */
+html body #checkerView #hv#hv .hv-num,html body #checkerView #hv#hv .hv-nd{font-style:normal;font-size:.78em;line-height:1;display:inline-block;vertical-align:baseline;font-variant-numeric:lining-nums tabular-nums;font-weight:inherit}
+html body #checkerView #hv#hv .hv-sh .hv-num{margin:0 .12em}
+/* second Georgian typeface for headline-level text (Latin/digits fall through to the main font) */
+html body #checkerView #hv#hv .hv-vt,html body #checkerView #hv#hv .hv-lb,html body #checkerView #hv#hv .hv-who,html body #checkerView #hv#hv .hv-dt b,html body #checkerView #hv#hv .hv-dlh,html body #checkerView #hv#hv .hv-rn,html body #checkerView #hv#hv .hv-sh>span:nth-child(2),html body #checkerView #hv#hv .hv-st b,html body #checkerView #hv#hv .hv-idle-grid b,html body #checkerView #hv#hv .hv-bl,html body #checkerView #hv#hv .hv-eg small,html body #checkerView #hv#hv .hv-go,html body #checkerView #hv#hv .hv-paste,html body #checkerView #hv#hv .hv-act>.hv-b{font-family:'BPGNinoPro',var(--moon-lat),'BPGAcademiuriU',system-ui,sans-serif}
+</style>
 <script id="hv-js">(function(){
 var $=function(i){return document.getElementById(i)},cv=$('checkerView');if(!cv||!$('hv'))return;
 var inp=$('ttdlUrlInput'),B=$('ttdlAnalyzeBtn'),R=$('ttdlResult'),G=$('ttdlStatsGrid'),Q=$('ttdlQualityBlock'),LG=$('ttdlLog'),
@@ -35707,7 +35725,9 @@ function render(){
  var nw=h('button','hv-b','სხვა ვიდეოს შემოწმება');nw.type='button';nw.onclick=function(){reset();refocus();window.scrollTo({top:0,behavior:'smooth'})};
  var mt=h('button','hv-b pri','ვიდეოს გაუმჯობესება →');mt.type='button';mt.onclick=goMethod;
  ap(ac,nw,h('span','hv-sp'),mt);ap(C,ac);ap(out,L,C);
- var sig=probed?[vw,val('views'),val('likes'),bt0()].join('|'):'';if(probed&&sig!==render.sig){render.sig=sig;countUp()}}
+ nums();var sig=probed?[vw,val('views'),val('likes'),bt0()].join('|'):'';if(probed&&sig!==render.sig){render.sig=sig;countUp()}}
+function nums(){out.querySelectorAll('.hv-wm,.hv-orig,.hv-vs:not(.hv-id)').forEach(function(el){if(!/[\u10D0-\u10FF]/.test(el.textContent))return;var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),L=[],n;while((n=w.nextNode()))L.push(n);L.forEach(function(t){var v=t.nodeValue;if(!/\d/.test(v))return;var f=document.createDocumentFragment(),last=0,re=/\d[\d.,]*[KMB]?/g,m;while((m=re.exec(v))){if(m.index>last)f.appendChild(document.createTextNode(v.slice(last,m.index)));f.appendChild(h('span','hv-nd',m[0]));last=m.index+m[0].length}if(!last)return;if(last<v.length)f.appendChild(document.createTextNode(v.slice(last)));t.parentNode.replaceChild(f,t)})})}
+function syncDl(){out.querySelectorAll('.hv-d2').forEach(function(b){var d=!b._on||!!(b._o&&b._o.disabled);if(b.disabled!==d)b.disabled=d})}
 function dlGroup(row,mr){
  (render.mos||[]).forEach(function(m){m.disconnect()});render.mos=[];
  if(render.mo){render.mo.disconnect();render.mo=null}
@@ -35719,7 +35739,7 @@ function dlGroup(row,mr){
  function info(t){return t?[t.res,t.fps,t.sz].filter(function(x){return x&&x!=='?'&&x!=='…'}).join(' · '):''}
  function mk(id,lid,title,sub,meta,on,ico){
   var o=$(id),l=$(lid),b=h('button','hv-b hv-d2'),i=h('span','hv-di'),t=h('span','hv-dt'),m=h('span','hv-dm',meta);
-  b.type='button';i.innerHTML=ico;ap(t,h('b','',title),h('small','',sub));ap(b,i,t,m);
+  b.type='button';b._o=o;b._on=on;i.innerHTML=ico;ap(t,h('b','',title),h('small','',sub));ap(b,i,t,m);
   b.disabled=!on||!!(o&&o.disabled);b.onclick=function(){o&&o.click()};
   if(l&&on){var upd=function(){var s=(l.textContent||'').trim(),k=s.match(/^(\d+(?:\.\d+)?)%$/);m.textContent=k||/MB$/.test(s)?s:meta;b.style.setProperty('--p',k?k[1]+'%':'0%');b.classList.toggle('busy',!!(k||/MB$/.test(s)))};upd();var mo=new MutationObserver(upd);mo.observe(l,{childList:true,characterData:true,subtree:true});render.mos.push(mo)}
   return b}
@@ -35751,7 +35771,7 @@ function prog(){if(state!=='run')return;var vis=R.style.display!=='none',hasS=G&
  var el0=(Date.now()-t0)/1000,tb=el0<.7?0:el0<1.5?1:el0<2.6?2:3,rl=!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4;steps(Math.max(rl,tb));var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE){tmE.textContent='';tmE.appendChild(h('i','hv-num',el.toFixed(1)));tmE.appendChild(document.createTextNode('წმ'))}
  if(done&&vis)finish(true);else if(!B.disabled&&el>1.5&&!(Q&&Q.classList.contains('tt-probing')))finish(vis&&hasS);else if(el>120)finish(false,'შემოწმება ზედმეტად გაგრძელდა. სცადე თავიდან.')}
 function finish(ok,msg){if(state!=='run')return;busy(0);clearInterval(tm);var el=((Date.now()-t0)/1000).toFixed(1),sh=st.querySelector('.hv-sh');
- if(ok){state='ok';st.style.setProperty('--prog','100%');st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';var ok=h('span','','შემოწმდა ');ok.appendChild(h('i','hv-num',el));ok.appendChild(document.createTextNode('წმ-ში'));ap(sh,d,ok,h('span','hv-note','ყველაფერი მზადაა.'));setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
+ if(ok){state='ok';st.style.setProperty('--prog','100%');st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';var ok=h('span','','შემოწმდა ');ok.appendChild(h('i','hv-num',el));ok.appendChild(document.createTextNode('წმ-ში'));ap(sh,d,ok);setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
  else{state='bad';var a=(!R||R.style.display==='none')?0:1;st.className='hv-status on bad';steps(a,a);sh.textContent='';var b=h('button','hv-retry','თავიდან ცდა');b.type='button';b.onclick=function(){go.click()};ap(sh,h('span','hv-dot'),h('span','','ვიდეოს შემოწმება ვერ მოხერხდა'),b);
   ap(st,h('div','hv-err',msg||lastBad||'ვიდეოს გაანალიზება ვერ მოხერხდა. შეამოწმე ლინკი და სცადე თავიდან.'));setGo(true)}
  render()}
@@ -35760,7 +35780,8 @@ function refocus(){if(!(window.matchMedia&&matchMedia('(pointer:coarse)').matche
 new MutationObserver(function(){if(B.disabled&&state!=='run')start()}).observe(B,{attributes:true,attributeFilter:['disabled']});
 LG&&new MutationObserver(function(){var n=LG.lastElementChild;if(n)lastBad=n.textContent.replace(/^\s*\[[^\]]*\]\s*/,'').trim();while(LG.children.length>5)LG.removeChild(LG.firstChild)}).observe(LG,{childList:true});
 function sched(){cancelAnimationFrame(q);q=requestAnimationFrame(function(){render();prog()})}
-[R,$('ttdlDetails'),$('ttdlDlRow'),$('ttdlMusicRow'),$('ttdlDlSd'),$('ttdlDlHd')].forEach(function(e){e&&new MutationObserver(sched).observe(e,{attributes:true,attributeFilter:['style','disabled']})});
+[R,$('ttdlDetails'),$('ttdlDlRow'),$('ttdlMusicRow')].forEach(function(e){e&&new MutationObserver(sched).observe(e,{attributes:true,attributeFilter:['style','disabled']})});
+[$('ttdlDlSd'),$('ttdlDlHd'),$('ttdlMusicBtn')].forEach(function(e){e&&new MutationObserver(syncDl).observe(e,{attributes:true,attributeFilter:['disabled']})});
 [G,Q,$('ttdlResultTitle'),$('ttdlResultMeta')].forEach(function(e){e&&new MutationObserver(sched).observe(e,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']})});
 $('ttdlThumb')&&new MutationObserver(sched).observe($('ttdlThumb'),{attributes:true,attributeFilter:['src']});
 /* input / paste / go */
