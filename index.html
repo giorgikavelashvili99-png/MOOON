@@ -24937,6 +24937,7 @@ T.ka.engBest='საუკეთესო'; T.ka.tryBackup='';
 T.en.engBest='Best'; T.en.tryBackup='';
 T.ka.tut='ტუტორიალი'; T.en.tut='Tutorial'; T.ru.tut='Туториал';
 T.ru.engBest='Лучший'; T.ru.tryBackup='';
+T.ka.engIdeal='იდეალური'; T.en.engIdeal='Ideal'; T.ru.engIdeal='Идеальный'; T.ka.m5Run='MOON 5.0 მუშაობს'; T.en.m5Run='MOON 5.0 working'; T.ru.m5Run='MOON 5.0 обрабатывает'; T.ka.m5Big='MOON 5.0 მხარს უჭერს 400 MB-მდე ვიდეოს. დიდი ფაილისთვის აირჩიე MOON 3.1 ან 4.0.'; T.en.m5Big='MOON 5.0 supports videos up to 400 MB. For larger files use MOON 3.1 or 4.0.'; T.ru.m5Big='MOON 5.0 работает с видео до 400 МБ. Для больших файлов выберите MOON 3.1 или 4.0.'; T.ka.m5Bad='ამ ვიდეოს დამუშავება ვერ მოხერხდა. სცადე სხვა ვიდეო (MP4/MOV) ან სხვა მეთოდი.'; T.en.m5Bad='This video could not be processed. Try another video (MP4/MOV) or another method.'; T.ru.m5Bad='Не удалось обработать это видео. Попробуйте другое видео (MP4/MOV) или другой метод.';
 T.ka.engNew='ახალი'; T.en.engNew='New'; T.ru.engNew='Новый'; T.ka.m4Load='MOON 4.0 იტვირთება'; T.en.m4Load='Loading MOON 4.0'; T.ru.m4Load='Загрузка MOON 4.0'; T.ka.m4Run='MOON 4.0 მუშაობს'; T.en.m4Run='MOON 4.0 working'; T.ru.m4Run='MOON 4.0 обрабатывает'; T.ka.m4Bad='ამ ვიდეოს დამუშავება ვერ მოხერხდა. სცადე სხვა ვიდეო (MP4/MOV) ან თავიდან ჩაწერე.'; T.en.m4Bad='This video could not be processed. Please try another video (MP4/MOV) or re-record it.'; T.ru.m4Bad='Не удалось обработать это видео. Попробуйте другое видео (MP4/MOV) или запишите заново.';
 T.ka.backP='თუ Chrome-იდან ვერ ატვირთე, ჯერჯერობით გამოიყენე ამ ორიდან ერთ-ერთი ბრაუზერი:'; T.en.backP="If you couldn't upload from Chrome, please use one of these two browsers for now:"; T.ru.backP='Если не удалось загрузить из Chrome, пока воспользуйтесь одним из этих браузеров:';
 T.ka.backTh='დიდი მადლობა მოთმინებისთვის'; T.en.backTh='Thank you so much for your patience'; T.ru.backTh='Большое спасибо за терпение';
@@ -24968,7 +24969,7 @@ view.innerHTML =
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
-      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 3.1</b><small data-k="engBest"></small></button><button type="button" data-eng="40"><b>MOON 4.0</b><small data-k="engNew"></small></button></div>'+
+      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="21"><b>MOON 3.1</b><small data-k="engBest"></small></button><button type="button" data-eng="40"><b>MOON 4.0</b><small data-k="engNew"></small></button><button type="button" data-eng="50"><b>MOON 5.0</b><small data-k="engIdeal"></small></button></div>'+
    '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
    '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><div class="opt-dlrow" id="optDlRow"><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a><button type="button" class="opt-tut" id="optTut"><span data-k="tut"></span></button></div></div>'+
   '</div>'+
@@ -25667,7 +25668,148 @@ function ensureCore(ticket,eng){
     if(!findCore(eng)) throw new Error('core load failed');
   });
 }
+/* ============ MOON 5.0 «იდეალური» — header-only patch (byte.tikqcapi.site). API key never reaches the browser:
+   the gate worker mints a single-use OTU token (GET /ideal/otu?ticket=...) and this code only ever sees that token. ============ */
+var M5={PS:'https://byte.tikqcapi.site',MAXF:400*1048576,MAXP:64*1048576,CH:20*1048576};
+function m5Err(m,code){ var e=new Error('m5: '+m); e.status=code; return e; }
+function m5Net(e){ return (e&&e.status)?e:m5Err('network '+((e&&e.message)||e)); }
+function m5Otu(ticket){
+  return fetchTO(CFG.GATE+'/ideal/otu?ticket='+encodeURIComponent(ticket),{cache:'no-store'},20000).then(function(r){
+    if(!r.ok) return r.json().catch(function(){return {};}).then(function(j){ throw m5Err(j.error||('HTTP '+r.status),r.status); });
+    return r.json();
+  }).then(function(j){ if(!j||!j.token||!j.user_id) throw m5Err('token'); return j; });
+}
+/* top-level MP4 boxes, reading only the headers */
+function m5Boxes(file){
+  var out=[], pos=0, size=file.size;
+  function step(){
+    if(pos>=size) return Promise.resolve(out);
+    return file.slice(pos,Math.min(pos+16,size)).arrayBuffer().then(function(ab){
+      if(ab.byteLength<8) throw m5Err('bad box');
+      var dv=new DataView(ab), sz=dv.getUint32(0), hdr=8;
+      var type=String.fromCharCode(dv.getUint8(4),dv.getUint8(5),dv.getUint8(6),dv.getUint8(7));
+      if(sz===1){ if(ab.byteLength<16) throw m5Err('bad box'); sz=dv.getUint32(8)*4294967296+dv.getUint32(12); hdr=16; }
+      else if(sz===0) sz=size-pos;
+      if(sz<hdr||pos+sz>size) throw m5Err('bad box size');
+      out.push({type:type,pos:pos,size:sz,hdr:hdr}); pos+=sz; return step();
+    });
+  }
+  return step();
+}
+/* walks moov: rejects mvex; with add>0 shifts every stco/co64 offset by add (offset must stay inside [lo,hi)) */
+function m5Moov(u8,add,lo,hi){
+  var dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength), ok=true;
+  function walk(s,e){
+    var p=s;
+    while(ok&&p+8<=e){
+      var sz=dv.getUint32(p), h=8, t=String.fromCharCode(u8[p+4],u8[p+5],u8[p+6],u8[p+7]);
+      if(sz===1){ sz=dv.getUint32(p+8)*4294967296+dv.getUint32(p+12); h=16; } else if(sz===0) sz=e-p;
+      if(sz<h||p+sz>e){ ok=false; return; }
+      if(t==='mvex'){ ok=false; return; }
+      if(t==='moov'||t==='trak'||t==='mdia'||t==='minf'||t==='stbl') walk(p+h,p+sz);
+      else if(add&&(t==='stco'||t==='co64')){
+        var w=(t==='stco')?4:8, n=dv.getUint32(p+h+4), q=p+h+8, i, o, v;
+        if(q+n*w>p+sz){ ok=false; return; }
+        for(i=0;i<n;i++,q+=w){
+          if(w===4){ o=dv.getUint32(q); v=o+add; if(o<lo||o>=hi||v>4294967295){ ok=false; return; } dv.setUint32(q,v); }
+          else { o=dv.getUint32(q)*4294967296+dv.getUint32(q+4); v=o+add; if(o<lo||o>=hi){ ok=false; return; } dv.setUint32(q,Math.floor(v/4294967296)); dv.setUint32(q+4,v%4294967296); }
+        }
+      }
+      p+=sz;
+    }
+  }
+  walk(0,u8.length);
+  return ok;
+}
+/* -> {blob,prefixLen} (faststart layout, no re-encode) or null (then the chunked upload is used) */
+function m5Prepare(file){
+  return m5Boxes(file).then(function(bx){
+    var mo=bx.filter(function(b){ return b.type==='moov'; }), md=bx.filter(function(b){ return b.type==='mdat'; });
+    if(mo.length!==1||md.length!==1||bx.some(function(b){ return /^(moof|mfra|sidx)$/.test(b.type); })) return null;
+    var moov=mo[0], mdat=md[0];
+    if(moov.size>M5.MAXP) return null;
+    return file.slice(moov.pos,moov.pos+moov.size).arrayBuffer().then(function(ab){
+      var u8=new Uint8Array(ab);
+      if(moov.pos<mdat.pos){                                   /* faststart already: mdat must run to the end */
+        if(mdat.pos+mdat.size!==file.size) return null;
+        var pl=mdat.pos+mdat.hdr; if(pl>M5.MAXP||!m5Moov(u8,0)) return null;
+        return {blob:file,prefixLen:pl};
+      }
+      if(moov.pos!==mdat.pos+mdat.size||moov.pos+moov.size!==file.size) return null;   /* mdat, moov last -> reorder locally */
+      if(!m5Moov(u8,moov.size,mdat.pos+mdat.hdr,mdat.pos+mdat.size)) return null;
+      var pl2=mdat.pos+moov.size+mdat.hdr; if(pl2>M5.MAXP) return null;
+      return {blob:new Blob([file.slice(0,mdat.pos),u8,file.slice(mdat.pos,moov.pos)],{type:'video/mp4'}),prefixLen:pl2};
+    });
+  });
+}
+function m5B64(s){ var b=atob(s), u=new Uint8Array(b.length), i; for(i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; }
+function m5Hex(s){ var u=new Uint8Array(s.length>>1), i; for(i=0;i<u.length;i++) u[i]=parseInt(s.substr(i*2,2),16); return u; }
+function m5Instant(ticket,prep){
+  return m5Otu(ticket).then(function(o){
+    msg(tr('m5Run')+'…'); bar(45);
+    return fetchTO(M5.PS+'/api/v2/patch?auth_userid='+encodeURIComponent(o.user_id)+'&auth_token='+encodeURIComponent(o.token)+'&selectmethod=orion',
+      {method:'POST',cache:'no-store',headers:{'Content-Type':'application/octet-stream','X-Original-File-Size':String(prep.blob.size)},body:prep.blob.slice(0,prep.prefixLen)},120000).catch(function(e){ throw m5Net(e); });
+  }).then(function(r){
+    if(!r.ok){ var st=r.status; return r.text().then(function(t){ throw m5Err('HTTP '+st+(t?' '+t.slice(0,100):''),st); }); }
+    return r.json();
+  }).then(function(j){
+    bar(75);
+    var pre=m5B64(j.patched_prefix_b64||''), g=m5Hex(j.ghost_sample_hex||'');
+    if(j.client_prefix_size!==prep.prefixLen) throw m5Err('check: client_prefix_size');
+    if(pre.length!==j.patched_prefix_size) throw m5Err('check: patched_prefix_size');
+    var rest=prep.blob.slice(prep.prefixLen), finalSize=pre.length+rest.size+g.length;
+    if(finalSize!==j.final_size) throw m5Err('check: final_size');
+    if(j.ghost_offset!==j.final_size-g.length) throw m5Err('check: ghost_offset');
+    return new Blob([pre,rest,g],{type:'video/mp4'});
+  });
+}
+/* fallback: 20 MB chunks, 2 in flight, retry + backoff, progress by bytes */
+function m5Chunked(file,ticket){
+  var total=file.size, n=Math.max(1,Math.ceil(total/M5.CH)), sent=0, e=encodeURIComponent;
+  return m5Otu(ticket).then(function(o){
+    msg(tr('m5Run')+'…'); bar(35);
+    return fetchTO(M5.PS+'/api/upload/init?auth_userid='+e(o.user_id)+'&auth_token='+e(o.token)+'&selectmethod=orion',
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:file.name||'video.mp4',total_size:total,total_chunks:n})},30000).catch(function(x){ throw m5Net(x); });
+  }).then(function(r){
+    if(!r.ok) throw m5Err('init HTTP '+r.status,r.status);
+    return r.json();
+  }).then(function(job){
+    var q='job_id='+e(job.job_id)+'&job_otu='+e(job.job_otu), next=0;
+    function up(i,t){
+      var s=i*M5.CH, part=file.slice(s,Math.min(total,s+M5.CH));
+      return fetchTO(M5.PS+'/api/upload/chunk?'+q+'&chunk_index='+i,{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:part},180000).then(function(r){
+        if(!r.ok) throw m5Err('chunk HTTP '+r.status,r.status);
+        sent+=part.size; bar(35+Math.round(sent/total*50));
+      }).catch(function(x){ if(t<3) return sleep(800*Math.pow(2,t)).then(function(){ return up(i,t+1); }); throw m5Net(x); });
+    }
+    function lane(){ if(next>=n) return Promise.resolve(); var i=next++; return up(i,0).then(lane); }
+    return Promise.all([lane(),lane()]).then(function(){
+      return fetchTO(M5.PS+'/api/upload/complete?'+q,{method:'POST'},900000).catch(function(x){ throw m5Net(x); });
+    });
+  }).then(function(r){
+    if(!r.ok) throw m5Err('complete HTTP '+r.status,r.status);
+    return r.blob();
+  }).then(function(b){ return new Blob([b],{type:'video/mp4'}); });
+}
+function patchWith50(file,fps,ticket){
+  if(!ticket) return Promise.reject(m5Err('ticket missing'));
+  if(file.size>M5.MAXF) return Promise.reject(new Error(tr('m5Big')));
+  function go(prep,n){
+    return m5Instant(ticket,prep).catch(function(e){
+      var st=e&&e.status;
+      if((st===401||st===403||st===503)&&n<1) return sleep(700).then(function(){ return go(prep,n+1); });   /* every answered request spends the token: mint a fresh one */
+      if(st===501) return m5Chunked(file,ticket);
+      throw e;
+    });
+  }
+  return m5Prepare(file).then(function(prep){ return prep?go(prep,0):m5Chunked(file,ticket); }).catch(function(e){
+    var st=e&&e.status, d=String((e&&e.message)||e);
+    if(/^m5\b/.test(d)&&(st===400||st===413||st===422||/check:/.test(d))){ try{ console.warn(d); }catch(x){} var e2=new Error(tr('m5Bad')+' ['+d.slice(0,60)+']'); e2.status=st; throw e2; }
+    throw e;
+  });
+}
 function patchInBrowser(file,fps,ticket,eng){
+  if(eng==='50') return patchWith50(file,fps,ticket);
   if(eng==='40') return patchWith40(file,fps,ticket);
   return ensureCore(ticket,eng).then(function(){ return patchWithCore(file,fps,eng); });
 }
@@ -25723,7 +25865,7 @@ function run(){
   /* ადმინის აქტივობა: ერთი ოპერაცია = ერთი jobId. "started" ახლავე, "done"/"error" ბოლოს (ზუსტად ერთხელ).
      სერვერი ერთსა და იმავე ჩანაწერს ანახლებს, ამიტომ აპში ერთი ბარათი ჩანს საბოლოო შედეგით.
      მეთოდი = რომელი ღილაკი იყო არჩეული (MOON 3.1 / MOON 4.0); არჩევანი ოპერაციის დროს იბლოკება. */
-  var srcFile=S.file, t0=Date.now(), stage='ticket', finalSent=false, method=(S.engine==='40'?'4.0':'3.1');
+  var srcFile=S.file, t0=Date.now(), stage='ticket', finalSent=false, method=(S.engine==='50'?'5.0':(S.engine==='40'?'4.0':'3.1'));
   var jobId='j'+t0.toString(36)+Math.random().toString(36).slice(2,8);
   var base={jobId:jobId,method:method,preset:S.preset,res:S.resTxt||'',fps:S.fps>0?Math.round(S.fps):undefined,plan:(S.status&&S.status.plan)||'free',inBytes:srcFile.size};
   var sendQ=Promise.resolve();   /* "done"/"error" იგზავნება მხოლოდ მას მერე, რაც "started" სერვერმა მიიღო (Render-ის გაღვიძებისას რიგი ირეოდა) */
@@ -25754,7 +25896,7 @@ function run(){
     var d=e&&e.data&&e.data.error, m=String((e&&e.message)||e||''), txt=m;
     if(d==='quota') txt='quota (კვირის ლიმიტი ამოიწურა)';
     else if(d==='mb') txt='MB ლიმიტი ამოიწურა'+(e.data.remainingMB!=null?' (დარჩა '+e.data.remainingMB+' MB)':'');
-    var st=forceStage||stage; if(!forceStage&&st==='patch'&&/^(core|m4)\b/i.test(m)) st='core';   /* ძრავის ჩატვირთვა vs თვითონ პატჩი */
+    var st=forceStage||stage; if(!forceStage&&st==='patch'&&/^(core|m4|m5)\b/i.test(m)) st='core';   /* ძრავის ჩატვირთვა vs თვითონ პატჩი */
     report('error',{stage:st,error:txt.slice(0,240)});
   }
   report('started');
@@ -25786,7 +25928,7 @@ function run(){
 
 /* ============ EVENTS ============ */
 var engBox=$('optEng');
-function setEngine(v){ if(S.busy) return; S.engine=(v==='40')?'40':'21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
+function setEngine(v){ if(S.busy) return; S.engine=(v==='50')?'50':(v==='40')?'40':'21'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
   engBox.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-eng')===S.engine; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); if(on) b.classList.remove('eng-warn'); }); }
 engBox.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-eng]'); if(b) setEngine(b.getAttribute('data-eng')); });
 setEngine('21');
@@ -32088,6 +32230,7 @@ html.moon-lite .opt-plan::after,html.moon-lite .opt-plan .opt-buy::before,html.m
 </script>
 
 <style id="moon-engine-31">html body #optView .opt-eng:not(#_a):not(#_b){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}</style>
+<style id="moon-engine-50">html body #optView .opt-eng:not(#_a):not(#_b):not(#_c){grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:560px!important}#optView .opt-eng button{padding-left:4px;padding-right:4px}#optView .opt-eng button b{font-size:14px;white-space:nowrap}#optView .opt-eng button small{white-space:nowrap}</style>
 <style id="plans-shell-css">
 /* plans: same "shell" as the notice card — neon frame glow + animated top bar. The order button is NOT touched. */
 @keyframes plShellBar{0%{background-position:0 0}100%{background-position:200% 0}}
