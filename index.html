@@ -35583,12 +35583,16 @@ html body #checkerView #hv .hv-st span{display:none}
 html body #checkerView #hv .hv-st .hv-n{margin:0;flex:none;width:32px;height:32px;font-size:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.16);color:var(--ft);animation:none}
 html body #checkerView #hv .hv-st b{font-size:15px;white-space:normal;color:#7f8fb4}
 html body #checkerView #hv .hv-st.a b,html body #checkerView #hv .hv-st.d b{color:#fff}
-html body #checkerView #hv .hv-st.a .hv-n{background:var(--cosmic);border-color:transparent;color:#fff;animation:none;box-shadow:0 0 0 5px rgba(60,90,255,.25)}
+html body #checkerView #hv .hv-st.a .hv-n{background:var(--cosmic);background-origin:border-box;background-clip:border-box;border:0;color:#fff;animation:none;box-shadow:0 0 0 5px rgba(60,90,255,.25)}
 html body #checkerView #hv .hv-st.d .hv-n{background:rgba(67,227,148,.16);border-color:rgba(67,227,148,.6);color:#7dffc0;animation:none}
 html body #checkerView #hv .hv-st.x .hv-n{background:var(--bad);border-color:transparent;color:#fff}
-html body #checkerView #hv .hv-st:not(:last-child)::before{display:block!important;content:"";position:absolute;left:15px;right:auto;top:calc(100% - 9px);width:2px;height:18px;border-radius:2px;background:rgba(255,255,255,.12)}
-html body #checkerView #hv .hv-st:not(:last-child)::after{display:none!important}
-html body #checkerView #hv .hv-st.d:not(:last-child)::after{display:block!important;content:"";position:absolute;left:15px;right:auto;top:calc(100% - 9px);width:2px;height:18px;border-radius:2px;background:rgba(67,227,148,.7);transform:none}
+html body #checkerView #hv .hv-st{min-height:50px}
+html body #checkerView #hv .hv-st:not(:last-child)::before,html body #checkerView #hv .hv-st:not(:last-child)::after{display:none!important}
+html body #checkerView #hv .hv-st:not(:last-child) .hv-n::before,html body #checkerView #hv .hv-st.d:not(:last-child) .hv-n::after{content:"";display:block;position:absolute;left:calc(50% - 1px);top:100%;width:2px;height:20px;border-radius:0}
+html body #checkerView #hv .hv-st:not(:last-child) .hv-n::before{background:rgba(255,255,255,.14)}
+html body #checkerView #hv .hv-st.d:not(:last-child) .hv-n::after{background:#43e394}
+/* numbers next to Georgian letters: same visual baseline */
+html body #checkerView #hv .hv-num{font-style:normal;font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:.92em;display:inline-block;position:relative;top:.09em;margin-right:2px;letter-spacing:0;line-height:1}
 @media(prefers-reduced-motion:reduce){html body #checkerView #hv #hvSearch *{transition:none!important}}
 </style>
 <script id="hv-js">(function(){
@@ -35668,10 +35672,10 @@ function setState(s){state=s;idle.classList.toggle('off',s!=='idle'||(R&&R.style
 var HV=$('hv');function busy(on){HV.classList.toggle('hv-busy',!!on)}
 function start(){try{inp.blur()}catch(e){}busy(1);render.sig='';state='run';build();st.className='hv-status on run';t0=Date.now();steps(0);clearInterval(tm);tm=setInterval(prog,250);out.classList.remove('on');idle.classList.add('off');learn.classList.add('off');setGo(false)}
 function prog(){if(state!=='run')return;var vis=R.style.display!=='none',hasS=G&&G.children.length>0,hasT=Q&&Q.querySelector('.ttdl-quality-tier'),done=Q&&Q.classList.contains('tt-probed');
- var el0=(Date.now()-t0)/1000,tb=el0<.7?0:el0<1.5?1:el0<2.6?2:3,rl=!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4;steps(Math.max(rl,tb));var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE)tmE.textContent=el.toFixed(1)+'წმ';
+ var el0=(Date.now()-t0)/1000,tb=el0<.7?0:el0<1.5?1:el0<2.6?2:3,rl=!vis?0:!hasS?1:!it('shadow')?2:!hasT?3:4;steps(Math.max(rl,tb));var el=(Date.now()-t0)/1000,tmE=st.querySelector('.hv-tm');if(tmE){tmE.textContent='';tmE.appendChild(h('i','hv-num',el.toFixed(1)));tmE.appendChild(document.createTextNode('წმ'))}
  if(done&&vis)finish(true);else if(!B.disabled&&el>1.5&&!(Q&&Q.classList.contains('tt-probing')))finish(vis&&hasS);else if(el>120)finish(false,'შემოწმება ზედმეტად გაგრძელდა. სცადე თავიდან.')}
 function finish(ok,msg){if(state!=='run')return;busy(0);clearInterval(tm);var el=((Date.now()-t0)/1000).toFixed(1),sh=st.querySelector('.hv-sh');
- if(ok){state='ok';st.style.setProperty('--prog','100%');st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';ap(sh,d,h('span','','შემოწმდა '+el+'წმ-ში'),h('span','hv-note','ყველაფერი მზადაა.'));setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
+ if(ok){state='ok';st.style.setProperty('--prog','100%');st.className='hv-status on ok';sh.textContent='';var d=h('span','hv-dot');d.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#04101a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';var ok=h('span','','შემოწმდა ');ok.appendChild(h('i','hv-num',el));ok.appendChild(document.createTextNode('წმ-ში'));ap(sh,d,ok,h('span','hv-note','ყველაფერი მზადაა.'));setGo(false);setTimeout(function(){var o=$('hvOut');if(!o||!o.classList.contains('on'))return;var y=o.getBoundingClientRect().top+window.pageYOffset-84;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})},450)}
  else{state='bad';var a=(!R||R.style.display==='none')?0:1;st.className='hv-status on bad';steps(a,a);sh.textContent='';var b=h('button','hv-retry','თავიდან ცდა');b.type='button';b.onclick=function(){go.click()};ap(sh,h('span','hv-dot'),h('span','','ვიდეოს შემოწმება ვერ მოხერხდა'),b);
   ap(st,h('div','hv-err',msg||lastBad||'ვიდეოს გაანალიზება ვერ მოხერხდა. შეამოწმე ლინკი და სცადე თავიდან.'));setGo(true)}
  render()}
