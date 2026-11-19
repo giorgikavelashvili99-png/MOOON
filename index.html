@@ -1541,7 +1541,7 @@ html.moon-boot-ready body{ opacity:1; transition:opacity .28s ease; }
   .admin-box .a-blocklist-item .a-unblock-btn:active{ transform:scale(0.95); }
 
   
-  .a-stat-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
+  .a-stat-cards{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:18px; }
   .a-stat-card{
     position:relative; overflow:hidden; padding:16px 10px 14px; border-radius:16px;
     background:
@@ -15258,64 +15258,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     blockedCommentersCache = updated;
   }
 
-  // ---- Blocked IPs — a second, IP-based layer of blocking. IMPORTANT
-  // HONEST LIMITATION: a browser page cannot enforce a real ban on its
-  // own — this only checks the visitor's IP (fetched from a public
-  // lookup service, since JS can't read it directly) against a list and
-  // shows a block screen if it matches. A VPN, mobile data, or a router
-  // restart (new IP from the ISP) bypasses this instantly, and the check
-  // itself is visible to anyone who views the page source. The only
-  // real, unbypassable block is a Cloudflare IP Access Rule on the
-  // domain itself — this is a supplementary deterrent, not a substitute.
-  let blockedIPsCache = [];
-  let myVisitorIp = null;
-  async function loadBlockedIPs(){
-    const data = await mdbRead('blockedIPs');
-    blockedIPsCache = (data && Array.isArray(data.list)) ? data.list : [];
-    return blockedIPsCache;
-  }
-  async function fetchMyIp(){
-    if (myVisitorIp) return myVisitorIp;
-    try{
-      const res = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
-      if (!res.ok) return null;
-      const data = await res.json();
-      myVisitorIp = data.ip || null;
-      return myVisitorIp;
-    }catch(e){ return null; }
-  }
-  function isIpBlocked(ip){
-    if (!ip) return false;
-    return blockedIPsCache.some(b => b.ip === ip);
-  }
-  async function blockIp(ip){
-    const cleaned = String(ip || '').trim();
-    if (!cleaned) return;
-    const fresh = await loadBlockedIPs();
-    if (fresh.some(b => b.ip === cleaned)) return;
-    const updated = fresh.concat([{ ip: cleaned, blockedAt: Date.now() }]);
-    await mdbWrite('blockedIPs', { list: updated });
-    blockedIPsCache = updated;
-  }
-  async function unblockIp(ip){
-    const fresh = await loadBlockedIPs();
-    const updated = fresh.filter(b => b.ip !== ip);
-    await mdbWrite('blockedIPs', { list: updated });
-    blockedIPsCache = updated;
-  }
-  function showIpBlockGate(){
-    const gate = document.createElement('div');
-    gate.id = 'ipBlockGate';
-    gate.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#05050a;color:#eef1ff;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;font-family:MoonKa,BPGAcademiuriU, sans-serif;';
-    gate.innerHTML = '<div><div style="font-size:40px;margin-bottom:14px;">🚫</div><div style="font-size:18px;font-weight:700;margin-bottom:8px;">' + t('ipBlockedTitle') + '</div><div style="font-size:13px;color:#a9b8dd;max-width:340px;margin:0 auto;">' + t('ipBlockedSub') + '</div></div>';
-    document.documentElement.appendChild(gate);
-    document.body.style.overflow = 'hidden';
-  }
-  async function checkIpBlockGate(){
-    const [ip] = await Promise.all([fetchMyIp(), loadBlockedIPs()]);
-    if (isIpBlocked(ip)) showIpBlockGate();
-  }
-
   function escapeHtml(str){
     return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   }
@@ -15810,8 +15752,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
         return;
       }
       commentSubmit.disabled = true;
-      const submitterIp = await fetchMyIp();
-      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [], ip: submitterIp || null, discordId: discordId, avatarUrl: (!asAdmin && currentDiscordUser) ? (currentDiscordUser.avatarUrl || null) : null };
+      const entry = { id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.slice(0, 40), text: text.slice(0, 500), rating: selectedRating, ts: Date.now(), isAdmin: asAdmin, pinned: false, replies: [], discordId: discordId, avatarUrl: (!asAdmin && currentDiscordUser) ? (currentDiscordUser.avatarUrl || null) : null };
       const fresh = await mdbRead('comments');
       // CRITICAL: if the read genuinely failed (network hiccup, etc.),
       // falling back to commentsCache and writing THAT back used to be
@@ -16366,7 +16307,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     setInterval(() => { const a = admin(), uid = (me() || {}).id; if (a !== lastAdm || uid !== lastUid) { lastAdm = a; lastUid = uid; renderComposer(); render(); } }, 1000);
   })();
   loadBlockedCommenters();
-  checkIpBlockGate();
 
   // ============================================================
   // 9) VISITOR LOG
@@ -16391,22 +16331,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     return os + ' · ' + browser + (isMobile ? ' · Mobile' : ' · Desktop');
   }
 
-  async function detectLocation(){
-    try{
-      const r = await fetch('https://ipapi.co/json/');
-      if (!r.ok) throw new Error('bad response');
-      const data = await r.json();
-      if (data && data.city) return data.city + (data.country_name ? ', ' + data.country_name : '');
-      return 'Unknown';
-    } catch(e){ return 'Unknown'; }
-  }
-
   async function logVisit(){
     if (sessionStorage.getItem('moon_visit_logged')) return;
     sessionStorage.setItem('moon_visit_logged', '1');
     const device = detectDevice();
-    const location = await detectLocation();
-    const entry = { ts: Date.now(), device, location };
+    const entry = { ts: Date.now(), device };
     const fresh = await mdbRead('visits');
     // Same data-loss risk as the comments bug: on a failed read, falling
     // back to [] and writing that back would wipe the entire visit
@@ -16606,7 +16535,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
 
     const todayKey = now.toISOString().slice(0, 10);
     const todayCount = list.filter(v => { try { return new Date(v.ts).toISOString().slice(0, 10) === todayKey; } catch (e) { return false; } }).length;
-    const uniqueLocations = new Set(list.map(v => v.location || 'Unknown')).size;
 
     const chartHtml =
       '<div class="a-chart-card" id="visitsChartCard">' +
@@ -16616,17 +16544,15 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       '<div class="a-stat-cards">' +
         '<div class="a-stat-card"><div class="asc-num" id="vsTotal">0</div><div class="asc-label" data-i18n="adminVisitsTotal">სულ</div></div>' +
         '<div class="a-stat-card"><div class="asc-num" id="vsToday">0</div><div class="asc-label" data-i18n="adminVisitsToday">დღეს</div></div>' +
-        '<div class="a-stat-card"><div class="asc-num" id="vsLoc">0</div><div class="asc-label" data-i18n="adminVisitsLocations">ლოკაცია</div></div>' +
       '</div>';
 
     adminPanelVisits.innerHTML = chartHtml + list.map(v =>
-      '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.location || 'Unknown') + '</b><span>' + escapeHtml(v.device || '') + '</span></div>'
+      '<div class="a-visit-row"><span>' + formatCommentDate(v.ts) + '</span><b>' + escapeHtml(v.device || '') + '</b></div>'
     ).join('');
 
     animateChartLine(document.getElementById('visitsChartCard'));
     animateCountUp(document.getElementById('vsTotal'), list.length);
     animateCountUp(document.getElementById('vsToday'), todayCount);
-    animateCountUp(document.getElementById('vsLoc'), uniqueLocations);
   }
 
   function renderBlockedCommentersList(){
@@ -16641,48 +16567,25 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     ).join('');
   }
 
-  function renderBlockedIPsList(){
-    if (!blockedIPsCache.length) {
-      return '<div class="a-blocklist-empty">' + t('adminNoBlockedIps') + '</div>';
-    }
-    return blockedIPsCache.map(b =>
-      '<div class="a-blocklist-item">' +
-        '<span class="a-blocklist-name">' + escapeHtml(b.ip) + '</span>' +
-        '<button class="a-unblock-btn" data-action="unblock-ip" data-ip="' + escapeHtml(b.ip) + '">' + t('adminUnblock') + '</button>' +
-      '</div>'
-    ).join('');
-  }
-
   async function renderAdminComments(){
     adminPanelComments.innerHTML = '<div class="c-empty">…</div>';
     const data = await mdbRead('comments');
     const list = sortCommentsForDisplay((data && Array.isArray(data.list)) ? data.list : []);
     await loadBlockedCommenters();
-    await loadBlockedIPs();
     const blockedHtml =
       '<div class="a-blocklist">' +
         '<div class="a-blocklist-title">' + t('adminBlockedTitle') + '</div>' +
         '<div class="a-blocklist-body" id="adminBlockedBody">' + renderBlockedCommentersList() + '</div>' +
       '</div>' +
-      '<div class="a-blocklist">' +
-        '<div class="a-blocklist-title">' + t('adminBlockedIpsTitle') + '</div>' +
-        '<div class="a-blocklist-note">' + t('adminBlockedIpsNote') + '</div>' +
-        '<div class="a-blocklist-add">' +
-          '<input type="text" id="adminAddIpInput" placeholder="' + t('adminIpPlaceholder') + '">' +
-          '<button type="button" id="adminAddIpBtn">' + t('adminBlock') + '</button>' +
-        '</div>' +
-        '<div class="a-blocklist-body" id="adminBlockedIpsBody">' + renderBlockedIPsList() + '</div>' +
-      '</div>';
+      '';
     if (!list.length) {
       adminPanelComments.innerHTML = blockedHtml + '<div class="c-empty">' + t('adminNoComments') + '</div>';
-      wireAdminIpAdd();
       return;
     }
     adminPanelComments.innerHTML = blockedHtml + list.map(c => {
       const blocked = isCommenterBlocked(c.name, c.discordId);
-      const ipBlocked = c.ip && isIpBlocked(c.ip);
       return '<div class="a-cmt' + (c.pinned ? ' a-cmt-pinned' : '') + '" data-id="' + c.id + '">' +
-        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.pinned ? ' · 📌' : '') + (blocked ? ' · 🚫' : '') + (c.discordId ? ' · Discord ✓' : '') + (c.ip ? ' · ' + escapeHtml(c.ip) : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
+        '<div class="a-cmt-meta">' + escapeHtml(c.name) + (c.isAdmin ? ' · ADMIN' : '') + (c.pinned ? ' · 📌' : '') + (blocked ? ' · 🚫' : '') + (c.discordId ? ' · Discord ✓' : '') + (c.rating ? ' · ' + starsString(c.rating) : '') + ' · ' + formatCommentDate(c.ts) + '</div>' +
         '<textarea>' + escapeHtml(c.text) + '</textarea>' +
         '<div class="a-cmt-actions">' +
           '<button class="a-save-btn" data-action="save" data-id="' + c.id + '">' + t('adminSave') + '</button>' +
@@ -16690,31 +16593,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           (c.isAdmin ? '' : (blocked
             ? '<button class="a-unblock-btn" data-action="unblock" data-name="' + escapeHtml(c.name) + '" data-discord-id="' + escapeHtml(c.discordId || '') + '">' + t('adminUnblock') + '</button>'
             : '<button class="a-block-btn" data-action="block" data-name="' + escapeHtml(c.name) + '" data-discord-id="' + escapeHtml(c.discordId || '') + '">' + t('adminBlock') + '</button>')) +
-          (c.ip && !c.isAdmin ? (ipBlocked
-            ? '<button class="a-unblock-btn" data-action="unblock-ip" data-ip="' + escapeHtml(c.ip) + '">' + t('adminUnblockIp') + '</button>'
-            : '<button class="a-block-btn" data-action="block-ip" data-ip="' + escapeHtml(c.ip) + '">' + t('adminBlockIp') + '</button>') : '') +
           '<button class="a-del-btn" data-action="delete" data-id="' + c.id + '">' + t('adminDelete') + '</button>' +
         '</div>' +
         renderAdminReplies(c) +
       '</div>';
     }).join('');
-    wireAdminIpAdd();
-  }
-
-  function wireAdminIpAdd(){
-    const btn = document.getElementById('adminAddIpBtn');
-    const input = document.getElementById('adminAddIpInput');
-    if (!btn || !input) return;
-    btn.addEventListener('click', async () => {
-      const ip = input.value.trim();
-      if (!ip) return;
-      btn.disabled = true;
-      await blockIp(ip);
-      renderAdminComments();
-    });
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') btn.click();
-    });
   }
 
   async function renderAdminArchive(){
@@ -17597,20 +17480,6 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       renderAdminComments();
       return;
     }
-    if (action === 'block-ip') {
-      const ip = btn.getAttribute('data-ip');
-      btn.disabled = true;
-      await blockIp(ip);
-      renderAdminComments();
-      return;
-    }
-    if (action === 'unblock-ip') {
-      const ip = btn.getAttribute('data-ip');
-      btn.disabled = true;
-      await unblockIp(ip);
-      renderAdminComments();
-      return;
-    }
     const fresh = await mdbRead('comments');
     // Same fix as everywhere else in this file -- a failed read here
     // would silently wipe every comment on ANY of these actions (delete,
@@ -18485,6 +18354,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       const url = new URL(window.location.href);
       url.searchParams.delete('code');
       url.searchParams.delete('state');
+      url.searchParams.delete('iss');
       history.replaceState({}, document.title, url.toString());
     }
   }
