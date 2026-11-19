@@ -27109,7 +27109,18 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
       '<button type="button" class="mz-row" data-hz-act="accounts"><span>'+D.acc+'</span><em>'+accTxt+'</em>'+ic('chev','hzm-chev')+'</button>'+
       '<button type="button" class="mz-row" data-hz-act="lang"><span>'+D.lang+'</span><em>'+esc(t('langName'))+'</em>'+ic('chev','hzm-chev')+'</button>'+
       '<button type="button" class="mz-row mz-out" data-hz-act="logout"><span>'+D.out+'</span></button></div>';
-    return '<div class="mz">'+top+up+rows+'</div>';
+    /* GEMINI LAYOUT: name + plan pill, 2 quota cells, icon rows, ghost logout */
+    var I_U='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        I_G='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+    var gUp=s?(unl?'∞':esc(rem)+'<i> / '+esc(limit)+'</i>'):'—';
+    var gMb=(s&&s.mbLimit===null)?'∞':(s&&typeof s.mbLimit==='number'?esc(Math.round((Number(s.mbRemaining)||0)*10)/10)+'<i> / '+esc(s.mbLimit)+'</i>':'—');
+    var gTop='<div class="gz-top"><b class="gz-name">'+esc(nm)+'</b><span class="gz-plan">'+esc(s?planLabel(s.plan):'MEMBER')+'</span></div>';
+    var gQ='<div class="gz-q"><div class="gz-c"><span class="gz-cl">'+D.weekly+'</span><div class="gz-cv"><span>'+gUp+'</span><em>LIMIT</em></div></div>'+
+      '<div class="gz-c"><span class="gz-cl">'+({ka:'მოცულობა',en:'Volume',ru:'Объём'}[K])+'</span><div class="gz-cv"><span>'+gMb+'</span><em>MAX</em></div></div></div>';
+    var gRows='<div class="gz-rows">'+
+      '<button type="button" class="gz-row" data-hz-act="accounts"><span class="gz-ic">'+I_U+'</span><span class="gz-rl">'+D.acc+'</span><em>'+accTxt+'</em>'+ic('chev','hzm-chev')+'</button>'+
+      '<button type="button" class="gz-row" data-hz-act="lang"><span class="gz-ic">'+I_G+'</span><span class="gz-rl">'+D.lang+'</span><em>'+esc(t('langName'))+'</em>'+ic('chev','hzm-chev')+'</button></div>';
+    return '<div class="mz gz">'+gTop+gQ+(reset?reset:'')+gRows+'<button type="button" class="gz-out" data-hz-act="logout">'+D.out+'</button></div>';
   }
   function renderAcct(){
     var box=document.getElementById('hzmAcct'), u=user(), s=st(), h;
@@ -37279,6 +37290,30 @@ html body .hz-menu .hzm-chev:not(#_a):not(#_b):not(#_c){stroke:rgba(255,255,255,
 html body .hz-menu .hzm-label:not(#_a):not(#_b):not(#_c){margin:22px 14px 10px!important;font-family:'JetBrains Mono',monospace!important;font-size:10.5px!important;letter-spacing:.2em!important;color:#8e8e93!important}
 html body .hz-menu .hzm-promo:not(#_a):not(#_b):not(#_c){padding:13px 15px!important}
 html body .hz-menu .hzm-stats:not(#_a):not(#_b):not(#_c){padding:10px 14px!important;color:#a1a1aa}
+</style>
+<style id="moon-gz-v1">
+html body #hzMenu:not(#_a):not(#_b):not(#_c){--hz-bd:rgba(255,255,255,.1);--hz-tile:rgba(255,255,255,.06);background:#0a0a0c!important;border-color:rgba(255,255,255,.12)!important}
+html body #hzMenu .hzm-scroll:not(#_a):not(#_b):not(#_c){background:transparent!important}
+html body .gz:not(#_a):not(#_b):not(#_c){display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.gz-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 2px 0}
+.gz-name{font:700 17px/1.2 'JetBrains Mono',monospace;letter-spacing:.22em;color:#f4f4f5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gz-plan{flex:none;padding:6px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:.1em;color:#fff;text-transform:uppercase}
+.gz-q{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gz-c{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:18px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);min-width:0}
+.gz-cl{font-size:12px;color:#8e8e93}
+.gz-cv{display:flex;align-items:flex-end;justify-content:space-between;gap:6px}
+.gz-cv span{font:800 20px/1 Inter,sans-serif;color:#fff;white-space:nowrap}
+.gz-cv span i{font-style:normal;font-size:11px;font-weight:600;color:#8e8e93}
+.gz-cv em{font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;color:#6b6b73;font-style:normal}
+.gz-rows{display:flex;flex-direction:column}
+.gz-row{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:0 4px;background:none;border:0;color:#f4f4f5;text-align:left;cursor:pointer}
+.gz-ic{flex:none;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.15);color:#d4d4d8}
+.gz-rl{font-weight:800;font-size:15px}
+.gz-row em{margin-left:auto;font-style:normal;font-size:13px;color:#a1a1aa}
+.gz-row .hzm-chev{margin-left:0;stroke:rgba(255,255,255,.4)}
+.gz-out{width:100%;min-height:52px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:#f87171;font-weight:800;font-size:15px;cursor:pointer}
+.gz-out:active{background:rgba(255,255,255,.08)}
+html body .gz .mz-reset:not(#_a):not(#_b):not(#_c){font-size:11.5px;color:#8e8e93;text-align:center}
 </style>
 </body>
 </html>
