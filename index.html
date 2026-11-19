@@ -37507,5 +37507,28 @@ html body .hv-dls .hv-share.done .hv-dt b{color:#d6f5a0}
   }
 })();
 </script>
+
+<script id="moon-checker-desktop-scale">
+/* desktop checker result: compact, wider layout (like the reference screenshot) -- inline !important beats every older stylesheet layer */
+(function(){
+  var Z=0.8, MW=1500;
+  function set(el,p,v){ if(el&&el.style.getPropertyValue(p)!==v) el.style.setProperty(p,v,'important'); }
+  function apply(){
+    var big=window.innerWidth>=1100;
+    var cv=document.getElementById('checkerView'), hv=document.getElementById('hv');
+    var out=document.getElementById('hvOut'), st=document.getElementById('hvStatus');
+    if(!cv||!hv) return;
+    if(big){
+      set(cv,'max-width','none'); set(hv,'max-width',MW+'px'); set(hv,'width','100%');
+      set(hv,'margin-left','auto'); set(hv,'margin-right','auto');
+      set(out,'zoom',String(Z)); set(st,'zoom',String(Z));
+    }else{
+      [[cv,'max-width'],[hv,'max-width'],[hv,'width'],[hv,'margin-left'],[hv,'margin-right'],[out,'zoom'],[st,'zoom']].forEach(function(a){ if(a[0]) a[0].style.removeProperty(a[1]); });
+    }
+  }
+  addEventListener('resize',apply,{passive:true});
+  setInterval(apply,800); apply();
+})();
+</script>
 </body>
 </html>
