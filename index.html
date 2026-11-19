@@ -16291,6 +16291,11 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       if (act === 'pin' && admin()) togglePin(id);
     });
     document.addEventListener('moon:user', () => { renderComposer(); render(); });
+    window.moonCommunityShareTT = function(d, url){
+      const u = me(), asAdmin = admin();
+      if (!u && !asAdmin) { try { if (typeof startDiscordLogin === 'function') startDiscordLogin(); } catch(e){} return 'login'; }
+      try { shareTT(d || {}, url); return 'ok'; } catch(e){ return 'err'; }
+    };
 
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(es => { const was = inView; inView = es[0].isIntersecting; if (inView && !was) load(); }, { rootMargin: '200px' }).observe(panel);
@@ -34136,26 +34141,7 @@ document.addEventListener('click',function(e){
   new MutationObserver(setTop).observe(document.body,{attributes:true,attributeFilter:['class']});
 })();
 </script>
-<script>
-/* keyboard: the community layer ends exactly where the keyboard begins */
-(function(){
-  var vv=window.visualViewport; if(!vv) return;
-  function z(){var pr=document.createElement('div');pr.style.cssText='position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden';document.body.appendChild(pr);var k=(pr.getBoundingClientRect().width/100)||1;document.body.removeChild(pr);return k;}
-  var raf=0;
-  function upd(){
-    cancelAnimationFrame(raf);
-    raf=requestAnimationFrame(function(){
-      var kb=Math.max(0,window.innerHeight-vv.height-vv.offsetTop), r=document.documentElement.style;
-      if(kb>80){ r.setProperty('--cm-kb',Math.round(kb/z())+'px'); r.setProperty('--cm-kbp','6px'); }
-      else { r.removeProperty('--cm-kb'); r.removeProperty('--cm-kbp'); }
-      var l=document.getElementById('cmList'); if(l&&kb>80&&document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.cm-bar,.cm-chk')){ /* keep newest message visible */ }
-    });
-  }
-  vv.addEventListener('resize',upd); vv.addEventListener('scroll',upd); addEventListener('resize',upd);
-  document.addEventListener('focusin',function(){setTimeout(upd,120);setTimeout(upd,400);});
-  document.addEventListener('focusout',function(){setTimeout(upd,120);setTimeout(upd,400);});
-})();
-</script>
+<!-- old keyboard script removed: replaced by #moon-chat-ipad-fix2-js -->
 <script>
 (function(){var v=document.getElementById('communityView');if(!v)return;
 function t(){document.documentElement.classList.toggle('cm-open',v.classList.contains('show'));}
@@ -36219,6 +36205,22 @@ function dlGroup(row,mr){
  ap(g,mk('ttdlDlSd','ttdlDlSdLabel','ბრაუზერი','',info(tb),rowOn,IV));
  ap(g,mk('ttdlDlHd','ttdlDlHdLabel','ტელეფონი','',info(tp),rowOn,IV));
  ap(g,mk('ttdlMusicBtn','ttdlMusicLabel','მუსიკა',musOn?'აუდიო':'ვერ მოიძებნა','',musOn,IM));
+ /* iOS: the save link used to live in the hidden source block, so nobody saw it -> mirror it here */
+ var iw=$('ttdlIosLinkWrap'),il=$('ttdlIosLink');
+ if(iw&&il&&iw.style.display!=='none'&&il.getAttribute('href')){var sv=h('button','hv-b pri hv-save','💾 ვიდეო მზადაა — დააჭირე და შეინახე');sv.type='button';sv.onclick=function(){il.click()};ap(g,sv)}
+ /* share the result to the community chat */
+ var sd=h('div','hv-dlh hv-sharehd');ap(sd,h('span','','საზოგადოებაში გაზიარება'));ap(g,sd);
+ var SU=window.__moonSharedUrls=window.__moonSharedUrls||{},LD=window.__moonLastTT,did=!!(LD&&SU[LD.url]);
+ var SI='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>';
+ var sb=h('button','hv-b hv-d2 hv-share'+(did?' done':'')),si=h('span','hv-di'),st2=h('span','hv-dt');sb.type='button';si.innerHTML=SI;
+ ap(st2,h('b','',did?'გაზიარებულია ✓':'გაზიარება'),h('small','',did?'საზოგადოებაში ნახვა':'შედეგი გამოჩნდება საზოგადოების ჩატში'));ap(sb,si,st2);sb._on=true;
+ sb.onclick=function(){
+  var d=window.__moonLastTT;if(!d)return;
+  if(SU[d.url]){var c=document.querySelector('[data-hz-go="community"],[data-mn="community"]');if(c)c.click();return}
+  var r=window.moonCommunityShareTT?window.moonCommunityShareTT(d,d.url):'';
+  if(r==='ok'){SU[d.url]=1;sched()}
+ };
+ ap(g,sb);
  return g}
 function bestDl(){var T=tiers(),b=T.filter(function(n){return n.name==='Browser'})[0],p=T.filter(function(n){return n.name==='Phone'})[0],useSd=false;
  if(b&&p){var kb=[idx(b.res),pf(b.fps)||0,pf(b.sz)||0],kp=[idx(p.res),pf(p.fps)||0,pf(p.sz)||0];for(var i=0;i<3;i++){if(kb[i]!==kp[i]){useSd=kb[i]>kp[i];break}}}
@@ -36253,8 +36255,10 @@ function refocus(){if(!(window.matchMedia&&matchMedia('(pointer:coarse)').matche
 new MutationObserver(function(){if(B.disabled&&state!=='run')start()}).observe(B,{attributes:true,attributeFilter:['disabled']});
 LG&&new MutationObserver(function(){var n=LG.lastElementChild;if(n)lastBad=n.textContent.replace(/^\s*\[[^\]]*\]\s*/,'').trim();while(LG.children.length>5)LG.removeChild(LG.firstChild)}).observe(LG,{childList:true});
 function sched(){cancelAnimationFrame(q);q=requestAnimationFrame(function(){render();prog()})}
-[R,$('ttdlDetails'),$('ttdlDlRow'),$('ttdlMusicRow')].forEach(function(e){e&&new MutationObserver(sched).observe(e,{attributes:true,attributeFilter:['style','disabled']})});
+[R,$('ttdlDetails'),$('ttdlDlRow'),$('ttdlMusicRow'),$('ttdlIosLinkWrap')].forEach(function(e){e&&new MutationObserver(sched).observe(e,{attributes:true,attributeFilter:['style','disabled']})});
 [$('ttdlDlSd'),$('ttdlDlHd'),$('ttdlMusicBtn')].forEach(function(e){e&&new MutationObserver(syncDl).observe(e,{attributes:true,attributeFilter:['disabled']})});
+$('ttdlIosLink')&&new MutationObserver(sched).observe($('ttdlIosLink'),{attributes:true,attributeFilter:['href','download']});
+document.addEventListener('moon:ttdl-result',function(){window.__moonLastTT=arguments[0]&&arguments[0].detail;sched()});
 [G,Q,$('ttdlResultTitle'),$('ttdlResultMeta')].forEach(function(e){e&&new MutationObserver(sched).observe(e,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']})});
 $('ttdlThumb')&&new MutationObserver(sched).observe($('ttdlThumb'),{attributes:true,attributeFilter:['src']});
 /* input / paste / go */
@@ -37409,5 +37413,99 @@ cur=h;draw();ov.scrollTop=0;ov.classList.add('on');document.documentElement.styl
 function close(){try{history.replaceState({},document.title,location.pathname+location.search)}catch(e){}route()}
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('on'))close()});
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-btn')){setTimeout(function(){foot();if(ov.classList.contains('on'))draw()},50)}});
-window.addEventListener('hashchange',route);foot();route();})();</script></body>
+window.addEventListener('hashchange',route);foot();route();})();</script>
+<style id="moon-chat-ipad-fix2">
+/* community layer: bottom edge is 0 unless a chat field is really focused (keyboard) -- a stale keyboard offset can no longer hide the write bar */
+html body #communityView.show:not(#_a):not(#_b):not(#_c){bottom:var(--cm-fix,0px)!important}
+html.cm-typing body #communityView.show:not(#_a):not(#_b):not(#_c){bottom:calc(var(--cm-kb,0px) + var(--cm-fix,0px))!important}
+html body #communityView.show:not(#_a):not(#_b):not(#_c) .cm-composer{padding-bottom:2px}
+/* checker: save + share buttons */
+html body .hv-dls .hv-save,html body .hv-dls .hv-share{grid-column:1/-1}
+html body .hv-dls .hv-sharehd{grid-column:1/-1;margin-top:6px}
+html body .hv-dls .hv-save{min-height:54px;font-size:16px}
+html body .hv-dls .hv-share.done{border-color:rgba(163,230,53,.45)}
+html body .hv-dls .hv-share.done .hv-dt b{color:#d6f5a0}
+</style>
+<script id="moon-chat-ipad-fix2-js">
+(function(){
+  var vv=window.visualViewport, root=document.documentElement, raf=0, tmr=[];
+  function typing(){var a=document.activeElement;return !!(a&&a.closest&&a.closest('#communityView')&&/^(INPUT|TEXTAREA)$/.test(a.tagName));}
+  function place(){
+    var v=document.getElementById('communityView');
+    root.classList.toggle('cm-typing',typing());
+    if(!v||!v.classList.contains('show')){root.style.removeProperty('--cm-fix');return;}
+    if(typing()) {root.style.setProperty('--cm-fix','0px');return;}
+    root.style.setProperty('--cm-fix','0px');
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(function(){
+      var bar=document.getElementById('cmBar')||document.getElementById('cmGate');
+      if(!bar||bar.hidden||(vv&&vv.scale>1.02)) return;
+      var r=bar.getBoundingClientRect(); if(!r.height) return;
+      var vis=vv?(vv.offsetTop+vv.height):window.innerHeight;
+      var over=Math.ceil(r.bottom-vis);
+      if(over>1&&over<window.innerHeight*0.6) root.style.setProperty('--cm-fix',(over+6)+'px');
+    });
+  }
+  function run(){place();tmr.forEach(clearTimeout);tmr=[120,400,900,1800].map(function(d){return setTimeout(place,d)});}
+  addEventListener('resize',run,{passive:true});addEventListener('orientationchange',run);
+  if(vv){vv.addEventListener('resize',run,{passive:true});vv.addEventListener('scroll',place,{passive:true});}
+  document.addEventListener('focusin',run);document.addEventListener('focusout',run);
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-hz-go="community"],[data-mn="community"]'))[60,350,800,1600].forEach(function(d){setTimeout(place,d)});},true);
+  var v=document.getElementById('communityView');if(v)new MutationObserver(run).observe(v,{attributes:true,attributeFilter:['class']});
+})();
+</script>
+
+<style id="moon-method-counter-css">
+#moonMethodCount{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:18px auto 6px;padding:9px 16px;width:fit-content;max-width:calc(100% - 24px);border-radius:999px;
+ background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#b9c2e6;font-family:MoonKa,var(--moon-met),'GateSans','BPGAcademiuriU',system-ui,sans-serif;font-size:12.5px;letter-spacing:.02em;line-height:1.4;text-align:center}
+#moonMethodCount i{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:#7dc1fc;box-shadow:0 0 10px #7dc1fc;animation:mmcPulse 2s ease-in-out infinite}
+#moonMethodCount b{color:#fff;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;margin:0 2px}
+#moonMethodCount small{flex:1 1 100%;display:block;font-size:10.5px;color:#7f89b3;letter-spacing:.04em}
+@keyframes mmcPulse{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+@media (prefers-reduced-motion:reduce){#moonMethodCount i{animation:none}}
+</style>
+<script id="moon-method-counter-js">
+/* "today N people used the method": every 24 h the counter starts again from 50 and goes up by every finished run */
+(function(){
+  var BASE=50, URL_='https://mantledb.sh/v2/moonge-tbilisi-vc7f3q/method_uses';
+  var TXT={ka:['დღეს მეთოდი გამოიყენა','ადამიანმა','ნახლდება ყოველ 24 საათში'],en:['Today the method was used by','people','Refreshes every 24 hours'],ru:['Сегодня метод использовали','чел.','Обновляется каждые 24 часа']};
+  function dayKey(){return Math.floor((Date.now()+4*3600e3)/864e5);}   /* Tbilisi day (UTC+4) */
+  function lang(){var l=(document.documentElement.getAttribute('lang')||'ka').slice(0,2);return TXT[l]?l:'ka';}
+  var shown=BASE, nEl=null;
+  function read(){return fetch(URL_,{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null});}
+  function todayN(d){return(d&&d.d===dayKey()&&isFinite(d.n))?Math.max(0,Math.floor(d.n)):0;}
+  function paint(n,anim){
+    if(!nEl)return; var to=BASE+n, from=shown; shown=to;
+    if(!anim||from===to||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){nEl.textContent=to;return;}
+    var t0=performance.now();(function f(t){var p=Math.min(1,(t-t0)/500);nEl.textContent=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0);
+  }
+  function refresh(anim){read().then(function(d){paint(todayN(d),anim)});}
+  function mount(){
+    var v=document.getElementById('optView'); if(!v) return;
+    var el=document.getElementById('moonMethodCount');
+    if(el&&el.parentNode===v){var tt=TXT[lang()];el.firstChild&&0;return;}
+    el=document.createElement('div');el.id='moonMethodCount';
+    var tt=TXT[lang()];
+    el.innerHTML='<i></i><span>'+tt[0]+' <b id="moonMethodCountN">'+shown+'</b> '+tt[1]+'</span><small>'+tt[2]+'</small>';
+    v.appendChild(el);nEl=document.getElementById('moonMethodCountN');
+    refresh(true);
+  }
+  setInterval(mount,700);
+  setInterval(function(){if(!document.hidden&&document.getElementById('optView')&&document.getElementById('optView').classList.contains('show'))refresh(true)},45000);
+  /* +1 when a run finishes (pill goes busy -> done), once per run */
+  var last='';
+  setInterval(function(){
+    var p=document.getElementById('optPill'); if(!p)return; var s=p.getAttribute('data-s');
+    if(s==='done'&&last!=='done'){bump();}
+    last=s;
+  },500);
+  function bump(){
+    read().then(function(d){
+      var n=todayN(d)+1;
+      return fetch(URL_,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({d:dayKey(),n:n})}).then(function(r){if(r.ok)paint(n,true)});
+    }).catch(function(){});
+  }
+})();
+</script>
+</body>
 </html>
