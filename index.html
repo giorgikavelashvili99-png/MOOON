@@ -37195,5 +37195,32 @@ html body #checkerView#checkerView#checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv
 }
 html body #checkerView#checkerView#checkerView #hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv#hv .hv-st b{overflow-wrap:normal!important;word-break:normal!important;hyphens:none!important}
 </style>
+<style id="moon-gold-glow-contain">
+/* GOLD card light: kept, but it now lives strictly INSIDE the card.
+   Before: the glow layer was 136% tall and drifted 112% of its width, and the card had overflow:visible,
+   so the light spilled above/below the card and onto the neighbouring (red) card, and made the track scroll height unstable. */
+html body .pc-card.pc-card.pc-card--monthly:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not(#_h):not(#_i):not(#_j):not(#_k):not(#_l){
+  overflow:clip!important; overflow-clip-margin:0px!important; isolation:isolate!important}
+html:not(.low-power) body .pc-card.pc-card.pc-card--monthly:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not(#_h):not(#_i):not(#_j):not(#_k):not(#_l)::before{
+  content:""!important; display:block!important; position:absolute!important;
+  left:0!important; top:0!important; right:auto!important; bottom:auto!important;
+  width:72%!important; height:62%!important; min-height:0!important; max-height:none!important;
+  transform:translate3d(0,0,0); will-change:transform;
+  animation:mgGlowIn 11s cubic-bezier(.45,.05,.55,.95) infinite alternate!important}
+@keyframes mgGlowIn{
+  0%  {transform:translate3d(0%,0%,0)}
+  100%{transform:translate3d(38%,58%,0)}}
+/* the carousel track can never be nudged vertically, so the cards keep one fixed position */
+html body .pricing-cards.pc-scroll-mode .pc-scroll-track:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e):not(#_f):not(#_g):not(#_h):not(#_i):not(#_j):not(#_k):not(#_l){overflow-y:hidden!important; overscroll-behavior:contain!important}
+</style>
+<script id="moon-track-lock">
+(function(){
+  function lock(t){ if(!t||t.__mlk) return; t.__mlk=1;
+    t.addEventListener('scroll',function(){ if(t.scrollTop) t.scrollTop=0; },{passive:true}); }
+  function run(){ document.querySelectorAll('.pc-scroll-track').forEach(lock); }
+  run(); setTimeout(run,800); setTimeout(run,2500);
+  if(window.MutationObserver) new MutationObserver(run).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 </body>
 </html>
