@@ -14387,6 +14387,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     }
     // Guild-membership ("must join our Discord server") is no longer
     // required to send an order -- Discord login alone is enough.
+    if (btn && btn.disabled) return; // double tap while a send is already running
     if (btn) btn.disabled = true;
     if (textEl) textEl.textContent = t('orderProcessing') || '…';
 
@@ -14415,7 +14416,8 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     // page fetches its own history on open. So it now runs in the
     // background while the chat is already visible.
     // the "sending" animation plays on the button while the order is saved and the session is created in the background; the chat opens when it ends
-    const __sendAnim = (window.__moonSendAnim && btn) ? window.__moonSendAnim(btn) : Promise.resolve();
+    let __sendAnim;
+    try { __sendAnim = (window.__moonSendAnim && btn) ? window.__moonSendAnim(btn) : Promise.resolve(); } catch(e){ __sendAnim = Promise.resolve(); }
 
     // Fire-and-forget, with a hard timeout so a sleeping/unreachable
     // server can never leave this request hanging forever in the
@@ -14453,10 +14455,32 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     pendingSessionCreates[orderId] = sessionCreateP;
     sessionCreateP.then(() => { delete pendingSessionCreates[orderId]; });
 
-    await __sendAnim;
-    openMessengerPage(orderId, 'customer', firstMessageText, firstMessageId);
-    if (btn) btn.disabled = false;
-    if (textEl) textEl.textContent = t(idleKey);
+    try {
+      // the animation is cosmetic: never wait for it longer than 2.2 s
+      await Promise.race([__sendAnim, new Promise(r => setTimeout(r, 2200))]);
+    } catch(e){}
+    try {
+      openMessengerPage(orderId, 'customer', firstMessageText, firstMessageId);
+    } catch(e) {
+      // if anything in the chat setup throws, still show the chat instead of leaving the customer on a dead button
+      console.error('[MOON] openMessengerPage failed -- forcing the chat open', e);
+      try {
+        const pg = document.getElementById('messengerPage');
+        if (pg) pg.style.display = 'flex';
+        const bub = document.getElementById('activeChatBubble');
+        if (bub) bub.style.display = 'none';
+        messengerCurrentOrderId = orderId;
+        messengerRole = 'customer';
+        justSubmittedFreshOrder = true;
+        if (!window.__msgrLocked) { window.__msgrLocked = true; lockBodyScroll(); }
+        const box = document.getElementById('messengerMessages');
+        if (box && !box.children.length) { try { renderMessageBubble({ id: firstMessageId, from: 'customer', text: firstMessageText, ts: Date.now() }); } catch(_){} }
+        refreshMessengerHistory(orderId, firstMessageText);
+      } catch(e2){ console.error('[MOON] fallback chat open failed too', e2); }
+    } finally {
+      if (btn) { btn.disabled = false; btn.classList.remove('mo-sending'); const ov = btn.querySelector('.mo-send'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov); }
+      if (textEl) textEl.textContent = t(idleKey);
+    }
   }
 
   const copyNote = document.getElementById('copyNote');
@@ -28369,12 +28393,12 @@ html body .order-btn.mo-sending>*:not(.mo-send){visibility:hidden!important}
         o.innerHTML='<mo-lum class="mo-lum w"></mo-lum><mo-lum class="mo-lum y"></mo-lum><mo-lum class="mo-lum g"></mo-lum><mo-ring class="mo-ring"><i></i></mo-ring><mo-road class="mo-road"><i></i></mo-road>'+TRUCK+'<mo-ok class="mo-ok">'+(TXT[L]||TXT.ka)+'</mo-ok>';
         btn.classList.add('mo-sending'); btn.appendChild(o);
         requestAnimationFrame(function(){ requestAnimationFrame(function(){ o.classList.add('go'); }); });
-        setTimeout(function(){ o.classList.add('run'); },420);
-        setTimeout(function(){ o.classList.remove('run'); o.classList.add('ok'); },1950);
+        setTimeout(function(){ o.classList.add('run'); },250);
+        setTimeout(function(){ o.classList.remove('run'); o.classList.add('ok'); },1000);
         setTimeout(function(){
           res();
-          setTimeout(function(){ if(o.parentNode) o.parentNode.removeChild(o); btn.classList.remove('mo-sending'); },1000);
-        },2650);
+          setTimeout(function(){ if(o.parentNode) o.parentNode.removeChild(o); btn.classList.remove('mo-sending'); },600);
+        },1500);
       }catch(e){ res(); }
     });
   };
