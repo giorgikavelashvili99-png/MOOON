@@ -37452,16 +37452,18 @@ document.addEventListener('click',function(e){
 },true);
 })();</script>
 <script id="moon-qndrop-fit">(function(){
-/* the info panel (rules / why us / portfolio / ...) must cover exactly the menu card, whatever the scroll position */
+/* the info panel (rules / why us / portfolio / ...) covers exactly the menu card, whatever the scroll position */
 var mn=document.getElementById('hzMenu'),d=document.getElementById('qnDrop');if(!mn||!d)return;
+function P(k,v){d.style.setProperty(k,v,'important')}
 function fit(){
-  if(!d.classList.contains('open')){return}
+  if(!d.classList.contains('open')){['position','left','top','width','height','right','bottom','z-index','background','overflow','border-radius'].forEach(function(k){d.style.removeProperty(k)});return}
   var r=mn.getBoundingClientRect();
-  d.style.cssText+=';position:fixed!important;left:'+r.left+'px!important;top:'+r.top+'px!important;width:'+r.width+'px!important;height:'+r.height+'px!important;right:auto!important;bottom:auto!important;z-index:20!important;border-radius:inherit';
-  var cs=getComputedStyle(mn);d.style.setProperty('border-radius',cs.borderRadius,'important');
-  d.style.setProperty('background','#0e131f','important');d.style.setProperty('overflow','hidden','important');
+  P('position','fixed');P('left','0px');P('top','0px');P('right','auto');P('bottom','auto');P('width',r.width+'px');P('height',r.height+'px');P('z-index','20');
+  var o=d.getBoundingClientRect(); /* real origin of the containing block (fixed can be re-anchored by transforms/filters) */
+  P('left',(r.left-o.left)+'px');P('top',(r.top-o.top)+'px');
+  P('border-radius',getComputedStyle(mn).borderRadius);P('background','#0e131f');P('overflow','hidden');
 }
-new MutationObserver(fit).observe(d,{attributes:true,attributeFilter:['class']});
+new MutationObserver(function(){fit();requestAnimationFrame(fit)}).observe(d,{attributes:true,attributeFilter:['class']});
 window.addEventListener('resize',fit);
 })();</script>
 </body>
