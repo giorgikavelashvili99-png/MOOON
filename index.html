@@ -29532,7 +29532,7 @@ document.addEventListener('moon:acct',function(){setTimeout(fillTt,200)});
   document.addEventListener('click',function(e){
     if(e.target.closest('#mmOpen')){mn.classList.add('mm-sheet');var w=mn.querySelector('.qn-nav-wrap');if(w)w.scrollTop=0;return}
     if(e.target.closest('.mm-back')){mn.classList.remove('mm-sheet');return}
-    if(mn.classList.contains('mm-sheet')&&e.target.closest('#hzMenu .qn-nav-wrap .hzm-row')){setTimeout(function(){mn.classList.remove('mm-sheet')},400)}
+    if(mn.classList.contains('mm-sheet')&&e.target.closest('#hzMenu .qn-nav-wrap .hzm-row:not(.qn-tab)')){setTimeout(function(){mn.classList.remove('mm-sheet')},400)}
   });
   new MutationObserver(function(){if(!document.documentElement.classList.contains('hz-menu-open'))mn.classList.remove('mm-sheet')}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 })();
@@ -37444,12 +37444,25 @@ html body #hzMenu.mm-sheet #quickNav.hzm-group{margin:0 0 12px!important;transfo
 /* tapping an item inside "More": go to it and close the whole menu (it used to bounce back to the main menu list) */
 document.addEventListener('click',function(e){
   var mn=document.getElementById('hzMenu');if(!mn||!mn.classList.contains('mm-sheet'))return;
-  var r=e.target.closest&&e.target.closest('#hzMenu .qn-nav-wrap .hzm-row');if(!r)return;
+  var r=e.target.closest&&e.target.closest('#hzMenu .qn-nav-wrap .hzm-row:not(.qn-tab)');if(!r)return;
   setTimeout(function(){
     if(document.documentElement.classList.contains('hz-menu-open')){var b=document.getElementById('hzMenuBtn');if(b)b.click();}
     mn.classList.remove('mm-sheet');
   },90);
 },true);
+})();</script>
+<script id="moon-qndrop-fit">(function(){
+/* the info panel (rules / why us / portfolio / ...) must cover exactly the menu card, whatever the scroll position */
+var mn=document.getElementById('hzMenu'),d=document.getElementById('qnDrop');if(!mn||!d)return;
+function fit(){
+  if(!d.classList.contains('open')){return}
+  var r=mn.getBoundingClientRect();
+  d.style.cssText+=';position:fixed!important;left:'+r.left+'px!important;top:'+r.top+'px!important;width:'+r.width+'px!important;height:'+r.height+'px!important;right:auto!important;bottom:auto!important;z-index:20!important;border-radius:inherit';
+  var cs=getComputedStyle(mn);d.style.setProperty('border-radius',cs.borderRadius,'important');
+  d.style.setProperty('background','#0e131f','important');d.style.setProperty('overflow','hidden','important');
+}
+new MutationObserver(fit).observe(d,{attributes:true,attributeFilter:['class']});
+window.addEventListener('resize',fit);
 })();</script>
 </body>
 </html>
