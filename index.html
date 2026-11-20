@@ -13045,6 +13045,8 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
   function renderMessageBubble(msg){
     const container = document.getElementById('messengerMessages');
     if (!container) return;
+    // help tickets: hide the server's order auto-reply ("administrator will review your order / choose payment")
+    if (msg && msg.from !== 'customer' && /^T\d/.test(String(messengerCurrentOrderId || '')) && /ადმინისტრატორი მალე ნახავს|administrator will review your order|payment method/i.test(String(msg.text || ''))) { messengerRenderedCount++; return; }
     // edit-order video links are only for the admin: the customer's chat never shows them (their upload card says "sent")
     if (msg && msg.from !== 'admin' && messengerRole === 'customer' && window.moonIsVideoLinkMsg && window.moonIsVideoLinkMsg(msg.text)) { messengerRenderedCount++; return; }
     const bubble = document.createElement('div');
@@ -14511,7 +14513,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       orderId: ticketId,
       customer: { discordId: currentDiscordUser.id, username: currentDiscordUser.username, avatarUrl: currentDiscordUser.avatarUrl },
       order: ticket,
-      firstMessage: { id: firstMessageId, from: 'customer', text: '🆘 დახმარების ბილეთი\n\n' + text }
+      firstMessage: { id: firstMessageId, from: 'customer', text: '🆘 დახმარების ბილეთი\n' + text }
     });
     // chat opens at once (the free Render server can need up to a minute to wake);
     // the session is created in the background and retried so the ticket is not lost
@@ -14538,7 +14540,8 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     pendingSessionCreates[ticketId] = createP;
     createP.then(() => { delete pendingSessionCreates[ticketId]; });
     try{ localStorage.removeItem('moon_help_draft'); }catch(e){}
-    openMessengerPage(ticketId, 'customer', '🆘 დახმარების ბილეთი\n\n' + text, firstMessageId);
+    openMessengerPage(ticketId, 'customer', '🆘 დახმარების ბილეთი\n' + text, firstMessageId);
+    try{ appendSystemMessage(({ ka:'✅ მიმართვა მიღებულია. მხარდაჭერა მალე გიპასუხებთ — შეგიძლიათ აქვე დაწეროთ დამატებითი დეტალები.', en:'✅ Your request was received. Support will reply soon — feel free to add more details here.', ru:'✅ Обращение получено. Поддержка скоро ответит — можете добавить детали здесь.' })[lang] || ''); }catch(e){}
     return true;
   }
   window.__moonHelpTicket = createHelpTicket;
