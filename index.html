@@ -29643,7 +29643,7 @@ html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .mz-langs .hz-flag{width:2
 var F={ka:['ge','ქართული'],en:['gb','English'],ru:['ru','Русский']};
 function cur(){var l='ka';try{if(typeof currentLang!=='undefined'&&F[currentLang])l=currentLang}catch(e){}return l}
 document.addEventListener('click',function(e){
-  var r=e.target.closest&&e.target.closest('#hzMenu .mz-row[data-hz-act="lang"]');
+  var r=e.target.closest&&e.target.closest('#hzMenu .mz-row[data-hz-act="lang"], #hzMenu .gz-row[data-hz-act="lang"]');
   if(!r)return;
   e.stopImmediatePropagation();e.preventDefault();
   var nx=r.nextElementSibling;
