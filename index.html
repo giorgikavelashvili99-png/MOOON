@@ -37508,5 +37508,45 @@ html body #hzMenu#hzMenu#hzMenu#hzMenu:not(#_a):not(#_b) .mz-langs .hz-flag{widt
 /* logged-out login buttons */
 html body #hzMenu#hzMenu#hzMenu#hzMenu:not(#_a):not(#_b) .hzm-login,html body #hzMenu#hzMenu#hzMenu#hzMenu:not(#_a):not(#_b) .hzm-alt-btn{font-size:15.5px!important;font-weight:700!important;letter-spacing:0!important;min-height:50px!important}
 </style>
+
+<style id="moon-clean">
+/* Clean-up layer: declared inside @layer so its !important beats every unlayered !important rule above, regardless of selector weight. */
+@layer moon-clean {
+  /* 1) Text: no outline strokes, no glow/shadow halos, no fake bold, crisp grayscale AA */
+  html body :is(h1,h2,h3,h4,h5,h6,p,span,b,strong,em,small,a,li,label,button,input,select,textarea,option,div,sup,sub,i,td,th),
+  html body :is(h1,h2,h3,h4,h5,h6,p,span,b,strong,em,small,a,li,label,button,input,select,textarea,option,div,sup,sub,i,td,th)::before,
+  html body :is(h1,h2,h3,h4,h5,h6,p,span,b,strong,em,small,a,li,label,button,input,select,textarea,option,div,sup,sub,i,td,th):not(.bg)::after{
+    -webkit-text-stroke:0 !important;
+    text-stroke:0 !important;
+    paint-order:normal !important;
+    text-shadow:none !important;
+    -webkit-font-smoothing:antialiased !important;
+    -moz-osx-font-smoothing:grayscale !important;
+    text-rendering:optimizeLegibility !important;
+    font-synthesis:none !important;
+    image-rendering:auto !important;
+  }
+  /* 2) Nothing that carries text may be filtered, rasterised on its own layer, or blurred behind (these make edges and letters look pixelated/soft) */
+  html body :is(.pc-card,.pc-card *,.pc-badge,.pc-badge *,.panel,.panel *,.pc-modal-scroll,.pc-modal-scroll *,header,nav,h1,h2,h3,p,button,a,label,input,select,textarea,.site-menu,.site-menu *){
+    filter:none !important;
+    -webkit-filter:none !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    will-change:auto !important;
+    backface-visibility:visible !important;
+  }
+  /* 3) Frames: keep the card's look, but one clean hairline instead of stacked inset/outer shadow rings on panels and fields */
+  html body :is(.panel,.drop-zone,.scan-result,.pc-accordion-body,input,select,textarea,.wizard-step-dot,.pc-badge,.pc-feature,.pc-check){
+    box-shadow:none !important;
+    outline:0 !important;
+  }
+  html body :is(input,select,textarea,.drop-zone,.panel){
+    border-width:1px !important;
+    background-clip:padding-box !important;
+  }
+  /* 4) Images / icons / canvas: smooth scaling, never nearest-neighbour */
+  html body :is(img,svg,canvas,video){image-rendering:auto !important}
+}
+</style>
 </body>
 </html>
