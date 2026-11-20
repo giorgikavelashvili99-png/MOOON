@@ -8188,6 +8188,11 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
           <span class="q-check">✓</span>
         </button>
       </div>
+      <button type="button" class="moon-hdr" role="switch" aria-checked="false" data-moon-hdr>
+        <span class="mh-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9"/></svg></span>
+        <span class="mh-copy"><b>HDR ხარისხი</b><small>ღრმა ფერები და მკვეთრი, ნათელი შუქები</small></span>
+        <span class="mh-sw" aria-hidden="true"><i></i></span>
+      </button>
     </div>
 
     <div class="field" id="tiktokFieldWrap" style="margin-bottom:6px;">
@@ -8489,6 +8494,11 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
         <span class="wp-box-price"><s class="wp-old-price"></s><span class="wp-new-price">35.99<sup>₾</sup></span></span>
       </button>
     </div>
+      <button type="button" class="moon-hdr" role="switch" aria-checked="false" data-moon-hdr>
+        <span class="mh-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9"/></svg></span>
+        <span class="mh-copy"><b>HDR ხარისხი</b><small>ღრმა ფერები და მკვეთრი, ნათელი შუქები</small></span>
+        <span class="mh-sw" aria-hidden="true"><i></i></span>
+      </button>
 
     <div class="field" id="tiktokFieldWp" style="margin-top:14px; margin-bottom:6px;">
       <div class="toggle-row">
@@ -8645,6 +8655,11 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
         <span class="mp-box-price"><span class="mp-new-price">69.99<sup>₾</sup></span></span>
       </button>
     </div>
+      <button type="button" class="moon-hdr" role="switch" aria-checked="false" data-moon-hdr>
+        <span class="mh-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9"/></svg></span>
+        <span class="mh-copy"><b>HDR ხარისხი</b><small>ღრმა ფერები და მკვეთრი, ნათელი შუქები</small></span>
+        <span class="mh-sw" aria-hidden="true"><i></i></span>
+      </button>
 
     <div class="field field-tiktok" id="tiktokFieldMp" style="margin-top:14px; margin-bottom:6px;">
       <div class="field-top"><label data-i18n="tiktokLabel">თქვენი TikTok პროფილის ლინკი *</label></div>
@@ -8750,6 +8765,11 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
           <span class="mp-box-price"><span class="mp-new-price" id="eoPrice4k">14.99<sup>₾</sup></span></span>
         </button>
       </div>
+      <button type="button" class="moon-hdr" role="switch" aria-checked="false" data-moon-hdr>
+        <span class="mh-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9"/></svg></span>
+        <span class="mh-copy"><b>HDR ხარისხი</b><small>ღრმა ფერები და მკვეთრი, ნათელი შუქები</small></span>
+        <span class="mh-sw" aria-hidden="true"><i></i></span>
+      </button>
       <div class="order-grid" style="margin-top:14px;">
         <button class="order-btn chat" id="eoOrderBtnChat">
           <span data-i18n="eoSendChat" id="eoOrderBtnChatText">გაგზავნე შეკვეთა</span>
@@ -14588,7 +14608,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     const price = calculateExactPrice(s, ms, isSub, quality);
     return `🎬 ახალი შეკვეთა — MOON
 ხანგრძლივობა: ${s}.${String(ms).padStart(2,'0')} წამი
-ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
+ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}${window.__moonHdr&&window.__moonHdr.on?'\nHDR: დიახ ✨':''}
 გამომწერი: ${isSub ? 'დიახ' : 'არა'}
 ღირებულება: ${price} ₾
 TikTok პროფილი: ${getTiktokValue('main')}
@@ -14732,7 +14752,7 @@ TikTok პროფილი: ${getTiktokValue('main')}
     return `🗓 ახალი შეკვეთა — MOON 1-კვირიანი გამოწერა
 ლიმიტი: ${SUB_VIDEO_LIMIT} ვიდეო / 7 დღე
 თითო ვიდეო მაქს: 59.59 წამი
-ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
+ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}${window.__moonHdr&&window.__moonHdr.on?'\nHDR: დიახ ✨':''}
 არხის გამომწერი: ${isChannelSub ? 'კი (−3₾)' : 'არა'}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${SUB_VIDEO_LIMIT} ვიდეოზე (1 კვირა): ${total.toFixed(2)} ₾
@@ -14779,7 +14799,7 @@ TikTok პროფილი: ${getTiktokValue('wp')}
     return `🗓 ახალი შეკვეთა — MOON 1-თვიანი გამოწერა
 ლიმიტი: ${MONTH_SUB_VIDEO_LIMIT} ვიდეო / 30 დღე
 თითო ვიდეო მაქს: 59.59 წამი
-ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}
+ხარისხი: ${QUALITY_LABELS[quality] || QUALITY_LABELS['1080_60']}${window.__moonHdr&&window.__moonHdr.on?'\nHDR: დიახ ✨':''}
 1 ვიდეო (საშუალოდ): ${perVideo.toFixed(2)} ₾
 სულ ${MONTH_SUB_VIDEO_LIMIT} ვიდეოზე (1 თვე): ${total.toFixed(2)} ₾
 TikTok პროფილი: ${getTiktokValue('mp')}
@@ -14842,7 +14862,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     return `✨ ახალი შეკვეთა — MOON (ედითის შეკვეთა)
 პაკეტი: მსგავსი ედითი თქვენი პერსონაჟით
 სტილი: სტილი ${eoSelectedStyle}
-ხარისხი: ${qualityLabel}
+ხარისხი: ${qualityLabel}${window.__moonHdr&&window.__moonHdr.on?'\nHDR: დიახ ✨':''}
 ღირებულება: ${price} ₾
 
 გამოგიგზავნით ვიდეოს ჩატში და შემიფასეთ.`;
@@ -37549,5 +37569,45 @@ html body #hzMenu#hzMenu#hzMenu#hzMenu:not(#_a):not(#_b) .hzm-login,html body #h
 }
 </style>
 <style id="moon-zoom110">@media (hover:hover) and (pointer:fine){html{zoom:1.1}}</style>
+<style id="moon-hdr-css">
+.moon-hdr{all:unset;box-sizing:border-box;position:relative;display:flex;align-items:center;gap:14px;width:100%;margin:14px 0 4px;padding:14px 16px;border-radius:18px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.12);color:#eef2fb;
+  transition:border-color .35s ease,background .35s ease;-webkit-tap-highlight-color:transparent;overflow:hidden}
+.moon-hdr:focus-visible{outline:2px solid rgba(120,255,170,.7);outline-offset:2px}
+.moon-hdr .mh-ico{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);transition:background .35s ease,border-color .35s ease}
+.moon-hdr .mh-ico svg{width:24px;height:24px;fill:none;stroke:#aeb8cc;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke .35s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.moon-hdr .mh-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left}
+.moon-hdr .mh-copy b{font-size:15px;font-weight:700;letter-spacing:.02em;line-height:1.2}
+.moon-hdr .mh-copy small{font-size:12px;font-weight:400;line-height:1.35;color:rgba(228,236,247,.62)}
+.moon-hdr .mh-sw{flex:none;width:46px;height:28px;border-radius:999px;background:rgba(255,255,255,.14);position:relative;transition:background .35s ease}
+.moon-hdr .mh-sw i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.moon-hdr::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.12) 50%,transparent 65%);transform:translateX(-120%)}
+.moon-hdr[aria-checked="true"]{border-color:rgba(255,205,90,.65);background:linear-gradient(135deg,rgba(255,196,70,.16),rgba(60,220,130,.10) 60%,rgba(255,255,255,.03))}
+.moon-hdr[aria-checked="true"] .mh-ico{background:linear-gradient(135deg,#ffd35c,#ff9d2e);border-color:transparent}
+.moon-hdr[aria-checked="true"] .mh-ico svg{stroke:#1d1300;transform:rotate(90deg)}
+.moon-hdr[aria-checked="true"] .mh-sw{background:linear-gradient(135deg,#ffd35c,#35d57a)}
+.moon-hdr[aria-checked="true"] .mh-sw i{transform:translateX(18px)}
+.moon-hdr.mh-pop::after{transform:translateX(120%);transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+@media (hover:hover){.moon-hdr:hover{border-color:rgba(255,255,255,.28)}.moon-hdr[aria-checked="true"]:hover{border-color:rgba(255,215,110,.85)}}
+@media (prefers-reduced-motion:reduce){.moon-hdr *,.moon-hdr::after{transition:none!important}}
+</style>
+<script id="moon-hdr-js">
+(function(){
+  var st=window.__moonHdr={on:false};
+  function sync(pop){
+    document.querySelectorAll('[data-moon-hdr]').forEach(function(b){
+      b.setAttribute('aria-checked',st.on?'true':'false');
+      if(pop&&st.on){b.classList.remove('mh-pop');void b.offsetWidth;b.classList.add('mh-pop');}
+    });
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-moon-hdr]'); if(!b) return;
+    st.on=!st.on; sync(true);
+  });
+  document.addEventListener('keydown',function(e){
+    if((e.key===' '||e.key==='Enter')&&e.target.matches&&e.target.matches('[data-moon-hdr]')){e.preventDefault();e.target.click();}
+  });
+})();
+</script>
 </body>
 </html>
