@@ -7098,6 +7098,36 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       return res;
     });
   };
+  /* ffmpeg.wasm CDN fallback: when jsdelivr/unpkg are unreachable (ISP block, in-app browser, offline CDN)
+     the same file is fetched through the gate's cached /ffm/ proxy. Non-CDN URLs pass through untouched. */
+  var GATE_URL = 'https://ancient-frost-1a11.giorgikavelashvili99.workers.dev';
+  window.__moonCdnFetch = function(u, o){
+    var m = String(u).match(/^https:\/\/(?:cdn\.jsdelivr\.net\/npm|unpkg\.com)\/(@ffmpeg\/[^?#]+)$/);
+    if (!m) return fetch(u, o);
+    var viaGate = function(){ return fetch(GATE_URL + '/ffm/' + m[1], o && o.signal ? { signal: o.signal } : undefined); };
+    var ac = ('AbortController' in window) ? new AbortController() : null, to = null, opt = Object.assign({}, o);
+    if (ac){
+      if (o && o.signal){ if (o.signal.aborted) return fetch(u, o); o.signal.addEventListener('abort', function(){ ac.abort(); }); }
+      opt.signal = ac.signal; to = setTimeout(function(){ ac.abort(); }, 10000);   /* 10 s to first byte, then fall back */
+    }
+    return fetch(u, opt).then(function(r){ clearTimeout(to); return r.ok ? r : viaGate(); }, function(){ clearTimeout(to); return viaGate(); });
+  };
+  /* One silent re-login (Discord prompt=none: no consent screen if already authorised) for people who logged in
+     BEFORE the bearer token existed: their cookie is blocked, so they never got a token and could not refresh optSig.
+     Guarded to once per 30 min so it can never loop. */
+  window.__moonSilentRelogin = function(){
+    try{
+      if (navigator.onLine === false) return false;
+      var K = 'moon_silent_relogin_ts';
+      if (Date.now() - Number(localStorage.getItem(K) || 0) < 30 * 60 * 1000) return false;
+      localStorage.setItem(K, String(Date.now()));
+      var st = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (String(Date.now()) + Math.random().toString(36).slice(2));
+      sessionStorage.setItem(STATE_KEY, st);
+      var p = new URLSearchParams({ client_id: CLIENT_ID, redirect_uri: REDIRECT_URI, response_type: 'code', scope: 'identify guilds', state: st, prompt: 'none' });
+      window.location.href = 'https://discord.com/api/oauth2/authorize?' + p.toString();
+      return true;
+    }catch(e){ return false; }
+  };
   var MDB_BASE = 'https://mantledb.sh/v2';
   var MDB_NS = 'moonge-tbilisi-vc7f3q';
 
@@ -7135,6 +7165,15 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
   try{
     var tq = new URLSearchParams(window.location.search);
     if (tq.get('tt')){ tq.delete('tt'); var tu = window.location.pathname + (tq.toString() ? '?' + tq.toString() : '') + window.location.hash; history.replaceState({}, document.title, tu); }
+  }catch(e){}
+
+  try{
+    /* Discord answered the silent re-login with an error (not signed in to Discord etc.): just tidy the URL */
+    var eq = new URLSearchParams(window.location.search);
+    if (eq.get('error') && eq.get('state')){
+      ['error','error_description','state','iss'].forEach(function(k){ eq.delete(k); });
+      history.replaceState({}, document.title, window.location.pathname + (eq.toString() ? '?' + eq.toString() : '') + window.location.hash);
+    }
   }catch(e){}
 
   function earlyMdbRead(path){
@@ -18450,6 +18489,9 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     // a valid session. Only show logged-out if we truly have nothing cached.
     const cached = readCachedDiscordUser();
     setDiscordUI(cached);
+    /* logged in earlier, but /me cannot see the session (blocked cross-site cookie) and no bearer token yet:
+       one silent re-login hands this browser its token, so the API session can be refreshed from now on */
+    if (cached && !cached.via && !window.__moonSessToken()){ try{ window.__moonSilentRelogin(); }catch(e){} }
     return !!cached;
   }
 
@@ -25672,7 +25714,7 @@ function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
 function fetchTO(url,opt,ms){
   var ac=('AbortController' in window)?new AbortController():null, to=null;
   if(ac){ opt=Object.assign({},opt,{signal:ac.signal}); to=setTimeout(function(){ ac.abort(); },ms); }
-  return fetch(url,opt).then(function(r){ clearTimeout(to); return r; },function(e){ clearTimeout(to); throw e; });
+  return (window.__moonCdnFetch||fetch)(url,opt).then(function(r){ clearTimeout(to); return r; },function(e){ clearTimeout(to); throw e; });
 }
 /* no-cors ping: CORS-ს არ საჭიროებს, ამიტომ ამოწმებს მხოლოდ იმას, ხელმისაწვდომია თუ არა სერვერი */
 function pingPatcher(){
@@ -32784,7 +32826,7 @@ html body .hz-link.is-active[data-hz-go="audio"]{color:#cdbfff}
 
   /* ---------- ffmpeg.wasm (same version the optimizer uses) ---------- */
   var E={p:null,ff:null,urls:null,file:null,path:null,mode:null};
-  function tfetch(u,ms){ var c=new AbortController(), h=setTimeout(function(){ c.abort(); },ms); return fetch(u,{signal:c.signal}).finally(function(){ clearTimeout(h); }); }
+  function tfetch(u,ms){ var c=new AbortController(), h=setTimeout(function(){ c.abort(); },ms); return (window.__moonCdnFetch||fetch)(u,{signal:c.signal}).finally(function(){ clearTimeout(h); }); }
   function blobURL(u,type){ return tfetch(u,240000).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }).then(function(b){ return URL.createObjectURL(new Blob([b],{type:type})); }); }
   function loadUrls(){
     if(E.urls) return Promise.resolve(E.urls);
@@ -33293,7 +33335,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
 
   /* ---------- ffmpeg.wasm (same build the optimizer and audio pages use) ---------- */
   var E={p:null,ff:null,urls:null,file:null,path:null,mode:null};
-  function tfetch(u,ms){ var c=new AbortController(),h=setTimeout(function(){ c.abort(); },ms); return fetch(u,{signal:c.signal}).finally(function(){ clearTimeout(h); }); }
+  function tfetch(u,ms){ var c=new AbortController(),h=setTimeout(function(){ c.abort(); },ms); return (window.__moonCdnFetch||fetch)(u,{signal:c.signal}).finally(function(){ clearTimeout(h); }); }
   function blobURL(u,type){ return tfetch(u,240000).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }).then(function(b){ return URL.createObjectURL(new Blob([b],{type:type})); }); }
   function loadUrls(){
     if(E.urls) return Promise.resolve(E.urls);
