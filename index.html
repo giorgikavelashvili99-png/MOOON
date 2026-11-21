@@ -7076,6 +7076,28 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
   var REDIRECT_URI = window.location.origin + window.location.pathname;
   var STATE_KEY = 'moon_discord_oauth_state';
   var CACHE_KEY = 'moon_discord_user_cache';
+  /* Cross-site cookie fallback: Safari/iOS, Brave, Firefox strict and in-app browsers never send the
+     worker's cookie back, so /me failed, optSig (6h) could not be refreshed and the API answered
+     "Discord session could not be verified". The worker now also returns the signed session token in
+     the /exchange body; we keep it and send it as a Bearer header. */
+  var SESS_TOKEN_KEY = 'moon_discord_sess_token';
+  window.__moonSessToken = function(v){
+    try{
+      if (v === null) localStorage.removeItem(SESS_TOKEN_KEY);
+      else if (typeof v === 'string' && v) localStorage.setItem(SESS_TOKEN_KEY, v);
+      else return localStorage.getItem(SESS_TOKEN_KEY) || '';
+    }catch(e){}
+    return '';
+  };
+  window.__moonFetchMe = function(){
+    var tok = window.__moonSessToken();
+    var opt = { credentials: 'include' };
+    if (tok) opt.headers = { 'Authorization': 'Bearer ' + tok };
+    return fetch(WORKER_URL + '/me', opt).then(function(res){
+      if (res.status === 401 && tok) window.__moonSessToken(null); /* expired / invalid token */
+      return res;
+    });
+  };
   var MDB_BASE = 'https://mantledb.sh/v2';
   var MDB_NS = 'moonge-tbilisi-vc7f3q';
 
@@ -7179,7 +7201,8 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: code, redirect_uri: REDIRECT_URI })
-      }).then(function(res){ return res.ok ? res.json() : Promise.reject(new Error('exchange failed')); });
+      }).then(function(res){ return res.ok ? res.json() : Promise.reject(new Error('exchange failed')); })
+      .then(function(d){ if (d && d.sessionToken) window.__moonSessToken(d.sessionToken); return d; });
 
       window.__moonEarlyExchange.then(function(data){
         var user = data && data.user;
@@ -7217,7 +7240,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
         // the login screen sitting there for a second before quietly
         // swapping to the real site, and (for a blocked account) the real
         // site showing for a second before swapping to the ban screen.
-        window.__moonEarlySessionCheck = fetch(WORKER_URL + '/me', { credentials: 'include' })
+        window.__moonEarlySessionCheck = window.__moonFetchMe()
           .then(function(res){ return res.ok ? res.json() : null; })
           .catch(function(){ return null; })
           .then(function(data){
@@ -18309,7 +18332,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
   let __sessRefreshP = null, __sessLast = 0;
   function refreshDiscordSession(){
     if (__sessRefreshP) return __sessRefreshP;
-    __sessRefreshP = fetch(DISCORD_AUTH_WORKER_URL + '/me', { credentials: 'include' })
+    __sessRefreshP = window.__moonFetchMe()
       .then(function(r){ return r.ok ? r.json() : null; })
       .catch(function(){ return null; })
       .then(function(d){
@@ -18414,7 +18437,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     }
 
     try{
-      const res = await fetch(DISCORD_AUTH_WORKER_URL + '/me', { credentials: 'include' });
+      const res = await window.__moonFetchMe();
       if (res.ok){
         const data = await res.json();
         await resolveDiscordAuthState(data.user);
@@ -18462,6 +18485,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
       // the cookie, which iOS may have already dropped, and would
       // otherwise instantly log the person back out right after a
       // successful login.
+      if (data && data.sessionToken){ try{ window.__moonSessToken(data.sessionToken); }catch(e){} }
       await resolveDiscordAuthState(data.user);
     }catch(e){
       alert(t('authError'));
@@ -18476,6 +18500,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
   }
 
   async function discordLogout(){
+    try{ window.__moonSessToken(null); }catch(e){}
     try{ await fetch(DISCORD_AUTH_WORKER_URL + '/logout', { method: 'POST', credentials: 'include' }); }catch(e){}
     try{ localStorage.removeItem('moon_tt_token'); }catch(e){}
     cacheDiscordUser(null);
@@ -29405,7 +29430,7 @@ function gateLogin(btn){
     if(!data){fail(t().cancelled);return}
     api('/tg/login',{tg:data}).then(function(j){
       return fetch(DW+'/tg-session',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:j.user.id,username:j.user.username,avatarUrl:j.user.avatarUrl,isMember:j.user.isMember,via:j.user.via||'',exp:j.exp,proof:j.proof})})
-        .then(function(r){if(!r.ok)return r.json().catch(function(){return {}}).then(function(j){throw new Error('Discord-worker: '+r.status+(j&&j.error?' '+j.error:''))});try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}return r.json().catch(function(){return null}).then(function(d){try{if(d&&d.user)localStorage.setItem('moon_discord_user_cache',JSON.stringify(d.user))}catch(e){}location.reload()})});
+        .then(function(r){if(!r.ok)return r.json().catch(function(){return {}}).then(function(j){throw new Error('Discord-worker: '+r.status+(j&&j.error?' '+j.error:''))});try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}return r.json().catch(function(){return null}).then(function(d){try{if(d&&d.sessionToken&&window.__moonSessToken)window.__moonSessToken(d.sessionToken);if(d&&d.user)localStorage.setItem('moon_discord_user_cache',JSON.stringify(d.user))}catch(e){}location.reload()})});
     }).catch(function(e){fail(e&&e.data&&e.data.error==='not_linked'?t().gateNote:((e&&e.message)||t().err))});
   });
 }
@@ -29450,7 +29475,7 @@ document.addEventListener('moon:acct',function(){setTimeout(fillTt,200)});
   gateMsg(tkx().wait);
   api('/tt/login',{code:code}).then(function(j){
     return fetch(DW+'/tg-session',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:j.user.id,username:j.user.username,avatarUrl:j.user.avatarUrl,isMember:j.user.isMember,via:j.user.via||'',exp:j.exp,proof:j.proof})})
-      .then(function(r){if(!r.ok)return r.json().catch(function(){return {}}).then(function(j){throw new Error('Discord-worker: '+r.status+(j&&j.error?' '+j.error:''))});try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}return r.json().catch(function(){return null}).then(function(d){try{if(d&&d.user)localStorage.setItem('moon_discord_user_cache',JSON.stringify(d.user))}catch(e){}location.reload()})});
+      .then(function(r){if(!r.ok)return r.json().catch(function(){return {}}).then(function(j){throw new Error('Discord-worker: '+r.status+(j&&j.error?' '+j.error:''))});try{sessionStorage.removeItem('moon_discord_oauth_state')}catch(e){}return r.json().catch(function(){return null}).then(function(d){try{if(d&&d.sessionToken&&window.__moonSessToken)window.__moonSessToken(d.sessionToken);if(d&&d.user)localStorage.setItem('moon_discord_user_cache',JSON.stringify(d.user))}catch(e){}location.reload()})});
   }).catch(function(e){gateMsg((e&&e.message)||tkx().err)});
 })();
 /* ---- "მეტი" sub-menu ---- */
