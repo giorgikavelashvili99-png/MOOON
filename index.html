@@ -13045,6 +13045,8 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
   function renderMessageBubble(msg){
     const container = document.getElementById('messengerMessages');
     if (!container) return;
+    // help tickets: hide the server's order auto-reply ("administrator will review your order / choose payment")
+    if (msg && msg.from !== 'customer' && /^T\d/.test(String(messengerCurrentOrderId || '')) && /ადმინისტრატორი მალე ნახავს|administrator will review your order|payment method/i.test(String(msg.text || ''))) { messengerRenderedCount++; return; }
     // edit-order video links are only for the admin: the customer's chat never shows them (their upload card says "sent")
     if (msg && msg.from !== 'admin' && messengerRole === 'customer' && window.moonIsVideoLinkMsg && window.moonIsVideoLinkMsg(msg.text)) { messengerRenderedCount++; return; }
     const bubble = document.createElement('div');
@@ -14511,7 +14513,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       orderId: ticketId,
       customer: { discordId: currentDiscordUser.id, username: currentDiscordUser.username, avatarUrl: currentDiscordUser.avatarUrl },
       order: ticket,
-      firstMessage: { id: firstMessageId, from: 'customer', text: '🆘 დახმარების ბილეთი\n\n' + text }
+      firstMessage: { id: firstMessageId, from: 'customer', text: '🆘 დახმარების ბილეთი\n' + text }
     });
     // chat opens at once (the free Render server can need up to a minute to wake);
     // the session is created in the background and retried so the ticket is not lost
@@ -14538,7 +14540,8 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     pendingSessionCreates[ticketId] = createP;
     createP.then(() => { delete pendingSessionCreates[ticketId]; });
     try{ localStorage.removeItem('moon_help_draft'); }catch(e){}
-    openMessengerPage(ticketId, 'customer', '🆘 დახმარების ბილეთი\n\n' + text, firstMessageId);
+    openMessengerPage(ticketId, 'customer', '🆘 დახმარების ბილეთი\n' + text, firstMessageId);
+    try{ appendSystemMessage(({ ka:'✅ მიმართვა მიღებულია. მხარდაჭერა მალე გიპასუხებთ — შეგიძლიათ აქვე დაწეროთ დამატებითი დეტალები.', en:'✅ Your request was received. Support will reply soon — feel free to add more details here.', ru:'✅ Обращение получено. Поддержка скоро ответит — можете добавить детали здесь.' })[lang] || ''); }catch(e){}
     return true;
   }
   window.__moonHelpTicket = createHelpTicket;
@@ -25403,14 +25406,14 @@ function holdPing(commit){
 }
 function holdLost(){
   var h=S.hold; if(h){ holdStop(); h.state='lost'; }
-  if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} S.dlUrl=null; }
+  if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} S.dlUrl=null; S.dlBlob=null; }
   var a=$('optDl'); if(a){ a.style.display='none'; a.removeAttribute('href'); }
   S.busy=false; setPill('err',tr('err')); msg(tr('holdLost'),true); refreshStatus(); updateGo();
 }
 function dropHold(force){
   var h=S.hold; if(!h||(S.busy&&!force)) return Promise.resolve();
   holdStop(); S.hold=null;
-  if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} S.dlUrl=null; }
+  if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} S.dlUrl=null; S.dlBlob=null; }
   var a=$('optDl'); if(a){ a.style.display='none'; a.removeAttribute('href'); }
   if(h.state==='held'){
     var id=ident(), body=h.clicked?{ticket:h.ticket,commit:true}:{ticket:h.ticket,uid:id&&id.uid};
@@ -25694,7 +25697,7 @@ function run(){
     reportDone(blob);
     bar(100); S.busy=false; S.doneFile=S.file; setPill('done',tr('done')); msg(tr('ready')+' · '+fmtSize(blob.size));
     if(S.dlUrl){ try{ URL.revokeObjectURL(S.dlUrl); }catch(e){} }
-    S.dlUrl=URL.createObjectURL(blob); S.dlSize=blob.size; if(S.hold) S.hold.until=Date.now()+HB_IDLE;
+    S.dlUrl=URL.createObjectURL(blob); S.dlBlob=blob; S.noShare=false; S.dlSize=blob.size; if(S.hold) S.hold.until=Date.now()+HB_IDLE;
     var a=$('optDl'); a.removeAttribute('target'); a.href=S.dlUrl; a.download=nextOutName(S.file); a.style.display=''; updateGo(); setTimeout(function(){ scrollToProg('nearest'); },120); setTimeout(backNoticeOnce,900);
   }).catch(function(e){
     reportError(e);
@@ -25716,16 +25719,33 @@ $('optFile').addEventListener('change',function(e){ setFile(e.target.files[0]); 
 ['dragleave','drop'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.remove('drag'); }); });
 drop.addEventListener('drop',function(e){ var f=e.dataTransfer&&e.dataTransfer.files[0]; if(f) setFile(f); });
 $('optGo').addEventListener('click',run);
+/* ---- iOS: a plain <a download> on a blob is unreliable (in-app browsers do nothing, some Safari versions just open the video) -> use the share sheet ("Save Video") ---- */
+function isIOS(){ return /iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
+function inApp(){ return /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Bytedance|Snapchat|Telegram|Line\/|GSA\//i.test(navigator.userAgent); }
+var IOS_TXT={ka:{again:'მზადაა — დააჭირე „ჩამოტვირთვას" ისევ',app:'ამ ბრაუზერში ჩამოტვირთვა არ მუშაობს — გახსენი საიტი Safari-ში (··· → Open in Safari) და სცადე თავიდან',fail:'ვერ გაიხსნა შენახვის მენიუ — დააჭირე ისევ'},
+  en:{again:'Ready — tap Download again',app:'Downloads do not work in this in-app browser — open the site in Safari (··· → Open in Safari) and try again',fail:'Could not open the save sheet — tap again'},
+  ru:{again:'Готово — нажмите «Скачать» ещё раз',app:'В этом встроенном браузере скачивание не работает — откройте сайт в Safari (··· → Open in Safari) и повторите',fail:'Не удалось открыть меню сохранения — нажмите ещё раз'}};
+function iosTxt(k){ var l=document.documentElement.lang; return (IOS_TXT[l]||IOS_TXT.ka)[k]; }
+function iosFile(){ try{ if(!S.dlBlob) return null; var a=$('optDl'); return new File([S.dlBlob],(a&&a.download)||'moonfull4k.mp4',{type:S.dlBlob.type||'video/mp4'}); }catch(e){ return null; } }
+function iosCanShare(){ if(!isIOS()||S.noShare) return false; var f=iosFile(); try{ return !!(f&&navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})); }catch(e){ return false; } }
 $('optDl').addEventListener('click',function(e){
   var h=S.hold; if(!h||h.state==='done') return;
   if(h.state==='lost'){ e.preventDefault(); e.stopImmediatePropagation(); return; }
   if(!holdFresh(h)){
     e.preventDefault(); e.stopImmediatePropagation(); msg(tr('holdWait'));
-    holdPing(false).then(function(){ if(S.hold===h&&h.state==='held'&&holdFresh(h)) msg(tr('ready')+' · '+fmtSize(S.dlSize||0)); });
+    holdPing(false).then(function(){ if(S.hold===h&&h.state==='held'&&holdFresh(h)){ msg(tr('ready')+' · '+fmtSize(S.dlSize||0)); if(!iosCanShare()) setTimeout(function(){ try{ $('optDl').click(); }catch(_){} },0); else msg(iosTxt('again')); } });
     return;
   }
   h.clicked=true; holdPing(true);
 },true);
+$('optDl').addEventListener('click',function(e){
+  if(!isIOS()) return;
+  var f=iosFile();
+  if(iosCanShare()){
+    e.preventDefault();
+    navigator.share({files:[f]}).catch(function(err){ if(err&&err.name==='AbortError') return; S.noShare=true; msg(iosTxt('fail'),true); });   /* next tap = plain download */
+  } else if(inApp()){ msg(iosTxt('app'),true); }
+});
 document.addEventListener('visibilitychange',function(){ var h=S.hold; if(!document.hidden&&h&&h.state==='held') holdPing(false); });
 window.addEventListener('pagehide',function(ev){
   var h=S.hold; if(!h||h.state!=='held'||ev.persisted) return;
