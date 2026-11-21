@@ -24862,6 +24862,40 @@ html body #optView.mn-view{max-width:1040px}
 .opt-adm-row button{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
 </style>
 <!-- the MOON 6.1 engine is served by the gate worker (GET /m6?ticket=...) -->
+<style id="opt-credits">
+html body #optView .opt-cr{display:grid;gap:14px;width:100%;box-sizing:border-box;padding:20px 22px;border-radius:22px;background:var(--o-glass);border:1px solid var(--o-line);box-shadow:var(--o-edge);text-align:left;color:var(--o-text)}
+html body #optView .opt-cr .cr-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+html body #optView .opt-cr .cr-cap{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--o-faint)}
+html body #optView .opt-cr .cr-plan{font-size:13px;font-weight:600;color:var(--o-dim)}
+html body #optView .opt-cr .cr-big{display:flex;align-items:baseline;gap:10px}
+html body #optView .opt-cr .cr-big b{font-family:MoonKa,var(--o-num);font-size:44px;line-height:1;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+html body #optView .opt-cr .cr-big span{font-size:14px;color:var(--o-dim)}
+html body #optView .opt-cr .cr-bar{height:8px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}
+html body #optView .opt-cr .cr-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#dfe6ff,#fff);transition:width .5s cubic-bezier(.22,.9,.32,1)}
+html body #optView .opt-cr .cr-rows{display:grid;gap:8px;font-size:13.5px;color:var(--o-dim)}
+html body #optView .opt-cr .cr-rows div{display:flex;align-items:center;gap:9px}
+html body #optView .opt-cr .cr-rows i{width:9px;height:9px;border-radius:3px;background:rgba(255,255,255,.28)}
+html body #optView .opt-cr .cr-rows i.on{background:#fff}
+html body #optView .opt-cr .cr-rows b{margin-left:auto;color:var(--o-text);font-weight:700;font-variant-numeric:tabular-nums}
+html body #optView .opt-cr .cr-cost{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--o-line);font-size:13.5px;color:var(--o-dim)}
+html body #optView .opt-cr .cr-cost b{font-size:15px;color:var(--o-text);font-variant-numeric:tabular-nums}
+html body #optView .opt-cr .cr-cost.bad b{color:var(--o-bad)}
+html body #optView .opt-cr .cr-tbl summary{cursor:pointer;list-style:none;font-size:13px;font-weight:600;color:var(--o-dim);user-select:none}
+html body #optView .opt-cr .cr-tbl summary::-webkit-details-marker{display:none}
+html body #optView .opt-cr .cr-tbl summary::after{content:"▾";margin-left:8px;opacity:.6}
+html body #optView .opt-cr .cr-tbl[open] summary::after{content:"▴"}
+html body #optView .opt-cr .cr-grid{display:grid;grid-template-columns:auto repeat(4,minmax(0,1fr));gap:6px;align-items:center;margin-top:12px;font-size:13px;text-align:center}
+html body #optView .opt-cr .cr-grid em{font-style:normal;font-size:11px;color:var(--o-faint)}
+html body #optView .opt-cr .cr-grid b{text-align:left;font-weight:600;color:var(--o-dim);padding-right:6px}
+html body #optView .opt-cr .cr-grid span[data-p]{padding:7px 0;border-radius:10px;background:rgba(255,255,255,.06);color:var(--o-text);font-weight:700;font-variant-numeric:tabular-nums}
+html body #optView .opt-cr .cr-grid span.lock{opacity:.32}
+html body #optView .opt-cr .cr-grid span.cur{background:#f6f1e3;color:#0a1020;opacity:1}
+html body #optView .opt-cr .cr-up{appearance:none;width:100%;padding:13px 14px;border-radius:999px;border:0;background:#f6f1e3;color:#0a1020;font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer;transition:transform .2s,box-shadow .2s}
+html body #optView .opt-cr .cr-up:hover{transform:translateY(-2px);box-shadow:0 12px 24px -10px rgba(246,241,227,.45)}
+html body #optView .opt-go .opt-go-cost{font-style:normal;margin-left:10px;padding:3px 11px;border-radius:999px;background:rgba(7,16,31,.16);font-size:.74em;font-weight:800;letter-spacing:.02em}
+html body #optView .opt-go .opt-go-cost:empty{display:none}
+@media (max-width:520px){html body #optView .opt-cr{padding:16px 16px}html body #optView .opt-cr .cr-big b{font-size:38px}}
+</style>
 <style id="opt-redesign">
 #optView .opt{position:relative;isolation:isolate;overflow:hidden;display:grid;gap:30px;justify-items:center;padding:clamp(24px,5vw,56px) clamp(14px,4vw,40px) 60px;border-radius:32px;background:radial-gradient(120% 80% at 50% 0,#0b1030 0,#05060f 60%,#020208);border:1px solid rgba(255,255,255,.08);box-shadow:none;filter:none;backdrop-filter:none}
 /* aurora + 3D neon grid floor (no moon) */
@@ -25030,19 +25064,20 @@ var CFG = {
   JOB_PATH: '/api/jobs/',         // patcheri: GET /api/jobs/:id -> {status, progress, downloadUrl, error}
   POLL_MS: 2000
 };
-var PRESETS = [
-  {id:'1080p30', label:'1080p · 30', h:1080, fps:30},
-  {id:'1080p60', label:'1080p · 60', h:1080, fps:60},
-  {id:'1080p120',label:'1080p · 120',h:1080, fps:120},
-  {id:'4k60',    label:'4K · 60',    h:2160, fps:60},
-  {id:'4k120',   label:'4K · 120',   h:2160, fps:120}
-];
-var MAX_MB = 1000;
+var PRESETS = [];
+(function(){
+  var C={'1080':{24:3,30:4,60:5,120:7},'2k':{24:6,30:7,60:8,120:9},'4k':{24:7,30:8,60:9,120:10}},   /* ფასი კრედიტებში (სერვერზეც იგივეა) */
+      H={'1080':1080,'2k':1440,'4k':2160}, F={24:23.976,30:30,60:60,120:120}, LB={'1080':'1080p','2k':'2K','4k':'4K'};
+  Object.keys(C).forEach(function(r){ [24,30,60,120].forEach(function(f){
+    PRESETS.push({id:(r==='1080'?'1080p':r)+f, label:LB[r]+' · '+(f===24?'23.976':f), h:H[r], fps:F[f], cost:C[r][f], r:r, f:f});
+  }); });
+})();
+var MAX_MB = 1000;   /* მხოლოდ ტექნიკური ზღვარი (ბრაუზერის მეხსიერება), კვოტა აღარ არის */
 var PLANS = {
-  free:{h:1080,fps:60,price:0,mb:200,up:3},
-  p1:{h:1080,fps:60,price:'5.99',mb:450,up:7},
-  p2:{h:1080,fps:120,price:'7.99',mb:750,up:0},
-  p3:{h:2160,fps:120,price:'14.99',mb:0,up:0}
+  free:{h:2160,fps:120,price:0,cr:35},
+  p1:{h:2160,fps:120,price:'5.99',cr:100},
+  p2:{h:2160,fps:120,price:'7.99',cr:250},
+  p3:{h:2160,fps:120,price:'14.99',cr:0}   /* 0 = შეუზღუდავი კრედიტი */
 };
 var T = {
  ka:{"nav": "მეთოდი", "title": "მუნის მეთოდი", "sub": "ატვირთე ვიდეო და მიიღე წამებში", "idle": "მზადაა", "busy": "მუშავდება", "done": "დასრულდა", "err": "შეცდომა", "drop": "ატვირთე ვიდეო", "dropSub": "გადმოიტანე ან დააჭირეთ ასარჩევად", "hint": "", "size": "ზომა", "res": "გარჩევადობა", "dur": "ხანგრძლივობა", "preset": "ხარისხი", "go": "ოპტიმიზაცია", "left": "დარჩენილი ატვირთვა", "week": "ამ კვირაში", "unl": "ულიმიტო", "resets": "ლიმიტი განახლდება", "plans": "გეგმები", "buy": "შეძენა", "cur": "შენი გეგმა", "perMonth": "/თვე", "freeNote": "გადახდა არ არის საჭირო", "curNote": "მიმდინარე გეგმა", "free": "უფასო", "freeL": "3 ატვირთვა კვირაში", "unlimited": "ულიმიტო ატვირთვა", "upTo": "მაქს. ", "lock": "ამ გეგმაში მიუწვდომელია", "login": "გამოსაყენებლად შედი Discord-ით", "loginBtn": "Discord-ით შესვლა", "noGate": "სერვისი ჯერ არ არის დაკავშირებული (GATE URL).", "blocked": "შენი წვდომა შეზღუდულია.", "noQuota": "ამ კვირის ლიმიტი ამოწურულია. განახლდება: ", "expired": "გეგმა ვადაგასულია — გადართულია უფასოზე.", "up": "იტვირთება", "queue": "რიგშია", "proc": "მუშავდება", "ready": "მზადაა! ჩამოტვირთე ქვემოთ", "dl": "ჩამოტვირთვა", "tooFps": "ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება", "noFps": "ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი", "tooLow": "ვიდეო არის 540-720P ფორმატის ესეიგი დაბალი ხარისხის. ვიდეო დაბალი ხარისხით აიტვირთება!\nრეკომენდებულია MIN 1080P 30FPS", "tooBig": "ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია", "noMeta": "ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)", "pickMp4": "აირჩიე mp4 ფაილი", "d": "დ", "h": "სთ", "m": "წთ", "wake": "კავშირი ვერ დამყარდა, ვცდილობ თავიდან…", "slow": "ვიდეო მუშავდება, ცოტა ხანი დასჭირდება…"},
@@ -25062,6 +25097,9 @@ T.ka.plUp='{n} ატვირთვა / კვირაში'; T.ka.plUpU='�
 T.en.plUp='{n} uploads / week'; T.en.plUpU='Unlimited uploads / week'; T.en.plMb='{n}MB max size'; T.en.plMbU='Unlimited size'; T.en.plMethod='MOON Method'; T.en.plCheck='TikTok video checker'; T.en.plRed='4K / 120FPS'; T.en.plFull='Full support'; T.en.tooBigSize='This video ({s}) is larger than your remaining weekly volume. {n} MB left'; T.en.tooBigMax='The video is too large ({s}). The maximum is {n} MB';
 T.ru.plUp='{n} загрузок / неделя'; T.ru.plUpU='Безлимитные загрузки / неделя'; T.ru.plMb='Макс. размер {n} МБ'; T.ru.plMbU='Без ограничения размера'; T.ru.plMethod='Метод MOON'; T.ru.plCheck='TikTok-чекер видео'; T.ru.plRed='4K / 120FPS'; T.ru.plFull='Полная поддержка'; T.ru.tooBigSize='Видео ({s}) больше оставшегося недельного объёма. Осталось {n} МБ'; T.ru.tooBigMax='Видео слишком большое ({s}). Максимум — {n} МБ';
 T.ka.dropMax='1000 MB • MAX'; T.en.dropMax='1000 MB • MAX'; T.ru.dropMax='1000 MB • MAX'; T.ka.mbLeft='დარჩენილი მოცულობა'; T.en.mbLeft='Volume left'; T.ru.mbLeft='Осталось объёма'; T.ka.holdLost='შედეგის ვადა გავიდა და ბალანსი დაგიბრუნდა. გაუშვი ოპტიმიზაცია თავიდან'; T.en.holdLost='This result expired and your balance was returned. Run the optimization again'; T.ru.holdLost='Срок результата истёк, баланс возвращён. Запустите оптимизацию заново'; T.ka.holdWait='ერთი წამი, ვამოწმებ კავშირს…'; T.en.holdWait='One moment, checking the connection…'; T.ru.holdWait='Секунду, проверяю соединение…'; T.ka.upsT0='ამ კვირის მოცულობა ამოიწურა'; T.en.upsT0='Weekly volume used up'; T.ru.upsT0='Недельный объём исчерпан'; T.ka.ups0='გინდათ ლიმიტის გაზრდა გეგმებით?'; T.en.ups0='Want to raise your limit with a plan?'; T.ru.ups0='Хотите увеличить лимит с помощью тарифа?'; T.ka.upsT1='ვიდეო აღემატება დარჩენილ მოცულობას'; T.en.upsT1='The video exceeds your remaining volume'; T.ru.upsT1='Видео больше оставшегося объёма'; T.ka.ups1='ამ კვირაში დარჩენილია {n} MB. გინდათ ლიმიტის გაზრდა გეგმებით?'; T.en.ups1='{n} MB left this week. Want to raise your limit with a plan?'; T.ru.ups1='На этой неделе осталось {n} МБ. Хотите увеличить лимит с помощью тарифа?'; T.ka.upsYes='დიახ'; T.en.upsYes='Yes'; T.ru.upsYes='Да'; T.ka.upsNo='მოგვიანებით'; T.en.upsNo='Later'; T.ru.upsNo='Позже';
+T.ka.freeL='35 კრედიტი კვირაში'; T.ka.unlimited='ულიმიტო კრედიტი'; T.ka.left='დარჩენილი კრედიტი'; T.ka.plCr='{n} კრედიტი / კვირაში'; T.ka.plCrU='ულიმიტო კრედიტი'; T.ka.crCap='კრედიტები'; T.ka.crAvail='ხელმისაწვდომია'; T.ka.crWeekly='ყოველკვირეული'; T.ka.crResets='განახლდება'; T.ka.crCost='ამ ვიდეოს ფასი'; T.ka.crUnit='კრედიტი'; T.ka.crTable='კრედიტების ფასები'; T.ka.crUp='გეგმის გაუმჯობესება'; T.ka.noCr='კრედიტი არ გყოფნის: საჭიროა {c}, დარჩენილია {r}'; T.ka.upsT0='ამ კვირის კრედიტები ამოიწურა'; T.ka.ups0='გინდათ მეტი კრედიტი გეგმებით?'; T.ka.upsT1='კრედიტი არ გყოფნის'; T.ka.ups1='დარჩენილია {n} კრედიტი. გინდათ მეტი გეგმებით?';
+T.en.freeL='35 credits per week'; T.en.unlimited='Unlimited credits'; T.en.left='Credits left'; T.en.plCr='{n} credits / week'; T.en.plCrU='Unlimited credits'; T.en.crCap='Credits'; T.en.crAvail='available'; T.en.crWeekly='Weekly'; T.en.crResets='Resets in'; T.en.crCost='This video costs'; T.en.crUnit='credits'; T.en.crTable='Credit prices'; T.en.crUp='Upgrade plan'; T.en.noCr='Not enough credits: need {c}, {r} left'; T.en.upsT0='Weekly credits used up'; T.en.ups0='Want more credits with a plan?'; T.en.upsT1='Not enough credits'; T.en.ups1='{n} credits left. Want more with a plan?';
+T.ru.freeL='35 кредитов в неделю'; T.ru.unlimited='Безлимитные кредиты'; T.ru.left='Осталось кредитов'; T.ru.plCr='{n} кредитов / неделя'; T.ru.plCrU='Безлимитные кредиты'; T.ru.crCap='Кредиты'; T.ru.crAvail='доступно'; T.ru.crWeekly='В неделю'; T.ru.crResets='Сброс через'; T.ru.crCost='Стоимость видео'; T.ru.crUnit='кредитов'; T.ru.crTable='Цены в кредитах'; T.ru.crUp='Улучшить тариф'; T.ru.noCr='Недостаточно кредитов: нужно {c}, осталось {r}'; T.ru.upsT0='Недельные кредиты исчерпаны'; T.ru.ups0='Хотите больше кредитов с тарифом?'; T.ru.upsT1='Недостаточно кредитов'; T.ru.ups1='Осталось {n} кредитов. Хотите больше с тарифом?';
 T.ka.conv='გარდაიქმნება'; T.ka.convHint='გადადის MP4 ფორმატში'; T.ka.convLoad='ფორმატის გადაყვანის მომზადება…'; T.ka.convSlow='გადაყვანა რამდენიმე წუთს გასტანს…'; T.ka.convMsg='ვიდეო MP4 ფორმატში გადადის — დაელოდე, გვერდი არ დახურო'; T.ka.convFail='ამ ფორმატის გადაყვანა ვერ მოხერხდა. სცადე MP4 ან MOV'; T.ka.pickVideo='აირჩიე ვიდეო ფაილი'; T.ka.tooBigConv='ფაილი ძალიან დიდია გადასაყვანად (მაქს. 1.5 GB)';
 T.en.conv='Converting'; T.en.convHint='Converting to MP4'; T.en.convLoad='Preparing the converter…'; T.en.convSlow='Conversion will take a few minutes…'; T.en.convMsg='Converting the video to MP4 — please wait and keep this page open'; T.en.convFail='This format could not be converted. Try MP4 or MOV'; T.en.pickVideo='Choose a video file'; T.en.tooBigConv='File is too large to convert (max 1.5 GB)';
 T.ru.conv='Конвертация'; T.ru.convHint='Конвертация в MP4'; T.ru.convLoad='Подготовка конвертера…'; T.ru.convSlow='Конвертация займёт несколько минут…'; T.ru.convMsg='Видео конвертируется в MP4 — подождите и не закрывайте страницу'; T.ru.convFail='Не удалось конвертировать этот формат. Попробуйте MP4 или MOV'; T.ru.pickVideo='Выберите видеофайл'; T.ru.tooBigConv='Файл слишком большой для конвертации (макс. 1.5 GB)';
@@ -25080,14 +25118,14 @@ view.innerHTML =
  '<div class="opt-head"><div></div><span class="opt-pill" id="optPill" data-s="idle"><i></i><em data-k="idle" style="font-style:normal"></em></span></div>'+
  '<div id="optLogin" class="opt-card opt-login" style="display:none"><p data-k="login"></p><button type="button" class="opt-discord" id="optLoginBtn"><span data-k="loginBtn"></span></button></div>'+
  '<div id="optMain">'+
-  '<div class="opt-quota" id="optQuota"></div>'+
-  '<div class="op-col">'+
-   '<label class="opt-drop" id="optDrop" for="optFile"><span class="opt-ic"><svg viewBox="0 0 48 48"><path d="M24 6v24M14 21l10 10 10-10M8 34v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4"/></svg></span><b id="optName" data-k="drop"></b><span id="optHint" data-k="dropSub"></span><span id="optMax" class="opt-max">1000 MB • MAX</span><input id="optFile" type="file" accept="video/*,.mp4,.mov,.m4v,.mkv,.webm,.avi,.flv,.wmv,.ts,.mts,.m2ts,.3gp,.mpg,.mpeg" hidden></label>'+
+    '<div class="op-col">'+
+   '<label class="opt-drop" id="optDrop" for="optFile"><span class="opt-ic"><svg viewBox="0 0 48 48"><path d="M24 6v24M14 21l10 10 10-10M8 34v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4"/></svg></span><b id="optName" data-k="drop"></b><span id="optHint" data-k="dropSub"></span><input id="optFile" type="file" accept="video/*,.mp4,.mov,.m4v,.mkv,.webm,.avi,.flv,.wmv,.ts,.mts,.m2ts,.3gp,.mpg,.mpeg" hidden></label>'+
    '<div class="opt-stats"><div class="opt-stat"><small data-k="size"></small><strong id="oSize">—</strong></div><div class="opt-stat"><small data-k="res"></small><strong id="oRes">—</strong></div><div class="opt-stat"><small data-k="dur"></small><strong id="oDur">—</strong></div></div>'+
   '</div>'+
   '<div class="op-col">'+
-      '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="61"><span class="eng-top"><b>MOON 6.1</b><span class="eng-for">FOR HDR VIDEOS</span></span><span class="eng-ic" aria-hidden="true"><span class="ic-pc"></span><span class="ic-and"></span></span></button><button type="button" data-eng="51"><span class="eng-top"><b>MOON 5.1</b><span class="eng-for">FOR SDR VIDEOS</span></span><span class="eng-ic" aria-hidden="true"><span class="ic-ios"></span></span></button></div>'+
-   '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span></button>'+
+      '<div class="opt-cr" id="optQuota"></div>'+
+       '<div class="opt-eng" id="optEng" role="group"><button type="button" class="on" data-eng="61"><span class="eng-top"><b>MOON 6.1</b><span class="eng-for">FOR HDR VIDEOS</span></span><span class="eng-ic" aria-hidden="true"><span class="ic-pc"></span><span class="ic-and"></span></span></button><button type="button" data-eng="51"><span class="eng-top"><b>MOON 5.1</b><span class="eng-for">FOR SDR VIDEOS</span></span><span class="eng-ic" aria-hidden="true"><span class="ic-ios"></span></span></button></div>'+
+   '<button type="button" class="opt-go" id="optGo" disabled><span data-k="go"></span><em class="opt-go-cost" id="optGoCost"></em></button>'+
    '<div class="opt-card opt-prog" id="optProg" style="display:none"><div class="opt-pct"><b id="optPct">0</b><span>%</span></div><div class="opt-track"><i id="optBar"></i></div><div class="opt-msg" id="optMsg"></div><div class="opt-dlrow" id="optDlRow"><a class="opt-dl" id="optDl" style="display:none" target="_blank" rel="noopener"><span data-k="dl"></span></a><button type="button" class="opt-tut" id="optTut"><span data-k="tut"></span></button></div></div>'+
   '</div>'+
  '</div>'+
@@ -25120,10 +25158,19 @@ function ident(){ var u=user(); if(!u) return null; return {uid:String(u.id),use
 function eff(){ var pl=PLANS[(S.status&&S.status.plan)||'free']; var st=S.status; return {h:(st&&st.maxH)||pl.h, fps:Math.max((st&&st.maxFps)||0, pl.fps)}; }   /* never below the plan table: free = 60 fps, 120 fps only on Plan 2 / Plan 3 */
 function allowed(p){ var pl=eff(); return p.h<=pl.h && p.fps<=pl.fps; }
 function setHTML(el,h){ if(el._h!==h){ el._h=h; el.innerHTML=h; } }
-function renderPresets(){ var first=PRESETS.filter(allowed).pop(); S.preset=first?first.id:null; updateGo(); }
+function renderPresets(){ updateGo(); }
+/* ხარისხს (გარჩევადობა + fps) თვითონ ვიდეო განსაზღვრავს; ფასი კრედიტებში ამ ხარისხზეა დამოკიდებული */
+function pickPreset(){
+  var m=S.meta; if(!m||S.fps===undefined) return null;
+  var mx=Math.max(m.w,m.h), mn=Math.min(m.w,m.h);
+  var r=(mx>=3000||mn>1500)?'4k':((mn>1088||mx>1930)?'2k':'1080');
+  var f=S.fps, t=(f===null||!(f>0))?120:(f<=25?24:(f<=31?30:(f<=62?60:120)));
+  return (r==='1080'?'1080p':r)+t;
+}
+function presetOf(id){ return PRESETS.filter(function(p){return p.id===id;})[0]||null; }
 function fmtCd(ms){ if(!isFinite(ms)) return '--:--:--'; var t=Math.max(0,Math.floor(ms/1000)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sc=t%60; function p(n){return String(n).padStart(2,'0');} return p(h)+':'+p(m)+':'+p(sc); }
 function planLabel(st){ return st.plan==='free'?tr('free'):('Plan '+String(st.plan).replace(/^p/i,'')); }
-function upWord(){ var l=L(); try{ if(typeof currentLang!=='undefined'&&currentLang==='ka') l='ka'; }catch(e){} return l==='ka'?'ატვირთვა':(l==='ru'?'Загрузки':'Uploads'); }
+function upWord(){ var l=L(); try{ if(typeof currentLang!=='undefined'&&currentLang==='ka') l='ka'; }catch(e){} return l==='ka'?'კრედიტი':(l==='ru'?'Кредиты':'Credits'); }
 function renderChips(){
   var st=S.status, o=view.querySelector('.opt');
   /* 1) plan chip: top-right corner of the optimizer shell */
@@ -25141,30 +25188,50 @@ function renderChips(){
   chip.style.display='';
   var txt=upWord()+' '+(st.unlimited?'∞':(st.remaining+'/'+st.limit)); if(chip.textContent!==txt) chip.textContent=txt;
 }
-function renderMax(){
-  var mx=$('optMax'); if(!mx) return; var st=S.status, mb=MAX_MB;
-  if(st){ if(typeof st.mbLimit==='number') mb=st.mbLimit; else if(st.mbLimit===undefined){ var pl=PLANS[st.plan||'free']||PLANS.free; if(pl.mb>0) mb=pl.mb; } }
-  var t=Math.min(mb,MAX_MB)+' MB • MAX'; if(mx.textContent!==t) mx.textContent=t;
+function renderMax(){}
+function crTableHtml(){
+  var fp=[24,30,60,120], rows=[['1080','1080p'],['2k','2K'],['4k','4K']];
+  var h='<div class="cr-grid"><span></span>'+fp.map(function(f){ return '<em>'+(f===24?'23.976':f)+' fps</em>'; }).join('');
+  rows.forEach(function(r){ h+='<b>'+r[1]+'</b>'+fp.map(function(f){ var p=presetOf((r[0]==='1080'?'1080p':r[0])+f); return '<span data-p="'+p.id+'" class="'+(allowed(p)?'':'lock')+'">'+p.cost+'</span>'; }).join(''); });
+  return h+'</div>';
 }
-function mbBlock(st){
-  if(!(typeof st.mbLimit==='number'&&typeof st.mbRemaining==='number')) return '';
-  var pct=st.mbLimit>0?Math.max(0,Math.min(100,Math.round(st.mbRemaining/st.mbLimit*100))):0;
-  return '<div class="opt-q-main opt-q-mb"><div class="opt-q-lab">'+tr('mbLeft')+'</div><div class="opt-q-mbv"><b>'+fmtMB(st.mbRemaining)+'</b><span> / '+st.mbLimit+' MB</span></div><div class="opt-q-bar"><i style="width:'+pct+'%"></i></div></div>';
+function crCardHtml(st){
+  var unl=!!st.unlimited, lim=st.crLimit, rem=st.crRemaining;
+  var pct=unl?100:(lim>0?Math.max(0,Math.min(100,Math.round(rem/lim*100))):0);
+  var top=PLAN_ORDER.indexOf(st.plan||'free')>=PLAN_ORDER.length-1;
+  return '<div class="cr-top"><span class="cr-cap">'+esc(tr('crCap'))+'</span><span class="cr-plan">'+esc(planLabel(st))+'</span></div>'+
+    '<div class="cr-big"><b>'+(unl?'∞':rem)+'</b><span>'+esc(tr('crAvail'))+'</span></div>'+
+    '<div class="cr-bar"><i style="width:'+pct+'%"></i></div>'+
+    '<div class="cr-rows"><div><i class="on"></i><span>'+esc(tr('crWeekly'))+'</span><b>'+(unl?'∞':(rem+' / '+lim))+'</b></div>'+
+    (unl?'':'<div><i></i><span>'+esc(tr('crResets'))+'</span><b id="optCd"></b></div>')+'</div>'+
+    '<div class="cr-cost" id="optCrCostBox"><span>'+esc(tr('crCost'))+'</span><b id="optCrCost">—</b></div>'+
+    '<details class="cr-tbl"><summary>'+esc(tr('crTable'))+'</summary>'+crTableHtml()+'</details>'+
+    (top?'':'<button type="button" class="cr-up" data-cr-up="1">'+esc(tr('crUp'))+'</button>');
+}
+function crMark(){
+  var box=$('optQuota'); if(!box) return;
+  var pr=presetOf(S.preset), st=S.status;
+  box.querySelectorAll('.cr-grid span[data-p]').forEach(function(c){ c.classList.toggle('cur',!!pr&&c.getAttribute('data-p')===pr.id); });
+  var cv=$('optCrCost'), cb=$('optCrCostBox'), gc=$('optGoCost');
+  var txt=pr?(pr.cost+' '+tr('crUnit')):'—';
+  if(cv&&cv.textContent!==txt) cv.textContent=txt;
+  if(cb) cb.classList.toggle('bad',!!(pr&&st&&!st.unlimited&&pr.cost>(st.crRemaining||0)));
+  if(gc){ var g=pr?('−'+pr.cost):''; if(gc.textContent!==g) gc.textContent=g; }
 }
 function renderQuota(){
   var q=$('optQuota'); if(!q) return; var st=S.status;
-  renderChips(); renderMax();
+  renderChips();
   if(!st){ q.style.display='none'; return; }
-  var hasMb=(typeof st.mbLimit==='number'&&typeof st.mbRemaining==='number');
-  if((st.unlimited&&!hasMb)||!isFinite(st.resetAt)){ q.style.display='none'; return; }
   q.style.display='';
-  setHTML(q,mbBlock(st)+'<div class="opt-q-main"><div class="opt-q-lab">'+tr('resets')+'</div><div class="opt-q-cd" id="optCd">'+fmtCd(st.resetAt-Date.now())+'</div></div>');
+  setHTML(q,crCardHtml(st));
+  var cd=$('optCd'); if(cd&&isFinite(st.resetAt)){ var tx=fmtCd(st.resetAt-Date.now()); if(cd.textContent!==tx) cd.textContent=tx; }
+  crMark();
 }
 function planSpecs(id){
   var pl=PLANS[id], out=[];
   [{h:2160,l:'4K'},{h:1080,l:'1080p'}].forEach(function(r){
     if(pl.h<r.h) return; if(r.h===1080&&pl.h>=2160) return;
-    var f=PRESETS.filter(function(p){return p.h===r.h&&p.fps<=pl.fps;}).map(function(p){return p.fps;}).filter(function(x){return x!==30;}).sort(function(a,b){return b-a;});
+    var f=PRESETS.filter(function(p){return p.h===r.h&&p.fps<=pl.fps;}).map(function(p){return p.fps;}).filter(function(x){return x>=60;}).sort(function(a,b){return b-a;});
     if(f.length) out.push(r.l+' · '+f.join(' / ')+' fps');
   });
   return out;
@@ -25172,10 +25239,9 @@ function planSpecs(id){
 function planLines(id){
   var pl=PLANS[id]||PLANS.free, out=[];
   out.push((pl.h>=2160?'4K':'1080P')+' / '+pl.fps+'FPS');
-  out.push(pl.up?tr('plUp').replace('{n}',pl.up):tr('plUpU'));
-  out.push(pl.mb?tr('plMb').replace('{n}',pl.mb):tr('plMbU'));
+  out.push(pl.cr?tr('plCr').replace('{n}',pl.cr):tr('plCrU'));
   out.push(tr('plMethod')); out.push(tr('plCheck'));
-  out.push(id==='p3'?tr('plFull'):'~'+tr('plRed'));
+  if(id==='p3') out.push(tr('plFull'));
   return out;
 }
 function renderPlans(){
@@ -25257,22 +25323,30 @@ function readMp4Fps(file){
 }
 function showRes(){ if(!S.resTxt) return; var pr=S.resTxt.split(' · '); var q=pr[0]+(S.fps>0?' · '+Math.round(S.fps)+'fps':''); var d=pr[1]||''; $('oRes').innerHTML='<span class="rl">'+esc(q)+'</span>'+(d?'<span class="rl rs">'+esc(d)+'</span>':''); }
 function fmtMB(x){ x=Math.max(0,Number(x)||0); return String(x>=100?Math.round(x):Math.round(x*10)/10); }
-function mbLeft(){ var st=S.status; if(!st||st.mbLimit===null) return null; if(typeof st.mbRemaining==='number') return st.mbRemaining; var pl=PLANS[st.plan||'free']||PLANS.free; return pl.mb>0?pl.mb:null; }
-function capMB(){ var l=mbLeft(); return (l===null||l>MAX_MB)?MAX_MB:l; }
 function limitKey(){
-  var pl=eff(), m=S.meta;
-  if(S.file){ var cm=capMB(); if(S.file.size>cm*1048576) return cm>=MAX_MB?'tooBigMax':'tooBigSize'; }
+  var pl=eff(), m=S.meta, st=S.status;
+  if(S.file&&S.file.size>MAX_MB*1048576) return 'tooBigMax';
   if(m){ var mx=Math.max(m.w,m.h), mn=Math.min(m.w,m.h); if(mn<1072) return 'tooLow'; if(pl.h<2160&&(mn>1088||mx>1930)) return 'tooBig'; }
   if(S.fps===undefined) return '';
-  if(S.fps===null) return pl.fps<120?'noFps':'';
-  return S.fps>pl.fps*1.05?'tooFps':'';
+  if(S.fps===null){ if(pl.fps<120) return 'noFps'; }
+  else if(S.fps>pl.fps*1.05) return 'tooFps';
+  if(st&&!st.unlimited&&S.cost>0&&S.cost>(st.crRemaining||0)) return 'noCr';
+  return '';
 }
 function overLimit(){ return !!limitKey(); }
 function updateGo(){
-  var st=S.status, lk=limitKey(), pl=eff();
-  if(lk==='tooBigSize'&&S.file&&!S.busy&&S.doneFile!==S.file) setTimeout(upsellOnce,350);
-  if(lk&&S.file&&!S.busy&&!(S.doneFile===S.file&&/^tooBig(Size|Max)$/.test(lk))) msg(/^tooBig(Size|Max)$/.test(lk)?tr(lk).replace('{s}',fmtSize(S.file.size)).replace('{n}',fmtMB(capMB())):tr(lk).replace('{n}',pl.fps).replace('{f}',S.fps>0?Math.round(S.fps):'?'),true);
-  var ok=S.file&&S.meta&&S.fps!==undefined&&!lk&&S.preset&&!S.busy&&st&&!st.blocked&&(st.unlimited||st.remaining>0); $('optGo').disabled=!ok;
+  var st=S.status, pl=eff();
+  if(!S.busy) S.preset=pickPreset();
+  var pr=presetOf(S.preset); S.cost=pr?pr.cost:0;
+  var lk=limitKey();
+  if(lk==='noCr'&&S.file&&!S.busy&&S.doneFile!==S.file) setTimeout(upsellOnce,350);
+  if(lk&&S.file&&!S.busy&&!(S.doneFile===S.file&&/^(tooBigMax|noCr)$/.test(lk))){
+    msg(lk==='tooBigMax'?tr(lk).replace('{s}',fmtSize(S.file.size)).replace('{n}',MAX_MB)
+       :lk==='noCr'?tr('noCr').replace('{c}',S.cost).replace('{r}',st.crRemaining)
+       :tr(lk).replace('{n}',pl.fps).replace('{f}',S.fps>0?Math.round(S.fps):'?'),true);
+  }
+  var ok=S.file&&S.meta&&S.fps!==undefined&&!lk&&S.preset&&!S.busy&&st&&!st.blocked; $('optGo').disabled=!ok;
+  crMark();
 }
 function setFileReady(f){
   S.meta=null; S.fps=undefined; S.resTxt=''; S.file=f; (function(ff){ readMp4Fps(ff).then(function(v){ if(S.file!==ff) return; S.fps=v; showRes(); updateGo(); }); })(f); $('optProg').style.display='none'; $('optDl').style.display='none'; $('optName').textContent=f.name; $('optHint').textContent=fmtSize(f.size); $('optDrop').classList.add('has'); $('oSize').textContent=fmtSize(f.size);
@@ -25556,9 +25630,9 @@ function goPlans(){
 }
 function upsellOpen(){
   if(document.getElementById('moonUps')) return;
-  var st=S.status||{}, rem=typeof st.mbRemaining==='number'?st.mbRemaining:0, zero=rem<=0.05;
+  var st=S.status||{}, rem=typeof st.crRemaining==='number'?st.crRemaining:0, zero=rem<=0;
   var o=document.createElement('div'); o.id='moonUps'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true');
-  o.innerHTML='<div class="mups-card"><div class="mups-t">'+esc(tr(zero?'upsT0':'upsT1'))+'</div><div class="mups-p">'+esc(tr(zero?'ups0':'ups1').replace('{n}',fmtMB(rem)))+'</div><div class="mups-b"><button type="button" class="mups-yes">'+esc(tr('upsYes'))+'</button><button type="button" class="mups-no">'+esc(tr('upsNo'))+'</button></div></div>';
+  o.innerHTML='<div class="mups-card"><div class="mups-t">'+esc(tr(zero?'upsT0':'upsT1'))+'</div><div class="mups-p">'+esc(tr(zero?'ups0':'ups1').replace('{n}',rem))+'</div><div class="mups-b"><button type="button" class="mups-yes">'+esc(tr('upsYes'))+'</button><button type="button" class="mups-no">'+esc(tr('upsNo'))+'</button></div></div>';
   document.body.appendChild(o);
   function close(){ try{ o.remove(); }catch(e){} document.removeEventListener('keydown',kd); }
   function kd(e){ if(e.key==='Escape') close(); }
@@ -25567,7 +25641,7 @@ function upsellOpen(){
   try{ o.querySelector('.mups-yes').focus(); }catch(e){}
 }
 function upsellOnce(){
-  var st=S.status; if(!st||typeof st.mbLimit!=='number') return;
+  var st=S.status; if(!st||st.unlimited) return;
   if(S.file&&S.upsFor===S.file) return; S.upsFor=S.file||{};
   if(PLAN_ORDER.indexOf(st.plan||'free')>=PLAN_ORDER.length-1) return;
   upsellOpen();
@@ -25763,7 +25837,7 @@ function run(){
      მეთოდი = რომელი ღილაკი იყო არჩეული (MOON 5.1 / MOON 6.1); არჩევანი ოპერაციის დროს იბლოკება. */
   var srcFile=S.file, t0=Date.now(), stage='ticket', finalSent=false, method=(S.engine==='51'?'5.1':'6.1');
   var jobId='j'+t0.toString(36)+Math.random().toString(36).slice(2,8);
-  var base={jobId:jobId,method:method,preset:S.preset,res:S.resTxt||'',fps:S.fps>0?Math.round(S.fps):undefined,plan:(S.status&&S.status.plan)||'free',inBytes:srcFile.size};
+  var base={jobId:jobId,method:method,preset:S.preset,credits:S.cost,res:S.resTxt||'',fps:S.fps>0?Math.round(S.fps):undefined,plan:(S.status&&S.status.plan)||'free',inBytes:srcFile.size};
   var sendQ=Promise.resolve();   /* "done"/"error" იგზავნება მხოლოდ მას მერე, რაც "started" სერვერმა მიიღო (Render-ის გაღვიძებისას რიგი ირეოდა) */
   function report(status,extra){
     try{
@@ -25791,7 +25865,7 @@ function run(){
     if(finalSent) return; finalSent=true;
     var d=e&&e.data&&e.data.error, m=String((e&&e.message)||e||''), txt=m;
     if(d==='quota') txt='quota (კვირის ლიმიტი ამოიწურა)';
-    else if(d==='mb') txt='MB ლიმიტი ამოიწურა'+(e.data.remainingMB!=null?' (დარჩა '+e.data.remainingMB+' MB)':'');
+    else if(d==='credits') txt='credits (კრედიტი არ ჰყოფნის: საჭირო '+e.data.need+', დარჩა '+e.data.remaining+')';
     var st=forceStage||stage; if(!forceStage&&st==='patch'&&(/^(core|m5)\b/i.test(m)||e&&e.m6load)) st='core';   /* ძრავის ჩატვირთვა vs თვითონ პატჩი */
     report('error',{stage:st,error:txt.slice(0,240)});
   }
@@ -25802,7 +25876,7 @@ function run(){
     /* სერვერზე ვიდეო აღარ იტვირთება: მხოლოდ ბილეთის შემოწმება */
     stage='patcher';
     var wake=setTimeout(function(){ msg(tr('slow')); },8000);
-    return callPatcher({ticket:t.ticket,preset:S.preset,uid:id.uid}).then(function(j){ clearTimeout(wake); return j; },function(e){ clearTimeout(wake); throw e; });
+    return callPatcher({ticket:t.ticket,preset:t.legacy||S.preset,uid:id.uid}).then(function(j){ clearTimeout(wake); return j; },function(e){ clearTimeout(wake); throw e; });
   }).then(function(srv){
     bar(25); msg(tr('proc')+'…');
     var fps=Math.min(preset.fps, Number(srv.fps)>0?Number(srv.fps):preset.fps);
@@ -25817,8 +25891,8 @@ function run(){
   }).catch(function(e){
     reportError(e);
     if(tk){ return finishFail(tk.ticket,e.message||String(e)); }
-    if(e.data&&e.data.error==='mb'){ S.upsFor=null; setTimeout(upsellOnce,400); }
-    S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):(e.data&&e.data.error==='mb'&&S.file?tr('tooBigSize').replace('{s}',fmtSize(S.file.size)).replace('{n}',fmtMB(e.data.remainingMB)):e.message)),true); refreshStatus();
+    if(e.data&&e.data.error==='credits'){ S.upsFor=null; setTimeout(upsellOnce,400); }
+    S.busy=false; setPill('err',tr('err')); msg((e.data&&e.data.error==='quota'?tr('noQuota')+fmtLeft((e.data.resetAt||0)-Date.now()):(e.data&&e.data.error==='credits'?tr('noCr').replace('{c}',e.data.need).replace('{r}',e.data.remaining):e.message)),true); refreshStatus();
   });
 }
 
@@ -25827,6 +25901,7 @@ var engBox=$('optEng');
 function setEngine(v){ if(S.busy) return; S.engine=(v==='51')?'51':'61'; try{ localStorage.setItem('moonEngine',S.engine); }catch(e){}
   engBox.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-eng')===S.engine; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); if(on) b.classList.remove('eng-warn'); }); }
 engBox.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('button[data-eng]'); if(b) setEngine(b.getAttribute('data-eng')); });
+$('optQuota').addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('[data-cr-up]')) goPlans(); });
 setEngine('61');
 var drop=$('optDrop');
 $('optFile').addEventListener('change',function(e){ setFile(e.target.files[0]); });
@@ -25949,10 +26024,10 @@ function drawAdm(){
   var rows=admDir.filter(function(u){ return !q||String(u.username||'').toLowerCase().indexOf(q)>-1||String(u.id).indexOf(q)>-1; }).slice(0,200);
   list.innerHTML=rows.map(function(u){
     var r=admMap[String(u.id)]||{plan:'free'}; var days=r.expiresAt?Math.max(0,Math.ceil((r.expiresAt-Date.now())/864e5)):30;
-    return '<div class="opt-adm-row" data-id="'+esc(u.id)+'" data-name="'+esc(u.username||'')+'"><span class="nm">'+esc(u.username||u.id)+'<small>'+esc(u.id)+(r.expiresAt?' · ვადა: '+new Date(r.expiresAt).toLocaleDateString():'')+'<span class="f-bn">'+(r.bonusNow>0?' · ბონუსი: +'+esc(r.bonusNow)+' MB':'')+'</span></small></span>'+
-     '<select class="f-plan"><option value="free">უფასო (3/კვ.)</option><option value="p1">Plan 1 · 1080p60</option><option value="p2">Plan 2 · 1080p120</option><option value="p3">Plan 3 · 4K120</option></select>'+
-     '<input class="f-days" type="number" min="1" value="'+days+'" title="დღეები"><input class="f-lim" type="number" min="0" value="'+(r.weeklyLimit!=null?r.weeklyLimit:'')+'" placeholder="კვ.ლიმ." title="კვირის ლიმიტი (უფასოზე)">'+
-     '<label style="font-size:12px"><input class="f-bl" type="checkbox"'+(r.blocked?' checked':'')+'> ბლოკი</label><button class="a-go f-save">შენახვა</button><button class="f-reset" title="კვირის გამოყენების განულება">↺</button><span class="f-mbg"><input class="f-mb" type="number" step="1" placeholder="+MB" title="MB-ის დამატება ამ კვირისთვის (მინუსით აკლდება)"><button class="a-go f-mbadd" title="MB-ის დამატება ამ კვირისთვის">+MB</button></span></div>';
+    return '<div class="opt-adm-row" data-id="'+esc(u.id)+'" data-name="'+esc(u.username||'')+'"><span class="nm">'+esc(u.username||u.id)+'<small>'+esc(u.id)+(r.expiresAt?' · ვადა: '+new Date(r.expiresAt).toLocaleDateString():'')+'<span class="f-bn">'+(r.bonusNow>0?' · ბონუსი: +'+esc(r.bonusNow)+' კრედ.':'')+'</span></small></span>'+
+     '<select class="f-plan"><option value="free">უფასო (35 კრ./კვ.)</option><option value="p1">Plan 1 · 100 კრ.</option><option value="p2">Plan 2 · 250 კრ.</option><option value="p3">Plan 3 · ∞</option></select>'+
+     '<input class="f-days" type="number" min="1" value="'+days+'" title="დღეები"><input class="f-lim" type="number" min="0" value="'+(r.weeklyLimit!=null?r.weeklyLimit:'')+'" placeholder="კრედ." title="კვირის კრედიტების ლიმიტი (ცარიელი = გეგმის სტანდარტი)">'+
+     '<label style="font-size:12px"><input class="f-bl" type="checkbox"'+(r.blocked?' checked':'')+'> ბლოკი</label><button class="a-go f-save">შენახვა</button><button class="f-reset" title="კვირის გამოყენების განულება">↺</button><span class="f-mbg"><input class="f-mb" type="number" step="1" placeholder="+კრ." title="კრედიტების დამატება ამ კვირისთვის (მინუსით აკლდება)"><button class="a-go f-mbadd" title="კრედიტების დამატება ამ კვირისთვის">+კრ.</button></span></div>';
   }).join('')||'<div class="c-empty">—</div>';
   list.querySelectorAll('.opt-adm-row').forEach(function(row){ var r=admMap[row.getAttribute('data-id')]; if(r) row.querySelector('.f-plan').value=r.plan||'free'; });
 }
@@ -25969,10 +26044,10 @@ document.addEventListener('click',function(e){
     var mbi=row.querySelector('.f-mb'), add=Number(mbi.value), mbtn=e.target.closest('.f-mbadd');
     if(!isFinite(add)||add===0){ mbi.focus(); return; }
     mbtn.disabled=true;
-    admApi('/admin/add-mb',{uid:uid,mb:add}).then(function(r){
+    admApi('/admin/add-credits',{uid:uid,credits:add}).then(function(r){
       admMap[uid]=Object.assign({},r.user,{bonusNow:r.bonus}); mbi.value='';
-      var bn=row.querySelector('.f-bn'); if(bn) bn.textContent=r.bonus>0?' · ბონუსი: +'+r.bonus+' MB':'';
-      mbtn.textContent='✓'; setTimeout(function(){ mbtn.textContent='+MB'; mbtn.disabled=false; },1400);
+      var bn=row.querySelector('.f-bn'); if(bn) bn.textContent=r.bonus>0?' · ბონუსი: +'+r.bonus+' კრედ.':'';
+      mbtn.textContent='✓'; setTimeout(function(){ mbtn.textContent='+კრ.'; mbtn.disabled=false; },1400);
     }).catch(function(er){ mbtn.disabled=false; alert(er.message); });
     return;
   }
@@ -27073,9 +27148,9 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
     function p(v){ return String(v).padStart(2,'0'); } return p(Math.floor(s/3600))+':'+p(m)+':'+p(x); }
   function mzHtml(u,s){
     var K=lang(),D={
-      ka:{via:'Discord-ით შესული',viaTg:'Telegram-ით შესული',left:'ატვირთვა დარჩა',mbl:'დარჩენილი მოცულობა',weekly:'კვირაში',resets:'განახლდება',plans:'გეგმები',acc:'ანგარიშები',linked:'მიბმულია',lang:'ენა',out:'გამოსვლა',unl:'ულიმიტო',of:'სულ'},
-      en:{via:'Signed in with Discord',viaTg:'Signed in with Telegram',left:'uploads left',mbl:'Volume left',weekly:'Weekly',resets:'Resets in',plans:'Plans',acc:'Accounts',linked:'linked',lang:'Language',out:'Sign out',unl:'Unlimited',of:'Total'},
-      ru:{via:'Вход через Discord',viaTg:'Вход через Telegram',left:'загрузок осталось',mbl:'Осталось объёма',weekly:'В неделю',resets:'Сброс через',plans:'Тарифы',acc:'Аккаунты',linked:'привязано',lang:'Язык',out:'Выйти',unl:'Безлимит',of:'Всего'}
+      ka:{via:'Discord-ით შესული',viaTg:'Telegram-ით შესული',left:'კრედიტი დარჩა',mbl:'დარჩენილი მოცულობა',weekly:'კვირაში',resets:'განახლდება',plans:'გეგმები',acc:'ანგარიშები',linked:'მიბმულია',lang:'ენა',out:'გამოსვლა',unl:'ულიმიტო',of:'სულ'},
+      en:{via:'Signed in with Discord',viaTg:'Signed in with Telegram',left:'credits left',mbl:'Volume left',weekly:'Weekly',resets:'Resets in',plans:'Plans',acc:'Accounts',linked:'linked',lang:'Language',out:'Sign out',unl:'Unlimited',of:'Total'},
+      ru:{via:'Вход через Discord',viaTg:'Вход через Telegram',left:'кредитов осталось',mbl:'Осталось объёма',weekly:'В неделю',resets:'Сброс через',plans:'Тарифы',acc:'Аккаунты',linked:'привязано',lang:'Язык',out:'Выйти',unl:'Безлимит',of:'Всего'}
     }[K]||{};
     var unl=!!(s&&s.unlimited), limit=s&&!unl?(s.limit||0):0;
     var rem=s?(unl?'∞':(s.remaining!=null?s.remaining:'—')):'—';
@@ -27086,14 +27161,9 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
     var accTxt=n!=null?n+' / 3 '+D.linked:'';
     var nm=String(u.username||'');
     var mbH='';
-    if(s&&(s.mbLimit===null||typeof s.mbLimit==='number')){
-      var unM=s.mbLimit===null, rmM=Math.max(0,Number(s.mbRemaining)||0), shM=rmM>=100?Math.round(rmM):Math.round(rmM*10)/10;
-      var pM=unM?100:(s.mbLimit>0?Math.max(0,Math.min(100,Math.round(rmM/s.mbLimit*100))):0);
-      mbH='<div class="mz-mb"><div class="mz-mb-top"><span class="mz-mb-cap">'+D.mbl+'</span><span class="mz-mb-v">'+(unM?'∞':esc(shM)+'<i> / '+esc(s.mbLimit)+' MB</i>')+'</span></div><div class="mz-bar"><i style="width:'+pM+'%"></i></div></div>';
-    }
-    var reset=(s&&(!unl||typeof s.mbRemaining==='number')&&s.resetAt)?'<div class="mz-reset">'+D.resets+' <b id="hzmReset">'+fmtLeft(s.resetAt-Date.now())+'</b></div>':'';
+    var reset=(s&&!unl&&s.resetAt)?'<div class="mz-reset">'+D.resets+' <b id="hzmReset">'+fmtLeft(s.resetAt-Date.now())+'</b></div>':'';
     var top='<div class="mz-top"><div class="mz-who"><b class="mz-name">'+esc(nm)+'</b><span class="mz-pill"><i>M</i>MEMBER</span></div>'+'</div>';
-    var up='<div class="mz-up"><div class="mz-up-top"><div><div class="mz-cap">MOON '+({ka:'ატვირთვები',en:'uploads',ru:'загрузки'}[K])+'</div><div class="mz-big">'+esc(rem)+'</div></div>'+
+    var up='<div class="mz-up"><div class="mz-up-top"><div><div class="mz-cap">MOON '+({ka:'კრედიტები',en:'credits',ru:'кредиты'}[K])+'</div><div class="mz-big">'+esc(rem)+'</div></div>'+
       '<button type="button" class="mz-get" data-hz-go="plans">'+D.plans+'</button></div>'+
       '<div class="mz-bar"><i style="width:'+pct+'%"></i></div>'+
       '<div class="mz-leg"><span><i class="on"></i>'+D.weekly+' <b>'+(s?(unl?'∞':limit):'—')+'</b></span><span><i></i>'+esc(s?planLabel(s.plan):'—')+'</span></div>'+mbH+reset+'</div>';
@@ -27105,10 +27175,10 @@ html body #checkerView .pc-ttdl-row{max-width:none;margin:0 auto}
     var I_U='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
         I_G='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
     var gUp=s?(unl?'∞':esc(rem)+'<i> / '+esc(limit)+'</i>'):'—';
-    var gMb=(s&&s.mbLimit===null)?'∞':(s&&typeof s.mbLimit==='number'?esc(Math.round((Number(s.mbRemaining)||0)*10)/10)+'<i> / '+esc(s.mbLimit)+'</i>':'—');
+    var gMb=s?(unl?'∞':esc(s.crUsed||0)):'—';
     var gTop='<div class="gz-top"><b class="gz-name">'+esc(nm)+'</b><span class="gz-plan">'+esc(s?planLabel(s.plan):'MEMBER')+'</span></div>';
     var gQ='<div class="gz-q"><div class="gz-c"><span class="gz-cl">'+D.weekly+'</span><div class="gz-cv"><span>'+gUp+'</span><em>LIMIT</em></div></div>'+
-      '<div class="gz-c"><span class="gz-cl">'+({ka:'მოცულობა',en:'Volume',ru:'Объём'}[K])+'</span><div class="gz-cv"><span>'+gMb+'</span><em>MAX</em></div></div></div>';
+      '<div class="gz-c"><span class="gz-cl">'+({ka:'გამოყენებული',en:'Used',ru:'Использовано'}[K])+'</span><div class="gz-cv"><span>'+gMb+'</span><em>CR</em></div></div></div>';
     var gRows='<div class="gz-rows">'+
       '<button type="button" class="gz-row" data-hz-act="accounts"><span class="gz-ic">'+I_U+'</span><span class="gz-rl">'+D.acc+'</span><em>'+accTxt+'</em>'+ic('chev','hzm-chev')+'</button>'+
       '<button type="button" class="gz-row" data-hz-act="lang"><span class="gz-ic">'+I_G+'</span><span class="gz-rl">'+D.lang+'</span><em>'+esc(t('langName'))+'</em>'+ic('chev','hzm-chev')+'</button></div>';
@@ -29321,9 +29391,9 @@ html.ma-lock,html.ma-lock body{overflow:hidden!important}
 'use strict';
 var GATE='https://ancient-frost-1a11.giorgikavelashvili99.workers.dev';
 var T={
-ka:{title:'ჩემი ანგარიშები',sub:'ერთი პროფილი, ერთი ლიმიტი, შესვლის სამი გზა',member:'MOON მომხმარებელი',via:'Discord-ით შესული',secure:'დაცულობა',lv:['დაბალი','კარგი','მაქსიმალური'],linked:'ანგარიში მიბმულია',weekly:'კვირის ლიმიტი',shared:'ერთი ლიმიტი ყველა ანგარიშზე',usedOf:function(u,l){return 'გამოყენებულია <b>'+u+'</b> ატვირთვა '+l+'-დან.'},left:'დარჩა',unl:'ულიმიტო პაკეტი',resets:'განახლდება',monday:'ორშაბათს 00:00',noteB:'მიბმა ლიმიტს არ ზრდის.',noteT:' Telegram-ის ან TikTok-ის დამატებით ახალი ატვირთვები არ გემატება, ყველა ერთ პროფილზეა.',main:'მთავარი',on:'მიბმულია',off:'არ არის მიბმული',connect:'დაკავშირება',discon:'გამორთვა',soon:'მალე',dcOff:'მალე დაემატება',only:'ერთადერთი შესვლაა',here:'ახლა აქ ხარ',tgSub:'შედი ბოტით, წამებში',tkSub:'მალე დაემატება',checking:'ვამოწმებთ…',dcSub:'ძირითადი შესვლა',b1:'დაცული შესვლა',b1t:'თუ ერთ ანგარიშს დაკარგავ, სხვით შეხვალ',b2:'ერთი ისტორია',b2t:'ატვირთვები ერთ ადგილას',b3:'ერთი ლიმიტი',b3t:'ახალი ანგარიში ახალ ლიმიტს არ იძლევა',okTg:'Telegram მიბმულია. ლიმიტი იგივეა, ახალი ატვირთვა არ დაგემატა.',offTg:'Telegram გამოირთო',cancelled:'დაკავშირება გაუქმდა',err:'შეცდომა, სცადე თავიდან',retry:'თავიდან ცდა',loadErr:'ანგარიშის მონაცემები ვერ ჩაიტვირთა.',noLogin:'ჯერ შედი Discord-ით.',cfg:'Telegram ჯერ არ არის გამართული.',tgLoadFail:'Telegram-ის სკრიპტი ვერ ჩაიტვირთა',confirmOff:'გამოვრთო Telegram?',viaTg:'Telegram-ით შესული',again:'მზადაა, დააჭირე ისევ',gateTg:'შესვლა Telegram-ით',gateWait:'ვამოწმებთ…',gateNote:'Telegram მიბმული არ არის. შედი Discord-ით და ანგარიშებში მიაბი.'},
-en:{title:'My accounts',sub:'One profile, one limit, three ways to sign in',member:'MOON user',via:'Signed in with Discord',secure:'Security',lv:['Low','Good','Maximum'],linked:'accounts linked',weekly:'WEEKLY LIMIT',shared:'One limit for every account',usedOf:function(u,l){return '<b>'+u+'</b> of '+l+' uploads used.'},left:'left',unl:'Unlimited plan',resets:'Resets in',monday:'Monday 00:00',noteB:'Linking does not raise your limit.',noteT:' Adding Telegram or TikTok gives no extra uploads; everything stays on one profile.',main:'Primary',on:'Linked',off:'Not linked',connect:'Connect',discon:'Disconnect',soon:'Soon',dcOff:'Coming soon',only:'Only sign-in',here:'You are here',tgSub:'Sign in with the bot',tkSub:'Coming soon',checking:'Checking…',dcSub:'Primary sign-in',b1:'Safe sign-in',b1t:'Lose one account, use another',b2:'One history',b2t:'Uploads in one place',b3:'One limit',b3t:'A new account gives no new limit',okTg:'Telegram linked. Same limit, no extra uploads.',offTg:'Telegram disconnected',cancelled:'Connection cancelled',err:'Error, try again',retry:'Retry',loadErr:'Could not load account data.',noLogin:'Sign in with Discord first.',cfg:'Telegram is not set up yet.',tgLoadFail:'Could not load the Telegram script',confirmOff:'Disconnect Telegram?',viaTg:'Signed in with Telegram',again:'Ready, tap again',gateTg:'Sign in with Telegram',gateWait:'Checking…',gateNote:'Telegram is not linked yet: sign in with Discord and link it in Accounts.'},
-ru:{title:'Мои аккаунты',sub:'Один профиль, один лимит, три способа входа',member:'Пользователь MOON',via:'Вход через Discord',secure:'Защита',lv:['Низкая','Хорошая','Максимальная'],linked:'аккаунтов привязано',weekly:'НЕДЕЛЬНЫЙ ЛИМИТ',shared:'Один лимит на все аккаунты',usedOf:function(u,l){return 'Использовано <b>'+u+'</b> из '+l+' загрузок.'},left:'осталось',unl:'Безлимитный тариф',resets:'Сброс через',monday:'Понедельник 00:00',noteB:'Привязка не увеличивает лимит.',noteT:' Telegram или TikTok не дают новых загрузок: всё на одном профиле.',main:'Основной',on:'Привязан',off:'Не привязан',connect:'Подключить',discon:'Отключить',soon:'Скоро',dcOff:'Скоро',only:'Единственный вход',here:'Вы здесь',tgSub:'Вход через бота',tkSub:'Скоро',checking:'Проверяем…',dcSub:'Основной вход',b1:'Защищённый вход',b1t:'Потеряли один аккаунт, зайдёте с другого',b2:'Одна история',b2t:'Загрузки в одном месте',b3:'Один лимит',b3t:'Новый аккаунт не даёт нового лимита',okTg:'Telegram привязан. Лимит прежний, новых загрузок нет.',offTg:'Telegram отключён',cancelled:'Подключение отменено',err:'Ошибка, попробуйте снова',retry:'Повторить',loadErr:'Не удалось загрузить данные аккаунта.',noLogin:'Сначала войдите через Discord.',cfg:'Telegram ещё не настроен.',tgLoadFail:'Не удалось загрузить скрипт Telegram',confirmOff:'Отключить Telegram?',viaTg:'Вход через Telegram',again:'Готово, нажмите ещё раз',gateTg:'Войти через Telegram',gateWait:'Проверяем…',gateNote:'Telegram ещё не привязан: войдите через Discord и привяжите его в разделе аккаунтов.'}
+ka:{title:'ჩემი ანგარიშები',sub:'ერთი პროფილი, ერთი ლიმიტი, შესვლის სამი გზა',member:'MOON მომხმარებელი',via:'Discord-ით შესული',secure:'დაცულობა',lv:['დაბალი','კარგი','მაქსიმალური'],linked:'ანგარიში მიბმულია',weekly:'კვირის ლიმიტი',shared:'ერთი ლიმიტი ყველა ანგარიშზე',usedOf:function(u,l){return 'გამოყენებულია <b>'+u+'</b> კრედიტი '+l+'-დან.'},left:'დარჩა',unl:'ულიმიტო პაკეტი',resets:'განახლდება',monday:'ორშაბათს 00:00',noteB:'მიბმა ლიმიტს არ ზრდის.',noteT:' Telegram-ის ან TikTok-ის დამატებით ახალი ატვირთვები არ გემატება, ყველა ერთ პროფილზეა.',main:'მთავარი',on:'მიბმულია',off:'არ არის მიბმული',connect:'დაკავშირება',discon:'გამორთვა',soon:'მალე',dcOff:'მალე დაემატება',only:'ერთადერთი შესვლაა',here:'ახლა აქ ხარ',tgSub:'შედი ბოტით, წამებში',tkSub:'მალე დაემატება',checking:'ვამოწმებთ…',dcSub:'ძირითადი შესვლა',b1:'დაცული შესვლა',b1t:'თუ ერთ ანგარიშს დაკარგავ, სხვით შეხვალ',b2:'ერთი ისტორია',b2t:'ატვირთვები ერთ ადგილას',b3:'ერთი ლიმიტი',b3t:'ახალი ანგარიში ახალ ლიმიტს არ იძლევა',okTg:'Telegram მიბმულია. ლიმიტი იგივეა, ახალი ატვირთვა არ დაგემატა.',offTg:'Telegram გამოირთო',cancelled:'დაკავშირება გაუქმდა',err:'შეცდომა, სცადე თავიდან',retry:'თავიდან ცდა',loadErr:'ანგარიშის მონაცემები ვერ ჩაიტვირთა.',noLogin:'ჯერ შედი Discord-ით.',cfg:'Telegram ჯერ არ არის გამართული.',tgLoadFail:'Telegram-ის სკრიპტი ვერ ჩაიტვირთა',confirmOff:'გამოვრთო Telegram?',viaTg:'Telegram-ით შესული',again:'მზადაა, დააჭირე ისევ',gateTg:'შესვლა Telegram-ით',gateWait:'ვამოწმებთ…',gateNote:'Telegram მიბმული არ არის. შედი Discord-ით და ანგარიშებში მიაბი.'},
+en:{title:'My accounts',sub:'One profile, one limit, three ways to sign in',member:'MOON user',via:'Signed in with Discord',secure:'Security',lv:['Low','Good','Maximum'],linked:'accounts linked',weekly:'WEEKLY LIMIT',shared:'One limit for every account',usedOf:function(u,l){return '<b>'+u+'</b> of '+l+' credits used.'},left:'left',unl:'Unlimited plan',resets:'Resets in',monday:'Monday 00:00',noteB:'Linking does not raise your limit.',noteT:' Adding Telegram or TikTok gives no extra uploads; everything stays on one profile.',main:'Primary',on:'Linked',off:'Not linked',connect:'Connect',discon:'Disconnect',soon:'Soon',dcOff:'Coming soon',only:'Only sign-in',here:'You are here',tgSub:'Sign in with the bot',tkSub:'Coming soon',checking:'Checking…',dcSub:'Primary sign-in',b1:'Safe sign-in',b1t:'Lose one account, use another',b2:'One history',b2t:'Uploads in one place',b3:'One limit',b3t:'A new account gives no new limit',okTg:'Telegram linked. Same limit, no extra uploads.',offTg:'Telegram disconnected',cancelled:'Connection cancelled',err:'Error, try again',retry:'Retry',loadErr:'Could not load account data.',noLogin:'Sign in with Discord first.',cfg:'Telegram is not set up yet.',tgLoadFail:'Could not load the Telegram script',confirmOff:'Disconnect Telegram?',viaTg:'Signed in with Telegram',again:'Ready, tap again',gateTg:'Sign in with Telegram',gateWait:'Checking…',gateNote:'Telegram is not linked yet: sign in with Discord and link it in Accounts.'},
+ru:{title:'Мои аккаунты',sub:'Один профиль, один лимит, три способа входа',member:'Пользователь MOON',via:'Вход через Discord',secure:'Защита',lv:['Низкая','Хорошая','Максимальная'],linked:'аккаунтов привязано',weekly:'НЕДЕЛЬНЫЙ ЛИМИТ',shared:'Один лимит на все аккаунты',usedOf:function(u,l){return 'Использовано <b>'+u+'</b> из '+l+' кредитов.'},left:'осталось',unl:'Безлимитный тариф',resets:'Сброс через',monday:'Понедельник 00:00',noteB:'Привязка не увеличивает лимит.',noteT:' Telegram или TikTok не дают новых загрузок: всё на одном профиле.',main:'Основной',on:'Привязан',off:'Не привязан',connect:'Подключить',discon:'Отключить',soon:'Скоро',dcOff:'Скоро',only:'Единственный вход',here:'Вы здесь',tgSub:'Вход через бота',tkSub:'Скоро',checking:'Проверяем…',dcSub:'Основной вход',b1:'Защищённый вход',b1t:'Потеряли один аккаунт, зайдёте с другого',b2:'Одна история',b2t:'Загрузки в одном месте',b3:'Один лимит',b3t:'Новый аккаунт не даёт нового лимита',okTg:'Telegram привязан. Лимит прежний, новых загрузок нет.',offTg:'Telegram отключён',cancelled:'Подключение отменено',err:'Ошибка, попробуйте снова',retry:'Повторить',loadErr:'Не удалось загрузить данные аккаунта.',noLogin:'Сначала войдите через Discord.',cfg:'Telegram ещё не настроен.',tgLoadFail:'Не удалось загрузить скрипт Telegram',confirmOff:'Отключить Telegram?',viaTg:'Вход через Telegram',again:'Готово, нажмите ещё раз',gateTg:'Войти через Telegram',gateWait:'Проверяем…',gateNote:'Telegram ещё не привязан: войдите через Discord и привяжите его в разделе аккаунтов.'}
 };
 function lang(){var l=document.documentElement.lang;try{if(typeof currentLang!=='undefined'&&T[currentLang])l=currentLang}catch(e){}return T[l]?l:'ka'}
 function t(){return T[lang()]}
@@ -29378,7 +29448,7 @@ function render(){
   var a=S.acc,st=a.status||{},n=a.count,pv=a.providers||{};
   var unl=!!st.unlimited,limit=unl?0:(st.limit||0),used=st.used||0,rem=unl?'∞':(st.remaining!=null?st.remaining:0);
   var frac=unl?1:(limit?Math.max(0,Math.min(1,(st.remaining||0)/limit)):0),off=Math.round(289*(1-frac));
-  var dots='';if(!unl){for(var i=0;i<limit&&i<12;i++)dots+='<i'+(i>=used?' class="free"':'')+'></i>'}
+  var dots='';
   var av=u&&u.avatarUrl?'<img src="'+esc(u.avatarUrl)+'" alt="">':'<span>'+esc(((u&&u.username)||'M').charAt(0).toUpperCase())+'</span>';
   var plan=st.plan&&st.plan!=='free'?('Plan '+String(st.plan).replace(/^p/i,'')):(lang()==='ka'?'უფასო პაკეტი':lang()==='ru'?'Бесплатный':'Free');
   var segs='';for(var s=0;s<3;s++)segs+='<i'+(s<n?' class="on"':'')+'></i>';
@@ -31287,9 +31357,9 @@ function accountAnswer(){
   if(st&&st.plan){
     var pl=st.plan==='free'?{ka:'უფასო',en:'Free',ru:'Бесплатный'}[L]:('Plan '+String(st.plan).replace(/^p/i,''));
     var line='MOON METHOD: '+pl;
-    if(st.unlimited)line+=' · '+{ka:'ულიმიტო ატვირთვა',en:'unlimited uploads',ru:'безлимитные загрузки'}[L];
+    if(st.unlimited)line+=' · '+{ka:'ულიმიტო კრედიტი',en:'unlimited credits',ru:'безлимитные кредиты'}[L];
     else if(st.limit!=null){var rem=st.remaining!=null?st.remaining:0;
-      line+=' · '+{ka:'დარჩენილია ',en:'',ru:'осталось '}[L]+rem+'/'+st.limit+{ka:' ატვირთვა',en:' uploads left',ru:' загрузок'}[L];
+      line+=' · '+{ka:'დარჩენილია ',en:'',ru:'осталось '}[L]+rem+'/'+st.limit+{ka:' კრედიტი',en:' credits left',ru:' кредитов'}[L];
       var r=st.resetAt?resetIn(+st.resetAt):'';if(r)line+=' · '+{ka:'განახლდება ',en:'resets in ',ru:'обновится через '}[L]+r}
     bits.push(line);
   }
