@@ -18298,6 +18298,53 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     }catch(e){ return null; }
   }
 
+
+  // ---- keep the signed session (optSig) fresh --------------------------------
+  // The optimizer / accounts / audio APIs trust a signed token (optSig +
+  // optSigExp) that the auth worker puts on the user object. It expires; an
+  // old copy lived on in localStorage and in long-open tabs, so people got
+  // "Discord session could not be verified" and had to log in again. Now the
+  // token is re-fetched from /me in the background (focus, every 10 min) and
+  // once, transparently, when the API answers "auth".
+  let __sessRefreshP = null, __sessLast = 0;
+  function refreshDiscordSession(){
+    if (__sessRefreshP) return __sessRefreshP;
+    __sessRefreshP = fetch(DISCORD_AUTH_WORKER_URL + '/me', { credentials: 'include' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .catch(function(){ return null; })
+      .then(function(d){
+        __sessRefreshP = null; __sessLast = Date.now();
+        const u = d && d.user;
+        if (!u || !u.optSig) return null;
+        try{
+          if (currentDiscordUser && String(currentDiscordUser.id) === String(u.id)){
+            currentDiscordUser = Object.assign({}, currentDiscordUser, { optSig: u.optSig, optSigExp: u.optSigExp });
+            cacheDiscordUser(currentDiscordUser);
+          }
+        }catch(e){}
+        return u;
+      });
+    return __sessRefreshP;
+  }
+  window.__moonRefreshSession = refreshDiscordSession;
+  window.__moonAuthRetry = function(err, opt, again){
+    const isAuth = err && ((err.data && err.data.error === 'auth') || err.status === 401);
+    if (!isAuth) return Promise.reject(err);
+    return refreshDiscordSession().then(function(u){
+      if (!u) throw err;
+      const o = Object.assign({}, opt);
+      try{
+        const b = JSON.parse(o.body);
+        if (b && typeof b === 'object' && 'uid' in b){ b.uid = String(u.id); b.sig = u.optSig; b.sigExp = u.optSigExp; o.body = JSON.stringify(b); }
+      }catch(e){ throw err; }
+      return again(o);
+    });
+  };
+  setInterval(function(){ try{ if (currentDiscordUser && !document.hidden) refreshDiscordSession(); }catch(e){} }, 10 * 60 * 1000);
+  document.addEventListener('visibilitychange', function(){
+    try{ if (!document.hidden && currentDiscordUser && Date.now() - __sessLast > 5 * 60 * 1000) refreshDiscordSession(); }catch(e){}
+  });
+
   // Runs the same admin-moderation checks that used to happen inside
   // syncDiscordUserWithBackend() -- but BEFORE the UI is ever revealed as
   // logged in, instead of right after. That reordering is the actual fix
@@ -24997,7 +25044,8 @@ function fmtLeft(ms){ var m=Math.max(0,Math.floor(ms/60000)),d=Math.floor(m/1440
 function api(path,opt){
   if(!CFG.GATE) return Promise.reject(new Error(tr('noGate')));
   opt=opt||{}; opt.headers=Object.assign({'Content-Type':'application/json'},opt.headers||{});
-  return fetch(CFG.GATE+path,opt).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ if(!r.ok) { var e=new Error(j.message||j.error||('HTTP '+r.status)); e.data=j; throw e; } return j; }); });
+  function once(o){ return fetch(CFG.GATE+path,o).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ if(!r.ok) { var e=new Error(j.message||j.error||('HTTP '+r.status)); e.data=j; e.status=r.status; throw e; } return j; }); }); }
+  return once(opt).catch(function(e){ return window.__moonAuthRetry ? window.__moonAuthRetry(e,opt,once) : Promise.reject(e); });
 }
 function ident(){ var u=user(); if(!u) return null; return {uid:String(u.id),username:u.username||'',sig:u.optSig||undefined,sigExp:u.optSigExp||undefined}; }
 
@@ -29223,8 +29271,10 @@ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){retur
 function user(){try{return typeof currentDiscordUser!=='undefined'?currentDiscordUser:null}catch(e){return null}}
 function ident(u){return {uid:String(u.id),username:u.username||'',sig:u.optSig||undefined,sigExp:u.optSigExp||undefined}}
 function api(path,body){
-  return fetch(GATE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){
-    return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error(j.message||j.error||('HTTP '+r.status));e.data=j;throw e}return j})});
+  function once(o){ return fetch(GATE+path,o).then(function(r){
+    return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error(j.message||j.error||('HTTP '+r.status));e.data=j;e.status=r.status;throw e}return j})}); }
+  var opt={method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)};
+  return once(opt).catch(function(e){ return window.__moonAuthRetry?window.__moonAuthRetry(e,opt,once):Promise.reject(e); });
 }
 var root=document.getElementById('maRoot'),page=document.getElementById('maPage'),toastEl=document.getElementById('maToast');
 function setAcc(j){S.acc=j;window.__moonAcct=j;try{document.dispatchEvent(new Event('moon:acct'))}catch(e){}}
@@ -31853,8 +31903,10 @@ function user(){try{return typeof currentDiscordUser!=='undefined'?currentDiscor
 function ident(u){return {uid:String(u.id),username:u.username||'',sig:u.optSig||undefined,sigExp:u.optSigExp||undefined}}
 function lang(){var l=document.documentElement.lang;try{if(typeof currentLang!=='undefined')l=currentLang}catch(e){}return /^(ka|en|ru)$/.test(l)?l:'ka'}
 function api(path,body){
-  return fetch(GATE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){
-    return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error(j.message||j.error||('HTTP '+r.status));e.data=j;throw e}return j})});
+  function once(o){ return fetch(GATE+path,o).then(function(r){
+    return r.json().catch(function(){return {}}).then(function(j){if(!r.ok){var e=new Error(j.message||j.error||('HTTP '+r.status));e.data=j;e.status=r.status;throw e}return j})}); }
+  var opt={method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)};
+  return once(opt).catch(function(e){ return window.__moonAuthRetry?window.__moonAuthRetry(e,opt,once):Promise.reject(e); });
 }
 function homeVisible(){return !document.body.classList.contains('mn-view-on')}
 function blocked(){return !!document.querySelector('#pcModalScrim.open,#adminOverlay.open,#maRoot.open,#mfask-panel.mfask-open,#moonUps,#moonBack,#hzMenu[aria-hidden="false"],#moonSpin')}
