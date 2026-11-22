@@ -9379,7 +9379,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       messengerTitle: 'შეკვეთის ჩატი',
       messengerOrderLabel: 'შეკვეთა #',
       messengerInputPh: 'დაწერე შეტყობინება...',
-      messengerNeedsLogin: 'შეკვეთის ჩატისთვის საჭიროა Discord-ით შესვლა.',
+      messengerNeedsLogin: 'შეკვეთის ჩატისთვის საჭიროა შესვლა (Discord, TikTok ან Telegram).',
       messengerCompleted: 'შეკვეთა დასრულებულია — მადლობა! ✅',
       pmPickerPrompt: 'გთხოვთ, აირჩიოთ გადახდის მეთოდი:',
       pmBankMethodLabel: 'ბანკის გადარიცხვა',
@@ -9827,7 +9827,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       messengerTitle: 'Order chat',
       messengerOrderLabel: 'Order #',
       messengerInputPh: 'Write a message...',
-      messengerNeedsLogin: 'Please log in with Discord to open the order chat.',
+      messengerNeedsLogin: 'Please log in (Discord, TikTok or Telegram) to open the order chat.',
       messengerCompleted: 'Order completed — thank you! ✅',
       pmPickerPrompt: 'Please choose a payment method:',
       pmBankMethodLabel: 'Bank transfer',
@@ -14491,8 +14491,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       // page instead of actually sending what the customer had just
       // filled in.
       savePendingOrder(orderData, firstMessageText, idleKey);
-      alert(t('messengerNeedsLogin'));
-      startDiscordLogin();
+      promptLogin();
       return;
     }
     // Guild-membership ("must join our Discord server") is no longer
@@ -14607,8 +14606,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     const L = { ka:'დახმარების ჩატისთვის საჭიროა Discord-ით შესვლა.', en:'Please log in with Discord to open a help ticket.', ru:'Для обращения в поддержку нужно войти через Discord.' };
     if (!currentDiscordUser){
       try{ localStorage.setItem('moon_help_draft', text); }catch(e){}
-      alert(L[lang] || L.ka);
-      startDiscordLogin();
+      promptLogin();
       return false;
     }
     const ticketId = 'T' + generateOrderId();
@@ -16423,7 +16421,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     inputEl.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); send(); } });
     gateEl.addEventListener('click', e => {
       if (!e.target.closest('#cmLogin')) return;
-      if (typeof startDiscordLogin === 'function') startDiscordLogin();
+      if (typeof promptLogin === 'function') promptLogin(); else if (window.__moonPromptLogin) window.__moonPromptLogin();
     });
     emojiBox.innerHTML = EMOJIS.map(x => '<button type="button" data-e="' + x + '">' + x + '</button>').join('');
     smileBtn.addEventListener('click', e => { e.stopPropagation(); closeChk(); emojiBox.hidden = !emojiBox.hidden; });
@@ -16463,7 +16461,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     document.addEventListener('moon:user', () => { renderComposer(); render(); });
     window.moonCommunityShareTT = function(d, url){
       const u = me(), asAdmin = admin();
-      if (!u && !asAdmin) { try { if (typeof startDiscordLogin === 'function') startDiscordLogin(); } catch(e){} return 'login'; }
+      if (!u && !asAdmin) { try { if (window.__moonPromptLogin) window.__moonPromptLogin(); else if (typeof startDiscordLogin === 'function') startDiscordLogin(); } catch(e){} return 'login'; }
       try { shareTT(d || {}, url); return 'ok'; } catch(e){ return 'err'; }
     };
 
@@ -18178,6 +18176,21 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     return 'https://discord.com/api/oauth2/authorize?' + params.toString();
   }
 
+  /* "log in to continue" prompt: shows the login card with every method (Discord, TikTok, Telegram),
+     instead of sending people straight to Discord */
+  function promptLogin(){
+    try{
+      const g = document.getElementById('discordGate');
+      if (!g){ startDiscordLogin(); return; }
+      const lb = document.getElementById('discordLoginBtn'); if (lb) lb.style.display = '';
+      const sk = document.getElementById('discordGateSkip'); if (sk) sk.onclick = null;
+      g.setAttribute('data-mode', 'login');
+      try{ renderGateCopy(); }catch(e){}
+      g.classList.add('open');
+    }catch(e){ startDiscordLogin(); }
+  }
+  window.__moonPromptLogin = promptLogin;
+
   function startDiscordLogin(){
     // The early script (right after the gate markup) already builds and
     // follows this same URL the instant the button exists — long before
@@ -18644,7 +18657,7 @@ TikTok პროფილი: ${getTiktokValue('mp')}
           popover.classList.toggle('open', willOpen);
         }
       } else {
-        startDiscordLogin();
+        promptLogin();
       }
     });
     window.addEventListener('resize', () => {
@@ -25127,9 +25140,9 @@ var PLANS = {
   p3:{h:2160,fps:120,price:'14.99',cr:0}   /* 0 = შეუზღუდავი კრედიტი */
 };
 var T = {
- ka:{"nav": "მეთოდი", "title": "მუნის მეთოდი", "sub": "ატვირთე ვიდეო და მიიღე წამებში", "idle": "მზადაა", "busy": "მუშავდება", "done": "დასრულდა", "err": "შეცდომა", "drop": "ატვირთე ვიდეო", "dropSub": "გადმოიტანე ან დააჭირეთ ასარჩევად", "hint": "", "size": "ზომა", "res": "გარჩევადობა", "dur": "ხანგრძლივობა", "preset": "ხარისხი", "go": "ოპტიმიზაცია", "left": "დარჩენილი ატვირთვა", "week": "ამ კვირაში", "unl": "ულიმიტო", "resets": "ლიმიტი განახლდება", "plans": "გეგმები", "buy": "შეძენა", "cur": "შენი გეგმა", "perMonth": "/თვე", "freeNote": "გადახდა არ არის საჭირო", "curNote": "მიმდინარე გეგმა", "free": "უფასო", "freeL": "3 ატვირთვა კვირაში", "unlimited": "ულიმიტო ატვირთვა", "upTo": "მაქს. ", "lock": "ამ გეგმაში მიუწვდომელია", "login": "გამოსაყენებლად შედი Discord-ით", "loginBtn": "Discord-ით შესვლა", "noGate": "სერვისი ჯერ არ არის დაკავშირებული (GATE URL).", "blocked": "შენი წვდომა შეზღუდულია.", "noQuota": "ამ კვირის ლიმიტი ამოწურულია. განახლდება: ", "expired": "გეგმა ვადაგასულია — გადართულია უფასოზე.", "up": "იტვირთება", "queue": "რიგშია", "proc": "მუშავდება", "ready": "მზადაა! ჩამოტვირთე ქვემოთ", "dl": "ჩამოტვირთვა", "tooFps": "ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება", "noFps": "ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი", "tooLow": "ვიდეო არის 540-720P ფორმატის ესეიგი დაბალი ხარისხის. ვიდეო დაბალი ხარისხით აიტვირთება!\nრეკომენდებულია MIN 1080P 30FPS", "tooBig": "ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია", "noMeta": "ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)", "pickMp4": "აირჩიე mp4 ფაილი", "d": "დ", "h": "სთ", "m": "წთ", "wake": "კავშირი ვერ დამყარდა, ვცდილობ თავიდან…", "slow": "ვიდეო მუშავდება, ცოტა ხანი დასჭირდება…"},
- en:{"nav": "METHOD", "title": "MOON METHOD", "sub": "Upload a video and get it in seconds", "idle": "ready", "busy": "processing", "done": "done", "err": "error", "drop": "Upload a video", "dropSub": "Drag & drop or tap to choose", "hint": "", "size": "Size", "res": "Resolution", "dur": "Duration", "preset": "Quality", "go": "Optimize", "left": "Uploads left", "week": "this week", "unl": "Unlimited", "resets": "Limit resets in", "plans": "Plans", "buy": "Get plan", "cur": "Your plan", "perMonth": "/month", "freeNote": "No payment needed", "curNote": "Current plan", "free": "Free", "freeL": "3 uploads per week", "unlimited": "Unlimited uploads", "upTo": "Up to ", "lock": "Not available on your plan", "login": "Sign in with Discord to use MOON METHOD", "loginBtn": "Sign in with Discord", "noGate": "Service not connected yet (GATE URL).", "blocked": "Your access is restricted.", "noQuota": "Weekly limit reached. Resets in: ", "expired": "Plan expired — switched to free.", "up": "Uploading", "queue": "Queued", "proc": "Processing", "ready": "Done! Download below", "dl": "Download", "tooFps": "Video frame rate ({f} fps) is above your plan limit (max {n} fps). 120 fps videos need Plan 2 or Plan 3", "noFps": "Could not read the video fps. Try another mp4 file", "tooLow": "This video is 540-720P, which means low quality. The video will be uploaded in low quality!\nRecommended: MIN 1080P 30FPS", "tooBig": "This video is above your plan limit (max 1080p). 4K is only on the 14.99 ₾ plan", "noMeta": "Could not read the video resolution. Try another mp4 (H.264)", "pickMp4": "Choose an mp4 file", "d": "d", "h": "h", "m": "m", "wake": "Connection failed, trying again…", "slow": "Processing your video, this may take a moment…"},
- ru:{"nav": "МЕТОД", "title": "МЕТОД MOON", "sub": "Загрузите видео и получите результат за секунды", "idle": "готово", "busy": "обработка", "done": "готово", "err": "ошибка", "drop": "Загрузите видео", "dropSub": "Перетащите сюда или нажмите, чтобы выбрать", "hint": "", "size": "Размер", "res": "Разрешение", "dur": "Длительность", "preset": "Качество", "go": "Оптимизировать", "left": "Осталось загрузок", "week": "на этой неделе", "unl": "Безлимит", "resets": "Лимит обновится через", "plans": "Тарифы", "buy": "Купить", "cur": "Ваш тариф", "perMonth": "/мес", "freeNote": "Оплата не требуется", "curNote": "Текущий тариф", "free": "Бесплатно", "freeL": "3 загрузки в неделю", "unlimited": "Безлимитные загрузки", "upTo": "До ", "lock": "Недоступно на вашем тарифе", "login": "Войдите через Discord, чтобы пользоваться MOON METHOD", "loginBtn": "Войти через Discord", "noGate": "Сервис ещё не подключён (GATE URL).", "blocked": "Ваш доступ ограничен.", "noQuota": "Недельный лимит исчерпан. Обновится через: ", "expired": "Тариф истёк — переключено на бесплатный.", "up": "Загрузка", "queue": "В очереди", "proc": "Обработка", "ready": "Готово! Скачайте ниже", "dl": "Скачать", "tooFps": "Частота кадров видео ({f} fps) выше лимита вашего тарифа (макс. {n} fps). Видео 120 fps доступно только на Plan 2 и Plan 3", "noFps": "Не удалось определить fps видео. Попробуйте другой mp4-файл", "tooLow": "Видео в формате 540-720P, то есть низкого качества. Видео будет загружено в низком качестве!\nРекомендуется: MIN 1080P 30FPS", "tooBig": "Разрешение видео выше лимита вашего тарифа (макс. 1080p). 4K доступно только на тарифе за 14.99 ₾", "noMeta": "Не удалось определить разрешение видео. Попробуйте другой mp4 (H.264)", "pickMp4": "Выберите mp4-файл", "d": "д", "h": "ч", "m": "мин", "wake": "Не удалось подключиться, пробую снова…", "slow": "Видео обрабатывается, это может занять немного времени…"}
+ ka:{"nav": "მეთოდი", "title": "მუნის მეთოდი", "sub": "ატვირთე ვიდეო და მიიღე წამებში", "idle": "მზადაა", "busy": "მუშავდება", "done": "დასრულდა", "err": "შეცდომა", "drop": "ატვირთე ვიდეო", "dropSub": "გადმოიტანე ან დააჭირეთ ასარჩევად", "hint": "", "size": "ზომა", "res": "გარჩევადობა", "dur": "ხანგრძლივობა", "preset": "ხარისხი", "go": "ოპტიმიზაცია", "left": "დარჩენილი ატვირთვა", "week": "ამ კვირაში", "unl": "ულიმიტო", "resets": "ლიმიტი განახლდება", "plans": "გეგმები", "buy": "შეძენა", "cur": "შენი გეგმა", "perMonth": "/თვე", "freeNote": "გადახდა არ არის საჭირო", "curNote": "მიმდინარე გეგმა", "free": "უფასო", "freeL": "3 ატვირთვა კვირაში", "unlimited": "ულიმიტო ატვირთვა", "upTo": "მაქს. ", "lock": "ამ გეგმაში მიუწვდომელია", "login": "გამოსაყენებლად შედი (Discord, TikTok ან Telegram)", "loginBtn": "შესვლა", "noGate": "სერვისი ჯერ არ არის დაკავშირებული (GATE URL).", "blocked": "შენი წვდომა შეზღუდულია.", "noQuota": "ამ კვირის ლიმიტი ამოწურულია. განახლდება: ", "expired": "გეგმა ვადაგასულია — გადართულია უფასოზე.", "up": "იტვირთება", "queue": "რიგშია", "proc": "მუშავდება", "ready": "მზადაა! ჩამოტვირთე ქვემოთ", "dl": "ჩამოტვირთვა", "tooFps": "ვიდეოს კადრების სიხშირე ({f} fps) თქვენი გეგმის ლიმიტზე მაღალია (მაქს. {n} fps). 120 fps ვიდეო მხოლოდ Plan 2-სა და Plan 3-ში იტვირთება", "noFps": "ვიდეოს fps ვერ წაიკითხა. სცადეთ სხვა mp4 ფაილი", "tooLow": "ვიდეო არის 540-720P ფორმატის ესეიგი დაბალი ხარისხის. ვიდეო დაბალი ხარისხით აიტვირთება!\nრეკომენდებულია MIN 1080P 30FPS", "tooBig": "ვიდეო თქვენი გეგმისთვის ძალიან მაღალი გარჩევადობისაა (მაქს. 1080p). 4K მხოლოდ 14.99 ₾ გეგმაშია", "noMeta": "ვიდეოს გარჩევადობა ვერ წაიკითხა. სცადეთ სხვა mp4 (H.264)", "pickMp4": "აირჩიე mp4 ფაილი", "d": "დ", "h": "სთ", "m": "წთ", "wake": "კავშირი ვერ დამყარდა, ვცდილობ თავიდან…", "slow": "ვიდეო მუშავდება, ცოტა ხანი დასჭირდება…"},
+ en:{"nav": "METHOD", "title": "MOON METHOD", "sub": "Upload a video and get it in seconds", "idle": "ready", "busy": "processing", "done": "done", "err": "error", "drop": "Upload a video", "dropSub": "Drag & drop or tap to choose", "hint": "", "size": "Size", "res": "Resolution", "dur": "Duration", "preset": "Quality", "go": "Optimize", "left": "Uploads left", "week": "this week", "unl": "Unlimited", "resets": "Limit resets in", "plans": "Plans", "buy": "Get plan", "cur": "Your plan", "perMonth": "/month", "freeNote": "No payment needed", "curNote": "Current plan", "free": "Free", "freeL": "3 uploads per week", "unlimited": "Unlimited uploads", "upTo": "Up to ", "lock": "Not available on your plan", "login": "Sign in (Discord, TikTok or Telegram) to use MOON METHOD", "loginBtn": "Sign in", "noGate": "Service not connected yet (GATE URL).", "blocked": "Your access is restricted.", "noQuota": "Weekly limit reached. Resets in: ", "expired": "Plan expired — switched to free.", "up": "Uploading", "queue": "Queued", "proc": "Processing", "ready": "Done! Download below", "dl": "Download", "tooFps": "Video frame rate ({f} fps) is above your plan limit (max {n} fps). 120 fps videos need Plan 2 or Plan 3", "noFps": "Could not read the video fps. Try another mp4 file", "tooLow": "This video is 540-720P, which means low quality. The video will be uploaded in low quality!\nRecommended: MIN 1080P 30FPS", "tooBig": "This video is above your plan limit (max 1080p). 4K is only on the 14.99 ₾ plan", "noMeta": "Could not read the video resolution. Try another mp4 (H.264)", "pickMp4": "Choose an mp4 file", "d": "d", "h": "h", "m": "m", "wake": "Connection failed, trying again…", "slow": "Processing your video, this may take a moment…"},
+ ru:{"nav": "МЕТОД", "title": "МЕТОД MOON", "sub": "Загрузите видео и получите результат за секунды", "idle": "готово", "busy": "обработка", "done": "готово", "err": "ошибка", "drop": "Загрузите видео", "dropSub": "Перетащите сюда или нажмите, чтобы выбрать", "hint": "", "size": "Размер", "res": "Разрешение", "dur": "Длительность", "preset": "Качество", "go": "Оптимизировать", "left": "Осталось загрузок", "week": "на этой неделе", "unl": "Безлимит", "resets": "Лимит обновится через", "plans": "Тарифы", "buy": "Купить", "cur": "Ваш тариф", "perMonth": "/мес", "freeNote": "Оплата не требуется", "curNote": "Текущий тариф", "free": "Бесплатно", "freeL": "3 загрузки в неделю", "unlimited": "Безлимитные загрузки", "upTo": "До ", "lock": "Недоступно на вашем тарифе", "login": "Войдите (Discord, TikTok или Telegram), чтобы пользоваться MOON METHOD", "loginBtn": "Войти", "noGate": "Сервис ещё не подключён (GATE URL).", "blocked": "Ваш доступ ограничен.", "noQuota": "Недельный лимит исчерпан. Обновится через: ", "expired": "Тариф истёк — переключено на бесплатный.", "up": "Загрузка", "queue": "В очереди", "proc": "Обработка", "ready": "Готово! Скачайте ниже", "dl": "Скачать", "tooFps": "Частота кадров видео ({f} fps) выше лимита вашего тарифа (макс. {n} fps). Видео 120 fps доступно только на Plan 2 и Plan 3", "noFps": "Не удалось определить fps видео. Попробуйте другой mp4-файл", "tooLow": "Видео в формате 540-720P, то есть низкого качества. Видео будет загружено в низком качестве!\nРекомендуется: MIN 1080P 30FPS", "tooBig": "Разрешение видео выше лимита вашего тарифа (макс. 1080p). 4K доступно только на тарифе за 14.99 ₾", "noMeta": "Не удалось определить разрешение видео. Попробуйте другой mp4 (H.264)", "pickMp4": "Выберите mp4-файл", "d": "д", "h": "ч", "m": "мин", "wake": "Не удалось подключиться, пробую снова…", "slow": "Видео обрабатывается, это может занять немного времени…"}
 };
 T.ka.engBest='საუკეთესო'; T.ka.tryBackup='';
 T.en.engBest='Best'; T.en.tryBackup='';
@@ -25989,7 +26002,7 @@ window.addEventListener('pagehide',function(ev){
   if(h.clicked) holdPing(true); else { var id=ident(); try{ api('/refund',{method:'POST',keepalive:true,body:JSON.stringify({ticket:h.ticket,uid:id&&id.uid})}).catch(function(){}); }catch(e){} }
 });
 $('optPlans').addEventListener('click',function(e){ var bb=e.target.closest('[data-buy]'); if(bb){ if(window.__moonPlanBuy && window.__moonPlanBuy(bb.closest('.opt-plan'),bb)) return; var c=document.querySelector('.mn-link[data-mn="contact"]'); if(c) c.click(); } });
-$('optLoginBtn').addEventListener('click',function(){ try{ startDiscordLogin(); }catch(e){} });
+$('optLoginBtn').addEventListener('click',function(){ try{ if(window.__moonPromptLogin) window.__moonPromptLogin(); else startDiscordLogin(); }catch(e){} });
 
 /* 3D tilt on dropzone (fine pointers only, rAF-throttled, transform/custom-props only) */
 try{
