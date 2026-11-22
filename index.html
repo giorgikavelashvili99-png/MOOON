@@ -7089,12 +7089,20 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     }catch(e){}
     return '';
   };
-  window.__moonFetchMe = function(){
+  var __rawFetchMe = function(){
     var tok = window.__moonSessToken();
-    var opt = { credentials: 'include' };
-    if (tok) opt.headers = { 'Authorization': 'Bearer ' + tok };
-    return fetch(WORKER_URL + '/me', opt).then(function(res){
-      if (res.status === 401 && tok) window.__moonSessToken(null); /* expired / invalid token */
+    var plain = function(){ return fetch(WORKER_URL + '/me', { credentials: 'include' }); };
+    if (!tok) return plain();
+    return fetch(WORKER_URL + '/me', { credentials: 'include', headers: { 'Authorization': 'Bearer ' + tok } }).then(function(res){
+      if (res.status !== 401) return res;
+      /* token rejected: the cookie may still be good; only if that fails too is the token dead */
+      return plain().then(function(r2){ if (!r2.ok) window.__moonSessToken(null); return r2; }, function(){ window.__moonSessToken(null); return res; });
+    }, function(){ return plain(); });   /* header refused (worker without CORS 'Authorization' = not redeployed yet): cookie-only, as before */
+  };
+  /* /me hands out a renewed session token for active people (sliding 30 days): keep it */
+  window.__moonFetchMe = function(){
+    return __rawFetchMe().then(function(res){
+      try{ if (res.ok) res.clone().json().then(function(d){ if (d && d.sessionToken) window.__moonSessToken(d.sessionToken); }).catch(function(){}); }catch(e){}
       return res;
     });
   };
@@ -7127,6 +7135,39 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       window.location.href = 'https://discord.com/api/oauth2/authorize?' + p.toString();
       return true;
     }catch(e){ return false; }
+  };
+  /* Visible way out when the session cannot be refreshed (before: a cryptic error and the person had to find
+     "log out" first, because the site still showed them as logged in). One tap = normal Discord login. */
+  window.__moonSessionExpired = function(){
+    try{
+      var K = 'moon_sessexp_ts';
+      if (Date.now() - Number(sessionStorage.getItem(K) || 0) < 60 * 1000) return;
+      sessionStorage.setItem(K, String(Date.now()));
+    }catch(e){}
+    var show = function(){
+      if (document.getElementById('moonSessExp')) return;
+      var l = 'ka'; try{ l = (typeof currentLang !== 'undefined' && currentLang) || document.documentElement.lang || 'ka'; }catch(e){}
+      if (!/^(ka|en|ru)$/.test(l)) l = 'ka';
+      var X = {
+        ka: { t: 'სესია უნდა განახლდეს', p: 'Discord სესიის დადასტურება ვერ მოხერხდა. დააჭირე ღილაკს და ერთ წამში გაგრძელდება. გამოსვლა საჭირო არ არის.', b: 'შესვლა Discord-ით', c: 'მოგვიანებით' },
+        en: { t: 'Session needs a refresh', p: 'Your Discord session could not be verified. Tap the button and you can continue in a second. No need to log out first.', b: 'Continue with Discord', c: 'Later' },
+        ru: { t: 'Нужно обновить сессию', p: 'Не удалось подтвердить сессию Discord. Нажмите кнопку, и вы продолжите через секунду. Выходить не нужно.', b: 'Войти через Discord', c: 'Позже' }
+      }[l];
+      var o = document.createElement('div'); o.id = 'moonSessExp'; o.setAttribute('role', 'alertdialog');
+      o.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483000;width:min(92vw,380px);box-sizing:border-box;padding:16px 18px;border-radius:16px;background:#14161c;color:#f4f4f5;border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 50px rgba(0,0,0,.55);font:500 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+      var t = document.createElement('b'); t.style.cssText = 'display:block;font-size:15px;margin-bottom:4px'; t.textContent = X.t;
+      var p = document.createElement('span'); p.style.cssText = 'display:block;color:#a1a1aa;margin-bottom:12px'; p.textContent = X.p;
+      var row = document.createElement('span'); row.style.cssText = 'display:flex;gap:8px';
+      var go = document.createElement('button'); go.type = 'button'; go.textContent = X.b;
+      go.style.cssText = 'flex:1;appearance:none;border:0;border-radius:10px;padding:10px 12px;font:700 14px system-ui,sans-serif;background:#5865f2;color:#fff;cursor:pointer';
+      var no = document.createElement('button'); no.type = 'button'; no.textContent = X.c;
+      no.style.cssText = 'appearance:none;border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:10px 12px;font:600 14px system-ui,sans-serif;background:transparent;color:#d4d4d8;cursor:pointer';
+      go.addEventListener('click', function(){ try{ o.remove(); }catch(e){} try{ window.__moonStartDiscordLogin(); }catch(e){} });
+      no.addEventListener('click', function(){ try{ o.remove(); }catch(e){} });
+      row.appendChild(go); row.appendChild(no); o.appendChild(t); o.appendChild(p); o.appendChild(row);
+      document.body.appendChild(o);
+    };
+    if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
   };
   var MDB_BASE = 'https://mantledb.sh/v2';
   var MDB_NS = 'moonge-tbilisi-vc7f3q';
@@ -7173,6 +7214,9 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
     if (eq.get('error') && eq.get('state')){
       ['error','error_description','state','iss'].forEach(function(k){ eq.delete(k); });
       history.replaceState({}, document.title, window.location.pathname + (eq.toString() ? '?' + eq.toString() : '') + window.location.hash);
+      /* the silent attempt (a minute ago) was refused by Discord (no consent for the new scope / not signed in there):
+         offer the visible one-tap login instead of leaving the session silently broken */
+      try{ if (Date.now() - Number(localStorage.getItem('moon_silent_relogin_ts') || 0) < 120000) window.__moonSessionExpired(); }catch(e){}
     }
   }catch(e){}
 
@@ -18393,7 +18437,10 @@ TikTok პროფილი: ${getTiktokValue('mp')}
     const isAuth = err && ((err.data && err.data.error === 'auth') || err.status === 401);
     if (!isAuth) return Promise.reject(err);
     return refreshDiscordSession().then(function(u){
-      if (!u) throw err;
+      if (!u){
+        try{ if (currentDiscordUser && !currentDiscordUser.via && window.__moonSessionExpired) window.__moonSessionExpired(); }catch(_){}
+        throw err;
+      }
       const o = Object.assign({}, opt);
       try{
         const b = JSON.parse(o.body);
