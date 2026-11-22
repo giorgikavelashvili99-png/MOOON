@@ -29887,12 +29887,25 @@ html body #hzMenu:not(#_a):not(#_b):not(#_c):not(#_d) .hzm-promo{padding:12px 14
 
 /* account menu: help+contact sit in the same card as the tools; "მეტი" is its own separate card */
 html body #hzMenu .hzm-dup{display:none!important}
+@media (min-width:1024px){
+html body #hzMenu#hzMenu#hzMenu .hzm-sec--more .hzm-group.mm-grp:not(#_a):not(#_b):not(#_c):not(#_d){margin-top:14px!important}
+}
 @media (max-width:1023px){
 html body #hzMenu .hzm-dup{display:flex!important}
 html body #hzMenu .hzm-help-orig{display:none!important}
 html body #hzMenu .hzm-sec--more{margin-top:14px!important}
 html body #hzMenu .hzm-sec--more .mm-grp{margin-top:0!important}
 }
+
+/* "მეტი" sheet + menu scrollbars: same neutral black as the menu, nothing blue */
+html body #hzMenu#hzMenu#hzMenu.mm-sheet .hzm-sec--more .qn-nav-wrap:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){background:#0a0a0c!important;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.22) transparent}
+html body #hzMenu#hzMenu#hzMenu.mm-sheet .mm-head:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){background:#0a0a0c!important;border-bottom:1px solid rgba(255,255,255,.08)!important}
+html body #hzMenu#hzMenu#hzMenu .mm-back:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){border:1px solid rgba(255,255,255,.14)!important;background:rgba(255,255,255,.06)!important;color:#f4f4f5!important}
+html body #hzMenu#hzMenu#hzMenu .qn-nav-wrap:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::-webkit-scrollbar{width:6px}
+html body #hzMenu#hzMenu#hzMenu .qn-nav-wrap:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:6px}
+html body #hzMenu#hzMenu#hzMenu .hzm-scroll:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e){scrollbar-color:rgba(255,255,255,.22) transparent}
+html body #hzMenu#hzMenu#hzMenu .hzm-scroll:not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22)}
+html body #hzMenu#hzMenu#hzMenu :is(.hzm-promo,.hzm-row,.mz-row,.mz-get,.hzm-langopt,.mm-back):not(#_a):not(#_b):not(#_c):not(#_d):not(#_e)::after{box-shadow:0 0 0 1px rgba(255,255,255,.28),0 0 12px 1px rgba(255,255,255,.12)!important}
 </style>
 <style id="moon-modal-light">
 /* ===== Plan modal open/close: only opacity + transform (no blur filters, no animated glow shadow, no backdrop blur) so it doesn't stutter ===== */
