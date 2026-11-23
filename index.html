@@ -20718,6 +20718,99 @@ TikTok პროფილი: ${getTiktokValue('mp')}
   ttdlSafeInit(initScrollReveal);
   ttdlSafeInit(initPricingScrollCarousel);
 
+  // ============================================================
+  // PRICING COVERFLOW v3 — pure-CSS scroll-driven 3D (compositor only, zero per-frame JS)
+  // + soft cross-fading colour glow. No rail, no scroll listeners.
+  // ============================================================
+  function initPricingCoverflow(){
+    const shell = document.querySelector('.pricing-cards .pc-scroll-shell');
+    const track = shell && shell.querySelector('.pc-scroll-track');
+    if (!track || shell.__pcw) return;
+    shell.__pcw = true;
+    const slides = Array.from(track.querySelectorAll('.pc-slide'));
+    if (slides.length < 2) return;
+
+    // every slide gets a neutral wrapper so the 3D transform never fights a card's own transforms
+    slides.forEach(sl => {
+      const c = sl.firstElementChild;
+      if (!c || c.classList.contains('pcw-wrap')) return;
+      const w = document.createElement('div'); w.className = 'pcw-wrap';
+      sl.insertBefore(w, c); w.appendChild(c);
+    });
+
+    const COL = { indiv:'34,190,52', any:'30,145,235', weekly:'64,112,255', monthly:'248,174,24', edit:'236,48,48' };
+    const keyOf = s => { const c = s.querySelector('.pc-card'); const m = c && /pc-card--(\w+)/.exec(c.className); return m ? m[1] : 'indiv'; };
+
+    const st = document.createElement('style'); st.id = 'pcwStyle';
+    st.textContent = `
+html body .pricing-cards.pc-scroll-mode > .pc-scroll-shell{isolation:isolate}
+.pcw-glow{position:absolute;left:50%;top:0;width:300px;height:380px;transform:translateX(-50%);z-index:-1;pointer-events:none}
+.pcw-glow > span{position:absolute;inset:0;border-radius:28px;opacity:0;transition:opacity .7s ease}
+.pcw-glow > span.on{opacity:1}
+.pcw-wrap{display:flex;width:100%;min-width:0}
+.pcw-wrap > *{flex:1 1 auto;width:100%;min-width:0}
+`;
+    document.head.appendChild(st);
+
+    const glow = document.createElement('div'); glow.className = 'pcw-glow'; glow.setAttribute('aria-hidden','true');
+    const layers = {};
+    Object.keys(COL).forEach(k => {
+      const i = document.createElement('span'), c = COL[k];
+      i.style.setProperty('box-shadow', '0 0 70px 28px rgba(' + c + ',.42), 0 0 170px 70px rgba(' + c + ',.22)', 'important');
+      glow.appendChild(i); layers[k] = i;
+    });
+    shell.insertBefore(glow, shell.firstChild);
+
+    function placeGlow(){
+      const a = slides.find(x => x.classList.contains('pc-slide--active')) || slides[0];
+      const card = a.querySelector('.pc-card'); if (!card) return;
+      const sr = shell.getBoundingClientRect(), cr = card.getBoundingClientRect();
+      if (!cr.width) return;
+      glow.style.width = Math.round(cr.width * 0.8) + 'px';
+      glow.style.height = Math.round(cr.height * 0.8) + 'px';
+      glow.style.top = Math.round(cr.top - sr.top + cr.height * 0.1) + 'px';
+    }
+    let last = '';
+    function sync(){
+      placeGlow();
+      const a = slides.find(s => s.classList.contains('pc-slide--active')) || slides[0];
+      const k = keyOf(a); if (k === last) return; last = k;
+      Object.keys(layers).forEach(n => layers[n].classList.toggle('on', n === k));
+    }
+    const mo = new MutationObserver(sync);
+    slides.forEach(s => mo.observe(s, { attributes: true, attributeFilter: ['class'] }));
+    sync();
+
+    // ---- cheap 3D: cached centres + scrollLeft only (no layout reads), writes only transform/opacity ----
+    const wraps = slides.map(sl => sl.querySelector('.pcw-wrap'));
+    let centers = [], step = 346, raf = 0;
+    const measure = () => { centers = slides.map(sl => sl.offsetLeft + sl.offsetWidth / 2); step = (slides[0].offsetWidth || 330) + 16; };
+    function frame(){
+      raf = 0;
+      if (window.innerWidth < 700) { wraps.forEach(w => { w.style.transform = ''; w.style.opacity = ''; }); return; }
+      const c = track.scrollLeft + track.clientWidth / 2;
+      for (let i = 0; i < wraps.length; i++){
+        const d = (centers[i] - c) / step, ad = Math.abs(d), w = wraps[i];
+        if (!w) continue;
+        if (ad < 0.03) { w.style.transform = ''; w.style.opacity = ''; continue; }
+        const a = Math.max(-2, Math.min(2, d)), aa = Math.abs(a);
+        w.style.transform = 'perspective(1100px) translateZ(' + (-aa * 50).toFixed(0) + 'px) rotateY(' + (-a * 24).toFixed(1) + 'deg) scale(' + (1 - Math.min(aa, 1.5) * 0.06).toFixed(3) + ')';
+        w.style.opacity = (1 - Math.min(aa, 2) * 0.28).toFixed(2);
+      }
+    }
+    const sched = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    track.addEventListener('scroll', sched, { passive: true });
+    const remeasure = () => { measure(); sched(); placeGlow(); };
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('load', remeasure);
+    if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(track);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
+    [150, 700, 1600].forEach(ms => setTimeout(remeasure, ms));
+    remeasure();
+  }
+  ttdlSafeInit(initPricingCoverflow);
+
+
   // ---------- Pricing cards: desktop motion (armed after the carousel exists) ----------
   // Each card plays its intro exactly once -- the first time it becomes the active card.
   // Going back to a card you've already seen shows it settled, with no replay.
