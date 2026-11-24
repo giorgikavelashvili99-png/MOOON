@@ -38262,38 +38262,32 @@ html body .pc-slide .pc-card--edit .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:no
 html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za):not(#_zb):not(#_zc):not(#_zd):not(#_ze):not(#_zf):not(#_zg):not(#_zh):not(#_zi):not(#_zj):not(#_zk):not(#_zl):not(#_zm):not(#_zn):hover{border:0!important;border-color:transparent!important;box-shadow:none!important;filter:brightness(1.08)!important}
 html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za):not(#_zb):not(#_zc):not(#_zd):not(#_ze):not(#_zf):not(#_zg):not(#_zh):not(#_zi):not(#_zj):not(#_zk):not(#_zl):not(#_zm):not(#_zn):focus-visible{outline:0!important}
 </style>
-<style id="codex-menu-centered-final">
-/* Center the existing menu in the viewport at every responsive size. */
-html body #hzMenu{
-  left:50vw!important; right:auto!important;
-  width:min(440px,calc(100vw - 24px))!important;
-  max-width:calc(100vw - 24px)!important;
-  box-sizing:border-box!important;
-  transform:translate3d(-50%,-8px,0) scale(.985)!important;
-  transform-origin:top center!important;
-  border-color:rgba(255,255,255,.12)!important;
-  box-shadow:0 24px 64px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.035)!important;
-}
-html.hz-menu-open body #hzMenu{
-  transform:translate3d(-50%,0,0) scale(1)!important;
-}
-html body #hzMenu .hzm-scroll{
-  padding:16px 14px 18px!important;
-  scrollbar-gutter:stable;
-}
-html body #hzMenu .hzm-promo{
-  border-color:rgba(143,174,246,.22)!important;
-  background:linear-gradient(135deg,rgba(143,174,246,.12),rgba(255,255,255,.025) 72%)!important;
-}
-html body #hzMenu .hzm-group,
-html body #hzMenu .hzm-card,
-html body #hzMenu .hzm-acct-head,
-html body #hzMenu .hzm-acct-body{
-  border-color:rgba(255,255,255,.075)!important;
-}
-@media (max-width:380px){
-  html body #hzMenu{width:calc(100vw - 20px)!important;max-width:calc(100vw - 20px)!important}
-  html body #hzMenu .hzm-scroll{padding:12px 10px 14px!important}
+<style id="codex-desktop-menu-fix">
+/* Desktop account menu: align the compact panel with the account control. */
+@media (min-width:1024px){
+  html body #hzMenu{
+    position:fixed!important;
+    top:calc(var(--hz-h,64px) + 10px)!important;
+    left:auto!important;
+    right:clamp(16px,2vw,40px)!important;
+    bottom:auto!important;
+    width:min(400px,calc(100vw - 32px))!important;
+    max-width:400px!important;
+    max-height:calc(100vh - var(--hz-h,64px) - 24px)!important;
+    transform:translate3d(0,-8px,0) scale(.985)!important;
+    transform-origin:top right!important;
+    box-sizing:border-box!important;
+    border-color:rgba(255,255,255,.12)!important;
+    box-shadow:0 24px 64px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.035)!important;
+  }
+  html.hz-menu-open body #hzMenu{
+    transform:translate3d(0,0,0) scale(1)!important;
+  }
+  html body #hzMenu .hzm-scroll{padding:16px 14px 18px!important}
+  html body #hzMenu .hzm-promo{
+    border-color:rgba(143,174,246,.22)!important;
+    background:linear-gradient(135deg,rgba(143,174,246,.12),rgba(255,255,255,.025) 72%)!important;
+  }
 }
 </style>
 </body>
