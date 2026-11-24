@@ -38294,6 +38294,16 @@ html body #hzMenu#hzMenu#hzMenu#hzMenu:not(#_a):not(#_b) .hzm-login,html body #h
 }
 </style>
 <style id="moon-zoom110">@media (hover:hover) and (pointer:fine){html{zoom:1.1}}</style>
+<style id="moon-hz-zoomfix">
+/* Top bar at browser zoom 125% (viewport 1536px wide, usually <= 820px tall).
+   moon-small-screen sets the bar zoom to 1.111 to cancel html{zoom:.9}, but on a mouse/desktop device moon-zoom110 (above) forces html{zoom:1.1} instead,
+   so the bar came out ~27% too big (logo and links overflowed, the menu ran off the right edge). With html at 1.1 the bar keeps its normal .869565 factor. */
+@media (hover:hover) and (pointer:fine) and (min-width:901px){
+  .hz-bar,.hz-menu,.hz-scrim,.hz-spacer{zoom:.869565}
+}
+/* safety net: if the links ever run out of room they stay left-aligned instead of spilling over the logo */
+@media (min-width:1024px){html body .hz-links{justify-content:safe center}}
+</style>
 <style id="moon-hdr-colors">
 @layer moon-hdr {
   .pc-card--indiv{--hd-edge:rgb(4 74 6);--hd-mid:rgb(14 128 18);--hd-acc:rgb(44 222 84);--hd-a60:rgb(44 222 84 / 0.6);--hd-a42:rgb(44 222 84 / 0.42);--hd-a30:rgb(44 222 84 / 0.3);--hd-a22:rgb(44 222 84 / 0.22)}
