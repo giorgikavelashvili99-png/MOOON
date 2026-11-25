@@ -38469,5 +38469,55 @@ html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za
   go.addEventListener('click',run);
 })();
 </script>
+
+<style id="bf-style">
+#plansView .opt-plan .bf-head,#optView .opt-plan .bf-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 -2px}
+#plansView .opt-plan .bf-old,#optView .opt-plan .bf-old{font-size:17px;font-weight:700;line-height:1;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#ff4d4d;color:#9aa3c7;opacity:.85;white-space:nowrap}
+#plansView .opt-plan .bf-tag,#optView .opt-plan .bf-tag{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#0b1220;background:linear-gradient(90deg,#ffd54a,#ff9f1a);white-space:nowrap}
+</style>
+<script id="bf-sale-js">
+/* BLACK FRIDAY: ფასდაკლება მოქმედებს 30 ნოემბრის ბოლომდე (თბილისის დრო, UTC+4).
+   1 დეკემბერს 00:00-დან კოდი აღარ ჩაერევა და ძველი ფასები ბრუნდება. */
+(function(){
+ var END=Date.UTC(2026,10,30,20,0,0); /* = 1 დეკემბერი 2026, 00:00 (UTC+4) */
+ var SALE={'1':['5.99','3.99'],'2':['7.99','5.99'],'3':['14.99','9.99']};
+ function on(){return Date.now()<END;}
+ function decorate(){
+  if(!on()) return;
+  var box=document.getElementById('optPlans'); if(!box) return;
+  box.querySelectorAll('.opt-plan').forEach(function(card){
+   var h=card.querySelector('h4'), pr=card.querySelector('.pr');
+   if(!h||!pr||pr.getAttribute('data-bf')) return;
+   var m=(h.textContent||'').match(/plan\s*([123])/i); if(!m) return;
+   var d=SALE[m[1]]; if(!d) return;
+   var tn=null; for(var i=0;i<pr.childNodes.length;i++){ if(pr.childNodes[i].nodeType===3){tn=pr.childNodes[i];break;} }
+   if(!tn||tn.nodeValue.indexOf(d[0])===-1) return;
+   pr.setAttribute('data-bf','1');
+   tn.nodeValue=tn.nodeValue.replace(d[0],d[1]);
+   var head=document.createElement('div'); head.className='bf-head';
+   var tag=document.createElement('span'); tag.className='bf-tag'; tag.textContent='BLACK FRIDAY';
+   var old=document.createElement('span'); old.className='bf-old'; old.textContent=d[0]+' ₾';
+   head.appendChild(tag); head.appendChild(old);
+   pr.parentNode.insertBefore(head,pr);
+  });
+ }
+ function promo(){
+  if(!on()) return;
+  document.querySelectorAll('[data-hz="promoS"]').forEach(function(el){
+   if(el.textContent.indexOf('5.99')!==-1) el.textContent=el.textContent.replace('5.99','3.99');
+  });
+ }
+ function run(){decorate();promo();}
+ function init(){
+  run();
+  try{
+   var mo=new MutationObserver(function(){ if(!on()){mo.disconnect();return;} run(); });
+   mo.observe(document.documentElement,{childList:true,subtree:true});
+  }catch(e){}
+  setInterval(run,1500);
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+</script>
 </body>
 </html>
