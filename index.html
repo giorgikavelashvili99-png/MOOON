@@ -32768,7 +32768,8 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var srcKbps=(f&&dur>0)?(f.size*8/dur/1000):8000;
     var ratio=S.opt.mode==='br'?Math.min(.95,S.opt.br/srcKbps):Math.max(.45,Math.min(.9,.72-(S.opt.rf-14)*.012));
     var targetK=Math.max(300,Math.round(srcKbps*ratio*Math.pow(.8,boost)));
-    var hevc=i.v==='hevc', ten=hevc&&(i.tenBit||/\.(2|4)\./.test(i.codecString||'')||/main.?10|10.?bit/i.test(i.codecString||''));
+    var big=!!(i.w&&i.h&&(Math.max(i.w,i.h)>1920||Math.min(i.w,i.h)>1080)); S.wasmScaled=big;
+    var hevc=i.v==='hevc'&&!big, ten=hevc&&(i.tenBit||/\.(2|4)\./.test(i.codecString||'')||/main.?10|10.?bit/i.test(i.codecString||''));
     var encoder=hevc?'libx265':'libx264', pix=hevc?(ten?'yuv420p10le':'yuv420p'):'yuv420p';
     var profile=hevc?(ten?'main10':'main'):'high', preset=fast?'ultrafast':(hevc?'ultrafast':'veryfast');
     var a=['-hide_banner','-stats_period','1','-progress','pipe:1','-nostats','-i',path,'-map','0:v:0','-map','0:a?',
@@ -32776,6 +32777,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       '-b:v',targetK+'k','-maxrate',Math.round(targetK*1.15)+'k','-bufsize',Math.round(targetK*2)+'k',
       '-fps_mode','passthrough','-c:a','copy','-map_metadata','0','-map_chapters','0','-dn','-sn'];
     if(hevc) a.push('-tag:v','hvc1');
+    if(big){ var land=i.w>=i.h; a.push('-vf','scale=w='+(land?1920:1080)+':h='+(land?1080:1920)+':force_original_aspect_ratio=decrease:force_divisible_by=2'); }
     if(i.colorPrimaries&&typeof i.colorPrimaries==='string') a.push('-color_primaries',i.colorPrimaries);
     if(i.colorTransfer&&typeof i.colorTransfer==='string') a.push('-color_trc',i.colorTransfer);
     if(i.colorSpace&&typeof i.colorSpace==='string') a.push('-colorspace',i.colorSpace);
@@ -32815,6 +32817,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     if(S.state!=='ready'||!S.file||S.probing) return;
     if(tinySource()){ S.t0=Date.now(); keepOriginal(S.file); return; }
     if(S.wcOK&&!S.wcFail&&(!S.info||S.info.browserCanDecode!==false)&&wcWorthIt()) return compressWC();
+    if(!S.wcWhy){ S.wcWhy=!WC_OK?'no-webcodecs':(!S.wcOK?'probe-failed':(S.info&&S.info.browserCanDecode===false?'browser cannot decode '+(S.info.v||'video')+' (hardware decoder missing)':(S.wcFail?'wc-failed':'not-worth-it'))); }
     compressWasm();
   }
   function compressWasm(){
@@ -32826,7 +32829,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>30&&E.ff){ el.PS.textContent='მუშაობს… ('+Math.round(sec)+'წ) — პირველი პროცენტი ცოტა ხანში გამოჩნდება'; } } },1000);
     getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,true); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
-    .then(function(){ if(tk!==S.token) throw new Error('stale'); return probe(ff,'hbout.mp4').then(function(outInfo){ var src=S.info||{}; var cn={avc:'h264',hevc:'hevc',vp9:'vp9',av1:'av1',vp8:'vp8'}; if(src.v&&outInfo.v&&(cn[src.v]||src.v)!==(cn[outInfo.v]||outInfo.v)) throw new Error('codec changed'); }); })
+    .then(function(){ if(tk!==S.token) throw new Error('stale'); return probe(ff,'hbout.mp4').then(function(outInfo){ var src=S.info||{}; if(!S.wasmScaled){ var cn={avc:'h264',hevc:'hevc',vp9:'vp9',av1:'av1',vp8:'vp8'}; if(src.v&&outInfo.v&&(cn[src.v]||src.v)!==(cn[outInfo.v]||outInfo.v)) throw new Error('codec changed'); } }); })
     .then(function(){ if(tk!==S.token) throw new Error('stale'); setProg(1,false); return ff.readFile('hbout.mp4'); })
     .then(function(data){
       if(tk!==S.token) throw new Error('stale');
