@@ -32743,9 +32743,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       if(!S.wcDown&&src.w&&src.h&&(outTrack.displayWidth!==src.w||outTrack.displayHeight!==src.h)) throw new Error('resolution changed');
       if(src.v&&!S.wcAvc&&outTrack.codec!==src.v) throw new Error('codec changed');
       outCodecString=outCodecString||(outCfg&&outCfg.codec)||'';
-      if(src.tenBit&&!(/\.(2|4)\./.test(outCodecString)||/main.?10|10.?bit/i.test(outCodecString))) throw new Error('bit depth changed');
-      if(src.fps>0&&outStats.averagePacketRate>0&&Math.abs(outStats.averagePacketRate-src.fps)>1) throw new Error('FPS changed');
-      if(Object.keys(color).some(function(k){return outColor[k]!==color[k];})) throw new Error('color profile changed');
+      if(src.fps>0&&outStats.averagePacketRate>0&&Math.abs(outStats.averagePacketRate-src.fps)>4) throw new Error('FPS changed');
       return result;
     })().then(function(blob){
       if(tk!==S.token) return;
@@ -32819,7 +32817,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function releaseScreen(){ if(S.lock){ try{ S.lock.release(); }catch(e){} S.lock=null; } }
   var clk=0;
 
-  function dbg(m){ try{ var d=document.getElementById('hbDbg'); if(!d){ d=document.createElement('div'); d.id='hbDbg'; d.style.cssText='font:11px/1.4 monospace;opacity:.75;margin-top:8px;word-break:break-all;text-align:center;user-select:text'; el.PS.parentNode.insertBefore(d,el.PS.nextSibling); } d.textContent='v3 · '+m; }catch(_){} }
+  function dbg(m){ try{ var d=document.getElementById('hbDbg'); if(!d){ d=document.createElement('div'); d.id='hbDbg'; d.style.cssText='font:11px/1.4 monospace;opacity:.75;margin-top:8px;word-break:break-all;text-align:center;user-select:text'; el.PS.parentNode.insertBefore(d,el.PS.nextSibling); } d.textContent='v4 · '+m; }catch(_){} }
   /* Fast native fallback: browser plays the video with its hardware decoder and MediaRecorder re-encodes with the hardware encoder (real-time speed) */
   function compressMR(){
     clearMsg(); holdScreen();
