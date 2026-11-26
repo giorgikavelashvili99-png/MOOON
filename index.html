@@ -37728,14 +37728,18 @@ html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za
   /* ---- login block (logged-out) keeps working, just softer ---- */
   #hzMenu#hzMenu#hzMenu .hzm-alt-btn{border-radius:14px!important;border:1px solid var(--v-line)!important;background-color:rgba(255,255,255,.04)!important}
 
-  /* ---- staggered entrance ---- */
-  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>*{animation:hzmRise .4s cubic-bezier(.2,.8,.2,1) backwards!important}
-  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-promo{animation-delay:.02s!important}
-  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-sec--tools{animation-delay:.05s!important}
-  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-sec--more{animation-delay:.08s!important}
-  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-stats{animation-delay:.12s!important}
-  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-acct{animation-delay:.16s!important}
-  @media (prefers-reduced-motion:reduce){html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>*{animation:none!important}}
+  /* ---- one calm motion: the whole panel fades in and settles 6px (no per-card stagger, no scale = no flicker) ---- */
+  #hzMenu#hzMenu#hzMenu{
+    transform:translate3d(0,-6px,0)!important;transform-origin:top right!important;
+    transition:opacity .18s ease,transform .24s cubic-bezier(.22,.8,.24,1),visibility 0s linear .24s!important;
+  }
+  html.hz-menu-open #hzMenu#hzMenu#hzMenu{
+    transform:none!important;
+    transition:opacity .18s ease,transform .28s cubic-bezier(.22,.8,.24,1),visibility 0s!important;
+  }
+  /* inner motion stays tiny and never animates layout */
+  #hzMenu#hzMenu#hzMenu .hzm-row,#hzMenu#hzMenu#hzMenu .gz-row{transition:background-color .16s ease!important}
+  @media (prefers-reduced-motion:reduce){#hzMenu#hzMenu#hzMenu,html.hz-menu-open #hzMenu#hzMenu#hzMenu{transition:opacity .01s!important;transform:none!important}}
 }
 </style>
 <script id="moon-menu-place">
@@ -37777,16 +37781,6 @@ html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za
       set('width',(t.width/z)+'px');
       if(t.full){ set('height',(t.maxH/z)+'px'); set('max-height','none'); }
       else{ set('height','auto'); set('max-height',(t.maxH/z)+'px'); }
-      clearTimeout(tmr);
-      tmr=setTimeout(function(){          /* one correction pass once the open animation has settled */
-        try{
-          if(!root.classList.contains('hz-menu-open')) return;
-          var r=menu.getBoundingClientRect(), z2=Z(), dx=t.left-r.left, dy=t.top-r.top;
-          if(Math.abs(dx)>1.5||Math.abs(dy)>1.5){
-            set('left',((parseFloat(s.left)||0)+dx/z2)+'px'); set('top',((parseFloat(s.top)||0)+dy/z2)+'px');
-          }
-        }catch(e){}
-      },420);
     }catch(e){}
   }
   new MutationObserver(function(){ if(root.classList.contains('hz-menu-open')) apply(); }).observe(root,{attributes:true,attributeFilter:['class']});
