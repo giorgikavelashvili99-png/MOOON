@@ -32668,7 +32668,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   /* fast probe without downloading the 30 MB ffmpeg engine; on any failure the old wasm analysis runs instead */
   function analyseFast(file,tk){
     if(!WC_OK){ analyse(file,tk); return; }
-    S.info=null; S.probing=true; render();
+    S.info=null; S.probing=true; S.wcAvc=false; render();
     var done=false, to=setTimeout(function(){ if(done||tk!==S.token) return; done=true; S.wcOK=false; analyse(file,tk); },10000);
     (async function(){
       var M=await loadMB();
@@ -32702,7 +32702,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var input=new M.Input({source:new M.BlobSource(file),formats:M.ALL_FORMATS});
       var sourceTrack=await input.getPrimaryVideoTrack(), sourceCfg=sourceTrack?await sourceTrack.getDecoderConfig():null, sourceColor=sourceTrack?await sourceTrack.getColorSpace():null;
       var sourceCodecString=sourceTrack&&typeof sourceTrack.getCodecParameterString==='function'?await sourceTrack.getCodecParameterString():null;
-      var sameHevc=!!(sourceTrack&&sourceTrack.codec==='hevc'), codec=sameHevc?'hevc':'avc';
+      var sameHevc=!!(sourceTrack&&sourceTrack.codec==='hevc'&&!S.wcAvc), codec=sameHevc?'hevc':'avc';
       var srcKbps=dur>0?file.size*8/dur/1000:8000;
       var ratio=S.opt.mode==='br'?Math.min(.95,S.opt.br/srcKbps):Math.max(.45,Math.min(.9,.72-(S.opt.rf-14)*.012));
       var kbps=Math.max(300,Math.round(srcKbps*ratio*Math.pow(.8,boost)));
@@ -32732,7 +32732,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var outTrack=await check.getPrimaryVideoTrack(); if(!outTrack) throw new Error('output video track missing');
       var outStats=await outTrack.computePacketStats(200), outColor=await outTrack.getColorSpace(), outCfg=await outTrack.getDecoderConfig(), outCodecString=outTrack&&typeof outTrack.getCodecParameterString==='function'?await outTrack.getCodecParameterString():null, src=S.info||{};
       if(src.w&&src.h&&(outTrack.displayWidth!==src.w||outTrack.displayHeight!==src.h)) throw new Error('resolution changed');
-      if(src.v&&outTrack.codec!==src.v) throw new Error('codec changed');
+      if(src.v&&!S.wcAvc&&outTrack.codec!==src.v) throw new Error('codec changed');
       outCodecString=outCodecString||(outCfg&&outCfg.codec)||'';
       if(src.tenBit&&!(/\.(2|4)\./.test(outCodecString)||/main.?10|10.?bit/i.test(outCodecString))) throw new Error('bit depth changed');
       if(src.fps>0&&outStats.averagePacketRate>0&&Math.abs(outStats.averagePacketRate-src.fps)>.1) throw new Error('FPS changed');
@@ -32749,7 +32749,10 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     }).catch(function(e){
       if(tk!==S.token||(e&&e.message==='stale')) return;
       try{ console.warn('WebCodecs path failed, falling back to ffmpeg.wasm',e); }catch(_){}
-      S.wcWhy=String((e&&e.message)||e).slice(0,140); S.wcFail=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWasm(); },0);
+      S.wcWhy=String((e&&e.message)||e).slice(0,140);
+      /* HEVC hardware encoding is often unavailable in the browser; software x265 in wasm cannot handle 4K/60 in reasonable time, so retry once with hardware H.264 (8-bit sources only) */
+      var si=S.info||{}; if(si.v==='hevc'&&!S.wcAvc&&!si.tenBit&&si.w*si.h>=1920*1080){ S.wcAvc=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWC(); },0); return; }
+      S.wcFail=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWasm(); },0);
     }).then(function(){ E.conv=null; clearInterval(clk); releaseScreen(); });
   }
 
