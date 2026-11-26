@@ -32692,7 +32692,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   }
   function compressWC(){
     clearMsg(); wakeTF(); holdScreen();
-    var file=S.file, tk=S.token, boost=S.boost||0;
+    var file=S.file, tk=S.token, boost=S.boost||0; dbg('WC hardware'+(S.wcAvc?' avc':'')+(S.wcDown?' 1080p':''));
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
     el.PT.textContent=t('pTitleRun'); el.PS.textContent=WCT[L()]||WCT.en; setProg(0,true);
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy') el.El.textContent=clock((Date.now()-S.t0)/1000); },1000);
@@ -32758,7 +32758,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     }).catch(function(e){
       if(tk!==S.token||(e&&e.message==='stale')) return;
       try{ console.warn('WebCodecs path failed, falling back to ffmpeg.wasm',e); }catch(_){}
-      S.wcWhy=String((e&&e.message)||e).slice(0,140);
+      S.wcWhy=String((e&&e.message)||e).slice(0,140); dbg('WC failed: '+S.wcWhy);
       /* HEVC hardware encoding is often unavailable in the browser; software x265 in wasm cannot handle 4K/60 in reasonable time, so retry once with hardware H.264 (8-bit sources only) */
       var si=S.info||{}; if(si.v==='hevc'&&!S.wcAvc&&!si.tenBit&&si.w*si.h>=1920*1080){ S.wcAvc=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWC(); },0); return; }
       if(!S.wcDown&&si.w&&si.h&&Math.max(si.w,si.h)>1920){ S.wcDown=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWC(); },0); return; }
@@ -32819,12 +32819,13 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function releaseScreen(){ if(S.lock){ try{ S.lock.release(); }catch(e){} S.lock=null; } }
   var clk=0;
 
+  function dbg(m){ try{ var d=document.getElementById('hbDbg'); if(!d){ d=document.createElement('div'); d.id='hbDbg'; d.style.cssText='font:11px/1.4 monospace;opacity:.75;margin-top:8px;word-break:break-all;text-align:center;user-select:text'; el.PS.parentNode.insertBefore(d,el.PS.nextSibling); } d.textContent='v3 · '+m; }catch(_){} }
   /* Fast native fallback: browser plays the video with its hardware decoder and MediaRecorder re-encodes with the hardware encoder (real-time speed) */
   function compressMR(){
     clearMsg(); holdScreen();
     var file=S.file, tk=S.token, why=S.wcWhy||'', dead=false, chunks=[], rec=null, ac=null, poll=0, stall=0, lastT=-1;
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
-    el.PT.textContent=t('pTitleRun'); el.PS.textContent='სწრაფი რეჟიმი'+(why?' ['+why+']':''); setProg(0,true);
+    el.PT.textContent=t('pTitleRun'); el.PS.textContent='სწრაფი რეჟიმი'+(why?' ['+why+']':''); setProg(0,true); dbg('MR recorder · '+why);
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy') el.El.textContent=clock((Date.now()-S.t0)/1000); },1000);
     var v=document.createElement('video'), url=URL.createObjectURL(file);
     v.playsInline=true; v.preload='auto'; v.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:.02;pointer-events:none';
@@ -32888,7 +32889,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     clearMsg(); wakeTF(); holdScreen();
     var file=S.file, tk=S.token, ff=null;
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
-    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=(loaded?t('pSubRun'):loadingHint())+(S.wcWhy?' ['+S.wcWhy+']':''); setProg(0,true);
+    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); dbg('WASM slow · '+(S.wcWhy||'?')); el.PS.textContent=(loaded?t('pSubRun'):loadingHint())+(S.wcWhy?' ['+S.wcWhy+']':''); setProg(0,true);
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>30&&E.ff){ el.PS.textContent='მუშაობს… ('+Math.round(sec)+'წ) — პირველი პროცენტი ცოტა ხანში გამოჩნდება'; } } },1000);
     getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,true); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
