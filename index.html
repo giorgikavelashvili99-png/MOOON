@@ -38604,6 +38604,17 @@ html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za
   html body .pc-modal-scrim.open{ overflow-y:auto !important; overscroll-behavior:contain !important; padding-bottom:80px !important; -webkit-overflow-scrolling:touch; }
   html body .pc-modal-scrim > .pc-accordion-body.panel{ max-height:none !important; margin-bottom:24px !important; }
   html body .pc-modal-scrim .pc-modal-scroll{ max-height:none !important; overflow:visible !important; }
+
+  /* 3) order / edit-order window: on short screens it was ENLARGED (1.17x) and ran off the bottom.
+        Now it shrinks in steps so the whole window (tabs, preview, quality, confirm button) sits inside the screen.
+        Screens taller than 820px keep their current size. */
+  @media (min-width:901px) and (max-height:819px){ html body .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1.1 !important } }
+  @media (min-width:901px) and (max-height:759px){ html body .pc-modal-scrim > .pc-accordion-body.panel{ zoom:1 !important } }
+  @media (min-width:901px) and (max-height:699px){ html body .pc-modal-scrim > .pc-accordion-body.panel{ zoom:.9 !important } }
+  @media (min-width:901px) and (max-height:639px){ html body .pc-modal-scrim > .pc-accordion-body.panel{ zoom:.82 !important } }
+  @media (min-width:901px) and (max-height:589px){ html body .pc-modal-scrim > .pc-accordion-body.panel{ zoom:.74 !important } }
+  @media (min-width:901px) and (max-height:539px){ html body .pc-modal-scrim > .pc-accordion-body.panel{ zoom:.66 !important } }
+  @media (min-width:901px) and (max-height:479px){ html body .pc-modal-scrim > .pc-accordion-body.panel{ zoom:.58 !important } }
 }
 </style>
 </body>
