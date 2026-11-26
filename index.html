@@ -10599,6 +10599,7 @@ html body #hzBar.hz-fit4 .hz-link:not(.is-active)>span{display:none!important}
     // not inside .pc-card anymore.
     const modalBody = pcModalScrim ? pcModalScrim.querySelector('.pc-accordion-body') : null;
     if (modalBody && modalBody.contains(e.target)) return;
+    if (pcModalScrim && pcModalScrim.contains(e.target)) return;
     if (pcModalScrim && !pcModalScrim.classList.contains('open')) return;
     e.preventDefault();
   }
@@ -38572,6 +38573,37 @@ html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za
 
   /* room so the glow is not clipped in the slider */
   html body .pricing-cards.pc-scroll-mode .pc-scroll-track{padding-top:54px !important;padding-bottom:60px !important}
+}
+</style>
+<style id="laptopStabilizer">
+/* LAPTOP STABILIZER
+   - Big screens (taller than 800px and wider than 1250px, e.g. 1080p / 1440p / 240Hz gaming monitors): NOTHING changes.
+   - Smaller laptop screens (1366x768, 1280x720, scaled 1080p ...): every page block and the order window scale down in steps so they fit inside the frame.
+   - Wheel / trackpad scrolling now works everywhere over the cards and inside the order window. */
+@layer moon-final {
+  :root{--lzh:1;--lzw:1}
+  @media (min-width:900px) and (max-height:800px){:root{--lzh:.94}}
+  @media (min-width:900px) and (max-height:720px){:root{--lzh:.88}}
+  @media (min-width:900px) and (max-height:650px){:root{--lzh:.8}}
+  @media (min-width:900px) and (max-height:590px){:root{--lzh:.72}}
+  @media (min-width:900px) and (max-height:520px){:root{--lzh:.64}}
+  @media (min-width:900px) and (max-width:1250px){:root{--lzw:.92}}
+  @media (min-width:900px) and (max-width:1100px){:root{--lzw:.84}}
+
+  @media (min-width:900px) and (max-height:800px), (min-width:900px) and (max-width:1250px){
+    html body .pc-section,
+    html body #mnViews .mn-view:not(#communityView){ zoom:min(var(--lzh),var(--lzw)) !important; }
+  }
+
+  /* 1) wheel / trackpad over the pricing cards scrolls the page (it was swallowed by the card track) */
+  html body .pricing-cards .pc-scroll-track,
+  html body .pricing-cards .pc-scroll-shell,
+  html body .pricing-cards .pc-slide{ overscroll-behavior-y:auto !important; }
+
+  /* 2) order window: one reliable scroll area, always reachable, leaves room under it */
+  html body .pc-modal-scrim.open{ overflow-y:auto !important; overscroll-behavior:contain !important; padding-bottom:80px !important; -webkit-overflow-scrolling:touch; }
+  html body .pc-modal-scrim > .pc-accordion-body.panel{ max-height:none !important; margin-bottom:24px !important; }
+  html body .pc-modal-scrim .pc-modal-scroll{ max-height:none !important; overflow:visible !important; }
 }
 </style>
 </body>
