@@ -37559,5 +37559,230 @@ html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za
   #hzMenu#hzMenu .hzm-stats .mm-stat+.mm-stat{border-left:1px solid rgba(255,255,255,.12)!important}
 }
 </style>
+<style id="moon-menu-v2">
+/* =====================================================================
+   MOON — menu v2 (loads last, lives in the first cascade layer).
+   Same family as the Method page (zinc glass + plan colour), but calmer:
+   1px hairlines instead of 1.5px glowing rings, one soft shadow per card,
+   no chip header, consistent 20px cards / 12px tiles, staggered entrance.
+   Position is handled by #moon-menu-place (script below), not by CSS.
+   ===================================================================== */
+@keyframes hzmRise{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:none}}
+@layer moon-final{
+  #hzMenu#hzMenu#hzMenu{
+    --v-line:rgba(255,255,255,.10); --v-line2:rgba(255,255,255,.07);
+    --v-tx:#f4f4f6; --v-dim:#9a9fae; --v-chev:rgba(255,255,255,.34);
+    --v-acc:#8aa4ff; --v-acc-rgb:110,140,255;
+    border:1px solid rgba(255,255,255,.13)!important;
+    border-radius:26px!important;
+    background-color:#0d0f15!important;
+    background-image:
+      radial-gradient(120% 38% at 100% 0%, rgba(110,140,255,.15), transparent 62%),
+      radial-gradient(100% 30% at 0% 100%, rgba(255,255,255,.045), transparent 70%),
+      linear-gradient(180deg,#171a23 0%,#0c0e14 100%)!important;
+    box-shadow:0 30px 70px rgba(0,0,0,.62),0 2px 0 rgba(255,255,255,.05) inset!important;
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-scroll{padding:14px!important;gap:12px!important}
+
+  /* ---- cards ---- */
+  #hzMenu#hzMenu#hzMenu .hzm-group,
+  #hzMenu#hzMenu#hzMenu .hzm-stats,
+  #hzMenu#hzMenu#hzMenu .gz{
+    border:1px solid var(--v-line)!important;border-radius:20px!important;
+    background-color:rgba(20,23,32,.72)!important;
+    background-image:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02))!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-promo{
+    border:1px solid rgba(var(--v-acc-rgb),.42)!important;border-radius:20px!important;
+    background-color:rgba(24,30,56,.85)!important;
+    background-image:
+      radial-gradient(90% 160% at 0% 0%, rgba(var(--v-acc-rgb),.32), transparent 62%),
+      linear-gradient(160deg,rgba(70,92,190,.26),rgba(18,22,40,.55))!important;
+    box-shadow:0 10px 26px rgba(60,90,220,.20),inset 0 1px 0 rgba(255,255,255,.13)!important;
+    transition:transform .2s ease,box-shadow .2s ease!important;
+  }
+  @media (hover:hover){
+    #hzMenu#hzMenu#hzMenu .hzm-promo:hover{transform:translateY(-1px)!important;box-shadow:0 14px 32px rgba(60,90,220,.30),inset 0 1px 0 rgba(255,255,255,.16)!important}
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-promo .hzm-tile{
+    background-color:transparent!important;background-image:linear-gradient(145deg,#86a1ff,#3b5bdb)!important;
+    border:0!important;color:#fff!important;border-radius:12px!important;
+    box-shadow:0 6px 14px rgba(59,91,219,.5),inset 0 1px 0 rgba(255,255,255,.35)!important;
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-promo .hzm-promo-txt b{font-size:16px!important;font-weight:800!important;letter-spacing:.005em!important;color:#fff!important}
+  #hzMenu#hzMenu#hzMenu .hzm-promo .hzm-promo-txt small{font-size:12.5px!important;font-weight:500!important;color:#b6c0e6!important;font-family:inherit!important}
+  #hzMenu#hzMenu#hzMenu .hzm-promo>.hzm-chev{
+    background-color:rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.2)!important;
+    stroke:#fff!important;transition:transform .2s ease,background-color .2s ease!important}
+  @media (hover:hover){#hzMenu#hzMenu#hzMenu .hzm-promo:hover>.hzm-chev{transform:translateX(2px)!important;background-color:rgba(255,255,255,.2)!important}}
+
+  /* ---- section caption: quiet text + hairline instead of a glowing chip ---- */
+  #hzMenu#hzMenu#hzMenu .hzm-sec>.hzm-label{
+    display:flex!important;align-items:center!important;gap:12px!important;width:100%!important;margin:0 0 8px!important;padding:0 6px!important;
+    border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;
+    color:var(--v-dim)!important;font-size:12px!important;font-weight:700!important;letter-spacing:.14em!important;line-height:1!important;text-transform:uppercase!important;
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-sec>.hzm-label::before{display:none!important;content:none!important}
+  #hzMenu#hzMenu#hzMenu .hzm-sec>.hzm-label::after{content:""!important;display:block!important;flex:1 1 auto;height:1px;background:linear-gradient(90deg,var(--v-line),transparent)!important}
+
+  /* ---- rows ---- */
+  #hzMenu#hzMenu#hzMenu .hzm-group>.hzm-row,
+  #hzMenu#hzMenu#hzMenu #quickNav .hzm-row,
+  #hzMenu#hzMenu#hzMenu .gz-row{
+    min-height:58px!important;padding:10px 14px!important;gap:14px!important;
+    color:var(--v-tx)!important;font-weight:600!important;
+    transition:background-color .18s ease!important;
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-group>.hzm-row+.hzm-row,
+  #hzMenu#hzMenu#hzMenu #quickNav .hzm-row+.hzm-row,
+  #hzMenu#hzMenu#hzMenu .gz-row+.gz-row{
+    background-image:linear-gradient(var(--v-line2),var(--v-line2))!important;background-repeat:no-repeat!important;
+    background-size:calc(100% - 64px) 1px!important;background-position:100% 0!important;
+  }
+  @media (hover:hover){
+    #hzMenu#hzMenu#hzMenu .hzm-group>.hzm-row:hover,
+    #hzMenu#hzMenu#hzMenu #quickNav .hzm-row:hover,
+    #hzMenu#hzMenu#hzMenu .gz-row:hover{background-color:rgba(255,255,255,.055)!important}
+    #hzMenu#hzMenu#hzMenu .hzm-row:hover>.hzm-chev,
+    #hzMenu#hzMenu#hzMenu .gz-row:hover>.hzm-chev,
+    #hzMenu#hzMenu#hzMenu .mm-open:hover>.mm-ch{transform:translateX(3px)!important;stroke:rgba(255,255,255,.75)!important}
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-row>.hzm-chev,
+  #hzMenu#hzMenu#hzMenu .gz-row>.hzm-chev,
+  #hzMenu#hzMenu#hzMenu .mm-open>.mm-ch{stroke:var(--v-chev)!important;transition:transform .2s ease,stroke .2s ease!important}
+
+  /* ---- icon tiles ---- */
+  #hzMenu#hzMenu#hzMenu .hzm-row:not(.is-active) .hzm-tile,
+  #hzMenu#hzMenu#hzMenu .gz-ic,
+  #hzMenu#hzMenu#hzMenu .mm-back{
+    background-color:transparent!important;
+    background-image:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.04))!important;
+    border:1px solid rgba(255,255,255,.14)!important;color:#e7e7ec!important;border-radius:12px!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important;
+  }
+  #hzMenu#hzMenu#hzMenu .hzm-row .hzm-tile svg,#hzMenu#hzMenu#hzMenu .gz-ic svg{width:18px!important;height:18px!important;stroke-width:1.9}
+  #hzMenu#hzMenu#hzMenu .mm-open .mm-sub{background-color:rgba(var(--v-acc-rgb),.2)!important;color:#dbe4ff!important;border:1px solid rgba(var(--v-acc-rgb),.35)!important}
+
+  /* ---- stats ---- */
+  #hzMenu#hzMenu#hzMenu .hzm-stats{padding:14px 0!important}
+  #hzMenu#hzMenu#hzMenu .hzm-stats .mm-stat+.mm-stat{border-left:1px solid var(--v-line)!important}
+  #hzMenu#hzMenu#hzMenu .hzm-stats .mm-stat b{font-size:19px!important;font-weight:800!important;color:#fff!important}
+  #hzMenu#hzMenu#hzMenu .hzm-stats .mm-lab{color:var(--v-dim)!important}
+
+  /* ---- account card (tinted by plan, like the Method page: free zinc, 1 blue, 2 purple, 3 gold) ---- */
+  #hzMenu#hzMenu#hzMenu .gz{--pl:#cdd4ff;--pl-rgb:140,160,255;position:relative}
+  #hzMenu#hzMenu#hzMenu .gz[data-plan="free"]{--pl:#e4e4e7;--pl-rgb:161,161,170}
+  #hzMenu#hzMenu#hzMenu .gz[data-plan="p1"]{--pl:#b3c9ff;--pl-rgb:84,138,255}
+  #hzMenu#hzMenu#hzMenu .gz[data-plan="p2"]{--pl:#e3c6ff;--pl-rgb:168,85,247}
+  #hzMenu#hzMenu#hzMenu .gz[data-plan="p3"]{--pl:#ffe29a;--pl-rgb:255,190,36}
+  #hzMenu#hzMenu#hzMenu .gz{
+    border-color:rgba(var(--pl-rgb),.38)!important;
+    background-image:radial-gradient(110% 70% at 0% 0%,rgba(var(--pl-rgb),.16),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))!important;
+    box-shadow:0 8px 24px rgba(var(--pl-rgb),.10),inset 0 1px 0 rgba(255,255,255,.07)!important;
+  }
+  #hzMenu#hzMenu#hzMenu .gz-top{padding:16px 16px 12px!important}
+  #hzMenu#hzMenu#hzMenu .gz-name{font-size:19px!important;font-weight:800!important;letter-spacing:.01em!important;color:#fff!important}
+  #hzMenu#hzMenu#hzMenu .gz-plan{
+    border:1px solid rgba(var(--pl-rgb),.6)!important;color:var(--pl)!important;
+    background-color:transparent!important;background-image:linear-gradient(180deg,rgba(var(--pl-rgb),.28),rgba(var(--pl-rgb),.10))!important;
+    box-shadow:0 0 12px rgba(var(--pl-rgb),.25),inset 0 1px 0 rgba(255,255,255,.18)!important;
+    font-weight:800!important;letter-spacing:.09em!important}
+  #hzMenu#hzMenu#hzMenu .gz-q{padding:0 16px 14px!important;gap:10px!important}
+  #hzMenu#hzMenu#hzMenu .gz-c{
+    padding:13px 14px!important;border-radius:15px!important;gap:10px!important;
+    background-color:rgba(6,8,14,.45)!important;background-image:none!important;border:1px solid var(--v-line2)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important}
+  #hzMenu#hzMenu#hzMenu .gz-cl{color:var(--v-dim)!important;font-size:12.5px!important}
+  #hzMenu#hzMenu#hzMenu .gz-cv>span{font-size:28px!important;font-weight:800!important;color:#fff!important}
+  #hzMenu#hzMenu#hzMenu .gz-cv>em{color:#767c8e!important}
+  #hzMenu#hzMenu#hzMenu .gz-rows{border-top:1px solid var(--v-line2)!important}
+  #hzMenu#hzMenu#hzMenu .gz-row em{color:var(--v-dim)!important}
+  #hzMenu#hzMenu#hzMenu .gz-row em b{color:#fff!important}
+  #hzMenu#hzMenu#hzMenu .gz-out{
+    min-height:48px!important;margin:4px 16px 16px!important;width:calc(100% - 32px)!important;border-radius:14px!important;
+    background-color:transparent!important;background-image:linear-gradient(180deg,rgba(248,113,113,.12),rgba(248,113,113,.04))!important;
+    border:1px solid rgba(248,113,113,.38)!important;color:#ff8f8f!important;box-shadow:none!important;transition:background-color .18s ease,border-color .18s ease,color .18s ease!important}
+  @media (hover:hover){#hzMenu#hzMenu#hzMenu .gz-out:hover{background-image:linear-gradient(180deg,rgba(248,113,113,.22),rgba(248,113,113,.09))!important;border-color:rgba(248,113,113,.6)!important;color:#ffb0b0!important}}
+
+  /* ---- login block (logged-out) keeps working, just softer ---- */
+  #hzMenu#hzMenu#hzMenu .hzm-alt-btn{border-radius:14px!important;border:1px solid var(--v-line)!important;background-color:rgba(255,255,255,.04)!important}
+
+  /* ---- staggered entrance ---- */
+  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>*{animation:hzmRise .4s cubic-bezier(.2,.8,.2,1) backwards!important}
+  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-promo{animation-delay:.02s!important}
+  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-sec--tools{animation-delay:.05s!important}
+  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-sec--more{animation-delay:.08s!important}
+  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-stats{animation-delay:.12s!important}
+  html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>.hzm-acct{animation-delay:.16s!important}
+  @media (prefers-reduced-motion:reduce){html.hz-menu-open #hzMenu#hzMenu#hzMenu .hzm-scroll>*{animation:none!important}}
+}
+</style>
+<script id="moon-menu-place">
+/* Positions the menu under the account / menu button, independent of CSS zoom quirks.
+   Method: measure the real zoom factor Z of the menu's coordinate space with a probe element
+   (same zoom rules as .hz-menu), then write left/top/width/max-height in CSS px = wanted viewport px / Z. */
+(function(){
+  var root=document.documentElement, menu=document.getElementById('hzMenu'), bar=document.getElementById('hzBar');
+  if(!menu||!bar) return;
+  var probe=null, tmr=0;
+  function Z(){
+    if(!probe){
+      probe=document.createElement('div'); probe.className='hz-spacer'; probe.setAttribute('aria-hidden','true');
+      probe.style.cssText='position:fixed!important;left:0!important;top:0!important;width:100px!important;height:10px!important;visibility:hidden!important;pointer-events:none!important;contain:none!important';
+      document.body.appendChild(probe);
+    }
+    var w=probe.getBoundingClientRect().width;
+    return (w>1&&isFinite(w))?w/100:1;
+  }
+  function target(){
+    var vw=root.clientWidth||innerWidth, vh=innerHeight, G=16;
+    var br=bar.getBoundingClientRect(), top=Math.round(br.bottom)+8;
+    var acct=document.getElementById('hzAcctBtn'), ar=acct?acct.getBoundingClientRect():null;
+    var desk=vw>=1024, right, width, full=!desk;
+    if(desk){
+      right=(ar&&ar.width>0)?Math.min(ar.right,vw-G):vw-G;
+      width=Math.min(352,vw-2*G);
+    }else{
+      right=vw-G; width=vw>=600?Math.min(520,vw-2*G):vw-2*G;
+    }
+    return {left:Math.round(right-width),top:top,width:Math.round(width),maxH:Math.max(240,vh-top-12),full:full};
+  }
+  function apply(){
+    try{
+      if(!root.classList.contains('hz-menu-open')) return;
+      var z=Z(), t=target(), s=menu.style;
+      function set(p,v){ s.setProperty(p,v,'important'); }
+      set('left',(t.left/z)+'px'); set('top',(t.top/z)+'px'); set('right','auto'); set('bottom','auto');
+      set('width',(t.width/z)+'px');
+      if(t.full){ set('height',(t.maxH/z)+'px'); set('max-height','none'); }
+      else{ set('height','auto'); set('max-height',(t.maxH/z)+'px'); }
+      clearTimeout(tmr);
+      tmr=setTimeout(function(){          /* one correction pass once the open animation has settled */
+        try{
+          if(!root.classList.contains('hz-menu-open')) return;
+          var r=menu.getBoundingClientRect(), z2=Z(), dx=t.left-r.left, dy=t.top-r.top;
+          if(Math.abs(dx)>1.5||Math.abs(dy)>1.5){
+            set('left',((parseFloat(s.left)||0)+dx/z2)+'px'); set('top',((parseFloat(s.top)||0)+dy/z2)+'px');
+          }
+        }catch(e){}
+      },420);
+    }catch(e){}
+  }
+  new MutationObserver(function(){ if(root.classList.contains('hz-menu-open')) apply(); }).observe(root,{attributes:true,attributeFilter:['class']});
+  addEventListener('resize',apply,{passive:true});
+
+  /* tag the account card with the plan so CSS can tint it (free / p1 / p2 / p3) */
+  var acctBox=document.getElementById('hzmAcct');
+  function tagPlan(){
+    try{
+      var g=acctBox&&acctBox.querySelector('.gz'); if(!g) return;
+      var p=g.querySelector('.gz-plan'), tx=p?p.textContent.trim():'', m=tx.match(/(\d+)\s*$/);
+      var v=m?('p'+m[1]):'free'; if(g.getAttribute('data-plan')!==v) g.setAttribute('data-plan',v);
+    }catch(e){}
+  }
+  if(acctBox){ new MutationObserver(tagPlan).observe(acctBox,{childList:true,subtree:true}); tagPlan(); }
+})();
+</script>
+
 </body>
 </html>
