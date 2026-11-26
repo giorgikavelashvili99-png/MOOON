@@ -25121,9 +25121,20 @@ window.renderAdminOptimizer=function(){
   var p=$('adminPanelOptimizer'); if(!p) return;
   var key=''; try{ key=sessionStorage.getItem(ADM_KEY)||''; }catch(e){}
   p.innerHTML='<div class="opt-adm-row"><span class="nm">Gate admin key<small>Worker-ის ADMIN_KEY (ინახება მხოლოდ ამ სესიაში)</small></span><input type="password" id="optAdmKey" value="'+esc(key)+'" style="max-width:200px"><button id="optAdmLoad" class="a-go">ჩატვირთვა</button></div>'+
-   '<div class="a-form-row"><input type="text" id="optAdmSearch" placeholder="ძებნა სახელით ან ID-ით..." style="width:100%"></div><div id="optAdmList"></div>';
+   '<div class="a-form-row"><input type="text" id="optAdmSearch" placeholder="ძებნა სახელით ან ID-ით..." style="width:100%"></div>'+
+   '<div class="opt-adm-row" id="optAdmBulk"><span class="nm">კრედიტების შევსება მაქსიმუმამდე<small>ამ კვირის გამოყენება ნულდება: ყველას ან მხოლოდ არჩეული გეგმის მომხმარებლებს</small></span>'+
+   '<select id="optAdmBulkPlan"><option value="">ყველა გეგმა</option><option value="free">მხოლოდ უფასო</option><option value="p1">მხოლოდ Plan 1</option><option value="p2">მხოლოდ Plan 2</option><option value="p3">მხოლოდ Plan 3</option></select>'+
+   '<button id="optAdmBulkGo" class="a-go">შევსება ყველასთვის</button></div><div id="optAdmList"></div>';
   $('optAdmLoad').onclick=function(){ try{ sessionStorage.setItem(ADM_KEY,$('optAdmKey').value); }catch(e){} loadAdm(); };
   $('optAdmSearch').oninput=drawAdm;
+  $('optAdmBulkGo').onclick=function(){
+    var pl=$('optAdmBulkPlan').value, btn=this, lbl=pl?({free:'უფასო',p1:'Plan 1',p2:'Plan 2',p3:'Plan 3'})[pl]:'ყველა';
+    if(!confirm('დარწმუნებული ხარ? კრედიტები შეივსება მაქსიმუმამდე: '+lbl+' მომხმარებელს.')) return;
+    btn.disabled=true; btn.textContent='…';
+    admApi('/admin/refill',pl?{all:true,plan:pl}:{all:true}).then(function(r){
+      btn.textContent='✓ '+(r.count||0); setTimeout(function(){ btn.textContent='შევსება ყველასთვის'; btn.disabled=false; },1800); loadAdm();
+    }).catch(function(er){ btn.textContent='შევსება ყველასთვის'; btn.disabled=false; alert(er.message); });
+  };
   if(key) loadAdm();
 };
 var admDir=[],admMap={};
@@ -25136,15 +25147,19 @@ function loadAdm(){
     drawAdm();
   }).catch(function(e){ list.innerHTML='<div class="c-empty">'+esc(e.message)+'</div>'; });
 }
+function crTxt(r){ if(!r||r.crRemaining===undefined) return '—'; if(r.unlimited) return '∞'; return r.crRemaining+' / '+r.crLimit; }
+function crColor(r){ if(!r||r.crRemaining===undefined||r.unlimited) return '#9aa0b4'; var p=r.crLimit?r.crRemaining/r.crLimit:0; return p<=0?'#f87171':(p<.25?'#fbbf24':'#6ee7a0'); }
+function setCr(row,r){ var e=row&&row.querySelector('.f-cr'); if(!e) return; e.textContent='დარჩა: '+crTxt(r); e.style.color=crColor(r); }
 function drawAdm(){
   var q=(($('optAdmSearch')||{}).value||'').toLowerCase(), list=$('optAdmList');
   var rows=admDir.filter(function(u){ return !q||String(u.username||'').toLowerCase().indexOf(q)>-1||String(u.id).indexOf(q)>-1; }).slice(0,200);
   list.innerHTML=rows.map(function(u){
     var r=admMap[String(u.id)]||{plan:'free'}; var days=r.expiresAt?Math.max(0,Math.ceil((r.expiresAt-Date.now())/864e5)):30;
     return '<div class="opt-adm-row" data-id="'+esc(u.id)+'" data-name="'+esc(u.username||'')+'"><span class="nm">'+esc(u.username||u.id)+'<small>'+esc(u.id)+(r.expiresAt?' · ვადა: '+new Date(r.expiresAt).toLocaleDateString():'')+'<span class="f-bn">'+(r.bonusNow>0?' · ბონუსი: +'+esc(r.bonusNow)+' კრედ.':'')+'</span></small></span>'+
+     '<span class="f-cr" style="font-weight:700;font-size:13px;white-space:nowrap;color:'+crColor(r)+'">დარჩა: '+esc(crTxt(r))+'</span>'+
      '<select class="f-plan"><option value="free">უფასო (35 კრ./კვ.)</option><option value="p1">Plan 1 · 100 კრ.</option><option value="p2">Plan 2 · 250 კრ.</option><option value="p3">Plan 3 · ∞</option></select>'+
      '<input class="f-days" type="number" min="1" value="'+days+'" title="დღეები"><input class="f-lim" type="number" min="0" value="'+(r.weeklyLimit!=null?r.weeklyLimit:'')+'" placeholder="კრედ." title="კვირის კრედიტების ლიმიტი (ცარიელი = გეგმის სტანდარტი)">'+
-     '<label style="font-size:12px"><input class="f-bl" type="checkbox"'+(r.blocked?' checked':'')+'> ბლოკი</label><button class="a-go f-save">შენახვა</button><button class="f-reset" title="კვირის გამოყენების განულება">↺</button><span class="f-mbg"><input class="f-mb" type="number" step="1" placeholder="+კრ." title="კრედიტების დამატება ამ კვირისთვის (მინუსით აკლდება)"><button class="a-go f-mbadd" title="კრედიტების დამატება ამ კვირისთვის">+კრ.</button></span></div>';
+     '<label style="font-size:12px"><input class="f-bl" type="checkbox"'+(r.blocked?' checked':'')+'> ბლოკი</label><button class="a-go f-save">შენახვა</button><button class="a-go f-reset" title="კრედიტების შევსება მაქსიმუმამდე (ამ კვირის გამოყენება ნულდება)">↺ შევსება</button><span class="f-mbg"><input class="f-mb" type="number" step="1" placeholder="+კრ." title="კრედიტების დამატება ამ კვირისთვის (მინუსით აკლდება)"><button class="a-go f-mbadd" title="კრედიტების დამატება ამ კვირისთვის">+კრ.</button></span></div>';
   }).join('')||'<div class="c-empty">—</div>';
   list.querySelectorAll('.opt-adm-row').forEach(function(row){ var r=admMap[row.getAttribute('data-id')]; if(r) row.querySelector('.f-plan').value=r.plan||'free'; });
 }
@@ -25162,13 +25177,19 @@ document.addEventListener('click',function(e){
     if(!isFinite(add)||add===0){ mbi.focus(); return; }
     mbtn.disabled=true;
     admApi('/admin/add-credits',{uid:uid,credits:add}).then(function(r){
-      admMap[uid]=Object.assign({},r.user,{bonusNow:r.bonus}); mbi.value='';
+      admMap[uid]=Object.assign({},r.user,{bonusNow:r.bonus},r.status?{crUsed:r.status.crUsed,crLimit:r.status.crLimit,crRemaining:r.status.crRemaining,unlimited:r.status.unlimited,effPlan:r.status.plan}:{}); mbi.value=''; setCr(row,admMap[uid]);
       var bn=row.querySelector('.f-bn'); if(bn) bn.textContent=r.bonus>0?' · ბონუსი: +'+r.bonus+' კრედ.':'';
       mbtn.textContent='✓'; setTimeout(function(){ mbtn.textContent='+კრ.'; mbtn.disabled=false; },1400);
     }).catch(function(er){ mbtn.disabled=false; alert(er.message); });
     return;
   }
-  if(e.target.closest('.f-reset')){ admApi('/admin/reset-usage',{uid:uid}).then(function(){ e.target.textContent='✓'; setTimeout(function(){ e.target.textContent='↺'; },1200); }).catch(function(er){ alert(er.message); }); }
+  if(e.target.closest('.f-reset')){
+    var rb=e.target.closest('.f-reset'); rb.disabled=true;
+    admApi('/admin/refill',{uid:uid}).then(function(r){
+      var s2=r.status||{}; admMap[uid]=Object.assign({},admMap[uid]||{plan:'free'},{crUsed:s2.crUsed,crLimit:s2.crLimit,crRemaining:s2.crRemaining,unlimited:s2.unlimited}); setCr(row,admMap[uid]);
+      rb.textContent='✓ შევსდა'; setTimeout(function(){ rb.textContent='↺ შევსება'; rb.disabled=false; },1400);
+    }).catch(function(er){ rb.disabled=false; alert(er.message); });
+  }
 });
 var tabBtn=$('adminTabOptimizer'); if(tabBtn) tabBtn.addEventListener('click',function(){ try{ switchAdminTab('optimizer'); }catch(e){} });
 })();
