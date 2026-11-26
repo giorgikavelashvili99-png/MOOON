@@ -25063,6 +25063,18 @@ $('optDl').addEventListener('click',function(e){
     navigator.share({files:[f]}).catch(function(err){ if(err&&err.name==='AbortError') return; S.noShare=true; msg(iosTxt('fail'),true); });   /* next tap = plain download */
   } else if(inApp()){ msg(iosTxt('app'),true); }
 });
+/* ჩამოტვირთვისას აღწერის ტექსტი ავტომატურად იკოპირება (ყველა ვერსია: 5.1 / 6.1) — დასაპოსტად უბრალოდ ჩასვი description-ში */
+var UPLOAD_TAG='UPLOAD METHOD - @moonaee26';
+var TAG_TXT={ka:'აღწერაში (description) ჩასვი: ',en:'Paste into your description: ',ru:'Вставьте в описание: '};
+function copyUploadTag(){
+  var ok=function(){ try{ var l=document.documentElement.lang; msg((TAG_TXT[l]||TAG_TXT.ka)+UPLOAD_TAG+' ✓'); }catch(e){} };
+  try{
+    if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(UPLOAD_TAG).then(ok,function(){}); return; }
+    var ta=document.createElement('textarea'); ta.value=UPLOAD_TAG; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+    document.body.appendChild(ta); ta.select(); var r=document.execCommand&&document.execCommand('copy'); document.body.removeChild(ta); if(r) ok();
+  }catch(e){}
+}
+$('optDl').addEventListener('click',function(){ if(S.hold&&S.hold.state==='lost') return; copyUploadTag(); });
 document.addEventListener('visibilitychange',function(){ var h=S.hold; if(!document.hidden&&h&&h.state==='held') holdPing(false); });
 window.addEventListener('pagehide',function(ev){
   var h=S.hold; if(!h||h.state!=='held'||ev.persisted) return;
