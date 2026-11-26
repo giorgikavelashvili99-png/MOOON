@@ -32661,7 +32661,9 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var vt=await input.getPrimaryVideoTrack(); if(!vt) throw new Error('novideo');
       if(!(await vt.canDecode())) throw new Error('undecodable');
       var dur=await input.computeDuration(), st=await vt.computePacketStats(200), cs=await vt.getColorSpace(), dc=await vt.getDecoderConfig();
-      return {v:vt.codec,w:vt.displayWidth,h:vt.displayHeight,fps:st.averagePacketRate,dur:dur,hasV:true,colorSpace:cs,codecString:dc&&dc.codec,tenBit:!!(dc&&/\.2\./.test(dc.codec||''))};
+      var codecString=typeof vt.getCodecParameterString==='function'?await vt.getCodecParameterString():null;
+      codecString=codecString||(dc&&dc.codec)||'';
+      return {v:vt.codec,w:vt.displayWidth,h:vt.displayHeight,fps:st.averagePacketRate,dur:dur,hasV:true,colorSpace:cs,codecString:codecString,tenBit:/\.(2|4)\./.test(codecString)||/main.?10|10.?bit/i.test(codecString)};
     })().then(function(info){
       if(done||tk!==S.token) return; done=true; clearTimeout(to);
       S.info=info; S.probing=false; S.wcOK=true; render(); compress();
@@ -32682,12 +32684,13 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var i=S.info||{}, tg=target(), dur=i.dur||(S.meta&&S.meta.dur)||0;
       var input=new M.Input({source:new M.BlobSource(file),formats:M.ALL_FORMATS});
       var sourceTrack=await input.getPrimaryVideoTrack(), sourceCfg=sourceTrack?await sourceTrack.getDecoderConfig():null, sourceColor=sourceTrack?await sourceTrack.getColorSpace():null;
+      var sourceCodecString=sourceTrack&&typeof sourceTrack.getCodecParameterString==='function'?await sourceTrack.getCodecParameterString():null;
       var sameHevc=!!(sourceTrack&&sourceTrack.codec==='hevc'), codec=sameHevc?'hevc':'avc';
       var srcKbps=dur>0?file.size*8/dur/1000:8000;
       var ratio=S.opt.mode==='br'?Math.min(.95,S.opt.br/srcKbps):Math.max(.45,Math.min(.9,.72-(S.opt.rf-14)*.012));
       var kbps=Math.max(300,Math.round(srcKbps*ratio*Math.pow(.8,boost)));
       var vo={codec:codec,quality:new M.Quality({bitrate:kbps*1000,bitrateMode:'variable'}),hardwareAcceleration:'no-preference',latencyMode:'quality',keyFrameInterval:2};
-      if(sameHevc&&sourceCfg&&sourceCfg.codec) vo.fullCodecString=sourceCfg.codec;
+      if(sameHevc&&(sourceCodecString||(sourceCfg&&sourceCfg.codec))) vo.fullCodecString=sourceCodecString||(sourceCfg&&sourceCfg.codec);
       var ow=0,oh=0;
       if(tg&&tg.scaled){ ow=tg.w; oh=tg.h; } else if(i.w&&i.h&&(i.w%2||i.h%2)){ ow=i.w; oh=i.h; }
       if(ow&&oh){ vo.width=ow-ow%2; vo.height=oh-oh%2; vo.fit='contain'; }
@@ -32710,10 +32713,11 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var result=new Blob([buf],{type:'video/mp4'});
       var check=new M.Input({source:new M.BlobSource(result),formats:M.ALL_FORMATS});
       var outTrack=await check.getPrimaryVideoTrack(); if(!outTrack) throw new Error('output video track missing');
-      var outStats=await outTrack.computePacketStats(200), outColor=await outTrack.getColorSpace(), outCfg=await outTrack.getDecoderConfig(), src=S.info||{};
+      var outStats=await outTrack.computePacketStats(200), outColor=await outTrack.getColorSpace(), outCfg=await outTrack.getDecoderConfig(), outCodecString=outTrack&&typeof outTrack.getCodecParameterString==='function'?await outTrack.getCodecParameterString():null, src=S.info||{};
       if(src.w&&src.h&&(outTrack.displayWidth!==src.w||outTrack.displayHeight!==src.h)) throw new Error('resolution changed');
       if(src.v&&outTrack.codec!==src.v) throw new Error('codec changed');
-      if(src.tenBit&&!(outCfg&&/\.2\./.test(outCfg.codec||''))) throw new Error('bit depth changed');
+      outCodecString=outCodecString||(outCfg&&outCfg.codec)||'';
+      if(src.tenBit&&!(/\.(2|4)\./.test(outCodecString)||/main.?10|10.?bit/i.test(outCodecString))) throw new Error('bit depth changed');
       if(src.fps>0&&outStats.averagePacketRate>0&&Math.abs(outStats.averagePacketRate-src.fps)>.1) throw new Error('FPS changed');
       if(Object.keys(color).some(function(k){return outColor[k]!==color[k];})) throw new Error('color profile changed');
       return result;
@@ -32738,10 +32742,10 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var srcKbps=(f&&dur>0)?(f.size*8/dur/1000):8000;
     var ratio=S.opt.mode==='br'?Math.min(.95,S.opt.br/srcKbps):Math.max(.45,Math.min(.9,.72-(S.opt.rf-14)*.012));
     var targetK=Math.max(300,Math.round(srcKbps*ratio*Math.pow(.8,boost)));
-    var hevc=i.v==='hevc', ten=hevc&&(i.tenBit||/\.2\./.test(i.codecString||''));
+    var hevc=i.v==='hevc', ten=hevc&&(i.tenBit||/\.(2|4)\./.test(i.codecString||'')||/main.?10|10.?bit/i.test(i.codecString||''));
     var encoder=hevc?'libx265':'libx264', pix=hevc?(ten?'yuv420p10le':'yuv420p'):'yuv420p';
     var profile=hevc?(ten?'main10':'main'):'high', preset=fast?'ultrafast':(hevc?'ultrafast':'veryfast');
-    var a=['-hide_banner','-stats_period','1','-i',path,'-map','0:v:0','-map','0:a?',
+    var a=['-hide_banner','-stats_period','1','-progress','pipe:1','-nostats','-i',path,'-map','0:v:0','-map','0:a?',
       '-c:v',encoder,'-preset',preset,'-threads','1','-profile:v',profile,'-pix_fmt',pix,
       '-b:v',targetK+'k','-maxrate',Math.round(targetK*1.15)+'k','-bufsize',Math.round(targetK*2)+'k',
       '-fps_mode','passthrough','-c:a','copy','-map_metadata','0','-map_chapters','0','-dn','-sn'];
@@ -32756,8 +32760,15 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function runFF(ff,path,fast){
     var last=0, logs=[];
     function onProg(e){ var p=Number(e&&e.progress); if(!isFinite(p)) return; p=Math.max(0,Math.min(.99,p)); if(p>last){ last=p; setProg(p,false); tick(p); } }
-    function onLog(e){ var m=String(e&&e.message||''); if(logs.length<300) logs.push(m); var f=m.match(/fps=\s*([\d.]+)/); if(f){ S.fps=parseFloat(f[1]); el.Fps.textContent=S.fps>0?S.fps.toFixed(1):'—'; }
-      var fr=m.match(/frame=\s*(\d+)/); if(fr){ var n=+fr[1], inf=S.info||{}, du=inf.dur||(S.meta&&S.meta.dur)||0, tot=Math.round(du*(inf.fps||24)); if(tot>0&&n>0){ el.PS.textContent=(n>=tot*0.98)?'ფაილი სრულდება… (დიდ ფაილზე რამდენიმე წუთი შეიძლება დასჭირდეს, გვერდი არ დახურო)':(n+' / '+tot+' frames'); var p=Math.min(.99,n/tot); if(p>last){ last=p; setProg(p,false); tick(p); } } } }
+    function onLog(e){ var m=String(e&&e.message||''); if(logs.length<300) logs.push(m); var inf=S.info||{}, du=inf.dur||(S.meta&&S.meta.dur)||0;
+      var f=m.match(/fps=\s*([\d.]+)/); if(f){ S.fps=parseFloat(f[1]); el.Fps.textContent=S.fps>0?S.fps.toFixed(1):'—'; }
+      var fr=m.match(/frame=\s*(\d+)/); if(fr){ var n=+fr[1], tot=Math.round(du*(inf.fps||24)); if(tot>0&&n>0){ el.PS.textContent=(n>=tot*0.98)?'ფაილი სრულდება… (დიდ ფაილზე რამდენიმე წუთი შეიძლება დასჭირდეს, გვერდი არ დახურო)':(n+' / '+tot+' frames'); var p=Math.min(.99,n/tot); if(p>last){ last=p; setProg(p,false); tick(p); } } }
+      /* ffmpeg.wasm progress events can stall when compression changes the output size.
+         Read FFmpeg's own output timestamp instead; it tracks processed media time. */
+      var tm=m.match(/out_time_(?:ms|us)=([0-9]+)/), sec=tm?Number(tm[1])/1000000:null;
+      if(sec===null){ var ts=m.match(/out_time=(\d+):(\d+):(\d+(?:\.\d+)?)/); if(ts) sec=Number(ts[1])*3600+Number(ts[2])*60+Number(ts[3]); }
+      if(du>0&&sec!==null&&isFinite(sec)){ var tp=Math.max(0,Math.min(.99,sec/du)); if(tp>last){ last=tp; setProg(tp,false); tick(tp); el.PS.textContent=clock(sec)+' / '+clock(du)+' ვიდეო'; } }
+    }
     function off(){ try{ ff.off('progress',onProg); ff.off('log',onLog); }catch(_){} window.__hbLog=logs.slice(-10).join(' | '); }
     ff.on('progress',onProg); ff.on('log',onLog);
     return ff.exec(buildArgs(path,fast)).then(function(code){
