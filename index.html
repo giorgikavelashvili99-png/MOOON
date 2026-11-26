@@ -35448,6 +35448,7 @@ html body .orb:not(#_a):not(#_a):not(#_a):not(#_a),html body .orb.o1:not(#_a):no
     for(var i=0;i<document.styleSheets.length;i++){
       var sh=document.styleSheets[i];
       if(done.has(sh))continue;
+      if(sh.ownerNode&&sh.ownerNode.id==='neonOrderFrame'){done.add(sh);continue;}
       var rules;try{rules=sh.cssRules;}catch(e){continue;}
       done.add(sh);walk(rules);
     }
@@ -38527,5 +38528,51 @@ html body .pc-slide .pc-card .pc-toggle-btn.pc-toggle-btn.pc-toggle-btn:not(#_za
  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
+
+<style id="neonOrderFrame">
+/* NEON order cards + buttons (all 5 cards, each in its own color). First-declared layer so !important wins. */
+@layer moon-final {
+  html body .pc-card--indiv{--nl:#baff70;--ng:#39ff00;--n1:#12cc12;--n2:#00a000;--nr:0,255,0}
+  html body .pc-card--any{--nl:#a8ecff;--ng:#30c4ff;--n1:#1ea6e6;--n2:#0a85c4;--nr:48,196,255}
+  html body .pc-card--weekly{--nl:#b3c9ff;--ng:#548aff;--n1:#4a80ff;--n2:#2a5ee0;--nr:84,138,255}
+  html body .pc-card--monthly{--nl:#ffe29a;--ng:#ffbe24;--n1:#f5b014;--n2:#d98f00;--nr:255,190,36}
+  html body .pc-card--edit{--nl:#ffb3b3;--ng:#ff5454;--n1:#f03a3a;--n2:#cc1c1c;--nr:255,84,84}
+
+  /* card frame: slightly softer glow */
+  html body :is(.pc-card--indiv,.pc-card--any,.pc-card--weekly,.pc-card--monthly,.pc-card--edit){
+    border:2px solid var(--nl) !important;
+    box-shadow:
+      0 0 4px var(--nl),
+      0 0 8px var(--ng),
+      0 0 16px rgba(var(--nr),0.6),
+      0 0 28px rgba(var(--nr),0.35),
+      inset 0 0 10px rgba(var(--nr),0.35) !important;
+  }
+
+  /* order button: full neon shell, no white line */
+  html body :is(.pc-card--indiv,.pc-card--any,.pc-card--weekly,.pc-card--monthly,.pc-card--edit) .pc-toggle-btn{
+    background:linear-gradient(180deg,var(--n1),var(--n2)) !important;
+    background-image:linear-gradient(180deg,var(--n1),var(--n2)) !important;
+    background-color:var(--n2) !important;
+    border:2px solid var(--nl) !important;
+    box-shadow:
+      0 0 6px var(--nl),
+      0 0 14px var(--ng),
+      0 0 28px var(--ng),
+      0 0 50px rgba(var(--nr),0.95),
+      inset 0 0 14px rgba(var(--nr),0.6) !important;
+    color:#fff !important;
+    text-shadow:none !important;
+  }
+  html body :is(.pc-card--indiv,.pc-card--any,.pc-card--weekly,.pc-card--monthly,.pc-card--edit) .pc-toggle-btn span{color:#fff !important}
+  html body :is(.pc-card--indiv,.pc-card--any,.pc-card--weekly,.pc-card--monthly,.pc-card--edit) .pc-toggle-btn::before,
+  html body :is(.pc-card--indiv,.pc-card--any,.pc-card--weekly,.pc-card--monthly,.pc-card--edit) .pc-toggle-btn::after{
+    content:none !important; display:none !important; background:none !important; box-shadow:none !important;
+  }
+
+  /* room so the glow is not clipped in the slider */
+  html body .pricing-cards.pc-scroll-mode .pc-scroll-track{padding-top:54px !important;padding-bottom:60px !important}
+}
+</style>
 </body>
 </html>
