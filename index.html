@@ -32719,12 +32719,15 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var bad=conv.discardedTracks.filter(function(d){ return d.reason!=='discarded_by_user'; });
       if(!conv.isValid||bad.length) throw new Error('wc-unsupported:'+bad.map(function(d){ return d.track.type+'/'+d.reason; }).join(','));
       var tot=Math.round(dur*(i.fps||30));
+      var gotP=false, stallT=0, stallRej=null, stallP=new Promise(function(_,rj){ stallRej=rj; });
+      stallT=setTimeout(function(){ if(gotP||tk!==S.token) return; try{ conv.cancel(); }catch(_){} stallRej(new Error('wc-stalled (no frames in 20s)')); },20000);
       conv.onProgress=function(p){
+        if(p>0){ gotP=true; clearTimeout(stallT); }
         if(tk!==S.token) return; p=Math.max(0,Math.min(.99,p)); setProg(p,false); tick(p);
         var sec=(Date.now()-S.t0)/1000, n=Math.round(p*tot);
         if(sec>.5&&tot>0){ el.Fps.textContent=(n/sec).toFixed(1); el.PS.textContent=n+' / '+tot+' frames'; }
       };
-      await conv.execute();
+      try{ await Promise.race([conv.execute(),stallP]); } finally { clearTimeout(stallT); }
       if(tk!==S.token) throw new Error('stale');
       var buf=output.target.buffer; if(!buf||!buf.byteLength) throw new Error('empty output');
       var result=new Blob([buf],{type:'video/mp4'});
@@ -32816,7 +32819,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     clearMsg(); wakeTF(); holdScreen();
     var file=S.file, tk=S.token, ff=null;
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
-    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=loaded?t('pSubRun'):loadingHint(); setProg(0,true);
+    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=(loaded?t('pSubRun'):loadingHint())+(S.wcWhy?' ['+S.wcWhy+']':''); setProg(0,true);
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>30&&E.ff){ el.PS.textContent='მუშაობს… ('+Math.round(sec)+'წ) — პირველი პროცენტი ცოტა ხანში გამოჩნდება'; } } },1000);
     getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,false); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
