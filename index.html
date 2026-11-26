@@ -32573,8 +32573,17 @@ html body .mn-view[data-view="compress"]{max-width:680px}
 
   /* ---------- ffmpeg.wasm (same build the optimizer and audio pages use) ---------- */
   var E={p:null,ff:null,urls:null,file:null,path:null,mode:null};
+  function loadingHint(){ var s=t('pSubLoad'); if(!S.wcWhy) return s; var l=L(); return s+' '+(l==='ka'?'სწრაფი რეჟიმი ამ ვიდეოს ვერ კითხულობს; თავსებადი რეჟიმი ჩაიტვირთება.':(l==='ru'?'Быстрый режим не поддерживает это видео; загружается совместимый режим.':'Fast mode cannot read this video; the compatible mode is loading.')); }
   function tfetch(u,ms){ var c=new AbortController(),h=setTimeout(function(){ c.abort(); },ms); return (window.__moonCdnFetch||fetch)(u,{signal:c.signal}).finally(function(){ clearTimeout(h); }); }
-  function blobURL(u,type){ return tfetch(u,240000).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }).then(function(b){ return URL.createObjectURL(new Blob([b],{type:type})); }); }
+  function blobURL(u,type,onProgress){ return tfetch(u,240000).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    var total=Number(r.headers&&r.headers.get('content-length'))||0;
+    if(onProgress) onProgress(0,total,false);
+    if(!r.body||!r.body.getReader) return r.blob().then(function(b){ if(onProgress) onProgress(b.size,total||b.size,true); return URL.createObjectURL(new Blob([b],{type:type})); });
+    var reader=r.body.getReader(), chunks=[], loaded=0;
+    function read(){ return reader.read().then(function(x){ if(x.done){ if(onProgress) onProgress(loaded,total||loaded,true); return URL.createObjectURL(new Blob(chunks,{type:type})); } chunks.push(x.value); loaded+=x.value.byteLength; if(onProgress) onProgress(loaded,total,false); return read(); }); }
+    return read();
+  }); }
   function loadUrls(){
     if(E.urls) return Promise.resolve(E.urls);
     var BASE='https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/', CORE='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm/';
@@ -32582,7 +32591,12 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var m=code.match(/(\d+\.ffmpeg\.js)/), chunk=m?m[1]:'814.ffmpeg.js';
       if(!window.FFmpegWASM){ var s=document.createElement('script'); s.textContent=code; document.head.appendChild(s); s.parentNode.removeChild(s); }
       if(!window.FFmpegWASM) throw new Error('ffmpeg');
-      return Promise.all([blobURL(BASE+chunk,'text/javascript'),blobURL(CORE+'ffmpeg-core.js','text/javascript'),blobURL(CORE+'ffmpeg-core.wasm','application/wasm')]);
+      var loaded=[0,0,0], totals=[0,0,0];
+      function report(index,n,total,done){ loaded[index]=n; if(total>0) totals[index]=total; else if(done) totals[index]=n||1;
+        var ready=totals.every(function(x){return x>0;}), l=loaded.reduce(function(a,b){return a+b;},0), t=totals.reduce(function(a,b){return a+b;},0);
+        if(S.state==='busy'&&el.PS){ if(ready){ var p=Math.min(.99,l/t); setProg(p,false); el.PS.textContent='ძრავის ჩამოტვირთვა '+size(l)+' / '+size(t); } else { setProg(0,true); el.PS.textContent=loadingHint(); } }
+      }
+      return Promise.all([blobURL(BASE+chunk,'text/javascript',function(n,t,d){report(0,n,t,d);}),blobURL(CORE+'ffmpeg-core.js','text/javascript',function(n,t,d){report(1,n,t,d);}),blobURL(CORE+'ffmpeg-core.wasm','application/wasm',function(n,t,d){report(2,n,t,d);})]);
     }).then(function(u){ E.urls=u; return u; });
   }
   function getEngine(){
@@ -32592,8 +32606,9 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     function attempt(v){
       return loadUrls().then(function(u){
         var c=u[1], w=u[2]; if(v===1){ c=JSD+'ffmpeg-core.js'; w=JSD+'ffmpeg-core.wasm'; } if(v===2){ c=UNP+'ffmpeg-core.js'; w=UNP+'ffmpeg-core.wasm'; }
-        var ff=new window.FFmpegWASM.FFmpeg();
-        return ff.load({classWorkerURL:u[0],coreURL:c,wasmURL:w}).then(function(){ return ff; },function(e){ try{ ff.terminate(); }catch(_){} throw e; });
+        var ff=new window.FFmpegWASM.FFmpeg(), timer=0;
+        var loaded=ff.load({classWorkerURL:u[0],coreURL:c,wasmURL:w});
+        return Promise.race([loaded,new Promise(function(_,reject){ timer=setTimeout(function(){ reject(new Error('engine startup timed out')); },60000); })]).then(function(){ clearTimeout(timer); return ff; },function(e){ clearTimeout(timer); try{ ff.terminate(); }catch(_){} throw e; });
       }).catch(function(e){ (E.errs=E.errs||[]).push('v'+v+':'+String(e&&e.message||e)); if(v<2) return attempt(v+1); throw e; });
     }
     E.p=attempt(0).then(function(ff){ E.ff=ff; E.p=null; E.errs=null; return ff; })
@@ -32659,11 +32674,11 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var M=await loadMB();
       var input=new M.Input({source:new M.BlobSource(file),formats:M.ALL_FORMATS});
       var vt=await input.getPrimaryVideoTrack(); if(!vt) throw new Error('novideo');
-      if(!(await vt.canDecode())) throw new Error('undecodable');
+      var browserCanDecode=true; try{ browserCanDecode=!!(await vt.canDecode()); }catch(_){ browserCanDecode=false; }
       var dur=await input.computeDuration(), st=await vt.computePacketStats(200), cs=await vt.getColorSpace(), dc=await vt.getDecoderConfig();
       var codecString=typeof vt.getCodecParameterString==='function'?await vt.getCodecParameterString():null;
       codecString=codecString||(dc&&dc.codec)||'';
-      return {v:vt.codec,w:vt.displayWidth,h:vt.displayHeight,fps:st.averagePacketRate,dur:dur,hasV:true,colorSpace:cs,codecString:codecString,tenBit:/\.(2|4)\./.test(codecString)||/main.?10|10.?bit/i.test(codecString)};
+      return {v:vt.codec,w:vt.displayWidth,h:vt.displayHeight,fps:st.averagePacketRate,dur:dur,hasV:true,colorSpace:cs,codecString:codecString,tenBit:/\.(2|4)\./.test(codecString)||/main.?10|10.?bit/i.test(codecString),browserCanDecode:browserCanDecode};
     })().then(function(info){
       if(done||tk!==S.token) return; done=true; clearTimeout(to);
       S.info=info; S.probing=false; S.wcOK=true; render(); compress();
@@ -32788,7 +32803,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
   function compress(){
     if(S.state!=='ready'||!S.file||S.probing) return;
     if(tinySource()){ S.t0=Date.now(); keepOriginal(S.file); return; }
-    if(S.wcOK&&!S.wcFail&&wcWorthIt()) return compressWC();
+    if(S.wcOK&&!S.wcFail&&(!S.info||S.info.browserCanDecode!==false)&&wcWorthIt()) return compressWC();
     compressWasm();
   }
   function compressWasm(){
@@ -32796,7 +32811,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     clearMsg(); wakeTF(); holdScreen();
     var file=S.file, tk=S.token, ff=null;
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
-    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=(loaded?t('pSubRun'):t('pSubLoad'))+(S.wcWhy?' [WC: '+S.wcWhy+']':''); setProg(0,true);
+    var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=loaded?t('pSubRun'):loadingHint(); setProg(0,true);
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>30&&E.ff){ el.PS.textContent='მუშაობს… ('+Math.round(sec)+'წ) — პირველი პროცენტი ცოტა ხანში გამოჩნდება'; } } },1000);
     getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,false); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
