@@ -32706,7 +32706,8 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var srcKbps=dur>0?file.size*8/dur/1000:8000;
       var ratio=S.opt.mode==='br'?Math.min(.95,S.opt.br/srcKbps):Math.max(.45,Math.min(.9,.72-(S.opt.rf-14)*.012));
       var kbps=Math.max(300,Math.round(srcKbps*ratio*Math.pow(.8,boost)));
-      var vo={codec:codec,quality:new M.Quality({bitrate:kbps*1000,bitrateMode:'variable'}),hardwareAcceleration:'no-preference',latencyMode:'quality',keyFrameInterval:2};
+      var wt=S.wcTry||0;
+      var vo={codec:codec,bitrate:kbps*1000,bitrateMode:wt?'constant':'variable',hardwareAcceleration:wt?'prefer-software':'no-preference',latencyMode:'realtime',keyFrameInterval:2};
       if(sameHevc&&(sourceCodecString||(sourceCfg&&sourceCfg.codec))) vo.fullCodecString=sourceCodecString||(sourceCfg&&sourceCfg.codec);
       var ow=0,oh=0;
       if(tg&&tg.scaled){ ow=tg.w; oh=tg.h; } else if(i.w&&i.h&&(i.w%2||i.h%2)){ ow=i.w; oh=i.h; }
@@ -32719,15 +32720,16 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       var bad=conv.discardedTracks.filter(function(d){ return d.reason!=='discarded_by_user'; });
       if(!conv.isValid||bad.length) throw new Error('wc-unsupported:'+bad.map(function(d){ return d.track.type+'/'+d.reason; }).join(','));
       var tot=Math.round(dur*(i.fps||30));
-      var gotP=false, stallT=0, stallRej=null, stallP=new Promise(function(_,rj){ stallRej=rj; });
-      stallT=setTimeout(function(){ if(gotP||tk!==S.token) return; try{ conv.cancel(); }catch(_){} stallRej(new Error('wc-stalled (no frames in 20s)')); },20000);
+      var gotP=false, lastP=0, stallT=0, stallRej=null, stallP=new Promise(function(_,rj){ stallRej=rj; });
+      function armStall(ms){ clearTimeout(stallT); stallT=setTimeout(function(){ if(tk!==S.token) return; try{ Promise.resolve(conv.cancel()).catch(noop); }catch(_){} stallRej(new Error('wc-stalled (no progress '+(ms/1000)+'s)')); },ms); }
+      armStall(12000);
       conv.onProgress=function(p){
-        if(p>0){ gotP=true; clearTimeout(stallT); }
+        if(p>lastP){ lastP=p; gotP=true; armStall(25000); }
         if(tk!==S.token) return; p=Math.max(0,Math.min(.99,p)); setProg(p,false); tick(p);
         var sec=(Date.now()-S.t0)/1000, n=Math.round(p*tot);
         if(sec>.5&&tot>0){ el.Fps.textContent=(n/sec).toFixed(1); el.PS.textContent=n+' / '+tot+' frames'; }
       };
-      try{ await Promise.race([conv.execute(),stallP]); } finally { clearTimeout(stallT); }
+      var exP=conv.execute(); exP.catch(noop); try{ await Promise.race([exP,stallP]); } finally { clearTimeout(stallT); }
       if(tk!==S.token) throw new Error('stale');
       var buf=output.target.buffer; if(!buf||!buf.byteLength) throw new Error('empty output');
       var result=new Blob([buf],{type:'video/mp4'});
@@ -32755,6 +32757,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
       S.wcWhy=String((e&&e.message)||e).slice(0,140);
       /* HEVC hardware encoding is often unavailable in the browser; software x265 in wasm cannot handle 4K/60 in reasonable time, so retry once with hardware H.264 (8-bit sources only) */
       var si=S.info||{}; if(si.v==='hevc'&&!S.wcAvc&&!si.tenBit&&si.w*si.h>=1920*1080){ S.wcAvc=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWC(); },0); return; }
+      if(!(S.wcTry>=1)&&!/wc-unsupported/.test(S.wcWhy)){ S.wcTry=1; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWC(); },0); return; }
       S.wcFail=true; setState('ready'); setTimeout(function(){ if(tk===S.token) compressWasm(); },0);
     }).then(function(){ E.conv=null; clearInterval(clk); releaseScreen(); });
   }
@@ -32821,9 +32824,9 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     setState('busy'); S.t0=Date.now(); S.fps=0; el.El.textContent='0:00'; el.Eta.textContent='—'; el.Fps.textContent='—';
     var loaded=!!E.ff; el.PT.textContent=loaded?t('pTitleRun'):t('pTitleLoad'); el.PS.textContent=(loaded?t('pSubRun'):loadingHint())+(S.wcWhy?' ['+S.wcWhy+']':''); setProg(0,true);
     clearInterval(clk); clk=setInterval(function(){ if(S.state==='busy'){ var sec=(Date.now()-S.t0)/1000; el.El.textContent=clock(sec); if(!S.fps&&sec>30&&E.ff){ el.PS.textContent='მუშაობს… ('+Math.round(sec)+'წ) — პირველი პროცენტი ცოტა ხანში გამოჩნდება'; } } },1000);
-    getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,false); S.t0=Date.now(); return mountFile(ff,file); })
+    getEngine().then(function(f){ ff=f; if(tk!==S.token) throw new Error('stale'); el.PT.textContent=t('pTitleRun'); el.PS.textContent=t('pSubRun'); setProg(0,true); S.t0=Date.now(); return mountFile(ff,file); })
     .then(function(path){ if(tk!==S.token) throw new Error('stale'); return runFF(ff,path,false); })
-    .then(function(){ if(tk!==S.token) throw new Error('stale'); return probe(ff,'hbout.mp4').then(function(outInfo){ var src=S.info||{}; ['colorRange','colorSpace','colorPrimaries','colorTransfer'].forEach(function(k){ if(src[k]&&outInfo[k]!==src[k]) throw new Error('color profile changed: '+k); }); if(src.v&&outInfo.v!==src.v) throw new Error('codec changed'); if(src.tenBit&&!outInfo.tenBit) throw new Error('bit depth changed'); }); })
+    .then(function(){ if(tk!==S.token) throw new Error('stale'); return probe(ff,'hbout.mp4').then(function(outInfo){ var src=S.info||{}; var cn={avc:'h264',hevc:'hevc',vp9:'vp9',av1:'av1',vp8:'vp8'}; if(src.v&&outInfo.v&&(cn[src.v]||src.v)!==(cn[outInfo.v]||outInfo.v)) throw new Error('codec changed'); }); })
     .then(function(){ if(tk!==S.token) throw new Error('stale'); setProg(1,false); return ff.readFile('hbout.mp4'); })
     .then(function(data){
       if(tk!==S.token) throw new Error('stale');
@@ -32910,7 +32913,7 @@ html body .mn-view[data-view="compress"]{max-width:680px}
     var f=files&&files[0]; if(!f||S.state==='busy') return;
     if(!isVideo(f)){ showMsg(t('notVideo'),'err'); return; }
     if(f.size>MAXB){ showMsg(t('tooBig'),'err'); return; }
-    S.token++; S.boost=0; S.wcOK=false; S.wcFail=false; S.wcWhy=''; var tk=S.token; revokeOut(); S.file=f; S.info=null; S.meta=null; clearMsg(); setThumb(null);
+    S.token++; S.boost=0; S.wcOK=false; S.wcFail=false; S.wcTry=0; S.wcWhy=''; var tk=S.token; revokeOut(); S.file=f; S.info=null; S.meta=null; clearMsg(); setThumb(null);
     setState('ready'); wakeTF();
     makeThumb(f,function(r){ if(tk!==S.token) return; S.meta=r||{}; setThumb(r); render(); });
     analyseFast(f,tk);
