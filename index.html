@@ -7858,7 +7858,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
 
 
   <div class="ql-card" id="ql12" hidden>
-    <div class="ql-row"><label>MOON4K 1.2 მოდელი</label><label class="ql-pick" for="ql12Model"><i>＋</i><span id="ql12Name">აირჩიე მოდელის ფაილი</span></label><input type="file" id="ql12Model" accept=".onnx,application/octet-stream" hidden></div>
+    <div class="ql-row"><label>MOON4K 1.2 მოდელი</label><div class="ql-pick" id="ql12Pick"><i>⬇</i><span id="ql12Name">მოდელის ჩამოტვირთვა (≈5 MB, მხოლოდ ერთხელ)</span></div><input type="file" id="ql12Model" hidden></div>
     <div class="ql-row"><label>კადრი: გამოიყენება ვიდეოს მიმდინარე კადრი</label><button type="button" id="ql12Run" class="ql-run">✦ 1.2-ით გაუმჯობესება</button></div>
     <div id="ql12St" class="ql-sub"></div>
     <canvas id="ql12Out" hidden></canvas>
@@ -7902,7 +7902,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
         <li>ძლიერი ხმაურის მოხსნა</li>
         <li>წვრილი დეტალების და ტექსტურის აღდგენა</li>
         <li>ანიმეც და რეალური ვიდეოც</li>
-        <li><b>რეჟიმი:</b> ახლა მუშაობს ერთ კადრზე — მოდელის ფაილით</li></ul></div>
+        <li><b>რეჟიმი:</b> ახლა მუშაობს ერთ კადრზე · მოდელი ავტომატურად იტვირთება (≈5 MB, ერთხელ)</li></ul></div>
     </div>
   </section>
   <div class="ql-toast" id="qlToast"></div>
@@ -38287,7 +38287,7 @@ function applyEng(){
   $('ql12').hidden=!is12;$('qlCtl').hidden=is12;$('qlRec').hidden=is12;
   if(rec&&rec.state==='recording')rec.stop();
   $('ql12Out').hidden=true;$('ql12Dl').hidden=true;$('ql12St').textContent='';
-  if(is12&&!window.__ql12Tried){window.__ql12Tried=1;try{fetch('moon4k-1.2.onnx').then(function(r){return r.ok?r.arrayBuffer():null}).then(function(b){if(b&&b.byteLength>100000&&window.__ql12Auto)window.__ql12Auto(b)}).catch(function(){})}catch(e){}}
+  if(is12&&window.__ql12Get)window.__ql12Get();
   sizeCanvas();
 }
 function sizeCanvas(){
@@ -38349,12 +38349,33 @@ gpu();
 var $=function(i){return document.getElementById(i)};
 var sess=null,mbuf=null;window.__ql12Auto=function(b){mbuf=b;sess=null;$('ql12Name').textContent='✓ MOON4K 1.2';st('მოდელი ავტომატურად ჩაიტვირთა.')};
 function st(t){$('ql12St').textContent=t}
+var ML=false;
+async function getModel(){
+  if(mbuf||ML)return;ML=true;
+  var U='https://huggingface.co/baker76/upscale-models/resolve/main/RealESR_General_x4.onnx',K='moon4k-1.2-model-v1';
+  try{
+    try{if(window.caches){var c=await caches.open(K),m=await c.match(U);if(m){mbuf=await m.arrayBuffer();sess=null;$('ql12Name').textContent='✓ მოდელი მზადაა';st('მოდელი მზადაა.');ML=false;return}}}catch(e){}
+    st('მოდელი იტვირთება…');$('ql12Name').textContent='იტვირთება…';
+    var r=await fetch(U);if(!r.ok)throw new Error('HTTP '+r.status);
+    var tot=+r.headers.get('content-length')||5000000,rd=r.body.getReader(),ch=[],got=0;
+    for(;;){var x=await rd.read();if(x.done)break;ch.push(x.value);got+=x.value.length;st('მოდელი იტვირთება: '+Math.min(99,Math.round(got/tot*100))+'%')}
+    if(got<1000000)throw new Error('ფაილი არასრულია');
+    var b=new Uint8Array(got),o=0;ch.forEach(function(a){b.set(a,o);o+=a.length});
+    mbuf=b.buffer;sess=null;
+    try{if(window.caches){var c2=await caches.open(K);await c2.put(U,new Response(b.slice(0).buffer))}}catch(e){}
+    $('ql12Name').textContent='✓ მოდელი მზადაა';st('მოდელი ჩამოტვირთულია.');
+  }catch(e){$('ql12Name').textContent='⬇ სცადე თავიდან';st('მოდელის ჩამოტვირთვა ვერ მოხერხდა ('+(e&&e.message||e)+'). შეამოწმე ინტერნეტი.')}
+  ML=false;
+}
+window.__ql12Get=getModel;
+$('ql12Pick').addEventListener('click',getModel);
+
 $('ql12Model').addEventListener('change',function(){var f=this.files[0];if(!f)return;if(!/\.onnx$/i.test(f.name)){mbuf=null;sess=null;this.value='';$('ql12Name').textContent='აირჩიე მოდელის ფაილი';return st('ეს ფაილი ('+f.name+') არ არის MOON4K 1.2 მოდელი. სურათი ან ვიდეო აქ არ გამოდგება.')}f.arrayBuffer().then(function(b){mbuf=b;sess=null;$('ql12Name').textContent='✓ '+f.name;st('მოდელი არჩეულია.')})});
 function loadOrt(){return new Promise(function(res,rej){if(window.ort)return res();var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js';sc.onload=res;sc.onerror=function(){rej(new Error('ძრავა ვერ ჩაიტვირთა (შეამოწმე ინტერნეტი)'))};document.head.appendChild(sc)})}
 $('ql12Run').addEventListener('click',async function(){
   var vid=document.querySelector('#qlStage')&&window.__qlVid&&window.__qlVid();
   if(!vid)return st('ჯერ აირჩიე ვიდეო.');
-  if(!mbuf)return st('ჯერ აირჩიე .onnx მოდელი.');
+  if(!mbuf){await getModel();if(!mbuf)return}
   try{
     st('ვტვირთავ ძრავას…');await loadOrt();
     if(!sess){st('მოდელს ვხსნი…');sess=await ort.InferenceSession.create(mbuf,{executionProviders:['webgpu','wasm']})}
