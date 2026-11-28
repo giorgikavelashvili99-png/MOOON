@@ -38032,90 +38032,34 @@ html body #hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu
 html body #hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu .hzm-promo .hzm-tile{box-shadow:none!important}
 }
 </style>
-
-<style id="moon-footer-v2">
-/* ===== site footer: always the very last thing on the page (never follows views / menu), tidy real-site look ===== */
-html body .wrap:not(#_a):not(#_b){padding-bottom:0!important}
-html body footer:not(#_a):not(#_b):not(#_c):not(#_d){
-  display:flex!important;flex-direction:column;align-items:center;gap:14px;
-  max-width:none!important;width:100%;box-sizing:border-box;
-  margin:56px 0 0 0!important;
-  padding:30px 16px calc(34px + env(safe-area-inset-bottom,0px))!important;
-  border:0!important;position:relative;
-  white-space:normal!important;text-wrap:balance;
-  font-size:13px!important;line-height:1.6!important;letter-spacing:.01em;
-  color:#6f7480!important;text-align:center;
-  background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.025) 100%);
-}
-html body footer:not(#_a):not(#_b):not(#_c):not(#_d)::before{
-  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:min(100%,640px);height:1px;
-  background:linear-gradient(90deg,transparent,rgba(144,170,255,.38),transparent);
-}
-html body footer .lg-foot:not(#_a):not(#_b){
-  order:1;margin:0!important;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 8px;font-size:13px!important;
-}
-html body footer .lg-foot a:not(#_a):not(#_b){
-  display:inline-block;padding:8px 15px;border-radius:999px;
-  color:#aab4d4!important;text-decoration:none;border:1px solid rgba(255,255,255,.08)!important;
-  background:rgba(255,255,255,.03);transition:color .2s,background .2s,border-color .2s,transform .2s;
-}
-html body footer .lg-foot a:not(#_a):not(#_b):hover{
-  color:#fff!important;background:rgba(99,144,248,.14);border-color:rgba(144,170,255,.5)!important;transform:translateY(-1px);
-}
-html body footer .lg-foot span:not(#_a):not(#_b){display:none}
-html body footer > span[data-i18n="footer"]:not(#_a):not(#_b){
-  order:2;display:block;white-space:normal!important;font-size:12.5px!important;color:#6f7480;
-}
-html body footer .ft-lat:not(#_a):not(#_b){color:#8e94a3;font-weight:600;letter-spacing:.06em}
-@media (max-width:700px){
-  html body footer:not(#_a):not(#_b):not(#_c):not(#_d){margin-top:40px!important;padding:26px 14px calc(96px + env(safe-area-inset-bottom,0px))!important;gap:12px}
-  html body footer .lg-foot a:not(#_a):not(#_b){padding:7px 13px;font-size:12.5px}
-}
-html body.mn-view-on .mn-views:not(#_a):not(#_b):not(#_c){min-height:0!important}
-html body.hv-on footer:not(#_a):not(#_b):not(#_c):not(#_d){margin-top:40px!important;padding-top:30px!important}
+<style id="moonMaintCss">
+html.moon-maint,html.moon-maint body{overflow:hidden!important;height:100%!important}
+#moonMaint{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:rgba(2,5,14,.55);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);
+  touch-action:none;user-select:none;-webkit-user-select:none}
+#moonMaint .mm-box{max-width:340px;text-align:center;color:#f2f5ff;font-family:"Noto Sans Georgian","Segoe UI",system-ui,sans-serif;
+  background:rgba(8,12,24,.72);border:1px solid rgba(120,160,255,.25);border-radius:22px;padding:26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#moonMaint .mm-ic{font-size:38px;line-height:1;margin-bottom:10px}
+#moonMaint h2{margin:0 0 8px;font-size:19px;font-weight:800}
+#moonMaint p{margin:0;font-size:14px;line-height:1.5;color:#aab3cc}
+#moonMaint .mm-en{margin-top:10px;font-size:12px;color:#7d86a3}
 </style>
-<script id="moon-footer-v2-js">
-/* pushes the footer down to the bottom edge of the screen when the page content is shorter than the screen
-   (works with the page's html{zoom} values: the zoom factor is measured, not assumed) */
-(function(){
-  var extra=0, raf=0, probe=null;
-  function zoom(){
-    try{
-      if(!probe){probe=document.createElement('div');probe.style.cssText='position:absolute;left:-9999px;top:0;width:10px;height:100px;visibility:hidden;pointer-events:none';document.body.appendChild(probe);}
-      var z=probe.getBoundingClientRect().height/100;
-      return z>0.2&&z<5?z:1;
-    }catch(e){return 1}
-  }
-  function fit(){
-    raf=0;
-    var f=document.querySelector('.wrap > footer');
-    if(!f||getComputedStyle(f).display==='none')return;
-    var z=zoom();
-    var vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
-    vh=Math.max(vh,window.innerHeight);
-    var r=f.getBoundingClientRect();
-    var natural=r.bottom-extra*z;               /* where the footer ends without the extra spacing (screen px) */
-    var need=(vh-natural)/z;
-    var next=need>1?Math.round(need):0;
-    if(Math.abs(next-extra)>1){
-      extra=next;
-      f.style.setProperty('margin-top','calc(56px + '+extra+'px)','important');
-    }
-  }
-  function sched(){ if(!raf) raf=requestAnimationFrame(fit); }
-  function init(){
-    var w=document.querySelector('.wrap'); if(!w){return}
-    sched();
-    window.addEventListener('resize',sched);
-    window.addEventListener('orientationchange',sched);
-    window.addEventListener('load',sched);
-    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sched);
-    if(window.ResizeObserver){var ro=new ResizeObserver(sched);ro.observe(w);var v=document.getElementById('mnViews');if(v)ro.observe(v);}
-    if(window.MutationObserver){new MutationObserver(sched).observe(document.body,{attributes:true,attributeFilter:['class']});new MutationObserver(sched).observe(document.documentElement,{attributes:true,attributeFilter:['class']});}
-    setTimeout(sched,400);setTimeout(sched,1500);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+<div id="moonMaint" role="alertdialog" aria-live="polite" aria-label="Maintenance">
+  <div class="mm-box"><div class="mm-ic">🛠️</div>
+    <h2>მიმდინარეობს ტექნიკური სამუშაოები</h2>
+    <p>საიტი დროებით მიუწვდომელია. გთხოვთ, სცადოთ მოგვიანებით.</p>
+    <p class="mm-en">Technical maintenance in progress. Please check back soon.</p></div>
+</div>
+<script>
+/* ტექნიკური სამუშაოები: გამორთვისთვის დააყენე false (ან წაშალე ეს ბლოკი) */
+(function(){var ON=true;
+  if(!ON){var e=document.getElementById('moonMaint'),s=document.getElementById('moonMaintCss');if(e)e.remove();return}
+  document.documentElement.classList.add('moon-maint');
+  /* ფონზე სკროლი / ტაპები / ღილაკები არ მუშაობდეს */
+  var el=document.getElementById('moonMaint');
+  ['touchmove','wheel'].forEach(function(t){el.addEventListener(t,function(x){x.preventDefault()},{passive:false})});
+  document.addEventListener('keydown',function(x){if(x.key==='Tab')x.preventDefault()},true);
+  var main=document.querySelector('.wrap');if(main){main.setAttribute('inert','');main.setAttribute('aria-hidden','true')}
 })();
 </script>
 </body>
