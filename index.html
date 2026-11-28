@@ -7853,13 +7853,13 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
       <small>ნელი, მძიმე · ღრმა ნეირონული გაუმჯობესება · ანიმე და რეალური ვიდეო</small></button>
   </div>
 
-  <label class="ql-drop" for="qlInput"><b>აირჩიე ვიდეო</b><span>MP4 · MOV · WEBM · MKV</span>
-    <input type="file" id="qlInput" accept="video/*" hidden></label>
+  <label class="ql-drop" for="qlInput"><b>აირჩიე ვიდეო ან ფოტო</b><span>MP4 · MOV · WEBM · JPG · PNG · WEBP</span>
+    <input type="file" id="qlInput" accept="video/*,image/*" hidden></label>
 
 
   <div class="ql-card" id="ql12" hidden>
     <div class="ql-row"><label>MOON4K 1.2 მოდელი</label><div class="ql-pick" id="ql12Pick"><i>⬇</i><span id="ql12Name">მოდელის ჩამოტვირთვა (≈5 MB, მხოლოდ ერთხელ)</span></div><input type="file" id="ql12Model" hidden></div>
-    <div class="ql-row"><label>კადრი: გამოიყენება ვიდეოს მიმდინარე კადრი</label><button type="button" id="ql12Run" class="ql-run">✦ 1.2-ით გაუმჯობესება</button></div>
+    <div class="ql-row"><label>დამუშავდება ფოტო ან ვიდეოს მიმდინარე კადრი</label><button type="button" id="ql12Run" class="ql-run">✦ 1.2-ით გაუმჯობესება</button></div>
     <div id="ql12St" class="ql-sub"></div>
     <div id="ql12Cmp" hidden><div class="ql-cmp"><canvas id="ql12Out"></canvas><canvas id="ql12Orig"></canvas><i id="ql12Ln"></i><span class="ql-lb l">ორიგინალი</span><span class="ql-lb r">MOON4K 1.2</span></div><input type="range" id="ql12Rng" min="0" max="100" value="50" class="ql-rng"></div>
     <a id="ql12Dl" class="ql-run" hidden download="moon4k-1.2.png">⬇ PNG-ის შენახვა</a>
@@ -38256,7 +38256,7 @@ var $=function(i){return document.getElementById(i)};
 var gpuBox=$('qlGpu'),cv=$('qlCanvas'),stage=$('qlStage'),inp=$('qlInput'),info=$('qlInfo'),tz=$('qlToast');
 if(!gpuBox||!cv)return;
 var eng='1.1',scale=2,dev=null,ctx=null,pipe=null,smp=null,ubuf=null,fmt=null,vid=null,url=null,raf=0,rec=null;
-var cmpHold=false;
+var cmpHold=false,isImg=false;
 var P={sharp:.6,thin:.35,den:.3,sat:1.05,con:1.05};
 function toast(t){tz.textContent=t;tz.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){tz.classList.remove('show')},3200)}
 var WGSL='struct U{src:vec2<f32>,sharp:f32,den:f32,thin:f32,sat:f32,con:f32,pad:f32};'+
@@ -38293,7 +38293,7 @@ var ready=null;function gpu(){return ready||(ready=initGPU())}
 
 function applyEng(){
   var is12=(eng==='1.2');
-  $('ql12').hidden=!is12;$('qlCtl').hidden=is12;$('qlRec').hidden=is12;$('qlHold').hidden=is12;
+  $('ql12').hidden=!is12;$('qlCtl').hidden=is12;$('qlRec').hidden=is12||isImg;$('qlHold').hidden=is12;
   if(rec&&rec.state==='recording')rec.stop();
   $('ql12Cmp').hidden=true;$('ql12Dl').hidden=true;$('ql12St').textContent='';
   if(is12&&window.__ql12Get)window.__ql12Get();
@@ -38309,11 +38309,11 @@ function frame(){
   if(!vid||!dev)return;
   if(vid.readyState>=2&&vid.videoWidth){
     dev.queue.writeBuffer(ubuf,0,new Float32Array((eng==='1.2'||cmpHold)?[vid.videoWidth,vid.videoHeight,0,0,0,1,1,0]:[vid.videoWidth,vid.videoHeight,P.sharp,P.den,P.thin,P.sat,P.con,0]));
-    var ext=dev.importExternalTexture({source:vid});
+    var vf=isImg?new VideoFrame(vid,{timestamp:0}):null;var ext=dev.importExternalTexture({source:vf||vid});
     var bg=dev.createBindGroup({layout:pipe.getBindGroupLayout(0),entries:[{binding:0,resource:smp},{binding:1,resource:ext},{binding:2,resource:{buffer:ubuf}}]});
     var enc=dev.createCommandEncoder();
     var pass=enc.beginRenderPass({colorAttachments:[{view:ctx.getCurrentTexture().createView(),loadOp:'clear',storeOp:'store',clearValue:{r:0,g:0,b:0,a:1}}]});
-    pass.setPipeline(pipe);pass.setBindGroup(0,bg);pass.draw(3);pass.end();dev.queue.submit([enc.finish()]);
+    pass.setPipeline(pipe);pass.setBindGroup(0,bg);pass.draw(3);pass.end();dev.queue.submit([enc.finish()]);if(vf)vf.close();
   }
   raf=requestAnimationFrame(frame);
 }
@@ -38321,8 +38321,16 @@ inp.addEventListener('change',async function(){
   var f=inp.files&&inp.files[0];if(!f)return;
   if(!(await gpu()))return toast('WebGPU საჭიროა');
   cancelAnimationFrame(raf);if(url)URL.revokeObjectURL(url);
-  vid=document.createElement('video');vid.muted=true;vid.loop=true;vid.playsInline=true;vid.preload='auto';
-  url=URL.createObjectURL(f);vid.src=url;
+  isImg=/^image\//.test(f.type);
+  $('qlPlay').hidden=isImg;$('qlRec').hidden=isImg||eng==='1.2';
+  url=URL.createObjectURL(f);
+  if(isImg){
+    if(!window.VideoFrame)return toast('ფოტოს რეჟიმი ამ ბრაუზერში მიუწვდომელია (გამოიყენე Chrome)');
+    var im=new Image();
+    im.onload=function(){var c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);c.videoWidth=c.width;c.videoHeight=c.height;c.readyState=4;c.paused=true;c.play=function(){return Promise.resolve()};c.pause=function(){};vid=c;stage.hidden=false;sizeCanvas();frame()};
+    im.onerror=function(){toast('ფოტოს გახსნა ვერ მოხერხდა')};im.src=url;return;
+  }
+  vid=document.createElement('video');vid.muted=true;vid.loop=true;vid.playsInline=true;vid.preload='auto';vid.src=url;
   vid.addEventListener('loadedmetadata',function(){stage.hidden=false;sizeCanvas();vid.play().catch(function(){});frame()});
   vid.addEventListener('error',function(){toast('ვიდეოს გახსნა ვერ მოხერხდა')});
 });
