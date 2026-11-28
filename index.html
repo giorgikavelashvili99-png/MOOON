@@ -24186,7 +24186,7 @@ html body #optView .opt-go .opt-go-cost:empty{display:none}
 'use strict';
 /* ============ CONFIG ============ */
 var CFG = {
-  PATCHER: 'https://patcheri12.onrender.com',
+  PATCHER: 'https://crimson-frost-b178.giorgikavelashvili99.workers.dev',
   GATE: 'https://ancient-frost-1a11.giorgikavelashvili99.workers.dev',                       // <-- ჩასვი დეპლოირებული optimizer-gate worker-ის URL
   UPLOAD_PATH: '/api/optimize',   // patcheri: POST JSON (ticket, preset) -> {success, fps, height}; ვიდეო სერვერზე არ იტვირთება
   JOB_PATH: '/api/jobs/',         // patcheri: GET /api/jobs/:id -> {status, progress, downloadUrl, error}
@@ -24948,7 +24948,7 @@ function callPatcher(payload){
         return pingPatcher().then(function(up){
           throw new Error(up
             ? 'სერვერი ჩანს, მაგრამ ბრაუზერმა მოთხოვნა დაბლოკა (CORS). patcheri-ზე დაამატე Access-Control-Allow-Origin და OPTIONS /api/optimize.'
-            : 'patcheri სერვერი მიუწვდომელია (Render გათიშულია/იძინებს ან ბლოკავს ქსელი). სცადე ცოტა ხანში.');
+            : 'patcheri სერვერი მიუწვდომელია (სერვერი გათიშულია ან ქსელი ბლოკავს). სცადე ცოტა ხანში.');
         });
       }
       throw lastErr;
@@ -38032,35 +38032,5 @@ html body #hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu
 html body #hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu#hzMenu .hzm-promo .hzm-tile{box-shadow:none!important}
 }
 </style>
-<style id="moonMaintCss">
-html.moon-maint,html.moon-maint body{overflow:hidden!important;height:100%!important}
-#moonMaint{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;
-  background:rgba(2,5,14,.55);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);
-  touch-action:none;user-select:none;-webkit-user-select:none}
-#moonMaint .mm-box{max-width:340px;text-align:center;color:#f2f5ff;font-family:"Noto Sans Georgian","Segoe UI",system-ui,sans-serif;
-  background:rgba(8,12,24,.72);border:1px solid rgba(120,160,255,.25);border-radius:22px;padding:26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-#moonMaint .mm-ic{font-size:38px;line-height:1;margin-bottom:10px}
-#moonMaint h2{margin:0 0 8px;font-size:19px;font-weight:800}
-#moonMaint p{margin:0;font-size:14px;line-height:1.5;color:#aab3cc}
-#moonMaint .mm-en{margin-top:10px;font-size:12px;color:#7d86a3}
-</style>
-<div id="moonMaint" role="alertdialog" aria-live="polite" aria-label="Maintenance">
-  <div class="mm-box"><div class="mm-ic">🛠️</div>
-    <h2>მიმდინარეობს ტექნიკური სამუშაოები</h2>
-    <p>საიტი დროებით მიუწვდომელია. გთხოვთ, სცადოთ მოგვიანებით.</p>
-    <p class="mm-en">Technical maintenance in progress. Please check back soon.</p></div>
-</div>
-<script>
-/* ტექნიკური სამუშაოები: გამორთვისთვის დააყენე false (ან წაშალე ეს ბლოკი) */
-(function(){var ON=true;
-  if(!ON){var e=document.getElementById('moonMaint'),s=document.getElementById('moonMaintCss');if(e)e.remove();return}
-  document.documentElement.classList.add('moon-maint');
-  /* ფონზე სკროლი / ტაპები / ღილაკები არ მუშაობდეს */
-  var el=document.getElementById('moonMaint');
-  ['touchmove','wheel'].forEach(function(t){el.addEventListener(t,function(x){x.preventDefault()},{passive:false})});
-  document.addEventListener('keydown',function(x){if(x.key==='Tab')x.preventDefault()},true);
-  var main=document.querySelector('.wrap');if(main){main.setAttribute('inert','');main.setAttribute('aria-hidden','true')}
-})();
-</script>
 </body>
 </html>
