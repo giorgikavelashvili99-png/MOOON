@@ -7858,7 +7858,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
 
 
   <div class="ql-card" id="ql12" hidden>
-    <div class="ql-row"><label>Real-ESRGAN მოდელი (.onnx)</label><input type="file" id="ql12Model" accept=".onnx"></div>
+    <div class="ql-row"><label>MOON4K 1.2 მოდელი</label><label class="ql-pick" for="ql12Model"><i>＋</i><span id="ql12Name">აირჩიე მოდელის ფაილი</span></label><input type="file" id="ql12Model" accept=".onnx,application/octet-stream" hidden></div>
     <div class="ql-row"><label>კადრი: გამოიყენება ვიდეოს მიმდინარე კადრი</label><button type="button" id="ql12Run" class="ql-run">✦ 1.2-ით გაუმჯობესება</button></div>
     <div id="ql12St" class="ql-sub"></div>
     <canvas id="ql12Out" hidden></canvas>
@@ -7902,7 +7902,7 @@ document.addEventListener('moon:user',function(){try{if(window.__moonAcct||docum
         <li>ძლიერი ხმაურის მოხსნა</li>
         <li>წვრილი დეტალების და ტექსტურის აღდგენა</li>
         <li>ანიმეც და რეალური ვიდეოც</li>
-        <li><b>რეჟიმი:</b> ახლა მუშაობს ერთ კადრზე — შენი Real-ESRGAN .onnx მოდელით</li></ul></div>
+        <li><b>რეჟიმი:</b> ახლა მუშაობს ერთ კადრზე — მოდელის ფაილით</li></ul></div>
     </div>
   </section>
   <div class="ql-toast" id="qlToast"></div>
@@ -38236,6 +38236,11 @@ html body .mn-view[data-view="quality"]{max-width:980px}
 #qlView .ql-box ul{padding-left:20px}
 #qlView canvas{max-width:100%;height:auto}
 }
+#qlView .ql-pick{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:13px 14px;border:1.5px dashed rgba(255,255,255,.28);border-radius:12px;background:#0f1117;color:#e8eaf0;font-size:13.5px;cursor:pointer;flex:1;min-width:0}
+#qlView .ql-pick i{font-style:normal;font-size:18px;color:#c6ff3d}
+#qlView .ql-pick span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#qlView .ql-pick:hover{background:#171a23;border-color:#c6ff3d}
+#qlView [hidden]{display:none!important}
 </style>
 <script id="ql-js">
 (function(){
@@ -38277,16 +38282,24 @@ async function initGPU(){
 }
 var ready=null;function gpu(){return ready||(ready=initGPU())}
 
+function applyEng(){
+  var is12=(eng==='1.2');
+  $('ql12').hidden=!is12;$('qlCtl').hidden=is12;$('qlRec').hidden=is12;
+  if(rec&&rec.state==='recording')rec.stop();
+  $('ql12Out').hidden=true;$('ql12Dl').hidden=true;$('ql12St').textContent='';
+  if(is12&&!window.__ql12Tried){window.__ql12Tried=1;try{fetch('moon4k-1.2.onnx').then(function(r){return r.ok?r.arrayBuffer():null}).then(function(b){if(b&&b.byteLength>100000&&window.__ql12Auto)window.__ql12Auto(b)}).catch(function(){})}catch(e){}}
+  sizeCanvas();
+}
 function sizeCanvas(){
   if(!vid||!vid.videoWidth)return;var lim=dev?dev.limits.maxTextureDimension2D:4096;
-  var w=vid.videoWidth*scale,h=vid.videoHeight*scale,k=Math.min(1,lim/w,lim/h);
+  var sc=(eng==='1.2')?1:scale;var w=vid.videoWidth*sc,h=vid.videoHeight*sc,k=Math.min(1,lim/w,lim/h);
   cv.width=Math.round(w*k);cv.height=Math.round(h*k);
-  info.textContent=vid.videoWidth+'×'+vid.videoHeight+' → '+cv.width+'×'+cv.height+' · MOON4K '+eng;
+  info.textContent=vid.videoWidth+'×'+vid.videoHeight+' → '+cv.width+'×'+cv.height+(eng==='1.2'?' · ორიგინალი (1.2-ით დასამუშავებელი კადრი)':' · MOON4K 1.1');
 }
 function frame(){
   if(!vid||!dev)return;
   if(vid.readyState>=2&&vid.videoWidth){
-    dev.queue.writeBuffer(ubuf,0,new Float32Array([vid.videoWidth,vid.videoHeight,P.sharp,P.den,P.thin,P.sat,P.con,0]));
+    dev.queue.writeBuffer(ubuf,0,new Float32Array(eng==='1.2'?[vid.videoWidth,vid.videoHeight,0,0,0,1,1,0]:[vid.videoWidth,vid.videoHeight,P.sharp,P.den,P.thin,P.sat,P.con,0]));
     var ext=dev.importExternalTexture({source:vid});
     var bg=dev.createBindGroup({layout:pipe.getBindGroupLayout(0),entries:[{binding:0,resource:smp},{binding:1,resource:ext},{binding:2,resource:{buffer:ubuf}}]});
     var enc=dev.createCommandEncoder();
@@ -38307,9 +38320,7 @@ inp.addEventListener('change',async function(){
 $('qlEngines').addEventListener('click',function(e){
   var b=e.target.closest('.ql-eng');if(!b)return;
   [].forEach.call(this.children,function(x){x.classList.toggle('is-on',x===b);x.setAttribute('aria-checked',x===b)});
-  eng=b.getAttribute('data-e');
-  $('ql12').hidden=(eng!=='1.2');
-  sizeCanvas();
+  eng=b.getAttribute('data-e');applyEng();
 });
 $('qlScale').addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;scale=+b.getAttribute('data-v');
@@ -38336,16 +38347,16 @@ gpu();
 
 (function(){
 var $=function(i){return document.getElementById(i)};
-var sess=null,mbuf=null;
+var sess=null,mbuf=null;window.__ql12Auto=function(b){mbuf=b;sess=null;$('ql12Name').textContent='✓ MOON4K 1.2';st('მოდელი ავტომატურად ჩაიტვირთა.')};
 function st(t){$('ql12St').textContent=t}
-$('ql12Model').addEventListener('change',function(){var f=this.files[0];if(!f)return;f.arrayBuffer().then(function(b){mbuf=b;sess=null;st('მოდელი არჩეულია: '+f.name)})});
-function loadOrt(){return new Promise(function(res,rej){if(window.ort)return res();var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js';sc.onload=res;sc.onerror=function(){rej(new Error('onnxruntime-web ვერ ჩაიტვირთა'))};document.head.appendChild(sc)})}
+$('ql12Model').addEventListener('change',function(){var f=this.files[0];if(!f)return;if(!/\.onnx$/i.test(f.name)){mbuf=null;sess=null;this.value='';$('ql12Name').textContent='აირჩიე მოდელის ფაილი';return st('ეს ფაილი ('+f.name+') არ არის MOON4K 1.2 მოდელი. სურათი ან ვიდეო აქ არ გამოდგება.')}f.arrayBuffer().then(function(b){mbuf=b;sess=null;$('ql12Name').textContent='✓ '+f.name;st('მოდელი არჩეულია.')})});
+function loadOrt(){return new Promise(function(res,rej){if(window.ort)return res();var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js';sc.onload=res;sc.onerror=function(){rej(new Error('ძრავა ვერ ჩაიტვირთა (შეამოწმე ინტერნეტი)'))};document.head.appendChild(sc)})}
 $('ql12Run').addEventListener('click',async function(){
   var vid=document.querySelector('#qlStage')&&window.__qlVid&&window.__qlVid();
   if(!vid)return st('ჯერ აირჩიე ვიდეო.');
   if(!mbuf)return st('ჯერ აირჩიე .onnx მოდელი.');
   try{
-    st('ვტვირთავ onnxruntime-ს…');await loadOrt();
+    st('ვტვირთავ ძრავას…');await loadOrt();
     if(!sess){st('მოდელს ვხსნი…');sess=await ort.InferenceSession.create(mbuf,{executionProviders:['webgpu','wasm']})}
     var W=vid.videoWidth,H=vid.videoHeight;
     if(W*H>960*540&&!confirm('კადრი დიდია ('+W+'×'+H+'), შეიძლება ძალიან ნელი იყოს. გავაგრძელო?'))return st('გაუქმდა.');
@@ -38367,7 +38378,7 @@ $('ql12Run').addEventListener('click',async function(){
     }
     out.hidden=false;var dl=$('ql12Dl');dl.href=out.toDataURL('image/png');dl.hidden=false;
     st('მზადაა: '+W+'×'+H+' → '+out.width+'×'+out.height+' ('+scale+'×)');
-  }catch(e){st('შეცდომა: '+(e&&e.message||e)+' — მოდელს დინამიკური H/W შესასვლელი უნდა ჰქონდეს (NCHW, 0–1).')}
+  }catch(e){st('შეცდომა: '+(e&&e.message||e)+' — მოდელის ფაილი ვერ გამოიყენება.')}
 });
 })();
 </script>
